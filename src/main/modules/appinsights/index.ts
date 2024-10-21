@@ -8,7 +8,7 @@ export class AppInsights {
       appInsights.setup(config.get('appInsights.instrumentationKey')).setSendLiveMetrics(true).start();
 
       appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] =
-        'pcs-pcs';
+        'rpe-expressjs-template';
       appInsights.defaultClient.trackTrace({
         message: 'App insights activated',
       });

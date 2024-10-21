@@ -18,4 +18,4 @@ FROM base as runtime
 
 COPY --from=build $WORKDIR/src/main ./src/main
 # TODO: expose the right port for your application
-EXPOSE 3101
+EXPOSE 3100
