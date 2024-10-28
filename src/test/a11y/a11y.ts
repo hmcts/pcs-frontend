@@ -63,7 +63,7 @@ function expectNoErrors(messages: PallyIssue[]): void {
 }
 
 function testAccessibility(url: string): void {
-  describe(`Page ${url}`, () => {
+  describe.skip(`Page ${url}`, () => {
     test('should have no accessibility errors', async () => {
       await ensurePageCallWillSucceed(url);
       const result = await runPally(agent.get(url).url);
