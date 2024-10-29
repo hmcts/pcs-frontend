@@ -53,24 +53,22 @@ function runPally(url: string): Promise<Pa11yResult> {
   });
 }
 
-// function expectNoErrors(messages: PallyIssue[]): void {
-//   const errors = messages.filter(m => m.type === 'error');
+function expectNoErrors(messages: PallyIssue[]): void {
+  const errors = messages.filter(m => m.type === 'error');
 
-//   if (errors.length > 0) {
-//     const errorsAsJson = `${JSON.stringify(errors, null, 2)}`;
-//     throw new Error(`There are accessibility issues: \n${errorsAsJson}\n`);
-//   }
-// }
+  if (errors.length > 0) {
+    const errorsAsJson = `${JSON.stringify(errors, null, 2)}`;
+    throw new Error(`There are accessibility issues: \n${errorsAsJson}\n`);
+  }
+}
 
 function testAccessibility(url: string): void {
   describe(`Page ${url}`, () => {
     test('should have no accessibility errors', async () => {
       await ensurePageCallWillSucceed(url);
-      await runPally(agent.get(url).url);
-      // console.log('pa11y results', result);
-      // expect(result.issues).toEqual(expect.any(Array));
-      // expectNoErrors(result.issues);
-      expect(true).toEqual(true);
+      const result = await runPally(agent.get(url).url);
+      expect(result.issues).toEqual(expect.any(Array));
+      expectNoErrors(result.issues);
     });
   });
 }
