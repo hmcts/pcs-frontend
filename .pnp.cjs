@@ -83,7 +83,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:29.7.0"],\
             ["jest-html-reporter", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:3.10.2"],\
             ["jquery", "npm:3.7.1"],\
-            ["lint-staged", "npm:15.2.8"],\
+            ["lint-staged", "npm:15.2.10"],\
             ["lodash", "npm:4.17.21"],\
             ["mini-css-extract-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:2.9.0"],\
             ["nock", "npm:13.5.4"],\
@@ -14378,17 +14378,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["lint-staged", [\
-        ["npm:15.2.8", {\
-          "packageLocation": "./.yarn/cache/lint-staged-npm-15.2.8-cf794cd20d-7077c1ec96.zip/node_modules/lint-staged/",\
+        ["npm:15.2.10", {\
+          "packageLocation": "./.yarn/cache/lint-staged-npm-15.2.10-3374e8211c-7ab255b848.zip/node_modules/lint-staged/",\
           "packageDependencies": [\
-            ["lint-staged", "npm:15.2.8"],\
+            ["lint-staged", "npm:15.2.10"],\
             ["chalk", "npm:5.3.0"],\
             ["commander", "npm:12.1.0"],\
             ["debug", "virtual:b26422bd59fa17e008d6bc0175738ae8cd421c0bdf97531bc9d7ba8df7eb875cf3586702fdab2ad784dd2bd788b2ef7d413cd512768add7bfe10a3e1b04e9659#npm:4.3.7"],\
             ["execa", "npm:8.0.1"],\
             ["lilconfig", "npm:3.1.2"],\
             ["listr2", "npm:8.2.4"],\
-            ["micromatch", "npm:4.0.7"],\
+            ["micromatch", "npm:4.0.8"],\
             ["pidtree", "npm:0.6.0"],\
             ["string-argv", "npm:0.3.2"],\
             ["yaml", "npm:2.5.0"]\
@@ -14956,6 +14956,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/micromatch-npm-4.0.7-28fb7387ee-3cde047d70.zip/node_modules/micromatch/",\
           "packageDependencies": [\
             ["micromatch", "npm:4.0.7"],\
+            ["braces", "npm:3.0.3"],\
+            ["picomatch", "npm:2.3.1"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:4.0.8", {\
+          "packageLocation": "./.yarn/cache/micromatch-npm-4.0.8-c9570e4aca-79920eb634.zip/node_modules/micromatch/",\
+          "packageDependencies": [\
+            ["micromatch", "npm:4.0.8"],\
             ["braces", "npm:3.0.3"],\
             ["picomatch", "npm:2.3.1"]\
           ],\
@@ -16385,7 +16394,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:29.7.0"],\
             ["jest-html-reporter", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:3.10.2"],\
             ["jquery", "npm:3.7.1"],\
-            ["lint-staged", "npm:15.2.8"],\
+            ["lint-staged", "npm:15.2.10"],\
             ["lodash", "npm:4.17.21"],\
             ["mini-css-extract-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:2.9.0"],\
             ["nock", "npm:13.5.4"],\
