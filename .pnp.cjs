@@ -78,7 +78,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["glob", "npm:10.4.5"],\
             ["govuk-frontend", "npm:4.8.0"],\
             ["helmet", "npm:7.1.0"],\
-            ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.0"],\
+            ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.3"],\
             ["husky", "npm:9.0.11"],\
             ["jest", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:29.7.0"],\
             ["jest-html-reporter", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:3.10.2"],\
@@ -12401,17 +12401,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["html-webpack-plugin", [\
-        ["npm:5.6.0", {\
-          "packageLocation": "./.yarn/cache/html-webpack-plugin-npm-5.6.0-4225ed9587-32a6e41da5.zip/node_modules/html-webpack-plugin/",\
+        ["npm:5.6.3", {\
+          "packageLocation": "./.yarn/cache/html-webpack-plugin-npm-5.6.3-57a7b18662-59e7d971b0.zip/node_modules/html-webpack-plugin/",\
           "packageDependencies": [\
-            ["html-webpack-plugin", "npm:5.6.0"]\
+            ["html-webpack-plugin", "npm:5.6.3"]\
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.0", {\
-          "packageLocation": "./.yarn/__virtual__/html-webpack-plugin-virtual-26aef895de/0/cache/html-webpack-plugin-npm-5.6.0-4225ed9587-32a6e41da5.zip/node_modules/html-webpack-plugin/",\
+        ["virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.3", {\
+          "packageLocation": "./.yarn/__virtual__/html-webpack-plugin-virtual-f3a84f54e4/0/cache/html-webpack-plugin-npm-5.6.3-57a7b18662-59e7d971b0.zip/node_modules/html-webpack-plugin/",\
           "packageDependencies": [\
-            ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.0"],\
+            ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.3"],\
             ["@rspack/core", null],\
             ["@types/html-minifier-terser", "npm:6.1.0"],\
             ["@types/rspack__core", null],\
@@ -16380,7 +16380,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["glob", "npm:10.4.5"],\
             ["govuk-frontend", "npm:4.8.0"],\
             ["helmet", "npm:7.1.0"],\
-            ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.0"],\
+            ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.3"],\
             ["husky", "npm:9.0.11"],\
             ["jest", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:29.7.0"],\
             ["jest-html-reporter", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:3.10.2"],\
