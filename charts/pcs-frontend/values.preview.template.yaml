@@ -3,7 +3,6 @@ nodejs:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   environment:
-     REDIS_CLOUD_URL: redis://${SERVICE_NAME}-redis-master:6379
+    REDIS_CLOUD_URL: redis://${SERVICE_NAME}-redis-master:6379
 redis:
   enabled: true
-  
