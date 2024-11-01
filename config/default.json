@@ -3,9 +3,7 @@
   "appInsights": {
     "instrumentationKey": false
   },
-  "secrets": {
-    "pcs": {
-      "redis-connection-string": "redis://localhost:6379"
-    }
+  "pcs": {
+    "redis-connection-string": "redis://localhost:6379"
   }
 }
