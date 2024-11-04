@@ -1,0 +1,5 @@
+{
+  "pcs": {
+    "redis-connection-string": "REDIS_CLOUD_URL"
+  }
+}

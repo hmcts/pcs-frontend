@@ -18,3 +18,4 @@ nodejs:
   #      secrets:
   #        - AppInsightsInstrumentationKey
   environment:
+    REDIS_TTL: 6000
