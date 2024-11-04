@@ -7,6 +7,6 @@ export default async function (app: Application): Promise<void> {
   await redis.set('mykey', 'value');
   app.get('/', async (req, res) => {
     const mykey = await redis.get('mykey');
-    res.render('home', { mykey });
+    res.render('home', { redisKey: mykey });
   });
 }
