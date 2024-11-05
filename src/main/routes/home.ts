@@ -1,10 +1,10 @@
-import config from 'config';
+// import config from 'config';
 import { Application } from 'express';
-import { Redis } from 'ioredis';
+// import { Redis } from 'ioredis';
 
 export default async function (app: Application): Promise<void> {
   app.get('/', async (req, res) => {
-    let logMsg = '';
+    /* let logMsg = '';
     if (!app.locals.redis) {
       try {
         app.locals.redis = new Redis(config.get('pcs.redis-connection-string'), {
@@ -22,7 +22,7 @@ export default async function (app: Application): Promise<void> {
       logMsg += ` - value: ${val}`;
     } catch (err) {
       logMsg += ` ${err.message} - unable to get my key`;
-    }
-    res.render('home', { redisKey: logMsg });
+    } */
+    res.render('home');
   });
 }
