@@ -58,7 +58,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["applicationinsights", "npm:3.2.1"],\
             ["axios", "npm:1.7.3"],\
             ["axios-debug-log", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:1.0.0"],\
-            ["babel-loader", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.1.3"],\
+            ["babel-loader", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.2.1"],\
             ["body-parser", "npm:1.20.2"],\
             ["chai", "npm:4.4.1"],\
             ["chai-as-promised", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:8.0.0"],\
@@ -7571,17 +7571,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["babel-loader", [\
-        ["npm:9.1.3", {\
-          "packageLocation": "./.yarn/cache/babel-loader-npm-9.1.3-cbf4da21df-b168dde5b8.zip/node_modules/babel-loader/",\
+        ["npm:9.2.1", {\
+          "packageLocation": "./.yarn/cache/babel-loader-npm-9.2.1-6cf3231de6-e1858d7625.zip/node_modules/babel-loader/",\
           "packageDependencies": [\
-            ["babel-loader", "npm:9.1.3"]\
+            ["babel-loader", "npm:9.2.1"]\
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.1.3", {\
-          "packageLocation": "./.yarn/__virtual__/babel-loader-virtual-432810aa95/0/cache/babel-loader-npm-9.1.3-cbf4da21df-b168dde5b8.zip/node_modules/babel-loader/",\
+        ["virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.2.1", {\
+          "packageLocation": "./.yarn/__virtual__/babel-loader-virtual-f465504620/0/cache/babel-loader-npm-9.2.1-6cf3231de6-e1858d7625.zip/node_modules/babel-loader/",\
           "packageDependencies": [\
-            ["babel-loader", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.1.3"],\
+            ["babel-loader", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.2.1"],\
             ["@babel/core", "npm:7.26.0"],\
             ["@types/babel__core", null],\
             ["@types/webpack", null],\
@@ -16315,7 +16315,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["applicationinsights", "npm:3.2.1"],\
             ["axios", "npm:1.7.3"],\
             ["axios-debug-log", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:1.0.0"],\
-            ["babel-loader", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.1.3"],\
+            ["babel-loader", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.2.1"],\
             ["body-parser", "npm:1.20.2"],\
             ["chai", "npm:4.4.1"],\
             ["chai-as-promised", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:8.0.0"],\
