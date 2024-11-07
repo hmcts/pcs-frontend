@@ -60,7 +60,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["axios-debug-log", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:1.0.0"],\
             ["babel-loader", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.2.1"],\
             ["body-parser", "npm:1.20.3"],\
-            ["chai", "npm:4.4.1"],\
+            ["chai", "npm:4.5.0"],\
             ["chai-as-promised", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:8.0.0"],\
             ["codeceptjs", "npm:3.5.14"],\
             ["config", "npm:3.3.12"],\
@@ -8311,17 +8311,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["chai", [\
-        ["npm:4.4.1", {\
-          "packageLocation": "./.yarn/cache/chai-npm-4.4.1-ffd006b4b1-9ab84f36eb.zip/node_modules/chai/",\
+        ["npm:4.5.0", {\
+          "packageLocation": "./.yarn/cache/chai-npm-4.5.0-428447e206-70e5a8418a.zip/node_modules/chai/",\
           "packageDependencies": [\
-            ["chai", "npm:4.4.1"],\
+            ["chai", "npm:4.5.0"],\
             ["assertion-error", "npm:1.1.0"],\
             ["check-error", "npm:1.0.3"],\
             ["deep-eql", "npm:4.1.3"],\
             ["get-func-name", "npm:2.0.2"],\
             ["loupe", "npm:2.3.6"],\
             ["pathval", "npm:1.1.1"],\
-            ["type-detect", "npm:4.0.8"]\
+            ["type-detect", "npm:4.1.0"]\
           ],\
           "linkType": "HARD"\
         }],\
@@ -8351,7 +8351,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["chai-as-promised", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:8.0.0"],\
             ["@types/chai", null],\
-            ["chai", "npm:4.4.1"],\
+            ["chai", "npm:4.5.0"],\
             ["check-error", "npm:2.0.0"]\
           ],\
           "packagePeers": [\
@@ -16358,7 +16358,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["axios-debug-log", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:1.0.0"],\
             ["babel-loader", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:9.2.1"],\
             ["body-parser", "npm:1.20.3"],\
-            ["chai", "npm:4.4.1"],\
+            ["chai", "npm:4.5.0"],\
             ["chai-as-promised", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:8.0.0"],\
             ["codeceptjs", "npm:3.5.14"],\
             ["config", "npm:3.3.12"],\
@@ -18285,7 +18285,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["sinon-chai", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:3.7.0"],\
             ["@types/chai", null],\
             ["@types/sinon", null],\
-            ["chai", "npm:4.4.1"],\
+            ["chai", "npm:4.5.0"],\
             ["sinon", "npm:18.0.1"]\
           ],\
           "packagePeers": [\
@@ -19728,6 +19728,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/type-detect-npm-4.0.8-8d8127b901-62b5628bff.zip/node_modules/type-detect/",\
           "packageDependencies": [\
             ["type-detect", "npm:4.0.8"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:4.1.0", {\
+          "packageLocation": "./.yarn/cache/type-detect-npm-4.1.0-171d011a73-3b32f873cd.zip/node_modules/type-detect/",\
+          "packageDependencies": [\
+            ["type-detect", "npm:4.1.0"]\
           ],\
           "linkType": "HARD"\
         }]\
