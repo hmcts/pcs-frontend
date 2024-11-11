@@ -3,7 +3,15 @@
   "appInsights": {
     "instrumentationKey": false
   },
-  "pcs": {
-    "redis-connection-string": "redis://localhost:6379"
+  "node-env": "development",
+  "session": {
+    "prefix": "pcs-session",
+    "ttlInSeconds": 1200,
+    "cookieName": "pcs_session"
+  },
+  "secrets": {
+    "pcs": {
+      "redis-connection-string": "redis://localhost:6379"
+    }
   }
 }

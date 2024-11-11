@@ -1,5 +1,12 @@
 {
-  "pcs": {
-    "redis-connection-string": "REDIS_CLOUD_URL"
+  "secrets": {
+    "pcs": {
+      "redis-connection-string": "REDIS_CLOUD_URL"
+    }
+  },
+  "node-env": "NODE_ENV",
+  "session": {
+    "prefix": "REDIS_SESSION_PREFIX",
+    "ttlInSeconds": "REDIS_TTL"
   }
 }
