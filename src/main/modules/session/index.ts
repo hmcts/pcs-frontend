@@ -18,8 +18,6 @@ export class Session {
       const redis = new Redis(config.get('secrets.pcs.redis-connection-string'));
       app.locals.redisClient = redis;
 
-      //redis.on('error', (err: typeof Error) => console.error('REDIS ERROR', err));
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const redisStore = new (RedisStore as any)({
         client: redis,
