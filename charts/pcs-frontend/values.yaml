@@ -16,7 +16,7 @@ nodejs:
   keyVaults:
     pcs:
       secrets:
-      - redis-connection-string
+        - redis-connection-string
   #   - AppInsightsInstrumentationKey
   environment:
     REDIS_TTL: 6000
