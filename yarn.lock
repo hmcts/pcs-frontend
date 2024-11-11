@@ -2591,12 +2591,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:0.54.1":
-  version: 0.54.1
-  resolution: "@opentelemetry/api-logs@npm:0.54.1"
+"@opentelemetry/api-logs@npm:0.54.2":
+  version: 0.54.2
+  resolution: "@opentelemetry/api-logs@npm:0.54.2"
   dependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: da3d2bd36f138ec1a56ea34b1601c6bf30be22f443b3a24f5df2cf293ed3f2601fb01ff00cb34a4ef08bd955b78f8259243dc757195f9ace7af4196896d32291
+  checksum: 6af14100932147d2296c7de1a16e14be528e0cb85cde79884967a777c0f0e2610aa130b04e48e5deec0a442c5a3966863a9da82ac40631755014f45cec5c8973
   languageName: node
   linkType: hard
 
@@ -2879,11 +2879,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation@npm:0.54.1":
-  version: 0.54.1
-  resolution: "@opentelemetry/instrumentation@npm:0.54.1"
+"@opentelemetry/instrumentation@npm:0.54.2":
+  version: 0.54.2
+  resolution: "@opentelemetry/instrumentation@npm:0.54.2"
   dependencies:
-    "@opentelemetry/api-logs": 0.54.1
+    "@opentelemetry/api-logs": 0.54.2
     "@types/shimmer": ^1.2.0
     import-in-the-middle: ^1.8.1
     require-in-the-middle: ^7.1.1
@@ -2891,7 +2891,7 @@ __metadata:
     shimmer: ^1.2.1
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 3109540b953aa8d06c8e57882c9af240be475a28d7a3245de8d93667997e70c2a528b72f75af8faaa82436690068aa8a6caaa65ca0aa329429d0b3c9ae6e703e
+  checksum: c8ebf9eab5dc16c51a937367f6c21e22068b863d44d72c8b1f7615750ad526218229c30ab3c90c376c2cc03ee17cae3949a6f6ed987486511a13a3bef100e6b6
   languageName: node
   linkType: hard
 
