@@ -27,7 +27,7 @@ export class Session {
     });
     sessionMiddleware.store = redisStore;
 
-    if (config.get('node-env').toLowerCase() === 'production' && sessionMiddleware.cookie) {
+    if (config.get<string>('node-env').toLowerCase() === 'production' && sessionMiddleware.cookie) {
       sessionMiddleware.cookie.secure = true; // serve secure cookies
     }
 
