@@ -16,11 +16,7 @@ nodejs:
     pcs:
       secrets:
         - name: app-insights-connection-string
-        - name: api-POSTGRES-PASS
-          alias: PCS_DB_PASSWORD
+        - name: redis-connection-string
   environment:
     REDIS_TTL: 6000
-    PCS_DB_USER_NAME: pgadmin
-    PCS_DB_NAME: pcs
-    DRAFT_STORE_DB_CONN_OPTIONS: ?sslmode=require&gssEncMode=disable
-    PCS_DB_HOST: pcs-{{ .Values.global.environment }}.postgres.database.azure.com
+    REDIS_HOST: 'pcs-{{ .Values.global.environment }}.redis.cache.windows.net'
