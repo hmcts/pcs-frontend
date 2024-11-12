@@ -76,7 +76,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["express", "npm:4.21.1"],\
             ["express-nunjucks", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:3.1.2"],\
             ["glob", "npm:10.4.5"],\
-            ["govuk-frontend", "npm:4.8.0"],\
+            ["govuk-frontend", "npm:4.9.0"],\
             ["helmet", "npm:7.1.0"],\
             ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.3"],\
             ["husky", "npm:9.0.11"],\
@@ -12265,10 +12265,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["govuk-frontend", [\
-        ["npm:4.8.0", {\
-          "packageLocation": "./.yarn/cache/govuk-frontend-npm-4.8.0-48d4f1031d-e255f924f3.zip/node_modules/govuk-frontend/",\
+        ["npm:4.9.0", {\
+          "packageLocation": "./.yarn/cache/govuk-frontend-npm-4.9.0-c8763a0d08-f70cf65d91.zip/node_modules/govuk-frontend/",\
           "packageDependencies": [\
-            ["govuk-frontend", "npm:4.8.0"]\
+            ["govuk-frontend", "npm:4.9.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -16611,7 +16611,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["express", "npm:4.21.1"],\
             ["express-nunjucks", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:3.1.2"],\
             ["glob", "npm:10.4.5"],\
-            ["govuk-frontend", "npm:4.8.0"],\
+            ["govuk-frontend", "npm:4.9.0"],\
             ["helmet", "npm:7.1.0"],\
             ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.3"],\
             ["husky", "npm:9.0.11"],\
