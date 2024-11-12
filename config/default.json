@@ -3,7 +3,7 @@
   "appInsights": {
     "instrumentationKey": false
   },
-  "node-env": "development",
+  "node-env": "dev",
   "session": {
     "prefix": "pcs-session",
     "ttlInSeconds": 1200,
