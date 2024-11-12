@@ -14,21 +14,20 @@ export class Session {
       name: config.get('session.cookieName'),
     };
 
+    const redis = new Redis(config.get('secrets.pcs.redis-connection-string'));
+    redis.on('error', (err: typeof Error) => console.error('REDIS ERROR', err));
+    app.locals.redisClient = redis;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const redisStore = new (RedisStore as any)({
+      client: redis,
+      prefix: config.get('session.prefix') + ':',
+      ttl: config.get('session.ttlInSeconds'),
+    });
+    sessionMiddleware.store = redisStore;
+
     if (config.get('node-env') === 'production') {
-      const redis = new Redis(config.get('secrets.pcs.redis-connection-string'));
-      app.locals.redisClient = redis;
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const redisStore = new (RedisStore as any)({
-        client: redis,
-        prefix: config.get('session.prefix') + ':',
-        ttl: config.get('session.ttlInSeconds'),
-      });
-      sessionMiddleware.store = redisStore;
-
-      if (sessionMiddleware.cookie) {
-        sessionMiddleware.cookie.secure = true; // serve secure cookies
-      }
+      sessionMiddleware.cookie.secure = true; // serve secure cookies
     }
 
     app.use(session(sessionMiddleware));
