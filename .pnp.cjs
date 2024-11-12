@@ -77,7 +77,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["express-nunjucks", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:3.1.2"],\
             ["glob", "npm:10.4.5"],\
             ["govuk-frontend", "npm:4.9.0"],\
-            ["helmet", "npm:7.1.0"],\
+            ["helmet", "npm:7.2.0"],\
             ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.3"],\
             ["husky", "npm:9.0.11"],\
             ["ioredis", "npm:5.4.1"],\
@@ -5796,7 +5796,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-helmet-npm-4.0.0-48d8baa6ce-ded60d8d99.zip/node_modules/@types/helmet/",\
           "packageDependencies": [\
             ["@types/helmet", "npm:4.0.0"],\
-            ["helmet", "npm:7.1.0"]\
+            ["helmet", "npm:8.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -12444,10 +12444,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["helmet", [\
-        ["npm:7.1.0", {\
-          "packageLocation": "./.yarn/cache/helmet-npm-7.1.0-0f9f70fa93-16aaa0df99.zip/node_modules/helmet/",\
+        ["npm:7.2.0", {\
+          "packageLocation": "./.yarn/cache/helmet-npm-7.2.0-c5ff2da1c6-d09247a28e.zip/node_modules/helmet/",\
           "packageDependencies": [\
-            ["helmet", "npm:7.1.0"]\
+            ["helmet", "npm:7.2.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:8.0.0", {\
+          "packageLocation": "./.yarn/cache/helmet-npm-8.0.0-ba86ece81a-1a7ef94d35.zip/node_modules/helmet/",\
+          "packageDependencies": [\
+            ["helmet", "npm:8.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -16612,7 +16619,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["express-nunjucks", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:3.1.2"],\
             ["glob", "npm:10.4.5"],\
             ["govuk-frontend", "npm:4.9.0"],\
-            ["helmet", "npm:7.1.0"],\
+            ["helmet", "npm:7.2.0"],\
             ["html-webpack-plugin", "virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.6.3"],\
             ["husky", "npm:9.0.11"],\
             ["ioredis", "npm:5.4.1"],\
