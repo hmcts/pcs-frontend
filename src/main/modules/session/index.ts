@@ -1,8 +1,8 @@
 import config from 'config';
-import RedisStore from 'connect-redis';
+// import RedisStore from 'connect-redis';
 import type { Express } from 'express';
 import session from 'express-session';
-import { Redis } from 'ioredis';
+// import { Redis } from 'ioredis';
 
 export class Session {
   enableFor(app: Express): void {
@@ -14,22 +14,23 @@ export class Session {
       name: config.get('session.cookieName'),
     };
 
-    const redis = new Redis(config.get('secrets.pcs.redis-connection-string'));
     console.log('conn str = ', config.get('secrets.pcs.redis-connection-string'), process.env.REDIS_CLOUD_URL);
-    redis.on('error', (err: typeof Error) => console.error('REDIS ERROR', err));
-    app.locals.redisClient = redis;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const redisStore = new (RedisStore as any)({
-      client: redis,
-      prefix: config.get('session.prefix') + ':',
-      ttl: config.get('session.ttlInSeconds'),
-    });
-    sessionMiddleware.store = redisStore;
+    // const redis = new Redis(config.get('secrets.pcs.redis-connection-string'));
+    // redis.on('error', (err: typeof Error) => console.error('REDIS ERROR', err));
+    // app.locals.redisClient = redis;
 
-    if (config.get<string>('node-env').toLowerCase() === 'production' && sessionMiddleware.cookie) {
-      sessionMiddleware.cookie.secure = true; // serve secure cookies
-    }
+    // // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // const redisStore = new (RedisStore as any)({
+    //   client: redis,
+    //   prefix: config.get('session.prefix') + ':',
+    //   ttl: config.get('session.ttlInSeconds'),
+    // });
+    // sessionMiddleware.store = redisStore;
+
+    // if (config.get<string>('node-env').toLowerCase() === 'production' && sessionMiddleware.cookie) {
+    //   sessionMiddleware.cookie.secure = true; // serve secure cookies
+    // }
 
     app.use(session(sessionMiddleware));
   }
