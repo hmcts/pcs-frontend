@@ -15,7 +15,7 @@ nodejs:
   keyVaults:
     pcs:
       secrets:
-        - name: app-insights-connection-string
+#        - name: app-insights-connection-string TODO: Re enable when app insights is working.
         - name: redis-connection-string
   environment:
     REDIS_TTL: 6000
