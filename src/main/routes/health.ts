@@ -13,6 +13,7 @@ export default function (app: Application): void {
     checks: {
       redis: healthcheck.raw(() => {
         if (app.locals.redisClient) {
+          app.locals.redisClient.ping((err: typeof Error, response: string) => console.log(err, response));
           return app.locals.redisClient.ping() ? healthcheck.up() : healthcheck.down();
         }
         return healthcheck.up();
