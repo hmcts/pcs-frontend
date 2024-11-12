@@ -12,12 +12,12 @@ nodejs:
   aadIdentityName: pcs
   ingressHost: pcs-frontend.{{ .Values.global.environment }}.platform.hmcts.net
   image: 'hmctspublic.azurecr.io/pcs/frontend:latest',
-    keyVaults:
-      pcs:
-        secrets:
-          - AppInsightsInstrumentationKey
-          - name: api-POSTGRES-PASS
-            alias: PCS_DB_PASSWORD
+  keyVaults:
+    pcs:
+      secrets:
+        - AppInsightsInstrumentationKey
+        - name: api-POSTGRES-PASS
+          alias: PCS_DB_PASSWORD
   environment:
     REDIS_TTL: 6000
     PCS_DB_USER_NAME: pgadmin
