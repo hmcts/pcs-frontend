@@ -17,7 +17,6 @@ export class Session {
     if (config.get('node-env') === 'production') {
       const redis = new Redis(config.get('secrets.pcs.redis-connection-string'));
       app.locals.redisClient = redis;
-      connectedClient = 'RedisStore';
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const redisStore = new (RedisStore as any)({
