@@ -16,7 +16,7 @@ export class Session {
 
     const redis = new Redis(config.get('secrets.pcs.redis-connection-string'));
     console.log('conn str = ', config.get('secrets.pcs.redis-connection-string'), process.env.REDIS_CLOUD_URL);
-    redis.on('error', (err: typeof Error) => console.error('REDIS ERROR', err));
+    redis.on('error', (err: Error) => console.error('REDIS ERROR', err));
     app.locals.redisClient = redis;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,7 +27,8 @@ export class Session {
     });
     sessionMiddleware.store = redisStore;
 
-    if (config.get('node-env') === 'production' && sessionMiddleware.cookie) {
+    //if (config.get('node-env') === 'production' && sessionMiddleware.cookie) {
+    if (config.get('node-env').toLowerCase() === 'production' && sessionMiddleware.cookie) {
       sessionMiddleware.cookie.secure = true; // serve secure cookies
     }
 
