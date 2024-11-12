@@ -12,10 +12,16 @@ nodejs:
   aadIdentityName: pcs
   ingressHost: pcs-frontend.{{ .Values.global.environment }}.platform.hmcts.net
   image: 'hmctspublic.azurecr.io/pcs/frontend:latest'
-  #  Uncomment once the vault containing the app insights key has been set up
-  #  keyVaults:
-  #    pcs:
-  #      secrets:
-  #        - AppInsightsInstrumentationKey
+    Uncomment once the vault containing the app insights key has been set up
+    keyVaults:
+      pcs:
+        secrets:
+          - AppInsightsInstrumentationKey
+          - name: api-POSTGRES-PASS
+            alias: PCS_DB_PASSWORD
   environment:
     REDIS_TTL: 6000
+    PCS_DB_USER_NAME: pgadmin
+    PCS_DB_NAME: pcs
+    DRAFT_STORE_DB_CONN_OPTIONS: ?sslmode=require&gssEncMode=disable
+    PCS_DB_HOST: pcs-{{ .Values.global.environment }}.postgres.database.azure.com
