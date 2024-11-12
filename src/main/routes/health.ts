@@ -11,7 +11,17 @@ function shutdownCheck(): boolean {
 export default function (app: Application): void {
   const healthCheckConfig = {
     checks: {
-      redis: healthcheck.raw(() => (app.locals.redisClient.ping() ? healthcheck.up() : healthcheck.down())),
+      redis: healthcheck.raw(() => {
+        app.locals.redisClient.ping((err: typeof Error | null, response: string) => {
+          if (err) {
+            console.error('Redis health check failed:', err);
+            return healthcheck.down();
+          }
+
+          console.log('Redis health check response:', response);
+          return response === 'PONG' ? healthcheck.up() : healthcheck.down();
+        });
+      }),
     },
     readinessChecks: {
       shutdownCheck: healthcheck.raw(() => {
