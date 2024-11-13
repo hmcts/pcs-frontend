@@ -17,13 +17,15 @@ export class Session {
       ttl: config.get('session.ttlInSeconds'),
     });
 
+    const secure = config.get<string>('node-env').toLowerCase() === 'production';
+
     const sessionMiddleware: session.SessionOptions = {
       secret: 'PCS-SECRET', //TODO: replace this
       resave: false,
       saveUninitialized: false,
       cookie: {
-        sameSite: 'strict',
-        secure: config.get<string>('node-env').toLowerCase() === 'production',
+        sameSite: secure ? 'strict' : 'lax',
+        secure,
       },
       name: config.get('session.cookieName'),
       store: redisStore,
