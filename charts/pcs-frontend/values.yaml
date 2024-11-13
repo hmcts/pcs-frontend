@@ -12,11 +12,14 @@ nodejs:
   aadIdentityName: pcs
   ingressHost: pcs-frontend.{{ .Values.global.environment }}.platform.hmcts.net
   image: 'hmctspublic.azurecr.io/pcs/frontend:latest'
+  #  Uncomment once the vault containing the app insights key has been set up
   keyVaults:
     pcs:
       secrets:
-        - name: redis-connection-string
-        # - name: app-insights-connection-string TODO: Re enable when app insights is working.
+        - redis-connection-string
+        - pcs-session-secret
+  #   - AppInsightsInstrumentationKey
   environment:
     REDIS_TTL: 6000
+    REDIS_SESSION_PREFIX: 'pcs'
     REDIS_HOST: 'pcs-{{ .Values.global.environment }}.redis.cache.windows.net'
