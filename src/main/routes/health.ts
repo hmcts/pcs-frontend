@@ -14,14 +14,15 @@ export default function (app: Application): void {
   const healthCheckConfig = {
     checks: {
       redis: healthcheck.raw(() => {
-        app.locals.redisClient.ping((err: typeof Error | null, response: string) => {
-          if (err) {
-            logger.error('Redis health check failed:', err);
-            return healthcheck.down();
-          }
-          logger.info('redis ping response', response);
-          return response === 'PONG' ? healthcheck.up() : healthcheck.down();
-        });
+        return app.locals.redisClient
+          .ping()
+          .then((_: string) => {
+            return healthcheck.status(_ === 'PONG');
+          })
+          .catch((error: typeof Error) => {
+            logger.errorWithReq(null, 'health_check_error', 'Health check failed on redis', error);
+            return false;
+          });
       }),
     },
     readinessChecks: {
