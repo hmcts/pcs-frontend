@@ -11,6 +11,7 @@
   },
   "secrets": {
     "pcs": {
+      "pcs-session-secret": "pcs-supersecret",
       "redis-connection-string": "redis://localhost:6379"
     }
   }
