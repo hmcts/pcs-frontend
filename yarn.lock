@@ -3734,6 +3734,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/connect-redis@npm:^0.0.23":
+  version: 0.0.23
+  resolution: "@types/connect-redis@npm:0.0.23"
+  dependencies:
+    "@types/express": "*"
+    "@types/express-session": "*"
+    "@types/node": "*"
+    "@types/redis": ^2.8.0
+    ioredis: ^5.3.0
+  checksum: 56ae04700217e579e47b14711f3d7ffd21c54ced77ab0ebf3feb8d8903a0c854c6a63bb2f7d27f0eaec3224a7b725b14e52ebfbecd529e38c05b6e6e5947c1dd
+  languageName: node
+  linkType: hard
+
 "@types/connect@npm:*":
   version: 3.4.35
   resolution: "@types/connect@npm:3.4.35"
@@ -3827,6 +3840,15 @@ __metadata:
     "@types/range-parser": "*"
     "@types/send": "*"
   checksum: cc8995d10c6feda475ec1b3a0e69eb0f35f21ab6b49129ad5c6f279e0bc5de8175bc04ec51304cb79a43eec3ed2f5a1e01472eb6d5f827b8c35c6ca8ad24eb6e
+  languageName: node
+  linkType: hard
+
+"@types/express-session@npm:*, @types/express-session@npm:^1.18.0":
+  version: 1.18.0
+  resolution: "@types/express-session@npm:1.18.0"
+  dependencies:
+    "@types/express": "*"
+  checksum: f624bc956d223eda618dc3ee5908cfc91d5cf67252aa83e667c1260b96c2d2ac302407d57d2a57b29728a21bf521f09c6409da5e727509c01a2b50d7a012f0a1
   languageName: node
   linkType: hard
 
@@ -4051,6 +4073,15 @@ __metadata:
   version: 1.2.4
   resolution: "@types/range-parser@npm:1.2.4"
   checksum: b7c0dfd5080a989d6c8bb0b6750fc0933d9acabeb476da6fe71d8bdf1ab65e37c136169d84148034802f48378ab94e3c37bb4ef7656b2bec2cb9c0f8d4146a95
+  languageName: node
+  linkType: hard
+
+"@types/redis@npm:^2.8.0":
+  version: 2.8.32
+  resolution: "@types/redis@npm:2.8.32"
+  dependencies:
+    "@types/node": "*"
+  checksum: 2b12103e05977941870c9a248f6ea51f4b7ad7e0f16a7403799c2ed1b3e63b60f693c39f9186be0ea02776934c4595ddcd2a5bde41e530aaad42d26449f6a669
   languageName: node
   linkType: hard
 
@@ -6560,6 +6591,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"connect-redis@npm:^7.1.1":
+  version: 7.1.1
+  resolution: "connect-redis@npm:7.1.1"
+  peerDependencies:
+    express-session: ">=1"
+  checksum: ac91ee818d0f467866b6982f66b3423fee58de9da3562618f6d1df2ddeea426354c1efe70b3f799be1b52e3cc67f2043b9ae203678fd3ff9db5dff44b078f0ca
+  languageName: node
+  linkType: hard
+
 "console-control-strings@npm:^1.1.0":
   version: 1.1.0
   resolution: "console-control-strings@npm:1.1.0"
@@ -6611,6 +6651,13 @@ __metadata:
   version: 1.0.6
   resolution: "cookie-signature@npm:1.0.6"
   checksum: f4e1b0a98a27a0e6e66fd7ea4e4e9d8e038f624058371bf4499cfcd8f3980be9a121486995202ba3fca74fbed93a407d6d54d43a43f96fd28d0bd7a06761591a
+  languageName: node
+  linkType: hard
+
+"cookie-signature@npm:1.0.7":
+  version: 1.0.7
+  resolution: "cookie-signature@npm:1.0.7"
+  checksum: 1a62808cd30d15fb43b70e19829b64d04b0802d8ef00275b57d152de4ae6a3208ca05c197b6668d104c4d9de389e53ccc2d3bc6bcaaffd9602461417d8c40710
   languageName: node
   linkType: hard
 
@@ -7158,7 +7205,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"depd@npm:2.0.0":
+"depd@npm:2.0.0, depd@npm:~2.0.0":
   version: 2.0.0
   resolution: "depd@npm:2.0.0"
   checksum: abbe19c768c97ee2eed6282d8ce3031126662252c58d711f646921c9623f9052e3e1906443066beec1095832f534e57c523b7333f8e7e0d93051ab6baef5ab3a
@@ -8296,6 +8343,22 @@ __metadata:
     express: ^4.19.2
     nunjucks: ^3.2.4
   checksum: cccec33d2644032cf806907ea0764a67e829773e5baf69d70d754fd776782952f7935d63419433fe402365ae79e2fba6a5547264463f6e1b054b9732e7f6a63e
+  languageName: node
+  linkType: hard
+
+"express-session@npm:^1.18.1":
+  version: 1.18.1
+  resolution: "express-session@npm:1.18.1"
+  dependencies:
+    cookie: 0.7.2
+    cookie-signature: 1.0.7
+    debug: 2.6.9
+    depd: ~2.0.0
+    on-headers: ~1.0.2
+    parseurl: ~1.3.3
+    safe-buffer: 5.2.1
+    uid-safe: ~2.1.5
+  checksum: e712cb3399300d9e300b51769ee3e81da6a4a54acc39137945134bf61a452f27ee9afde337f3c0f300457a88b3a12d0b5c711625684d7c8d998e9d2bd34d9e18
   languageName: node
   linkType: hard
 
@@ -9874,7 +9937,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ioredis@npm:^5.4.1":
+"ioredis@npm:^5.3.0, ioredis@npm:^5.4.1":
   version: 5.4.1
   resolution: "ioredis@npm:5.4.1"
   dependencies:
@@ -12681,6 +12744,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"on-headers@npm:~1.0.2":
+  version: 1.0.2
+  resolution: "on-headers@npm:1.0.2"
+  checksum: 2bf13467215d1e540a62a75021e8b318a6cfc5d4fc53af8e8f84ad98dbcea02d506c6d24180cd62e1d769c44721ba542f3154effc1f7579a8288c9f7873ed8e5
+  languageName: node
+  linkType: hard
+
 "once@npm:^1.3.0, once@npm:^1.3.1, once@npm:^1.4.0":
   version: 1.4.0
   resolution: "once@npm:1.4.0"
@@ -13150,10 +13220,12 @@ __metadata:
     "@types/body-parser": ^1.19.2
     "@types/chai-as-promised": ^7.1.5
     "@types/config": ^3.3.0
+    "@types/connect-redis": ^0.0.23
     "@types/cookie-parser": ^1.4.3
     "@types/csurf": ^1.11.2
     "@types/es6-promisify": ^6.0.1
     "@types/express": ^4.17.17
+    "@types/express-session": ^1.18.0
     "@types/glob": ^8.1.0
     "@types/helmet": ^4.0.0
     "@types/jest": ^29.5.14
@@ -13174,6 +13246,7 @@ __metadata:
     chai-as-promised: ^8.0.0
     codeceptjs: ^3.5.3
     config: ^3.3.9
+    connect-redis: ^7.1.1
     cookie-parser: ^1.4.6
     copy-webpack-plugin: 9.1.0
     css-loader: ^7.0.0
@@ -13185,6 +13258,7 @@ __metadata:
     eslint-plugin-jest: ^28.0.0
     express: ^4.18.2
     express-nunjucks: ^3.1.1
+    express-session: ^1.18.1
     glob: ^10.3.3
     govuk-frontend: 4.9.0
     helmet: ^7.0.0
@@ -16331,7 +16405,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uid-safe@npm:2.1.5":
+"uid-safe@npm:2.1.5, uid-safe@npm:~2.1.5":
   version: 2.1.5
   resolution: "uid-safe@npm:2.1.5"
   dependencies:

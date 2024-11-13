@@ -1,28 +1,19 @@
-// import config from 'config';
-import { Application } from 'express';
-// import { Redis } from 'ioredis';
+import { Application, type Request, type Response } from 'express';
 
-export default async function (app: Application): Promise<void> {
-  app.get('/', async (req, res) => {
-    /* let logMsg = '';
-    if (!app.locals.redis) {
-      try {
-        app.locals.redis = new Redis(config.get('pcs.redis-connection-string'), {
-          maxRetriesPerRequest: 3,
-        });
-        await app.locals.redis.set('mykey', 'value');
-      } catch (error) {
-        logMsg = `${error.message} - Unable to connect and Set to redis`;
-        app.locals.redis.disconnect();
-      }
+declare module 'express-session' {
+  export interface SessionData {
+    views: number;
+  }
+}
+
+export default function (app: Application): void {
+  app.get('/', (req: Request, res: Response) => {
+    if (req.session.views) {
+      req.session.views++;
+    } else {
+      req.session.views = 1;
     }
 
-    try {
-      const val = await app.locals.redis.get('mykey');
-      logMsg += ` - value: ${val}`;
-    } catch (err) {
-      logMsg += ` ${err.message} - unable to get my key`;
-    } */
-    res.render('home');
+    res.render('home', { views: req.session.views });
   });
 }
