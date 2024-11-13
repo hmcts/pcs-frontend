@@ -4,10 +4,13 @@ import type { Express } from 'express';
 import session from 'express-session';
 import { Redis } from 'ioredis';
 
+const { Logger } = require('@hmcts/nodejs-logging');
+
 export class Session {
+  logger = Logger.getLogger('session');
   enableFor(app: Express): void {
     const redis = new Redis(config.get<string>('secrets.pcs.redis-connection-string'));
-    redis.on('error', (err: typeof Error) => console.error('REDIS ERROR', err));
+    redis.on('error', (err: typeof Error) => this.logger.error('REDIS ERROR', err));
     app.locals.redisClient = redis;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
