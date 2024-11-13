@@ -6,7 +6,7 @@ import { Redis } from 'ioredis';
 
 export class Session {
   enableFor(app: Express): void {
-    const redis = new Redis(config.get('secrets.pcs.redis-connection-string'));
+    const redis = new Redis(config.get<string>('secrets.pcs.redis-connection-string'));
     redis.on('error', (err: typeof Error) => console.error('REDIS ERROR', err));
     app.locals.redisClient = redis;
 
@@ -20,14 +20,14 @@ export class Session {
     const secure = config.get<string>('node-env').toLowerCase() === 'production';
 
     const sessionMiddleware: session.SessionOptions = {
-      secret: 'PCS-SECRET', //TODO: replace this
+      secret: config.get<string>('secrets.pcs.pcs-session-secret'),
       resave: false,
       saveUninitialized: false,
       cookie: {
         sameSite: secure ? 'strict' : 'lax',
         secure,
       },
-      name: config.get('session.cookieName'),
+      name: config.get<string>('session.cookieName'),
       store: redisStore,
     };
 
