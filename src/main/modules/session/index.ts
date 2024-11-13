@@ -1,8 +1,8 @@
 import config from 'config';
-// import RedisStore from 'connect-redis';
+import RedisStore from 'connect-redis';
 import type { Express } from 'express';
 import session from 'express-session';
-// import { Redis } from 'ioredis';
+import { Redis } from 'ioredis';
 
 export class Session {
   enableFor(app: Express): void {
@@ -28,9 +28,9 @@ export class Session {
      });
      sessionMiddleware.store = redisStore;
 
-     if (config.get<string>('node-env').toLowerCase() === 'production' && sessionMiddleware.cookie) {
-       sessionMiddleware.cookie.secure = true; // serve secure cookies
-     }
+    if (config.get<string>('node-env').toLowerCase() === 'production' && sessionMiddleware.cookie) {
+      sessionMiddleware.cookie.secure = true; // serve secure cookies
+    }
 
     app.use(session(sessionMiddleware));
   }
