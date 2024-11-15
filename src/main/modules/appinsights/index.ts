@@ -10,7 +10,7 @@ export class AppInsights {
         .setSendLiveMetrics(true)
         .start();
 
-      appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = 'pcs-frontend';
+      appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRoleName] = 'pcs-frontend';
       appInsights.defaultClient.trackTrace({
         message: 'App insights activated',
       });
