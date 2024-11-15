@@ -18,7 +18,7 @@ nodejs:
       secrets:
         - redis-connection-string
         - pcs-session-secret
-  #   - AppInsightsInstrumentationKey
+        - app-insights-connection-string
   environment:
     REDIS_TTL: 6000
     REDIS_SESSION_PREFIX: 'pcs'

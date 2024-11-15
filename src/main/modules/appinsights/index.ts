@@ -4,8 +4,11 @@ const appInsights = require('applicationinsights');
 
 export class AppInsights {
   enable(): void {
-    if (config.get('appInsights.instrumentationKey')) {
-      appInsights.setup(config.get('appInsights.instrumentationKey')).setSendLiveMetrics(true).start();
+    if (config.has<string>('secrets.pcs.app-insights-connection-string')) {
+      appInsights
+        .setup(config.get<string>('secrets.pcs.app-insights-connection-string'))
+        .setSendLiveMetrics(true)
+        .start();
 
       appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = 'pcs-frontend';
       appInsights.defaultClient.trackTrace({
