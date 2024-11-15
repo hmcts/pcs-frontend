@@ -31,6 +31,7 @@ version
 
 .eslintcache
 
+.pnp.*
 .yarn/*
 .yarn/install-state.gz
 !.yarn/cache/*
