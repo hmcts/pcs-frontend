@@ -1,5 +1,5 @@
 services:
-  frontend:
+  pcs-frontend:
     build:
       context: .
       args:
@@ -9,19 +9,19 @@ services:
     ports:
       - '3209:3209'
     depends_on:
-      pcs-frontend-cache:
+      cache:
         condition: service_healthy
     environment:
-      - REDIS_CONNECTION_STRING=redis://pcs-frontend-cache:6379
+      - REDIS_CONNECTION_STRING=redis://cache:6379
     networks:
-      - frontend-network
+      - pcs-frontend-network
 
-  pcs-frontend-cache:
-    image: bitnami/redis:7.4.1
+  cache:
+    image: bitnami/redis:6.2.16
     ports:
       - '6379:6379'
     volumes:
-      - frontend-cache-data:/bitnami/redis/data
+      - cache-data:/bitnami/redis/data
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     healthcheck:
@@ -30,11 +30,11 @@ services:
       timeout: 2s
       retries: 10
     networks:
-      - frontend-network
+      - pcs-frontend-network
 
 networks:
-  frontend-network:
+  pcs-frontend-network:
     driver: bridge
 
 volumes:
-  frontend-cache-data:
+  cache-data:
