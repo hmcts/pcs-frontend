@@ -19,13 +19,13 @@ services:
   pcs-frontend-cache:
     image: bitnami/redis:7.4.1
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - frontend-cache-data:/bitnami/redis/data
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 3s
       timeout: 2s
       retries: 10
