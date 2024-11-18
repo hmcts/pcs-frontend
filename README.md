@@ -46,10 +46,9 @@ Run the application by executing the following command:
 docker-compose up
 ```
 
-This will start the frontend container exposing the application's port
-(set to `3209` in this template app).
+This will start the frontend container exposing the application's port on `3209`, and a redis instance on port `6379`.
 
-In order to test if the application is up, you can visit https://localhost:3209 in your browser.
+In order to test if the application is up, you can visit http://localhost:3209/ in your browser.
 You should get a very basic home page (no styles, etc.).
 
 ## Developing

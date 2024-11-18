@@ -1,8 +1,5 @@
-version: '2'
-
 services:
-  # TODO: change this name to match the name of your app
-  frontend:
+  pcs-frontend:
     build:
       context: .
       args:
@@ -10,5 +7,34 @@ services:
         - https_proxy
         - no_proxy
     ports:
-      # TODO: change this mapping to map the port your application listens on
       - '3209:3209'
+    depends_on:
+      cache:
+        condition: service_healthy
+    environment:
+      - REDIS_CONNECTION_STRING=redis://cache:6379
+    networks:
+      - pcs-frontend-network
+
+  cache:
+    image: bitnami/redis:6.2.16
+    ports:
+      - '6379:6379'
+    volumes:
+      - cache-data:/bitnami/redis/data
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      timeout: 2s
+      retries: 10
+    networks:
+      - pcs-frontend-network
+
+networks:
+  pcs-frontend-network:
+    driver: bridge
+
+volumes:
+  cache-data:

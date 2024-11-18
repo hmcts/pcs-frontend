@@ -9,7 +9,8 @@ const { Logger } = require('@hmcts/nodejs-logging');
 export class Session {
   logger = Logger.getLogger('session');
   enableFor(app: Express): void {
-    const redis = new Redis(config.get<string>('secrets.pcs.redis-connection-string'));
+    const redisConnectionString = config.get<string>('secrets.pcs.redis-connection-string');
+    const redis = new Redis(redisConnectionString);
     redis.on('error', (err: typeof Error) => this.logger.error('REDIS ERROR', err));
     app.locals.redisClient = redis;
 
