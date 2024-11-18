@@ -11,10 +11,8 @@ export class Session {
   enableFor(app: Express): void {
     const redisConnectionString =
       process.env.REDIS_CONNECTION_STRING || config.get<string>('secrets.pcs.redis-connection-string');
-    this.logger.info(`Connecting to Redis at: ${redisConnectionString}`);
     const redis = new Redis(redisConnectionString);
     redis.on('error', (err: typeof Error) => this.logger.error('REDIS ERROR', err));
-    redis.on('connect', () => this.logger.info('Successfully connected to Redis'));
     app.locals.redisClient = redis;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
