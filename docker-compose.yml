@@ -17,7 +17,7 @@ services:
       - frontend-network
 
   pcs-frontend-cache:
-    image: bitnami/redis:latest
+    image: bitnami/redis:7.4.1
     ports:
       - "6379:6379"
     volumes:
