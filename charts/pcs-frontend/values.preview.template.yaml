@@ -4,6 +4,6 @@ nodejs:
   ingressHost: ${SERVICE_FQDN}
   disableKeyVaults: true
   environment:
-    REDIS_CLOUD_URL: redis://${SERVICE_NAME}-redis-master:6379
+    REDIS_CONNECTION_STRING: redis://${SERVICE_NAME}-redis-master:6379
 redis:
   enabled: true
