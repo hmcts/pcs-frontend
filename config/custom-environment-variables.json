@@ -1,7 +1,7 @@
 {
   "secrets": {
     "pcs": {
-      "redis-connection-string": "REDIS_CLOUD_URL"
+      "redis-connection-string": "REDIS_CONNECTION_STRING"
     }
   },
   "node-env": "NODE_ENV",
