@@ -125,7 +125,7 @@ Here's an example setup:
     "security": {
       "referrerPolicy": "origin",
     }
-``` 
+```
 
 Make sure you have those values set correctly for your application.
 
