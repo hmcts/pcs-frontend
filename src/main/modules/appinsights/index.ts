@@ -9,9 +9,6 @@ export class AppInsights {
 
       appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = 'pcs-frontend';
       appInsights.start();
-      appInsights.defaultClient.trackTrace({
-        message: 'App insights activated',
-      });
     }
   }
 }
