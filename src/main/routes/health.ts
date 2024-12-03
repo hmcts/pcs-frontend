@@ -1,9 +1,32 @@
 import { app as myApp } from '../app';
 
+import config from 'config';
 import { Application } from 'express';
+import { OK } from 'http-status-codes';
 
 const healthcheck = require('@hmcts/nodejs-healthcheck');
 const { Logger } = require('@hmcts/nodejs-logging');
+const appInsights = require('applicationinsights');
+
+const healthTimeout: number = config.get('health.timeout');
+const healthDeadline: number = config.get('health.deadline');
+
+const apiUrl: string = config.get('api.url');
+const apiHealthUrl = `${apiUrl}/health`;
+const apiReadinessUrl = `${apiHealthUrl}/readiness`;
+
+const healthOptions = (message: string) => {
+  return {
+    callback: (error: Error, res: Response) => {
+      if (error) {
+        appInsights.trackTrace(`health_check_error: ${message} and error: ${error}`);
+      }
+      return !error && res.status === OK ? healthcheck.up() : healthcheck.down(error);
+    },
+    timeout: healthTimeout,
+    deadline: healthDeadline,
+  };
+};
 
 function shutdownCheck(): boolean {
   return myApp.locals.shutdown;
@@ -11,6 +34,7 @@ function shutdownCheck(): boolean {
 
 export default function (app: Application): void {
   const logger = Logger.getLogger('health');
+
   const healthCheckConfig = {
     checks: {
       redis: healthcheck.raw(() => {
@@ -24,11 +48,13 @@ export default function (app: Application): void {
             return false;
           });
       }),
+      'pcs-api': healthcheck.web(apiHealthUrl, healthOptions('Health check failed on pcs-api:')),
     },
     readinessChecks: {
       shutdownCheck: healthcheck.raw(() => {
         return shutdownCheck() ? healthcheck.down() : healthcheck.up();
       }),
+      'pcs-api': healthcheck.web(apiReadinessUrl, healthOptions('Readiness check failed on pcs-api:')),
     },
   };
 
