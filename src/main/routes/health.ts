@@ -54,8 +54,7 @@ export default function (app: Application): void {
       shutdownCheck: healthcheck.raw(() => {
         return shutdownCheck() ? healthcheck.down() : healthcheck.up();
       }),
-      'pcs-api': healthcheck.web(apiReadinessUrl, healthOptions('Readiness check failed on pcs-api:')),
-    },
+    }
   };
 
   healthcheck.addTo(app, healthCheckConfig);
