@@ -14,9 +14,7 @@
     "deadline": 15000
   },
   "api": {
-    "url": "http://pcs-api-aat.service.core-compute-aat.internal",
-    "retries": 3,
-    "delay": 2000
+    "url": "http://pcs-api-aat.service.core-compute-aat.internal"
   },
   "secrets": {
     "pcs": {
