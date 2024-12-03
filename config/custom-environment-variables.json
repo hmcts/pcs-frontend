@@ -4,6 +4,9 @@
       "redis-connection-string": "REDIS_CONNECTION_STRING"
     }
   },
+  "api": {
+    "url": "PCS_API_URL"
+  },
   "node-env": "NODE_ENV",
   "session": {
     "prefix": "REDIS_SESSION_PREFIX",
