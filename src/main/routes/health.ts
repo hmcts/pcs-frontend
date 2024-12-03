@@ -13,7 +13,6 @@ const healthDeadline: number = config.get('health.deadline');
 
 const apiUrl: string = config.get('api.url');
 const apiHealthUrl = `${apiUrl}/health`;
-const apiReadinessUrl = `${apiHealthUrl}/readiness`;
 
 const healthOptions = (message: string) => {
   return {
