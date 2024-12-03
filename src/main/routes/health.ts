@@ -18,7 +18,7 @@ const healthOptions = (message: string) => {
   return {
     callback: (error: Error, res: Response) => {
       if (error) {
-        appInsights.trackTrace(`health_check_error: ${message} and error: ${error}`);
+        appInsights.defaultClient.trackTrace(`health_check_error: ${message} and error: ${error}`);
       }
       return !error && res.status === OK ? healthcheck.up() : healthcheck.down(error);
     },
