@@ -10,7 +10,7 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 withPipeline(type, product, component) {
   onPR() {
-    afterAlways('FunctionalTestPreview') {
+    afterAlways('functionalTest:preview') {
       stage('Publish Test Results') {
         try {
           publishHTML([
