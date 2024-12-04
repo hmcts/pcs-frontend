@@ -1,4 +1,4 @@
-import { Application, type Request } from 'express';
+import { Application, type Response } from 'express';
 
 declare module 'express-session' {
   export interface SessionData {
@@ -7,11 +7,8 @@ declare module 'express-session' {
 }
 
 export default function (app: Application): void {
-  app.get('/', (req: Request) => {
-    if (req.session.views) {
-      return;
-    } else {
-      return;
-    }
+  app.get('/', (res: Response) => {
+
+    res.render('home',);
   });
 }
