@@ -8,7 +8,6 @@ declare module 'express-session' {
 
 export default function (app: Application): void {
   app.get('/', (res: Response) => {
-
-    res.render('home',);
+    res.render('home');
   });
 }
