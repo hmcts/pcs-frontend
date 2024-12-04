@@ -9,6 +9,13 @@
     "ttlInSeconds": 1200,
     "cookieName": "pcs_session"
   },
+  "health": {
+    "timeout": 10000,
+    "deadline": 15000
+  },
+  "api": {
+    "url": "http://pcs-api-aat.service.core-compute-aat.internal"
+  },
   "secrets": {
     "pcs": {
       "pcs-session-secret": "pcs-supersecret",
