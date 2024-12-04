@@ -1,5 +1,6 @@
-import config from 'config';
 import { AppInsights } from '../../../../main/modules/appinsights';
+
+import config from 'config';
 
 jest.mock('applicationinsights', () => {
   const setup = jest.fn().mockReturnThis();
@@ -38,7 +39,9 @@ describe('AppInsights', () => {
     expect(appInsightsModule.setup).toHaveBeenCalledWith('fake-connection-string');
     expect(appInsightsModule.setSendLiveMetrics).toHaveBeenCalledWith(true);
     expect(appInsightsModule.start).toHaveBeenCalled();
-    expect(appInsightsModule.defaultClient.context.tags[appInsightsModule.defaultClient.context.keys.cloudRole]).toBe('pcs-frontend');
+    expect(appInsightsModule.defaultClient.context.tags[appInsightsModule.defaultClient.context.keys.cloudRole]).toBe(
+      'pcs-frontend'
+    );
   });
 
   it('should not enable Application Insights when connection string is not provided', () => {

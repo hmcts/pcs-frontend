@@ -1,8 +1,10 @@
 import * as os from 'os';
+
+import infoRoute from '../../../main/routes/info';
+
+import { InfoContributor, infoRequestHandler } from '@hmcts/info-provider';
 import config from 'config';
 import { Router } from 'express';
-import { InfoContributor, infoRequestHandler } from '@hmcts/info-provider';
-import infoRoute from '../../../main/routes/info';
 
 jest.mock('os');
 jest.mock('config');
@@ -33,10 +35,7 @@ describe('info route', () => {
   it('should set up the /info route with the correct handler', () => {
     infoRoute(app);
 
-    expect(app.get).toHaveBeenCalledWith(
-      '/info',
-      expect.any(Function)
-    );
+    expect(app.get).toHaveBeenCalledWith('/info', expect.any(Function));
 
     const handler = (app.get as jest.Mock).mock.calls[0][1];
     const req = {};
