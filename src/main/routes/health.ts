@@ -53,7 +53,7 @@ export default function (app: Application): void {
       shutdownCheck: healthcheck.raw(() => {
         return shutdownCheck() ? healthcheck.down() : healthcheck.up();
       }),
-    }
+    },
   };
 
   healthcheck.addTo(app, healthCheckConfig);
