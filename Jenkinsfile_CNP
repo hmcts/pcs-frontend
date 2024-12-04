@@ -10,6 +10,22 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 withPipeline(type, product, component) {
   onPR() {
-
+    afterAlways('FunctionalTestPreview') {
+      stage('Publish Test Results') {
+        try {
+          publishHTML([
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "playwright-report",
+            reportFiles          : 'index.html',
+            reportName           : 'Manage Cases Chrome E2E Smoke Test Report'
+          ])
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+        } catch (Error) {
+          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+        }
+      }
+    }
   }
 }
