@@ -9021,6 +9021,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"http-status-codes@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "http-status-codes@npm:2.3.0"
+  checksum: dae3b99e0155441b6df28e8265ff27c56a45f82c6092f736414233e9ccf063d5ea93c1e1279e8b499c4642e2538b37995c76b1640ed3f615d0e2883d3a1dcfd5
+  languageName: node
+  linkType: hard
+
 "https-proxy-agent@npm:5.0.1, https-proxy-agent@npm:^5.0.0":
   version: 5.0.1
   resolution: "https-proxy-agent@npm:5.0.1"
@@ -12603,6 +12610,7 @@ __metadata:
     govuk-frontend: 4.9.0
     helmet: ^7.0.0
     html-webpack-plugin: ^5.5.3
+    http-status-codes: ^2.3.0
     husky: ^9.0.0
     ioredis: ^5.4.1
     jest: ^29.6.2
