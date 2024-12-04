@@ -19,7 +19,26 @@ withPipeline(type, product, component) {
             keepAll              : true,
             reportDir            : "playwright-report",
             reportFiles          : 'index.html',
-            reportName           : 'Manage Cases Chrome E2E Smoke Test Report'
+            reportName           : 'PCS Frontend Functional Test Report'
+          ])
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+        } catch (Error) {
+          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+        }
+      }
+    }
+  }
+  onMaster() {
+    afterAlways('functionalTest:aat') {
+      stage('Publish Test Results') {
+        try {
+          publishHTML([
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "playwright-report",
+            reportFiles          : 'index.html',
+            reportName           : 'PCS Frontend Functional Test Report'
           ])
           steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
         } catch (Error) {
