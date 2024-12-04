@@ -76,6 +76,7 @@
     "@babel/preset-env": "^7.22.14",
     "@codeceptjs/allure-legacy": "^1.0.2",
     "@codeceptjs/configure": "^1.0.0",
+    "@playwright/test": "^1.49.0",
     "@types/chai-as-promised": "^8.0.0",
     "@types/jest": "^29.5.14",
     "@types/supertest": "^6.0.0",
@@ -127,5 +128,5 @@
     "*.{js,ts}": "eslint --cache --fix",
     "*.{js,ts,css,md,html,json}": "prettier --write"
   },
-  "packageManager": "yarn@3.8.6"
+  "packageManager": "yarn@4.5.3"
 }
