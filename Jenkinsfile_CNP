@@ -9,9 +9,38 @@ def component = "frontend"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 withPipeline(type, product, component) {
-  afterSuccess('build') {
-    yarnBuilder.yarn('playwright install')
-    yarnBuilder.yarn('rebuild puppeteer')
-    yarnBuilder.yarn('build')
+  onPR() {
+    afterAlways('functionalTest:preview') {
+      try {
+        publishHTML([
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : "playwright-report",
+          reportFiles          : 'index.html',
+          reportName           : 'PCS Frontend Functional Test Report'
+        ])
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+      } catch (Error) {
+        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+      }
+    }
+  }
+  onMaster() {
+    afterAlways('functionalTest:aat') {
+      try {
+        publishHTML([
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : "playwright-report",
+          reportFiles          : 'index.html',
+          reportName           : 'PCS Frontend Functional Test Report'
+        ])
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+      } catch (Error) {
+        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+      }
+    }
   }
 }
