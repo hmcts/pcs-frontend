@@ -3290,7 +3290,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
+"@types/node@npm:*, @types/node@npm:^22.0.0":
   version: 22.10.1
   resolution: "@types/node@npm:22.10.1"
   dependencies:
@@ -3299,7 +3299,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.0.0, @types/node@npm:^20.1.0":
+"@types/node@npm:^20.1.0":
   version: 20.17.9
   resolution: "@types/node@npm:20.17.9"
   dependencies:
@@ -12577,7 +12577,7 @@ __metadata:
     "@types/helmet": ^4.0.0
     "@types/jest": ^29.5.14
     "@types/lodash": ^4.14.197
-    "@types/node": ^20.0.0
+    "@types/node": ^22.0.0
     "@types/nunjucks": ^3.2.3
     "@types/require-directory": ^2.1.2
     "@types/serve-favicon": ^2.5.4
