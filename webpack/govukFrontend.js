@@ -15,8 +15,10 @@ const copyGovukTemplateAssets = new CopyWebpackPlugin({
   patterns: [
     { from: images, to: 'assets/images' },
     { from: fonts, to: 'assets/fonts' },
+    { from: `${assets}/manifest.json`, to: 'assets' },
     { from: `${root}/template.njk`, to: '../views/govuk' },
     { from: `${root}/components`, to: '../views/govuk/components' },
+    { from: `${root}/macros`, to: '../views/govuk/macros' },
   ],
 });
 
