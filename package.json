@@ -115,7 +115,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "resolutions": {
-    "@opentelemetry/instrumentation": "0.55.0",
+    "@opentelemetry/instrumentation": "0.56.0",
     "semver": "^7.5.2",
     "axios": ">1.6.0"
   },
