@@ -41,7 +41,7 @@
     "@types/nunjucks": "^3.2.3",
     "@types/require-directory": "^2.1.2",
     "@types/serve-favicon": "^2.5.4",
-    "applicationinsights": "2.9.1",
+    "applicationinsights": "2.9.6",
     "axios": "^1.4.0",
     "body-parser": "^1.20.2",
     "config": "^3.3.9",
