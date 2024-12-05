@@ -3939,6 +3939,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"array-union@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "array-union@npm:3.0.1"
+  checksum: 10/47b29f88258e8f37ffb93ddaa327d4308edd950b52943c172b73558afdd3fa74cfd68816ba5aa4b894242cf281fa3c6d0362ae057e4a18bddbaedbe46ebe7112
+  languageName: node
+  linkType: hard
+
 "array.prototype.findlastindex@npm:^1.2.5":
   version: 1.2.5
   resolution: "array.prototype.findlastindex@npm:1.2.5"
@@ -5017,19 +5024,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"copy-webpack-plugin@npm:9.1.0":
-  version: 9.1.0
-  resolution: "copy-webpack-plugin@npm:9.1.0"
+"copy-webpack-plugin@npm:10.2.4":
+  version: 10.2.4
+  resolution: "copy-webpack-plugin@npm:10.2.4"
   dependencies:
     fast-glob: "npm:^3.2.7"
     glob-parent: "npm:^6.0.1"
-    globby: "npm:^11.0.3"
+    globby: "npm:^12.0.2"
     normalize-path: "npm:^3.0.0"
-    schema-utils: "npm:^3.1.1"
+    schema-utils: "npm:^4.0.0"
     serialize-javascript: "npm:^6.0.0"
   peerDependencies:
     webpack: ^5.1.0
-  checksum: 10/fb76532d65e7f6a57a5861104c4a3bce2771c0aaf7925c503fa2a13237e9187889f19a268fc142109ffe5ff0e5459b3ad773a6f36b2e584295c3e1de87d1b09f
+  checksum: 10/5fe136aa70eca642b1276a640cb8e63c1eb58372583560f91eeb7f0eb908b796395dac95724c7a5ed9c10d1ec140a77b012105c9bc00635b92b47b62470d7998
   languageName: node
   linkType: hard
 
@@ -7015,7 +7022,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globby@npm:^11.0.3, globby@npm:^11.1.0":
+"globby@npm:^11.1.0":
   version: 11.1.0
   resolution: "globby@npm:11.1.0"
   dependencies:
@@ -7026,6 +7033,20 @@ __metadata:
     merge2: "npm:^1.4.1"
     slash: "npm:^3.0.0"
   checksum: 10/288e95e310227bbe037076ea81b7c2598ccbc3122d87abc6dab39e1eec309aa14f0e366a98cdc45237ffcfcbad3db597778c0068217dcb1950fef6249104e1b1
+  languageName: node
+  linkType: hard
+
+"globby@npm:^12.0.2":
+  version: 12.2.0
+  resolution: "globby@npm:12.2.0"
+  dependencies:
+    array-union: "npm:^3.0.1"
+    dir-glob: "npm:^3.0.1"
+    fast-glob: "npm:^3.2.7"
+    ignore: "npm:^5.1.9"
+    merge2: "npm:^1.4.1"
+    slash: "npm:^4.0.0"
+  checksum: 10/894e05b2eaec0ba7cdad1e459061078f9973768927f5aa28bbc81f967af92bfa7726c3f38fbb09de51905beebf5e8670d6b990b480e897845f770d9c42ac3556
   languageName: node
   linkType: hard
 
@@ -7424,6 +7445,13 @@ __metadata:
   version: 1.0.1
   resolution: "ignore-by-default@npm:1.0.1"
   checksum: 10/441509147b3615e0365e407a3c18e189f78c07af08564176c680be1fabc94b6c789cad1342ad887175d4ecd5225de86f73d376cec8e06b42fd9b429505ffcf8a
+  languageName: node
+  linkType: hard
+
+"ignore@npm:^5.1.9":
+  version: 5.3.2
+  resolution: "ignore@npm:5.3.2"
+  checksum: 10/cceb6a457000f8f6a50e1196429750d782afce5680dd878aa4221bd79972d68b3a55b4b1458fc682be978f4d3c6a249046aa0880637367216444ab7b014cfc98
   languageName: node
   linkType: hard
 
@@ -10113,7 +10141,7 @@ __metadata:
     config: "npm:^3.3.9"
     connect-redis: "npm:^7.1.1"
     cookie-parser: "npm:^1.4.6"
-    copy-webpack-plugin: "npm:9.1.0"
+    copy-webpack-plugin: "npm:10.2.4"
     css-loader: "npm:^7.0.0"
     csurf: "npm:^1.11.0"
     debug: "npm:^4.3.4"
@@ -11325,6 +11353,13 @@ __metadata:
   version: 3.0.0
   resolution: "slash@npm:3.0.0"
   checksum: 10/94a93fff615f25a999ad4b83c9d5e257a7280c90a32a7cb8b4a87996e4babf322e469c42b7f649fd5796edd8687652f3fb452a86dc97a816f01113183393f11c
+  languageName: node
+  linkType: hard
+
+"slash@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "slash@npm:4.0.0"
+  checksum: 10/da8e4af73712253acd21b7853b7e0dbba776b786e82b010a5bfc8b5051a1db38ed8aba8e1e8f400dd2c9f373be91eb1c42b66e91abb407ff42b10feece5e1d2d
   languageName: node
   linkType: hard
 
