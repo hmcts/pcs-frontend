@@ -1,4 +1,5 @@
 import config from 'config';
+// eslint-disable-next-line
 import RedisStore from 'connect-redis';
 import type { Express } from 'express';
 import session from 'express-session';
