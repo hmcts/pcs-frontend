@@ -10,7 +10,7 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 withPipeline(type, product, component) {
   onPR() {
-    env.TEST_URL = "https://pcs-frontend-pr--${CHANGE_ID}.preview.platform.hmcts.net"
+    env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     afterAlways('functionalTest:preview') {
       try {
         publishHTML([
