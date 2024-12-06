@@ -16,7 +16,7 @@
     "test:unit": "jest",
     "test:coverage": "jest --coverage",
     "test:routes": "jest -c jest.routes.config.js",
-    "test:a11y": "echo 'ally tests covered elsewhere'",
+    "test:a11y": "yarn playwright install && yarn playwright test --project chromium --grep @accessibility",
     "test:smoke": "NODE_TLS_REJECT_UNAUTHORIZED=0 jest -c jest.smoke.config.js",
     "test:functional": "NODE_TLS_REJECT_UNAUTHORIZED=0 yarn playwright install && yarn playwright test --project chromium",
     "prepare": "husky install"
@@ -70,6 +70,7 @@
     "typescript": "^5.1.6"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
     "@babel/core": "^7.22.11",
     "@babel/eslint-parser": "^7.22.11",
     "@babel/preset-env": "^7.22.14",
