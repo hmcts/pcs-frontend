@@ -10,6 +10,8 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 withPipeline(type, product, component) {
   onPR() {
+    // TODO: Update URL
+    env.TEST_URL = "https://pcs-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     afterAlways('functionalTest:preview') {
       try {
         publishHTML([
@@ -20,13 +22,14 @@ withPipeline(type, product, component) {
           reportFiles          : 'index.html',
           reportName           : 'PCS Frontend Functional Test Report'
         ])
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/pcsFrontendFunctional/*'
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       }
     }
   }
   onMaster() {
+    env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
     afterAlways('functionalTest:aat') {
       try {
         publishHTML([
@@ -37,7 +40,7 @@ withPipeline(type, product, component) {
           reportFiles          : 'index.html',
           reportName           : 'PCS Frontend Functional Test Report'
         ])
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/pcsFrontendFunctional/*'
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       }
