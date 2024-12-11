@@ -73,19 +73,26 @@ the following command:
 yarn test
 ```
 
-Here's how to run functional tests (the template contains just one sample test):
+The functional UI tests use [Playwright](https://playwright.dev/), and the pr suite can be run with the following command:
 
 ```bash
-yarn test:routes
+yarn test:functional
 ```
+
+By default, the tests will run against http://localhost:3209/, please update the value on line 7 of src/test/config.ts to change this.
+
+There are also several custom test scripts available:
+
+- `yarn test:changed` - runs only changed spec files
+- `test:E2eChrome` - runs the full E2E suite in Chrome
+- `test:E2eFirefox` - runs the full E2E suite in Firefox
+- `test:E2eSafari` - runs the full E2E suite in Safari
 
 Running accessibility tests:
 
 ```bash
-yarn test:a11y
+yarn test:accessibility
 ```
-
-Make sure all the paths in your application are covered by accessibility tests (see [a11y.ts](src/test/a11y/a11y.ts)).
 
 ### Security
 
