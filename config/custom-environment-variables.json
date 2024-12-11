@@ -1,7 +1,8 @@
 {
   "secrets": {
     "pcs": {
-      "redis-connection-string": "REDIS_CONNECTION_STRING"
+      "redis-connection-string": "REDIS_CONNECTION_STRING",
+      "pcs-frontend-s2s-secret": "S2S_SECRET"
     }
   },
   "api": {
@@ -11,5 +12,8 @@
   "session": {
     "prefix": "REDIS_SESSION_PREFIX",
     "ttlInSeconds": "REDIS_TTL"
+  },
+  "s2s": {
+    "url": "S2S_URL"
   }
 }

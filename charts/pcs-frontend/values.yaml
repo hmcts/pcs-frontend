@@ -19,7 +19,9 @@ nodejs:
         - redis-connection-string
         - pcs-session-secret
         - app-insights-connection-string
+        - pcs-frontend-s2s-secret
   environment:
     REDIS_TTL: 6000
     REDIS_SESSION_PREFIX: 'pcs'
     PCS_API_URL: 'http://pcs-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
+    S2S_URL: 'http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
