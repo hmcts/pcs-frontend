@@ -11,6 +11,37 @@ def type = "nodejs"
 def product = "pcs"
 def component = "frontend"
 
-withNightlyPipeline(type, product, component) {
+def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
+withNightlyPipeline(type, product, component) {
+  env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
+  enableSlackNotifications('#pcs-tech')
+  afterAlways('DependencyCheckNightly') {
+    runE2ETestsForBrowser(yarnBuilder, 'Chrome')
+    runE2ETestsForBrowser(yarnBuilder, 'Firefox')
+    runE2ETestsForBrowser(yarnBuilder, 'Safari')
+  }
+}
+
+def runE2ETestsForBrowser(yarnBuilder, String browser) {
+  stage("Full E2E Test - ${browser}") {
+    try {
+      yarnBuilder.yarn("test:E2e${browser}")
+    } catch (Error) {
+      unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+    } finally {
+      publishHTML([
+        allowMissing: true,
+        alwaysLinkToLastBuild: true,
+        keepAll: true,
+        reportDir: "playwright-report",
+        reportFiles: 'index.html',
+        reportName: "Full ${browser} E2E Test Report"
+      ])
+      steps.archiveArtifacts(
+        allowEmptyArchive: true,
+        artifacts: 'definitions/test/playwright-report/**'
+      )
+    }
+  }
 }
