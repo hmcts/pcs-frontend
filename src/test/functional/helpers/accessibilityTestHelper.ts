@@ -1,5 +1,6 @@
-import { AxeBuilder } from '@axe-core/playwright';
 import { Page, expect } from '@playwright/test';
+
+import { AxeBuilder } from '@axe-core/playwright';
 
 export class AxeTest {
   public static async run(page: Page): Promise<void> {

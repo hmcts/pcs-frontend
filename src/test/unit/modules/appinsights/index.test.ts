@@ -1,6 +1,6 @@
-import { AppInsights } from '../../../../main/modules/appinsights';
-
 import config from 'config';
+
+import { AppInsights } from '../../../../main/modules/appinsights';
 
 jest.mock('applicationinsights', () => {
   const setup = jest.fn().mockReturnThis();
