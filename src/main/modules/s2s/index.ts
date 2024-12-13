@@ -4,9 +4,9 @@ import { Express, NextFunction, Request, Response } from 'express';
 import otp from 'otp';
 
 declare module 'express-session' {
-    export interface SessionData {
-        serviceToken: string;
-    }
+  export interface SessionData {
+    serviceToken: string;
+  }
 }
 
 const { Logger } = require('@hmcts/nodejs-logging');
@@ -35,13 +35,13 @@ export class S2S {
     app.use(async (req: Request, res: Response, next: NextFunction) => {
       if (!req.session.serviceToken) {
         try {
-            const response = await fetch(`${s2sUrl}/lease`, options);
-            req.session.serviceToken = await response.json();
+          const response = await fetch(`${s2sUrl}/lease`, options);
+          req.session.serviceToken = await response.json();
         } catch (error) {
-            this.logger.error('S2S ERROR', error);
+          this.logger.error('S2S ERROR', error);
         }
       }
-      
+
       axios.defaults.headers.common['ServiceAuthorization'] = `Bearer ${req.session.serviceToken}`;
       next();
     });
