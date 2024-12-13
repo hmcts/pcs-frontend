@@ -33,7 +33,6 @@ version
 
 .pnp.*
 .vscode
-.yarn
 .yarn/install-state.gz
 !.yarn/cache/*
 !.yarn/patches
