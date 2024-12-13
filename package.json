@@ -81,6 +81,7 @@
     "@babel/eslint-parser": "^7.22.11",
     "@babel/preset-env": "^7.22.14",
     "@playwright/test": "^1.49.0",
+    "@types/chai": "^5.0.1",
     "@types/chai-as-promised": "^8.0.0",
     "@types/jest": "^29.5.14",
     "@types/supertest": "^6.0.0",
@@ -125,7 +126,8 @@
   "resolutions": {
     "@opentelemetry/instrumentation": "0.56.0",
     "semver": "^7.5.2",
-    "axios": ">1.6.0"
+    "axios": ">1.6.0",
+    "@types/express-serve-static-core": "*"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
