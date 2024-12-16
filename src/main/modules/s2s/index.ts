@@ -19,6 +19,11 @@ export class S2S {
     const s2sUrl = config.get('s2s.url');
 
     const oneTimePassword = new otp({ secret: s2sSecret }).totp(0);
+    this.logger.info('S2S oneTimePassword', oneTimePassword);
+    this.logger.info('s2sUrl', s2sUrl);
+    this.logger.info('s2sSecret', s2sSecret);
+    this.logger.info('microservice', microservice);
+
 
     const options = {
       method: 'POST',
