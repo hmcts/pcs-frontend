@@ -10,9 +10,9 @@ export default function (app: Application): void {
     try {
       apiResponse = await axios.get(config.get('api.url'));
     } catch (error) {
-      console.error('pcs-api error', error.response.statusText);
+      // console.error('pcs-api error', error.response.statusText);
     }
-    
+
     res.render('home', { apiResponse: apiResponse.data });
   });
 }
