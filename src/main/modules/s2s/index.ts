@@ -24,7 +24,6 @@ export class S2S {
     this.logger.info('s2sSecret', s2sSecret);
     this.logger.info('microservice', microservice);
 
-
     const options = {
       method: 'POST',
       headers: {
