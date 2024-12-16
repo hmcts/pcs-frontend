@@ -48,7 +48,7 @@ export class S2S {
                     return Promise.reject(new Error(text));
                   });
             })
-            .then(response => response.json())
+            .then(response => response.text())
             .then((token: string) => {
               resolve(token);
             })
