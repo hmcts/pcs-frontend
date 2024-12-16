@@ -1,6 +1,6 @@
 import axios from 'axios';
 import config from 'config';
-import { Express, NextFunction, Request, Response } from 'express';
+import { Express, Response as ExpressResponse, NextFunction, Request } from 'express';
 import { TOTP } from 'totp-generator';
 
 declare module 'express-session' {
@@ -22,9 +22,7 @@ export class S2S {
     this.logger.info('s2sSecret', s2sSecret);
     this.logger.info('microservice', microservice);
 
-
-    app.use(async (req: Request, res: Response, next: NextFunction) => {
-
+    app.use(async (req: Request, res: ExpressResponse, next: NextFunction) => {
       const { otp } = TOTP.generate(s2sSecret);
 
       const params = {
@@ -33,17 +31,14 @@ export class S2S {
       };
 
       const data = await new Promise((resolve, reject) => {
-        fetch(
-          `${s2sUrl}/lease`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(params),
+        fetch(`${s2sUrl}/lease`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        )
-          .then((res: any) => res.text())
+          body: JSON.stringify(params),
+        })
+          .then((resp: Response) => resp.text())
           .then((token: string) => {
             resolve(token);
           })
@@ -64,13 +59,6 @@ export class S2S {
       //   try {
       //     const { otp } = TOTP.generate(s2sSecret);
       //     this.logger.info('S2S oneTimePassword', otp);
-
-
-
-
-
-
-
 
       //     const response = await axios.post(`${s2sUrl}/lease`, {
       //       microservice,
