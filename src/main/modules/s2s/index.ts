@@ -25,30 +25,23 @@ export class S2S {
     app.use(async (req: Request, res: Response, next: NextFunction) => {
       if (!req.session.serviceToken) {
         try {
-          const oneTimePassword = new otp({ secret: s2sSecret }).totp(0);
-          const options = {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json;charset=UTF-8',
-            },
-            body: JSON.stringify({
-              microservice,
-              oneTimePassword,
-            }),
-          };
-
+          const now = new Date().getMilliseconds();
+          const oneTimePassword = new otp({ secret: s2sSecret }).totp(now);
           this.logger.info('S2S oneTimePassword', oneTimePassword);
 
-          const response = await fetch(`${s2sUrl}/lease`, options);
-          req.session.serviceToken = await response.json();
+          const response = await axios.post(`${s2sUrl}/lease`, {
+            microservice,
+            oneTimePassword,
+          });
+          this.logger.info('S2S request status: ', response.status, response.statusText, response.data);
+          req.session.serviceToken = response.data;
         } catch (error) {
-          this.logger.error('S2S ERROR', error.response);
+          this.logger.error('S2S ERROR'); //error.response.data, error.message);
         }
       }
 
       if (req.session.serviceToken) {
-        this.logger.info('SERVICE TOKEN = ', s2sUrl, req.session.serviceToken, options);
+        this.logger.info('SERVICE TOKEN = ', s2sUrl, req.session.serviceToken);
         axios.defaults.headers.common['ServiceAuthorization'] = `Bearer ${req.session.serviceToken}`;
       }
       next();
