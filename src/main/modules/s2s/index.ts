@@ -25,8 +25,7 @@ export class S2S {
     app.use(async (req: Request, res: Response, next: NextFunction) => {
       if (!req.session.serviceToken) {
         try {
-          const now = new Date().getMilliseconds();
-          const oneTimePassword = new otp({ secret: s2sSecret }).totp(now);
+          const oneTimePassword = new otp({ secret: s2sSecret }).totp(0);
           this.logger.info('S2S oneTimePassword', oneTimePassword);
 
           const response = await axios.post(`${s2sUrl}/lease`, {
@@ -36,7 +35,7 @@ export class S2S {
           this.logger.info('S2S request status: ', response.status, response.statusText, response.data);
           req.session.serviceToken = response.data;
         } catch (error) {
-          this.logger.error('S2S ERROR'); //error.response.data, error.message);
+          this.logger.error('S2S ERROR', error.response.data, error.message);
         }
       }
 
