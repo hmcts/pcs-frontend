@@ -43,11 +43,14 @@ export class S2S {
           const response = await fetch(`${s2sUrl}/lease`, options);
           req.session.serviceToken = await response.json();
         } catch (error) {
-          this.logger.error('S2S ERROR', error);
+          this.logger.error('S2S ERROR', error.response);
         }
       }
 
-      axios.defaults.headers.common['ServiceAuthorization'] = `Bearer ${req.session.serviceToken}`;
+      if (req.session.serviceToken) {
+        this.logger.info('SERVICE TOKEN = ', s2sUrl, req.session.serviceToken, options);
+        axios.defaults.headers.common['ServiceAuthorization'] = `Bearer ${req.session.serviceToken}`;
+      }
       next();
     });
   }
