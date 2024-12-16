@@ -23,7 +23,6 @@ export class S2S {
     this.logger.info('microservice', microservice);
 
     app.use(async (req: Request, res: ExpressResponse, next: NextFunction) => {
-
       if (!req.session.serviceToken) {
         const { otp } = TOTP.generate(s2sSecret);
 
@@ -40,14 +39,16 @@ export class S2S {
             },
             body: JSON.stringify(params),
           })
-            .then((response) => {
+            .then(response => {
               this.logger.info('S2S response code: ', response.status);
-                return response.status === 200 ? response : response.text().then((text) => {
-                  this.logger.error('FETCH ERR: ', response.status, text);
-                  return Promise.reject(new Error(text))
-                })
+              return response.status === 200
+                ? response
+                : response.text().then(text => {
+                    this.logger.error('FETCH ERR: ', response.status, text);
+                    return Promise.reject(new Error(text));
+                  });
             })
-            .then((response) => response.json())
+            .then(response => response.json())
             .then((token: string) => {
               resolve(token);
             })
@@ -58,7 +59,7 @@ export class S2S {
         });
 
         try {
-          req.session.serviceToken = await request as string;
+          req.session.serviceToken = (await request) as string;
         } catch (error) {
           this.logger.error('S2S ERROR', error.message);
         }
