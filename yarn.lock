@@ -4234,13 +4234,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"charenc@npm:>= 0.0.1":
-  version: 0.0.2
-  resolution: "charenc@npm:0.0.2"
-  checksum: 10/81dcadbe57e861d527faf6dd3855dc857395a1c4d6781f4847288ab23cffb7b3ee80d57c15bba7252ffe3e5e8019db767757ee7975663ad2ca0939bb8fcaf2e5
-  languageName: node
-  linkType: hard
-
 "check-error@npm:^1.0.3":
   version: 1.0.3
   resolution: "check-error@npm:1.0.3"
@@ -4681,13 +4674,6 @@ __metadata:
     shebang-command: "npm:^2.0.0"
     which: "npm:^2.0.1"
   checksum: 10/0d52657d7ae36eb130999dffff1168ec348687b48dd38e2ff59992ed916c88d328cf1d07ff4a4a10bc78de5e1c23f04b306d569e42f7a2293915c081e4dfee86
-  languageName: node
-  linkType: hard
-
-"crypt@npm:>= 0.0.1":
-  version: 0.0.2
-  resolution: "crypt@npm:0.0.2"
-  checksum: 10/2c72768de3d28278c7c9ffd81a298b26f87ecdfe94415084f339e6632f089b43fe039f2c93f612bcb5ffe447238373d93b2e8c90894cba6cfb0ac7a74616f8b9
   languageName: node
   linkType: hard
 
@@ -8010,6 +7996,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jssha@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "jssha@npm:3.3.1"
+  checksum: 10/ecc3440abe95149b5c17ea38c1b8b831dbe5149e56d417dd4fb930f65bfb5a80842f3b25408957f357deb9cd8c513931b446fea6d204a111d934165a89139d7f
+  languageName: node
+  linkType: hard
+
 "just-extend@npm:^6.2.0":
   version: 6.2.0
   resolution: "just-extend@npm:6.2.0"
@@ -9075,15 +9068,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"otp@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "otp@npm:1.1.2"
-  dependencies:
-    sha1: "npm:^1.1.1"
-  checksum: 10/3fd1a46ae889b71c62d91358a1db678e6f32bcd41264f978902fad1fe4c4d3b01c109e845d314e2b3844fc4de83b7f3ab189bed6a8a612681127110acb7b11b9
-  languageName: node
-  linkType: hard
-
 "p-limit@npm:^2.2.0":
   version: 2.3.0
   resolution: "p-limit@npm:2.3.0"
@@ -9368,7 +9352,6 @@ __metadata:
     nock: "npm:^13.3.2"
     nodemon: "npm:^3.0.0"
     nunjucks: "npm:^3.2.4"
-    otp: "npm:^1.1.2"
     playwright: "npm:^1.36.2"
     postcss: "npm:^8.4.27"
     prettier: "npm:^3.0.0"
@@ -9385,6 +9368,7 @@ __metadata:
     stylelint-config-standard: "npm:^36.0.0"
     stylelint-config-standard-scss: "npm:^14.0.0"
     supertest: "npm:^7.0.0"
+    totp-generator: "npm:^1.0.0"
     ts-jest: "npm:^29.1.1"
     ts-loader: "npm:^9.4.4"
     ts-node: "npm:^10.9.1"
@@ -10325,16 +10309,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sha1@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "sha1@npm:1.1.1"
-  dependencies:
-    charenc: "npm:>= 0.0.1"
-    crypt: "npm:>= 0.0.1"
-  checksum: 10/da9f47e949988e2f595ef19733fd1dc736866ef6de4e421a55c13b444c03ae532e528b7350ae6ea55d9fb053be61d4648ec2cd5250d46cfdbdf4f6b4e763713d
-  languageName: node
-  linkType: hard
-
 "shallow-clone@npm:^3.0.0":
   version: 3.0.1
   resolution: "shallow-clone@npm:3.0.1"
@@ -11153,6 +11127,15 @@ __metadata:
   version: 1.0.1
   resolution: "toidentifier@npm:1.0.1"
   checksum: 10/952c29e2a85d7123239b5cfdd889a0dde47ab0497f0913d70588f19c53f7e0b5327c95f4651e413c74b785147f9637b17410ac8c846d5d4a20a5a33eb6dc3a45
+  languageName: node
+  linkType: hard
+
+"totp-generator@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "totp-generator@npm:1.0.0"
+  dependencies:
+    jssha: "npm:^3.3.1"
+  checksum: 10/333d3c8a16c22b9842f7d3fcf3b0b03752c4a52e4ec7b1994defa1ce9b7ba25d8b42fca4eb80d883a92d5fae7ee265deb026dad6f7da69c38cf9525cbcc02ce8
   languageName: node
   linkType: hard
 
