@@ -17,7 +17,7 @@
     "url": "http://pcs-api-aat.service.core-compute-aat.internal"
   },
   "s2s": {
-    "microservice": "pcs-frontend",
+    "microservice": "pcs_frontend",
     "url": "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   },
   "secrets": {
