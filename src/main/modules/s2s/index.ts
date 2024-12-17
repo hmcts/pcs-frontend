@@ -36,7 +36,6 @@ export class S2S {
             body: JSON.stringify(params),
           })
             .then(response => {
-              this.logger.info('S2S response code: ', response.status);
               return response.status === 200
                 ? response
                 : response.text().then(text => {
@@ -62,7 +61,6 @@ export class S2S {
       }
 
       if (req.session.serviceToken) {
-        this.logger.info('SERVICE TOKEN = ', s2sUrl, req.session.serviceToken);
         axios.defaults.headers.common['ServiceAuthorization'] = `Bearer ${req.session.serviceToken}`;
       }
       next();
