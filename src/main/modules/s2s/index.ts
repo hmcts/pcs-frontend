@@ -18,10 +18,6 @@ export class S2S {
     const s2sSecret = config.get<string>('secrets.pcs.pcs-frontend-s2s-secret');
     const s2sUrl = config.get('s2s.url');
 
-    this.logger.info('s2sUrl', s2sUrl);
-    this.logger.info('s2sSecret', s2sSecret);
-    this.logger.info('microservice', microservice);
-
     app.use(async (req: Request, res: ExpressResponse, next: NextFunction) => {
       if (!req.session.serviceToken) {
         const { otp } = TOTP.generate(s2sSecret);
