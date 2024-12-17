@@ -2,7 +2,10 @@ nodejs:
   # Don't modify below here
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  disableKeyVaults: true
+  keyVaults:
+    pcs:
+      secrets:
+        - pcs-frontend-s2s-secret
   environment:
     REDIS_CONNECTION_STRING: redis://${SERVICE_NAME}-redis-master:6379
 redis:
