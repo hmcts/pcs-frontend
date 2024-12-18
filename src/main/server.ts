@@ -24,6 +24,9 @@ if (app.locals.ENV === 'development') {
     key: fs.readFileSync(path.join(sslDirectory, 'localhost.key')),
   };
   httpsServer = https.createServer(sslOptions, app);
+  httpsServer.listen(port, () => {
+    logger.info(`Application started: https://localhost:${port}`);
+  });
 } else {
   app.listen(port, () => {
     logger.info(`Application started: http://localhost:${port}`);
