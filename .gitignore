@@ -44,3 +44,5 @@ version
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/.yarn/cache/
+/.yarn/unplugged/
