@@ -3847,6 +3847,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios-mock-adapter@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "axios-mock-adapter@npm:2.1.0"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+    is-buffer: "npm:^2.0.5"
+  peerDependencies:
+    axios: ">= 0.17.0"
+  checksum: 10/6db724760e794ccfc81d25fb7e8ee9b6de189bb2ff96af772622a4cdaf948e58f1d2927abf2624d0751f629519588329a1b5be0d5ec510f8fe888fcd22926ac8
+  languageName: node
+  linkType: hard
+
 "axios@npm:>1.6.0":
   version: 1.7.9
   resolution: "axios@npm:1.7.9"
@@ -4374,6 +4386,13 @@ __metadata:
     kind-of: "npm:^6.0.2"
     shallow-clone: "npm:^3.0.0"
   checksum: 10/770f912fe4e6f21873c8e8fbb1e99134db3b93da32df271d00589ea4a29dbe83a9808a322c93f3bcaf8584b8b4fa6fc269fc8032efbaa6728e0c9886c74467d2
+  languageName: node
+  linkType: hard
+
+"clone@npm:2.x":
+  version: 2.1.2
+  resolution: "clone@npm:2.1.2"
+  checksum: 10/d9c79efba655f0bf601ab299c57eb54cbaa9860fb011aee9d89ed5ac0d12df1660ab7642fddaabb9a26b7eff0e117d4520512cb70798319ff5d30a111b5310c2
   languageName: node
   linkType: hard
 
@@ -6825,6 +6844,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-buffer@npm:^2.0.5":
+  version: 2.0.5
+  resolution: "is-buffer@npm:2.0.5"
+  checksum: 10/3261a8b858edcc6c9566ba1694bf829e126faa88911d1c0a747ea658c5d81b14b6955e3a702d59dabadd58fdd440c01f321aa71d6547105fd21d03f94d0597e7
+  languageName: node
+  linkType: hard
+
 "is-callable@npm:^1.1.3, is-callable@npm:^1.2.7":
   version: 1.2.7
   resolution: "is-callable@npm:1.2.7"
@@ -7680,7 +7706,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest@npm:^29.6.2":
+"jest@npm:^29.7.0":
   version: 29.7.0
   resolution: "jest@npm:29.7.0"
   dependencies:
@@ -7894,6 +7920,13 @@ __metadata:
     jwa: "npm:^2.0.0"
     safe-buffer: "npm:^5.0.1"
   checksum: 10/1d15f4cdea376c6bd6a81002bd2cb0bf3d51d83da8f0727947b5ba3e10cf366721b8c0d099bf8c1eb99eb036e2c55e5fd5efd378ccff75a2b4e0bd10002348b9
+  languageName: node
+  linkType: hard
+
+"jwt-decode@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "jwt-decode@npm:4.0.0"
+  checksum: 10/87b569e4a9a0067fb0d592bcf3b2ac3e638e49beee28620eeb07bef1b4470f4077dea68c15d191dd68e076846c3af8394be3bcaecffedc6e97433b221fdbbcf3
   languageName: node
   linkType: hard
 
@@ -8641,6 +8674,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-cache@npm:^5.1.2":
+  version: 5.1.2
+  resolution: "node-cache@npm:5.1.2"
+  dependencies:
+    clone: "npm:2.x"
+  checksum: 10/6ac71a9e65fdd8940883c3c188de4888ff592f5bf52e4d42436c49e2a575d635e7327acea490c49fa7c01d5fa81f7b6e060fd35cf6f6ec401fbd5f77a3ebeecf
+  languageName: node
+  linkType: hard
+
 "node-gyp@npm:latest":
   version: 11.0.0
   resolution: "node-gyp@npm:11.0.0"
@@ -9155,6 +9197,7 @@ __metadata:
     applicationinsights: "npm:2.9.6"
     axios: "npm:^1.4.0"
     axios-debug-log: "npm:^1.0.0"
+    axios-mock-adapter: "npm:^2.1.0"
     babel-loader: "npm:^9.1.3"
     body-parser: "npm:^1.20.2"
     chai: "npm:^4.3.7"
@@ -9180,13 +9223,15 @@ __metadata:
     http-status-codes: "npm:^2.3.0"
     husky: "npm:^9.0.0"
     ioredis: "npm:^5.4.1"
-    jest: "npm:^29.6.2"
+    jest: "npm:^29.7.0"
     jest-html-reporter: "npm:^3.10.1"
     jquery: "npm:^3.7.0"
+    jwt-decode: "npm:^4.0.0"
     lint-staged: "npm:^15.0.0"
     lodash: "npm:^4.17.21"
     mini-css-extract-plugin: "npm:^2.7.6"
     nock: "npm:^13.3.2"
+    node-cache: "npm:^5.1.2"
     nodemon: "npm:^3.0.0"
     nunjucks: "npm:^3.2.4"
     playwright: "npm:^1.36.2"
@@ -9205,7 +9250,7 @@ __metadata:
     stylelint-config-standard-scss: "npm:^14.0.0"
     supertest: "npm:^7.0.0"
     totp-generator: "npm:^1.0.0"
-    ts-jest: "npm:^29.1.1"
+    ts-jest: "npm:^29.2.5"
     ts-loader: "npm:^9.4.4"
     ts-node: "npm:^10.9.1"
     tsconfig-paths: "npm:^4.2.0"
@@ -10902,7 +10947,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:^29.1.1":
+"ts-jest@npm:^29.2.5":
   version: 29.2.5
   resolution: "ts-jest@npm:29.2.5"
   dependencies:

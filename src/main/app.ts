@@ -2,6 +2,7 @@ import * as path from 'path';
 
 import { HTTPError } from './HttpError';
 import { AppInsights } from './modules/appinsights';
+import { OidcMiddleware } from './modules/auth/oidcMiddleware';
 import { Helmet } from './modules/helmet';
 import { Nunjucks } from './modules/nunjucks';
 import { PropertiesVolume } from './modules/properties-volume';
@@ -23,6 +24,7 @@ const developmentMode = env === 'development';
 
 export const app = express();
 app.locals.ENV = env;
+app.locals.developmentMode = process.env.NODE_ENV !== 'production';
 
 const logger = Logger.getLogger('app');
 
@@ -33,6 +35,7 @@ new Nunjucks(developmentMode).enableFor(app);
 new Helmet(developmentMode).enableFor(app);
 new Session().enableFor(app);
 new S2S().enableFor(app);
+new OidcMiddleware().enableFor(app);
 
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
