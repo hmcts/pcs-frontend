@@ -2088,7 +2088,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jest/test-result@npm:^29.0.2, @jest/test-result@npm:^29.7.0":
+"@jest/test-result@npm:^29.7.0":
   version: 29.7.0
   resolution: "@jest/test-result@npm:29.7.0"
   dependencies:
@@ -2135,7 +2135,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jest/types@npm:^29.0.2, @jest/types@npm:^29.6.3":
+"@jest/types@npm:^29.6.3":
   version: 29.6.3
   resolution: "@jest/types@npm:29.6.3"
   dependencies:
@@ -7548,12 +7548,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-html-reporter@npm:^3.10.1":
-  version: 3.10.2
-  resolution: "jest-html-reporter@npm:3.10.2"
+"jest-html-reporter@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "jest-html-reporter@npm:4.0.1"
   dependencies:
-    "@jest/test-result": "npm:^29.0.2"
-    "@jest/types": "npm:^29.0.2"
+    "@jest/reporters": "npm:^29.7.0"
+    "@jest/test-result": "npm:^29.7.0"
+    "@jest/types": "npm:^29.6.3"
     dateformat: "npm:3.0.2"
     mkdirp: "npm:^1.0.3"
     strip-ansi: "npm:6.0.1"
@@ -7561,7 +7562,7 @@ __metadata:
   peerDependencies:
     jest: 19.x - 29.x
     typescript: ^3.7.x || ^4.3.x || ^5.x
-  checksum: 10/bb726d9d3e552751a839632798c964657db537f5b0614d7648129cd3016d37fa6e66964f3c7e9cef88f90abb9a20a242548afc5ccab288366707357f841259e0
+  checksum: 10/ba23c601db57a89cb1e4d5a7f401fd24dcc7ab3d8cfd17247052d65cd0b2b6d300d6080323d2db833a9676233ec2097fb10f957afa857d0224d4329686d86ec3
   languageName: node
   linkType: hard
 
@@ -9291,7 +9292,7 @@ __metadata:
     husky: "npm:^9.0.0"
     ioredis: "npm:^5.4.1"
     jest: "npm:^29.6.2"
-    jest-html-reporter: "npm:^3.10.1"
+    jest-html-reporter: "npm:^4.0.0"
     jquery: "npm:^3.7.0"
     lint-staged: "npm:^15.0.0"
     lodash: "npm:^4.17.21"
