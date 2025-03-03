@@ -1,0 +1,92 @@
+{% extends "govuk/template.njk" %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/footer/macro.njk" import govukFooter %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set language = "Cymraeg" %}
+
+{% if ToggleLanguage == "cy" %}
+{% set language = "Cymraeg" %}
+{% elif ToggleLanguage == "en" %}
+{% set language = "English" %}
+{% else %}
+{% set language = "Cymraeg" %}
+{% endif %}
+
+{% block header %}
+  {{ govukHeader({serviceName: content.serviceName}) }}
+{% endblock %}
+
+{% block backLink %}{% endblock %}
+
+{% block head %}
+  {% include "webpack/css.njk" %}
+  <!-- Dynatrace -->
+    <script type="text/javascript" src="{{ globals.dynatrace.dynatraceUrl }}" crossorigin="anonymous"></script>
+  <!-- End Dynatrace -->
+{% endblock %}
+
+{% block beforeContent %}
+{{ govukPhaseBanner({
+  tag: {
+    text: "BETA"
+  },
+  html: content.banner|replace("currentUrl",currentUrl) +'<span class="float-right"><a href="?lang='+ToggleLanguage+'" class="govuk-link ">'+language+'</a></span>'
+}) }}
+{% endblock %}
+
+{% block bodyEnd %}
+  {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
+  {% include "webpack/js.njk" %}
+{% endblock %}
+
+{% block content %}
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-9">{{content.title}}</h1>
+    <p class="govuk-body-l">{{content.paragraph1}}</p>
+    <p class="govuk-body-l">{{content.paragraph2}}</p>
+    <p class="govuk-body-l govuk-!-margin-bottom-9">{{content.paragraph3}}</p>
+
+  {{ govukButton({
+    text: content.button,
+    href: loginURL,
+    isStartButton: true
+  }) }}
+{% endblock %}
+
+{% block page_contact_us %}
+{% endblock %}
+
+{% block footer %}
+  {{ govukFooter({
+    copyright: {
+      text: content.copyright | safe
+    },
+    contentLicence: {
+      text: content.ogl | safe
+    },
+    meta: {
+      items: [
+        {
+          href: "/cookies",
+          text: content.cookies
+        },
+        {
+          href: "/privacy-policy",
+          text: content.privacyPolicy
+        },
+        {
+          href: "/accessibility-statement",
+          text: content.accessibility
+        },
+        {
+          href: "/terms-and-conditions",
+          text: content.termsAndConditions
+        },
+        {
+          href: "/contact-us",
+          text: content.contactUs
+        }
+      ]
+    }
+  }) }}
+{% endblock %}

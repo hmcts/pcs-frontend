@@ -1,0 +1,37 @@
+{
+  "translations": {
+    "en": {
+      "serviceName": "Housing Disputes Policy",
+      "banner": "<b>Help us improve this service</b><br>This is a new service. Help us for others to improve it by <a class='govuk-link' href='https://www.smartsurvey.co.uk/s/Specials_Feedback/?pageurl=currentUrl' target=_blank>giving your feedback</a>",
+      "title": "Update an existing First-tier Tribunal case",
+      "paragraph1": "Use this service to update a case that has already been submitted to the First-tier Tribunal.",
+      "paragraph2":
+      "You may want to send the Tribunal some extra paperwork that was not available at the time you initially submitted your tribunal form. Or you may want to give the Tribunal some extra details about aspects of your case.",
+      "paragraph3": "To update an existing case, you will need the case reference number.",
+      "button": "Start now",
+      "ogl": "All content is available under the <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\" rel=\"license\">Open Government Licence v3.0</a>, except where otherwise stated",
+      "copyright": "© Crown copyright",
+      "accessibility": "Accessibility statement",
+      "cookies": "Cookies",
+      "privacyPolicy": "Privacy policy",
+      "termsAndConditions": "Terms and conditions",
+      "contactUs": "Contact Us"
+    },
+    "cy": {
+      "serviceName": "Polisi Anghydfodau Tai",
+      "banner": "<b>Helpwch ni i wella’r gwasanaeth hwn</b><br> Mae hwn yn wasanaeth newydd. Helpwch ni ei wella i bobl eraill trwy <a class='govuk-link' href='https://www.smartsurvey.co.uk/s/Specials_Feedback/?pageurl=currentUrl' target=_blank>roi eich adborth</a>",
+      "title": "Diweddaru achos sy’n bodoli’n barod yn y Tribiwnlys Haen Gyntaf",
+      "paragraph1": "Defnyddiwch y gwasanaeth hwn i ddiweddaru achos sydd wedi’i gyflwyno’n barod i’r Tribiwnlys Haen Gyntaf.",
+      "paragraph2": "Efallai y byddwch eisiau anfon gwaith papur ychwanegol i’r tribiwnlys nad oedd ar gael adeg cyflwyno eich ffurflen tribiwnlys wreiddiol. Neu efallai yr hoffech roi mwy o fanylion i’r Tribiwnlys am rai agweddau o’ch achos.",
+      "paragraph3": "I ddiweddaru achos sy’n bodoli’n barod, byddwch angen cyfeirnod yr achos.",
+      "button": "Dechrau nawr",
+      "ogl": "Mae’r holl gynnwys ar gael o dan <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\" rel=\"license\" >Drwydded Agored y Llywodraeth f3.0</a>, oni nodir fel arall",
+      "copyright": "© Hawlfraint y Goron",
+      "accessibility": "Datganiad Hygyrchedd",
+      "cookies": "Cwcis",
+      "privacyPolicy": "Polisi Preifatrwydd",
+      "termsAndConditions": "Telerau ac Amodau",
+      "contactUs": "Cysylltu â ni"
+    }
+  }
+}
