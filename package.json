@@ -56,7 +56,7 @@
     "express-nunjucks": "^3.1.1",
     "express-session": "^1.18.1",
     "glob": "^11.0.0",
-    "govuk-frontend": "5.8.0",
+    "govuk-frontend": "5.9.0",
     "helmet": "^8.0.0",
     "http-status-codes": "^2.3.0",
     "ioredis": "^5.4.1",
@@ -100,10 +100,10 @@
     "html-webpack-plugin": "^5.5.3",
     "husky": "^9.0.0",
     "jest": "^29.6.2",
-    "jest-html-reporter": "^3.10.1",
+    "jest-html-reporter": "^4.0.0",
     "lint-staged": "^15.0.0",
     "mini-css-extract-plugin": "^2.7.6",
-    "nock": "^13.3.2",
+    "nock": "^14.0.0",
     "nodemon": "^3.0.0",
     "playwright": "^1.36.2",
     "prettier": "^3.0.0",
@@ -131,5 +131,5 @@
     "*.{js,ts}": "eslint --cache --fix",
     "*.{js,ts,css,md,html,json}": "prettier --write"
   },
-  "packageManager": "yarn@4.6.0"
+  "packageManager": "yarn@4.7.0"
 }
