@@ -2747,11 +2747,11 @@ __metadata:
   linkType: hard
 
 "@types/chai-as-promised@npm:^8.0.0":
-  version: 8.0.1
-  resolution: "@types/chai-as-promised@npm:8.0.1"
+  version: 8.0.2
+  resolution: "@types/chai-as-promised@npm:8.0.2"
   dependencies:
     "@types/chai": "npm:*"
-  checksum: 10/827f7d8d5af15761e4b4c0ef08134e12835b28b6da91dd75e4d3e76c856cee9f3dd8bef45d4c1219237951e3e588c3f70d7271b38e626415126c63b057bf2fba
+  checksum: 10/c1ff3eb32f599623f3d78ef6a2bbda06f35f62e12cc6341e1e1deb5ff1652898880d93846ad83dab03d7cb633a5939330eb1af120b52fab46eb2e5321c2d0cdc
   languageName: node
   linkType: hard
 
