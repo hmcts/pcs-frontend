@@ -18,7 +18,8 @@
     "paths": {
       "router/*": ["router/*"],
       "routes/*": ["routes/*"]
-    }
+    },
+    "types": ["jest"]
   },
   "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*"]
 }
