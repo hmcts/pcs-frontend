@@ -1,73 +1,49 @@
-import path from 'path';
-
 import { Pact } from '@pact-foundation/pact';
 import axios from 'axios';
 
-const pact = new Pact({
-  consumer: 'pcs_frontend',
-  provider: 's2s_auth',
-  port: 5050,
-  log: path.resolve(process.cwd(), 'pact/logs', 'pact.log'),
-  dir: path.resolve(process.cwd(), 'pact/pacts'),
-  logLevel: 'info',
+const mockProvider = new Pact({
+  consumer: 'ConsumerApp',
+  provider: 'ProviderApp',
+  port: 1234, // Mock server port
+  log: './logs',
+  dir: './pacts', // Where to store pact files
+  logLevel: 'debug',
+  pactfileWriteMode: 'overwrite',
 });
 
-describe('Service Authorisation Consumer Pact Test', () => {
-  const MICRO_SERVICE_NAME = 'someMicroServiceName';
-  const MICRO_SERVICE_TOKEN = 'someMicroServiceToken';
-  const AUTHORISATION_TOKEN = 'Bearer someAuthorisationToken';
-
-  test('should receive a token when requesting a lease', async () => {
-    await pact.addInteraction({
-      state: 'microservice with valid credentials',
-      uponReceiving: 'a request for a token',
-      withRequest: {
-        method: 'POST',
-        path: '/lease',
-        body: { microservice: MICRO_SERVICE_NAME, oneTimePassword: '784467' },
-        headers: { 'Content-Type': 'application/json' },
-      },
-      willRespondWith: {
-        status: 200,
-        headers: { 'Content-Type': 'text/plain' },
-        body: MICRO_SERVICE_TOKEN,
-      },
-    });
-
-    const response = await axios.post('http://localhost:5050/lease', {
-      microservice: MICRO_SERVICE_NAME,
-      oneTimePassword: '784467',
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.data).toBe(MICRO_SERVICE_TOKEN);
-
-    await pact.verify();
+describe('Pact with ProviderApp', () => {
+  beforeAll(async () => {
+    await mockProvider.setup();
   });
 
-  test('should validate details with a valid token', async () => {
-    await pact.addInteraction({
-      state: 'microservice with valid token',
-      uponReceiving: 'a request to validate details',
+  afterAll(async () => {
+    await mockProvider.finalize();
+  });
+
+  it('should request data from provider and receive correct response', async () => {
+    // Define the expected interaction
+    await mockProvider.addInteraction({
+      state: 'provider has data',
+      uponReceiving: 'a request for user data',
       withRequest: {
         method: 'GET',
-        path: '/details',
-        headers: { Authorization: AUTHORISATION_TOKEN },
+        path: '/user',
       },
       willRespondWith: {
         status: 200,
-        headers: { 'Content-Type': 'text/plain' },
-        body: MICRO_SERVICE_NAME,
+        body: {
+          id: 1,
+          name: 'John Doe',
+        },
       },
     });
 
-    const response = await axios.get('http://localhost:5050/details', {
-      headers: { Authorization: AUTHORISATION_TOKEN },
-    });
+    const response = await axios.get('http://localhost:1234/user');
 
     expect(response.status).toBe(200);
-    expect(response.data).toBe(MICRO_SERVICE_NAME);
+    expect(response.data.id).toBe(1);
+    expect(response.data.name).toBe('John Doe');
 
-    await pact.verify();
+    await mockProvider.verify();
   });
 });
