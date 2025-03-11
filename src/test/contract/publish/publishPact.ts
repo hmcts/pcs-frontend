@@ -7,7 +7,6 @@ import path from 'path';
 import pact from '@pact-foundation/pact-node';
 import git from 'git-rev-sync';
 
-// Load environment variables (fallbacks included)
 const PACT_DIRECTORY = process.env.PACT_DIRECTORY || 'pact/pacts';
 const PACT_BROKER_URL = process.env.PACT_BROKER_URL || 'http://localhost:80';
 const PACT_BRANCH_NAME = process.env.PACT_BRANCH_NAME || 'Dev';
