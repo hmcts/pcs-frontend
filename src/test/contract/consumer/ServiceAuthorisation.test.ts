@@ -2,47 +2,77 @@ import { Pact } from '@pact-foundation/pact';
 import axios from 'axios';
 
 const mockProvider = new Pact({
-  consumer: 'pcs-frontend',
-  provider: 'ProviderApp',
-  port: 1234, // Mock server port
-  log: './logs',
-  dir: './pacts', // Where to store pact files
-  logLevel: 'debug',
-  pactfileWriteMode: 'overwrite',
+  consumer: 'pcs_frontend',
+  provider: 's2s_auth',
+  port: 5050,
+  log: './pact/logs',
+  dir: './pact/pacts',
+  logLevel: 'info',
 });
 
-describe('Pact with ProviderApp', () => {
+describe('Service Authorisation Consumer Pact Test', () => {
   beforeAll(async () => {
     await mockProvider.setup();
   });
-
   afterAll(async () => {
     await mockProvider.finalize();
   });
 
-  it('should request data from provider and receive correct response', async () => {
-    // Define the expected interaction
+  const BASE_URL = 'http://localhost:5050';
+  const MICRO_SERVICE_NAME = 'someMicroServiceName';
+  const MICRO_SERVICE_TOKEN = 'someMicroServiceToken';
+  const AUTHORISATION_TOKEN = 'Bearer someAuthorisationToken';
+
+  test('should receive a token when making a request to the lease endpoint', async () => {
     await mockProvider.addInteraction({
-      state: 'provider has data',
-      uponReceiving: 'a request for user data',
+      state: 'microservice with valid credentials',
+      uponReceiving: 'a request for a token',
       withRequest: {
-        method: 'GET',
-        path: '/user',
+        method: 'POST',
+        path: '/lease',
+        body: { microservice: MICRO_SERVICE_NAME, oneTimePassword: '784467' },
+        headers: { 'Content-Type': 'application/json' },
       },
       willRespondWith: {
         status: 200,
-        body: {
-          id: 1,
-          name: 'John Doe',
-        },
+        headers: { 'Content-Type': 'text/plain' },
+        body: MICRO_SERVICE_TOKEN,
       },
     });
 
-    const response = await axios.get('http://localhost:1234/user');
+    const response = await axios.post(`${BASE_URL}/lease`, {
+      microservice: MICRO_SERVICE_NAME,
+      oneTimePassword: '784467',
+    });
 
     expect(response.status).toBe(200);
-    expect(response.data.id).toBe(1);
-    expect(response.data.name).toBe('John Doe');
+    expect(response.data).toBe(MICRO_SERVICE_TOKEN);
+
+    await mockProvider.verify();
+  });
+
+  test('should validate details with a valid token', async () => {
+    await mockProvider.addInteraction({
+      state: 'microservice with valid token',
+      uponReceiving: 'a request to validate details',
+      withRequest: {
+        method: 'GET',
+        path: '/details',
+        headers: { Authorization: AUTHORISATION_TOKEN },
+      },
+      willRespondWith: {
+        status: 200,
+        headers: { 'Content-Type': 'text/plain' },
+        body: MICRO_SERVICE_NAME,
+      },
+    });
+
+    const response = await axios.get(`${BASE_URL}/details`, {
+      headers: { Authorization: AUTHORISATION_TOKEN },
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.data).toBe(MICRO_SERVICE_NAME);
 
     await mockProvider.verify();
   });
