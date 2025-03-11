@@ -13,7 +13,9 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 withPipeline(type, product, component) {
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    enablePactAs([ AppPipelineDsl.PactRoles.CONSUMER ])
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER,
+                  AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
+    ])
     afterAlways('functionalTest:preview') {
       try {
         publishHTML([
@@ -52,7 +54,9 @@ withPipeline(type, product, component) {
 
   onMaster() {
     env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
-    enablePactAs([ AppPipelineDsl.PactRoles.CONSUMER ])
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER,
+                  AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
+    ])
     afterAlways('functionalTest:aat') {
       try {
         publishHTML([
