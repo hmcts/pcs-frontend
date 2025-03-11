@@ -14,21 +14,6 @@ withPipeline(type, product, component) {
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     enablePactAs([ AppPipelineDsl.PactRoles.CONSUMER ])
-    afterAlways('smokeTests') {
-      try {
-        // Debug: Check if test script exists
-        sh 'cat package.json | grep smoke || echo "Smoke test script missing in package.json!"'
-
-        // Debug: Check if dependencies are installed
-        sh 'yarn list || echo "Dependencies might be missing!"'
-
-        // Debug: Run smoke tests with full logging
-        sh 'yarn test:smoke || echo "Smoke test failed!"'
-
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      }
-    }
     afterAlways('functionalTest:preview') {
       try {
         publishHTML([
