@@ -46,3 +46,4 @@ version
 /playwright/.cache/
 /.yarn/cache/
 /.yarn/unplugged/
+/pact/
