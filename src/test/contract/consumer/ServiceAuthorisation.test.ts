@@ -2,7 +2,7 @@ import { Pact } from '@pact-foundation/pact';
 import axios from 'axios';
 
 const mockProvider = new Pact({
-  consumer: 'pcs_frontend',
+  consumer: 'pcs-frontend',
   provider: 's2s_auth',
   port: 5050,
   log: './pact/logs',
