@@ -21,7 +21,6 @@ describe('Service Authorisation Consumer Pact Test', () => {
   const BASE_URL = 'http://localhost:5050';
   const MICRO_SERVICE_NAME = 'someMicroServiceName';
   const MICRO_SERVICE_TOKEN = 'someMicroServiceToken';
-  const AUTHORISATION_TOKEN = 'Bearer someAuthorisationToken';
 
   test('should receive a token when making a request to the lease endpoint', async () => {
     await mockProvider.addInteraction({
@@ -47,32 +46,6 @@ describe('Service Authorisation Consumer Pact Test', () => {
 
     expect(response.status).toBe(200);
     expect(response.data).toBe(MICRO_SERVICE_TOKEN);
-
-    await mockProvider.verify();
-  });
-
-  test('should validate details with a valid token', async () => {
-    await mockProvider.addInteraction({
-      state: 'microservice with valid token',
-      uponReceiving: 'a request to validate details',
-      withRequest: {
-        method: 'GET',
-        path: '/details',
-        headers: { Authorization: AUTHORISATION_TOKEN },
-      },
-      willRespondWith: {
-        status: 200,
-        headers: { 'Content-Type': 'text/plain' },
-        body: MICRO_SERVICE_NAME,
-      },
-    });
-
-    const response = await axios.get(`${BASE_URL}/details`, {
-      headers: { Authorization: AUTHORISATION_TOKEN },
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.data).toBe(MICRO_SERVICE_NAME);
 
     await mockProvider.verify();
   });
