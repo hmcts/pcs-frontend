@@ -2299,50 +2299,50 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-darwin-arm64@npm:16.0.6":
-  version: 16.0.6
-  resolution: "@pact-foundation/pact-cli-darwin-arm64@npm:16.0.6"
+"@pact-foundation/pact-cli-darwin-arm64@npm:16.0.7":
+  version: 16.0.7
+  resolution: "@pact-foundation/pact-cli-darwin-arm64@npm:16.0.7"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-darwin-x64@npm:16.0.6":
-  version: 16.0.6
-  resolution: "@pact-foundation/pact-cli-darwin-x64@npm:16.0.6"
+"@pact-foundation/pact-cli-darwin-x64@npm:16.0.7":
+  version: 16.0.7
+  resolution: "@pact-foundation/pact-cli-darwin-x64@npm:16.0.7"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-linux-arm64@npm:16.0.6":
-  version: 16.0.6
-  resolution: "@pact-foundation/pact-cli-linux-arm64@npm:16.0.6"
+"@pact-foundation/pact-cli-linux-arm64@npm:16.0.7":
+  version: 16.0.7
+  resolution: "@pact-foundation/pact-cli-linux-arm64@npm:16.0.7"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-linux-x64@npm:16.0.6":
-  version: 16.0.6
-  resolution: "@pact-foundation/pact-cli-linux-x64@npm:16.0.6"
+"@pact-foundation/pact-cli-linux-x64@npm:16.0.7":
+  version: 16.0.7
+  resolution: "@pact-foundation/pact-cli-linux-x64@npm:16.0.7"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-windows-x64@npm:16.0.6":
-  version: 16.0.6
-  resolution: "@pact-foundation/pact-cli-windows-x64@npm:16.0.6"
+"@pact-foundation/pact-cli-windows-x64@npm:16.0.7":
+  version: 16.0.7
+  resolution: "@pact-foundation/pact-cli-windows-x64@npm:16.0.7"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
 "@pact-foundation/pact-cli@npm:^16.0.6":
-  version: 16.0.6
-  resolution: "@pact-foundation/pact-cli@npm:16.0.6"
+  version: 16.0.7
+  resolution: "@pact-foundation/pact-cli@npm:16.0.7"
   dependencies:
-    "@pact-foundation/pact-cli-darwin-arm64": "npm:16.0.6"
-    "@pact-foundation/pact-cli-darwin-x64": "npm:16.0.6"
-    "@pact-foundation/pact-cli-linux-arm64": "npm:16.0.6"
-    "@pact-foundation/pact-cli-linux-x64": "npm:16.0.6"
-    "@pact-foundation/pact-cli-windows-x64": "npm:16.0.6"
+    "@pact-foundation/pact-cli-darwin-arm64": "npm:16.0.7"
+    "@pact-foundation/pact-cli-darwin-x64": "npm:16.0.7"
+    "@pact-foundation/pact-cli-linux-arm64": "npm:16.0.7"
+    "@pact-foundation/pact-cli-linux-x64": "npm:16.0.7"
+    "@pact-foundation/pact-cli-windows-x64": "npm:16.0.7"
     chalk: "npm:4.1.2"
     check-types: "npm:11.2.3"
     cross-spawn: "npm:7.0.6"
@@ -2372,7 +2372,7 @@ __metadata:
     pact-provider-verifier: bin/pact-provider-verifier.js
     pact-stub-service: bin/pact-stub-service.js
     pactflow: bin/pactflow.js
-  checksum: 10/c1a607eeed5ce3c88c23d09ba760f6f60072c17f553f97138903c88db14cbaa9a993e837f5282426c1130ff58e3227e3a5e6893cea7fb687503ef3f59015e628
+  checksum: 10/e24f85f887b8fe006688b97e0abc8b901ce7e2e69d6b273bdaadeeb6d9f48072546c4fd79851feb69d0e760ff30b2212b9383423293560f91378fe2470329426
   conditions: (os=darwin | os=linux | os=win32) & (cpu=x64 | cpu=arm64)
   languageName: node
   linkType: hard
@@ -8977,9 +8977,9 @@ __metadata:
   linkType: hard
 
 "mdn-data@npm:^2.15.0":
-  version: 2.17.0
-  resolution: "mdn-data@npm:2.17.0"
-  checksum: 10/d4c2d3dcaa71b070d8a7e6040a94fb91dcfcbf696147ae938e3c1c0301e89fa40e60d07f4c8d5016266ae30d7408df113da89818018d864296e6c350ed731540
+  version: 2.18.0
+  resolution: "mdn-data@npm:2.18.0"
+  checksum: 10/5d6b3912e264e4356ceb4ae8201fc93b27bb5ed232bc0ec0f49339e7e93706f0373033c851ad3acac94eff72d8c05df28cf70d21e7ea75f545c0d915dbfbc82d
   languageName: node
   linkType: hard
 
