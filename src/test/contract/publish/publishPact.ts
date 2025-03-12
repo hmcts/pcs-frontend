@@ -18,7 +18,7 @@ const opts = {
   tags: [PACT_BRANCH_NAME === 'master' ? 'master' : 'Dev'],
 };
 
-console.log(`Publishing Pacts with options: ${JSON.stringify(opts, null, 2)}`);
+console.debug(`Publishing Pacts with options: ${JSON.stringify(opts, null, 2)}`);
 
 pact
   .publishPacts(opts)
