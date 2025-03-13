@@ -8087,8 +8087,8 @@ __metadata:
   linkType: hard
 
 "jest-html-reporter@npm:^4.0.0":
-  version: 4.0.1
-  resolution: "jest-html-reporter@npm:4.0.1"
+  version: 4.1.0
+  resolution: "jest-html-reporter@npm:4.1.0"
   dependencies:
     "@jest/reporters": "npm:^29.7.0"
     "@jest/test-result": "npm:^29.7.0"
@@ -8100,7 +8100,7 @@ __metadata:
   peerDependencies:
     jest: 19.x - 29.x
     typescript: ^3.7.x || ^4.3.x || ^5.x
-  checksum: 10/ba23c601db57a89cb1e4d5a7f401fd24dcc7ab3d8cfd17247052d65cd0b2b6d300d6080323d2db833a9676233ec2097fb10f957afa857d0224d4329686d86ec3
+  checksum: 10/b5b72c353bfab5f472e345dce30777102bbdf4af10af5c76ce9ffb8bc88b2e780b7404cd01a6274ec6d7e44bfe9ba5fc7e61b57f15123b69fbf8e26476833f37
   languageName: node
   linkType: hard
 
