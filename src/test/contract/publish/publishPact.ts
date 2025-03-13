@@ -4,7 +4,7 @@
 
 import path from 'path';
 
-import pact from '@pact-foundation/pact-node';
+import { Publisher } from '@pact-foundation/pact';
 import git from 'git-rev-sync';
 
 const PACT_DIRECTORY = process.env.PACT_DIRECTORY || 'pact/pacts';
@@ -20,8 +20,8 @@ const opts = {
 
 console.debug(`Publishing Pacts with options: ${JSON.stringify(opts, null, 2)}`);
 
-pact
-  .publishPacts(opts)
+new Publisher(opts)
+  .publish()
   .then(() => {
     console.log('Pact contract publishing complete!');
   })
