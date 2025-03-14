@@ -1,12 +1,11 @@
 import { app as myApp } from '../app';
 
+import healthcheck from '@hmcts/nodejs-healthcheck';
+import { Logger } from '@hmcts/nodejs-logging';
+import appInsights from 'applicationinsights';
 import config from 'config';
 import { Application } from 'express';
 import { OK } from 'http-status-codes';
-
-const healthcheck = require('@hmcts/nodejs-healthcheck');
-const { Logger } = require('@hmcts/nodejs-logging');
-const appInsights = require('applicationinsights');
 
 const healthTimeout: number = config.get('health.timeout');
 const healthDeadline: number = config.get('health.deadline');

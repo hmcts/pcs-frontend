@@ -30,9 +30,10 @@ describe('AppInsights', () => {
     appInsights = new AppInsights();
   });
 
-  it('should enable Application Insights when connection string is provided', () => {
+  it('should enable Application Insights when connection string is provided', async () => {
     jest.spyOn(config, 'get').mockReturnValue('fake-connection-string');
-    const appInsightsModule = require('applicationinsights');
+
+    const appInsightsModule = await import('applicationinsights');
 
     appInsights.enable();
 
@@ -44,12 +45,12 @@ describe('AppInsights', () => {
     );
   });
 
-  it('should not enable Application Insights when connection string is not provided', () => {
+  it('should not enable Application Insights when connection string is not provided', async () => {
     jest.spyOn(config, 'get').mockReturnValue(null);
 
     appInsights.enable();
 
-    const appInsightsModule = require('applicationinsights');
+    const appInsightsModule = await import('applicationinsights');
     expect(appInsightsModule.setup).not.toHaveBeenCalled();
     expect(appInsightsModule.start).not.toHaveBeenCalled();
   });
