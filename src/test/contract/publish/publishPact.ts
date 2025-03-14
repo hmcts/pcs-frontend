@@ -20,7 +20,7 @@ const opts = {
 
 console.debug(`Publishing Pacts with options: ${JSON.stringify(opts, null, 2)}`);
 
-const command = `npx pact-broker publish ${opts.pactFilesOrDirs[0]} --consumer-app-version ${opts.consumerVersion} --broker-base-url ${opts.pactBroker} --tag ${opts.tags[0]}`;
+const command = `yarn pact-broker publish ${opts.pactFilesOrDirs[0]} --consumer-app-version ${opts.consumerVersion} --broker-base-url ${opts.pactBroker} --tag ${opts.tags[0]}`;
 
 function publishPacts(): Promise<void> {
   return new Promise((resolve, reject) => {
