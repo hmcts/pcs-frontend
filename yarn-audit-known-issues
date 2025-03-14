@@ -1,0 +1,1 @@
+{"value":"glob","children":{"ID":"glob (deprecation)","Issue":"Glob versions prior to v9 are no longer supported","Severity":"moderate","Vulnerable Versions":"8.1.0","Tree Versions":["8.1.0"],"Dependents":["help-me@npm:4.2.0"]}}
