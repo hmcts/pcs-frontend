@@ -14,7 +14,7 @@ export default function (app: Application): void {
     try {
       apiResponse = await axios.get(config.get('api.url'));
     } catch (error) {
-      logger.error(`pcs-api error: ${error.response?.statusText}`); // ✅ Use logger
+      logger.error(`pcs-api error: ${error.response?.statusText}`);
     }
 
     res.render('home', { apiResponse: apiResponse.data });

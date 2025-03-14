@@ -27,7 +27,6 @@ const logger = Logger.getLogger('app');
 new PropertiesVolume().enableFor(app);
 new AppInsights().enable();
 new Nunjucks(developmentMode).enableFor(app);
-// secure the application by adding various HTTP headers to its responses
 new Helmet(developmentMode).enableFor(app);
 new Session().enableFor(app);
 new S2S().enableFor(app);
@@ -44,7 +43,7 @@ app.use((req, res, next) => {
 
 Promise.all(
   glob.sync(__dirname + '/routes/**/*.+(ts|js)').map(async filename => {
-    const route = await import(filename); // ✅ Use `import()` instead of `require()`
+    const route = await import(filename);
     if (route.default) {
       route.default(app);
     }
@@ -54,17 +53,14 @@ Promise.all(
 });
 
 setupDev(app, developmentMode);
-// returning "not found" page for requests with paths not resolved by the router
 app.use((req, res) => {
   res.status(404);
   res.render('not-found');
 });
 
-// error handler
 app.use((err: HTTPError, req: express.Request, res: express.Response) => {
   logger.error(`${err.stack || err}`);
 
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = env === 'development' ? err : {};
   res.status(err.status || 500);
