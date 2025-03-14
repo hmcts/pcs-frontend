@@ -1,17 +1,18 @@
-import * as express from 'express';
+import webpackConfig from '../../webpack.config';
+
+import express from 'express';
+import webpack from 'webpack';
+import webpackDevMiddleware from 'webpack-dev-middleware';
 
 const setupDev = (app: express.Express, developmentMode: boolean): void => {
   if (developmentMode) {
-    const webpackDev = require('webpack-dev-middleware');
-    const webpack = require('webpack');
-    const webpackconfig = require('../../webpack.config');
-    const compiler = webpack(webpackconfig);
+    const compiler = webpack(webpackConfig);
     app.use(
-      webpackDev(compiler, {
+      webpackDevMiddleware(compiler, {
         publicPath: '/',
       })
     );
   }
 };
 
-module.exports = { setupDev };
+export { setupDev };

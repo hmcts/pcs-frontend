@@ -1,3 +1,5 @@
+import { exec } from 'child_process';
+
 import { SimpleGit, simpleGit } from 'simple-git';
 
 export class ChangedTestsRunner {
@@ -42,7 +44,7 @@ export class ChangedTestsRunner {
 
   private static execCommand(command: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const child = require('child_process').exec(command, (error: Error) => {
+      const child = exec(command, (error: Error | null) => {
         if (error) {
           reject(error);
         } else {
