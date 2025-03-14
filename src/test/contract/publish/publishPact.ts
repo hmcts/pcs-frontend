@@ -4,8 +4,9 @@
 
 import path from 'path';
 
-import { Publisher } from '@pact-foundation/pact';
 import git from 'git-rev-sync';
+
+const pact = require('@pact-foundation/pact-node');
 
 const PACT_DIRECTORY = process.env.PACT_DIRECTORY || 'pact/pacts';
 const PACT_BROKER_URL = process.env.PACT_BROKER_URL || 'http://localhost:80';
@@ -20,12 +21,12 @@ const opts = {
 
 console.debug(`Publishing Pacts with options: ${JSON.stringify(opts, null, 2)}`);
 
-new Publisher(opts)
-  .publish()
-  .then(() => {
+pact
+  .publishPacts(opts)
+  .then(function () {
     console.log('Pact contract publishing complete!');
   })
-  .catch(e => {
+  .catch(function (e) {
     console.error('Pact contract publishing failed:', e);
     process.exit(1);
   });
