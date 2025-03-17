@@ -2,9 +2,9 @@
 
 /* eslint no-console: 0 */
 
+import { exec } from 'child_process';
 import path from 'path';
 
-import pact from '@pact-foundation/pact-node';
 import git from 'git-rev-sync';
 
 const PACT_DIRECTORY = process.env.PACT_DIRECTORY || 'pact/pacts';
@@ -20,12 +20,24 @@ const opts = {
 
 console.debug(`Publishing Pacts with options: ${JSON.stringify(opts, null, 2)}`);
 
-pact
-  .publishPacts(opts)
-  .then(() => {
-    console.log('Pact contract publishing complete!');
-  })
+const command = `yarn pact-broker publish ${opts.pactFilesOrDirs[0]} --consumer-app-version ${opts.consumerVersion} --broker-base-url ${opts.pactBroker} --tag ${opts.tags[0]}`;
+
+function publishPacts(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    exec(command, error => {
+      if (error) {
+        return reject(new Error(`Pact contract publishing failed: ${error.message}`));
+      } else {
+        console.log('Pact contract publishing complete!');
+        resolve();
+      }
+    });
+  });
+}
+
+publishPacts()
+  .then(() => {})
   .catch(e => {
-    console.error('Pact contract publishing failed:', e);
+    console.error(e);
     process.exit(1);
   });
