@@ -26,7 +26,7 @@ function publishPacts(): Promise<void> {
   return new Promise((resolve, reject) => {
     exec(command, error => {
       if (error) {
-        return reject(new Error(`Pact contract publishing failed: ${error.message}`));
+        reject(new Error(`Pact contract publishing failed: ${error.message}`));
       } else {
         console.log('Pact contract publishing complete!');
         resolve();
