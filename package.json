@@ -52,7 +52,7 @@
     "applicationinsights": "2.9.6",
     "axios": "^1.4.0",
     "body-parser": "^1.20.2",
-    "chai": "4.5.0",
+    "chai": "5.2.0",
     "config": "^3.3.9",
     "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.7",
