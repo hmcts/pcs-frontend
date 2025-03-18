@@ -2,7 +2,7 @@
 
 /* eslint no-console: 0 */
 
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import path from 'path';
 
 import git from 'git-rev-sync';
@@ -20,17 +20,31 @@ const opts = {
 
 console.debug(`Publishing Pacts with options: ${JSON.stringify(opts, null, 2)}`);
 
-const command = `yarn pact-broker publish ${opts.pactFilesOrDirs[0]} --consumer-app-version ${opts.consumerVersion} --broker-base-url ${opts.pactBroker} --tag ${opts.tags[0]}`;
+const command = 'yarn';
+const args = [
+  'pact-broker',
+  'publish',
+  opts.pactFilesOrDirs[0],
+  '--consumer-app-version',
+  opts.consumerVersion,
+  '--broker-base-url',
+  opts.pactBroker,
+  '--tag',
+  opts.tags[0],
+];
 
 function publishPacts(): Promise<void> {
   return new Promise((resolve, reject) => {
-    exec(command, error => {
+    execFile(command, args, (error, stdout, stderr) => {
       if (error) {
         reject(new Error(`Pact contract publishing failed: ${error.message}`));
-      } else {
-        console.log('Pact contract publishing complete!');
-        resolve();
       }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+      }
+      console.log(`stdout: ${stdout}`);
+      console.log('Pact contract publishing complete!');
+      resolve();
     });
   });
 }
