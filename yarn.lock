@@ -7091,7 +7091,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.0.0":
+"husky@npm:^9.1.7":
   version: 9.1.7
   resolution: "husky@npm:9.1.7"
   bin:
@@ -9884,7 +9884,7 @@ __metadata:
     helmet: "npm:^8.0.0"
     html-webpack-plugin: "npm:^5.5.3"
     http-status-codes: "npm:^2.3.0"
-    husky: "npm:^9.0.0"
+    husky: "npm:^9.1.7"
     ioredis: "npm:^5.4.1"
     jest: "npm:^29.6.2"
     jest-html-reporter: "npm:^4.0.0"
