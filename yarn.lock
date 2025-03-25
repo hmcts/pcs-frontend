@@ -3235,6 +3235,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/totp-generator@npm:^0.0.8":
+  version: 0.0.8
+  resolution: "@types/totp-generator@npm:0.0.8"
+  checksum: 10/70f0378e2c56b2a00dbe452c406cfe1834bd11b12e3228774c1a9664218f06bf89515b4864fc91a9ff015e34e08cf1b51b3a1b0082cd6c7d504a8ae720ba845d
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.3
   resolution: "@types/yargs-parser@npm:21.0.3"
