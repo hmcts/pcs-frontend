@@ -84,8 +84,7 @@
     "ts-jest": "^29.2.6",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.1.6",
-    "express-rate-limit": "^7.5.0"
+    "typescript": "^5.1.6"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",

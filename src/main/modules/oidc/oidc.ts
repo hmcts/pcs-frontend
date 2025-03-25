@@ -1,7 +1,6 @@
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import * as client from 'openid-client';
-import RateLimit from 'express-rate-limit';
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
@@ -23,11 +22,6 @@ export class OIDCModule {
   }
 
   public enableFor(app: Express): void {
-    // Rate limiter: maximum of 100 requests per 15 minutes
-    const limiter = RateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100, // max 100 requests per windowMs
-    });
 
     // Store code verifier in session
     app.use((req: Request, res: Response, next: NextFunction) => {
@@ -38,7 +32,7 @@ export class OIDCModule {
     });
 
     // Login route
-    app.get('/login', limiter, async (req: Request, res: Response, next: NextFunction) => {
+    app.get('/login', async (req: Request, res: Response, next: NextFunction) => {
       try {
         const codeVerifier = req.session.codeVerifier;
         if (!codeVerifier) {
