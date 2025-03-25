@@ -1,6 +1,7 @@
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import * as client from 'openid-client';
+
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
@@ -22,7 +23,6 @@ export class OIDCModule {
   }
 
   public enableFor(app: Express): void {
-
     // Store code verifier in session
     app.use((req: Request, res: Response, next: NextFunction) => {
       if (!req.session.codeVerifier) {

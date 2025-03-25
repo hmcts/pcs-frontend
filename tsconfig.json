@@ -20,7 +20,7 @@
       "routes/*": ["routes/*"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "types": ["node", "express", "express-session"]
+    "types": ["jest", "node", "express", "express-session"]
   },
   "include": ["src/main/**/*", "src/types/**/*", "src/types/global.d.ts"],
   "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*", "src/test/**/*", "**/*.spec.ts", "**/*.e2e.ts"]
