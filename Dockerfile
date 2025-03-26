@@ -9,6 +9,11 @@ USER hmcts
 FROM base AS dependencies
 
 WORKDIR /app
+# Ensure hmcts user owns the /app directory
+USER root
+RUN chown -R hmcts:hmcts /app
+USER hmcts
+
 COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
 COPY --chown=hmcts:hmcts .yarn ./.yarn
 
@@ -32,6 +37,11 @@ RUN yarn build:prod && \
 FROM base AS runtime
 
 WORKDIR /app
+# Ensure hmcts user owns the /app directory in runtime stage
+USER root
+RUN chown -R hmcts:hmcts /app
+USER hmcts
+
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=build /app/src/main ./src/main
 
