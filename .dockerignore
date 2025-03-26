@@ -14,5 +14,6 @@
 !tsconfig.json
 !webpack/**
 !src/main/**
+!src/types/**
 !config/**
 !webpack.config.js
