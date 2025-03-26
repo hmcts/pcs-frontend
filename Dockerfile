@@ -50,6 +50,3 @@ ENV NODE_ENV=production
 
 # Expose the application port
 EXPOSE 3209
-
-# Start the application
-CMD ["node", "src/main/server.js"]
