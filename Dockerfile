@@ -42,6 +42,8 @@ USER root
 RUN chown -R hmcts:hmcts /app
 USER hmcts
 
+COPY --from=dependencies /app/package.json /app/yarn.lock /app/.yarnrc.yml ./
+COPY --from=dependencies /app/.yarn ./.yarn
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=build /app/src/main ./src/main
 
