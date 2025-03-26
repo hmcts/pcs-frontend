@@ -34,6 +34,9 @@ COPY --chown=hmcts:hmcts config ./config
 RUN yarn build:prod && \
     rm -rf webpack/ webpack.config.js
 
+# Compile TypeScript to JavaScript
+RUN npx tsc --outDir ./dist
+
 # ---- Runtime image ----
 FROM base AS runtime
 
@@ -43,13 +46,15 @@ USER root
 RUN chown -R hmcts:hmcts /app
 USER hmcts
 
-# Copy package.json for app detection
+# Copy only production dependencies
 COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
 COPY --chown=hmcts:hmcts .yarn ./.yarn
+RUN yarn install --production --frozen-lockfile
 
-# Copy node_modules and compiled code
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=build /app/src/main ./src/main
+# Copy only compiled code and necessary assets
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/src/main/public ./src/main/public
+COPY --from=build /app/config ./config
 
 # Set environment variables
 ENV NODE_ENV=production
