@@ -18,7 +18,7 @@ COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
 COPY --chown=hmcts:hmcts .yarn ./.yarn
 
 # Install dependencies
-RUN yarn install --frozen-lockfile
+RUN yarn install --immutable
 
 # ---- Build image ----
 FROM dependencies AS build
@@ -49,7 +49,7 @@ USER hmcts
 # Copy only production dependencies
 COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
 COPY --chown=hmcts:hmcts .yarn ./.yarn
-RUN yarn install --production --frozen-lockfile
+RUN yarn install --immutable --production
 
 # Copy only compiled code and necessary assets
 COPY --from=build /app/dist ./dist
@@ -61,3 +61,6 @@ ENV NODE_ENV=production
 
 # Expose the application port
 EXPOSE 3209
+
+# Start with compiled JavaScript file
+CMD ["node", "dist/main/server.js"]
