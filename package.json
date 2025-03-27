@@ -142,7 +142,8 @@
     "axios": ">1.6.0",
     "@types/express-serve-static-core": "*",
     "chai": "5.0.0",
-    "@types/node": "20.11.24"
+    "@types/node": "20.11.24",
+    "glob": "^11.0.0"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
