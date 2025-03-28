@@ -16,7 +16,7 @@ const apiHealthUrl = `${apiUrl}/health`;
 
 const healthOptions = (message: string) => {
   return {
-     callback: (error: Error, res: Response) => {
+    callback: (error: Error, res: Response) => {
       if (error) {
         appInsights.defaultClient.trackTrace(`health_check_error: ${message} and error: ${error}`);
       }
