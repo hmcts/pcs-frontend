@@ -3,7 +3,7 @@
     "pcs": {
       "redis-connection-string": "REDIS_CONNECTION_STRING",
       "pcs-frontend-s2s-secret": "S2S_SECRET",
-      "oidc-client-secret": "OIDC_CLIENT_SECRET"
+      "pcs-frontend-idam-secret": "OIDC_CLIENT_SECRET"
     }
   },
   "api": {
