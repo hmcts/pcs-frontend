@@ -89,7 +89,7 @@
     "@babel/core": "^7.22.11",
     "@babel/eslint-parser": "^7.22.11",
     "@babel/preset-env": "^7.22.14",
-    "@pact-foundation/pact": "^14.0.0",
+    "@pact-foundation/pact": "^15.0.0",
     "@playwright/test": "^1.49.0",
     "@types/chai": "^4",
     "@types/chai-as-promised": "^8.0.0",
