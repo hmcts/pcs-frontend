@@ -1,4 +1,6 @@
-module.exports = {
+import type { Config } from '@jest/types';
+
+const config: Config.InitialOptions = {
   roots: ['<rootDir>/src/test/smoke'],
   testRegex: '(/src/test/.*|\\.test)\\.(ts|js)$',
   testEnvironment: 'node',
@@ -19,3 +21,5 @@ module.exports = {
     ],
   ],
 };
+
+export default config;
