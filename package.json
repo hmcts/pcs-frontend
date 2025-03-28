@@ -28,7 +28,7 @@
     "test:pact": "jest -c jest.pact.config.ts --runInBand",
     "pact:publish": "ts-node src/test/contract/publish/*.ts",
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@hmcts/info-provider": "^1.1.0",
