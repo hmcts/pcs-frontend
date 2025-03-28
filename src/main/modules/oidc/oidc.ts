@@ -18,7 +18,7 @@ export class OIDCModule {
     this.config = await client.discovery(
       new URL(this.oidcConfig.issuer),
       this.oidcConfig.clientId,
-      this.oidcConfig.clientSecret
+      config.get('secrets.pcs.oidc-client-secret')
     );
   }
 

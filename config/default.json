@@ -25,13 +25,13 @@
       "pcs-frontend-s2s-secret": "AAAAAAAAAAAAAAAA",
       "pcs-session-secret": "pcs-supersecret",
       "redis-connection-string": "redis://localhost:6379",
-      "app-insights-connection-string": "InstrumentationKey=79536ccc-f225-4028-ae0f-edae519eb55f;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3598a202-277f-4848-bfd2-7c0877d11a8b"
+      "app-insights-connection-string": "InstrumentationKey=79536ccc-f225-4028-ae0f-edae519eb55f;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3598a202-277f-4848-bfd2-7c0877d11a8b",
+      "oidc-client-secret": "AAAAAAAAAAAAAAAA"
     }
   },
   "oidc": {
     "issuer": "https://idam-web-public.aat.platform.hmcts.net/o",
     "clientId": "pcs-frontend",
-    "clientSecret": "s",
     "redirectUri": "http://localhost:3209/oauth2/callback",
     "scope": "openid profile roles"
   }
