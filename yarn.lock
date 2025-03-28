@@ -2506,15 +2506,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact@npm:^14.0.0":
-  version: 14.0.0
-  resolution: "@pact-foundation/pact@npm:14.0.0"
+"@pact-foundation/pact@npm:^15.0.0":
+  version: 15.0.1
+  resolution: "@pact-foundation/pact@npm:15.0.1"
   dependencies:
     "@pact-foundation/pact-core": "npm:^16.0.0"
-    axios: "npm:^1.7.8"
+    axios: "npm:^1.8.4"
     body-parser: "npm:^1.20.3"
     chalk: "npm:4.1.2"
     express: "npm:^4.21.1"
+    graphql: "npm:^16.10.0"
     graphql-tag: "npm:^2.9.1"
     http-proxy: "npm:^1.18.1"
     https-proxy-agent: "npm:^7.0.4"
@@ -2522,7 +2523,7 @@ __metadata:
     lodash: "npm:^4.17.21"
     ramda: "npm:^0.30.0"
     randexp: "npm:^0.5.3"
-  checksum: 10/fecbee870a6ba84ef3c9b4d83fa2184aadf5c0a9a9f84cf8c302fdb3d520205b00b01e00ce825cf967158de40cfb45580ef2044520ec6eebe26415b4bd69adc6
+  checksum: 10/17727866f30ba7d6ef385c06cabcd4c280d8aab2c6996634d26f30cf4c0dbbc2949d18776f011e26873d26cae623deab573bd61533d96a151751a1860e8ca7b3
   languageName: node
   linkType: hard
 
@@ -9822,7 +9823,7 @@ __metadata:
     "@hmcts/nodejs-healthcheck": "npm:^1.8.0"
     "@hmcts/nodejs-logging": "npm:^4.0.4"
     "@hmcts/properties-volume": "npm:^1.2.0"
-    "@pact-foundation/pact": "npm:^14.0.0"
+    "@pact-foundation/pact": "npm:^15.0.0"
     "@pact-foundation/pact-cli": "npm:^16.0.6"
     "@playwright/test": "npm:^1.49.0"
     "@types/body-parser": "npm:^1.19.2"
