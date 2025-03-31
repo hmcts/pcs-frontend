@@ -2,9 +2,10 @@ import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import * as client from 'openid-client';
 
+import { unless } from '../../lib/unless';
+
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
-
 export class OIDCModule {
   private config!: client.Configuration;
   private oidcConfig!: OIDCConfig;
@@ -81,11 +82,16 @@ export class OIDCModule {
     });
 
     // Authentication middleware
-    app.use((req: Request, res: Response, next: NextFunction) => {
-      if (req.session.user) {
-        return next();
-      }
-      res.redirect('/login');
-    });
+    app.use(
+      unless(
+        ['/login', '/oauth2/callback', '/logout', '/health/liveness', '/health/readiness'],
+        (req: Request, res: Response, next: NextFunction) => {
+          if (req.session.user) {
+            return next();
+          }
+          res.redirect('/login');
+        }
+      )
+    );
   }
 }
