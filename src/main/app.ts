@@ -7,6 +7,7 @@ import { Nunjucks } from './modules/nunjucks';
 import { PropertiesVolume } from './modules/properties-volume';
 import { S2S } from './modules/s2s';
 import { Session } from './modules/session';
+import postcodeRouter from './routes/postcode';
 
 import * as bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -50,6 +51,12 @@ glob
   .forEach(route => route.default(app));
 
 setupDev(app, developmentMode);
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'njk');
+
+app.use('/postcode', postcodeRouter);
+
 // returning "not found" page for requests with paths not resolved by the router
 app.use((req, res) => {
   res.status(404);
