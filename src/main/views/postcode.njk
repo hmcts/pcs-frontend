@@ -4,26 +4,27 @@
 
 {% block content %}
   <h1 class="govuk-heading-l">Postcode Page</h1>
-
-   {{ govukInput({
-        label: {
-            text: "Please enter your postcode"
-        },
-        id: "postcode",
-        name: "postcode",
-        value: fields.postcode.value | safe,
-        errorMessage: { text: fields.postcode.errorMessage | safe } if fields.postcode.errorMessage,
-        attributes: {
-            maxlength: 8
-        },
-        classes: "govuk-!-width-three-quarters"
-    }) }}
-
-    <div class="govuk-form-group">
-      {{ govukButton({
-          text: "Submit",
-          preventDoubleClick: true
+  <form method="POST" action="/postcode">
+    {{ govukInput({
+          label: {
+              text: "Please enter your postcode"
+          },
+          id: "postcode",
+          name: "postcode",
+          value: fields.postcode.value | safe,
+          errorMessage: { text: fields.postcode.errorMessage | safe } if fields.postcode.errorMessage,
+          attributes: {
+              maxlength: 8
+          },
+          classes: "govuk-!-width-three-quarters"
       }) }}
-  </div>
+
+      <div class="govuk-form-group">
+        {{ govukButton({
+            text: "Submit",
+            preventDoubleClick: true
+        }) }}
+    </div>
+  </form>
 
 {% endblock %}
