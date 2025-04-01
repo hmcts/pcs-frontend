@@ -2,8 +2,6 @@ import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import * as client from 'openid-client';
 
-import { unless } from '../../lib/unless';
-
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 export class OIDCModule {
@@ -46,6 +44,18 @@ export class OIDCModule {
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
         };
+
+        // check if the AS supports PKCE
+        /**
+         * We cannot be sure the AS supports PKCE so we're going to use nonce too. Use
+         * of PKCE is backwards compatible even if the AS doesn't support it which is
+         * why we're using it regardless.
+         */
+        if (!this.config.serverMetadata().supportsPKCE()) {
+          const nonce = client.randomNonce();
+          parameters.nonce = nonce;
+        }
+
         const redirectTo = client.buildAuthorizationUrl(this.config, parameters);
         res.redirect(redirectTo.href);
       } catch (error) {
@@ -80,18 +90,5 @@ export class OIDCModule {
         res.redirect('/');
       });
     });
-
-    // Authentication middleware
-    app.use(
-      unless(
-        ['/login', '/oauth2/callback', '/logout', '/health/liveness', '/health/readiness'],
-        (req: Request, res: Response, next: NextFunction) => {
-          if (req.session.user) {
-            return next();
-          }
-          res.redirect('/login');
-        }
-      )
-    );
   }
 }
