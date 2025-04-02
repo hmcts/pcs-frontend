@@ -89,7 +89,11 @@ export class OIDCModule {
         this.logger.info('Callback URL:', req.url);
         this.logger.info('Redirect URI:', this.oidcConfig.redirectUri);
 
-        const tokens = await client.authorizationCodeGrant(this.config, new URL(req.url, this.oidcConfig.redirectUri), {
+        // Construct the full callback URL
+        const callbackUrl = new URL(req.url, this.oidcConfig.redirectUri);
+        this.logger.info('Full callback URL:', callbackUrl.toString());
+
+        const tokens = await client.authorizationCodeGrant(this.config, callbackUrl, {
           pkceCodeVerifier: codeVerifier,
         });
 
