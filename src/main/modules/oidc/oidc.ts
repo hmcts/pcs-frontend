@@ -34,7 +34,8 @@ export class OIDCModule {
   public enableFor(app: Express): void {
     // Store code verifier in session
     app.use((req: Request, res: Response, next: NextFunction) => {
-      if (!req.session.codeVerifier) {
+      // Only generate code verifier for non-callback routes
+      if (!req.path.startsWith('/oauth2/callback') && !req.session.codeVerifier) {
         req.session.codeVerifier = client.randomPKCECodeVerifier();
       }
       next();
