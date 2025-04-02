@@ -3,6 +3,7 @@ import { TokenSet } from 'openid-client';
 
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
+  nonce?: string;
   tokens?: TokenSet;
   user?: any; // You can make this more specific based on your user type
   serviceToken?: string;

@@ -5,10 +5,17 @@ import * as client from 'openid-client';
 
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
+
 export class OIDCModule {
-  private config!: client.Configuration;
+  private config!: client.Configuration & {
+    token_endpoint: string;
+    authorization_endpoint: string;
+    userinfo_endpoint: string;
+    jwks_uri: string;
+  };
   private oidcConfig!: OIDCConfig;
   private logger = Logger.getLogger('oidc');
+
   constructor() {
     this.setupClient();
   }
@@ -16,18 +23,29 @@ export class OIDCModule {
   private async setupClient(): Promise<void> {
     this.oidcConfig = config.get('oidc') as OIDCConfig;
     this.logger.info('setting up client');
-    this.config = await client.discovery(
-      new URL(this.oidcConfig.issuer),
-      this.oidcConfig.clientId,
-      config.get('secrets.pcs.pcs-frontend-idam-secret')
-    );
+
+    // Create client with specific configuration
+    const issuer = new URL(this.oidcConfig.issuer);
+    const clientId = this.oidcConfig.clientId;
+    const clientSecret = config.get('secrets.pcs.pcs-frontend-idam-secret') as string;
 
     // Log the configuration for debugging
     this.logger.info('OIDC Configuration:', {
-      issuer: this.oidcConfig.issuer,
-      clientId: this.oidcConfig.clientId,
+      issuer: issuer.toString(),
+      clientId,
       redirectUri: this.oidcConfig.redirectUri,
       scope: this.oidcConfig.scope,
+    });
+
+    // Create client with specific configuration
+    this.config = (await client.discovery(issuer, clientId, clientSecret)) as typeof this.config;
+
+    // Log the client configuration
+    this.logger.info('Client configuration:', {
+      tokenEndpoint: this.config.token_endpoint,
+      authorizationEndpoint: this.config.authorization_endpoint,
+      userinfoEndpoint: this.config.userinfo_endpoint,
+      jwksUri: this.config.jwks_uri,
     });
   }
 
@@ -56,24 +74,19 @@ export class OIDCModule {
           code_challenge_method: 'S256',
         };
 
+        // Always use nonce with HMCTS IDAM
+        const nonce = client.randomNonce();
+        parameters.nonce = nonce;
+        req.session.nonce = nonce; // Store nonce in session
+
         // Log the authorization request details
         this.logger.info('Authorization request details:', {
           codeVerifier,
           codeChallenge,
+          nonce,
           redirectUri: this.oidcConfig.redirectUri,
           scope: this.oidcConfig.scope,
         });
-
-        // check if the AS supports PKCE
-        /**
-         * We cannot be sure the AS supports PKCE so we're going to use nonce too. Use
-         * of PKCE is backwards compatible even if the AS doesn't support it which is
-         * why we're using it regardless.
-         */
-        if (!this.config.serverMetadata().supportsPKCE()) {
-          const nonce = client.randomNonce();
-          parameters.nonce = nonce;
-        }
 
         this.logger.info('building authorization url');
         const redirectTo = client.buildAuthorizationUrl(this.config, parameters);
@@ -99,9 +112,8 @@ export class OIDCModule {
         this.logger.info('Redirect URI:', this.oidcConfig.redirectUri);
         this.logger.info('Code verifier from session:', codeVerifier);
 
-        // Extract just the query string from the request URL
-        const queryString = req.url.split('?')[1];
-        const callbackUrl = new URL(`?${queryString}`, this.oidcConfig.redirectUri);
+        // Use the full URL from the request
+        const callbackUrl = new URL(req.url, `https://${req.get('host')}`);
         this.logger.info('Full callback URL:', callbackUrl.toString());
 
         try {
@@ -113,15 +125,42 @@ export class OIDCModule {
             issuer: this.oidcConfig.issuer,
           });
 
-          const tokens = await client.authorizationCodeGrant(this.config, callbackUrl, {
-            pkceCodeVerifier: codeVerifier,
+          // Get the authorization code from the callback URL
+          const code = callbackUrl.searchParams.get('code');
+          if (!code) {
+            throw new OIDCCallbackError('No authorization code found in callback');
+          }
+
+          // Make the token request manually
+          const tokenResponse = await fetch(this.config.token_endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              grant_type: 'authorization_code',
+              code,
+              redirect_uri: this.oidcConfig.redirectUri,
+              client_id: this.oidcConfig.clientId,
+              code_verifier: codeVerifier,
+              client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
+            }),
           });
 
-          // Log successful token claims
-          this.logger.info('Token claims:', tokens.claims());
+          if (!tokenResponse.ok) {
+            const errorBody = await tokenResponse.text();
+            this.logger.error('Token response error:', {
+              status: tokenResponse.status,
+              body: errorBody,
+            });
+            throw new OIDCCallbackError('Failed to exchange authorization code for tokens');
+          }
+
+          const tokens = await tokenResponse.json();
+          this.logger.info('Token response:', tokens);
 
           req.session.tokens = tokens;
-          req.session.user = tokens.claims();
+          req.session.user = tokens;
           res.redirect('/');
         } catch (tokenError: unknown) {
           const error = tokenError as Error & {
