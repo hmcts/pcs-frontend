@@ -75,17 +75,28 @@ export class OIDCModule {
         if (!codeVerifier) {
           throw new OIDCCallbackError('No code verifier found in session');
         }
+
+        // Add debug logging
+        this.logger.info('Processing callback with code verifier');
+
         const tokens = await client.authorizationCodeGrant(this.config, new URL(req.url, this.oidcConfig.redirectUri), {
           pkceCodeVerifier: codeVerifier,
         });
-        this.logger.info('tokens', tokens);
-        // Store tokens in session
+
+        // Log successful token claims
+        this.logger.info('Token claims:', tokens.claims());
+
         req.session.tokens = tokens;
         req.session.user = tokens.claims();
-
         res.redirect('/');
       } catch (error) {
-        this.logger.error('error completing authentication', error);
+        // Enhance error logging
+        this.logger.error('Authentication error details:', {
+          error: error.message,
+          code: error.code,
+          name: error.name,
+          stack: error.stack,
+        });
         next(new OIDCCallbackError('Failed to complete authentication'));
       }
     });
