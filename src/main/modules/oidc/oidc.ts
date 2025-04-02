@@ -55,6 +55,14 @@ export class OIDCModule {
           code_challenge_method: 'S256',
         };
 
+        // Log the authorization request details
+        this.logger.info('Authorization request details:', {
+          codeVerifier,
+          codeChallenge,
+          redirectUri: this.oidcConfig.redirectUri,
+          scope: this.oidcConfig.scope,
+        });
+
         // check if the AS supports PKCE
         /**
          * We cannot be sure the AS supports PKCE so we're going to use nonce too. Use
@@ -88,6 +96,7 @@ export class OIDCModule {
         this.logger.info('Processing callback with code verifier');
         this.logger.info('Callback URL:', req.url);
         this.logger.info('Redirect URI:', this.oidcConfig.redirectUri);
+        this.logger.info('Code verifier from session:', codeVerifier);
 
         // Extract just the query string from the request URL
         const queryString = req.url.split('?')[1];
@@ -95,6 +104,14 @@ export class OIDCModule {
         this.logger.info('Full callback URL:', callbackUrl.toString());
 
         try {
+          // Log the token request details
+          this.logger.info('Token request details:', {
+            codeVerifier,
+            redirectUri: callbackUrl.toString(),
+            clientId: this.oidcConfig.clientId,
+            issuer: this.oidcConfig.issuer,
+          });
+
           const tokens = await client.authorizationCodeGrant(this.config, callbackUrl, {
             pkceCodeVerifier: codeVerifier,
           });
