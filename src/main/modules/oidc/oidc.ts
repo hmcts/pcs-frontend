@@ -94,16 +94,33 @@ export class OIDCModule {
         const callbackUrl = new URL(`?${queryString}`, this.oidcConfig.redirectUri);
         this.logger.info('Full callback URL:', callbackUrl.toString());
 
-        const tokens = await client.authorizationCodeGrant(this.config, callbackUrl, {
-          pkceCodeVerifier: codeVerifier,
-        });
+        try {
+          const tokens = await client.authorizationCodeGrant(this.config, callbackUrl, {
+            pkceCodeVerifier: codeVerifier,
+          });
 
-        // Log successful token claims
-        this.logger.info('Token claims:', tokens.claims());
+          // Log successful token claims
+          this.logger.info('Token claims:', tokens.claims());
 
-        req.session.tokens = tokens;
-        req.session.user = tokens.claims();
-        res.redirect('/');
+          req.session.tokens = tokens;
+          req.session.user = tokens.claims();
+          res.redirect('/');
+        } catch (tokenError: unknown) {
+          const error = tokenError as Error & {
+            response?: { body?: unknown; status?: number; headers?: unknown };
+            code?: string;
+          };
+          // Log the full error response
+          this.logger.error('Token exchange error details:', {
+            error: error.message,
+            code: error.code,
+            name: error.name,
+            response: error.response?.body,
+            status: error.response?.status,
+            headers: error.response?.headers,
+          });
+          throw error;
+        }
       } catch (error) {
         // Enhance error logging
         this.logger.error('Authentication error details:', {
