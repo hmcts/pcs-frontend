@@ -1,9 +1,8 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 import { Express, Response as ExpressResponse, NextFunction, Request } from 'express';
 import { TOTP } from 'totp-generator';
-
-const { Logger } = require('@hmcts/nodejs-logging');
 
 export class S2S {
   logger = Logger.getLogger('s2s');

@@ -1,3 +1,4 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import * as client from 'openid-client';
@@ -7,13 +8,14 @@ import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 export class OIDCModule {
   private config!: client.Configuration;
   private oidcConfig!: OIDCConfig;
-
+  private logger = Logger.getLogger('oidc');
   constructor() {
     this.setupClient();
   }
 
   private async setupClient(): Promise<void> {
     this.oidcConfig = config.get('oidc') as OIDCConfig;
+    this.logger.info('setting up client');
     this.config = await client.discovery(
       new URL(this.oidcConfig.issuer),
       this.oidcConfig.clientId,
@@ -56,9 +58,12 @@ export class OIDCModule {
           parameters.nonce = nonce;
         }
 
+        this.logger.info('building authorization url');
         const redirectTo = client.buildAuthorizationUrl(this.config, parameters);
+        this.logger.info('redirecting to', redirectTo.href);
         res.redirect(redirectTo.href);
       } catch (error) {
+        this.logger.error('error building authorization url', error);
         next(new OIDCAuthenticationError('Failed to initiate authentication'));
       }
     });
@@ -73,13 +78,14 @@ export class OIDCModule {
         const tokens = await client.authorizationCodeGrant(this.config, new URL(req.url, this.oidcConfig.redirectUri), {
           pkceCodeVerifier: codeVerifier,
         });
-
+        this.logger.info('tokens', tokens);
         // Store tokens in session
         req.session.tokens = tokens;
         req.session.user = tokens.claims();
 
         res.redirect('/');
       } catch (error) {
+        this.logger.error('error completing authentication', error);
         next(new OIDCCallbackError('Failed to complete authentication'));
       }
     });

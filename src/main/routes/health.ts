@@ -1,3 +1,4 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import { Application } from 'express';
 import { OK } from 'http-status-codes';
@@ -5,7 +6,6 @@ import { OK } from 'http-status-codes';
 import { app as myApp } from '../app';
 
 const healthcheck = require('@hmcts/nodejs-healthcheck');
-const { Logger } = require('@hmcts/nodejs-logging');
 const appInsights = require('applicationinsights');
 
 const healthTimeout: number = config.get('health.timeout');
