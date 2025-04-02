@@ -89,8 +89,9 @@ export class OIDCModule {
         this.logger.info('Callback URL:', req.url);
         this.logger.info('Redirect URI:', this.oidcConfig.redirectUri);
 
-        // Construct the full callback URL
-        const callbackUrl = new URL(req.url, this.oidcConfig.redirectUri);
+        // Extract just the query string from the request URL
+        const queryString = req.url.split('?')[1];
+        const callbackUrl = new URL(`?${queryString}`, this.oidcConfig.redirectUri);
         this.logger.info('Full callback URL:', callbackUrl.toString());
 
         const tokens = await client.authorizationCodeGrant(this.config, callbackUrl, {
