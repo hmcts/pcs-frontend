@@ -21,6 +21,14 @@ export class OIDCModule {
       this.oidcConfig.clientId,
       config.get('secrets.pcs.pcs-frontend-idam-secret')
     );
+
+    // Log the configuration for debugging
+    this.logger.info('OIDC Configuration:', {
+      issuer: this.oidcConfig.issuer,
+      clientId: this.oidcConfig.clientId,
+      redirectUri: this.oidcConfig.redirectUri,
+      scope: this.oidcConfig.scope,
+    });
   }
 
   public enableFor(app: Express): void {
@@ -78,6 +86,8 @@ export class OIDCModule {
 
         // Add debug logging
         this.logger.info('Processing callback with code verifier');
+        this.logger.info('Callback URL:', req.url);
+        this.logger.info('Redirect URI:', this.oidcConfig.redirectUri);
 
         const tokens = await client.authorizationCodeGrant(this.config, new URL(req.url, this.oidcConfig.redirectUri), {
           pkceCodeVerifier: codeVerifier,
@@ -96,6 +106,10 @@ export class OIDCModule {
           code: error.code,
           name: error.name,
           stack: error.stack,
+          url: req.url,
+          redirectUri: this.oidcConfig.redirectUri,
+          issuer: this.oidcConfig.issuer,
+          clientId: this.oidcConfig.clientId,
         });
         next(new OIDCCallbackError('Failed to complete authentication'));
       }
