@@ -114,8 +114,28 @@ export class OIDCModule {
             issuer: this.oidcConfig.issuer,
           });
 
-          // @ts-expect-error - this is a valid config in the library
-          const { as, c, auth, fetch, tlsOnly, jarm, hybrid, nonRepudiation, timeout, decrypt } = int(config); // prettier-ignore
+          const int = (clientConfig: client.Configuration) => {
+            return props.get(clientConfig)!;
+          };
+
+          interface Internal {
+            __proto__: null;
+            as: unknown;
+            c: unknown;
+            fetch?: unknown;
+            timeout?: number;
+            tlsOnly: boolean;
+            auth: unknown;
+            jarm?: unknown;
+            hybrid?: unknown;
+            nonRepudiation?: unknown;
+            decrypt?: unknown;
+            jwksCache: unknown;
+          }
+
+          let props!: WeakMap<client.Configuration, Internal>;
+
+          const { as, c, auth, fetch, tlsOnly, jarm, hybrid, nonRepudiation, timeout, decrypt } = int(this.config); // prettier-ignore
           this.logger.info('CONFIG destructured:', {
             as,
             c,
