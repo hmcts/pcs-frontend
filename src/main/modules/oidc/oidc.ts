@@ -114,11 +114,25 @@ export class OIDCModule {
             issuer: this.oidcConfig.issuer,
           });
 
-          // Use the library's authorizationCodeGrant method
+          // @ts-expect-error - this is a valid config in the library
+          const { as, c, auth, fetch, tlsOnly, jarm, hybrid, nonRepudiation, timeout, decrypt } = int(config); // prettier-ignore
+          this.logger.info('CONFIG destructured:', {
+            as,
+            c,
+            auth,
+            fetch,
+            tlsOnly,
+            jarm,
+            hybrid,
+            nonRepudiation,
+            timeout,
+            decrypt,
+          });
+
+          // Use the library's authorizationCodeGrant method with basic options
           const tokens = await client.authorizationCodeGrant(this.config, callbackUrl, {
             pkceCodeVerifier: codeVerifier,
             expectedNonce: req.session.nonce,
-            idTokenExpected: true,
           });
 
           this.logger.info('Token response:', tokens);
@@ -131,8 +145,9 @@ export class OIDCModule {
           const error = tokenError as Error & {
             response?: { body?: unknown; status?: number; headers?: unknown };
             code?: string;
+            cause?: unknown;
           };
-          // Log the full error response
+          // Log the full error response with more details
           this.logger.error('Token exchange error details:', {
             error: error.message,
             code: error.code,
@@ -140,6 +155,8 @@ export class OIDCModule {
             response: error.response?.body,
             status: error.response?.status,
             headers: error.response?.headers,
+            cause: error.cause,
+            stack: error.stack,
           });
           throw error;
         }
