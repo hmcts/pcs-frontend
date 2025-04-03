@@ -30,23 +30,13 @@ export class OIDCModule {
     const clientSecret = config.get('secrets.pcs.pcs-frontend-idam-secret') as string;
 
     // Log the configuration for debugging
-    this.logger.info('OIDC Configuration:', {
-      issuer: issuer.toString(),
-      clientId,
-      redirectUri: this.oidcConfig.redirectUri,
-      scope: this.oidcConfig.scope,
-    });
+    this.logger.info('OIDC Configuration:', JSON.stringify(this.oidcConfig, null, 2));
 
     // Create client with specific configuration
     this.config = (await client.discovery(issuer, clientId, clientSecret)) as typeof this.config;
 
     // Log the client configuration
-    this.logger.info('Client configuration:', {
-      tokenEndpoint: this.config.token_endpoint,
-      authorizationEndpoint: this.config.authorization_endpoint,
-      userinfoEndpoint: this.config.userinfo_endpoint,
-      jwksUri: this.config.jwks_uri,
-    });
+    this.logger.info('Client configuration:', JSON.stringify(this.config, null, 2));
   }
 
   public enableFor(app: Express): void {
@@ -131,20 +121,25 @@ export class OIDCModule {
             throw new OIDCCallbackError('No authorization code found in callback');
           }
 
+          const body = new URLSearchParams({
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: this.oidcConfig.redirectUri,
+            client_id: this.oidcConfig.clientId,
+            code_verifier: codeVerifier,
+            client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
+          });
+
+          this.logger.info('fetching token from', this.config.token_endpoint);
+          this.logger.info('Token request body:', body.toString());
+
           // Make the token request manually
           const tokenResponse = await fetch(this.config.token_endpoint, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: new URLSearchParams({
-              grant_type: 'authorization_code',
-              code,
-              redirect_uri: this.oidcConfig.redirectUri,
-              client_id: this.oidcConfig.clientId,
-              code_verifier: codeVerifier,
-              client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
-            }),
+            body,
           });
 
           if (!tokenResponse.ok) {
