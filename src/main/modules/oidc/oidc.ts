@@ -7,12 +7,7 @@ import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
 export class OIDCModule {
-  private config!: client.Configuration & {
-    token_endpoint: string;
-    authorization_endpoint: string;
-    userinfo_endpoint: string;
-    jwks_uri: string;
-  };
+  private config!: client.Configuration;
   private oidcConfig!: OIDCConfig;
   private logger = Logger.getLogger('oidc');
 
@@ -33,10 +28,14 @@ export class OIDCModule {
     this.logger.info('OIDC Configuration:', JSON.stringify(this.oidcConfig, null, 2));
 
     // Create client with specific configuration
-    this.config = (await client.discovery(issuer, clientId, clientSecret)) as typeof this.config;
+    this.config = await client.discovery(issuer, clientId, clientSecret);
 
     // Log the client configuration
-    this.logger.info('Client configuration:', JSON.stringify(this.config, null, 2));
+    this.logger.info(
+      'Client configuration:',
+      JSON.stringify(this.config, null, 2),
+      this.config.serverMetadata().token_endpoint
+    );
   }
 
   public enableFor(app: Express): void {
@@ -130,11 +129,11 @@ export class OIDCModule {
             client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
           });
 
-          this.logger.info('fetching token from', this.config.token_endpoint);
+          this.logger.info('fetching token from', this.config.serverMetadata().token_endpoint!);
           this.logger.info('Token request body:', body.toString());
 
           // Make the token request manually
-          const tokenResponse = await fetch(this.config.token_endpoint, {
+          const tokenResponse = await fetch(this.config.serverMetadata().token_endpoint!, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
