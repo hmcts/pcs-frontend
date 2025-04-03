@@ -114,47 +114,18 @@ export class OIDCModule {
             issuer: this.oidcConfig.issuer,
           });
 
-          // Get the authorization code from the callback URL
-          const code = callbackUrl.searchParams.get('code');
-          if (!code) {
-            throw new OIDCCallbackError('No authorization code found in callback');
-          }
-
-          const body = new URLSearchParams({
-            grant_type: 'authorization_code',
-            code,
-            redirect_uri: this.oidcConfig.redirectUri,
-            client_id: this.oidcConfig.clientId,
-            code_verifier: codeVerifier,
-            client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
+          // Use the library's authorizationCodeGrant method
+          const tokens = await client.authorizationCodeGrant(this.config, callbackUrl, {
+            pkceCodeVerifier: codeVerifier,
+            expectedNonce: req.session.nonce,
+            idTokenExpected: true,
           });
 
-          this.logger.info('fetching token from', this.config.serverMetadata().token_endpoint!);
-          this.logger.info('Token request body:', body.toString());
-
-          // Make the token request manually
-          const tokenResponse = await fetch(this.config.serverMetadata().token_endpoint!, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body,
-          });
-
-          if (!tokenResponse.ok) {
-            const errorBody = await tokenResponse.text();
-            this.logger.error('Token response error:', {
-              status: tokenResponse.status,
-              body: errorBody,
-            });
-            throw new OIDCCallbackError('Failed to exchange authorization code for tokens');
-          }
-
-          const tokens = await tokenResponse.json();
           this.logger.info('Token response:', tokens);
 
+          // Store tokens in session
           req.session.tokens = tokens;
-          req.session.user = tokens;
+          req.session.user = tokens.claims();
           res.redirect('/');
         } catch (tokenError: unknown) {
           const error = tokenError as Error & {
