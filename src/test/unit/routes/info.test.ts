@@ -1,10 +1,10 @@
 import * as os from 'os';
 
-import infoRoute from '../../../main/routes/info';
-
 import { InfoContributor, infoRequestHandler } from '@hmcts/info-provider';
 import config from 'config';
 import { Router } from 'express';
+
+import infoRoute from '../../../main/routes/info';
 
 jest.mock('os');
 jest.mock('config');
