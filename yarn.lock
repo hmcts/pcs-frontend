@@ -235,6 +235,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@azure/msal-browser@npm:4.11.0":
   version: 4.11.0
   resolution: "@azure/msal-browser@npm:4.11.0"
@@ -255,10 +256,33 @@ __metadata:
   version: 15.5.1
   resolution: "@azure/msal-common@npm:15.5.1"
   checksum: 10/caa187c73190a3f8a7820099401672cd986a1df24426a606aa84ab529e1338ec73c2dd0d277e6d0b40987815d3702b468a49800b1a2a62113ea0defc8e18bc78
+=======
+"@azure/msal-browser@npm:^4.2.0":
+  version: 4.8.0
+  resolution: "@azure/msal-browser@npm:4.8.0"
+  dependencies:
+    "@azure/msal-common": "npm:15.3.0"
+  checksum: 10/e5393cb013adaa90cbcfbce779883fabee82d8a69b8830c1fce96e1edf83ce282a7d2a25ac9730d715976bc6fb0080de8e68014e50334f871def94cfa3cbebad
+  languageName: node
+  linkType: hard
+
+"@azure/msal-common@npm:15.3.0":
+  version: 15.3.0
+  resolution: "@azure/msal-common@npm:15.3.0"
+  checksum: 10/6f809038b827d421cb160e936880cec5b8ad70ed8628e7774ac18e365bfbf9c97223786638a07dc04d194d7c10bae001b5dac5487dacb791d69e3766fa6b9c04
+  languageName: node
+  linkType: hard
+
+"@azure/msal-common@npm:15.4.0":
+  version: 15.4.0
+  resolution: "@azure/msal-common@npm:15.4.0"
+  checksum: 10/599e724d299a8397da8eb433d45261eb26fccc624b2b46d56100084fabfc01471a4397f6fdc038f1a44d6d15523ef9688da442e1ec538508097231ea0c4c4ca4
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
 "@azure/msal-node@npm:^3.2.3":
+<<<<<<< HEAD
   version: 3.5.0
   resolution: "@azure/msal-node@npm:3.5.0"
   dependencies:
@@ -266,6 +290,15 @@ __metadata:
     jsonwebtoken: "npm:^9.0.0"
     uuid: "npm:^8.3.0"
   checksum: 10/2b373531c4e1e8cf4813b69ddcf760f3ef806e9958f46fd8a64f6f1fbb3efbed152cf87393f49d56258f25223d3ca2f5ad3ab7eb0a83e2c9aed7ca9c357516ab
+=======
+  version: 3.4.1
+  resolution: "@azure/msal-node@npm:3.4.1"
+  dependencies:
+    "@azure/msal-common": "npm:15.4.0"
+    jsonwebtoken: "npm:^9.0.0"
+    uuid: "npm:^8.3.0"
+  checksum: 10/3b356723aec10fda1275b33524e23c710e92cb6026303b03402d96563c7615c5e2b6e77d850a2ca258dc2223528578c1964696101e8a3782a6538eddc6c2e219
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -1654,13 +1687,22 @@ __metadata:
   linkType: hard
 
 "@eslint-community/eslint-utils@npm:^4.2.0, @eslint-community/eslint-utils@npm:^4.4.0":
+<<<<<<< HEAD
   version: 4.6.0
   resolution: "@eslint-community/eslint-utils@npm:4.6.0"
+=======
+  version: 4.5.1
+  resolution: "@eslint-community/eslint-utils@npm:4.5.1"
+>>>>>>> 69df422 (update config)
   dependencies:
     eslint-visitor-keys: "npm:^3.4.3"
   peerDependencies:
     eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
+<<<<<<< HEAD
   checksum: 10/f81d40d69ea83616f7ea38c6c45ce55d3cf76d80f91d5c01cc361699ae1951b8678f3627d693b3d4bc062bd35d459be9290c6f796744e09e64161a57497fe446
+=======
+  checksum: 10/336b85150cf1828cba5b1fcf694233b947e635654c33aa2c1692dc9522d617218dff5abf3aaa6410b92fcb7fd1f0bf5393ec5b588987ac8835860465f8808ec5
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -2979,7 +3021,11 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@types/express@npm:*, @types/express@npm:^5.0.1":
+=======
+"@types/express@npm:*":
+>>>>>>> 69df422 (update config)
   version: 5.0.1
   resolution: "@types/express@npm:5.0.1"
   dependencies:
@@ -2987,6 +3033,21 @@ __metadata:
     "@types/express-serve-static-core": "npm:^5.0.0"
     "@types/serve-static": "npm:*"
   checksum: 10/189dd078679c5f748644c9dccf6b9666755d2fd37741ae5b7494129531b14d0366746a79191e1064060c2547daf7d342a02c48923730f20c8980c9ca7dfce1d2
+<<<<<<< HEAD
+=======
+  languageName: node
+  linkType: hard
+
+"@types/express@npm:^4.17.17":
+  version: 4.17.21
+  resolution: "@types/express@npm:4.17.21"
+  dependencies:
+    "@types/body-parser": "npm:*"
+    "@types/express-serve-static-core": "npm:^4.17.33"
+    "@types/qs": "npm:*"
+    "@types/serve-static": "npm:*"
+  checksum: 10/7a6d26cf6f43d3151caf4fec66ea11c9d23166e4f3102edfe45a94170654a54ea08cf3103d26b3928d7ebcc24162c90488e33986b7e3a5f8941225edd5eb18c7
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -3309,6 +3370,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@typescript-eslint/scope-manager@npm:8.30.1":
   version: 8.30.1
   resolution: "@typescript-eslint/scope-manager@npm:8.30.1"
@@ -3316,6 +3378,15 @@ __metadata:
     "@typescript-eslint/types": "npm:8.30.1"
     "@typescript-eslint/visitor-keys": "npm:8.30.1"
   checksum: 10/ecae69888a06126d57f3ac2db9935199b708406e8cd84e0918dd8302f31771145d62b52bf3c454be43c5aa4f93685d3f8c15b118d0de1c0323e02113c127aa66
+=======
+"@typescript-eslint/scope-manager@npm:8.29.0":
+  version: 8.29.0
+  resolution: "@typescript-eslint/scope-manager@npm:8.29.0"
+  dependencies:
+    "@typescript-eslint/types": "npm:8.29.0"
+    "@typescript-eslint/visitor-keys": "npm:8.29.0"
+  checksum: 10/23ce9962d57607f91a8a4a9bc43e64bd91cd933b53e61765924704614e52f39e8ccb28276b60b7472fb6dffe52fa681f114b73e4561fb4dcb74910a4e6a3629f
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -3343,10 +3414,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@typescript-eslint/types@npm:8.30.1":
   version: 8.30.1
   resolution: "@typescript-eslint/types@npm:8.30.1"
   checksum: 10/342ec75ba2c596ffaa93612c6c6afd2b0a05c346bdfa73ac208b49f1969b48a3f739f306431f9a10cf34e99e8585ca924fdde7f9508dd7869142b25f399d6bd6
+=======
+"@typescript-eslint/types@npm:8.29.0":
+  version: 8.29.0
+  resolution: "@typescript-eslint/types@npm:8.29.0"
+  checksum: 10/d65b9f2f6d87a3744788b09d9112c4a0298f1215138d8677240aae3bfa37ddc24a59315536cd9aab63c7608909ae2c5f436924c889b98986b78003b6028b5c35
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -3369,12 +3447,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@typescript-eslint/typescript-estree@npm:8.30.1":
   version: 8.30.1
   resolution: "@typescript-eslint/typescript-estree@npm:8.30.1"
   dependencies:
     "@typescript-eslint/types": "npm:8.30.1"
     "@typescript-eslint/visitor-keys": "npm:8.30.1"
+=======
+"@typescript-eslint/typescript-estree@npm:8.29.0":
+  version: 8.29.0
+  resolution: "@typescript-eslint/typescript-estree@npm:8.29.0"
+  dependencies:
+    "@typescript-eslint/types": "npm:8.29.0"
+    "@typescript-eslint/visitor-keys": "npm:8.29.0"
+>>>>>>> 69df422 (update config)
     debug: "npm:^4.3.4"
     fast-glob: "npm:^3.3.2"
     is-glob: "npm:^4.0.3"
@@ -3383,7 +3470,11 @@ __metadata:
     ts-api-utils: "npm:^2.0.1"
   peerDependencies:
     typescript: ">=4.8.4 <5.9.0"
+<<<<<<< HEAD
   checksum: 10/60c307fbb8ec86d28e4b2237b624427b7aee737bced82e5f94acc84229eae907e7742ccf0c9c0825326b3ccb9f72b14075893d90e06c28f8ce2fd04502c0b410
+=======
+  checksum: 10/276e6ea97857ef0fd940578d4b8f1677fd68d2bb62603c85d7aa97fcf86c1f66c5da962393254b605c7025f0cda74395904053891088cbe405b899afc1180e9c
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -3402,6 +3493,7 @@ __metadata:
   linkType: hard
 
 "@typescript-eslint/utils@npm:^6.0.0 || ^7.0.0 || ^8.0.0":
+<<<<<<< HEAD
   version: 8.30.1
   resolution: "@typescript-eslint/utils@npm:8.30.1"
   dependencies:
@@ -3413,6 +3505,19 @@ __metadata:
     eslint: ^8.57.0 || ^9.0.0
     typescript: ">=4.8.4 <5.9.0"
   checksum: 10/97d27d2f0bce6f60a1857d511dba401f076766477a2896405aca52e860f9c5460111299f6e17642e18e578be1dbf850a0b1202ba61aa65d6a52646429ff9c99c
+=======
+  version: 8.29.0
+  resolution: "@typescript-eslint/utils@npm:8.29.0"
+  dependencies:
+    "@eslint-community/eslint-utils": "npm:^4.4.0"
+    "@typescript-eslint/scope-manager": "npm:8.29.0"
+    "@typescript-eslint/types": "npm:8.29.0"
+    "@typescript-eslint/typescript-estree": "npm:8.29.0"
+  peerDependencies:
+    eslint: ^8.57.0 || ^9.0.0
+    typescript: ">=4.8.4 <5.9.0"
+  checksum: 10/1fd17a28b8b57fc73c0455dea43a8185d3a4421f4a21ece01009b5e6a2974c8d4113f90d27993f668fa97077891b4464588d380c25116d351eb12ad7ef0d468d
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -3426,6 +3531,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@typescript-eslint/visitor-keys@npm:8.30.1":
   version: 8.30.1
   resolution: "@typescript-eslint/visitor-keys@npm:8.30.1"
@@ -3433,6 +3539,15 @@ __metadata:
     "@typescript-eslint/types": "npm:8.30.1"
     eslint-visitor-keys: "npm:^4.2.0"
   checksum: 10/0c08169123ebca4ab04464486a7f41093ba77e75fb088e2c8af9f36bb4c0f785d4e82940f6b62e47457d4758fa57a53423db4226250d6eb284e75a3f96f03f2b
+=======
+"@typescript-eslint/visitor-keys@npm:8.29.0":
+  version: 8.29.0
+  resolution: "@typescript-eslint/visitor-keys@npm:8.29.0"
+  dependencies:
+    "@typescript-eslint/types": "npm:8.29.0"
+    eslint-visitor-keys: "npm:^4.2.0"
+  checksum: 10/02e0e86ab112849a31b7d06c767be0ca7802385bf953d3b75f4ba6d06741d9492773325bc69d4c2a1c191b08f1c4c4b33f8e062d6d5d9f0f4f78f1b8b3cc2d41
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -4497,9 +4612,15 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001688":
+<<<<<<< HEAD
   version: 1.0.30001713
   resolution: "caniuse-lite@npm:1.0.30001713"
   checksum: 10/0c1b97320d08cf87c73883fe9a7b9d8037b7c24aa027641e75cce3dee74c9ad538cf17725fdcb46e6ec86be8efedf6edd0848db07c5f8110936ccf0185e2ff68
+=======
+  version: 1.0.30001710
+  resolution: "caniuse-lite@npm:1.0.30001710"
+  checksum: 10/8e496924c5cf91f844945f6ab675c89edf9e7a55be880c718ca99bf4e1afeeff3d11d743558fcfa001c60eaf60e7489037fa6c2d9cba1e56a53d1a7b25544282
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -5507,9 +5628,15 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.73":
+<<<<<<< HEAD
   version: 1.5.137
   resolution: "electron-to-chromium@npm:1.5.137"
   checksum: 10/97645a6400b70a04906f83812fd1b3c3992f5b5dff0413298857df096c6aad09299f0d8f491b3b7282fe4360dc2ad2c150363d4e662cd7dd7be32f5fc8778c5d
+=======
+  version: 1.5.132
+  resolution: "electron-to-chromium@npm:1.5.132"
+  checksum: 10/ff50f38e26c5acdce1010703197a1cd1b9d9d789160ee1d4a2fc9f5dff6a030632ab36893156147d7360e891dd7151e156c6003ca271d4acbb4e501788ff22bd
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -6730,6 +6857,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
+=======
+"glob@npm:^10.2.2":
+  version: 10.4.5
+  resolution: "glob@npm:10.4.5"
+  dependencies:
+    foreground-child: "npm:^3.1.0"
+    jackspeak: "npm:^3.1.2"
+    minimatch: "npm:^9.0.4"
+    minipass: "npm:^7.1.2"
+    package-json-from-dist: "npm:^1.0.0"
+    path-scurry: "npm:^1.11.1"
+  bin:
+    glob: dist/esm/bin.mjs
+  checksum: 10/698dfe11828b7efd0514cd11e573eaed26b2dff611f0400907281ce3eab0c1e56143ef9b35adc7c77ecc71fba74717b510c7c223d34ca8a98ec81777b293d4ac
+  languageName: node
+  linkType: hard
+
+>>>>>>> 69df422 (update config)
 "glob@npm:^11.0.0":
   version: 11.0.1
   resolution: "glob@npm:11.0.1"
@@ -6984,10 +7130,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "hookified@npm:^1.8.1":
   version: 1.8.2
   resolution: "hookified@npm:1.8.2"
   checksum: 10/344099d23e4cd2803672ece46c173f61672a938b87ff2f024613f1d2b15164255176df9ce7c7fb4186d2a19007ad142a8a1a9fe2ffb0d3b53152d0d86a098dc7
+=======
+"hookified@npm:^1.7.1":
+  version: 1.8.1
+  resolution: "hookified@npm:1.8.1"
+  checksum: 10/d784864816c98e97b24462e08107041c30fcc585cb87e9bb8ea9961716cc951a917db3950b1a4519bedfb9a2cadc7efa3b205979f323f49c57991767ad2573e8
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -8553,7 +8706,11 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "keyv@npm:^5.3.2":
+=======
+"keyv@npm:^5.3.1":
+>>>>>>> 69df422 (update config)
   version: 5.3.2
   resolution: "keyv@npm:5.3.2"
   dependencies:
@@ -8903,9 +9060,15 @@ __metadata:
   linkType: hard
 
 "mdn-data@npm:^2.15.0":
+<<<<<<< HEAD
   version: 2.21.0
   resolution: "mdn-data@npm:2.21.0"
   checksum: 10/b1e52805eeee301479b498f3443d4148257ea0c1edf87d6350a233de9b2b9e939405c5a121246df3e3e8aed7aa729a37a9b0070fc0a849221001f6dc77aea88b
+=======
+  version: 2.19.0
+  resolution: "mdn-data@npm:2.19.0"
+  checksum: 10/d8a0e4ed17144faa022ee5a686c1dc50b1b1f3b1f4e0e630b315813a0e8097b7d71ec3e5aa557e62f24fa2f0300d6d0135d55bf1347d22e8076afa7cff3a65aa
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
@@ -10863,6 +11026,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "roarr@npm:^7.0.4":
   version: 7.21.1
   resolution: "roarr@npm:7.21.1"
@@ -10887,6 +11051,8 @@ __metadata:
   languageName: node
   linkType: hard
 
+=======
+>>>>>>> 69df422 (update config)
 "rrweb-cssom@npm:^0.8.0":
   version: 0.8.0
   resolution: "rrweb-cssom@npm:0.8.0"
@@ -12086,10 +12252,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "tldts-core@npm:^6.1.86":
   version: 6.1.86
   resolution: "tldts-core@npm:6.1.86"
   checksum: 10/cb5dff9cc15661ac773a2099e98c99a5cb3cebc35909c23cc4261ff7992032c7501995ae995de3574dbbf3431e59c47496534d52f5e96abcb231f0e72144c020
+=======
+"tldts-core@npm:^6.1.85":
+  version: 6.1.85
+  resolution: "tldts-core@npm:6.1.85"
+  checksum: 10/4068bede7cd6b690387621e2740758ec1205c8b2ee3ce6dc9d0b9d09b7b659f6dfc6129b2e3227c363d4015d62528580d378cbf0c28e94de55f10206f67adadc
+>>>>>>> 69df422 (update config)
   languageName: node
   linkType: hard
 
