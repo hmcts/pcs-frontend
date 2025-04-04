@@ -8,6 +8,10 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "strictNullChecks": true,
+<<<<<<< HEAD
     "types": ["jest", "node"]
+=======
+    "types": ["codeceptjs", "jest", "node"]
+>>>>>>> 50c35ed (unit test fixing)
   }
 }
