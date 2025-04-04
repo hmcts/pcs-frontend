@@ -1,9 +1,12 @@
 import * as os from 'os';
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> 227da3d (HDPI-359: fixing the unit test and build errors)
+=======
+>>>>>>> 546a257 (HDPI-359: fixing the linting issue)
 import { InfoContributor, infoRequestHandler } from '@hmcts/info-provider';
 import config from 'config';
 import { Router } from 'express';

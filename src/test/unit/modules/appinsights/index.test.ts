@@ -4,10 +4,13 @@ import config from 'config';
 
 import { AppInsights } from '../../../../main/modules/appinsights';
 
+<<<<<<< HEAD
 >>>>>>> 227da3d (HDPI-359: fixing the unit test and build errors)
 
 import { AppInsights } from '../../../../main/modules/appinsights';
 
+=======
+>>>>>>> 546a257 (HDPI-359: fixing the linting issue)
 jest.mock('applicationinsights', () => {
   const setup = jest.fn().mockReturnThis();
   const setSendLiveMetrics = jest.fn().mockReturnThis();
