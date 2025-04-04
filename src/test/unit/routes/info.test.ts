@@ -1,6 +1,5 @@
 import * as os from 'os';
 
-
 import { InfoContributor, infoRequestHandler } from '@hmcts/info-provider';
 import config from 'config';
 import { Router } from 'express';
