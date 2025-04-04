@@ -44,20 +44,25 @@ export class OIDCModule {
 
         const codeVerifier = req.session.codeVerifier;
         const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
+        const nonce = client.randomNonce();
+
         const parameters: Record<string, string> = {
           redirect_uri: this.oidcConfig.redirectUri,
           scope: this.oidcConfig.scope,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
-          nonce: client.randomNonce(),
+          nonce,
         };
 
-        req.session.nonce = parameters.nonce; // Store nonce in session
+        // Store nonce in session
+        req.session.nonce = nonce;
+        this.logger.info('Generated nonce for session:', nonce);
 
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
         this.logger.info('redirecting to', redirectTo.href);
         res.redirect(redirectTo.href);
       } catch (error) {
+        this.logger.error('Login error:', error);
         next(new OIDCAuthenticationError('Failed to initiate authentication'));
       }
     });
@@ -68,6 +73,11 @@ export class OIDCModule {
         const codeVerifier = req.session.codeVerifier;
         if (!codeVerifier) {
           throw new OIDCCallbackError('No code verifier found in session');
+        }
+
+        const nonce = req.session.nonce;
+        if (!nonce) {
+          throw new OIDCCallbackError('No nonce found in session');
         }
 
         // Get the full URL more reliably
@@ -84,20 +94,25 @@ export class OIDCModule {
             redirectUri: callbackUrl.toString(),
             clientId: this.oidcConfig.clientId,
             issuer: this.oidcConfig.issuer,
-            expectedNonce: req.session.nonce,
+            expectedNonce: nonce,
           });
 
-          // Use the library's authorizationCodeGrant method with basic options
+          // Use the library's authorizationCodeGrant method with explicit nonce validation
           const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
             pkceCodeVerifier: codeVerifier,
-            expectedNonce: req.session.nonce,
+            expectedNonce: nonce,
           });
 
-          this.logger.info('Token response:', tokens);
+          this.logger.info('Token response received successfully');
 
           // Store tokens in session
           req.session.tokens = tokens;
           req.session.user = tokens.claims();
+
+          // Clear sensitive session data after successful authentication
+          delete req.session.codeVerifier;
+          delete req.session.nonce;
+
           res.redirect('/');
         } catch (tokenError: unknown) {
           const error = tokenError as Error & {
