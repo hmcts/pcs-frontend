@@ -23,16 +23,10 @@ export default function (app: Application): void {
 
     try {
       const pcsApiURL = config.get('api.url');
-      //  console.log('pcsApiURL ===> ', pcsApiURL);
-      //  const response = await axios.get(`${pcsApiURL}/court?postCode=${encodeURIComponent(postcode)}`);
-      const response = await axios.get(`${pcsApiURL}/health`);
+      const response = await axios.get(`${pcsApiURL}/court?postCode=${encodeURIComponent(postcode)}`);
       const courtData = response.data;
-
-      // Render or handle the result however you need
       res.render('postcode-result', { courtData });
     } catch (error) {
-      //   console.error('Error calling court API:', error);
-
       res.render('postcode', {
         fields: {
           postcode: {
