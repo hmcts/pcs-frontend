@@ -27,6 +27,9 @@ export default function (app: Application): void {
       const courtData = response.data;
       res.render('postcode-result', { courtData });
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching court postcode data:', error);
+
       res.render('postcode', {
         fields: {
           postcode: {
