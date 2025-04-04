@@ -7,7 +7,7 @@ import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
 export class OIDCModule {
-  private config!: client.Configuration;
+  private clientConfig!: client.Configuration;
   private oidcConfig!: OIDCConfig;
   private logger = Logger.getLogger('oidc');
 
@@ -24,65 +24,40 @@ export class OIDCModule {
     const clientId = this.oidcConfig.clientId;
     const clientSecret = config.get('secrets.pcs.pcs-frontend-idam-secret') as string;
 
-    // Log the configuration for debugging
-    this.logger.info('OIDC Configuration:', JSON.stringify(this.oidcConfig, null, 2));
-
     // Create client with specific configuration
-    this.config = await client.discovery(issuer, clientId, clientSecret);
+    this.clientConfig = await client.discovery(issuer, clientId, clientSecret);
 
     // Log the client configuration
-    this.logger.info(
-      'Client configuration:',
-      JSON.stringify(this.config, null, 2),
-      this.config.serverMetadata().token_endpoint
-    );
+    this.logger.info('Client configuration:', JSON.stringify(this.clientConfig.serverMetadata(), null, 2));
   }
 
   public enableFor(app: Express): void {
-    // Store code verifier in session
-    app.use((req: Request, res: Response, next: NextFunction) => {
-      // Only generate code verifier for non-callback routes
-      if (!req.path.startsWith('/oauth2/callback') && !req.session.codeVerifier) {
-        req.session.codeVerifier = client.randomPKCECodeVerifier();
-      }
-      next();
-    });
+    app.set('trust proxy', true);
 
     // Login route
     app.get('/login', async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const codeVerifier = req.session.codeVerifier;
-        if (!codeVerifier) {
-          throw new OIDCAuthenticationError('No code verifier found in session');
+        // Generate code verifier only when needed for login
+        if (!req.session.codeVerifier) {
+          req.session.codeVerifier = client.randomPKCECodeVerifier();
         }
+
+        const codeVerifier = req.session.codeVerifier;
         const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
         const parameters: Record<string, string> = {
           redirect_uri: this.oidcConfig.redirectUri,
           scope: this.oidcConfig.scope,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
+          nonce: client.randomNonce(),
         };
 
-        // Always use nonce with HMCTS IDAM
-        const nonce = client.randomNonce();
-        parameters.nonce = nonce;
-        req.session.nonce = nonce; // Store nonce in session
+        req.session.nonce = parameters.nonce; // Store nonce in session
 
-        // Log the authorization request details
-        this.logger.info('Authorization request details:', {
-          codeVerifier,
-          codeChallenge,
-          nonce,
-          redirectUri: this.oidcConfig.redirectUri,
-          scope: this.oidcConfig.scope,
-        });
-
-        this.logger.info('building authorization url');
-        const redirectTo = client.buildAuthorizationUrl(this.config, parameters);
+        const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
         this.logger.info('redirecting to', redirectTo.href);
         res.redirect(redirectTo.href);
       } catch (error) {
-        this.logger.error('error building authorization url', error);
         next(new OIDCAuthenticationError('Failed to initiate authentication'));
       }
     });
@@ -95,15 +70,12 @@ export class OIDCModule {
           throw new OIDCCallbackError('No code verifier found in session');
         }
 
-        // Add debug logging
-        this.logger.info('Processing callback with code verifier');
-        this.logger.info('Callback URL:', req.url);
-        this.logger.info('Redirect URI:', this.oidcConfig.redirectUri);
-        this.logger.info('Code verifier from session:', codeVerifier);
-
-        // Use the full URL from the request
-        const callbackUrl = new URL(req.url, `https://${req.get('host')}`);
-        this.logger.info('Full callback URL:', callbackUrl.toString());
+        // Get the full URL more reliably
+        const protocol = req.protocol;
+        const host = req.get('host');
+        // Get the original URL from the request and preserve the query parameters
+        const originalUrl = req.originalUrl;
+        const callbackUrl = new URL(originalUrl, `${protocol}://${host}`);
 
         try {
           // Log the token request details
@@ -112,45 +84,11 @@ export class OIDCModule {
             redirectUri: callbackUrl.toString(),
             clientId: this.oidcConfig.clientId,
             issuer: this.oidcConfig.issuer,
-          });
-
-          const int = (clientConfig: client.Configuration) => {
-            return props.get(clientConfig)!;
-          };
-
-          interface Internal {
-            __proto__: null;
-            as: unknown;
-            c: unknown;
-            fetch?: unknown;
-            timeout?: number;
-            tlsOnly: boolean;
-            auth: unknown;
-            jarm?: unknown;
-            hybrid?: unknown;
-            nonRepudiation?: unknown;
-            decrypt?: unknown;
-            jwksCache: unknown;
-          }
-
-          let props!: WeakMap<client.Configuration, Internal>;
-
-          const { as, c, auth, fetch, tlsOnly, jarm, hybrid, nonRepudiation, timeout, decrypt } = int(this.config); // prettier-ignore
-          this.logger.info('CONFIG destructured:', {
-            as,
-            c,
-            auth,
-            fetch,
-            tlsOnly,
-            jarm,
-            hybrid,
-            nonRepudiation,
-            timeout,
-            decrypt,
+            expectedNonce: req.session.nonce,
           });
 
           // Use the library's authorizationCodeGrant method with basic options
-          const tokens = await client.authorizationCodeGrant(this.config, callbackUrl, {
+          const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
             pkceCodeVerifier: codeVerifier,
             expectedNonce: req.session.nonce,
           });
