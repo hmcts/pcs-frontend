@@ -1,4 +1,10 @@
 import config from 'config';
+<<<<<<< HEAD
+=======
+
+import { AppInsights } from '../../../../main/modules/appinsights';
+
+>>>>>>> 227da3d (HDPI-359: fixing the unit test and build errors)
 
 import { AppInsights } from '../../../../main/modules/appinsights';
 

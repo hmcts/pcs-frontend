@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
+=======
+import config from 'config';
+import { Application } from 'express';
+import { OK } from 'http-status-codes';
+>>>>>>> 227da3d (HDPI-359: fixing the unit test and build errors)
 
 import { app as myApp } from '../app';
 

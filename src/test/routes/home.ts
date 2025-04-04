@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> 227da3d (HDPI-359: fixing the unit test and build errors)
 import { expect } from 'chai';
 import request from 'supertest';
 
