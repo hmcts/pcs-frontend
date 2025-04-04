@@ -62,6 +62,7 @@ RUN yarn set version 4.7.0 && \
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/src/main/public ./dist/main/public
 COPY --from=build /app/src/main/assets ./dist/main/assets
+COPY --from=build /app/src/main/views ./dist/main/views
 COPY --from=build /app/config ./config
 
 # Create required directories and copy assets
