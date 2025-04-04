@@ -1,82 +1,82 @@
+import express, { Application, Request, Response } from 'express';
+import request from 'supertest';
+import postcodeRoutes from '../../../main/routes/postcode';
 import axios from 'axios';
 import config from 'config';
-import { Request, Response } from 'express';
-import postcodeRoutes from '../../../main/routes/postcode';
 
 jest.mock('axios');
 jest.mock('config');
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-const mockedConfig = config as jest.Mocked<typeof config>;
-
-describe('postcode routes', () => {
-  let req: Partial<Request>;
-  let res: Partial<Response>;
-  let app: any;
+describe('POST /postcode', () => {
+  let app: Application;
+  let renderSpy: jest.Mock;
 
   beforeEach(() => {
-    req = { body: {} };
-    res = { render: jest.fn() };
-    app = {
-      get: jest.fn(),
-      post: jest.fn()
-    };
+    app = express();
+
+    // Parse URL-encoded body before route is registered
+    app.use(express.urlencoded({ extended: false }));
+
+    // Mock res.render and auto-end the response
+    app.use((req: Request, res: Response, next) => {
+      renderSpy = jest.fn((view, options) => {
+        res.status(200).send({ view, options });
+      });
+      res.render = renderSpy as unknown as Response['render'];
+      next();
+    });
+
+    // Register the actual route
     postcodeRoutes(app);
   });
 
-  test('GET /postcode should render the postcode form', () => {
-    expect(app.get).toHaveBeenCalledWith('/postcode', expect.any(Function));
+  it('should return error if postcode is missing', async () => {
+    const response = await request(app).post('/postcode').type('form').send({ postcode: '' });
 
-    const handler = app.get.mock.calls[0][1];
-    handler(req as Request, res as Response);
-
-    expect(res.render).toHaveBeenCalledWith('postcode', { fields: {} });
-  });
-
-  test('POST /postcode with empty input should show validation error', async () => {
-    req.body = { postcode: '' };
-
-    const handler = app.post.mock.calls[0][1];
-    await handler(req as Request, res as Response);
-
-    expect(res.render).toHaveBeenCalledWith('postcode', {
+    expect(renderSpy).toHaveBeenCalledWith('postcode', {
       fields: {
         postcode: {
           value: '',
           errorMessage: 'Please enter a postcode',
-        }
-      }
+        },
+      },
     });
+
+    expect(response.status).toBe(200);
   });
 
-  test('POST /postcode with valid input should call the API and render result', async () => {
-    req.body = { postcode: 'SW1A 1AA' };
-    const fakeData = { court: 'Westminster Court' };
-    mockedAxios.get.mockResolvedValue({ data: fakeData });
-    mockedConfig.get.mockReturnValue('http://mock-api');
+  it('should render result if postcode is valid and API responds', async () => {
+    (config.get as jest.Mock).mockReturnValue('http://mock-api');
+    (axios.get as jest.Mock).mockResolvedValue({
+      data: { courtName: 'Mock Court' },
+    });
 
-    const handler = app.post.mock.calls[0][1];
-    await handler(req as Request, res as Response);
+    const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
 
-    expect(mockedAxios.get).toHaveBeenCalledWith('http://mock-api/court?postCode=SW1A%201AA');
-    expect(res.render).toHaveBeenCalledWith('postcode-result', { courtData: fakeData });
+    expect(axios.get).toHaveBeenCalledWith('http://mock-api/court?postCode=SW1A%201AA');
+
+    expect(renderSpy).toHaveBeenCalledWith('postcode-result', {
+      courtData: { courtName: 'Mock Court' },
+    });
+
+    expect(response.status).toBe(200);
   });
 
-  test('POST /postcode API failure should render error message', async () => {
-    req.body = { postcode: 'SW1A 1AA' };
-    mockedAxios.get.mockRejectedValue(new Error('API error'));
-    mockedConfig.get.mockReturnValue('http://mock-api');
+  it('should show error if API call fails', async () => {
+    (config.get as jest.Mock).mockReturnValue('http://mock-api');
+    (axios.get as jest.Mock).mockRejectedValue(new Error('API error'));
 
-    const handler = app.post.mock.calls[0][1];
-    await handler(req as Request, res as Response);
+    const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
 
-    expect(res.render).toHaveBeenCalledWith('postcode', {
+    expect(renderSpy).toHaveBeenCalledWith('postcode', {
       fields: {
         postcode: {
           value: 'SW1A 1AA',
           errorMessage: 'There was a problem retrieving court information.',
-        }
-      }
+        },
+      },
     });
+
+    expect(response.status).toBe(200);
   });
 });
