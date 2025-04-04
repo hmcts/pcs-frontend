@@ -1,98 +1,82 @@
-import express, { Application, Request, Response } from 'express';
-import request from 'supertest';
-
+import axios from 'axios';
+import config from 'config';
+import { Request, Response } from 'express';
 import postcodeRoutes from '../../../main/routes/postcode';
-import { getCourtVenues } from '../../../main/services/pcsApi/pcsApiService';
 
-interface MockSession {
-  user: {
-    accessToken: string;
-  };
-}
+jest.mock('axios');
+jest.mock('config');
 
-// Mock external modules
-jest.mock('../../../main/services/pcsApi/pcsApiService');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedConfig = config as jest.Mocked<typeof config>;
 
-jest.mock('@hmcts/nodejs-logging', () => ({
-  Logger: {
-    getLogger: () => ({
-      error: jest.fn(),
-      info: jest.fn(),
-      debug: jest.fn(),
-    }),
-  },
-}));
-
-describe('POST /postcode', () => {
-  let app: Application;
-  let renderSpy: jest.Mock;
+describe('postcode routes', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+  let app: any;
 
   beforeEach(() => {
-    app = express();
-    app.use(express.urlencoded({ extended: false }));
-
-    // Mock res.render
-    app.use((req: Request, res: Response, next) => {
-      // Mock session
-      (req.session as unknown as MockSession) = {
-        user: {
-          accessToken: 'test-token',
-        },
-      };
-
-      renderSpy = jest.fn((view, options) => {
-        res.status(200).send({ view, options });
-      });
-      res.render = renderSpy as unknown as Response['render'];
-      next();
-    });
-
+    req = { body: {} };
+    res = { render: jest.fn() };
+    app = {
+      get: jest.fn(),
+      post: jest.fn()
+    };
     postcodeRoutes(app);
   });
 
-  it('should render an error if postcode is missing', async () => {
-    const response = await request(app).post('/postcode').type('form').send({ postcode: '' });
+  test('GET /postcode should render the postcode form', () => {
+    expect(app.get).toHaveBeenCalledWith('/postcode', expect.any(Function));
 
-    expect(renderSpy).toHaveBeenCalledWith('postcode', {
+    const handler = app.get.mock.calls[0][1];
+    handler(req as Request, res as Response);
+
+    expect(res.render).toHaveBeenCalledWith('postcode', { fields: {} });
+  });
+
+  test('POST /postcode with empty input should show validation error', async () => {
+    req.body = { postcode: '' };
+
+    const handler = app.post.mock.calls[0][1];
+    await handler(req as Request, res as Response);
+
+    expect(res.render).toHaveBeenCalledWith('postcode', {
       fields: {
         postcode: {
           value: '',
           errorMessage: 'Please enter a postcode',
-        },
-      },
+        }
+      }
     });
-
-    expect(response.status).toBe(200);
   });
 
-  it('should show error message if PCS API call fails', async () => {
-    (getCourtVenues as jest.Mock).mockRejectedValue(new Error('API failed'));
+  test('POST /postcode with valid input should call the API and render result', async () => {
+    req.body = { postcode: 'SW1A 1AA' };
+    const fakeData = { court: 'Westminster Court' };
+    mockedAxios.get.mockResolvedValue({ data: fakeData });
+    mockedConfig.get.mockReturnValue('http://mock-api');
 
-    const response = await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
+    const handler = app.post.mock.calls[0][1];
+    await handler(req as Request, res as Response);
 
-    expect(renderSpy).toHaveBeenCalledWith('postcode', {
+    expect(mockedAxios.get).toHaveBeenCalledWith('http://mock-api/court?postCode=SW1A%201AA');
+    expect(res.render).toHaveBeenCalledWith('postcode-result', { courtData: fakeData });
+  });
+
+  test('POST /postcode API failure should render error message', async () => {
+    req.body = { postcode: 'SW1A 1AA' };
+    mockedAxios.get.mockRejectedValue(new Error('API error'));
+    mockedConfig.get.mockReturnValue('http://mock-api');
+
+    const handler = app.post.mock.calls[0][1];
+    await handler(req as Request, res as Response);
+
+    expect(res.render).toHaveBeenCalledWith('postcode', {
       fields: {
         postcode: {
-          value: 'EC1A 1BB',
-          errorMessage: 'There was an error retrieving court data. Please try again later.',
-        },
-      },
+          value: 'SW1A 1AA',
+          errorMessage: 'There was a problem retrieving court information.',
+        }
+      }
     });
-
-    expect(response.status).toBe(200);
-  });
-
-  it('should render courts.njk with tableRows if PCS API returns data', async () => {
-    (getCourtVenues as jest.Mock).mockResolvedValue([{ epimId: 123, id: 456, name: 'Test Court' }]);
-
-    const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
-
-    expect(getCourtVenues).toHaveBeenCalledWith('SW1A 1AA', { accessToken: 'test-token' });
-
-    expect(renderSpy).toHaveBeenCalledWith('courts.njk', {
-      tableRows: [[{ text: '456' }, { text: 'Test Court' }]],
-    });
-
-    expect(response.status).toBe(200);
   });
 });
