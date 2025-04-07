@@ -1,4 +1,5 @@
 import { Logger } from '@hmcts/nodejs-logging';
+import axios from 'axios';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import * as client from 'openid-client';
@@ -22,17 +23,36 @@ export class OIDCModule {
     this.oidcConfig = config.get('oidc') as OIDCConfig;
     this.logger.info('setting up client');
 
-    // Create client with specific configuration
-    const issuer = new URL(this.oidcConfig.issuer);
-    const clientId = this.oidcConfig.clientId;
-    const clientSecret = config.get('secrets.pcs.pcs-frontend-idam-secret') as string;
+    try {
+      // Manually fetch the OIDC configuration
+      const discoveryUrl = new URL('.well-known/openid-configuration', this.oidcConfig.issuer).toString();
+      this.logger.info('Fetching OIDC configuration from:', discoveryUrl);
 
-    // Create client with specific configuration
-    this.clientConfig = await client.discovery(issuer, clientId, clientSecret);
+      const response = await axios.get(discoveryUrl);
+      const metadata = response.data;
 
-    // Log the client configuration
-    this.logger.info('Client configuration:', JSON.stringify(this.clientConfig.serverMetadata(), null, 2));
-    this.logger.info('Using issuer for validation:', this.actualIssuer);
+      this.logger.info('OIDC configuration:', JSON.stringify(metadata, null, 2));
+
+      // Create client with the actual issuer
+      const clientId = this.oidcConfig.clientId;
+      const clientSecret = config.get('secrets.pcs.pcs-frontend-idam-secret') as string;
+
+      // Create a custom issuer object that overrides the issuer
+      const customIssuer = new URL(this.oidcConfig.issuer);
+
+      // Create client with manual configuration
+      // @ts-expect-error - The metadata option is not in the type definition but is supported
+      this.clientConfig = await client.discovery(customIssuer, clientId, clientSecret, { metadata });
+
+      // Override the issuer in the client configuration
+      // @ts-expect-error - We need to override the issuer property
+      this.clientConfig.issuer = this.actualIssuer;
+
+      this.logger.info('Client configuration created with issuer:', this.actualIssuer);
+    } catch (error) {
+      this.logger.error('Failed to setup OIDC client:', error);
+      throw new OIDCAuthenticationError('Failed to initialize OIDC client');
+    }
   }
 
   public enableFor(app: Express): void {
@@ -93,13 +113,10 @@ export class OIDCModule {
 
         try {
           // Use the library's authorizationCodeGrant method with explicit nonce validation
-          // and override the issuer validation
           const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
             pkceCodeVerifier: codeVerifier,
             expectedNonce: nonce,
             idTokenExpected: true,
-            // @ts-expect-error - The issuer option is not in the type definition but is supported
-            issuer: this.actualIssuer,
           });
 
           this.logger.info('Token response:', tokens);
