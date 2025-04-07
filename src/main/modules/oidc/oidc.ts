@@ -6,6 +6,15 @@ import * as client from 'openid-client';
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
+// Define the claims interface to match what we expect from the IDAM service
+interface IDAMClaims {
+  roles?: string[];
+  authorities?: string[];
+  permissions?: string[];
+  scope?: string;
+  [key: string]: string | string[] | undefined;
+}
+
 export class OIDCModule {
   private clientConfig!: client.Configuration;
   private oidcConfig!: OIDCConfig;
@@ -105,9 +114,40 @@ export class OIDCModule {
 
           this.logger.info('Token response received successfully');
 
-          // Store tokens in session
+          // Process the claims to extract roles
+          const claims = (tokens.claims() as IDAMClaims) || {};
+          this.logger.info('User claims received:', JSON.stringify(claims, null, 2));
+
+          // Extract roles from various possible claim fields
+          // HMCTS IDAM might use different claim names for roles
+          let roles: string[] = [];
+
+          // Check for roles in various possible claim fields
+          if (claims.roles) {
+            roles = Array.isArray(claims.roles) ? claims.roles : [];
+            this.logger.info('Found roles in claims.roles:', roles);
+          } else if (claims.authorities) {
+            roles = Array.isArray(claims.authorities) ? claims.authorities : [];
+            this.logger.info('Found roles in claims.authorities:', roles);
+          } else if (claims.permissions) {
+            roles = Array.isArray(claims.permissions) ? claims.permissions : [];
+            this.logger.info('Found roles in claims.permissions:', roles);
+          } else if (claims.scope) {
+            // Sometimes roles are included in the scope claim
+            const scopeRoles = claims.scope.split(' ').filter((s: string) => s.startsWith('fr:idm:'));
+            roles = scopeRoles.map((r: string) => r.replace('fr:idm:', ''));
+            this.logger.info('Found roles in claims.scope:', roles);
+          }
+
+          // Log all available claims for debugging
+          this.logger.info('All available claims:', Object.keys(claims));
+
+          // Store tokens and user info in session
           req.session.tokens = tokens;
-          req.session.user = tokens.claims();
+          req.session.user = {
+            ...claims,
+            roles,
+          };
 
           // Clear sensitive session data after successful authentication
           delete req.session.codeVerifier;
