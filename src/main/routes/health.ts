@@ -1,13 +1,16 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 =======
+=======
+import { app as myApp } from '../app';
+
+>>>>>>> da49f45 (Linting fixes)
 import config from 'config';
 import { Application } from 'express';
 import { OK } from 'http-status-codes';
 >>>>>>> 227da3d (HDPI-359: fixing the unit test and build errors)
-
-import { app as myApp } from '../app';
 
 const healthcheck = require('@hmcts/nodejs-healthcheck');
 

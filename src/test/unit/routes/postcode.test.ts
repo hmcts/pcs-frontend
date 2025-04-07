@@ -1,9 +1,9 @@
+import postcodeRoutes from '../../../main/routes/postcode';
+
 import axios from 'axios';
 import config from 'config';
 import express, { Application, Request, Response } from 'express';
 import request from 'supertest';
-
-import postcodeRoutes from '../../../main/routes/postcode';
 
 jest.mock('axios');
 jest.mock('config');

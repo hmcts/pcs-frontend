@@ -1,11 +1,14 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> 227da3d (HDPI-359: fixing the unit test and build errors)
+=======
+import { app } from '../../main/app';
+
+>>>>>>> da49f45 (Linting fixes)
 import { expect } from 'chai';
 import request from 'supertest';
-
-import { app } from '../../main/app';
 
 // TODO: replace this sample test with proper route tests for your application
 /* eslint-disable jest/expect-expect */

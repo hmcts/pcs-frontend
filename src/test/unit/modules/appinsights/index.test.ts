@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import config from 'config';
 <<<<<<< HEAD
 =======
@@ -11,6 +12,12 @@ import { AppInsights } from '../../../../main/modules/appinsights';
 
 =======
 >>>>>>> 546a257 (HDPI-359: fixing the linting issue)
+=======
+import { AppInsights } from '../../../../main/modules/appinsights';
+
+import config from 'config';
+
+>>>>>>> da49f45 (Linting fixes)
 jest.mock('applicationinsights', () => {
   const setup = jest.fn().mockReturnThis();
   const setSendLiveMetrics = jest.fn().mockReturnThis();
