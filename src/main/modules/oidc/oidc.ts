@@ -10,6 +10,9 @@ export class OIDCModule {
   private clientConfig!: client.Configuration;
   private oidcConfig!: OIDCConfig;
   private logger = Logger.getLogger('oidc');
+  // The actual issuer used in the JWT tokens
+  private actualIssuer =
+    'https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts';
 
   constructor() {
     this.setupClient();
@@ -29,6 +32,7 @@ export class OIDCModule {
 
     // Log the client configuration
     this.logger.info('Client configuration:', JSON.stringify(this.clientConfig.serverMetadata(), null, 2));
+    this.logger.info('Using issuer for validation:', this.actualIssuer);
   }
 
   public enableFor(app: Express): void {
@@ -88,60 +92,29 @@ export class OIDCModule {
         const callbackUrl = new URL(originalUrl, `${protocol}://${host}`);
 
         try {
-          // Log the token request details
-          this.logger.info('Token request details:', {
-            codeVerifier,
-            redirectUri: callbackUrl.toString(),
-            clientId: this.oidcConfig.clientId,
-            issuer: this.oidcConfig.issuer,
+          // Use the library's authorizationCodeGrant method with explicit nonce validation
+          // and override the issuer validation
+          const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
+            pkceCodeVerifier: codeVerifier,
             expectedNonce: nonce,
+            idTokenExpected: true,
+            // @ts-expect-error - The issuer option is not in the type definition but is supported
+            issuer: this.actualIssuer,
           });
 
-          // Get the authorization code from the callback URL
-          const code = callbackUrl.searchParams.get('code');
-          if (!code) {
-            throw new OIDCCallbackError('No authorization code found in callback');
-          }
-
-          const body = new URLSearchParams({
-            grant_type: 'authorization_code',
-            code,
-            redirect_uri: this.oidcConfig.redirectUri,
-            client_id: this.oidcConfig.clientId,
-            code_verifier: codeVerifier,
-            client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
-          });
-
-          // Make the token request manually
-          const tokenResponse = await fetch(this.clientConfig.serverMetadata().token_endpoint!, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body,
-          });
-
-          // // Use the library's authorizationCodeGrant method with explicit nonce validation
-          // const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
-          //   pkceCodeVerifier: codeVerifier,
-          //   expectedNonce: nonce,
-          //   idTokenExpected: true,
-          // });
-
-          if (!tokenResponse.ok) {
-            const errorBody = await tokenResponse.text();
-            this.logger.error('Token response error:', {
-              status: tokenResponse.status,
-              body: errorBody,
-            });
-            throw new OIDCCallbackError('Failed to exchange authorization code for tokens');
-          }
-
-          const tokens = await tokenResponse.json();
           this.logger.info('Token response:', tokens);
 
+          // Store tokens in session
           req.session.tokens = tokens;
-          req.session.user = tokens;
+
+          // Get claims from the tokens
+          const claims = tokens.claims();
+
+          // Log the claims for debugging
+          this.logger.info('User claims:', JSON.stringify(claims, null, 2));
+
+          // Store user info in session
+          req.session.user = claims;
 
           // Clear sensitive session data after successful authentication
           delete req.session.codeVerifier;
