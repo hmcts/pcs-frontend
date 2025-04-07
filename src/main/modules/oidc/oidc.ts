@@ -6,15 +6,6 @@ import * as client from 'openid-client';
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
-// Define the claims interface to match what we expect from the IDAM service
-interface IDAMClaims {
-  roles?: string[];
-  authorities?: string[];
-  permissions?: string[];
-  scope?: string;
-  [key: string]: string | string[] | undefined;
-}
-
 export class OIDCModule {
   private clientConfig!: client.Configuration;
   private oidcConfig!: OIDCConfig;
@@ -106,48 +97,51 @@ export class OIDCModule {
             expectedNonce: nonce,
           });
 
-          // Use the library's authorizationCodeGrant method with explicit nonce validation
-          const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
-            pkceCodeVerifier: codeVerifier,
-            expectedNonce: nonce,
-          });
-
-          this.logger.info('Token response received successfully');
-
-          // Process the claims to extract roles
-          const claims = (tokens.claims() as IDAMClaims) || {};
-          this.logger.info('User claims received:', JSON.stringify(claims, null, 2));
-
-          // Extract roles from various possible claim fields
-          // HMCTS IDAM might use different claim names for roles
-          let roles: string[] = [];
-
-          // Check for roles in various possible claim fields
-          if (claims.roles) {
-            roles = Array.isArray(claims.roles) ? claims.roles : [];
-            this.logger.info('Found roles in claims.roles:', roles);
-          } else if (claims.authorities) {
-            roles = Array.isArray(claims.authorities) ? claims.authorities : [];
-            this.logger.info('Found roles in claims.authorities:', roles);
-          } else if (claims.permissions) {
-            roles = Array.isArray(claims.permissions) ? claims.permissions : [];
-            this.logger.info('Found roles in claims.permissions:', roles);
-          } else if (claims.scope) {
-            // Sometimes roles are included in the scope claim
-            const scopeRoles = claims.scope.split(' ').filter((s: string) => s.startsWith('fr:idm:'));
-            roles = scopeRoles.map((r: string) => r.replace('fr:idm:', ''));
-            this.logger.info('Found roles in claims.scope:', roles);
+          // Get the authorization code from the callback URL
+          const code = callbackUrl.searchParams.get('code');
+          if (!code) {
+            throw new OIDCCallbackError('No authorization code found in callback');
           }
 
-          // Log all available claims for debugging
-          this.logger.info('All available claims:', Object.keys(claims));
+          const body = new URLSearchParams({
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: this.oidcConfig.redirectUri,
+            client_id: this.oidcConfig.clientId,
+            code_verifier: codeVerifier,
+            client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
+          });
 
-          // Store tokens and user info in session
+          // Make the token request manually
+          const tokenResponse = await fetch(this.clientConfig.serverMetadata().token_endpoint!, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body,
+          });
+
+          // // Use the library's authorizationCodeGrant method with explicit nonce validation
+          // const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
+          //   pkceCodeVerifier: codeVerifier,
+          //   expectedNonce: nonce,
+          //   idTokenExpected: true,
+          // });
+
+          if (!tokenResponse.ok) {
+            const errorBody = await tokenResponse.text();
+            this.logger.error('Token response error:', {
+              status: tokenResponse.status,
+              body: errorBody,
+            });
+            throw new OIDCCallbackError('Failed to exchange authorization code for tokens');
+          }
+
+          const tokens = await tokenResponse.json();
+          this.logger.info('Token response:', tokens);
+
           req.session.tokens = tokens;
-          req.session.user = {
-            ...claims,
-            roles,
-          };
+          req.session.user = tokens;
 
           // Clear sensitive session data after successful authentication
           delete req.session.codeVerifier;

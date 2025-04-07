@@ -33,6 +33,6 @@
     "issuer": "https://idam-web-public.aat.platform.hmcts.net/o",
     "clientId": "pcs-frontend",
     "redirectUri": "http://localhost:3209/oauth2/callback",
-    "scope": "openid profile fr:idm:*"
+    "scope": "openid profile roles"
   }
 }
