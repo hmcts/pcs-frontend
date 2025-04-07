@@ -2171,9 +2171,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mswjs/interceptors@npm:^0.38.0":
-  version: 0.38.0
-  resolution: "@mswjs/interceptors@npm:0.38.0"
+"@mswjs/interceptors@npm:^0.38.1":
+  version: 0.38.1
+  resolution: "@mswjs/interceptors@npm:0.38.1"
   dependencies:
     "@open-draft/deferred-promise": "npm:^2.2.0"
     "@open-draft/logger": "npm:^0.3.0"
@@ -2182,7 +2182,7 @@ __metadata:
     jsdom: "npm:^26.0.0"
     outvariant: "npm:^1.4.3"
     strict-event-emitter: "npm:^0.5.1"
-  checksum: 10/758d8867d9635f1aeabf8ef7c76aa0158b41a3f718f3329a0e24448b70ddaff01e3d6b467b67103d8251bdce6c4afb84c5386c5c51b3ae93b02d4351cc2a480a
+  checksum: 10/8bffe0b98c97d564d60049e7f541d5920a05ebac4982d79b5a0361fce2260a41fe39a230d97abb8bc9500504e17f9e3ef40403856d791b8ba50ca6af1ea3d48f
   languageName: node
   linkType: hard
 
@@ -4412,12 +4412,12 @@ __metadata:
   linkType: hard
 
 "cacheable@npm:^1.8.9":
-  version: 1.8.9
-  resolution: "cacheable@npm:1.8.9"
+  version: 1.8.10
+  resolution: "cacheable@npm:1.8.10"
   dependencies:
-    hookified: "npm:^1.7.1"
-    keyv: "npm:^5.3.1"
-  checksum: 10/f037d66f02f1a769b98b46897c5dc58406b405f4204922cf8048c1744fb632076d427ee413d932eb65029fdfb1f6ecf709ab6cef93a1edfaf602200544156499
+    hookified: "npm:^1.8.1"
+    keyv: "npm:^5.3.2"
+  checksum: 10/0c4b9c05a8a2bc823ddc8026305a13bfef5cf2ebbd7c613c8d088905d9400ea73cf273d401c7a4169304f4fec07aa352b93662be75fbfc60461218f96e3642bc
   languageName: node
   linkType: hard
 
@@ -4485,9 +4485,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001688":
-  version: 1.0.30001710
-  resolution: "caniuse-lite@npm:1.0.30001710"
-  checksum: 10/8e496924c5cf91f844945f6ab675c89edf9e7a55be880c718ca99bf4e1afeeff3d11d743558fcfa001c60eaf60e7489037fa6c2d9cba1e56a53d1a7b25544282
+  version: 1.0.30001712
+  resolution: "caniuse-lite@npm:1.0.30001712"
+  checksum: 10/1831ac3260b9657c5a0236d21c02bea6a6b88fd67a451a0ff166d27da17c95ab398c5721e08aeb24f766bced1d38f562f07c8de84e91a10a065808e83835e89e
   languageName: node
   linkType: hard
 
@@ -6279,11 +6279,11 @@ __metadata:
   linkType: hard
 
 "file-entry-cache@npm:^10.0.7":
-  version: 10.0.7
-  resolution: "file-entry-cache@npm:10.0.7"
+  version: 10.0.8
+  resolution: "file-entry-cache@npm:10.0.8"
   dependencies:
-    flat-cache: "npm:^6.1.7"
-  checksum: 10/4d080a0e683df569bee759f0cedf4d17e023a4e9aeab6b8825364fc4f89e5c92090c91f6c7a800297b3b74c3e9727e42283b89dfd069f50a94b1bea5d107e054
+    flat-cache: "npm:^6.1.8"
+  checksum: 10/1094f55bd39d18de81ba64a3ed998fc8223ae814eef6e65518e2a1491d419febcaa852c8b87df2f4dd67c10b0053906be86b7f04ecdadaa5781821604dc88437
   languageName: node
   linkType: hard
 
@@ -6360,14 +6360,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flat-cache@npm:^6.1.7":
-  version: 6.1.7
-  resolution: "flat-cache@npm:6.1.7"
+"flat-cache@npm:^6.1.8":
+  version: 6.1.8
+  resolution: "flat-cache@npm:6.1.8"
   dependencies:
     cacheable: "npm:^1.8.9"
     flatted: "npm:^3.3.3"
-    hookified: "npm:^1.7.1"
-  checksum: 10/7fafc964e7e6eff9795396fa23b23955d02760b01ebc0e2b4861ef1e3945ef446416b0a07be99097fe20353414ffc8d38edd62351423c22983d7e84f4e20f9d3
+    hookified: "npm:^1.8.1"
+  checksum: 10/0aee09163c06c336c14254c6464736fcd8ad32344337a7645c1d5bda27956f5c1fc389f2c6443e5218b17859e5edb45e7882cbc9a91e2f5ddffd62f1c5dccb1e
   languageName: node
   linkType: hard
 
@@ -6954,7 +6954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hookified@npm:^1.7.1":
+"hookified@npm:^1.8.1":
   version: 1.8.1
   resolution: "hookified@npm:1.8.1"
   checksum: 10/d784864816c98e97b24462e08107041c30fcc585cb87e9bb8ea9961716cc951a917db3950b1a4519bedfb9a2cadc7efa3b205979f323f49c57991767ad2573e8
@@ -8521,7 +8521,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keyv@npm:^5.3.1":
+"keyv@npm:^5.3.2":
   version: 5.3.2
   resolution: "keyv@npm:5.3.2"
   dependencies:
@@ -9274,13 +9274,13 @@ __metadata:
   linkType: hard
 
 "nock@npm:^14.0.0":
-  version: 14.0.2
-  resolution: "nock@npm:14.0.2"
+  version: 14.0.3
+  resolution: "nock@npm:14.0.3"
   dependencies:
-    "@mswjs/interceptors": "npm:^0.38.0"
+    "@mswjs/interceptors": "npm:^0.38.1"
     json-stringify-safe: "npm:^5.0.1"
     propagate: "npm:^2.0.0"
-  checksum: 10/3abf8f3026af898014e55acf76888e69e4bcdab34f59c0f4240faca2cdc0ee6913d1d7eac775b808b1f546263cad225cf76d95e1a0943b41bb6be15658a21a7c
+  checksum: 10/e9f9599c43b38d10337b749d246bbdb4092c67a38c3c7211635975724e0fd2fc6a629acdbebbeffcc94a9d37704262b6be5cd4647e3bcc02874fa6449766ea94
   languageName: node
   linkType: hard
 
@@ -11691,8 +11691,8 @@ __metadata:
   linkType: hard
 
 "stylelint@npm:^16.0.0":
-  version: 16.17.0
-  resolution: "stylelint@npm:16.17.0"
+  version: 16.18.0
+  resolution: "stylelint@npm:16.18.0"
   dependencies:
     "@csstools/css-parser-algorithms": "npm:^3.0.4"
     "@csstools/css-tokenizer": "npm:^3.0.3"
@@ -11734,7 +11734,7 @@ __metadata:
     write-file-atomic: "npm:^5.0.1"
   bin:
     stylelint: bin/stylelint.mjs
-  checksum: 10/23a4d93db030b322ae1548877428317f5430a9c47f8bdf837fd31a84ceb8ee40c0ba822c315e0ae5b0424a84030243ebb742d0fad9f91c2d71ef6d3dfc9b32b0
+  checksum: 10/96b00d96125a033aeb9dfc710fbeacd36b69cc3914a060a09ba56c9f2165ed2296f09b048ab3ac702bdd2a1dd5a1ed7c3d0f315312d7802a5444e7df053e42ba
   languageName: node
   linkType: hard
 
@@ -12293,22 +12293,22 @@ __metadata:
   linkType: hard
 
 "typescript@npm:^5.1.6":
-  version: 5.8.2
-  resolution: "typescript@npm:5.8.2"
+  version: 5.8.3
+  resolution: "typescript@npm:5.8.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10/dbc2168a55d56771f4d581997be52bab5cbc09734fec976cfbaabd787e61fb4c6cf9125fd48c6f98054ce549c77ecedefc7f64252a830dd8e9c3381f61fbeb78
+  checksum: 10/65c40944c51b513b0172c6710ee62e951b70af6f75d5a5da745cb7fab132c09ae27ffdf7838996e3ed603bb015dadd099006658046941bd0ba30340cc563ae92
   languageName: node
   linkType: hard
 
 "typescript@patch:typescript@npm%3A^5.1.6#optional!builtin<compat/typescript>":
-  version: 5.8.2
-  resolution: "typescript@patch:typescript@npm%3A5.8.2#optional!builtin<compat/typescript>::version=5.8.2&hash=5786d5"
+  version: 5.8.3
+  resolution: "typescript@patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10/97920a082ffc57583b1cb6bc4faa502acc156358e03f54c7fc7fdf0b61c439a717f4c9070c449ee9ee683d4cfc3bb203127c2b9794b2950f66d9d307a4ff262c
+  checksum: 10/b9b1e73dabac5dc730c041325dbd9c99467c1b0d239f1b74ec3b90d831384af3e2ba973946232df670519147eb51a2c20f6f96163cea2b359f03de1e2091cc4f
   languageName: node
   linkType: hard
 
