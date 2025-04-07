@@ -22,7 +22,7 @@ jest.mock('applicationinsights', () => {
   };
 });
 
-describe('AppInsights', () => {
+describe('AppInsights test', () => {
   let appInsights: AppInsights;
 
   beforeEach(() => {
