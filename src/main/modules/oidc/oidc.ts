@@ -107,10 +107,17 @@ export class OIDCModule {
         const originalUrl = req.originalUrl;
         const callbackUrl = new URL(originalUrl, `${protocol}://${host}`);
 
+        // Get the authorization code from the callback URL
+        const code = callbackUrl.searchParams.get('code');
+        if (!code) {
+          throw new OIDCCallbackError('No authorization code found in callback');
+        }
+
         try {
           this.logger.info('Callback URL:', callbackUrl.toString());
           this.logger.info('Code verifier:', codeVerifier);
           this.logger.info('Nonce:', nonce);
+          this.logger.info('Code:', code);
 
           // Use the library's authorizationCodeGrant method with explicit nonce validation
           // const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
@@ -118,27 +125,40 @@ export class OIDCModule {
           //   expectedNonce: nonce,
           //   idTokenExpected: true,
           // });
+          // });
 
-          // do a manual request
-          const tokens = await axios.post(this.clientConfig.serverMetadata().token_endpoint as string, {
-            code: req.query.code,
+          const body = new URLSearchParams({
+            grant_type: 'authorization_code',
+            code,
             redirect_uri: this.oidcConfig.redirectUri,
+            client_id: this.oidcConfig.clientId,
             code_verifier: codeVerifier,
+            client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
           });
 
+          // Make the token request manually
+          const tokenResponse = await fetch(this.clientConfig.serverMetadata().token_endpoint!, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body,
+          });
+
+          if (!tokenResponse.ok) {
+            const errorBody = await tokenResponse.text();
+            this.logger.error('Token response error:', {
+              status: tokenResponse.status,
+              body: errorBody,
+            });
+            throw new OIDCCallbackError('Failed to exchange authorization code for tokens');
+          }
+
+          const tokens = await tokenResponse.json();
           this.logger.info('Token response:', tokens);
 
-          // Store tokens in session
           req.session.tokens = tokens;
-
-          // Get claims from the tokens
-          const claims = tokens.claims();
-
-          // Log the claims for debugging
-          this.logger.info('User claims:', JSON.stringify(claims, null, 2));
-
-          // Store user info in session
-          req.session.user = claims;
+          req.session.user = tokens;
 
           // Clear sensitive session data after successful authentication
           delete req.session.codeVerifier;
