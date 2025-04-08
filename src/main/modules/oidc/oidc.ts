@@ -37,18 +37,17 @@ export class OIDCModule {
       const clientId = this.oidcConfig.clientId;
       const clientSecret = config.get('secrets.pcs.pcs-frontend-idam-secret') as string;
 
-      // Create a custom issuer object that overrides the issuer
-      const customIssuer = new URL(this.oidcConfig.issuer);
-
       // Create client with manual configuration
-      // @ts-expect-error - The metadata option is not in the type definition but is supported
-      this.clientConfig = await client.discovery(customIssuer, clientId, clientSecret, { metadata });
+      // Create a server metadata object with the necessary fields
+      const serverMetadata = {
+        ...metadata,
+        issuer: this.actualIssuer,
+      };
 
-      // Override the issuer in the client configuration
-      // @ts-expect-error - We need to override the issuer property
-      this.clientConfig.issuer = this.actualIssuer;
+      // Create the client configuration with the server metadata
+      this.clientConfig = new client.Configuration(serverMetadata, clientId, clientSecret);
 
-      this.logger.info('Client configuration created with issuer:', this.actualIssuer);
+      this.logger.info('Client configuration created with metadata:', this.clientConfig.serverMetadata());
     } catch (error) {
       this.logger.error('Failed to setup OIDC client:', error);
       throw new OIDCAuthenticationError('Failed to initialize OIDC client');
