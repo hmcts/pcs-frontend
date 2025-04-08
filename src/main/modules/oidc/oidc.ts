@@ -47,7 +47,10 @@ export class OIDCModule {
       // Create the client configuration with the server metadata
       this.clientConfig = new client.Configuration(serverMetadata, clientId, clientSecret);
 
-      this.logger.info('Client configuration created with metadata:', this.clientConfig.serverMetadata());
+      this.logger.info(
+        'Client configuration created with metadata:',
+        JSON.stringify(this.clientConfig.serverMetadata(), null, 2)
+      );
     } catch (error) {
       this.logger.error('Failed to setup OIDC client:', error);
       throw new OIDCAuthenticationError('Failed to initialize OIDC client');
@@ -75,6 +78,7 @@ export class OIDCModule {
         };
 
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
+        this.logger.info('Parameters:', JSON.stringify(parameters, null, 2));
         this.logger.info('redirecting to', redirectTo.href);
         res.redirect(redirectTo.href);
       } catch (error) {
