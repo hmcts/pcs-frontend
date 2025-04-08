@@ -113,10 +113,17 @@ export class OIDCModule {
           this.logger.info('Nonce:', nonce);
 
           // Use the library's authorizationCodeGrant method with explicit nonce validation
-          const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
-            pkceCodeVerifier: codeVerifier,
-            expectedNonce: nonce,
-            idTokenExpected: true,
+          // const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
+          //   pkceCodeVerifier: codeVerifier,
+          //   expectedNonce: nonce,
+          //   idTokenExpected: true,
+          // });
+
+          // do a manual request
+          const tokens = await axios.post(this.clientConfig.serverMetadata().token_endpoint as string, {
+            code: req.query.code,
+            redirect_uri: this.oidcConfig.redirectUri,
+            code_verifier: codeVerifier,
           });
 
           this.logger.info('Token response:', tokens);
