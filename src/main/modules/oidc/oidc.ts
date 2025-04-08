@@ -25,7 +25,7 @@ export class OIDCModule {
 
     try {
       // Manually fetch the OIDC configuration
-      const discoveryUrl = new URL('.well-known/openid-configuration', this.oidcConfig.issuer).toString();
+      const discoveryUrl = new URL('o/.well-known/openid-configuration', this.oidcConfig.issuer).toString();
       this.logger.info('Fetching OIDC configuration from:', discoveryUrl);
 
       const response = await axios.get(discoveryUrl);
