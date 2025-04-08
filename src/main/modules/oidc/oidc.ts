@@ -60,26 +60,19 @@ export class OIDCModule {
     // Login route
     app.get('/login', async (req: Request, res: Response, next: NextFunction) => {
       try {
-        // Generate code verifier only when needed for login
-        if (!req.session.codeVerifier) {
-          req.session.codeVerifier = client.randomPKCECodeVerifier();
-        }
+        // Generate a new code verifier and store it in the session
+        req.session.codeVerifier = client.randomPKCECodeVerifier();
+        req.session.nonce = client.randomNonce();
 
-        const codeVerifier = req.session.codeVerifier;
-        const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
-        const nonce = client.randomNonce();
+        const codeChallenge = await client.calculatePKCECodeChallenge(req.session.codeVerifier);
 
         const parameters: Record<string, string> = {
           redirect_uri: this.oidcConfig.redirectUri,
           scope: this.oidcConfig.scope,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
-          nonce,
+          nonce: req.session.nonce,
         };
-
-        // Store nonce in session
-        req.session.nonce = nonce;
-        this.logger.info('Generated nonce for session:', nonce);
 
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
         this.logger.info('redirecting to', redirectTo.href);
@@ -111,6 +104,10 @@ export class OIDCModule {
         const callbackUrl = new URL(originalUrl, `${protocol}://${host}`);
 
         try {
+          this.logger.info('Callback URL:', callbackUrl.toString());
+          this.logger.info('Code verifier:', codeVerifier);
+          this.logger.info('Nonce:', nonce);
+
           // Use the library's authorizationCodeGrant method with explicit nonce validation
           const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
             pkceCodeVerifier: codeVerifier,
