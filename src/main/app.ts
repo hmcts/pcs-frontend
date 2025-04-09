@@ -50,7 +50,6 @@ glob
   .forEach(route => route.default(app));
 
 setupDev(app, developmentMode);
-
 // returning "not found" page for requests with paths not resolved by the router
 app.use((req, res) => {
   res.status(404);
