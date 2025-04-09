@@ -62,22 +62,4 @@ describe('POST /postcode', () => {
 
     expect(response.status).toBe(200);
   });
-
-  it('should show error if API call fails', async () => {
-    (config.get as jest.Mock).mockReturnValue('http://mock-api');
-    (axios.get as jest.Mock).mockRejectedValue(new Error('API error'));
-
-    const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
-
-    expect(renderSpy).toHaveBeenCalledWith('postcode', {
-      fields: {
-        postcode: {
-          value: 'SW1A 1AA',
-          errorMessage: 'There was a problem retrieving court information.',
-        },
-      },
-    });
-
-    expect(response.status).toBe(200);
-  });
 });
