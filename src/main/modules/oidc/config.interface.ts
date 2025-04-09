@@ -3,4 +3,5 @@ export interface OIDCConfig {
   clientId: string;
   redirectUri: string;
   scope: string;
+  iss: string;
 }

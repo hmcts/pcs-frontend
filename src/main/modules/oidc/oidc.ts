@@ -11,9 +11,6 @@ export class OIDCModule {
   private clientConfig!: client.Configuration;
   private oidcConfig!: OIDCConfig;
   private logger = Logger.getLogger('oidc');
-  // The actual issuer used in the JWT tokens
-  private actualIssuer =
-    'https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts';
 
   constructor() {
     this.setupClient();
@@ -31,8 +28,6 @@ export class OIDCModule {
       const response = await axios.get(discoveryUrl);
       const metadata = response.data;
 
-      this.logger.info('OIDC configuration:', JSON.stringify(metadata, null, 2));
-
       // Create client with the actual issuer
       const clientId = this.oidcConfig.clientId;
       const clientSecret = config.get('secrets.pcs.pcs-frontend-idam-secret') as string;
@@ -41,7 +36,7 @@ export class OIDCModule {
       // Create a server metadata object with the necessary fields
       const serverMetadata = {
         ...metadata,
-        issuer: this.actualIssuer,
+        issuer: this.oidcConfig.iss,
       };
 
       // Create the client configuration with the server metadata
@@ -78,8 +73,6 @@ export class OIDCModule {
         };
 
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
-        this.logger.info('Parameters:', JSON.stringify(parameters, null, 2));
-        this.logger.info('redirecting to', redirectTo.href);
         res.redirect(redirectTo.href);
       } catch (error) {
         this.logger.error('Login error:', error);
@@ -114,17 +107,12 @@ export class OIDCModule {
         }
 
         try {
-          this.logger.info('Callback URL:', callbackUrl.toString());
-          this.logger.info('Code verifier:', codeVerifier);
-          this.logger.info('Nonce:', nonce);
-          this.logger.info('Code:', code);
-
           // Use the library's authorizationCodeGrant method with explicit nonce validation
+          // TODO: doesn't seem to work with the current config/IDAM setup
           // const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
           //   pkceCodeVerifier: codeVerifier,
           //   expectedNonce: nonce,
           //   idTokenExpected: true,
-          // });
           // });
 
           const body = new URLSearchParams({
@@ -155,9 +143,10 @@ export class OIDCModule {
           }
 
           const tokens = await tokenResponse.json();
-          this.logger.info('Token response:', tokens);
 
           req.session.tokens = tokens;
+
+          // TODO: this is not the correct way to get the user info, we should use the library's fetchUserInfo method
           req.session.user = tokens;
 
           // Clear sensitive session data after successful authentication
@@ -202,6 +191,7 @@ export class OIDCModule {
 
     // Logout route
     app.get('/logout', (req: Request, res: Response) => {
+      // TODO: destroy the session by calling the IDAM logout endpoint
       req.session.destroy(() => {
         res.redirect('/');
       });
