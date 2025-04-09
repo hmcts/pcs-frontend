@@ -54,7 +54,7 @@ describe('POST /postcode', () => {
 
     const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
 
-    expect(axios.get).toHaveBeenCalledWith('http://mock-api/court?postCode=SW1A%201AA');
+    expect(axios.get).toHaveBeenCalledWith('http://mock-api/courts?postCode=SW1A%201AA');
 
     expect(renderSpy).toHaveBeenCalledWith('postcode-result', {
       courtData: { courtName: 'Mock Court' },

@@ -21,7 +21,7 @@ export default function (app: Application): void {
       });
     }
     const pcsApiURL = config.get('api.url');
-    const response = await axios.get(`${pcsApiURL}/court?postCode=${encodeURIComponent(postcode)}`);
+    const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
     const courtData = response.data;
     res.render('postcode-result', { courtData });
   });
