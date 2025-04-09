@@ -20,24 +20,9 @@ export default function (app: Application): void {
         },
       });
     }
-
-    try {
-      const pcsApiURL = config.get('api.url');
-      const response = await axios.get(`${pcsApiURL}/court?postCode=${encodeURIComponent(postcode)}`);
-      const courtData = response.data;
-      res.render('postcode-result', { courtData });
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error fetching court postcode data:', error);
-
-      res.render('postcode', {
-        fields: {
-          postcode: {
-            value: postcode,
-            errorMessage: 'There was a problem retrieving court information.',
-          },
-        },
-      });
-    }
+    const pcsApiURL = config.get('api.url');
+    const response = await axios.get(`${pcsApiURL}/court?postCode=${encodeURIComponent(postcode)}`);
+    const courtData = response.data;
+    res.render('postcode-result', { courtData });
   });
 }
