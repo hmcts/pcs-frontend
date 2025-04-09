@@ -192,7 +192,10 @@ export class OIDCModule {
     // Logout route
     app.get('/logout', (req: Request, res: Response) => {
       // TODO: destroy the session by calling the IDAM logout endpoint
-      req.session.destroy(() => {
+      req.session.destroy(err => {
+        if (err) {
+          this.logger.error('Session destroyed error:', err);
+        }
         res.redirect('/');
       });
     });
