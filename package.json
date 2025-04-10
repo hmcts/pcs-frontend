@@ -43,7 +43,7 @@
     "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.7",
     "csrf-csrf": "^3.1.0",
-    "express": "^4.21.2",
+    "express": "^5.0.0",
     "express-nunjucks": "^3.1.1",
     "express-session": "^1.18.1",
     "git-rev-sync": "^3.0.2",
@@ -150,5 +150,5 @@
     "*.{js,ts}": "eslint --cache --fix",
     "*.{js,ts,css,md,html,json}": "prettier --write"
   },
-  "packageManager": "yarn@4.8.1"
+  "packageManager": "yarn@4.9.0"
 }
