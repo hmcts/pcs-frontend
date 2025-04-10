@@ -6,7 +6,9 @@ nodejs:
     pcs:
       secrets:
         - pcs-frontend-s2s-secret
+        - pcs-frontend-idam-secret
   environment:
     REDIS_CONNECTION_STRING: redis://${SERVICE_NAME}-redis-master:6379
+    OIDC_REDIRECT_URI: 'https://${SERVICE_FQDN}/oauth2/callback'
 redis:
   enabled: true
