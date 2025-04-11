@@ -82,7 +82,14 @@
     "openid-client": "^6.3.4",
     "require-directory": "^2.1.1",
     "serve-favicon": "^2.5.0",
-    "totp-generator": "^1.0.0"
+    "stylelint": "^16.0.0",
+    "stylelint-config-standard": "^38.0.0",
+    "stylelint-config-standard-scss": "^14.0.0",
+    "totp-generator": "^1.0.0",
+    "ts-jest": "^29.2.6",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.1.6"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
