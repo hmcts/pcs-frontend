@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 import { oidcMiddleware } from '../../../main/middleware/oidc.middleware';
+
 import { NextFunction, Request, Response } from 'express';
 import { Session, SessionData } from 'express-session';
 
