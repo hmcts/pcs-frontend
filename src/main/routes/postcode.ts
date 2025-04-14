@@ -38,6 +38,15 @@ export default function (app: Application): void {
         stack: error?.stack,
         postcode,
       });
+
+      return res.render('postcode', {
+        fields: {
+          postcode: {
+            value: postcode,
+            errorMessage: 'There was an error retrieving court data. Please try again later.',
+          },
+        },
+      });
     }
   });
 }

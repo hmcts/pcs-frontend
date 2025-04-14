@@ -5,8 +5,24 @@ import config from 'config';
 import express, { Application, Request, Response } from 'express';
 import request from 'supertest';
 
-jest.mock('axios');
-jest.mock('config');
+// Mock external modules
+jest.mock('axios', () => ({
+  get: jest.fn(),
+}));
+
+jest.mock('config', () => ({
+  get: jest.fn(),
+}));
+
+jest.mock('@hmcts/nodejs-logging', () => ({
+  Logger: {
+    getLogger: () => ({
+      error: jest.fn(),
+      info: jest.fn(),
+      debug: jest.fn(),
+    }),
+  },
+}));
 
 describe('POST /postcode', () => {
   let app: Application;
@@ -14,11 +30,9 @@ describe('POST /postcode', () => {
 
   beforeEach(() => {
     app = express();
-
-    // Parse URL-encoded body before route is registered
     app.use(express.urlencoded({ extended: false }));
 
-    // Mock res.render and auto-end the response
+    // Intercept res.render
     app.use((req: Request, res: Response, next) => {
       renderSpy = jest.fn((view, options) => {
         res.status(200).send({ view, options });
@@ -27,12 +41,12 @@ describe('POST /postcode', () => {
       next();
     });
 
-    // Register the actual route
+    // Register the routes
     postcodeRoutes(app);
   });
 
   it('should return error if postcode is missing', async () => {
-    const response = await request(app).post('/postcode').type('form').send({ postcode: '' });
+    await request(app).post('/postcode').type('form').send({ postcode: '' });
 
     expect(renderSpy).toHaveBeenCalledWith('postcode', {
       fields: {
@@ -42,24 +56,40 @@ describe('POST /postcode', () => {
         },
       },
     });
-
-    expect(response.status).toBe(200);
   });
 
-  it('should render result if postcode is valid and API responds', async () => {
+  it('should render postcode-result with court data if postcode is valid', async () => {
+    const mockCourtData = [{ court_venue_id: '123', court_name: 'Test Court' }];
+
     (config.get as jest.Mock).mockReturnValue('http://mock-api');
-    (axios.get as jest.Mock).mockResolvedValue({
-      data: { courtName: 'Mock Court' },
-    });
+    (axios.get as jest.Mock).mockResolvedValue({ data: mockCourtData });
 
-    const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
+    await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
 
-    expect(axios.get).toHaveBeenCalledWith('http://mock-api/courts?postCode=SW1A%201AA');
-
+    expect(axios.get).toHaveBeenCalledWith('http://mock-api/courts?postCode=EC1A%201BB');
     expect(renderSpy).toHaveBeenCalledWith('postcode-result', {
-      courtData: { courtName: 'Mock Court' },
+      courtData: mockCourtData,
     });
+  });
 
-    expect(response.status).toBe(200);
+  it('should show error message if API call fails', async () => {
+    (config.get as jest.Mock).mockReturnValue('http://mock-api');
+    (axios.get as jest.Mock).mockRejectedValue(new Error('API failed'));
+
+    await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
+
+    expect(renderSpy).toHaveBeenCalledWith('postcode', {
+      fields: {
+        postcode: {
+          value: 'EC1A 1BB',
+          errorMessage: 'There was an error retrieving court data. Please try again later.',
+        },
+      },
+    });
+  });
+
+  it('should render postcode view on GET /postcode', async () => {
+    await request(app).get('/postcode');
+    expect(renderSpy).toHaveBeenCalledWith('postcode', { fields: {} });
   });
 });

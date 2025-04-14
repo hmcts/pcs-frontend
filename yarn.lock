@@ -8659,7 +8659,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^15.0.0":
+"lint-staged@npm:^15.5.1":
   version: 15.5.1
   resolution: "lint-staged@npm:15.5.1"
   dependencies:
@@ -9956,7 +9956,7 @@ __metadata:
     jest-html-reporter: "npm:^4.0.0"
     jest-pact: "npm:^0.11.2"
     jquery: "npm:^3.7.0"
-    lint-staged: "npm:^15.0.0"
+    lint-staged: "npm:^15.5.1"
     lodash: "npm:^4.17.21"
     mini-css-extract-plugin: "npm:^2.7.6"
     nock: "npm:^14.0.0"
