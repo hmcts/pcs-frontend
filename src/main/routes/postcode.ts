@@ -25,8 +25,24 @@ export default function (app: Application): void {
       });
     }
     const pcsApiURL = config.get('api.url');
-    const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
+    //const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
+    const response = await axios.get(`${pcsApiURL}/health`);
     const courtData = response.data;
-    res.render('postcode-result', { courtData });
+
+    const courtList = [
+      {
+        epimms_id: '20262',
+        court_venue_id: '40821',
+        court_name: 'Royal Courts of Justice (Main Building)',
+      },
+      {
+        epimms_id: '20262',
+        court_venue_id: '40822',
+        court_name: 'Royal Courts of Justice - Thomas More Building',
+      },
+    ];
+
+    const tableRows = courtList.map(court => [{ text: court.court_venue_id }, { text: court.court_name }]);
+    res.render('courts-name', { courtData, tableRows });
   });
 }
