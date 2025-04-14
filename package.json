@@ -182,8 +182,12 @@
     "*.{js,ts,css,md,html,json}": "prettier --write"
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
   "packageManager": "yarn@4.9.1"
 =======
   "packageManager": "yarn@4.9.0"
 >>>>>>> 4e09e5c (Update Yarn to v4.9.0 (#300))
+=======
+  "packageManager": "yarn@4.9.1"
+>>>>>>> 6945e8b (Update Yarn to v4.9.1 (#304))
 }
