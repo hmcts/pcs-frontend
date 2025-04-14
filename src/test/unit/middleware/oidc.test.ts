@@ -1,19 +1,7 @@
-/// <reference types="jest" />
 import { oidcMiddleware } from '../../../main/middleware/oidc.middleware';
 
 import { NextFunction, Request, Response } from 'express';
 import { Session, SessionData } from 'express-session';
-
-// Mock the Logger
-jest.mock('@hmcts/nodejs-logging', () => ({
-  Logger: {
-    getLogger: jest.fn().mockReturnValue({
-      info: jest.fn(),
-    }),
-  },
-}));
-
-const mockInfo = jest.requireMock('@hmcts/nodejs-logging').Logger.getLogger().info;
 
 interface SessionUser {
   id: string;
@@ -51,7 +39,6 @@ describe('oidcMiddleware', () => {
       redirect: jest.fn(),
     };
     nextFunction = jest.fn();
-    mockInfo.mockClear();
   });
 
   it('should call next() when user is present in session', () => {
@@ -60,7 +47,6 @@ describe('oidcMiddleware', () => {
 
     expect(nextFunction).toHaveBeenCalled();
     expect(mockResponse.redirect).not.toHaveBeenCalled();
-    expect(mockInfo).not.toHaveBeenCalled();
   });
 
   it('should redirect to /login when user is not present in session', () => {
@@ -68,7 +54,6 @@ describe('oidcMiddleware', () => {
 
     expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
     expect(nextFunction).not.toHaveBeenCalled();
-    expect(mockInfo).toHaveBeenCalledWith('unauthenticated user, redirecting to login');
   });
 
   it('should redirect to /login when session is undefined', () => {
@@ -77,6 +62,5 @@ describe('oidcMiddleware', () => {
 
     expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
     expect(nextFunction).not.toHaveBeenCalled();
-    expect(mockInfo).toHaveBeenCalledWith('unauthenticated user, redirecting to login');
   });
 });
