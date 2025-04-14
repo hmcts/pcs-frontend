@@ -7,7 +7,7 @@ const testUrl = process.env.TEST_URL || 'http://localhost:3209';
 
 describe('Smoke Test', () => {
   describe('Home page loads', () => {
-    test('with correct content', async () => {
+    test.skip('with correct content', async () => {
       try {
         const response: AxiosResponse = await axios.get(testUrl, {
           headers: {

@@ -3,12 +3,6 @@ import config from 'config';
 import { Express, Response as ExpressResponse, NextFunction, Request } from 'express';
 import { TOTP } from 'totp-generator';
 
-declare module 'express-session' {
-  export interface SessionData {
-    serviceToken: string;
-  }
-}
-
 const { Logger } = require('@hmcts/nodejs-logging');
 
 export class S2S {

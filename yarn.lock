@@ -2961,7 +2961,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express-session@npm:*, @types/express-session@npm:^1.18.0":
+"@types/express-session@npm:*, @types/express-session@npm:^1.18.1":
   version: 1.18.1
   resolution: "@types/express-session@npm:1.18.1"
   dependencies:
@@ -2982,7 +2982,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:^5.0.0":
+"@types/express@npm:^5.0.1":
   version: 5.0.1
   resolution: "@types/express@npm:5.0.1"
   dependencies:
@@ -8342,6 +8342,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jose@npm:^6.0.10":
+  version: 6.0.10
+  resolution: "jose@npm:6.0.10"
+  checksum: 10/8ba0d1aca94bdf780247c737328114fab3e394e1531e881dfe3fdd1d4a293b08cf7c0242769e72c8c8eee15c95761b542cf10730c3dfbb108084762df7d25cec
+  languageName: node
+  linkType: hard
+
 "joycon@npm:^3.1.1":
   version: 3.1.1
   resolution: "joycon@npm:3.1.1"
@@ -9516,6 +9523,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"oauth4webapi@npm:^3.4.1":
+  version: 3.4.1
+  resolution: "oauth4webapi@npm:3.4.1"
+  checksum: 10/c2bc186f4ae66c2783cf9ac32f294345e0f8d0f0801fc67ce8ac4f188857de474ad7b4bc49cd46dea7bb50f595c4138545c2d01fb5d0bdab668c0aeeded2bf7b
+  languageName: node
+  linkType: hard
+
 "object-inspect@npm:^1.13.3":
   version: 1.13.4
   resolution: "object-inspect@npm:1.13.4"
@@ -9647,6 +9661,16 @@ __metadata:
     is-inside-container: "npm:^1.0.0"
     is-wsl: "npm:^3.1.0"
   checksum: 10/a9c4105243a1b3c5312bf2aeb678f78d31f00618b5100088ee01eed2769963ea1f2dd464ac8d93cef51bba2d911e1a9c0c34a753ec7b91d6b22795903ea6647a
+  languageName: node
+  linkType: hard
+
+"openid-client@npm:^6.4.2":
+  version: 6.4.2
+  resolution: "openid-client@npm:6.4.2"
+  dependencies:
+    jose: "npm:^6.0.10"
+    oauth4webapi: "npm:^3.4.1"
+  checksum: 10/798d4c88e6a5e52a37c8d321b92da9a93a431cfc6f909857ae1aadb558d2444d31fde68e03fd59e2779b69cdf46707f5a52e5ba9eaf4ab2e4bd63e621b51ada8
   languageName: node
   linkType: hard
 
@@ -9902,8 +9926,8 @@ __metadata:
     "@types/cookie-parser": "npm:^1.4.3"
     "@types/csurf": "npm:^1.11.2"
     "@types/es6-promisify": "npm:^6.0.1"
-    "@types/express": "npm:^5.0.0"
-    "@types/express-session": "npm:^1.18.0"
+    "@types/express": "npm:^5.0.1"
+    "@types/express-session": "npm:^1.18.1"
     "@types/git-rev-sync": "npm:^2.0.2"
     "@types/glob": "npm:^8.1.0"
     "@types/jest": "npm:^29.5.14"
@@ -9955,6 +9979,7 @@ __metadata:
     nock: "npm:^14.0.0"
     nodemon: "npm:^3.0.0"
     nunjucks: "npm:^3.2.4"
+    openid-client: "npm:^6.4.2"
     playwright: "npm:^1.36.2"
     postcss: "npm:^8.4.27"
     prettier: "npm:^3.0.0"

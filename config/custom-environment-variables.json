@@ -2,7 +2,8 @@
   "secrets": {
     "pcs": {
       "redis-connection-string": "REDIS_CONNECTION_STRING",
-      "pcs-frontend-s2s-secret": "S2S_SECRET"
+      "pcs-frontend-s2s-secret": "S2S_SECRET",
+      "pcs-frontend-idam-secret": "OIDC_CLIENT_SECRET"
     }
   },
   "api": {
@@ -15,5 +16,12 @@
   },
   "s2s": {
     "url": "S2S_URL"
+  },
+  "oidc": {
+    "issuer": "OIDC_ISSUER",
+    "clientId": "OIDC_CLIENT_ID",
+    "redirectUri": "OIDC_REDIRECT_URI",
+    "scope": "OIDC_SCOPE",
+    "iss": "OIDC_ISS"
   }
 }
