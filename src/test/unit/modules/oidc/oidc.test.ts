@@ -2,6 +2,7 @@
 import axios from 'axios';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
+import { jwtDecode } from 'jwt-decode';
 import * as client from 'openid-client';
 
 import { OIDCAuthenticationError, OIDCCallbackError } from '../../../../main/modules/oidc/errors';
@@ -10,6 +11,9 @@ import { OIDCModule } from '../../../../main/modules/oidc/oidc';
 jest.mock('axios');
 jest.mock('config');
 jest.mock('openid-client');
+jest.mock('jwt-decode', () => ({
+  jwtDecode: jest.fn(),
+}));
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
@@ -46,7 +50,6 @@ describe('OIDCModule', () => {
     codeVerifier: undefined,
     nonce: undefined,
     state: undefined,
-    tokens: undefined,
     user: undefined,
     serviceToken: undefined,
     ...overrides,
@@ -176,25 +179,49 @@ describe('OIDCModule', () => {
 
     describe('callback route', () => {
       it('should handle successful authentication', async () => {
-        const mockTokens = { access_token: 'test-token', id_token: 'test-id-token' };
-        global.fetch = jest.fn().mockResolvedValue({
+        const mockTokens = {
+          access_token: 'test-token',
+          id_token: 'test-id-token',
+          id: 'test-id',
+          roles: ['test-role'],
+        };
+        const mockJwtPayload = {
+          uid: 'test-id',
+          roles: ['test-role'],
+        };
+        const mockFetchResponse = {
           ok: true,
-          json: () => Promise.resolve(mockTokens),
-        });
+          json: jest.fn().mockResolvedValue(mockTokens),
+        };
+        global.fetch = jest.fn().mockResolvedValue(mockFetchResponse);
+        (jwtDecode as unknown as jest.Mock).mockReturnValue(mockJwtPayload);
 
         mockRequest.session = createMockSession({
           codeVerifier: 'test-verifier',
           nonce: 'test-nonce',
+          state: 'test-state',
+          save: jest.fn().mockImplementation(function (callback) {
+            // Delete the properties after save is called
+            delete this.codeVerifier;
+            delete this.nonce;
+            delete this.state;
+            callback(null);
+          }),
         });
 
         oidcModule.enableFor(mockApp);
         const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
-        expect(mockRequest.session).toHaveProperty('tokens', mockTokens);
-        expect(mockRequest.session).toHaveProperty('user', mockTokens);
+        expect(mockRequest.session).toHaveProperty('user', {
+          accessToken: mockTokens.access_token,
+          idToken: mockTokens.id_token,
+          id: mockJwtPayload.uid,
+          roles: mockJwtPayload.roles,
+        });
         expect(mockRequest.session).not.toHaveProperty('codeVerifier');
         expect(mockRequest.session).not.toHaveProperty('nonce');
+        expect(mockRequest.session).not.toHaveProperty('state');
         expect(mockResponse.redirect).toHaveBeenCalledWith('/');
       });
 

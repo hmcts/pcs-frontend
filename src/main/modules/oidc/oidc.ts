@@ -141,7 +141,10 @@ export class OIDCModule {
 
           const data: IdamResponseData = await tokenResponse.json();
 
+          console.log('data', data);
+
           const jwt: IdTokenJwtPayload = jwtDecode(data.id_token);
+          console.log('jwt', jwt);
 
           req.session.user = {
             accessToken: data.access_token,
@@ -153,6 +156,7 @@ export class OIDCModule {
           req.session.save(() => {
             delete req.session.codeVerifier;
             delete req.session.nonce;
+            delete req.session.state;
 
             res.redirect('/');
           });
