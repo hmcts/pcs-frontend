@@ -1,16 +1,16 @@
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
-
 import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
+import { Configuration } from 'openid-client';
 import * as client from 'openid-client';
 
 export class OIDCModule {
-  private clientConfig!: client.Configuration;
+  private clientConfig!: Configuration;
   private oidcConfig!: OIDCConfig;
-  private logger = Logger.getLogger('oidc');
+  private readonly logger = Logger.getLogger('oidc');
 
   constructor() {
     this.setupClient();
@@ -40,7 +40,7 @@ export class OIDCModule {
       };
 
       // Create the client configuration with the server metadata
-      this.clientConfig = new client.Configuration(serverMetadata, clientId, clientSecret);
+      this.clientConfig = new Configuration(serverMetadata, clientId, clientSecret);
 
       this.logger.info(
         'Client configuration created with metadata:',

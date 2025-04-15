@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import { AppInsights } from '../../../../main/modules/appinsights';
 
 import config from 'config';

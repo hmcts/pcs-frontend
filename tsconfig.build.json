@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
@@ -24,5 +25,5 @@
     "types": ["node"]
   },
   "include": ["src/**/*", "src/types/**/*.d.ts"],
-  "exclude": ["**/codecept.conf.ts", "**/__mocks__/*"]
-}
+  "exclude": ["src/test/**/*", "**/*.test.ts", "**/*.spec.ts", "**/__mocks__/*"]
+} 

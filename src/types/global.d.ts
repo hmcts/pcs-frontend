@@ -1,7 +1,7 @@
 import { Session, SessionData } from 'express-session';
 import { TokenSet } from 'openid-client';
 
-interface CustomSessionData extends SessionData {
+export interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
   state?: string;
@@ -20,5 +20,9 @@ declare module 'express' {
     session: Session & CustomSessionData;
   }
 }
+
+// Ensure the types are properly exported
+export type ExpressRequest = import('express').Request;
+export type ExpressSession = Session & CustomSessionData;
 
 export {};
