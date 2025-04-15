@@ -2,9 +2,12 @@ import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
+import { jwtDecode } from 'jwt-decode';
 import { Configuration } from 'openid-client';
 import * as client from 'openid-client';
 
+import { IdTokenJwtPayload } from './IdTokenJwtPayload.interface';
+import { IdamResponseData } from './IdamResponseData.interface';
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
@@ -136,18 +139,23 @@ export class OIDCModule {
             throw new OIDCCallbackError('Failed to exchange authorization code for tokens');
           }
 
-          const tokens = await tokenResponse.json();
+          const data: IdamResponseData = await tokenResponse.json();
 
-          req.session.tokens = tokens;
+          const jwt: IdTokenJwtPayload = jwtDecode(data.id_token);
 
-          // TODO: this is not the correct way to get the user info, we should use the library's fetchUserInfo method
-          req.session.user = tokens;
+          req.session.user = {
+            accessToken: data.access_token,
+            idToken: data.id_token,
+            id: jwt.uid,
+            roles: jwt.roles,
+          };
 
-          // Clear sensitive session data after successful authentication
-          delete req.session.codeVerifier;
-          delete req.session.nonce;
+          req.session.save(() => {
+            delete req.session.codeVerifier;
+            delete req.session.nonce;
 
-          res.redirect('/');
+            res.redirect('/');
+          });
         } catch (tokenError: unknown) {
           const error = tokenError as Error & {
             response?: { body?: unknown; status?: number; headers?: unknown };

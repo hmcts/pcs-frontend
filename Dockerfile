@@ -69,12 +69,6 @@ COPY --from=build /app/config ./config
 RUN mkdir -p ./dist/main/public/assets/images && \
     cp ./dist/main/assets/images/favicon.ico ./dist/main/public/assets/images/
 
-# Verify the files in runtime image
-RUN echo "Contents of dist directory in runtime:" && \
-    ls -la dist && \
-    echo "Full directory structure:" && \
-    find dist -type f
-
 # Set environment variables
 ENV NODE_ENV=production
 
