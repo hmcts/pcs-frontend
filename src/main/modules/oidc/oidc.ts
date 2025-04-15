@@ -2,15 +2,16 @@ import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
+import { Configuration } from 'openid-client';
 import * as client from 'openid-client';
 
 import { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
 export class OIDCModule {
-  private clientConfig!: client.Configuration;
+  private clientConfig!: Configuration;
   private oidcConfig!: OIDCConfig;
-  private logger = Logger.getLogger('oidc');
+  private readonly logger = Logger.getLogger('oidc');
 
   constructor() {
     this.setupClient();
@@ -40,7 +41,7 @@ export class OIDCModule {
       };
 
       // Create the client configuration with the server metadata
-      this.clientConfig = new client.Configuration(serverMetadata, clientId, clientSecret);
+      this.clientConfig = new Configuration(serverMetadata, clientId, clientSecret);
 
       this.logger.info(
         'Client configuration created with metadata:',
@@ -61,7 +62,7 @@ export class OIDCModule {
         // Generate a new code verifier and store it in the session
         req.session.codeVerifier = client.randomPKCECodeVerifier();
         req.session.nonce = client.randomNonce();
-
+        req.session.state = client.randomState();
         const codeChallenge = await client.calculatePKCECodeChallenge(req.session.codeVerifier);
 
         const parameters: Record<string, string> = {
@@ -70,6 +71,7 @@ export class OIDCModule {
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
           nonce: req.session.nonce,
+          state: req.session.state,
         };
 
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
@@ -107,14 +109,6 @@ export class OIDCModule {
         }
 
         try {
-          // Use the library's authorizationCodeGrant method with explicit nonce validation
-          // TODO: doesn't seem to work with the current config/IDAM setup
-          // const tokens = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
-          //   pkceCodeVerifier: codeVerifier,
-          //   expectedNonce: nonce,
-          //   idTokenExpected: true,
-          // });
-
           const body = new URLSearchParams({
             grant_type: 'authorization_code',
             code,
@@ -192,7 +186,7 @@ export class OIDCModule {
     // Logout route
     app.get('/logout', (req: Request, res: Response) => {
       // TODO: destroy the session by calling the IDAM logout endpoint
-      req.session.destroy(err => {
+      req.session.destroy((err: unknown) => {
         if (err) {
           this.logger.error('Session destroyed error:', err);
         }
