@@ -140,11 +140,7 @@ export class OIDCModule {
           }
 
           const data: IdamResponseData = await tokenResponse.json();
-
-          console.log('data', data);
-
           const jwt: IdTokenJwtPayload = jwtDecode(data.id_token);
-          console.log('jwt', jwt);
 
           req.session.user = {
             accessToken: data.access_token,
