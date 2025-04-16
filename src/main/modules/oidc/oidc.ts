@@ -152,12 +152,12 @@ export class OIDCModule {
             familyName: jwt.family_name,
           };
 
-          app.locals.nunjucksEnv.addGlobal('user', req.session.user);
-
           req.session.save(() => {
             delete req.session.codeVerifier;
             delete req.session.nonce;
             delete req.session.state;
+
+            app.locals.nunjucksEnv.addGlobal('user', req.session.user);
 
             res.redirect('/');
           });

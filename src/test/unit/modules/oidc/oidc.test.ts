@@ -88,6 +88,11 @@ describe('OIDCModule', () => {
     mockApp = {
       get: jest.fn(),
       set: jest.fn(),
+      locals: {
+        nunjucksEnv: {
+          addGlobal: jest.fn(),
+        },
+      },
     } as unknown as Express;
     mockRequest = {
       session: createMockSession(),
