@@ -6,4 +6,9 @@ module.exports = {
   transform: {
     '^.+\\.ts?$': 'ts-jest',
   },
+  moduleNameMapper: {
+    '^openid-client$': '<rootDir>/src/test/unit/modules/oidc/__mocks__/openid-client.ts',
+  },
+  testPathIgnorePatterns: ['/__mocks__/'],
+  coverageProvider: 'v8',
 };
