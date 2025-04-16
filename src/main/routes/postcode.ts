@@ -1,4 +1,5 @@
 import axios from 'axios';
+import config from 'config';
 import { Application, Request, Response } from 'express';
 
 const { Logger } = require('@hmcts/nodejs-logging');
@@ -25,21 +26,16 @@ export default function (app: Application): void {
     }
 
     try {
+      const pcsUrl = config.get('api.url');
       const s2sToken = req.session.serviceToken;
       // eslint-disable-next-line no-console
-      console.log(
-        'url => ',
-        `https://pcs-api-pr-148.preview.platform.hmcts.net/courts?postCode=${encodeURIComponent(postcode)}`
-      );
+      console.log('url => ', `${pcsUrl}/courts?postCode=${encodeURIComponent(postcode)}`);
 
-      const response = await axios.get(
-        `https://pcs-api-pr-148.preview.platform.hmcts.net/courts?postCode=${encodeURIComponent(postcode)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${s2sToken}`,
-          },
-        }
-      );
+      const response = await axios.get(`${pcsUrl}/courts?postCode=${encodeURIComponent(postcode)}`, {
+        headers: {
+          Authorization: `Bearer ${s2sToken}`,
+        },
+      });
       // eslint-disable-next-line no-console
       console.log('response => ', response);
       const courtData = response.data;
