@@ -3,8 +3,8 @@ import postcodeRoutes from '../../../main/routes/postcode';
 import axios from 'axios';
 import config from 'config';
 import express, { Application, Request, Response } from 'express';
-import request from 'supertest';
 import session from 'express-session';
+import request from 'supertest';
 
 // Mock external modules
 jest.mock('axios', () => ({
@@ -36,11 +36,15 @@ describe('POST /postcode', () => {
         secret: 'test-secret',
         resave: false,
         saveUninitialized: true,
+        cookie: {
+          secure: false,
+          httpOnly: true,
+        },
       })
     );
 
     app.use((req, res, next) => {
-      req.session.serviceToken = 'mock-s2s-token';
+      req.session.serviceToken = 'test-token';
       next();
     });
 
@@ -87,7 +91,7 @@ describe('POST /postcode', () => {
 
     expect(axios.get).toHaveBeenCalledWith('http://mock-api/courts?postCode=EC1A%201BB', {
       headers: {
-        Authorization: 'Bearer mock-s2s-token',
+        Authorization: 'Bearer test-token',
       },
     });
     expect(renderSpy).toHaveBeenCalledWith('courts-name', {
