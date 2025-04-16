@@ -37,10 +37,6 @@ describe('POST /postcode', () => {
         secret: 'test-secret',
         resave: false,
         saveUninitialized: true,
-        cookie: {
-          secure: false,
-          httpOnly: true,
-        },
       })
     );
 
@@ -85,23 +81,26 @@ describe('POST /postcode', () => {
   it('should render postcode-result with court data if postcode is valid', async () => {
     const mockCourtData = [{ court_venue_id: '123', court_name: 'Test Court' }];
 
-    (config.get as jest.Mock).mockReturnValue('http://mock-api');
+    (config.get as jest.Mock).mockReturnValue('https://pcs-api-pr-148.preview.platform.hmcts.net');
     (axios.get as jest.Mock).mockResolvedValue({ data: mockCourtData });
 
     await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
 
-    expect(axios.get).toHaveBeenCalledWith('http://mock-api/courts?postCode=EC1A%201BB', {
-      headers: {
-        Authorization: 'Bearer test-token',
-      },
-    });
+    expect(axios.get).toHaveBeenCalledWith(
+      'https://pcs-api-pr-148.preview.platform.hmcts.net/courts?postCode=EC1A%201BB',
+      {
+        headers: {
+          Authorization: 'Bearer test-token',
+        },
+      }
+    );
     expect(renderSpy).toHaveBeenCalledWith('courts-name', {
       tableRows: [[{ text: '123' }, { text: 'Test Court' }]],
     });
   });
 
   it('should show error message if API call fails', async () => {
-    (config.get as jest.Mock).mockReturnValue('http://mock-api');
+    (config.get as jest.Mock).mockReturnValue('https://pcs-api-pr-148.preview.platform.hmcts.net');
     (axios.get as jest.Mock).mockRejectedValue(new Error('API failed'));
 
     await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });

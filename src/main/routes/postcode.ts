@@ -1,5 +1,4 @@
 import axios from 'axios';
-import config from 'config';
 import { Application, Request, Response } from 'express';
 
 const { Logger } = require('@hmcts/nodejs-logging');
@@ -26,7 +25,6 @@ export default function (app: Application): void {
     }
 
     try {
-      const pcsApiURL = config.get('api.url');
       const s2sToken = req.session.serviceToken;
       // eslint-disable-next-line no-console
       console.log(
