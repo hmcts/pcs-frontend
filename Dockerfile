@@ -60,6 +60,8 @@ COPY --from=build /app/src/main/public ./dist/main/public
 COPY --from=build /app/src/main/views ./dist/main/views
 COPY --from=build /app/config ./config
 
+RUN chown -R hmcts:hmcts /app/dist && chmod -R 755 /app/dist
+
 # Set environment variables
 ENV NODE_ENV=production
 
