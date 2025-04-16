@@ -26,7 +26,6 @@ export default function (app: Application): void {
     }
 
     try {
-      const pcsApiURL = config.get('api.url');
       const s2sToken = req.session.serviceToken;
       // eslint-disable-next-line no-console
       console.log(
