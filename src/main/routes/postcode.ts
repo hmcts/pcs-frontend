@@ -24,33 +24,27 @@ export default function (app: Application): void {
         },
       });
     }
-    const pcsApiURL = config.get('api.url');
-    //const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
-    const response = await axios.get(`${pcsApiURL}/health`);
-    const courtData = response.data;
 
-<<<<<<< HEAD
-    const courtList = [
-      {
-        epimms_id: '20262',
-        court_venue_id: '40821',
-        court_name: 'Royal Courts of Justice (Main Building)',
-      },
-      {
-        epimms_id: '20262',
-        court_venue_id: '40822',
-        court_name: 'Royal Courts of Justice - Thomas More Building',
-      },
-    ];
-
-    const tableRows = courtList.map(court => [{ text: court.court_venue_id }, { text: court.court_name }]);
-    res.render('courts-name', { courtData, tableRows });
-=======
     try {
       const pcsApiURL = config.get('api.url');
-      const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
+      const s2sToken = req.session.serviceToken;
+      // eslint-disable-next-line no-console
+      console.log('url => ', `${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
+
+      const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`, {
+        headers: {
+          Authorization: `Bearer ${s2sToken}`,
+        },
+      });
+      // eslint-disable-next-line no-console
+      console.log('response => ', response);
       const courtData = response.data;
-      res.render('postcode-result', { courtData });
+
+      const tableRows = courtData?.map((court: { court_venue_id: string; court_name: string }) => [
+        { text: court.court_venue_id },
+        { text: court.court_name },
+      ]);
+      res.render('courts-name', { tableRows });
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log('error: ', error);
