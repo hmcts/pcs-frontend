@@ -29,13 +29,19 @@ export default function (app: Application): void {
       const pcsApiURL = config.get('api.url');
       const s2sToken = req.session.serviceToken;
       // eslint-disable-next-line no-console
-      console.log('url => ', `${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
+      console.log(
+        'url => ',
+        `https://pcs-api-pr-148.preview.platform.hmcts.net/courts?postCode=${encodeURIComponent(postcode)}`
+      );
 
-      const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`, {
-        headers: {
-          Authorization: `Bearer ${s2sToken}`,
-        },
-      });
+      const response = await axios.get(
+        `https://pcs-api-pr-148.preview.platform.hmcts.net/courts?postCode=${encodeURIComponent(postcode)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${s2sToken}`,
+          },
+        }
+      );
       // eslint-disable-next-line no-console
       console.log('response => ', response);
       const courtData = response.data;
