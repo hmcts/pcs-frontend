@@ -69,6 +69,7 @@
     "@babel/eslint-parser": "^7.22.11",
     "@babel/preset-env": "^7.22.14",
     "@pact-foundation/pact": "^15.0.0",
+    "@pact-foundation/pact-cli": "^16.0.7",
     "@playwright/test": "^1.49.0",
     "@types/axios": "^0.14.4",
     "@types/body-parser": "^1.19.2",
