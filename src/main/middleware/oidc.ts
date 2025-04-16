@@ -1,5 +1,4 @@
-import { Logger } from '@hmcts/nodejs-logging';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 /**
  * Authentication middleware
@@ -7,11 +6,9 @@ import { NextFunction, Request, Response } from 'express';
  * @param res
  * @param next
  */
-export const oidcMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  const logger = Logger.getLogger('oidcMiddleware');
+export const oidcMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
   if (req.session?.user) {
     return next();
   }
-  logger.info('redirecting to login');
   res.redirect('/login');
 };

@@ -2,7 +2,7 @@
 FROM hmctspublic.azurecr.io/base/node:20-alpine AS base
 
 USER root
-RUN corepack enable && corepack prepare yarn@4.7.0 --activate
+RUN corepack enable
 USER hmcts
 
 # ---- Dependencies image ----
@@ -18,9 +18,7 @@ COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
 COPY --chown=hmcts:hmcts .yarn ./.yarn
 
 # Install all dependencies
-RUN yarn set version 4.7.0 && \
-    yarn config set nodeLinker node-modules && \
-    yarn install
+RUN yarn install
 
 # ---- Build image ----
 FROM dependencies AS build
@@ -37,7 +35,7 @@ RUN yarn build:prod && \
     rm -rf webpack/ webpack.config.js
 
 # Compile TypeScript to JavaScript
-RUN npx tsc --outDir ./dist
+RUN npx tsc
 
 # ---- Runtime image ----
 FROM base AS runtime
@@ -54,26 +52,16 @@ COPY --chown=hmcts:hmcts .yarn ./.yarn
 
 # Install only production dependencies
 ENV NODE_ENV=production
-RUN yarn set version 4.7.0 && \
-    yarn config set nodeLinker node-modules && \
-    yarn workspaces focus --production --all
+RUN yarn workspaces focus --production --all
 
 # Copy only compiled code and necessary assets
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/src/main/public ./dist/main/public
-COPY --from=build /app/src/main/assets ./dist/main/assets
 COPY --from=build /app/src/main/views ./dist/main/views
 COPY --from=build /app/config ./config
-
-# Create required directories and copy assets
-RUN mkdir -p ./dist/main/public/assets/images && \
-    cp ./dist/main/assets/images/favicon.ico ./dist/main/public/assets/images/
 
 # Set environment variables
 ENV NODE_ENV=production
 
 # Expose the application port
 EXPOSE 3209
-
-# Start with compiled JavaScript file
-CMD ["node", "./dist/main/server.js"]
