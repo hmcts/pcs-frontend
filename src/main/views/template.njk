@@ -4,6 +4,10 @@
   {% include "webpack/css.njk" %}
 {% endblock %}
 
+{% block main }
+  <small>Logged in as: {{user.givenName}} {{user.familyName}}
+{% endblock %}
+
 {% block bodyEnd %}
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}

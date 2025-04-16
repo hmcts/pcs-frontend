@@ -147,7 +147,12 @@ export class OIDCModule {
             idToken: data.id_token,
             id: jwt.uid,
             roles: jwt.roles,
+            email: jwt.email,
+            givenName: jwt.given_name,
+            familyName: jwt.family_name,
           };
+
+          app.locals.nunjucksEnv.addGlobal('user', req.session.user);
 
           req.session.save(() => {
             delete req.session.codeVerifier;

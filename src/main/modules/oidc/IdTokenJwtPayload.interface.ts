@@ -4,4 +4,5 @@ export interface IdTokenJwtPayload {
   given_name: string;
   family_name: string;
   roles: string[];
+  email: string;
 }
