@@ -4,8 +4,8 @@
   {% include "webpack/css.njk" %}
 {% endblock %}
 
-{% block main }
-  <small>Logged in as: {{user.givenName}} {{user.familyName}}
+{% block main %}
+  <small>Logged in as:<small> {{user.givenName}}&nbsp;{{user.familyName}}
 {% endblock %}
 
 {% block bodyEnd %}
