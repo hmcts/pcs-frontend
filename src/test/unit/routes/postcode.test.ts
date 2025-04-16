@@ -4,6 +4,7 @@ import axios from 'axios';
 import config from 'config';
 import express, { Application, Request, Response } from 'express';
 import request from 'supertest';
+import session from 'express-session';
 
 // Mock external modules
 jest.mock('axios', () => ({
@@ -30,6 +31,19 @@ describe('POST /postcode', () => {
 
   beforeEach(() => {
     app = express();
+    app.use(
+      session({
+        secret: 'test-secret',
+        resave: false,
+        saveUninitialized: true,
+      })
+    );
+
+    app.use((req, res, next) => {
+      req.session.serviceToken = 'mock-s2s-token';
+      next();
+    });
+
     app.use(express.urlencoded({ extended: false }));
 
     // Intercept res.render
@@ -43,6 +57,11 @@ describe('POST /postcode', () => {
 
     // Register the routes
     postcodeRoutes(app);
+  });
+
+  it('should render postcode view on GET /postcode', async () => {
+    await request(app).get('/postcode');
+    expect(renderSpy).toHaveBeenCalledWith('postcode', { fields: {} });
   });
 
   it('should return error if postcode is missing', async () => {
@@ -66,9 +85,13 @@ describe('POST /postcode', () => {
 
     await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
 
-    expect(axios.get).toHaveBeenCalledWith('http://mock-api/courts?postCode=EC1A%201BB');
-    expect(renderSpy).toHaveBeenCalledWith('postcode-result', {
-      courtData: mockCourtData,
+    expect(axios.get).toHaveBeenCalledWith('http://mock-api/courts?postCode=EC1A%201BB', {
+      headers: {
+        Authorization: 'Bearer mock-s2s-token',
+      },
+    });
+    expect(renderSpy).toHaveBeenCalledWith('courts-name', {
+      tableRows: [[{ text: '123' }, { text: 'Test Court' }]],
     });
   });
 
@@ -86,10 +109,5 @@ describe('POST /postcode', () => {
         },
       },
     });
-  });
-
-  it('should render postcode view on GET /postcode', async () => {
-    await request(app).get('/postcode');
-    expect(renderSpy).toHaveBeenCalledWith('postcode', { fields: {} });
   });
 });

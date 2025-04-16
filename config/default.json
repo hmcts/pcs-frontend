@@ -14,7 +14,7 @@
     "deadline": 15000
   },
   "api": {
-    "url": "http://pcs-api-aat.service.core-compute-aat.internal"
+    "url": "https://pcs-api-pr-148.preview.platform.hmcts.net"
   },
   "s2s": {
     "microservice": "pcs_frontend",

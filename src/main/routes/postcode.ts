@@ -27,25 +27,24 @@ export default function (app: Application): void {
 
     try {
       const pcsApiURL = config.get('api.url');
-      //const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
-      const response = await axios.get(`${pcsApiURL}/health`);
+      const s2sToken = req.session.serviceToken;
+      // eslint-disable-next-line no-console
+      console.log('url => ', `${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
+
+      const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`, {
+        headers: {
+          Authorization: `Bearer ${s2sToken}`,
+        },
+      });
+      // eslint-disable-next-line no-console
+      console.log('response => ', response);
       const courtData = response.data;
 
-      const courtList = [
-        {
-          epimms_id: '20262',
-          court_venue_id: '40821',
-          court_name: 'Royal Courts of Justice (Main Building)',
-        },
-        {
-          epimms_id: '20262',
-          court_venue_id: '40822',
-          court_name: 'Royal Courts of Justice - Thomas More Building',
-        },
-      ];
-
-      const tableRows = courtList.map(court => [{ text: court.court_venue_id }, { text: court.court_name }]);
-      res.render('courts-name', { courtData, tableRows });
+      const tableRows = courtData?.map((court: { court_venue_id: string; court_name: string }) => [
+        { text: court.court_venue_id },
+        { text: court.court_name },
+      ]);
+      res.render('courts-name', { tableRows });
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log('error: ', error);
