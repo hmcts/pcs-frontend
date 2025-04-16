@@ -1,10 +1,12 @@
-import axios from 'axios';
-import config from 'config';
 import { Application, Request, Response } from 'express';
+
+import { PcsApiClient } from '../modules/pcs-api-client';
 
 const { Logger } = require('@hmcts/nodejs-logging');
 
 export default function (app: Application): void {
+  const pcsApiClient: PcsApiClient = new PcsApiClient();
+
   app.get('/postcode', (req: Request, res: Response) => {
     res.render('postcode', { fields: {} });
   });
@@ -26,9 +28,7 @@ export default function (app: Application): void {
     }
 
     try {
-      const pcsApiURL = config.get('api.url');
-      const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
-      const courtData = response.data;
+      const courtData = await pcsApiClient.getCourtVenues(postcode);
       res.render('postcode-result', { courtData });
     } catch (error) {
       // eslint-disable-next-line no-console
