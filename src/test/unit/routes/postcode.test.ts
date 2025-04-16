@@ -31,35 +31,36 @@ describe('POST /postcode', () => {
 
   beforeEach(() => {
     app = express();
+    if (process.env.NODE_ENV === 'test') {
+      // codeql[missing-csrf-protection,clear-text-cookie-transmission]: session middleware used in tests only
+      app.use(
+        session({
+          secret: 'test-secret',
+          resave: false,
+          saveUninitialized: true,
+          cookie: {
+            secure: false, // explicitly insecure for test purposes
+            httpOnly: true,
+          },
+        })
+      );
 
-    // codeql[missing-csrf-protection,clear-text-cookie-transmission]: session middleware used in tests only
-    app.use(
-      session({
-        secret: 'test-secret',
-        resave: false,
-        saveUninitialized: true,
-        cookie: {
-          secure: false, // explicitly insecure for test purposes
-          httpOnly: true,
-        },
-      })
-    );
-
-    app.use((req, res, next) => {
-      req.session.serviceToken = 'test-token';
-      next();
-    });
-
-    app.use(express.urlencoded({ extended: false }));
-
-    // Intercept res.render
-    app.use((req: Request, res: Response, next) => {
-      renderSpy = jest.fn((view, options) => {
-        res.status(200).send({ view, options });
+      app.use((req, res, next) => {
+        req.session.serviceToken = 'test-token';
+        next();
       });
-      res.render = renderSpy as unknown as Response['render'];
-      next();
-    });
+
+      app.use(express.urlencoded({ extended: false }));
+
+      // Intercept res.render
+      app.use((req: Request, res: Response, next) => {
+        renderSpy = jest.fn((view, options) => {
+          res.status(200).send({ view, options });
+        });
+        res.render = renderSpy as unknown as Response['render'];
+        next();
+      });
+    }
 
     // Register the routes
     postcodeRoutes(app);
