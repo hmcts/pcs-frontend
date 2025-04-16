@@ -31,12 +31,17 @@ describe('POST /postcode', () => {
 
   beforeEach(() => {
     app = express();
-    // codeql[missing-csrf-protection,clear-text-cookie-transmission]: Safe in unit test environment
+
+    // codeql[missing-csrf-protection,clear-text-cookie-transmission]: session middleware used in tests only
     app.use(
       session({
         secret: 'test-secret',
         resave: false,
         saveUninitialized: true,
+        cookie: {
+          secure: false, // explicitly insecure for test purposes
+          httpOnly: true,
+        },
       })
     );
 
