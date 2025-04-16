@@ -29,9 +29,9 @@ describe('POST /postcode', () => {
   let app: Application;
   let renderSpy: jest.Mock;
 
-  // codeql[missing-csrf-protection,clear-text-cookie-transmission]: Safe in unit test environment
   beforeEach(() => {
     app = express();
+    // codeql[missing-csrf-protection,clear-text-cookie-transmission]: Safe in unit test environment
     app.use(
       session({
         secret: 'test-secret',
