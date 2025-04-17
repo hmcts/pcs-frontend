@@ -6,8 +6,14 @@ import config from 'config';
 >>>>>>> ace1866 (HDPI-515: update the pcs url to preview)
 import { Application, Request, Response } from 'express';
 
+<<<<<<< HEAD
 import { oidcMiddleware } from '../middleware';
 import { getCourtVenues } from '../services/pcsApi/pcsApiService';
+=======
+import { OIDCConfig } from '../modules/oidc/config.interface';
+
+const { Logger } = require('@hmcts/nodejs-logging');
+>>>>>>> e69b427 (HDPI-515: adding idam user token to the postcode api)
 
 export default function (app: Application): void {
   app.get('/postcode', oidcMiddleware, async (req: Request, res: Response) => {
@@ -31,16 +37,38 @@ export default function (app: Application): void {
     }
 
     try {
+      const idamUrl = config.get('idam.url');
+      // eslint-disable-next-line no-console
+      console.log('idamUrl=> ', idamUrl);
+
+      const oidcConfig = config.get('oidc') as OIDCConfig;
+
+      const idamBody = new URLSearchParams({
+        grant_type: 'password',
+        redirect_uri: oidcConfig.redirectUri,
+        client_id: oidcConfig.clientId,
+        username: config.get('secrets.pcs.idam-system-user-name'),
+        password: config.get('secrets.pcs.idam-system-user-password'),
+        client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
+        scope: oidcConfig.scope,
+      });
+
+      const tokenResponse = await axios.post(`${idamUrl}/o/token`, idamBody, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
+
+      const accessToken = tokenResponse.data.access_token;
+
       const pcsUrl = config.get('api.url');
-      const s2sToken = req.session.serviceToken;
       // eslint-disable-next-line no-console
       console.log('url => ', `${pcsUrl}/courts?postCode=${encodeURIComponent(postcode)}`);
 
       const response = await axios.get(`${pcsUrl}/courts?postCode=${encodeURIComponent(postcode)}`, {
         headers: {
-          Authorization: `Bearer ${s2sToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
+
       // eslint-disable-next-line no-console
       console.log('response => ', response);
       const courtData = response.data;
