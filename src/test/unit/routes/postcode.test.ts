@@ -6,7 +6,6 @@ import request from 'supertest';
 
 import postcodeRoutes from '../../../main/routes/postcode';
 
-
 jest.mock('axios');
 jest.mock('config');
 
