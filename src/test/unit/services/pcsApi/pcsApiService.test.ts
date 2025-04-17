@@ -1,8 +1,8 @@
 import axios from 'axios';
 import config from 'config';
 
-import { PcsApiClient } from '../../../../main/modules/pcs-api-client';
-import { CourtVenue } from '../../../../main/modules/pcs-api-client/court-venue.interface';
+import { CourtVenue } from '../../../../main/services/pcsApi/courtVenue.interface';
+import { getCourtVenues, getRootGreeting } from '../../../../main/services/pcsApi/pcsApiService';
 
 jest.mock('axios', () => ({
   get: jest.fn(),
@@ -12,12 +12,9 @@ jest.mock('config', () => ({
   get: jest.fn(),
 }));
 
-let underTest: PcsApiClient;
-
 const testApiBase = 'http://mock-api';
 beforeEach(() => {
   (config.get as jest.Mock).mockReturnValue(testApiBase);
-  underTest = new PcsApiClient();
 });
 
 test('should fetch root greeting', () => {
@@ -25,7 +22,7 @@ test('should fetch root greeting', () => {
 
   stubAxiosGet(expectedGreeting);
 
-  return underTest.getRootGreeting().then((actualGreeting: string) => {
+  return getRootGreeting().then((actualGreeting: string) => {
     expect(actualGreeting).toEqual(expectedGreeting);
     expect(axios.get).toHaveBeenCalledWith(testApiBase);
   });
@@ -34,9 +31,9 @@ test('should fetch root greeting', () => {
 test('should fetch court venues by postcode', () => {
   const expectedCourtVenues: CourtVenue[] = [
     {
-      epimms_id: 101,
-      court_venue_id: 1001,
-      court_name: 'some name',
+      epimmsId: 101,
+      courtVenueId: 1001,
+      courtName: 'some name',
     },
   ];
 
@@ -44,7 +41,7 @@ test('should fetch court venues by postcode', () => {
 
   const postcode: string = 'PC12 3AQ';
 
-  return underTest.getCourtVenues(postcode).then((actualCourtVenues: CourtVenue[]) => {
+  return getCourtVenues(postcode).then((actualCourtVenues: CourtVenue[]) => {
     expect(actualCourtVenues).toEqual(expectedCourtVenues);
     expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postCode=${encodeURIComponent(postcode)}`);
   });
