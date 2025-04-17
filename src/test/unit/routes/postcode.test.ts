@@ -2,16 +2,10 @@ import express, { Application, Request, Response } from 'express';
 import request from 'supertest';
 
 import postcodeRoutes from '../../../main/routes/postcode';
+import { getCourtVenues } from '../../../main/services/pcsApi/pcsApiService';
 
 // Mock external modules
-const mockGetCourtVenues = jest.fn();
-jest.mock('../../../main/modules/pcs-api-client', () => {
-  return {
-    PcsApiClient: jest.fn().mockImplementation(() => {
-      return { getCourtVenues: mockGetCourtVenues };
-    }),
-  };
-});
+jest.mock('../../../main/services/pcsApi/pcsApiService');
 
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
@@ -59,7 +53,7 @@ describe('POST /postcode', () => {
 
   it('should render postcode-result with court data if PCS API call succeeds', async () => {
     const mockCourtData = [{ court_venue_id: '123', court_name: 'Test Court' }];
-    mockGetCourtVenues.mockResolvedValue(mockCourtData);
+    (getCourtVenues as jest.Mock).mockResolvedValue(mockCourtData);
 
     await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
 
@@ -69,7 +63,7 @@ describe('POST /postcode', () => {
   });
 
   it('should show error message if PCS API call fails', async () => {
-    mockGetCourtVenues.mockRejectedValue(new Error('API failed'));
+    (getCourtVenues as jest.Mock).mockRejectedValue(new Error('API failed'));
 
     await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
 
