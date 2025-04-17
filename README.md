@@ -6,9 +6,22 @@
 
 Running the application requires the following tools to be installed in your environment:
 
-- [Node.js](https://nodejs.org/) v20.0.0 or later
+- [Node.js](https://nodejs.org/) v22.0.0 or later
 - [yarn](https://yarnpkg.com/)
 - [Docker](https://www.docker.com)
+
+#### NVM
+
+A better alternative to installing nodejs directly is to use a version manager like [nvm](https://github.com/nvm-sh/nvm)
+then running the command
+
+```
+nvm use
+```
+
+will ensure you are running the same version of node as determined in the CICD pipelines (it autodetects the .nvmrc file within this repository).
+
+You can take this a step further and integrate auto-detection directly into your [shell](https://github.com/nvm-sh/nvm?tab=readme-ov-file#calling-nvm-use-automatically-in-a-directory-with-a-nvmrc-file)
 
 ### Running the application
 
@@ -18,10 +31,26 @@ Install dependencies by executing the following command:
 yarn install
 ```
 
+#### Development
+
 Bundle:
 
 ```bash
-yarn webpack
+yarn build
+```
+
+Run:
+
+```bash
+yarn start:dev
+```
+
+#### Production
+
+Bundle:
+
+```bash
+yarn build:prod
 ```
 
 Run:
@@ -61,7 +90,7 @@ alongside [sass-lint](https://github.com/sasstools/sass-lint)
 Running the linting with auto fix:
 
 ```bash
-yarn lint --fix
+yarn lint:fix
 ```
 
 ### Running the tests
