@@ -26,4 +26,4 @@ nodejs:
     REDIS_SESSION_PREFIX: 'pcs'
     PCS_API_URL: 'http://pcs-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     S2S_URL: 'http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
-    OIDC_REDIRECT_URI: 'https://{{ .Values.ingressHost }}/oauth2/callback'
+    OIDC_REDIRECT_URI: 'https://pcs.{{ .Values.global.environment }}.platform.hmcts.net/oauth2/callback'
