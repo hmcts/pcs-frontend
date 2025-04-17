@@ -146,7 +146,7 @@
     "chai": "5.0.0",
     "@types/node": "20.11.24",
     "glob": "^11.0.0",
-    "@azure/msal-browser": "4.8.0"
+    "@azure/msal-browser": "4.11.0"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
