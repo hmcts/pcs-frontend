@@ -21,7 +21,7 @@
     "url": "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   },
   "idam": {
-    "url": "https://idam-api.aat.platform.hmcts.net/o/token"
+    "url": "https://idam-api.aat.platform.hmcts.net"
   },
   "secrets": {
     "pcs": {
