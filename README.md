@@ -11,15 +11,17 @@ Running the application requires the following tools to be installed in your env
 - [Docker](https://www.docker.com)
 
 #### NVM
+
 A better alternative to installing nodejs directly is to use a version manager like [nvm](https://github.com/nvm-sh/nvm)
 then running the command
+
 ```
 nvm use
 ```
+
 will ensure you are running the same version of node as determined in the CICD pipelines (it autodetects the .nvmrc file within this repository).
 
 You can take this a step further and integrate auto-detection directly into your [shell](https://github.com/nvm-sh/nvm?tab=readme-ov-file#calling-nvm-use-automatically-in-a-directory-with-a-nvmrc-file)
-
 
 ### Running the application
 
@@ -28,7 +30,9 @@ Install dependencies by executing the following command:
 ```bash
 yarn install
 ```
+
 #### Development
+
 Bundle:
 
 ```bash
