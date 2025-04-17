@@ -35,7 +35,7 @@
     }
   },
   "oidc": {
-    "issuer": "https://idam-web-public.aat.platform.hmcts.net/o",
+    "issuer": "https://idam-web-public.aat.platform.hmcts.net",
     "clientId": "pcs-frontend",
     "redirectUri": "http://localhost:3209/oauth2/callback",
     "scope": "openid profile roles",
