@@ -1,12 +1,10 @@
 import { Application, Request, Response } from 'express';
 
-import { PcsApiClient } from '../modules/pcs-api-client';
+import { getCourtVenues } from '../services/pcsApi/pcsApiService';
 
 const { Logger } = require('@hmcts/nodejs-logging');
 
 export default function (app: Application): void {
-  const pcsApiClient: PcsApiClient = new PcsApiClient();
-
   app.get('/postcode', (req: Request, res: Response) => {
     res.render('postcode', { fields: {} });
   });
@@ -28,7 +26,7 @@ export default function (app: Application): void {
     }
 
     try {
-      const courtData = await pcsApiClient.getCourtVenues(postcode);
+      const courtData = await getCourtVenues(postcode);
       res.render('postcode-result', { courtData });
     } catch (error) {
       // eslint-disable-next-line no-console
