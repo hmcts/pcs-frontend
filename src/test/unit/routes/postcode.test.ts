@@ -91,7 +91,7 @@ describe('POST /postcode', () => {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
 
-    expect(axios.get).toHaveBeenCalledWith('http://mock-pcs/courts?postCode=EC1A%201BB', {
+    expect(axios.get).toHaveBeenCalledWith('http://mock-pcs/courts?postcode=EC1A%201BB', {
       headers: {
         Authorization: `Bearer ${mockAccessToken}`,
       },

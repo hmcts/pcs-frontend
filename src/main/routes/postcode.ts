@@ -61,9 +61,9 @@ export default function (app: Application): void {
 
       const pcsUrl = config.get('api.url');
       // eslint-disable-next-line no-console
-      console.log('url => ', `${pcsUrl}/courts?postCode=${encodeURIComponent(postcode)}`);
+      console.log('url => ', `${pcsUrl}/courts?postcode=${encodeURIComponent(postcode)}`);
 
-      const response = await axios.get(`${pcsUrl}/courts?postCode=${encodeURIComponent(postcode)}`, {
+      const response = await axios.get(`${pcsUrl}/courts?postcode=${encodeURIComponent(postcode)}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
