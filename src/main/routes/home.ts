@@ -7,9 +7,8 @@ export default function (app: Application): void {
   const pcsApiClient: PcsApiClient = new PcsApiClient();
 
   app.get('/', oidcMiddleware, async (req: Request, res: Response) => {
-    let apiGreeting: Partial<AxiosResponse> = {
-      data: 'default value',
-    };
+    let apiGreeting = 'default value';
+
     try {
       apiGreeting = await pcsApiClient.getRootGreeting();
     } catch (error) {
