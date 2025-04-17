@@ -86,7 +86,7 @@
     "@types/glob": "^8.1.0",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.14.197",
-    "@types/node": "20.11.24",
+    "@types/node": "20.17.30",
     "@types/nunjucks": "^3.2.3",
     "@types/require-directory": "^2.1.2",
     "@types/serve-favicon": "^2.5.4",
@@ -144,7 +144,7 @@
     "axios": ">1.6.0",
     "@types/express-serve-static-core": "*",
     "chai": "5.0.0",
-    "@types/node": "20.11.24",
+    "@types/node": "20.17.30",
     "glob": "^11.0.0",
     "@azure/msal-browser": "4.11.0"
   },
