@@ -17,6 +17,9 @@
   "s2s": {
     "url": "S2S_URL"
   },
+  "idam": {
+    "url": "IDAM_API_URL"
+  },
   "oidc": {
     "issuer": "OIDC_ISSUER",
     "clientId": "OIDC_CLIENT_ID",

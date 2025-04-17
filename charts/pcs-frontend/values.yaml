@@ -21,9 +21,12 @@ nodejs:
         - app-insights-connection-string
         - pcs-frontend-s2s-secret
         - pcs-frontend-idam-secret
+        - idam-system-user-name
+        - idam-system-user-password
   environment:
     REDIS_TTL: 6000
     REDIS_SESSION_PREFIX: 'pcs'
     PCS_API_URL: 'https://pcs-api-pr-148.preview.platform.hmcts.net'
     S2S_URL: 'http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     OIDC_REDIRECT_URI: 'https://{{ .Values.ingressHost }}/oauth2/callback'
+    IDAM_API_URL: 'https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/o/token'
