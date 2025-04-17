@@ -235,19 +235,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-browser@npm:4.8.0":
-  version: 4.8.0
-  resolution: "@azure/msal-browser@npm:4.8.0"
+"@azure/msal-browser@npm:4.11.0":
+  version: 4.11.0
+  resolution: "@azure/msal-browser@npm:4.11.0"
   dependencies:
-    "@azure/msal-common": "npm:15.3.0"
-  checksum: 10/e5393cb013adaa90cbcfbce779883fabee82d8a69b8830c1fce96e1edf83ce282a7d2a25ac9730d715976bc6fb0080de8e68014e50334f871def94cfa3cbebad
-  languageName: node
-  linkType: hard
-
-"@azure/msal-common@npm:15.3.0":
-  version: 15.3.0
-  resolution: "@azure/msal-common@npm:15.3.0"
-  checksum: 10/6f809038b827d421cb160e936880cec5b8ad70ed8628e7774ac18e365bfbf9c97223786638a07dc04d194d7c10bae001b5dac5487dacb791d69e3766fa6b9c04
+    "@azure/msal-common": "npm:15.5.1"
+  checksum: 10/8bbf3e5eb02ef0a2b0cf72c34a43c31c0cbc040f2cd4abb29fa0a3e4c7a7e75b20ab7c45c466ff14186a48cf77f806b6f7c7442acc7405a182c8189ba0a385c8
   languageName: node
   linkType: hard
 
@@ -255,6 +248,13 @@ __metadata:
   version: 15.5.0
   resolution: "@azure/msal-common@npm:15.5.0"
   checksum: 10/f76d4004c05f7cf495105e31a9ca942f3f3a78978f4aa56228f2c3fe6d229b0cf5ce51c9d23a8c84395d857c1f3324b67113d60b13dba10c7b136b21677f4bf5
+  languageName: node
+  linkType: hard
+
+"@azure/msal-common@npm:15.5.1":
+  version: 15.5.1
+  resolution: "@azure/msal-common@npm:15.5.1"
+  checksum: 10/caa187c73190a3f8a7820099401672cd986a1df24426a606aa84ab529e1338ec73c2dd0d277e6d0b40987815d3702b468a49800b1a2a62113ea0defc8e18bc78
   languageName: node
   linkType: hard
 
@@ -3114,12 +3114,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.11.24":
-  version: 20.11.24
-  resolution: "@types/node@npm:20.11.24"
+"@types/node@npm:20.17.30":
+  version: 20.17.30
+  resolution: "@types/node@npm:20.17.30"
   dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10/7f34bfae5f9b98b9910230af4b4c52dc7fb2d1e96fdebfbc3d7576f8ab3d100076f193f9469add9e7418b455294155e7e6a028498cc5e98f9d49349875a459cf
+    undici-types: "npm:~6.19.2"
+  checksum: 10/69fd3b177417be77b459e8f1dd4e78c85c686167086920fbf35a9fda301709bbeee6a87ad2591fb1ddd96c65e725ec6bb527a06496626a1c94367d1361048f8d
   languageName: node
   linkType: hard
 
@@ -9815,7 +9815,7 @@ __metadata:
     "@types/glob": "npm:^8.1.0"
     "@types/jest": "npm:^29.5.14"
     "@types/lodash": "npm:^4.14.197"
-    "@types/node": "npm:20.11.24"
+    "@types/node": "npm:20.17.30"
     "@types/nunjucks": "npm:^3.2.3"
     "@types/require-directory": "npm:^2.1.2"
     "@types/serve-favicon": "npm:^2.5.4"
@@ -12387,10 +12387,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~5.26.4":
-  version: 5.26.5
-  resolution: "undici-types@npm:5.26.5"
-  checksum: 10/0097779d94bc0fd26f0418b3a05472410408877279141ded2bd449167be1aed7ea5b76f756562cb3586a07f251b90799bab22d9019ceba49c037c76445f7cddd
+"undici-types@npm:~6.19.2":
+  version: 6.19.8
+  resolution: "undici-types@npm:6.19.8"
+  checksum: 10/cf0b48ed4fc99baf56584afa91aaffa5010c268b8842f62e02f752df209e3dea138b372a60a963b3b2576ed932f32329ce7ddb9cb5f27a6c83040d8cd74b7a70
   languageName: node
   linkType: hard
 
