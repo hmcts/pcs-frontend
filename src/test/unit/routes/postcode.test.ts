@@ -1,9 +1,11 @@
-import express, { Application, Request, Response } from 'express';
-import request from 'supertest';
 import axios from 'axios';
-import session from 'express-session';
-import postcodeRoutes from '../../../main/routes/postcode';
 import config from 'config';
+import express, { Application, Request, Response } from 'express';
+import session from 'express-session';
+import request from 'supertest';
+
+import postcodeRoutes from '../../../main/routes/postcode';
+
 
 jest.mock('axios');
 jest.mock('config');
