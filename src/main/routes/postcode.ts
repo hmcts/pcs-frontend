@@ -2,6 +2,8 @@ import axios from 'axios';
 import config from 'config';
 import { Application, Request, Response } from 'express';
 
+import { OIDCConfig } from '../modules/oidc/config.interface';
+
 const { Logger } = require('@hmcts/nodejs-logging');
 
 export default function (app: Application): void {
@@ -26,10 +28,47 @@ export default function (app: Application): void {
     }
 
     try {
-      const pcsApiURL = config.get('api.url');
-      const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
+      const idamUrl = config.get('idam.url');
+      // eslint-disable-next-line no-console
+      console.log('idamUrl=> ', idamUrl);
+
+      const oidcConfig = config.get('oidc') as OIDCConfig;
+
+      const idamBody = new URLSearchParams({
+        grant_type: 'password',
+        redirect_uri: oidcConfig.redirectUri,
+        client_id: oidcConfig.clientId,
+        username: config.get('secrets.pcs.idam-system-user-name'),
+        password: config.get('secrets.pcs.idam-system-user-password'),
+        client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
+        scope: oidcConfig.scope,
+      });
+
+      const tokenResponse = await axios.post(`${idamUrl}/o/token`, idamBody, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const pcsUrl = config.get('api.url');
+      // eslint-disable-next-line no-console
+      console.log('url => ', `${pcsUrl}/courts?postcode=${encodeURIComponent(postcode)}`);
+
+      const response = await axios.get(`${pcsUrl}/courts?postcode=${encodeURIComponent(postcode)}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      // eslint-disable-next-line no-console
+      console.log('response => ', response);
       const courtData = response.data;
-      res.render('postcode-result', { courtData });
+
+      const tableRows = courtData?.map((court: { court_venue_id: string; court_name: string }) => [
+        { text: court.court_venue_id },
+        { text: court.court_name },
+      ]);
+      res.render('courts-name', { tableRows });
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log('error: ', error);

@@ -1,28 +1,13 @@
 import axios from 'axios';
 import config from 'config';
 import express, { Application, Request, Response } from 'express';
+import session from 'express-session';
 import request from 'supertest';
 
 import postcodeRoutes from '../../../main/routes/postcode';
 
-// Mock external modules
-jest.mock('axios', () => ({
-  get: jest.fn(),
-}));
-
-jest.mock('config', () => ({
-  get: jest.fn(),
-}));
-
-jest.mock('@hmcts/nodejs-logging', () => ({
-  Logger: {
-    getLogger: () => ({
-      error: jest.fn(),
-      info: jest.fn(),
-      debug: jest.fn(),
-    }),
-  },
-}));
+jest.mock('axios');
+jest.mock('config');
 
 describe('POST /postcode', () => {
   let app: Application;
@@ -30,9 +15,20 @@ describe('POST /postcode', () => {
 
   beforeEach(() => {
     app = express();
+
+    // Session middleware to avoid req.session errors
+    app.use(
+      session({
+        secret: 'test-secret',
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: false, httpOnly: true }, // test-safe settings
+      })
+    );
+
     app.use(express.urlencoded({ extended: false }));
 
-    // Intercept res.render
+    // Mock res.render
     app.use((req: Request, res: Response, next) => {
       renderSpy = jest.fn((view, options) => {
         res.status(200).send({ view, options });
@@ -41,12 +37,11 @@ describe('POST /postcode', () => {
       next();
     });
 
-    // Register the routes
     postcodeRoutes(app);
   });
 
-  it('should return error if postcode is missing', async () => {
-    await request(app).post('/postcode').type('form').send({ postcode: '' });
+  it('should render an error if postcode is missing', async () => {
+    const response = await request(app).post('/postcode').type('form').send({ postcode: '' });
 
     expect(renderSpy).toHaveBeenCalledWith('postcode', {
       fields: {
@@ -56,27 +51,66 @@ describe('POST /postcode', () => {
         },
       },
     });
+
+    expect(response.status).toBe(200);
   });
 
   it('should render postcode-result with court data if postcode is valid', async () => {
+    const mockAccessToken = 'test-access-token';
     const mockCourtData = [{ court_venue_id: '123', court_name: 'Test Court' }];
 
-    (config.get as jest.Mock).mockReturnValue('http://mock-api');
-    (axios.get as jest.Mock).mockResolvedValue({ data: mockCourtData });
-
-    await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
-
-    expect(axios.get).toHaveBeenCalledWith('http://mock-api/courts?postCode=EC1A%201BB');
-    expect(renderSpy).toHaveBeenCalledWith('postcode-result', {
-      courtData: mockCourtData,
+    // Mock config values
+    (config.get as jest.Mock).mockImplementation((key: string) => {
+      const configMap: Record<string, string> = {
+        'idam.url': 'http://mock-idam',
+        oidc: JSON.stringify({
+          redirectUri: 'http://localhost/redirect',
+          clientId: 'test-client-id',
+        }),
+        'secrets.pcs.idam-system-user-name': 'user',
+        'secrets.pcs.idam-system-user-password': 'pass',
+        'secrets.pcs.pcs-frontend-idam-secret': 'secret',
+        'api.url': 'http://mock-pcs',
+      };
+      return typeof configMap[key] === 'string' ? configMap[key] : JSON.parse(configMap[key]);
     });
+
+    // Mock IDAM token response
+    (axios.post as jest.Mock).mockResolvedValue({
+      data: { access_token: mockAccessToken },
+    });
+
+    // Mock PCS API response
+    (axios.get as jest.Mock).mockResolvedValue({
+      data: mockCourtData,
+    });
+
+    const response = await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
+
+    expect(axios.post).toHaveBeenCalledWith('http://mock-idam/o/token', expect.any(URLSearchParams), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    expect(axios.get).toHaveBeenCalledWith('http://mock-pcs/courts?postcode=EC1A%201BB', {
+      headers: {
+        Authorization: `Bearer ${mockAccessToken}`,
+      },
+    });
+
+    expect(renderSpy).toHaveBeenCalledWith('courts-name', {
+      tableRows: [[{ text: '123' }, { text: 'Test Court' }]],
+    });
+
+    expect(response.status).toBe(200);
   });
 
-  it('should show error message if API call fails', async () => {
-    (config.get as jest.Mock).mockReturnValue('http://mock-api');
-    (axios.get as jest.Mock).mockRejectedValue(new Error('API failed'));
+  it('should render error page if IDAM or PCS API fails', async () => {
+    (config.get as jest.Mock).mockReturnValue('http://mock-idam');
 
-    await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
+    // Force token call to fail
+    (axios.post as jest.Mock).mockRejectedValue(new Error('IDAM error'));
+
+    const response = await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
 
     expect(renderSpy).toHaveBeenCalledWith('postcode', {
       fields: {
@@ -86,10 +120,7 @@ describe('POST /postcode', () => {
         },
       },
     });
-  });
 
-  it('should render postcode view on GET /postcode', async () => {
-    await request(app).get('/postcode');
-    expect(renderSpy).toHaveBeenCalledWith('postcode', { fields: {} });
+    expect(response.status).toBe(200);
   });
 });

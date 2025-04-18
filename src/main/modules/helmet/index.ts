@@ -36,6 +36,7 @@ export class Helmet {
             objectSrc: [self],
             scriptSrc,
             styleSrc: [self],
+            manifestSrc: [self],
           },
         },
         referrerPolicy: { policy: 'origin' },
