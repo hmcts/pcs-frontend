@@ -157,6 +157,9 @@ export class OIDCModule {
             delete req.session.nonce;
             delete req.session.state;
 
+            // add Bearer token to axios instance
+            axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
+
             app.locals.nunjucksEnv.addGlobal('user', req.session.user);
 
             res.redirect('/');
