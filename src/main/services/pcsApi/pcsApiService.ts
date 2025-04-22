@@ -49,11 +49,17 @@ export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> =>
   const pcsApiURL = getBaseUrl();
   const accessToken = await getIdamSystemToken();
 
+  // eslint-disable-next-line no-console
+  console.log('accessToken => ', accessToken);
+
   const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
+
+  // eslint-disable-next-line no-console
+  console.log('response => ', response);
 
   return response.data as CourtVenue[];
 };
