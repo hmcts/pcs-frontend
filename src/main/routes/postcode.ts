@@ -27,7 +27,14 @@ export default function (app: Application): void {
 
     try {
       const courtData = await getCourtVenues(postcode);
-      res.render('postcode-result', { courtData });
+      
+      const tableRows = courtData.map(court => [
+        { text: court.epimId.toString() },
+        { text: court.id.toString() },
+        { text: court.name },
+      ]);
+
+      res.render('courts.njk', { tableRows });
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log('error: ', error);
