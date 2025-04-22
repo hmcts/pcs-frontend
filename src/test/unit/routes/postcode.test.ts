@@ -57,7 +57,7 @@ describe('POST /postcode', () => {
 
   it('should render postcode-result with court data if postcode is valid', async () => {
     const mockAccessToken = 'test-access-token';
-    const mockCourtData = [{ court_venue_id: '123', court_name: 'Test Court' }];
+    const mockCourtData = [{ id: '123', name: 'Test Court' }];
 
     // Mock config values
     (config.get as jest.Mock).mockImplementation((key: string) => {
