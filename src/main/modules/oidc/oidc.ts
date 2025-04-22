@@ -107,13 +107,37 @@ export class OIDCModule {
           ...user,
         };
 
-        req.session.save(() => {
-          delete req.session.codeVerifier;
-          delete req.session.nonce;
-          delete req.session.state;
-          app.locals.nunjucksEnv.addGlobal('user', req.session.user);
-          res.redirect('/');
-        });
+          req.session.save(() => {
+            delete req.session.codeVerifier;
+            delete req.session.nonce;
+            delete req.session.state;
+
+             // add Bearer token to axios instance
+             axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
+
+            app.locals.nunjucksEnv.addGlobal('user', req.session.user);
+
+            res.redirect('/');
+          });
+        } catch (tokenError: unknown) {
+          const error = tokenError as Error & {
+            response?: { body?: unknown; status?: number; headers?: unknown };
+            code?: string;
+            cause?: unknown;
+          };
+          // Log the full error response with more details
+          this.logger.error('Token exchange error details:', {
+            error: error.message,
+            code: error.code,
+            name: error.name,
+            response: error.response?.body,
+            status: error.response?.status,
+            headers: error.response?.headers,
+            cause: error.cause,
+            stack: error.stack,
+          });
+          throw error;
+        }
       } catch (error) {
         this.logger.error('Authentication error details:', {
           error: error.message,
