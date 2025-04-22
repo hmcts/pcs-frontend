@@ -1,8 +1,5 @@
-import axios from 'axios';
-import config from 'config';
 import { Application, Request, Response } from 'express';
-
-import { OIDCConfig } from '../modules/oidc/config.interface';
+import { getCourtVenues } from '../services/pcsApi/pcsApiService';
 
 const { Logger } = require('@hmcts/nodejs-logging');
 
@@ -28,47 +25,8 @@ export default function (app: Application): void {
     }
 
     try {
-      const idamUrl = config.get('idam.url');
-      // eslint-disable-next-line no-console
-      console.log('idamUrl=> ', idamUrl);
-
-      const oidcConfig = config.get('oidc') as OIDCConfig;
-
-      const idamBody = new URLSearchParams({
-        grant_type: 'password',
-        redirect_uri: oidcConfig.redirectUri,
-        client_id: oidcConfig.clientId,
-        username: config.get('secrets.pcs.idam-system-user-name'),
-        password: config.get('secrets.pcs.idam-system-user-password'),
-        client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
-        scope: oidcConfig.scope,
-      });
-
-      const tokenResponse = await axios.post(`${idamUrl}/o/token`, idamBody, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
-
-      const accessToken = tokenResponse.data.access_token;
-
-      const pcsUrl = config.get('api.url');
-      // eslint-disable-next-line no-console
-      console.log('url => ', `${pcsUrl}/courts?postcode=${encodeURIComponent(postcode)}`);
-
-      const response = await axios.get(`${pcsUrl}/courts?postcode=${encodeURIComponent(postcode)}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      // eslint-disable-next-line no-console
-      console.log('response => ', response);
-      const courtData = response.data;
-
-      const tableRows = courtData?.map((court: { id: string; name: string }) => [
-        { text: court.id },
-        { text: court.name },
-      ]);
-      res.render('courts-name', { tableRows });
+      const courtData = await getCourtVenues(postcode);
+      res.render('postcode-result', { courtData });
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log('error: ', error);
