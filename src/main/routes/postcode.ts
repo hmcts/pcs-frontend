@@ -64,9 +64,9 @@ export default function (app: Application): void {
       console.log('response => ', response);
       const courtData = response.data;
 
-      const tableRows = courtData?.map((court: { court_venue_id: string; court_name: string }) => [
-        { text: court.court_venue_id },
-        { text: court.court_name },
+      const tableRows = courtData?.map((court: { id: string; name: string }) => [
+        { text: court.id },
+        { text: court.name },
       ]);
       res.render('courts-name', { tableRows });
     } catch (error) {
