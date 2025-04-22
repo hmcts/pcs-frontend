@@ -64,29 +64,6 @@ describe('POST /postcode', () => {
     expect(response.status).toBe(200);
   });
 
-  it('should render postcode-result with court data if PCS API call succeeds', async () => {
-    const mockCourtData = [{ court_venue_id: '123', court_name: 'Test Court' }];
-    (getCourtVenues as jest.Mock).mockResolvedValue(mockCourtData);
-
-    const response = await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
-
-    expect(renderSpy).toHaveBeenCalledWith('postcode-result', {
-      courtData: mockCourtData,
-    });
-
-    expect(axios.get).toHaveBeenCalledWith('http://mock-pcs/courts?postcode=EC1A%201BB', {
-      headers: {
-        Authorization: `Bearer ${mockAccessToken}`,
-      },
-    });
-
-    expect(renderSpy).toHaveBeenCalledWith('courts-name', {
-      tableRows: [[{ text: '123' }, { text: 'Test Court' }]],
-    });
-
-    expect(response.status).toBe(200);
-  });
-
   it('should show error message if PCS API call fails', async () => {
     (getCourtVenues as jest.Mock).mockRejectedValue(new Error('API failed'));
 

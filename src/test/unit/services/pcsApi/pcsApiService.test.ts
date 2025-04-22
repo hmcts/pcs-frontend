@@ -31,9 +31,9 @@ test('should fetch root greeting', () => {
 test('should fetch court venues by postcode', () => {
   const expectedCourtVenues: CourtVenue[] = [
     {
-      epimmsId: 101,
-      courtVenueId: 1001,
-      courtName: 'some name',
+      epimId: 101,
+      id: 1001,
+      name: 'some name',
     },
   ];
 
