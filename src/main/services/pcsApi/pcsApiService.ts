@@ -69,7 +69,7 @@ export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> =>
   // eslint-disable-next-line no-console
   console.log('accessToken => ', accessToken);
 
-  const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`, {
+  const response = await axios.get(`${pcsApiURL}/courts?postcode=${encodeURIComponent(postcode)}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
