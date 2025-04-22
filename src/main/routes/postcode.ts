@@ -1,6 +1,6 @@
-import axios from 'axios';
-import config from 'config';
 import { Application, Request, Response } from 'express';
+
+import { getCourtVenues } from '../services/pcsApi/pcsApiService';
 
 const { Logger } = require('@hmcts/nodejs-logging');
 
@@ -26,9 +26,7 @@ export default function (app: Application): void {
     }
 
     try {
-      const pcsApiURL = config.get('api.url');
-      const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
-      const courtData = response.data;
+      const courtData = await getCourtVenues(postcode);
       res.render('postcode-result', { courtData });
     } catch (error) {
       // eslint-disable-next-line no-console

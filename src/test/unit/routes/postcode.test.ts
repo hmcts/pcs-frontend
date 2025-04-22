@@ -1,18 +1,11 @@
-import axios from 'axios';
-import config from 'config';
 import express, { Application, Request, Response } from 'express';
 import request from 'supertest';
 
 import postcodeRoutes from '../../../main/routes/postcode';
+import { getCourtVenues } from '../../../main/services/pcsApi/pcsApiService';
 
 // Mock external modules
-jest.mock('axios', () => ({
-  get: jest.fn(),
-}));
-
-jest.mock('config', () => ({
-  get: jest.fn(),
-}));
+jest.mock('../../../main/services/pcsApi/pcsApiService');
 
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
@@ -58,23 +51,19 @@ describe('POST /postcode', () => {
     });
   });
 
-  it('should render postcode-result with court data if postcode is valid', async () => {
+  it('should render postcode-result with court data if PCS API call succeeds', async () => {
     const mockCourtData = [{ court_venue_id: '123', court_name: 'Test Court' }];
-
-    (config.get as jest.Mock).mockReturnValue('http://mock-api');
-    (axios.get as jest.Mock).mockResolvedValue({ data: mockCourtData });
+    (getCourtVenues as jest.Mock).mockResolvedValue(mockCourtData);
 
     await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
 
-    expect(axios.get).toHaveBeenCalledWith('http://mock-api/courts?postCode=EC1A%201BB');
     expect(renderSpy).toHaveBeenCalledWith('postcode-result', {
       courtData: mockCourtData,
     });
   });
 
-  it('should show error message if API call fails', async () => {
-    (config.get as jest.Mock).mockReturnValue('http://mock-api');
-    (axios.get as jest.Mock).mockRejectedValue(new Error('API failed'));
+  it('should show error message if PCS API call fails', async () => {
+    (getCourtVenues as jest.Mock).mockRejectedValue(new Error('API failed'));
 
     await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
 
