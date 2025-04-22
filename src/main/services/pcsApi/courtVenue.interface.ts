@@ -1,5 +1,5 @@
 export interface CourtVenue {
-  epimmsId: number;
-  courtVenueId: number;
-  courtName: string;
+  epimId: number;
+  id: number;
+  name: string;
 }

@@ -55,6 +55,7 @@ describe('POST /postcode', () => {
     expect(response.status).toBe(200);
   });
 
+<<<<<<< HEAD
   it('should render postcode-result with court data if postcode is valid', async () => {
     const mockAccessToken = 'test-access-token';
     const mockCourtData = [{ id: '123', name: 'Test Court' }];
@@ -109,6 +110,10 @@ describe('POST /postcode', () => {
 
     // Force token call to fail
     (axios.post as jest.Mock).mockRejectedValue(new Error('IDAM error'));
+=======
+  it('should show error message if PCS API call fails', async () => {
+    (getCourtVenues as jest.Mock).mockRejectedValue(new Error('API failed'));
+>>>>>>> 789500f (HDPI-515: refactoring and tidying up)
 
     const response = await request(app).post('/postcode').type('form').send({ postcode: 'EC1A 1BB' });
 
