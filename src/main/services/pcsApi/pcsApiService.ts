@@ -33,10 +33,15 @@ export const getIdamSystemToken = async (): Promise<string> => {
     scope: oidcConfig.scope,
   });
 
+  // eslint-disable-next-line no-console
+  console.log('idamBody=> ', idamBody);
+
   const tokenResponse = await axios.post(`${idamUrl}/o/token`, idamBody, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   });
 
+  // eslint-disable-next-line no-console
+  console.log('tokenResponse => ', tokenResponse);
   return tokenResponse.data.access_token;
 };
 
