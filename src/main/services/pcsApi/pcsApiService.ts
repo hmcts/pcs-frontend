@@ -34,12 +34,7 @@ export const getCourtVenues = async (postcode: string, user: { accessToken: stri
 =======
 export const getIdamSystemToken = async (): Promise<string> => {
   const idamUrl = config.get('idam.url');
-
-  // eslint-disable-next-line no-console
-  console.log('idamUrl=> ', idamUrl);
-
   const oidcConfig = config.get('oidc') as OIDCConfig;
-
   const idamBody = new URLSearchParams({
     grant_type: 'password',
     redirect_uri: oidcConfig.redirectUri,
@@ -49,25 +44,16 @@ export const getIdamSystemToken = async (): Promise<string> => {
     client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
     scope: oidcConfig.scope,
   });
-
-  // eslint-disable-next-line no-console
-  console.log('idamBody=> ', idamBody);
-
   const tokenResponse = await axios.post(`${idamUrl}/o/token`, idamBody, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   });
 
-  // eslint-disable-next-line no-console
-  console.log('tokenResponse => ', tokenResponse);
   return tokenResponse.data.access_token;
 };
 
 export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> => {
   const pcsApiURL = getBaseUrl();
   const accessToken = await getIdamSystemToken();
-
-  // eslint-disable-next-line no-console
-  console.log('accessToken => ', accessToken);
 
   const response = await axios.get(`${pcsApiURL}/courts?postcode=${encodeURIComponent(postcode)}`, {
     headers: {
