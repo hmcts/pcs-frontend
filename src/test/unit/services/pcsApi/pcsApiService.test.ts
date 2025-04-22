@@ -73,7 +73,7 @@ describe('pcsApiService', () => {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(`${apiBaseUrl}/courts?postCode=${encodeURIComponent(mockPostcode)}`, {
+    expect(mockedAxios.get).toHaveBeenCalledWith(`${apiBaseUrl}/courts?postcode=${encodeURIComponent(mockPostcode)}`, {
       headers: {
         Authorization: `Bearer ${mockAccessToken}`,
       },
