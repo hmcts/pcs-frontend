@@ -1,8 +1,9 @@
 import axios from 'axios';
 import config from 'config';
 
+import { OIDCConfig } from '../../modules/oidc/config.interface';
+
 import { CourtVenue } from './courtVenue.interface';
-import { OIDCConfig } from 'modules/oidc/config.interface';
 
 function getBaseUrl(): string {
   return config.get('api.url');
@@ -41,7 +42,7 @@ export const getIdamSystemToken = async (): Promise<string> => {
 
 export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> => {
   const pcsApiURL = getBaseUrl();
-  const accessToken = getIdamSystemToken();
+  const accessToken = await getIdamSystemToken();
 
   const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`, {
     headers: {
