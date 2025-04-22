@@ -38,7 +38,7 @@ export default function (app: Application): void {
 
     try {
       const courtData = await getCourtVenues(postcode);
-      
+
       const tableRows = courtData.map(court => [
         { text: court.epimId.toString() },
         { text: court.id.toString() },

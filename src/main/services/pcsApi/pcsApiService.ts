@@ -59,7 +59,7 @@ export const getIdamSystemToken = async (): Promise<string> => {
 
 export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> => {
   const pcsApiURL = getBaseUrl();
-  const accessToken = getIdamSystemToken();
+  const accessToken = await getIdamSystemToken();
 
   const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`, {
     headers: {
