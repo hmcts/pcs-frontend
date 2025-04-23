@@ -3,6 +3,7 @@ import config from 'config';
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import type { CourtVenue } from '../../../../main/interface/courtVenue.interface';
 =======
 import { OIDCConfig } from '../../../../main/modules/oidc/config.interface';
@@ -10,6 +11,9 @@ import { OIDCConfig } from '../../../../main/modules/oidc/config.interface';
 >>>>>>> b9cf116 (HDPI-515: update test)
 import { CourtVenue } from '../../../../main/services/pcsApi/courtVenue.interface';
 >>>>>>> 3c0ea47 (HDPI-515: fixing linting and unit test errors)
+=======
+import { CourtVenue } from '../../../../main/interface/courtVenue.interface';
+>>>>>>> a44e576 (HDPI-515: clean up)
 import { getCourtVenues, getRootGreeting } from '../../../../main/services/pcsApi/pcsApiService';
 
 jest.mock('axios', () => ({

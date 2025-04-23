@@ -52,14 +52,7 @@ export const getIdamSystemToken = async (): Promise<string> => {
 // };
 
 export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> => {
-  const pcsApiURL = getBaseUrl();
-  //const accessToken = await getIdamSystemToken();
-
-  const response = await axios.get(`${pcsApiURL}/courts?postcode=${encodeURIComponent(postcode)}`);
-
-  // eslint-disable-next-line no-console
-  console.log('response => ', response);
-
+  const response = await axios.get(`${getBaseUrl()}/courts?postcode=${encodeURIComponent(postcode)}`);
   return response.data as CourtVenue[];
 >>>>>>> 4214d49 (HDPI-515: refactoring)
 };
