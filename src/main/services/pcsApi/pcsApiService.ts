@@ -52,7 +52,9 @@ export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> =>
   const url = `${getBaseUrl()}/courts?postcode=${encodeURIComponent(postcode)}`;
   logger.info(`Calling PCS court search with URL: ${url}`);
   const response = await axios.get(url);
-  logger.debug(`Court venue response for ${postcode}: ${JSON.stringify(response.data)}`);
+
+  //TODO: Temporarily adding the logger for tester. will be removed before merged to master
+  logger.info(`PCS API full response: ${JSON.stringify(response, null, 2)}`);
   return response.data as CourtVenue[];
 >>>>>>> 4214d49 (HDPI-515: refactoring)
 };
