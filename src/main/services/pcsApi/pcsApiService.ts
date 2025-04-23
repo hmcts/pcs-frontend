@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 
-import { CourtVenue } from '../../interface/courtVenue.interface';
+import type { CourtVenue } from '../../interface/courtVenue.interface';
 
 function getBaseUrl(): string {
   return config.get('api.url');
