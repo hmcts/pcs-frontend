@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 
-import { CourtVenue } from '../../../../main/services/pcsApi/courtVenue.interface';
+import { CourtVenue } from '../../../../main/interface/courtVenue.interface';
 import { getCourtVenues, getRootGreeting } from '../../../../main/services/pcsApi/pcsApiService';
 
 jest.mock('axios', () => ({

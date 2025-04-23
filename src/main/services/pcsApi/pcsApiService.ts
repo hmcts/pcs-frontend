@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 
-import { CourtVenue } from './courtVenue.interface';
+import { CourtVenue } from '../../interface/courtVenue.interface';
 
 function getBaseUrl(): string {
   return config.get('api.url');
@@ -13,33 +13,7 @@ export const getRootGreeting = async (): Promise<string> => {
   return response.data;
 };
 
-// export const getIdamSystemToken = async (): Promise<string> => {
-//   const idamUrl = config.get('idam.url');
-//   const oidcConfig = config.get('oidc') as OIDCConfig;
-//   const idamBody = new URLSearchParams({
-//     grant_type: 'password',
-//     redirect_uri: oidcConfig.redirectUri,
-//     client_id: oidcConfig.clientId,
-//     username: config.get('secrets.pcs.idam-system-user-name'),
-//     password: config.get('secrets.pcs.idam-system-user-password'),
-//     client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
-//     scope: oidcConfig.scope,
-//   });
-//   const tokenResponse = await axios.post(`${idamUrl}/o/token`, idamBody, {
-//     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-//   });
-
-//   return tokenResponse.data.access_token;
-// };
-
 export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> => {
-  const pcsApiURL = getBaseUrl();
-  //const accessToken = await getIdamSystemToken();
-
-  const response = await axios.get(`${pcsApiURL}/courts?postcode=${encodeURIComponent(postcode)}`);
-
-  // eslint-disable-next-line no-console
-  console.log('response => ', response);
-
+  const response = await axios.get(`${getBaseUrl()}/courts?postcode=${encodeURIComponent(postcode)}`);
   return response.data as CourtVenue[];
 };
