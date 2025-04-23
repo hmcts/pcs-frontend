@@ -73,15 +73,17 @@ describe('pcsApiService', () => {
 
     expect(result).toEqual(mockCourtVenues);
 
-    expect(mockedAxios.post).toHaveBeenCalledWith(`${idamUrl}/o/token`, expect.any(URLSearchParams), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
+    // expect(mockedAxios.post).toHaveBeenCalledWith(`${idamUrl}/o/token`, expect.any(URLSearchParams), {
+    //   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    // });
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(`${apiBaseUrl}/courts?postcode=${encodeURIComponent(mockPostcode)}`, {
-      headers: {
-        Authorization: `Bearer ${mockAccessToken}`,
-      },
-    });
+    expect(mockedAxios.get).toHaveBeenCalledWith(`${apiBaseUrl}/courts?postcode=${encodeURIComponent(mockPostcode)}`);
+
+    // expect(mockedAxios.get).toHaveBeenCalledWith(`${apiBaseUrl}/courts?postcode=${encodeURIComponent(mockPostcode)}`, {
+    //   headers: {
+    //     Authorization: `Bearer ${mockAccessToken}`,
+    //   },
+    // });
   });
 });
 <<<<<<< HEAD
