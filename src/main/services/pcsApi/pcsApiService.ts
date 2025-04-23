@@ -53,13 +53,9 @@ export const getIdamSystemToken = async (): Promise<string> => {
 
 export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> => {
   const pcsApiURL = getBaseUrl();
-  const accessToken = await getIdamSystemToken();
+  //const accessToken = await getIdamSystemToken();
 
-  const response = await axios.get(`${pcsApiURL}/courts?postcode=${encodeURIComponent(postcode)}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  const response = await axios.get(`${pcsApiURL}/courts?postcode=${encodeURIComponent(postcode)}`);
 
   // eslint-disable-next-line no-console
   console.log('response => ', response);
