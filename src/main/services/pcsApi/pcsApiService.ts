@@ -2,13 +2,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 
-<<<<<<< HEAD
 import type { CourtVenue } from '../../interface/courtVenue.interface';
-const logger = Logger.getLogger('pcsApiService');
-=======
-import { CourtVenue } from './courtVenue.interface';
-import { OIDCConfig } from 'modules/oidc/config.interface';
->>>>>>> 4214d49 (HDPI-515: refactoring)
 
 function getBaseUrl(): string {
   return config.get('api.url');
