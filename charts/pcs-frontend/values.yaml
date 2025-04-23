@@ -21,8 +21,6 @@ nodejs:
         - app-insights-connection-string
         - pcs-frontend-s2s-secret
         - pcs-frontend-idam-secret
-        - idam-system-user-name
-        - idam-system-user-password
   environment:
     REDIS_TTL: 6000
     REDIS_SESSION_PREFIX: 'pcs'

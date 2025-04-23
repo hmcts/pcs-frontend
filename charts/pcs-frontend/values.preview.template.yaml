@@ -7,8 +7,6 @@ nodejs:
       secrets:
         - pcs-frontend-s2s-secret
         - pcs-frontend-idam-secret
-        - idam-system-user-name
-        - idam-system-user-password
   environment:
     REDIS_CONNECTION_STRING: redis://${SERVICE_NAME}-redis-master:6379
     OIDC_REDIRECT_URI: 'https://${SERVICE_FQDN}/oauth2/callback'
