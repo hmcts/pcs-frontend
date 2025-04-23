@@ -31,7 +31,7 @@ describe('POST /postcode', () => {
         secret: 'test-secret',
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: false, httpOnly: true }, // test-safe settings
+        cookie: { secure: process.env.NODE_ENV !== 'test', httpOnly: true }
       })
     );
 
