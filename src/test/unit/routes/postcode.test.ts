@@ -22,7 +22,7 @@ describe('POST /postcode', () => {
         secret: 'test-secret',
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: process.env.NODE_ENV !== 'test', httpOnly: true }
+        cookie: { secure: process.env.NODE_ENV !== 'test', httpOnly: true },
       })
     );
 
