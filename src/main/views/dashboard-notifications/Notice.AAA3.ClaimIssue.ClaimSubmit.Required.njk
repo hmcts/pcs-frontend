@@ -1,0 +1,12 @@
+<div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+  <div class="govuk-notification-banner__header">
+    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+      Trial or hearing scheduled
+    </h2>
+  </div>
+  <div class="govuk-notification-banner__content">
+    Your appointment is on {{ hearingDate | dateWithTime }} in {{ location }}. You need to
+    pay {{ amount | gbp }} by {{ dueDate | date }}.
+    <a class="govuk-notification-banner__link" href="#">View the hearing notice.</a>
+  </div>
+</div>
