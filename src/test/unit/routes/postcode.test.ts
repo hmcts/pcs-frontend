@@ -128,4 +128,18 @@ describe('POST /postcode', () => {
 
     expect(response.status).toBe(200);
   });
+
+  it('should render courts.njk with tableRows if PCS API returns data', async () => {
+    (getCourtVenues as jest.Mock).mockResolvedValue([{ epimId: 123, id: 456, name: 'Test Court' }]);
+
+    const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
+
+    expect(getCourtVenues).toHaveBeenCalledWith('SW1A 1AA');
+
+    expect(renderSpy).toHaveBeenCalledWith('courts.njk', {
+      tableRows: [[{ text: '456' }, { text: 'Test Court' }]],
+    });
+
+    expect(response.status).toBe(200);
+  });
 });
