@@ -2,92 +2,46 @@ import axios from 'axios';
 import config from 'config';
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import type { CourtVenue } from '../../../../main/interface/courtVenue.interface';
 =======
 import { OIDCConfig } from '../../../../main/modules/oidc/config.interface';
+=======
+>>>>>>> b9cf116 (HDPI-515: update test)
 import { CourtVenue } from '../../../../main/services/pcsApi/courtVenue.interface';
 >>>>>>> 3c0ea47 (HDPI-515: fixing linting and unit test errors)
 import { getCourtVenues, getRootGreeting } from '../../../../main/services/pcsApi/pcsApiService';
 
-jest.mock('axios');
-jest.mock('config');
+jest.mock('axios', () => ({
+  get: jest.fn(),
+}));
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-const mockedConfig = config.get as jest.Mock;
+jest.mock('config', () => ({
+  get: jest.fn(),
+}));
 
-describe('pcsApiService', () => {
-  const apiBaseUrl = 'http://mock-api';
-  const idamUrl = 'http://mock-idam';
-  const oidcMock: OIDCConfig = {
-    clientId: 'test-client-id',
-    issuer: 'test-client-secret',
-    redirectUri: 'http://localhost/callback',
-    scope: 'openid profile',
-    iss: '',
-  };
+const testApiBase = 'http://mock-api';
+beforeEach(() => {
+  (config.get as jest.Mock).mockReturnValue(testApiBase);
+});
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+test('should fetch root greeting', () => {
+  const expectedGreeting = 'test greeting';
 
-    mockedConfig.mockImplementation((key: string) => {
-      const values: Record<string, string | OIDCConfig> = {
-        'api.url': apiBaseUrl,
-        'idam.url': idamUrl,
-        oidc: oidcMock,
-        'secrets.pcs.idam-system-user-name': 'mock-user',
-        'secrets.pcs.idam-system-user-password': 'mock-pass',
-        'secrets.pcs.pcs-frontend-idam-secret': 'mock-secret',
-      };
+  stubAxiosGet(expectedGreeting);
 
-      return values[key];
-    });
-  });
-
-  it('should fetch root greeting', async () => {
-    const mockGreeting = 'Hello from PCS!';
-    mockedAxios.get.mockResolvedValueOnce({ data: mockGreeting });
-
-    const result = await getRootGreeting();
-
-    expect(result).toEqual(mockGreeting);
-    expect(mockedAxios.get).toHaveBeenCalledWith(apiBaseUrl);
-  });
-
-  it('should fetch court venues by postcode', async () => {
-    const mockAccessToken = 'mock-access-token';
-    const mockPostcode = 'SW1A 1AA';
-
-    const mockCourtVenues: CourtVenue[] = [{ epimId: 101, id: 2001, name: 'Test Court' }];
-
-    // Mock IDAM token POST
-    mockedAxios.post.mockResolvedValueOnce({
-      data: { access_token: mockAccessToken },
-    });
-
-    // Mock PCS court venue GET
-    mockedAxios.get.mockResolvedValueOnce({
-      data: mockCourtVenues,
-    });
-
-    const result = await getCourtVenues(mockPostcode);
-
-    expect(result).toEqual(mockCourtVenues);
-
-    // expect(mockedAxios.post).toHaveBeenCalledWith(`${idamUrl}/o/token`, expect.any(URLSearchParams), {
-    //   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    // });
-
-    expect(mockedAxios.get).toHaveBeenCalledWith(`${apiBaseUrl}/courts?postcode=${encodeURIComponent(mockPostcode)}`);
-
-    // expect(mockedAxios.get).toHaveBeenCalledWith(`${apiBaseUrl}/courts?postcode=${encodeURIComponent(mockPostcode)}`, {
-    //   headers: {
-    //     Authorization: `Bearer ${mockAccessToken}`,
-    //   },
-    // });
+  return getRootGreeting().then((actualGreeting: string) => {
+    expect(actualGreeting).toEqual(expectedGreeting);
+    expect(axios.get).toHaveBeenCalledWith(testApiBase);
   });
 });
 <<<<<<< HEAD
+<<<<<<< HEAD
 test('should fetch court venues by postcode', async () => {
+=======
+
+test('should fetch court venues by postcode', () => {
+>>>>>>> b9cf116 (HDPI-515: update test)
   const expectedCourtVenues: CourtVenue[] = [
     {
       epimId: 101,
@@ -99,6 +53,7 @@ test('should fetch court venues by postcode', async () => {
   stubAxiosGet(expectedCourtVenues);
 
   const postcode: string = 'PC12 3AQ';
+<<<<<<< HEAD
   const mockAccessToken = 'test-token';
 
   const actualCourtVenues = await getCourtVenues(postcode, { accessToken: mockAccessToken });
@@ -108,11 +63,20 @@ test('should fetch court venues by postcode', async () => {
     headers: {
       Authorization: `Bearer ${mockAccessToken}`,
     },
+=======
+
+  return getCourtVenues(postcode).then((actualCourtVenues: CourtVenue[]) => {
+    expect(actualCourtVenues).toEqual(expectedCourtVenues);
+    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`);
+>>>>>>> b9cf116 (HDPI-515: update test)
   });
 });
 
 function stubAxiosGet(data: unknown) {
   (axios.get as jest.Mock).mockResolvedValue({ data });
 }
+<<<<<<< HEAD
 =======
 >>>>>>> 3c0ea47 (HDPI-515: fixing linting and unit test errors)
+=======
+>>>>>>> b9cf116 (HDPI-515: update test)

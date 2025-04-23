@@ -48,8 +48,8 @@ export const getIdamSystemToken = async (): Promise<string> => {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   });
 
-  return tokenResponse.data.access_token;
-};
+//   return tokenResponse.data.access_token;
+// };
 
 export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> => {
   const pcsApiURL = getBaseUrl();
