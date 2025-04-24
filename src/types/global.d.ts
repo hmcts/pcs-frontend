@@ -1,12 +1,17 @@
 import { Session, SessionData } from 'express-session';
-import { TokenSet } from 'openid-client';
+import { TokenEndpointResponse, UserInfoResponse } from 'openid-client';
+
+interface UserInfoResponseWithToken extends UserInfoResponse {
+  accessToken: string;
+  idToken: string;
+  refreshToken: string;
+}
 
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
   state?: string;
-  tokens?: TokenSet;
-  user?: any; // You can make this more specific based on your user type
+  user?: UserInfoResponseWithToken;
   serviceToken?: string;
   destroy(callback: (err?: Error) => void): void;
 }

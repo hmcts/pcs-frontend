@@ -8511,13 +8511,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jwt-decode@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "jwt-decode@npm:4.0.0"
-  checksum: 10/87b569e4a9a0067fb0d592bcf3b2ac3e638e49beee28620eeb07bef1b4470f4077dea68c15d191dd68e076846c3af8394be3bcaecffedc6e97433b221fdbbcf3
-  languageName: node
-  linkType: hard
-
 "keyv@npm:^4.5.3":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
@@ -9869,7 +9862,6 @@ __metadata:
     jest-html-reporter: "npm:^4.0.0"
     jest-pact: "npm:^0.11.2"
     jquery: "npm:^3.7.0"
-    jwt-decode: "npm:^4.0.0"
     lint-staged: "npm:^15.5.1"
     lodash: "npm:^4.17.21"
     mini-css-extract-plugin: "npm:^2.7.6"
