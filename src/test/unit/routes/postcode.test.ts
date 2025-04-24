@@ -1,7 +1,6 @@
 import axios from 'axios';
 import config from 'config';
 import express, { Application, Request, Response } from 'express';
-import session from 'express-session';
 import request from 'supertest';
 
 import postcodeRoutes from '../../../main/routes/postcode';
@@ -15,17 +14,6 @@ describe('POST /postcode', () => {
 
   beforeEach(() => {
     app = express();
-
-    // Session middleware to avoid req.session errors
-    app.use(
-      session({
-        secret: 'test-secret',
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: process.env.NODE_ENV !== 'test', httpOnly: true },
-      })
-    );
-
     app.use(express.urlencoded({ extended: false }));
 
     // Mock res.render
