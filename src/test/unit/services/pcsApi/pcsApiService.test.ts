@@ -45,9 +45,12 @@ test('should fetch root greeting', () => {
 });
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 test('should fetch court venues by postcode', async () => {
 =======
 
+=======
+>>>>>>> e401a8b (HDPI-515: fixing the authorization issue after merging from master)
 test('should fetch court venues by postcode', () => {
 >>>>>>> b9cf116 (HDPI-515: update test)
   const expectedCourtVenues: CourtVenue[] = [
@@ -62,6 +65,7 @@ test('should fetch court venues by postcode', () => {
 
   const postcode: string = 'PC12 3AQ';
 <<<<<<< HEAD
+<<<<<<< HEAD
   const mockAccessToken = 'test-token';
 
   const actualCourtVenues = await getCourtVenues(postcode, { accessToken: mockAccessToken });
@@ -72,11 +76,22 @@ test('should fetch court venues by postcode', () => {
       Authorization: `Bearer ${mockAccessToken}`,
     },
 =======
+=======
+  const mockAccessToken = 'mocked-access-token';
+>>>>>>> e401a8b (HDPI-515: fixing the authorization issue after merging from master)
 
-  return getCourtVenues(postcode).then((actualCourtVenues: CourtVenue[]) => {
+  return getCourtVenues(postcode, mockAccessToken).then((actualCourtVenues: CourtVenue[]) => {
     expect(actualCourtVenues).toEqual(expectedCourtVenues);
+<<<<<<< HEAD
     expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`);
 >>>>>>> b9cf116 (HDPI-515: update test)
+=======
+    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`, {
+      headers: {
+        Authorization: `Bearer ${mockAccessToken}`,
+      },
+    });
+>>>>>>> e401a8b (HDPI-515: fixing the authorization issue after merging from master)
   });
 });
 

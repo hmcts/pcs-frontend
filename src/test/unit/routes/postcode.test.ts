@@ -5,8 +5,29 @@ import request from 'supertest';
 
 import postcodeRoutes from '../../../main/routes/postcode';
 
+<<<<<<< HEAD
 jest.mock('axios');
 jest.mock('config');
+=======
+interface MockSession {
+  user: {
+    accessToken: string;
+  };
+}
+
+// Mock external modules
+jest.mock('../../../main/services/pcsApi/pcsApiService');
+
+jest.mock('@hmcts/nodejs-logging', () => ({
+  Logger: {
+    getLogger: () => ({
+      error: jest.fn(),
+      info: jest.fn(),
+      debug: jest.fn(),
+    }),
+  },
+}));
+>>>>>>> e401a8b (HDPI-515: fixing the authorization issue after merging from master)
 
 describe('POST /postcode', () => {
   let app: Application;
@@ -18,6 +39,13 @@ describe('POST /postcode', () => {
 
     // Mock res.render
     app.use((req: Request, res: Response, next) => {
+      // Mock session
+      (req.session as unknown as MockSession) = {
+        user: {
+          accessToken: 'mocked-access-token',
+        },
+      };
+
       renderSpy = jest.fn((view, options) => {
         res.status(200).send({ view, options });
       });
@@ -122,7 +150,7 @@ describe('POST /postcode', () => {
 
     const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
 
-    expect(getCourtVenues).toHaveBeenCalledWith('SW1A 1AA');
+    expect(getCourtVenues).toHaveBeenCalledWith('SW1A 1AA', 'mocked-access-token');
 
     expect(renderSpy).toHaveBeenCalledWith('courts.njk', {
       tableRows: [[{ text: '456' }, { text: 'Test Court' }]],
