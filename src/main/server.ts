@@ -3,14 +3,15 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as path from 'path';
 
-import { app } from './app';
+import { Logger } from '@hmcts/nodejs-logging';
+import { type HttpTerminator, createHttpTerminator } from 'http-terminator';
 
-const { Logger } = require('@hmcts/nodejs-logging');
+import { app } from './app';
 
 const logger = Logger.getLogger('server');
 
-let httpsServer: https.Server | null = null;
-
+let server: https.Server | ReturnType<typeof app.listen> | null = null;
+let httpTerminator: HttpTerminator | null = null;
 // used by shutdownCheck in readinessChecks
 app.locals.shutdown = false;
 
@@ -23,15 +24,18 @@ if (app.locals.ENV === 'development') {
     cert: fs.readFileSync(path.join(sslDirectory, 'localhost.crt')),
     key: fs.readFileSync(path.join(sslDirectory, 'localhost.key')),
   };
-  httpsServer = https.createServer(sslOptions, app);
-  httpsServer.listen(port, () => {
+  server = https.createServer(sslOptions, app);
+  server.listen(port, () => {
     logger.info(`Application started: https://localhost:${port}`);
   });
 } else {
-  app.listen(port, () => {
+  server = app.listen(port, () => {
     logger.info(`Application started: http://localhost:${port}`);
   });
 }
+httpTerminator = createHttpTerminator({
+  server,
+});
 
 function gracefulShutdownHandler(signal: string) {
   logger.info(`⚠️ Caught ${signal}, gracefully shutting down. Setting readiness to DOWN`);
@@ -40,11 +44,25 @@ function gracefulShutdownHandler(signal: string) {
 
   setTimeout(() => {
     logger.info('Shutting down application');
-    // Close server if it's running
-    httpsServer?.close(() => {
-      logger.info('HTTPS server closed');
+    app.locals.redisClient?.quit(async (err: Error | null) => {
+      if (err) {
+        logger.error('Error quitting Redis client', err);
+      }
+      logger.info('Redis client quit');
+
+      if (app.locals.ENV === 'development') {
+        // For HTTPS server, close it directly
+        server?.close(() => {
+          logger.info('HTTPS server closed');
+          process.exit(0);
+        });
+      } else {
+        // For HTTP server, use the terminator
+        await httpTerminator?.terminate();
+        logger.info('HTTP terminator terminated');
+      }
     });
-  }, 4000);
+  }, 500);
 }
 
 process.on('SIGINT', gracefulShutdownHandler);

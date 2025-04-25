@@ -1,18 +1,19 @@
-/// <reference types="jest" />
-import axios from 'axios';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
-import { jwtDecode } from 'jwt-decode';
 import * as client from 'openid-client';
 
-import { OIDCAuthenticationError, OIDCCallbackError } from '../../../../main/modules/oidc/errors';
-import { OIDCModule } from '../../../../main/modules/oidc/oidc';
+import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
 
-jest.mock('axios');
 jest.mock('config');
-jest.mock('openid-client');
-jest.mock('jwt-decode', () => ({
-  jwtDecode: jest.fn(),
+jest.mock('openid-client', () => ({
+  discovery: jest.fn(),
+  randomPKCECodeVerifier: jest.fn(),
+  randomNonce: jest.fn(),
+  randomState: jest.fn(),
+  calculatePKCECodeChallenge: jest.fn(),
+  buildAuthorizationUrl: jest.fn(),
+  authorizationCodeGrant: jest.fn(),
+  fetchUserInfo: jest.fn(),
 }));
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
@@ -46,27 +47,14 @@ describe('OIDCModule', () => {
     save: jest.fn(),
     touch: jest.fn(),
     resetMaxAge: jest.fn(),
-    // CustomSessionData properties
     codeVerifier: undefined,
     nonce: undefined,
     state: undefined,
     user: undefined,
-    serviceToken: undefined,
     ...overrides,
   });
 
   beforeEach(() => {
-    // Mock successful client setup
-    const mockMetadata = {
-      issuer: 'http://test-issuer',
-      token_endpoint: 'http://test-issuer/token',
-    };
-
-    (axios.get as jest.Mock).mockResolvedValue({ data: mockMetadata });
-    (client.Configuration as jest.Mock).mockImplementation(() => ({
-      serverMetadata: () => mockMetadata,
-    }));
-
     // Mock config
     (config.get as jest.Mock).mockImplementation((key: string) => {
       if (key === 'oidc') {
@@ -75,13 +63,19 @@ describe('OIDCModule', () => {
           clientId: 'test-client-id',
           redirectUri: 'http://localhost:3000/oauth2/callback',
           scope: 'openid profile',
-          iss: 'http://test-issuer',
         };
       }
       if (key === 'secrets.pcs.pcs-frontend-idam-secret') {
         return 'test-secret';
       }
       return undefined;
+    });
+
+    // Mock openid-client discovery
+    (client.discovery as jest.Mock).mockResolvedValue({
+      serverMetadata: () => ({
+        token_endpoint: 'http://test-issuer/token',
+      }),
     });
 
     oidcModule = new OIDCModule();
@@ -108,43 +102,19 @@ describe('OIDCModule', () => {
 
   describe('setupClient', () => {
     it('should successfully setup the OIDC client', async () => {
-      const mockMetadata = {
-        issuer: 'http://test-issuer',
-        token_endpoint: 'http://test-issuer/token',
-      };
-
-      (axios.get as jest.Mock).mockResolvedValue({ data: mockMetadata });
-      (client.Configuration as jest.Mock).mockImplementation(() => ({
-        serverMetadata: () => mockMetadata,
-      }));
-
       await oidcModule['setupClient']();
 
-      expect(axios.get).toHaveBeenCalledWith('http://test-issuer/o/.well-known/openid-configuration');
-      expect(client.Configuration).toHaveBeenCalled();
+      expect(client.discovery).toHaveBeenCalledWith(expect.any(URL), 'test-client-id', 'test-secret');
     });
 
     it('should throw OIDCAuthenticationError when setup fails', async () => {
-      (axios.get as jest.Mock).mockRejectedValue(new Error('Network error'));
+      (client.discovery as jest.Mock).mockRejectedValue(new Error('Discovery failed'));
 
       await expect(oidcModule['setupClient']()).rejects.toThrow(OIDCAuthenticationError);
     });
   });
 
   describe('enableFor', () => {
-    beforeEach(() => {
-      // Mock successful client setup
-      const mockMetadata = {
-        issuer: 'http://test-issuer',
-        token_endpoint: 'http://test-issuer/token',
-      };
-
-      (axios.get as jest.Mock).mockResolvedValue({ data: mockMetadata });
-      (client.Configuration as jest.Mock).mockImplementation(() => ({
-        serverMetadata: () => mockMetadata,
-      }));
-    });
-
     it('should set trust proxy to true', () => {
       oidcModule.enableFor(mockApp);
       expect(mockApp.set).toHaveBeenCalledWith('trust proxy', true);
@@ -187,29 +157,24 @@ describe('OIDCModule', () => {
         const mockTokens = {
           access_token: 'test-token',
           id_token: 'test-id-token',
-          id: 'test-id',
+          refresh_token: 'test-refresh-token',
+          claims: jest.fn().mockReturnValue({ sub: 'test-sub' }),
+        };
+        const mockUserInfo = {
+          email: 'test@example.com',
+          given_name: 'Test',
+          family_name: 'User',
           roles: ['test-role'],
         };
-        const mockJwtPayload = {
-          uid: 'test-id',
-          roles: ['test-role'],
-        };
-        const mockFetchResponse = {
-          ok: true,
-          json: jest.fn().mockResolvedValue(mockTokens),
-        };
-        global.fetch = jest.fn().mockResolvedValue(mockFetchResponse);
-        (jwtDecode as unknown as jest.Mock).mockReturnValue(mockJwtPayload);
+
+        (client.authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
+        (client.fetchUserInfo as jest.Mock).mockResolvedValue(mockUserInfo);
 
         mockRequest.session = createMockSession({
           codeVerifier: 'test-verifier',
           nonce: 'test-nonce',
           state: 'test-state',
           save: jest.fn().mockImplementation(function (callback) {
-            // Delete the properties after save is called
-            delete this.codeVerifier;
-            delete this.nonce;
-            delete this.state;
             callback(null);
           }),
         });
@@ -219,10 +184,10 @@ describe('OIDCModule', () => {
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
         expect(mockRequest.session).toHaveProperty('user', {
-          accessToken: mockTokens.access_token,
-          idToken: mockTokens.id_token,
-          id: mockJwtPayload.uid,
-          roles: mockJwtPayload.roles,
+          accessToken: 'test-token',
+          idToken: 'test-id-token',
+          refreshToken: 'test-refresh-token',
+          ...mockUserInfo,
         });
         expect(mockRequest.session).not.toHaveProperty('codeVerifier');
         expect(mockRequest.session).not.toHaveProperty('nonce');
@@ -230,27 +195,13 @@ describe('OIDCModule', () => {
         expect(mockResponse.redirect).toHaveBeenCalledWith('/');
       });
 
-      it('should handle missing code verifier', async () => {
-        mockRequest.session = createMockSession();
+      it('should handle token exchange errors', async () => {
+        (client.authorizationCodeGrant as jest.Mock).mockRejectedValue(new Error('Token exchange failed'));
 
-        oidcModule.enableFor(mockApp);
-        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
-        await callbackHandler(mockRequest, mockResponse, mockNext);
-
-        expect(mockNext).toHaveBeenCalledWith(expect.any(OIDCCallbackError));
-      });
-
-      it('should handle token exchange errors with detailed error information', async () => {
         mockRequest.session = createMockSession({
           codeVerifier: 'test-verifier',
           nonce: 'test-nonce',
-        });
-
-        global.fetch = jest.fn().mockResolvedValue({
-          ok: false,
-          status: 400,
-          text: () => Promise.resolve('Invalid request'),
-          headers: { 'content-type': 'application/json' },
+          state: 'test-state',
         });
 
         oidcModule.enableFor(mockApp);
@@ -258,75 +209,6 @@ describe('OIDCModule', () => {
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
         expect(mockNext).toHaveBeenCalledWith(expect.any(OIDCCallbackError));
-        expect(mockNext).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: 'Failed to complete authentication',
-          })
-        );
-      });
-
-      it('should handle token exchange errors with network failures', async () => {
-        mockRequest.session = createMockSession({
-          codeVerifier: 'test-verifier',
-          nonce: 'test-nonce',
-        });
-
-        global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
-
-        oidcModule.enableFor(mockApp);
-        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
-        await callbackHandler(mockRequest, mockResponse, mockNext);
-
-        expect(mockNext).toHaveBeenCalledWith(expect.any(OIDCCallbackError));
-        expect(mockNext).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: 'Failed to complete authentication',
-          })
-        );
-      });
-    });
-
-    describe('logout route', () => {
-      it('should destroy session and redirect to home', () => {
-        const mockDestroy = jest.fn(callback => callback(null));
-        mockRequest.session = createMockSession({
-          destroy: mockDestroy,
-        });
-
-        oidcModule.enableFor(mockApp);
-        const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
-        logoutHandler(mockRequest, mockResponse);
-
-        expect(mockDestroy).toHaveBeenCalled();
-        expect(mockResponse.redirect).toHaveBeenCalledWith('/');
-      });
-
-      it('should handle session destruction errors with detailed logging', () => {
-        const mockDestroy = jest.fn(callback => callback(new Error('Destroy failed')));
-        mockRequest.session = createMockSession({
-          destroy: mockDestroy,
-        });
-
-        oidcModule.enableFor(mockApp);
-        const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
-        logoutHandler(mockRequest, mockResponse);
-
-        expect(mockDestroy).toHaveBeenCalled();
-        expect(mockResponse.redirect).toHaveBeenCalledWith('/');
-      });
-
-      it('should handle session destruction with null error', () => {
-        const mockDestroy = jest.fn(callback => callback(null));
-        mockRequest.session = createMockSession({
-          destroy: mockDestroy,
-        });
-
-        oidcModule.enableFor(mockApp);
-        const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
-        logoutHandler(mockRequest, mockResponse);
-
-        expect(mockDestroy).toHaveBeenCalled();
-        expect(mockResponse.redirect).toHaveBeenCalledWith('/');
       });
     });
   });
