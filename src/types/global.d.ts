@@ -1,5 +1,6 @@
-import { Session, SessionData } from 'express-session';
-import { TokenEndpointResponse, UserInfoResponse } from 'openid-client';
+import { type Session, type SessionData } from 'express-session';
+import { type TokenEndpointResponse, type UserInfoResponse } from 'openid-client';
+import { type Redis } from 'ioredis';
 
 interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
@@ -23,6 +24,14 @@ declare module 'express-session' {
 declare module 'express' {
   interface Request {
     session: Session & CustomSessionData;
+  }
+
+  interface Application {
+    locals: {
+      redisClient?: Redis;
+      shutdown?: boolean;
+      ENV?: string;
+    };
   }
 }
 
