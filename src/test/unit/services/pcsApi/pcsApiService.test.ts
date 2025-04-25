@@ -27,7 +27,6 @@ test('should fetch root greeting', () => {
     expect(axios.get).toHaveBeenCalledWith(testApiBase);
   });
 });
-
 test('should fetch court venues by postcode', () => {
   const expectedCourtVenues: CourtVenue[] = [
     {
@@ -40,10 +39,15 @@ test('should fetch court venues by postcode', () => {
   stubAxiosGet(expectedCourtVenues);
 
   const postcode: string = 'PC12 3AQ';
+  const mockAccessToken = 'mocked-access-token';
 
-  return getCourtVenues(postcode).then((actualCourtVenues: CourtVenue[]) => {
+  return getCourtVenues(postcode, mockAccessToken).then((actualCourtVenues: CourtVenue[]) => {
     expect(actualCourtVenues).toEqual(expectedCourtVenues);
-    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`);
+    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`, {
+      headers: {
+        Authorization: `Bearer ${mockAccessToken}`,
+      },
+    });
   });
 });
 

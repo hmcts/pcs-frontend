@@ -15,10 +15,15 @@ export const getRootGreeting = async (): Promise<string> => {
   return response.data;
 };
 
-export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> => {
+export const getCourtVenues = async (postcode: string, accessToken: string): Promise<CourtVenue[]> => {
   const url = `${getBaseUrl()}/courts?postcode=${encodeURIComponent(postcode)}`;
+  const headersConfig = {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  };
   logger.info(`Calling PCS court search with URL: ${url}`);
-  const response = await axios.get<CourtVenue[]>(url);
+  const response = await axios.get<CourtVenue[]>(url, headersConfig);
 
   //TODO: remove console.log before merging to master (just for testing purpose)
   // eslint-disable-next-line no-console

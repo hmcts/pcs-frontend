@@ -25,7 +25,12 @@ export default function (app: Application): void {
     }
 
     try {
-      const courtData = await getCourtVenues(postcode);
+      if (!req.session?.user?.accessToken) {
+        throw new Error('Access token missing from session');
+      }
+
+      const accessToken = req.session.user.accessToken;
+      const courtData = await getCourtVenues(postcode, accessToken);
       const tableRows = courtData.map(court => [{ text: court.id.toString() }, { text: court.name }]);
       res.render('courts.njk', { tableRows });
     } catch (error) {

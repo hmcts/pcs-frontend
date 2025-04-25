@@ -4,6 +4,12 @@ import request from 'supertest';
 import postcodeRoutes from '../../../main/routes/postcode';
 import { getCourtVenues } from '../../../main/services/pcsApi/pcsApiService';
 
+interface MockSession {
+  user: {
+    accessToken: string;
+  };
+}
+
 // Mock external modules
 jest.mock('../../../main/services/pcsApi/pcsApiService');
 
@@ -27,6 +33,13 @@ describe('POST /postcode', () => {
 
     // Mock res.render
     app.use((req: Request, res: Response, next) => {
+      // Mock session
+      (req.session as unknown as MockSession) = {
+        user: {
+          accessToken: 'mocked-access-token',
+        },
+      };
+
       renderSpy = jest.fn((view, options) => {
         res.status(200).send({ view, options });
       });
@@ -74,7 +87,7 @@ describe('POST /postcode', () => {
 
     const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
 
-    expect(getCourtVenues).toHaveBeenCalledWith('SW1A 1AA');
+    expect(getCourtVenues).toHaveBeenCalledWith('SW1A 1AA', 'mocked-access-token');
 
     expect(renderSpy).toHaveBeenCalledWith('courts.njk', {
       tableRows: [[{ text: '456' }, { text: 'Test Court' }]],
