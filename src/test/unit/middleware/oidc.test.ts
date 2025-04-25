@@ -1,14 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
-import { Session, SessionData } from 'express-session';
+import { Session } from 'express-session';
+import { UserInfoResponse } from 'openid-client';
 
 import { oidcMiddleware } from '../../../main/middleware/oidc';
 
-interface SessionUser {
-  id: string;
-}
-
 interface CustomSession extends Session {
-  user?: SessionUser;
+  user?: UserInfoResponse & {
+    accessToken: string;
+    idToken: string;
+    refreshToken: string;
+  };
 }
 
 describe('oidcMiddleware', () => {
@@ -33,7 +34,7 @@ describe('oidcMiddleware', () => {
         save: jest.fn(),
         touch: jest.fn(),
         resetMaxAge: jest.fn(),
-      } as CustomSession & Partial<SessionData>,
+      } as CustomSession,
     };
     mockResponse = {
       redirect: jest.fn(),
@@ -42,7 +43,12 @@ describe('oidcMiddleware', () => {
   });
 
   it('should call next() when user is present in session', () => {
-    (mockRequest.session as CustomSession).user = { id: '123' };
+    (mockRequest.session as CustomSession).user = {
+      sub: '123',
+      accessToken: 'token',
+      idToken: 'id-token',
+      refreshToken: 'refresh-token',
+    };
     oidcMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(nextFunction).toHaveBeenCalled();

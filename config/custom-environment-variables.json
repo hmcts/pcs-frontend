@@ -21,7 +21,6 @@
     "issuer": "OIDC_ISSUER",
     "clientId": "OIDC_CLIENT_ID",
     "redirectUri": "OIDC_REDIRECT_URI",
-    "scope": "OIDC_SCOPE",
-    "iss": "OIDC_ISS"
+    "scope": "OIDC_SCOPE"
   }
 }

@@ -1,14 +1,10 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import axios from 'axios';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
-import { jwtDecode } from 'jwt-decode';
-import { Configuration } from 'openid-client';
+import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'openid-client';
 import * as client from 'openid-client';
 
-import { IdTokenJwtPayload } from './IdTokenJwtPayload.interface';
-import { IdamResponseData } from './IdamResponseData.interface';
-import { OIDCConfig } from './config.interface';
+import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
 export class OIDCModule {
@@ -21,30 +17,20 @@ export class OIDCModule {
   }
 
   private async setupClient(): Promise<void> {
-    this.oidcConfig = config.get('oidc') as OIDCConfig;
+    this.oidcConfig = config.get<OIDCConfig>('oidc');
     this.logger.info('setting up client');
 
     try {
-      // Manually fetch the OIDC configuration
-      const discoveryUrl = new URL('o/.well-known/openid-configuration', this.oidcConfig.issuer).toString();
-      this.logger.info('Fetching OIDC configuration from:', discoveryUrl);
+      const issuer = new URL(this.oidcConfig.issuer);
 
-      const response = await axios.get(discoveryUrl);
-      const metadata = response.data;
+      this.logger.info('Fetching OIDC configuration from:', this.oidcConfig.issuer);
 
       // Create client with the actual issuer
       const clientId = this.oidcConfig.clientId;
-      const clientSecret = config.get('secrets.pcs.pcs-frontend-idam-secret') as string;
+      const clientSecret = config.get<string>('secrets.pcs.pcs-frontend-idam-secret');
 
-      // Create client with manual configuration
-      // Create a server metadata object with the necessary fields
-      const serverMetadata = {
-        ...metadata,
-        issuer: this.oidcConfig.iss,
-      };
-
-      // Create the client configuration with the server metadata
-      this.clientConfig = new Configuration(serverMetadata, clientId, clientSecret);
+      // Create the client configuration with the server discovery
+      this.clientConfig = await client.discovery(issuer, clientId, clientSecret);
 
       this.logger.info(
         'Client configuration created with metadata:',
@@ -54,6 +40,14 @@ export class OIDCModule {
       this.logger.error('Failed to setup OIDC client:', error);
       throw new OIDCAuthenticationError('Failed to initialize OIDC client');
     }
+  }
+
+  public getCurrentUrl(req: Request): URL {
+    const protocol = req.protocol;
+    const host = req.get('host');
+    // Get the original URL from the request and preserve the query parameters
+    const originalUrl = req.originalUrl;
+    return new URL(originalUrl, `${protocol}://${host}`);
   }
 
   public enableFor(app: Express): void {
@@ -88,103 +82,39 @@ export class OIDCModule {
     // Callback route
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const codeVerifier = req.session.codeVerifier;
-        if (!codeVerifier) {
-          throw new OIDCCallbackError('No code verifier found in session');
-        }
+        const { codeVerifier, nonce, state } = req.session;
 
-        const nonce = req.session.nonce;
-        if (!nonce) {
-          throw new OIDCCallbackError('No nonce found in session');
-        }
+        const callbackUrl = this.getCurrentUrl(req);
 
-        // Get the full URL more reliably
-        const protocol = req.protocol;
-        const host = req.get('host');
-        // Get the original URL from the request and preserve the query parameters
-        const originalUrl = req.originalUrl;
-        const callbackUrl = new URL(originalUrl, `${protocol}://${host}`);
+        const tokens: TokenEndpointResponse = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
+          pkceCodeVerifier: codeVerifier,
+          expectedNonce: nonce,
+          expectedState: state,
+        });
 
-        // Get the authorization code from the callback URL
-        const code = callbackUrl.searchParams.get('code');
-        if (!code) {
-          throw new OIDCCallbackError('No authorization code found in callback');
-        }
+        const { access_token, id_token, refresh_token } = tokens;
 
-        try {
-          const body = new URLSearchParams({
-            grant_type: 'authorization_code',
-            code,
-            redirect_uri: this.oidcConfig.redirectUri,
-            client_id: this.oidcConfig.clientId,
-            code_verifier: codeVerifier,
-            client_secret: config.get('secrets.pcs.pcs-frontend-idam-secret'),
-          });
+        // @ts-expect-error - claims is not typed
+        const claims = tokens.claims();
 
-          // Make the token request manually
-          const tokenResponse = await fetch(this.clientConfig.serverMetadata().token_endpoint!, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body,
-          });
+        const { sub } = claims;
+        const user: UserInfoResponse = await client.fetchUserInfo(this.clientConfig, access_token, sub);
 
-          if (!tokenResponse.ok) {
-            const errorBody = await tokenResponse.text();
-            this.logger.error('Token response error:', {
-              status: tokenResponse.status,
-              body: errorBody,
-            });
-            throw new OIDCCallbackError('Failed to exchange authorization code for tokens');
-          }
+        req.session.user = {
+          accessToken: access_token,
+          idToken: id_token as string,
+          refreshToken: refresh_token as string,
+          ...user,
+        };
 
-          const data: IdamResponseData = await tokenResponse.json();
-          const jwt: IdTokenJwtPayload = jwtDecode(data.id_token);
-
-          req.session.user = {
-            accessToken: data.access_token,
-            idToken: data.id_token,
-            id: jwt.uid,
-            roles: jwt.roles,
-            email: jwt.email,
-            givenName: jwt.given_name,
-            familyName: jwt.family_name,
-          };
-
-          req.session.save(() => {
-            delete req.session.codeVerifier;
-            delete req.session.nonce;
-            delete req.session.state;
-
-            // add Bearer token to axios instance
-            axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
-
-            app.locals.nunjucksEnv.addGlobal('user', req.session.user);
-
-            res.redirect('/');
-          });
-        } catch (tokenError: unknown) {
-          const error = tokenError as Error & {
-            response?: { body?: unknown; status?: number; headers?: unknown };
-            code?: string;
-            cause?: unknown;
-          };
-          // Log the full error response with more details
-          this.logger.error('Token exchange error details:', {
-            error: error.message,
-            code: error.code,
-            name: error.name,
-            response: error.response?.body,
-            status: error.response?.status,
-            headers: error.response?.headers,
-            cause: error.cause,
-            stack: error.stack,
-          });
-          throw error;
-        }
+        req.session.save(() => {
+          delete req.session.codeVerifier;
+          delete req.session.nonce;
+          delete req.session.state;
+          app.locals.nunjucksEnv.addGlobal('user', req.session.user);
+          res.redirect('/');
+        });
       } catch (error) {
-        // Enhance error logging
         this.logger.error('Authentication error details:', {
           error: error.message,
           code: error.code,
