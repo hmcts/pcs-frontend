@@ -1,10 +1,9 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import RedisStore from 'connect-redis';
 import type { Express } from 'express';
 import session from 'express-session';
 import { Redis } from 'ioredis';
-
-const { Logger } = require('@hmcts/nodejs-logging');
 
 export class Session {
   logger = Logger.getLogger('session');

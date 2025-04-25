@@ -6,9 +6,12 @@
     "node": ">=18.0.0"
   },
   "scripts": {
+    "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback ts-node -r tsconfig-paths/register --files src/main/server.ts",
     "start:dev": "NODE_ENV=dev ts-node -r tsconfig-paths/register --files src/main/server.ts",
     "start": "NODE_ENV=production dist/main/server.js",
     "start:watch": "nodemon --config nodemon.json",
+    "docker:dev": "docker compose up",
+    "docker:dev:ssl": "COMMAND='yarn start:dev:ssl' docker compose up --build",
     "lint": "stylelint **/*.scss -v -q && eslint . --ext .js,.ts && prettier --check .",
     "lint:fix": "prettier --write . .github && eslint --fix .",
     "build": "yarn webpack --config webpack.config.js",
@@ -52,9 +55,9 @@
     "graphql": "^16.10.0",
     "helmet": "^8.0.0",
     "http-status-codes": "^2.3.0",
+    "http-terminator": "^3.2.0",
     "ioredis": "^5.4.1",
     "jquery": "^3.7.0",
-    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "nunjucks": "^3.2.4",
     "oauth4webapi": "^3.3.1",

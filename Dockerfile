@@ -37,6 +37,26 @@ RUN yarn build:prod && \
 # Compile TypeScript to JavaScript
 RUN npx tsc
 
+# ---- Development image ----
+FROM dependencies AS development
+
+WORKDIR /app
+# Install bash for development
+USER root
+RUN apk add --no-cache bash
+USER hmcts
+
+# Copy all source files
+COPY --chown=hmcts:hmcts . .
+
+# Make the SSL generation script executable
+USER root
+RUN chmod +x /app/bin/generate-ssl-options.sh
+USER hmcts
+
+# Set environment variables
+ENV NODE_ENV=development
+
 # ---- Runtime image ----
 FROM base AS runtime
 

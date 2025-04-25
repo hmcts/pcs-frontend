@@ -15,14 +15,17 @@ export default function (app: Application): void {
   const healthCheckConfig = {
     checks: {
       redis: healthcheck.raw(() => {
+        if (!app.locals.redisClient) {
+          return Promise.resolve(false);
+        }
         return app.locals.redisClient
           .ping()
           .then((_: string) => {
             return healthcheck.status(_ === 'PONG');
           })
-          .catch((error: typeof Error) => {
+          .catch((error: Error) => {
             logger.errorWithReq(null, 'health_check_error', 'Health check failed on redis', error);
-            return false;
+            return healthcheck.status(false);
           });
       }),
     },
