@@ -1,12 +1,18 @@
-import { Session, SessionData } from 'express-session';
-import { TokenSet } from 'openid-client';
+import { type Session, type SessionData } from 'express-session';
+import { type TokenEndpointResponse, type UserInfoResponse } from 'openid-client';
+import { type Redis } from 'ioredis';
+
+interface UserInfoResponseWithToken extends UserInfoResponse {
+  accessToken: string;
+  idToken: string;
+  refreshToken: string;
+}
 
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
   state?: string;
-  tokens?: TokenSet;
-  user?: any; // You can make this more specific based on your user type
+  user?: UserInfoResponseWithToken;
   serviceToken?: string;
   destroy(callback: (err?: Error) => void): void;
 }
@@ -18,6 +24,14 @@ declare module 'express-session' {
 declare module 'express' {
   interface Request {
     session: Session & CustomSessionData;
+  }
+
+  interface Application {
+    locals: {
+      redisClient?: Redis;
+      shutdown?: boolean;
+      ENV?: string;
+    };
   }
 }
 
