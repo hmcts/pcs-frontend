@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback ts-node -r tsconfig-paths/register --files src/main/server.ts",
-    "start:dev": "NODE_ENV=dev ts-node -r tsconfig-paths/register --files src/main/server.ts",
+    "start:dev": "node -v | grep -Eq 'v2[2-9]|v[3-9][0-9]|v[1-9][0-9]{2,}' && (NODE_ENV=dev ts-node -r tsconfig-paths/register --files src/main/server.ts || exit 0) || (echo Incompatible version of Node && node -v && exit 1)",
     "start": "NODE_ENV=production dist/main/server.js",
     "start:watch": "nodemon --config nodemon.json",
     "docker:dev": "docker compose up",
