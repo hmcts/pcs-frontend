@@ -46,6 +46,7 @@ test('should fetch root greeting', () => {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 test('should fetch court venues by postcode', async () => {
 =======
 
@@ -53,6 +54,9 @@ test('should fetch court venues by postcode', async () => {
 >>>>>>> e401a8b (HDPI-515: fixing the authorization issue after merging from master)
 test('should fetch court venues by postcode', () => {
 >>>>>>> b9cf116 (HDPI-515: update test)
+=======
+test('should fetch court venues by postcode', async () => {
+>>>>>>> 337ecea (HDPI-515: fixing unit test error)
   const expectedCourtVenues: CourtVenue[] = [
     {
       epimId: 101,
@@ -75,6 +79,7 @@ test('should fetch court venues by postcode', () => {
     headers: {
       Authorization: `Bearer ${mockAccessToken}`,
     },
+<<<<<<< HEAD
 =======
 =======
   const mockAccessToken = 'mocked-access-token';
@@ -92,6 +97,8 @@ test('should fetch court venues by postcode', () => {
       },
     });
 >>>>>>> e401a8b (HDPI-515: fixing the authorization issue after merging from master)
+=======
+>>>>>>> 337ecea (HDPI-515: fixing unit test error)
   });
 });
 
