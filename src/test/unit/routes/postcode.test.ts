@@ -42,7 +42,7 @@ describe('POST /postcode', () => {
       // Mock session
       (req.session as unknown as MockSession) = {
         user: {
-          accessToken: 'mocked-access-token',
+          accessToken: 'test-token',
         },
       };
 
