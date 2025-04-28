@@ -22,6 +22,6 @@ export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> =>
 
 export const getDashboardNotifications = async (caseReference: number): Promise<DashboardNotification[]> => {
   const pcsApiURL = getBaseUrl();
-  const response = await axios.get(`${pcsApiURL}/dashboard/${caseReference}/notifications`);
+  const response = await axios.get<DashboardNotification[]>(`${pcsApiURL}/dashboard/${caseReference}/notifications`);
   return response.data;
 };
