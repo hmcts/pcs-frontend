@@ -24,9 +24,5 @@ export const getCourtVenues = async (postcode: string, accessToken: string): Pro
   };
   logger.info(`Calling PCS court search with URL: ${url}`);
   const response = await axios.get<CourtVenue[]>(url, headersConfig);
-
-  //TODO: remove console.log before merging to master (just for testing purpose)
-  // eslint-disable-next-line no-console
-  console.log('response => ', response);
   return response.data;
 };
