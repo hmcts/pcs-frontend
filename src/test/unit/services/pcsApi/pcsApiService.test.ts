@@ -39,7 +39,7 @@ test('should fetch court venues by postcode', () => {
   stubAxiosGet(expectedCourtVenues);
 
   const postcode: string = 'PC12 3AQ';
-  const mockAccessToken = 'mocked-access-token';
+  const mockAccessToken = 'test-token';
 
   return getCourtVenues(postcode, mockAccessToken).then((actualCourtVenues: CourtVenue[]) => {
     expect(actualCourtVenues).toEqual(expectedCourtVenues);
