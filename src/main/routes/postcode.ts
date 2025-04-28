@@ -1,10 +1,11 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application, Request, Response } from 'express';
 
+import { oidcMiddleware } from '../middleware';
 import { getCourtVenues } from '../services/pcsApi/pcsApiService';
 
 export default function (app: Application): void {
-  app.get('/postcode', (req: Request, res: Response) => {
+  app.get('/postcode',  oidcMiddleware, async(req: Request, res: Response) => {
     res.render('postcode', { fields: {} });
   });
 
