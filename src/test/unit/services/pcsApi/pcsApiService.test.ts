@@ -27,7 +27,7 @@ test('should fetch root greeting', () => {
     expect(axios.get).toHaveBeenCalledWith(testApiBase);
   });
 });
-test('should fetch court venues by postcode', () => {
+test('should fetch court venues by postcode', async () => {
   const expectedCourtVenues: CourtVenue[] = [
     {
       epimId: 101,
@@ -41,13 +41,13 @@ test('should fetch court venues by postcode', () => {
   const postcode: string = 'PC12 3AQ';
   const mockAccessToken = 'test-token';
 
-  return getCourtVenues(postcode, mockAccessToken).then((actualCourtVenues: CourtVenue[]) => {
-    expect(actualCourtVenues).toEqual(expectedCourtVenues);
-    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`, {
-      headers: {
-        Authorization: `Bearer ${mockAccessToken}`,
-      },
-    });
+  const actualCourtVenues = await getCourtVenues(postcode, { accessToken: mockAccessToken });
+
+  expect(actualCourtVenues).toEqual(expectedCourtVenues);
+  expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`, {
+    headers: {
+      Authorization: `Bearer ${mockAccessToken}`,
+    },
   });
 });
 
