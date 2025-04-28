@@ -50,7 +50,7 @@ export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> =>
   const url = `${getBaseUrl()}/courts?postcode=${encodeURIComponent(postcode)}`;
   const headersConfig = {
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${user.accessToken}`,
     },
   };
   logger.info(`Calling PCS court search with URL: ${url}`);
