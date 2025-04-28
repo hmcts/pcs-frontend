@@ -150,7 +150,7 @@ describe('POST /postcode', () => {
 
     const response = await request(app).post('/postcode').type('form').send({ postcode: 'SW1A 1AA' });
 
-    expect(getCourtVenues).toHaveBeenCalledWith('SW1A 1AA', 'mocked-access-token');
+    expect(getCourtVenues).toHaveBeenCalledWith('SW1A 1AA', 'test-token');
 
     expect(renderSpy).toHaveBeenCalledWith('courts.njk', {
       tableRows: [[{ text: '456' }, { text: 'Test Court' }]],
