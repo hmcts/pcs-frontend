@@ -11987,7 +11987,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"superagent@npm:9, superagent@npm:^9.0.1":
+"superagent@npm:9.0.2":
   version: 9.0.2
   resolution: "superagent@npm:9.0.2"
   dependencies:
