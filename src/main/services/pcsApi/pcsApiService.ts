@@ -1,7 +1,8 @@
 import axios from 'axios';
 import config from 'config';
 
-import { CourtVenue } from './courtVenue.interface';
+import { CourtVenue } from '../../interface/courtVenue.interface';
+
 import { DashboardNotification } from './dashboardNotification.interface';
 
 function getBaseUrl(): string {

@@ -78,7 +78,7 @@ describe('Nunjucks', () => {
     it('should add custom filters', () => {
       // Mock the private addCustomFilters method
       const mockAddCustomFilters = jest.fn();
-      (nunjucksInstance as any).addCustomFilters = mockAddCustomFilters;
+      Object.defineProperty(nunjucksInstance, 'addCustomFilters', { value: mockAddCustomFilters });
 
       nunjucksInstance.enableFor(mockApp);
 
