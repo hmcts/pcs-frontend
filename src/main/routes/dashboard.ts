@@ -1,11 +1,14 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application, Request, Response } from 'express';
+
+import { oidcMiddleware } from '../middleware';
+
 import { type DashboardNotification, getDashboardNotifications } from '../services/pcsApi';
 
 const logger = Logger.getLogger('dashboard');
 
 export default function (app: Application): void {
-  app.get('/dashboard/:caseReference', async (req: Request, res: Response) => {
+  app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
     const caseReference: number = parseInt(req.params.caseReference, 10);
     try {
       const notifications: DashboardNotification[] = await getDashboardNotifications(caseReference);
