@@ -27,7 +27,7 @@ export class Nunjucks {
   }
 
   private addCustomFilters(nunjucksEnv: Environment) {
-    glob.sync(path.join(__dirname, '/filters/**/*.ts')).map(async (filename: string) => {
+    glob.sync(path.join(__dirname, '/filters/**/*.ts')).forEach(async (filename: string) => {
       const filter = await import(filename);
       Object.entries(filter).forEach(([key, value]) => {
         nunjucksEnv.addFilter(key, value as (...args: unknown[]) => unknown);
