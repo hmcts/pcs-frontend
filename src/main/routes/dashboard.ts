@@ -2,7 +2,6 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware';
-
 import { type DashboardNotification, getDashboardNotifications } from '../services/pcsApi';
 
 const logger = Logger.getLogger('dashboard');

@@ -1,8 +1,10 @@
-import { Nunjucks } from '../../../../main/modules/nunjucks';
-import * as express from 'express';
-import * as nunjucks from 'nunjucks';
 import * as path from 'path';
+
+import * as express from 'express';
 import { glob } from 'glob';
+import * as nunjucks from 'nunjucks';
+
+import { Nunjucks } from '../../../../main/modules/nunjucks';
 
 jest.mock('nunjucks');
 jest.mock('glob');
@@ -97,5 +99,4 @@ describe('Nunjucks', () => {
       expect(mockNext).toHaveBeenCalled();
     });
   });
-
 });

@@ -11,14 +11,11 @@ import { OIDCConfig } from '../../../../main/modules/oidc/config.interface';
 =======
 >>>>>>> b9cf116 (HDPI-515: update test)
 import { CourtVenue } from '../../../../main/services/pcsApi/courtVenue.interface';
->>>>>>> 3c0ea47 (HDPI-515: fixing linting and unit test errors)
-=======
-import { CourtVenue } from '../../../../main/interface/courtVenue.interface';
->>>>>>> a44e576 (HDPI-515: clean up)
-=======
-import type { CourtVenue } from '../../../../main/interface/courtVenue.interface';
->>>>>>> 090ff58 (HDPI-515: update code review)
-import { getCourtVenues, getRootGreeting } from '../../../../main/services/pcsApi/pcsApiService';
+import {
+  getCourtVenues,
+  getDashboardNotifications,
+  getRootGreeting,
+} from '../../../../main/services/pcsApi/pcsApiService';
 
 jest.mock('axios', () => ({
   get: jest.fn(),
@@ -79,26 +76,28 @@ test('should fetch court venues by postcode', async () => {
     headers: {
       Authorization: `Bearer ${mockAccessToken}`,
     },
-<<<<<<< HEAD
-=======
-=======
-  const mockAccessToken = 'mocked-access-token';
->>>>>>> e401a8b (HDPI-515: fixing the authorization issue after merging from master)
+  });
+});
 
-  return getCourtVenues(postcode, mockAccessToken).then((actualCourtVenues: CourtVenue[]) => {
-    expect(actualCourtVenues).toEqual(expectedCourtVenues);
-<<<<<<< HEAD
-    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`);
->>>>>>> b9cf116 (HDPI-515: update test)
-=======
-    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`, {
-      headers: {
-        Authorization: `Bearer ${mockAccessToken}`,
-      },
-    });
->>>>>>> e401a8b (HDPI-515: fixing the authorization issue after merging from master)
-=======
->>>>>>> 337ecea (HDPI-515: fixing unit test error)
+test('should fetch dashboard notifications by case reference', () => {
+  const expectedNotifications = [
+    {
+      templateId: 'template-1',
+      templateValues: { foo: 'bar', count: 2 },
+    },
+    {
+      templateId: 'template-2',
+      templateValues: { baz: 'qux' },
+    },
+  ];
+
+  stubAxiosGet(expectedNotifications);
+
+  const caseReference = 123456;
+
+  return getDashboardNotifications(caseReference).then(actualNotifications => {
+    expect(actualNotifications).toEqual(expectedNotifications);
+    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/dashboard/${caseReference}/notifications`);
   });
 });
 
