@@ -2,7 +2,14 @@ import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 
+<<<<<<< HEAD
 import type { CourtVenue } from '../../interface/courtVenue.interface';
+=======
+import { CourtVenue } from '../../interface/courtVenue.interface';
+
+import { DashboardNotification } from './dashboardNotification.interface';
+
+>>>>>>> 10dc3b8 (chore: fixed lint issues)
 const logger = Logger.getLogger('pcsApiService');
 
 function getBaseUrl(): string {
