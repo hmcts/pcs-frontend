@@ -3,6 +3,7 @@ import { Application } from 'express';
 
 import dashboardRoute from '../../../main/routes/dashboard';
 import { getDashboardNotifications } from '../../../main/services/pcsApi';
+import { oidcMiddleware } from '../../../main/middleware';
 
 jest.mock('../../../main/services/pcsApi');
 jest.mock('@hmcts/nodejs-logging', () => ({
@@ -17,10 +18,16 @@ describe('Dashboard Route', () => {
   let mockApp: Application;
   let mockGet: jest.Mock;
   let mockRender: jest.Mock;
+  let mockLogger: {
+    error: jest.Mock;
+  };
 
   beforeEach(() => {
     mockGet = jest.fn();
     mockRender = jest.fn();
+    mockLogger = {
+      error: jest.fn(),
+    };
 
     mockApp = {
       get: mockGet,
@@ -28,11 +35,12 @@ describe('Dashboard Route', () => {
 
     // Reset all mocks
     jest.clearAllMocks();
+    (Logger.getLogger as jest.Mock).mockReturnValue(mockLogger);
   });
 
   it('should register the dashboard route', () => {
     dashboardRoute(mockApp);
-    expect(mockGet).toHaveBeenCalledWith('/dashboard/:caseReference', expect.any(Function));
+    expect(mockGet).toHaveBeenCalledWith('/dashboard/:caseReference', oidcMiddleware, expect.any(Function));
   });
 
   describe('GET /dashboard/:caseReference', () => {
@@ -40,26 +48,32 @@ describe('Dashboard Route', () => {
       params: {
         caseReference: string;
       };
+      session?: {
+        user?: any;
+      };
     };
     let mockRes: {
       render: jest.Mock;
+      redirect: jest.Mock;
     };
-    let mockLogger: {
-      error: jest.Mock;
-    };
+    let mockNext: jest.Mock;
 
     beforeEach(() => {
       mockReq = {
         params: {
           caseReference: '12345',
         },
+        session: {
+          user: {} // Add mock user to session to pass oidcMiddleware
+        }
       };
 
       mockRes = {
         render: mockRender,
+        redirect: jest.fn()
       };
 
-      mockLogger = Logger.getLogger('dashboard');
+      mockNext = jest.fn();
     });
 
     it('should render dashboard with notifications when successful', async () => {
@@ -71,8 +85,8 @@ describe('Dashboard Route', () => {
       (getDashboardNotifications as jest.Mock).mockResolvedValue(mockNotifications);
 
       dashboardRoute(mockApp);
-      const routeHandler = mockGet.mock.calls[0][1];
-      await routeHandler(mockReq, mockRes);
+      const routeHandler = mockGet.mock.calls[0][2]; // Changed index to 2 to get the route handler after middleware
+      await routeHandler(mockReq, mockRes, mockNext);
 
       expect(getDashboardNotifications).toHaveBeenCalledWith(12345);
       expect(mockRender).toHaveBeenCalledWith('dashboard', {
@@ -85,9 +99,9 @@ describe('Dashboard Route', () => {
       (getDashboardNotifications as jest.Mock).mockRejectedValue(mockError);
 
       dashboardRoute(mockApp);
-      const routeHandler = mockGet.mock.calls[0][1];
-
-      await expect(routeHandler(mockReq, mockRes)).rejects.toThrow(mockError);
+      const routeHandler = mockGet.mock.calls[0][2];
+      
+      await expect(routeHandler(mockReq, mockRes, mockNext)).rejects.toThrow('Failed to fetch notifications');
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to fetch notifications for case 12345')
       );
@@ -97,10 +111,9 @@ describe('Dashboard Route', () => {
       mockReq.params.caseReference = 'invalid';
 
       dashboardRoute(mockApp);
-      const routeHandler = mockGet.mock.calls[0][1];
-
-      await expect(routeHandler(mockReq, mockRes)).rejects.toThrow();
-      expect(getDashboardNotifications).toHaveBeenCalledWith(NaN);
+      const routeHandler = mockGet.mock.calls[0][2];
+      
+      await expect(routeHandler(mockReq, mockRes, mockNext)).rejects.toThrow();
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to fetch notifications for case NaN')
       );
