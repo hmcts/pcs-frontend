@@ -4,9 +4,8 @@ import { Application, Request, Response } from 'express';
 import { oidcMiddleware } from '../middleware';
 import { type DashboardNotification, getDashboardNotifications } from '../services/pcsApi';
 
-const logger = Logger.getLogger('dashboard');
-
 export default function (app: Application): void {
+  const logger = Logger.getLogger('dashboard');
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
     const caseReference: number = parseInt(req.params.caseReference, 10);
     try {
