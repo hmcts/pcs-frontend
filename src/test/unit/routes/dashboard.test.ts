@@ -36,9 +36,17 @@ describe('Dashboard Route', () => {
   });
 
   describe('GET /dashboard/:caseReference', () => {
-    let mockReq: any;
-    let mockRes: any;
-    let mockLogger: any;
+    let mockReq: {
+      params: {
+        caseReference: string;
+      };
+    };
+    let mockRes: {
+      render: jest.Mock;
+    };
+    let mockLogger: {
+      error: jest.Mock;
+    };
 
     beforeEach(() => {
       mockReq = {
