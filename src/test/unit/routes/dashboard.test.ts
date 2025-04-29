@@ -1,9 +1,9 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 
+import { oidcMiddleware } from '../../../main/middleware';
 import dashboardRoute from '../../../main/routes/dashboard';
 import { getDashboardNotifications } from '../../../main/services/pcsApi';
-import { oidcMiddleware } from '../../../main/middleware';
 
 jest.mock('../../../main/services/pcsApi');
 jest.mock('@hmcts/nodejs-logging', () => ({
@@ -49,7 +49,7 @@ describe('Dashboard Route', () => {
         caseReference: string;
       };
       session?: {
-        user?: any;
+        user?: unknown;
       };
     };
     let mockRes: {
@@ -64,13 +64,13 @@ describe('Dashboard Route', () => {
           caseReference: '12345',
         },
         session: {
-          user: {} // Add mock user to session to pass oidcMiddleware
-        }
+          user: {}, // Add mock user to session to pass oidcMiddleware
+        },
       };
 
       mockRes = {
         render: mockRender,
-        redirect: jest.fn()
+        redirect: jest.fn(),
       };
 
       mockNext = jest.fn();
@@ -100,7 +100,7 @@ describe('Dashboard Route', () => {
 
       dashboardRoute(mockApp);
       const routeHandler = mockGet.mock.calls[0][2];
-      
+
       await expect(routeHandler(mockReq, mockRes, mockNext)).rejects.toThrow('Failed to fetch notifications');
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to fetch notifications for case 12345')
@@ -112,7 +112,7 @@ describe('Dashboard Route', () => {
 
       dashboardRoute(mockApp);
       const routeHandler = mockGet.mock.calls[0][2];
-      
+
       await expect(routeHandler(mockReq, mockRes, mockNext)).rejects.toThrow();
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to fetch notifications for case NaN')
