@@ -33,5 +33,11 @@ export class Nunjucks {
         nunjucksEnv.addFilter(key, value as (...args: unknown[]) => unknown);
       });
     });
+    glob.sync(path.join(__dirname, '/filters/**/*.ts')).map(async (filename: string) => {
+      const filter = await import(filename);
+      for (const [key, value] of Object.entries(filter)) {
+        nunjucksEnv.addFilter(key, value as (...args: unknown[]) => unknown);
+      }
+    });
   }
 }
