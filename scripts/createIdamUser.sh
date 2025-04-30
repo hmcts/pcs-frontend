@@ -5,15 +5,13 @@
 ##    - role: Comma-separated list of roles. Roles must exist in IDAM (i.e `caseworker-probate,caseworker-probate-solicitor`)
 ##    - email: Email address
 ##    - accessToken: Access token returned from https://idam-web-public.aat.platform.hmcts.net/o/token
-##    - password: User's password. Default to `Pa$$w0rd`. Weak passwords that do not match the password criteria by SIDAM will cause use creation to fail, and such failure may not be expressly communicated to the user.
+##    - password: User's password. Default to `Pa55w0rd`. Weak passwords that do not match the password criteria by SIDAM will cause use creation to fail, and such failure may not be expressly communicated to the user.
 ##    - surname: Last name. Default to `Test`.
 ##    - forename: First name. Default to `User`.
 ##
 ## Create an IDAM user with the role `citizen` or any other role provided in 'roles' option
 
 export $(grep -v '^#' .env | xargs)
-echo "${IDAM_SECRET}"
-IDAM_API_URL="https://idam-web-public.aat.platform.hmcts.net/o/token"
 response=$(curl --location 'https://idam-api.aat.platform.hmcts.net/o/token' \
            --header 'Content-Type: application/x-www-form-urlencoded' \
            --data-urlencode 'grant_type=client_credentials' \
@@ -35,7 +33,7 @@ if [ -z "$rolesStr" ]
     exit 1
 fi
 
-IFS=',' read -ra roles <<< "$rolesSt"
+IFS=',' read -ra roles <<< "$rolesStr"
 
 # Build roles JSON array
 rolesJson="["
