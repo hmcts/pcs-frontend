@@ -15,7 +15,7 @@ describe('date filter', () => {
   });
 
   it('should handle different timezones correctly', () => {
-    const isoDate = '2024-06-30T12:00:00Z';
+    const isoDate = '2024-06-29T23:00:00Z';
     const result = date(isoDate);
     // The result should be in Europe/London timezone
     expect(result).toBe('30 June 2024');
