@@ -9,6 +9,7 @@
     "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback ts-node -r tsconfig-paths/register --files src/main/server.ts",
     "start:dev": "NODE_ENV=dev ts-node -r tsconfig-paths/register --files src/main/server.ts",
     "start": "NODE_ENV=production dist/main/server.js",
+    "secrets": "./scripts/get_secrets.sh",
     "start:watch": "nodemon --config nodemon.json",
     "docker:dev": "docker compose up",
     "docker:dev:ssl": "COMMAND='yarn start:dev:ssl' docker compose up --build",
