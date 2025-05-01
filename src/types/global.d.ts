@@ -1,6 +1,7 @@
 import { type Session, type SessionData } from 'express-session';
 import { type TokenEndpointResponse, type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
+import { type Environment } from 'nunjucks';
 
 interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
@@ -28,7 +29,7 @@ declare module 'express' {
 
   interface Application {
     locals: {
-      nunjucksEnv: any;
+      nunjucksEnv?: Environment;
       redisClient?: Redis;
       shutdown?: boolean;
       ENV?: string;
