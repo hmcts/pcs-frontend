@@ -11,6 +11,9 @@ export class Nunjucks {
   }
 
   enableFor(app: express.Express): void {
+    // eslint-disable-next-line no-console
+    console.log('========================================= coming to Nunjucks =========================');
+
     app.set('view engine', 'njk');
     app.locals.nunjucksEnv = nunjucks.configure(path.join(__dirname, '..', '..', 'views'), {
       autoescape: true,
