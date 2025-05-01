@@ -27,11 +27,14 @@ export class Nunjucks {
   }
 
   private addCustomFilters(nunjucksEnv: Environment) {
-    glob.sync(path.join(__dirname, '/filters/**/*.ts')).forEach(async (filename: string) => {
-      const filter = await import(filename);
+    const filterFiles = glob.sync(path.join(__dirname, '/filters/**/*.ts'));
+
+    for (const filename of filterFiles) {
+      // Synchronously require instead of dynamic import
+      const filter = require(filename);
       Object.entries(filter).forEach(([key, value]) => {
         nunjucksEnv.addFilter(key, value as (...args: unknown[]) => unknown);
       });
-    });
+    }
   }
 }
