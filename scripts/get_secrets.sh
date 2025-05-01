@@ -14,8 +14,8 @@ secrets=$(az keyvault secret list --vault-name $KEY_VAULT_NAME --query "[].{id:i
 echo "$secrets" | jq -c '.[]' | while read -r secret; do
     secret_id=$(echo $secret | jq -r '.id')
     tags=$(echo $secret | jq -r '.tags')
-    if echo $tags | jq -e 'has("test")' > /dev/null; then
-        env_var=$(echo $tags | jq -r '.test')
+    if echo $tags | jq -e 'has("idam")' > /dev/null; then
+        env_var=$(echo $tags | jq -r '.idam')
         secret_value=$(az keyvault secret show --id $secret_id --query "value" -o tsv)
         echo "Reading $(basename $secret_id) from $KEY_VAULT_NAME vault"
         echo "$env_var=$secret_value" >> $TEMP_ENV_FILE

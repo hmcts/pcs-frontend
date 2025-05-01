@@ -1,5 +1,5 @@
 #!/bin/bash
-## Usage: ./createIdamUser.sh roles email accessToken [password] [surname] [forename]
+## Usage: ./createIdamUser.sh roles email [password] [surname] [forename]
 ##
 ## Options:
 ##    - role: Comma-separated list of roles. Roles must exist in IDAM (i.e `caseworker-probate,caseworker-probate-solicitor`)
@@ -10,8 +10,9 @@
 ##    - forename: First name. Default to `User`.
 ##
 ## Create an IDAM user with the role `citizen` or any other role provided in 'roles' option
-
+source ./scripts/get_secrets.sh
 export $(grep -v '^#' .env | xargs)
+
 response=$(curl --location 'https://idam-api.aat.platform.hmcts.net/o/token' \
            --header 'Content-Type: application/x-www-form-urlencoded' \
            --data-urlencode 'grant_type=client_credentials' \
@@ -23,13 +24,13 @@ accessToken=${response%%\"*}
 
 rolesStr=$1
 email=$2
-password=${4:-Pa55w0rd}
+password=${4:-Pa$$w0rd}
 surname=${5:-Test}
 forename=${6:-User}
 
 if [ -z "$rolesStr" ]
   then
-    echo "Usage: ./createUser.sh roles email [password] [surname] [forename]"
+    echo "Usage: ./createIdamUser.sh roles email [password] [surname] [forename]"
     exit 1
 fi
 

@@ -102,6 +102,21 @@ the following command:
 yarn test
 ```
 
+Use this command to create a temporary IDAM user:
+
+```bash
+yarn createIdamUser <role> <email>
+```
+
+- <role> space delimited list of user roles
+- <email> should not match any existing user email IDs
+
+For example, if you want to create an IDAM user with the email 'test@test.com' and the role 'citizen', use the following command:
+
+```bash
+yarn createIdamUser citizen test@test.com
+```
+
 The functional UI tests use [Playwright](https://playwright.dev/), and the pr suite can be run with the following command:
 
 ```bash
