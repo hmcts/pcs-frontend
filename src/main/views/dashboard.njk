@@ -1,10 +1,12 @@
 {% extends "template.njk" %}
+{%- from "components/notification/macro.njk" import notification -%}
 
 {% block content %}
   <h1 class="govuk-heading-l">Dashboard</h1>
 
-  {% for notification in notifications %}
-    {{ notification | safe }}
+  {% for dashboardNotification in notifications %}
+    {{ notification(dashboardNotification.templateId, dashboardNotification.templateValues)
+    }}    
   {% endfor %}
 
 {% endblock %}
