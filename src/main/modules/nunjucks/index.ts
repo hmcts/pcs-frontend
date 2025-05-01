@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import * as express from 'express';
-import { glob } from 'glob';
+import { DateTime } from 'luxon';
 import { Environment } from 'nunjucks';
 import * as nunjucks from 'nunjucks';
 
@@ -27,11 +27,16 @@ export class Nunjucks {
   }
 
   private addCustomFilters(nunjucksEnv: Environment) {
-    glob.sync(path.join(__dirname, '/filters/**/*.ts')).forEach(async (filename: string) => {
-      const filter = await import(filename);
-      Object.entries(filter).forEach(([key, value]) => {
-        nunjucksEnv.addFilter(key, value as (...args: unknown[]) => unknown);
-      });
+    nunjucksEnv.addFilter('dateWithTime', function (isoDateTime: string) {
+      return DateTime.fromISO(isoDateTime).setZone('Europe/London').setLocale('en-gb').toFormat("d LLLL y 'at' h:mma");
+    });
+
+    nunjucksEnv.addFilter('date', function (isoDate: string) {
+      return DateTime.fromISO(isoDate).setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y');
+    });
+
+    nunjucksEnv.addFilter('gbp', function (amount: number) {
+      return '£' + amount.toFixed(2);
     });
   }
 }
