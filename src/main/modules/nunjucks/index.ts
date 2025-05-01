@@ -11,8 +11,6 @@ export class Nunjucks {
   }
 
   enableFor(app: express.Express): void {
-    // eslint-disable-next-line no-console
-    console.log('========================================= coming to Nunjucks =========================');
 
     app.set('view engine', 'njk');
     app.locals.nunjucksEnv = nunjucks.configure(path.join(__dirname, '..', '..', 'views'), {
@@ -21,12 +19,7 @@ export class Nunjucks {
       express: app,
     });
 
-    try {
-      this.addCustomFilters(app.locals.nunjucksEnv);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-    }
+    this.addCustomFilters(app.locals.nunjucksEnv);
 
     app.use((req, res, next) => {
       res.locals.pagePath = req.path;
@@ -35,15 +28,9 @@ export class Nunjucks {
   }
 
   private addCustomFilters(nunjucksEnv: Environment) {
-    const filters = path.join(path.resolve(__dirname, 'filters'), '**/*.{ts,js}');
-    console.log('filters =>>>>>> ', filters, glob.sync(filters));
-    glob.sync(filters).forEach(async (filename: string) => {
-      // eslint-disable-next-line no-console
-      console.log('filename=>', filename);
+    glob.sync(path.join(path.resolve(__dirname, 'filters'), '**/*.{ts,js}')).forEach(async (filename: string) => {
       const filter = await import(filename);
       Object.entries(filter).forEach(([key, value]) => {
-        // eslint-disable-next-line no-console
-        console.log('add filter => ', key);
         nunjucksEnv.addFilter(key, value as (...args: unknown[]) => unknown);
       });
     });
