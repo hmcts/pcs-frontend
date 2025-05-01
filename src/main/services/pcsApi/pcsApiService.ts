@@ -1,9 +1,11 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 
-import { CourtVenue } from '../../interface/courtVenue.interface';
+import type { CourtVenue } from '../../interface/courtVenue.interface';
 
 import { DashboardNotification } from './dashboardNotification.interface';
+const logger = Logger.getLogger('pcsApiService');
 
 function getBaseUrl(): string {
   return config.get('api.url');
@@ -15,9 +17,15 @@ export const getRootGreeting = async (): Promise<string> => {
   return response.data;
 };
 
-export const getCourtVenues = async (postcode: string): Promise<CourtVenue[]> => {
-  const pcsApiURL = getBaseUrl();
-  const response = await axios.get(`${pcsApiURL}/courts?postCode=${encodeURIComponent(postcode)}`);
+export const getCourtVenues = async (postcode: string, user: { accessToken: string }): Promise<CourtVenue[]> => {
+  const url = `${getBaseUrl()}/courts?postcode=${encodeURIComponent(postcode)}`;
+  const headersConfig = {
+    headers: {
+      Authorization: `Bearer ${user.accessToken}`,
+    },
+  };
+  logger.info(`Calling PCS court search with URL: ${url}`);
+  const response = await axios.get<CourtVenue[]>(url, headersConfig);
   return response.data;
 };
 
