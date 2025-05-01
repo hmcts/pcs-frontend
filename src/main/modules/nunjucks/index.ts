@@ -18,13 +18,12 @@ export class Nunjucks {
       express: app,
     });
 
-    try{
+    try {
       this.addCustomFilters(app.locals.nunjucksEnv);
-    }catch(e){
+    } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
     }
-
 
     app.use((req, res, next) => {
       res.locals.pagePath = req.path;
