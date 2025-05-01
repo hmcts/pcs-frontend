@@ -32,5 +32,6 @@ export const getCourtVenues = async (postcode: string, user: { accessToken: stri
 export const getDashboardNotifications = async (caseReference: number): Promise<DashboardNotification[]> => {
   const pcsApiURL = getBaseUrl();
   const response = await axios.get<DashboardNotification[]>(`${pcsApiURL}/dashboard/${caseReference}/notifications`);
+  console.log('response=> ', response);
   return response.data;
 };
