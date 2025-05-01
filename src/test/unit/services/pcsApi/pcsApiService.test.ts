@@ -1,8 +1,8 @@
 import axios from 'axios';
 import config from 'config';
 
-import type { CourtVenue } from '../../../../main/interface/courtVenue.interface';
-import { getCourtVenues, getRootGreeting } from '../../../../main/services/pcsApi/pcsApiService';
+import { CourtVenue } from '../../../../main/services/pcsApi/courtVenue.interface';
+import { getCourtVenues, getRootGreeting, getDashboardNotifications } from '../../../../main/services/pcsApi/pcsApiService';
 
 jest.mock('axios', () => ({
   get: jest.fn(),
@@ -27,27 +27,45 @@ test('should fetch root greeting', () => {
     expect(axios.get).toHaveBeenCalledWith(testApiBase);
   });
 });
-test('should fetch court venues by postcode', async () => {
+
+test('should fetch court venues by postcode', () => {
   const expectedCourtVenues: CourtVenue[] = [
     {
-      epimId: 101,
-      id: 1001,
-      name: 'some name',
+      epimmsId: 101,
+      courtVenueId: 1001,
+      courtName: 'some name',
     },
   ];
 
   stubAxiosGet(expectedCourtVenues);
 
   const postcode: string = 'PC12 3AQ';
-  const mockAccessToken = 'test-token';
 
-  const actualCourtVenues = await getCourtVenues(postcode, { accessToken: mockAccessToken });
+  return getCourtVenues(postcode).then((actualCourtVenues: CourtVenue[]) => {
+    expect(actualCourtVenues).toEqual(expectedCourtVenues);
+    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postCode=${encodeURIComponent(postcode)}`);
+  });
+});
 
-  expect(actualCourtVenues).toEqual(expectedCourtVenues);
-  expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`, {
-    headers: {
-      Authorization: `Bearer ${mockAccessToken}`,
+test('should fetch dashboard notifications by case reference', () => {
+  const expectedNotifications = [
+    {
+      templateId: 'template-1',
+      templateValues: { foo: 'bar', count: 2 },
     },
+    {
+      templateId: 'template-2',
+      templateValues: { baz: 'qux' },
+    },
+  ];
+
+  stubAxiosGet(expectedNotifications);
+
+  const caseReference = 123456;
+
+  return getDashboardNotifications(caseReference).then((actualNotifications) => {
+    expect(actualNotifications).toEqual(expectedNotifications);
+    expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/dashboard/${caseReference}/notifications`);
   });
 });
 

@@ -1,3 +1,3 @@
-export const currency = (value: number) => {
-    return '£' + value.toFixed(2);
-}
+export const currency = (value: number): string => {
+  return '£' + value.toFixed(2);
+};
