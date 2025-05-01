@@ -71,6 +71,8 @@ export class OIDCModule {
           state: req.session.state,
         };
 
+        this.logger.info('parameters =>>>>>> ', parameters);
+
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
         res.redirect(redirectTo.href);
       } catch (error) {
@@ -84,7 +86,13 @@ export class OIDCModule {
       try {
         const { codeVerifier, nonce, state } = req.session;
 
+        this.logger.info('codeVerifier =>>>>>> ', codeVerifier);
+        this.logger.info('nonce =>>>>>> ', nonce);
+        this.logger.info('state =>>>>>> ', state);
+
         const callbackUrl = this.getCurrentUrl(req);
+
+        this.logger.info('callbackUrl =>>>>>> ', callbackUrl);
 
         const tokens: TokenEndpointResponse = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
           pkceCodeVerifier: codeVerifier,
