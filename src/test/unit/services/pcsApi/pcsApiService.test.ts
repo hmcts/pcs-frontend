@@ -2,7 +2,11 @@ import axios from 'axios';
 import config from 'config';
 
 import { CourtVenue } from '../../../../main/services/pcsApi/courtVenue.interface';
-import { getCourtVenues, getRootGreeting, getDashboardNotifications } from '../../../../main/services/pcsApi/pcsApiService';
+import {
+  getCourtVenues,
+  getDashboardNotifications,
+  getRootGreeting,
+} from '../../../../main/services/pcsApi/pcsApiService';
 
 jest.mock('axios', () => ({
   get: jest.fn(),
@@ -63,7 +67,7 @@ test('should fetch dashboard notifications by case reference', () => {
 
   const caseReference = 123456;
 
-  return getDashboardNotifications(caseReference).then((actualNotifications) => {
+  return getDashboardNotifications(caseReference).then(actualNotifications => {
     expect(actualNotifications).toEqual(expectedNotifications);
     expect(axios.get).toHaveBeenCalledWith(`${testApiBase}/dashboard/${caseReference}/notifications`);
   });

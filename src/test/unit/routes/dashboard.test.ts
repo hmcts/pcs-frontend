@@ -1,7 +1,8 @@
-import { Application } from 'express';
-import { getDashboardNotifications } from '../../../main/services/pcsApi';
-import dashboardRoute from '../../../main/routes/dashboard';
 import { Logger } from '@hmcts/nodejs-logging';
+import { Application } from 'express';
+
+import dashboardRoute from '../../../main/routes/dashboard';
+import { getDashboardNotifications } from '../../../main/services/pcsApi';
 
 jest.mock('../../../main/services/pcsApi');
 jest.mock('@hmcts/nodejs-logging', () => ({
@@ -20,7 +21,7 @@ describe('Dashboard Route', () => {
   beforeEach(() => {
     mockGet = jest.fn();
     mockRender = jest.fn();
-    
+
     mockApp = {
       get: mockGet,
     } as unknown as Application;
