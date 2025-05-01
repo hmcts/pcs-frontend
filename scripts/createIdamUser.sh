@@ -17,7 +17,7 @@ response=$(curl --location 'https://idam-api.aat.platform.hmcts.net/o/token' \
            --header 'Content-Type: application/x-www-form-urlencoded' \
            --data-urlencode 'grant_type=client_credentials' \
            --data-urlencode 'client_id=pcs-frontend' \
-           --data-urlencode 'client_secret='${IDAM_SECRET}'' \
+           --data-urlencode 'client_secret='${PCS_FRONTEND_IDAM_SECRET}'' \
            --data-urlencode 'scope=profile roles')
 response=${response#*:\"}
 accessToken=${response%%\"*}
