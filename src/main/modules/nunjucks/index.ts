@@ -35,7 +35,9 @@ export class Nunjucks {
   }
 
   private addCustomFilters(nunjucksEnv: Environment) {
-    glob.sync(path.join(__dirname, '/filters/**/*.ts')).forEach(async (filename: string) => {
+    const filters = path.join(path.resolve(__dirname, 'filters'), '**/*.ts');
+    console.log('filters =>>>>>> ', filters, glob.sync(filters));
+    glob.sync(filters).forEach(async (filename: string) => {
       // eslint-disable-next-line no-console
       console.log('filename=>', filename);
       const filter = await import(filename);
