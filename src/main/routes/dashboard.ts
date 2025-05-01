@@ -1,38 +1,20 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application, Request, Response } from 'express';
-
-import { DashboardNotification } from '../services/pcsApi/dashboardNotification.interface';
-import { getDashboardNotifications } from '../services/pcsApi/pcsApiService';
+import { type DashboardNotification, getDashboardNotifications } from '../services/pcsApi';
 
 const logger = Logger.getLogger('dashboard');
 
 export default function (app: Application): void {
   app.get('/dashboard/:caseReference', async (req: Request, res: Response) => {
-    const caseReference : number = parseInt(req.params.caseReference, 10);
-
-    let dashboardNotifications : DashboardNotification[] = [];
+    const caseReference: number = parseInt(req.params.caseReference, 10);
     try {
-      dashboardNotifications = await getDashboardNotifications(caseReference);
+      const notifications: DashboardNotification[] = await getDashboardNotifications(caseReference);
+      res.render('dashboard', {
+        notifications,
+      });
     } catch (e) {
       logger.error(`Failed to fetch notifications for case ${caseReference}. Error was: ${e}`);
-      dashboardNotifications.push({
-        templateId: 'Error.Notifications.FailedToFetch',
-        templateValues: {}
-      });
+      throw e;
     }
-
-    const renderedNotifications: string[] = dashboardNotifications.map(
-      dashboardNotification => renderNotification(app, dashboardNotification)
-    );
-
-    res.render('dashboard', {
-      notifications: renderedNotifications,
-    });
   });
-
-}
-
-function renderNotification(app: Application, dashboardNotification: DashboardNotification) {
-  return app.locals.nunjucksEnv.render(`dashboard-notifications/${dashboardNotification.templateId}.njk`,
-    dashboardNotification.templateValues);
 }

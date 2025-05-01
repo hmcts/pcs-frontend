@@ -28,6 +28,7 @@ declare module 'express' {
 
   interface Application {
     locals: {
+      nunjucksEnv: any;
       redisClient?: Redis;
       shutdown?: boolean;
       ENV?: string;

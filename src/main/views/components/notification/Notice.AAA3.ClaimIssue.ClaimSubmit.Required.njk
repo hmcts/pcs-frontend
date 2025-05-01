@@ -5,8 +5,8 @@
     </h2>
   </div>
   <div class="govuk-notification-banner__content">
-    Your appointment is on {{ hearingDate | dateWithTime }} in {{ location }}. You need to
-    pay {{ amount | gbp }} by {{ dueDate | date }}.
+    Your appointment is on {{ params.dueDate | date('d LLLL y \'at\' h:mma') }} in {{ params.location }}. You need to
+    pay {{ params.amount | currency }} by {{ params.dueDate | date }}.
     <a class="govuk-notification-banner__link" href="#">View the hearing notice.</a>
   </div>
 </div>
