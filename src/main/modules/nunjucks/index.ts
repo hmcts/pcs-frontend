@@ -18,7 +18,13 @@ export class Nunjucks {
       express: app,
     });
 
-    this.addCustomFilters(app.locals.nunjucksEnv);
+    try{
+      this.addCustomFilters(app.locals.nunjucksEnv);
+    }catch(e){
+      // eslint-disable-next-line no-console
+      console.log(e);
+    }
+
 
     app.use((req, res, next) => {
       res.locals.pagePath = req.path;
@@ -27,14 +33,15 @@ export class Nunjucks {
   }
 
   private addCustomFilters(nunjucksEnv: Environment) {
-    const filterFiles = glob.sync(path.join(__dirname, '/filters/**/*.ts'));
-
-    for (const filename of filterFiles) {
-      // Synchronously require instead of dynamic import
-      const filter = require(filename);
+    glob.sync(path.join(__dirname, '/filters/**/*.ts')).forEach(async (filename: string) => {
+      // eslint-disable-next-line no-console
+      console.log('filename=>', filename);
+      const filter = await import(filename);
       Object.entries(filter).forEach(([key, value]) => {
+        // eslint-disable-next-line no-console
+        console.log('add filter => ', key);
         nunjucksEnv.addFilter(key, value as (...args: unknown[]) => unknown);
       });
-    }
+    });
   }
 }
