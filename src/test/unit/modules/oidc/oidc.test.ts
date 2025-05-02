@@ -147,6 +147,52 @@ describe('OIDCModule', () => {
 
         expect(mockNext).toHaveBeenCalledWith(expect.any(OIDCAuthenticationError));
       });
+
+      it('should use nonce when PKCE is not supported', async () => {
+        const mockAuthUrl = 'http://test-issuer/auth';
+        (client.buildAuthorizationUrl as jest.Mock).mockReturnValue({ href: mockAuthUrl });
+        (client.randomNonce as jest.Mock).mockReturnValue('test-nonce');
+        (client.randomPKCECodeVerifier as jest.Mock).mockReturnValue('test-verifier');
+        (client.calculatePKCECodeChallenge as jest.Mock).mockResolvedValue('test-challenge');
+
+        // Mock server metadata to indicate PKCE is not supported
+        (client.discovery as jest.Mock).mockResolvedValue({
+          serverMetadata: () => ({
+            token_endpoint: 'http://test-issuer/token',
+            supportsPKCE: () => false,
+          }),
+        });
+
+        // Create new OIDC module instance and set it up
+        oidcModule = new OIDCModule();
+        await oidcModule['setupClient']();
+
+        // Reset mock app to ensure clean state
+        mockApp = {
+          get: jest.fn(),
+          set: jest.fn(),
+          locals: {
+            nunjucksEnv: {
+              addGlobal: jest.fn(),
+            },
+          },
+        } as unknown as Express;
+
+        oidcModule.enableFor(mockApp);
+        const loginHandler = (mockApp.get as jest.Mock).mock.calls[0][1];
+        await loginHandler(mockRequest, mockResponse, mockNext);
+
+        expect(mockResponse.redirect).toHaveBeenCalledWith(mockAuthUrl);
+        expect(mockRequest.session).toHaveProperty('nonce', 'test-nonce');
+        expect(client.buildAuthorizationUrl).toHaveBeenCalledWith(
+          expect.any(Object),
+          expect.objectContaining({
+            nonce: 'test-nonce',
+            redirect_uri: 'http://localhost:3000/oauth2/callback',
+            scope: 'openid profile',
+          })
+        );
+      });
     });
 
     describe('callback route', () => {
