@@ -9,11 +9,11 @@ jest.mock('openid-client', () => ({
   discovery: jest.fn(),
   randomPKCECodeVerifier: jest.fn(),
   randomNonce: jest.fn(),
-  randomState: jest.fn(),
   calculatePKCECodeChallenge: jest.fn(),
   buildAuthorizationUrl: jest.fn(),
   authorizationCodeGrant: jest.fn(),
   fetchUserInfo: jest.fn(),
+  buildEndSessionUrl: jest.fn(),
 }));
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
@@ -49,7 +49,6 @@ describe('OIDCModule', () => {
     resetMaxAge: jest.fn(),
     codeVerifier: undefined,
     nonce: undefined,
-    state: undefined,
     user: undefined,
     ...overrides,
   });
@@ -75,6 +74,7 @@ describe('OIDCModule', () => {
     (client.discovery as jest.Mock).mockResolvedValue({
       serverMetadata: () => ({
         token_endpoint: 'http://test-issuer/token',
+        supportsPKCE: () => true,
       }),
     });
 
@@ -126,7 +126,6 @@ describe('OIDCModule', () => {
         (client.buildAuthorizationUrl as jest.Mock).mockReturnValue({ href: mockAuthUrl });
         (client.randomPKCECodeVerifier as jest.Mock).mockReturnValue('test-verifier');
         (client.randomNonce as jest.Mock).mockReturnValue('test-nonce');
-        (client.randomState as jest.Mock).mockReturnValue('test-state');
         (client.calculatePKCECodeChallenge as jest.Mock).mockResolvedValue('test-challenge');
 
         oidcModule.enableFor(mockApp);
@@ -135,8 +134,6 @@ describe('OIDCModule', () => {
 
         expect(mockResponse.redirect).toHaveBeenCalledWith(mockAuthUrl);
         expect(mockRequest.session).toHaveProperty('codeVerifier', 'test-verifier');
-        expect(mockRequest.session).toHaveProperty('nonce', 'test-nonce');
-        expect(mockRequest.session).toHaveProperty('state', 'test-state');
       });
 
       it('should handle login errors', async () => {
@@ -173,7 +170,6 @@ describe('OIDCModule', () => {
         mockRequest.session = createMockSession({
           codeVerifier: 'test-verifier',
           nonce: 'test-nonce',
-          state: 'test-state',
           save: jest.fn().mockImplementation(function (callback) {
             callback(null);
           }),
@@ -191,7 +187,6 @@ describe('OIDCModule', () => {
         });
         expect(mockRequest.session).not.toHaveProperty('codeVerifier');
         expect(mockRequest.session).not.toHaveProperty('nonce');
-        expect(mockRequest.session).not.toHaveProperty('state');
         expect(mockResponse.redirect).toHaveBeenCalledWith('/');
       });
 
@@ -201,7 +196,6 @@ describe('OIDCModule', () => {
         mockRequest.session = createMockSession({
           codeVerifier: 'test-verifier',
           nonce: 'test-nonce',
-          state: 'test-state',
         });
 
         oidcModule.enableFor(mockApp);
@@ -209,6 +203,36 @@ describe('OIDCModule', () => {
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
         expect(mockNext).toHaveBeenCalledWith(expect.any(OIDCCallbackError));
+      });
+    });
+
+    describe('logout route', () => {
+      it('should destroy session and redirect to logout URL', async () => {
+        const mockLogoutUrl = 'http://test-issuer/logout';
+        (client.buildEndSessionUrl as jest.Mock).mockReturnValue({ href: mockLogoutUrl });
+
+        mockRequest.session = createMockSession({
+          user: {
+            idToken: 'test-id-token',
+          },
+          destroy: jest.fn().mockImplementation(function (callback) {
+            callback(null);
+          }),
+        });
+
+        oidcModule.enableFor(mockApp);
+        const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
+        await logoutHandler(mockRequest, mockResponse, mockNext);
+
+        expect(client.buildEndSessionUrl).toHaveBeenCalledWith(
+          expect.any(Object),
+          expect.objectContaining({
+            post_logout_redirect_uri: 'http://localhost:3000',
+            id_token_hint: 'test-id-token',
+          })
+        );
+        expect(mockRequest.session.destroy).toHaveBeenCalled();
+        expect(mockResponse.redirect).toHaveBeenCalledWith(mockLogoutUrl);
       });
     });
   });
