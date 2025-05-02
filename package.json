@@ -59,6 +59,7 @@
     "ioredis": "^5.4.1",
     "jquery": "^3.7.0",
     "lodash": "^4.17.21",
+    "luxon": "^3.6.1",
     "nunjucks": "^3.2.4",
     "oauth4webapi": "^3.3.1",
     "openid-client": "^6.3.4",
@@ -89,6 +90,7 @@
     "@types/glob": "^8.1.0",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.14.197",
+    "@types/luxon": "^3",
     "@types/node": "22.15.3",
     "@types/nunjucks": "^3.2.3",
     "@types/require-directory": "^2.1.2",
@@ -149,7 +151,8 @@
     "chai": "5.0.0",
     "@types/node": "22.15.3",
     "glob": "^11.0.0",
-    "@azure/msal-browser": "4.11.1"
+    "@azure/msal-browser": "4.11.1",
+    "superagent": "9.0.2"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
