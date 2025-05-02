@@ -3,6 +3,8 @@ import axios from 'axios';
 import config from 'config';
 
 import type { CourtVenue } from '../../interface/courtVenue.interface';
+
+import { DashboardNotification } from './dashboardNotification.interface';
 const logger = Logger.getLogger('pcsApiService');
 
 function getBaseUrl(): string {
@@ -24,5 +26,11 @@ export const getCourtVenues = async (postcode: string, user: { accessToken: stri
   };
   logger.info(`Calling PCS court search with URL: ${url}`);
   const response = await axios.get<CourtVenue[]>(url, headersConfig);
+  return response.data;
+};
+
+export const getDashboardNotifications = async (caseReference: number): Promise<DashboardNotification[]> => {
+  const pcsApiURL = getBaseUrl();
+  const response = await axios.get<DashboardNotification[]>(`${pcsApiURL}/dashboard/${caseReference}/notifications`);
   return response.data;
 };
