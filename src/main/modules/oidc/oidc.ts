@@ -58,18 +58,21 @@ export class OIDCModule {
       try {
         // Generate a new code verifier and store it in the session
         req.session.codeVerifier = client.randomPKCECodeVerifier();
-        req.session.nonce = client.randomNonce();
-        req.session.state = client.randomState();
         const codeChallenge = await client.calculatePKCECodeChallenge(req.session.codeVerifier);
+
+        let nonce!: string;
 
         const parameters: Record<string, string> = {
           redirect_uri: this.oidcConfig.redirectUri,
           scope: this.oidcConfig.scope,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
-          nonce: req.session.nonce,
-          state: req.session.state,
         };
+
+        if (!this.clientConfig.serverMetadata().supportsPKCE()) {
+          nonce = client.randomNonce();
+          parameters.nonce = nonce;
+        }
 
         this.logger.info('parameters =>>>>>> ', parameters);
 
@@ -84,20 +87,17 @@ export class OIDCModule {
     // Callback route
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const { codeVerifier, nonce, state } = req.session;
+        const { codeVerifier, nonce } = req.session;
 
         this.logger.info('codeVerifier =>>>>>> ', codeVerifier);
         this.logger.info('nonce =>>>>>> ', nonce);
-        this.logger.info('state =>>>>>> ', state);
 
         const callbackUrl = this.getCurrentUrl(req);
-
-        this.logger.info('callbackUrl =>>>>>> ', callbackUrl);
 
         const tokens: TokenEndpointResponse = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
           pkceCodeVerifier: codeVerifier,
           expectedNonce: nonce,
-          expectedState: state,
+          idTokenExpected: true,
         });
 
         const { access_token, id_token, refresh_token } = tokens;
@@ -110,15 +110,14 @@ export class OIDCModule {
 
         req.session.user = {
           accessToken: access_token,
-          idToken: id_token as string,
-          refreshToken: refresh_token as string,
+          idToken: id_token,
+          refreshToken: refresh_token,
           ...user,
         };
 
         req.session.save(() => {
           delete req.session.codeVerifier;
           delete req.session.nonce;
-          delete req.session.state;
           app.locals.nunjucksEnv.addGlobal('user', req.session.user);
           res.redirect('/');
         });

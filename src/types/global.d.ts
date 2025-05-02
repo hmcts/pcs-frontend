@@ -4,14 +4,13 @@ import { type Redis } from 'ioredis';
 
 interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
-  idToken: string;
-  refreshToken: string;
+  idToken: string | undefined;
+  refreshToken: string | undefined;
 }
 
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
-  state?: string;
   user?: UserInfoResponseWithToken;
   serviceToken?: string;
   destroy(callback: (err?: Error) => void): void;
