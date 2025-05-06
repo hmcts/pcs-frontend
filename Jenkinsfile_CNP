@@ -10,7 +10,23 @@ def component = "frontend"
 
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
+static Map < String, Object > secret(String secretName, String envVariable) {
+  [
+    $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    envVariable: envVariable
+  ]
+}
+
+def secrets = [
+  'pcs-${env}': [
+    secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET')
+  ]
+]
+
 withPipeline(type, product, component) {
+  loadVaultSecrets(secrets)
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     afterAlways('functionalTest:preview') {
