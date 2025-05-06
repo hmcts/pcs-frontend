@@ -101,6 +101,7 @@ the following command:
 ```bash
 yarn test
 ```
+
 ### Creating IDAM users for tests
 
 Use this command to create a temporary IDAM user:
@@ -108,7 +109,9 @@ Use this command to create a temporary IDAM user:
 ```bash
 yarn createIdamUser --roles=<ROLES> --email=<EMAIL> [--surname=<SURNAME>] [--forename=<FORENAME>]
 ```
+
 where
+
 - --roles: is a comma separated list of user roles without spaces
 - --email: should not match any existing user's email ID
 - [--surname]: is optional - defaults to 'Test' if not supplied
