@@ -2990,10 +2990,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:^4":
-  version: 4.3.20
-  resolution: "@types/chai@npm:4.3.20"
-  checksum: 10/94fd87036fb63f62c79caf58ccaec88e23cc109e4d41607d83adc609acd6b24eabc345feb7850095a53f76f99c470888251da9bd1b90849c8b2b5a813296bb19
+"@types/chai@npm:^5.0.0":
+  version: 5.2.2
+  resolution: "@types/chai@npm:5.2.2"
+  dependencies:
+    "@types/deep-eql": "npm:*"
+  checksum: 10/de425e7b02cc1233a93923866e019dffbafa892774813940b780ebb1ac9f8a8c57b7438c78686bf4e5db05cd3fc8a970fedf6b83638543995ecca88ef2060668
   languageName: node
   linkType: hard
 
@@ -4657,16 +4659,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai@npm:5.0.0":
-  version: 5.0.0
-  resolution: "chai@npm:5.0.0"
+"chai@npm:5.2.0":
+  version: 5.2.0
+  resolution: "chai@npm:5.2.0"
   dependencies:
     assertion-error: "npm:^2.0.1"
-    check-error: "npm:^2.0.0"
+    check-error: "npm:^2.1.1"
     deep-eql: "npm:^5.0.1"
-    loupe: "npm:^3.0.0"
+    loupe: "npm:^3.1.0"
     pathval: "npm:^2.0.0"
-  checksum: 10/c23d1bb3912cc36d12861d7e4010bb992aabf923a8d393bc71e776218c39f5f40778ab9f398ff962dd26857edee07ce732c9ad28a678feb1b76f99384d2e4a90
+  checksum: 10/2ce03671c159c6a567bf1912756daabdbb7c075f3c0078f1b59d61da8d276936367ee696dfe093b49e1479d9ba93a6074c8e55d49791dddd8061728cdcad249e
   languageName: node
   linkType: hard
 
@@ -4694,7 +4696,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"check-error@npm:^2.0.0":
+"check-error@npm:^2.0.0, check-error@npm:^2.1.1":
   version: 2.1.1
   resolution: "check-error@npm:2.1.1"
   checksum: 10/d785ed17b1d4a4796b6e75c765a9a290098cf52ff9728ce0756e8ffd4293d2e419dd30c67200aee34202463b474306913f2fcfaf1890641026d9fc6966fea27a
@@ -8934,7 +8936,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"loupe@npm:^3.0.0":
+"loupe@npm:^3.1.0":
   version: 3.1.3
   resolution: "loupe@npm:3.1.3"
   checksum: 10/9e98c34daf0eba48ccc603595e51f2ae002110982d84879cf78c51de2c632f0c571dfe82ce4210af60c32203d06b443465c269bda925076fe6d9b612cc65c321
@@ -10015,7 +10017,7 @@ __metadata:
     "@playwright/test": "npm:^1.49.0"
     "@types/axios": "npm:^0.14.4"
     "@types/body-parser": "npm:^1.19.2"
-    "@types/chai": "npm:^4"
+    "@types/chai": "npm:^5.0.0"
     "@types/chai-as-promised": "npm:^8.0.0"
     "@types/config": "npm:^3.3.5"
     "@types/connect-redis": "npm:^0.0.23"
@@ -10042,7 +10044,7 @@ __metadata:
     axios-debug-log: "npm:^1.0.0"
     babel-loader: "npm:^10.0.0"
     body-parser: "npm:^2.0.0"
-    chai: "npm:^4.3.7"
+    chai: "npm:^5.0.0"
     chai-as-promised: "npm:^8.0.0"
     config: "npm:^3.3.9"
     connect-redis: "npm:^7.1.1"
