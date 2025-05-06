@@ -107,22 +107,22 @@ Use this command to create a temporary IDAM user:
 ```bash
 yarn createIdamUser --roles=<ROLES> --email=<EMAIL> [--surname=<SURNAME>] [--forename=<FORENAME>]
 ```
+where
+- --roles: is a comma separated list of user roles without spaces
+- --email: should not match any existing user's email ID
+- [--surname]: is optional - defaults to 'Test' if not supplied
+- [--forename]: is optional - defaults to 'User' if not supplied
 
-- <ROLES> comma separated list of user roles without spaces
-- <EMAIL> should not match any existing user email IDs
-- <SURNAME> is optional but it defaults to 'Test' if not supplied
-- <FORENAME> is optional but it defaults to 'User' if not supplied
-
-For example, if you want to create an IDAM user with the email 'test@test.com', forename 'tester' and the roles 'citizen' and 'caseworker', use the following command:
+For example, if you want to create an IDAM user with the email 'test@test.com', forename 'Dummy', Surname 'Casworker' and the roles 'citizen' and 'caseworker', use the following command:
 
 ```bash
-yarn createIdamUser --roles=citizen,caseworker --email=test@test.com --forename=tester
+yarn createIdamUser --roles=citizen,caseworker --email=test@test.com --surname=Caseworker --forename=Dummy
 ```
 
-(or)
+or with abbreviated param names and single role:
 
 ```bash
-yarn createIdamUser -r=citizen,caseworker -e=test@test.com -f=tester
+yarn createIdamUser -r=citizen -e=test2@test.com
 ```
 
 Note: An auto-generated password will be output when the script runs.

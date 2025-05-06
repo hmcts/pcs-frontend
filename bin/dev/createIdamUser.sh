@@ -2,10 +2,10 @@
 ## Usage: ./createIdamUser.sh --roles=ROLES --email=EMAIL [--surname=SURNAME] [--forename=NAME]
 ##
 ## Options:
-##    - role: Comma-separated list of roles. Roles must exist in IDAM (i.e citizen,caseworker)
-##    - email: Email address
-##    - [surname]: Optional Last name. Default to `Test`.
-##    - [forename]: Optional First name. Default to `User`.
+##    --role: Comma-separated list of roles. Roles must exist in IDAM (i.e citizen,caseworker)
+##    --email: Email address
+##    --[surname]: Optional Last name. Defaults to `Test`.
+##    --[forename]: Optional First name. Defaults to `User`.
 ## Note: an auto-generated password will be output when the script runs.
 ## Create an IDAM user with the role `citizen` or any other role provided in 'roles' option
 
@@ -60,6 +60,7 @@ rolesJson="${rolesJson}"
 
 echo "Creating IDAM user account for: $email"
 echo "Temporary password set for $email: $password"
+echo "Roles requested are $rolesJson"
 
 curl -L -X POST 'https://idam-testing-support-api.aat.platform.hmcts.net/test/idam/users' \
 -H 'Authorization: Bearer '${accessToken} \
