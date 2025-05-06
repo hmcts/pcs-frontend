@@ -12,7 +12,6 @@ interface UserInfoResponseWithToken extends UserInfoResponse {
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
-  state?: string;
   user?: UserInfoResponseWithToken;
   serviceToken?: string;
   destroy(callback: (err?: Error) => void): void;
