@@ -118,10 +118,13 @@ For example, if you want to create an IDAM user with the email 'test@test.com', 
 ```bash
 yarn createIdamUser --roles=citizen,caseworker --email=test@test.com --forename=tester
 ```
+
 (or)
+
 ```bash
 yarn createIdamUser -r=citizen,caseworker -e=test@test.com -f=tester
 ```
+
 Note: An auto-generated password will be output when the script runs.
 
 The functional UI tests use [Playwright](https://playwright.dev/), and the pr suite can be run with the following command:
