@@ -14,7 +14,7 @@ idam_system_user_name=$(az keyvault secret show --name "idam-system-user-name" -
 idam_system_user_password=$(az keyvault secret show --name "idam-system-user-password" --vault-name "$KEY_VAULT_NAME" --query "value" -o tsv)
 pcs_frontend_idam_secret=$(az keyvault secret show --name "pcs-frontend-idam-secret" --vault-name "$KEY_VAULT_NAME" --query "value" -o tsv)
 
-response=$(curl --location 'https://idam-api.aat.platform.hmcts.net/o/token' \
+response=$(curl -s --location 'https://idam-api.aat.platform.hmcts.net/o/token' \
            --header 'Content-Type: application/x-www-form-urlencoded' \
            --data-urlencode 'username='${idam_system_user_name}'' \
            --data-urlencode 'password='${idam_system_user_password}'' \
