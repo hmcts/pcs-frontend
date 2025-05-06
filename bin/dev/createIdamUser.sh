@@ -32,15 +32,20 @@ password="Pa$$word"
 
 for arg in "$@"; do
     case "$arg" in
-        --roles|-r=*) rolesStr="${arg#*=}";;
-        --email|-e=*) email="${arg#*=}";;
-        --surname|-s=*) surname="${arg#*=}";;
-        --forename|-f=*) forename="${arg#*=}";;
+        --roles=*) rolesStr="${arg#*=}";;
+        -r=*) rolesStr="${arg#*=}";;
+        --email=*) email="${arg#*=}";;
+        -e=*) email="${arg#*=}";;
+        --surname=*) surname="${arg#*=}";;
+        -s=*) surname="${arg#*=}";;
+        --forename=*) forename="${arg#*=}";;
+        -f=*) forename="${arg#*=}";;
     esac
 done
 
+
 if [ -z "$rolesStr" ] || [ -z "$email" ]; then
-    echo "Error: --roles and --email are required"
+    echo "Error: --roles and --email values must be supplied"
     echo "Usage: ./createIdamUser.sh --roles=ROLES --email=EMAIL [--surname=SURNAME] [--forename=NAME]"
     exit 1
 fi
@@ -74,3 +79,4 @@ curl -L -X POST 'https://idam-testing-support-api.aat.platform.hmcts.net/test/id
         "roleNames": ['${rolesJson}']
     }
 }'
+echo " "
