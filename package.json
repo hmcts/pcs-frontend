@@ -38,7 +38,7 @@
     "@hmcts/nodejs-healthcheck": "^1.8.0",
     "@hmcts/nodejs-logging": "^4.0.4",
     "@hmcts/properties-volume": "^1.2.0",
-    "applicationinsights": "2.9.6",
+    "applicationinsights": "3.7.0",
     "axios": "^1.4.0",
     "body-parser": "^2.0.0",
     "chai": "5.2.0",
