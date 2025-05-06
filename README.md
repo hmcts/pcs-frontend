@@ -101,6 +101,7 @@ the following command:
 ```bash
 yarn test
 ```
+### Creating IDAM users for tests
 
 Use this command to create a temporary IDAM user:
 
