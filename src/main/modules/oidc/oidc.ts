@@ -58,8 +58,6 @@ export class OIDCModule {
       try {
         // Generate a new code verifier and store it in the session
         req.session.codeVerifier = client.randomPKCECodeVerifier();
-        req.session.nonce = client.randomNonce();
-        req.session.state = client.randomState();
         const codeChallenge = await client.calculatePKCECodeChallenge(req.session.codeVerifier);
 
         const parameters: Record<string, string> = {
@@ -67,9 +65,12 @@ export class OIDCModule {
           scope: this.oidcConfig.scope,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
-          nonce: req.session.nonce,
-          state: req.session.state,
         };
+
+        if (!this.clientConfig.serverMetadata().supportsPKCE()) {
+          req.session.nonce = client.randomNonce();
+          parameters.nonce = req.session.nonce;
+        }
 
         this.logger.info('parameters =>>>>>> ', parameters);
 
@@ -84,20 +85,17 @@ export class OIDCModule {
     // Callback route
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const { codeVerifier, nonce, state } = req.session;
+        const { codeVerifier, nonce } = req.session;
 
         this.logger.info('codeVerifier =>>>>>> ', codeVerifier);
         this.logger.info('nonce =>>>>>> ', nonce);
-        this.logger.info('state =>>>>>> ', state);
 
         const callbackUrl = this.getCurrentUrl(req);
-
-        this.logger.info('callbackUrl =>>>>>> ', callbackUrl);
 
         const tokens: TokenEndpointResponse = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
           pkceCodeVerifier: codeVerifier,
           expectedNonce: nonce,
-          expectedState: state,
+          idTokenExpected: true,
         });
 
         const { access_token, id_token, refresh_token } = tokens;
@@ -118,7 +116,6 @@ export class OIDCModule {
         req.session.save(() => {
           delete req.session.codeVerifier;
           delete req.session.nonce;
-          delete req.session.state;
           app.locals.nunjucksEnv.addGlobal('user', req.session.user);
           res.redirect('/');
         });
@@ -139,12 +136,18 @@ export class OIDCModule {
 
     // Logout route
     app.get('/logout', (req: Request, res: Response) => {
-      // TODO: destroy the session by calling the IDAM logout endpoint
+      // build the logout url
+      const callbackUrl = this.getCurrentUrl(req);
+      const logoutUrl = client.buildEndSessionUrl(this.clientConfig, {
+        post_logout_redirect_uri: callbackUrl.origin,
+        id_token_hint: req.session.user?.idToken as string,
+      });
+
       req.session.destroy((err: unknown) => {
         if (err) {
           this.logger.error('Session destroyed error:', err);
         }
-        res.redirect('/');
+        res.redirect(logoutUrl.href);
       });
     });
   }
