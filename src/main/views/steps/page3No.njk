@@ -1,0 +1,13 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">Not eligible for online service</h1>
+
+  <form method="post">
+    {{ govukButton({
+      text: "Close and return to case overview",
+      preventDoubleClick: true
+    }) }}
+  </form>
+{% endblock %}

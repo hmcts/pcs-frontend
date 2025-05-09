@@ -1,0 +1,31 @@
+{% extends "template.njk" %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">Who are you making the claim for?</h1>
+
+  <form method="post">
+    {{ govukCheckboxes({
+      idPrefix: "checkboxes",
+      name: "checkboxes",
+      fieldset: {
+        legend: {
+          text: "legend title",
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--m"
+        }
+      },
+      errorMessage: error and { text: "page 3 error" } or null,
+      items: [
+        { value: "option1", text: "Child" },
+        { value: "option2", text: "Protected person }
+      ]
+    }) }}
+
+    {{ govukButton({
+      text: "Submit",
+      preventDoubleClick: true
+    }) }}
+  </form>
+{% endblock %}

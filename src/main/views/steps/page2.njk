@@ -1,0 +1,31 @@
+{% extends "template.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">Are you 18 or over?</h1>
+
+  <form method="post">
+    {{ govukRadios({
+      idPrefix: "answer",
+      name: "answer",
+      fieldset: {
+        legend: {
+          text: "Radio title",
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--m"
+        }
+      },
+      errorMessage: error and { text: "error" } or null,
+      items: [
+        { value: "yes", text: "Yes" },
+        { value: "no", text: "No" }
+      ]
+    }) }}
+
+    {{ govukButton({
+      text: "Save and continue",
+      preventDoubleClick: true
+    }) }}
+  </form>
+{% endblock %}
