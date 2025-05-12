@@ -16,6 +16,7 @@ import { OIDCModule } from './modules/oidc';
 import { PropertiesVolume } from './modules/properties-volume';
 import { S2S } from './modules/s2s';
 import { Session } from './modules/session';
+import registerSteps from './routes/registerSteps';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
@@ -44,6 +45,8 @@ app.use((req, res, next) => {
   next();
 });
 
+registerSteps(app);
+
 glob
   .sync(__dirname + '/routes/**/*.+(ts|js)')
   .map(filename => require(filename))
@@ -66,3 +69,5 @@ app.use((err: HTTPError, req: express.Request, res: express.Response) => {
   res.status(err.status || 500);
   res.render('error');
 });
+
+

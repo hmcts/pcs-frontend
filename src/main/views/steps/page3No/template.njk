@@ -1,0 +1,14 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+  <p class="govuk-body">{{ message }}</p>
+
+  <form method="post" action="/steps/page3/no">
+    {{ govukButton({
+      text: "Back to previous step",
+      preventDoubleClick: true
+    }) }}
+  </form>
+{% endblock %}

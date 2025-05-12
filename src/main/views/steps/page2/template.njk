@@ -1,0 +1,31 @@
+{% extends "template.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+
+  <form method="post" action="/steps/page2">
+    {{ govukRadios({
+      idPrefix: "answer",
+      name: "answer",
+      fieldset: {
+        legend: {
+          text: title,
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--m"
+        }
+      },
+      errorMessage: error and { text: error } or null,
+      items: [
+        { value: "yes", text: yes },
+        { value: "no", text: no }
+      ]
+    }) }}
+
+    {{ govukButton({
+      text: next,
+      preventDoubleClick: true
+    }) }}
+  </form>
+{% endblock %}
