@@ -1,0 +1,29 @@
+[
+  {
+    "groupId": "CLAIM",
+    "tasks": [
+      {
+        "templateId": "Task.AAA6.Claim.ViewClaim",
+        "templateValues": {
+          "appointmentTime": "2025-05-20T10:30:00",
+          "location": "London",
+          "amount": 76,
+          "dueDate": "2025-05-20"
+        },
+        "status": "AVAILABLE"
+      }
+    ]
+  },
+  {
+    "groupId": "HEARING",
+    "tasks": [
+      {
+        "templateId": "Task.AAA6.Hearing.UploadDocuments",
+        "templateValues": {
+          "deadline": "2025-05-20"
+        },
+        "status": "ACTION_NEEDED"
+      }
+    ]
+  }
+]

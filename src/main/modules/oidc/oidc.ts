@@ -42,7 +42,7 @@ export class OIDCModule {
     }
   }
 
-  public getCurrentUrl(req: Request): URL {
+  public static getCurrentUrl(req: Request): URL {
     const protocol = req.protocol;
     const host = req.get('host');
     // Get the original URL from the request and preserve the query parameters
@@ -90,7 +90,7 @@ export class OIDCModule {
         this.logger.info('codeVerifier =>>>>>> ', codeVerifier);
         this.logger.info('nonce =>>>>>> ', nonce);
 
-        const callbackUrl = this.getCurrentUrl(req);
+        const callbackUrl = OIDCModule.getCurrentUrl(req);
 
         const tokens: TokenEndpointResponse = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
           pkceCodeVerifier: codeVerifier,
@@ -116,7 +116,6 @@ export class OIDCModule {
         req.session.save(() => {
           delete req.session.codeVerifier;
           delete req.session.nonce;
-          app.locals.nunjucksEnv.addGlobal('user', req.session.user);
           res.redirect('/');
         });
       } catch (error) {
@@ -137,7 +136,7 @@ export class OIDCModule {
     // Logout route
     app.get('/logout', (req: Request, res: Response) => {
       // build the logout url
-      const callbackUrl = this.getCurrentUrl(req);
+      const callbackUrl = OIDCModule.getCurrentUrl(req);
       const logoutUrl = client.buildEndSessionUrl(this.clientConfig, {
         post_logout_redirect_uri: callbackUrl.origin,
         id_token_hint: req.session.user?.idToken as string,

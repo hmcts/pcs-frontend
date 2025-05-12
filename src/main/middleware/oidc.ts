@@ -8,6 +8,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
  */
 export const oidcMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
   if (req.session?.user) {
+    req.app.locals.nunjucksEnv.addGlobal('user', req.session.user);
     return next();
   }
   res.redirect('/login');
