@@ -4,6 +4,7 @@ export const generateContent = () => {
     error: 'Please select an option',
     yes: 'Yes',
     no: 'No',
-    next: 'Continue'
+    next: 'Continue',
+    backUrl: '/steps/page1'
   };
 };

@@ -1,27 +1,33 @@
 {% extends "template.njk" %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+
 
 {% block content %}
-  <h1 class="govuk-heading-l">{{ title }}</h1>
+  {{ govukBackLink({
+    text: "Back",
+    href: backUrl
+  }) }}
 
   <form method="post" action="/steps/page2">
-    {{ govukRadios({
-      idPrefix: "answer",
-      name: "answer",
-      fieldset: {
-        legend: {
-          text: title,
-          isPageHeading: false,
-          classes: "govuk-fieldset__legend--m"
-        }
-      },
-      errorMessage: error and { text: error } or null,
-      items: [
-        { value: "yes", text: yes },
-        { value: "no", text: no }
-      ]
-    }) }}
+   {{ govukRadios({
+        name: "answer",
+        fieldset: {
+          legend: {
+            text: title,
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        items: [
+          { value: "yes", text: "Yes", checked: selected == 'yes' },
+          { value: "no", text: "No", checked: selected == 'no' }
+        ]
+      })
+    }}
+
 
     {{ govukButton({
       text: next,

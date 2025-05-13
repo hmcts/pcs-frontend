@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { setFormData } from '../../app/controllers/sessionHelper';
 
 export default class Page2PostController {
   constructor(private fields: string[]) {}
@@ -12,7 +13,10 @@ export default class Page2PostController {
         error: 'Please select an option',
         yes: 'Yes',
         no: 'No',
-        next: 'Continue'
+        next: 'Continue',
+        backUrl: '/steps/page1',
+        serviceName: 'Possession claims',
+        isLoggedIn: req.session?.isLoggedIn === true
       };
       return res.status(400).render('steps/page2/template.njk', {
         ...content,
@@ -20,8 +24,7 @@ export default class Page2PostController {
       });
     }
 
-    req.session.formData = req.session.formData || {};
-    req.session.formData.page2 = { answer };
+    setFormData(req, 'page2', { answer });
 
     const nextPage = answer === 'yes' ? '/steps/page3/yes' : '/steps/page3/no';
     res.redirect(nextPage);
