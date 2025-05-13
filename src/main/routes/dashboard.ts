@@ -52,7 +52,7 @@ export default function (app: Application): void {
                 ),
               },
               hint,
-              // TODO: slugify the templateId 
+              // TODO: slugify the templateId
               href: task.status === 'NOT_AVAILABLE' ? undefined : `${caseReference}/${taskGroupId}/${task.templateId}`,
               status: {
                 text: task.status,
