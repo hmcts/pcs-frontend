@@ -11,5 +11,10 @@ export const oidcMiddleware: RequestHandler = (req: Request, res: Response, next
     req.app.locals.nunjucksEnv.addGlobal('user', req.session.user);
     return next();
   }
+
+  // Store the current path in session before redirecting
+  if (req.session) {
+    req.session.returnTo = req.originalUrl;
+  }
   res.redirect('/login');
 };

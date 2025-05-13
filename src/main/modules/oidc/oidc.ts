@@ -116,7 +116,9 @@ export class OIDCModule {
         req.session.save(() => {
           delete req.session.codeVerifier;
           delete req.session.nonce;
-          res.redirect('/');
+          const returnTo = req.session.returnTo || '/';
+          delete req.session.returnTo;
+          res.redirect(returnTo);
         });
       } catch (error) {
         this.logger.error('Authentication error details:', {
