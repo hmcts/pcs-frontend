@@ -1,8 +1,7 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application, Request, Response } from 'express';
 
-import { oidcMiddleware } from '../middleware';
-import { OIDCModule } from '../modules/oidc/oidc';
+import { oidcMiddleware } from '../middleware/oidc';
 import {
   type DashboardNotification,
   type DashboardTaskGroup,
@@ -17,11 +16,9 @@ export default function (app: Application): void {
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
     const caseReference: number = parseInt(req.params.caseReference, 10);
     try {
-      const callbackUrl = OIDCModule.getCurrentUrl(req);
-      logger.info(JSON.stringify(req.headers));
       const data: [DashboardNotification[], DashboardTaskGroup[]] = await Promise.all([
         getDashboardNotifications(caseReference),
-        getDashboardTaskGroups(caseReference, callbackUrl.origin),
+        getDashboardTaskGroups(caseReference),
       ]);
 
       const taskGroups = data[1].map(taskGroup => {
@@ -36,6 +33,17 @@ export default function (app: Application): void {
 
             const tag = STATUS_MAP[task.status];
             const taskGroupId = taskGroup.groupId.toLowerCase();
+
+            const hint =
+              task.templateValues.dueDate || task.templateValues.deadline
+                ? {
+                    html: app.locals.nunjucksEnv.render(
+                      `components/taskGroup/${taskGroupId}/${task.templateId}-hint.njk`,
+                      task.templateValues
+                    ),
+                  }
+                : undefined;
+
             return {
               title: {
                 html: app.locals.nunjucksEnv.render(
@@ -43,7 +51,9 @@ export default function (app: Application): void {
                   task.templateValues
                 ),
               },
-              href: `${caseReference}/${taskGroupId}/${task.templateId}`,
+              hint,
+              // TODO: slugify the templateId 
+              href: task.status === 'NOT_AVAILABLE' ? undefined : `${caseReference}/${taskGroupId}/${task.templateId}`,
               status: {
                 text: task.status,
                 tag,
