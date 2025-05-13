@@ -117,6 +117,7 @@ export class OIDCModule {
           delete req.session.codeVerifier;
           delete req.session.nonce;
           app.locals.nunjucksEnv.addGlobal('user', req.session.user);
+          req.session.isLoggedIn = true;
           res.redirect('/');
         });
       } catch (error) {
@@ -136,6 +137,7 @@ export class OIDCModule {
 
     // Logout route
     app.get('/logout', (req: Request, res: Response) => {
+      req.session.isLoggedIn = false;
       // build the logout url
       const callbackUrl = this.getCurrentUrl(req);
       const logoutUrl = client.buildEndSessionUrl(this.clientConfig, {

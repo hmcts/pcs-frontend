@@ -10,7 +10,11 @@ export class GetController {
 
   get = (req: Request, res: Response): void => {
     const content = this.generateContent();
-    res.render(this.view, { ...content });
+    res.render(this.view, {
+      ...content,
+      serviceName: 'Possession claims',
+      isLoggedIn: req.session?.isLoggedIn === true
+    });
   };
 }
 
