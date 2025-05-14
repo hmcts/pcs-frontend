@@ -1,5 +1,5 @@
 export interface DashboardTaskGroup {
-  groupId: 'CLAIM' | 'HEARING' | 'JUDGEMENT' | 'NOTICE' | 'RESPONSE' | 'APPLICATION';
+  groupId: 'CLAIM' | 'HEARING' | 'JUDGEMENT' | 'NOTICE' | 'RESPONSE' | 'APPLICATIONS';
   tasks: DashboardTask[];
 }
 
@@ -24,5 +24,5 @@ export const TASK_GROUP_MAP: Record<DashboardTaskGroup['groupId'], string> = {
   JUDGEMENT: 'Judgement',
   NOTICE: 'Orders and notices from the court',
   RESPONSE: 'The response',
-  APPLICATION: 'The application',
+  APPLICATIONS: 'Applications',
 };
