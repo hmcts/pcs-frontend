@@ -1,7 +1,7 @@
 import nodeFetch from 'node-fetch';
 
 const { retry } = require('./retryHelper');
-const request = (url, headers, body, method = 'POST') =>
+export const request = (url, headers, body, method = 'POST') =>
   nodeFetch(url, {
     method,
     body,
@@ -21,5 +21,4 @@ export const retriedRequest = async (url, headers, body, method = 'POST', expect
     });
   });
 };
-
 module.exports = { request, retriedRequest };

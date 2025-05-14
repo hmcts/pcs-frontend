@@ -1,5 +1,5 @@
 import {config as testConfig} from '../../../config';
-import {retriedRequest} from "../../helpers/userHelpers/restHelper";
+import {retriedRequest,request} from "../../helpers/userHelpers/restHelper";
 
 const idamUrl = testConfig.IDAM_API;
 const idamTestingSupportUrl = testConfig.IDAM_TESTING_SUPPORT_USERS_URL;
@@ -44,6 +44,16 @@ export async function createAccount(userData) {
             .then(response => response.json());
     } catch (error) {
         console.error('Error creating account:', error);
+        throw error;
+    }
+}
+export async function deleteAccount(email) {
+    try {
+        let method = 'DELETE';
+        await request(`${idamUrl}//test/idam/users/${email}`, {'Content-Type': 'application/json'}, undefined, method);
+        console.log('Account deleted: ' + email);
+    } catch (error) {
+        console.error('Error deleting account:', error);
         throw error;
     }
 }
