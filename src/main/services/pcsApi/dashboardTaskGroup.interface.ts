@@ -21,7 +21,7 @@ export const STATUS_MAP: Record<DashboardTask['status'], { text: string; classes
 export const TASK_GROUP_MAP: Record<DashboardTaskGroup['groupId'], string> = {
   CLAIM: 'The claim',
   HEARING: 'Hearing',
-  JUDGEMENT: 'Judgement',
+  JUDGEMENT: 'Judgement from the court',
   NOTICE: 'Orders and notices from the court',
   RESPONSE: 'The response',
   APPLICATIONS: 'Applications',
