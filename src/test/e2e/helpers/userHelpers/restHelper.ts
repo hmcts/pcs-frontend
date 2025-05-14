@@ -1,13 +1,26 @@
-import nodeFetch from 'node-fetch';
+import nodeFetch, { BodyInit, Response } from 'node-fetch';
 
 const { retry } = require('./retryHelper');
-export const request = (url, headers, body, method = 'POST') =>
+
+export const request = (
+  url: string,
+  headers: Record<string, string>,
+  body: BodyInit,
+  method = 'POST'
+): Promise<Response> =>
   nodeFetch(url, {
     method,
     body,
     headers,
   });
-export const retriedRequest = async (url, headers, body, method = 'POST', expectedStatus = 200) => {
+export const retriedRequest = async (
+  url: string,
+  headers: Record<string, string>,
+  body: BodyInit,
+  method: string = 'POST',
+  expectedStatus = 200
+): Promise<Response> => {
+  // eslint-disable-next-line no-console
   console.log('Request details:', { url, headers, body, method });
   return retry(() => {
     return request(url, headers, body, method).then(response => {
@@ -21,4 +34,5 @@ export const retriedRequest = async (url, headers, body, method = 'POST', expect
     });
   });
 };
+
 module.exports = { request, retriedRequest };

@@ -13,7 +13,7 @@ export class IdamPage extends Base {
   constructor(page: Page) {
     super(page);
   }
-  async login(email, password): Promise<void> {
+  async login(email: string, password: string): Promise<void> {
     await this.usernameInput.fill(email);
     await this.passwordInput.fill(password);
     await this.submitBtn.click();
