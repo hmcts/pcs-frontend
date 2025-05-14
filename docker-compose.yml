@@ -18,6 +18,10 @@ services:
     env_file:
       - path: .env
         required: false
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.yarn
 
     networks:
       - pcs-frontend-network

@@ -14,6 +14,7 @@ interface CustomSessionData extends SessionData {
   nonce?: string;
   user?: UserInfoResponseWithToken;
   serviceToken?: string;
+  returnTo?: string;
   destroy(callback: (err?: Error) => void): void;
 }
 

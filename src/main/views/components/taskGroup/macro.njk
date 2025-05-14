@@ -1,0 +1,12 @@
+{% from "govuk/components/task-list/macro.njk" import govukTaskList %}
+
+{% macro taskGroup(taskGroup) %}
+    <h2 class="govuk-heading-m">{{ taskGroup.title }}</h2>
+    {{ govukTaskList({
+        idPrefix: taskGroup.groupId | lower,
+        items: taskGroup.tasks
+}) }}
+{% endmacro %}
+
+
+ 
