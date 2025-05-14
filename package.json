@@ -92,7 +92,7 @@
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.14.197",
     "@types/luxon": "^3",
-    "@types/node": "22.15.17",
+    "@types/node": "22.15.18",
     "@types/nunjucks": "^3.2.3",
     "@types/require-directory": "^2.1.2",
     "@types/serve-favicon": "^2.5.4",
@@ -150,7 +150,7 @@
     "axios": ">1.6.0",
     "@types/express-serve-static-core": "*",
     "chai": "5.2.0",
-    "@types/node": "22.15.17",
+    "@types/node": "22.15.18",
     "glob": "^11.0.0",
     "@azure/msal-browser": "4.11.1",
     "superagent": "10.2.1"
