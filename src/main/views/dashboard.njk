@@ -1,5 +1,6 @@
 {% extends "template.njk" %}
 {%- from "components/notification/macro.njk" import notification -%}
+{%- from "components/taskGroup/macro.njk" import taskGroup -%}
 
 {% block content %}
   <h1 class="govuk-heading-l">Dashboard</h1>
@@ -7,6 +8,10 @@
   {% for dashboardNotification in notifications %}
     {{ notification(dashboardNotification.templateId, dashboardNotification.templateValues)
     }}    
+  {% endfor %}
+
+  {% for dashboardTaskGroup in taskGroups %}
+      {{ taskGroup(dashboardTaskGroup) }}
   {% endfor %}
 
 {% endblock %}

@@ -12,7 +12,7 @@ export class S2S {
     const s2sUrl = config.get('s2s.url');
 
     app.use(async (req: Request, res: ExpressResponse, next: NextFunction) => {
-      if (!req.session.serviceToken) {
+      if (!req.app.locals.serviceToken) {
         const { otp } = TOTP.generate(s2sSecret);
 
         const params = {
@@ -47,14 +47,14 @@ export class S2S {
         });
 
         try {
-          req.session.serviceToken = (await request) as string;
+          req.app.locals.serviceToken = (await request) as string;
         } catch (error) {
           this.logger.error('S2S ERROR', error.message);
         }
       }
 
-      if (req.session.serviceToken) {
-        axios.defaults.headers.common['ServiceAuthorization'] = `Bearer ${req.session.serviceToken}`;
+      if (req.app.locals.serviceToken) {
+        axios.defaults.headers.common['ServiceAuthorization'] = `Bearer ${req.app.locals.serviceToken}`;
       }
       next();
     });
