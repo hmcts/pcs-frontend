@@ -12,8 +12,7 @@ export default class Page2GetController {
     res.render(this.view, {
       ...content,
       selected: formData?.answer,
-      serviceName: 'Possession claims',
-      isLoggedIn: req.session?.isLoggedIn === true
+      serviceName: 'Possession claims'
     });
   };
 }

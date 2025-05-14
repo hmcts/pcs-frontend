@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% block content %}
   {{ govukBackLink({
@@ -10,7 +11,24 @@
 
   <h1 class="govuk-heading-l">{{ title }}</h1>
 
-  <form method="post" action="/steps/page3/no">
+  <form method="post" action="/steps/page3/yes">
+    {{ govukCheckboxes({
+      idPrefix: "choices",
+      name: "choices",
+      fieldset: {
+        legend: {
+          text: "Select all that apply",
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--m"
+        }
+      },
+      items: [
+        { value: "option1", text: "Option 1" },
+        { value: "option2", text: "Option 2" },
+        { value: "option3", text: "Option 3" }
+      ]
+    }) }}
+
     {{ govukButton({
       text: next,
       preventDoubleClick: true

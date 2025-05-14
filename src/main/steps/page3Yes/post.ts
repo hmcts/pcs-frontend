@@ -1,7 +1,13 @@
 import { Request, Response } from 'express';
+import { setFormData } from '../../app/controllers/sessionHelper';
 
-export default class Page3NoPostController {
+export default class Page3YesPostController {
   post = (req: Request, res: Response): void => {
-    res.redirect('/steps/page1');
+    const choices = Array.isArray(req.body.choices)
+      ? req.body.choices
+      : req.body.choices ? [req.body.choices] : [];
+
+    setFormData(req, 'page3Yes', { choices });
+    res.redirect('/dashboard/1');
   };
 }

@@ -15,8 +15,7 @@ export default class Page2PostController {
         no: 'No',
         next: 'Continue',
         backUrl: '/steps/page1',
-        serviceName: 'Possession claims',
-        isLoggedIn: req.session?.isLoggedIn === true
+        serviceName: 'Possession claims'
       };
       return res.status(400).render('steps/page2/template.njk', {
         ...content,
