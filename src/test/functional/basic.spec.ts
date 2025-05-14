@@ -11,9 +11,8 @@ test.skip('has title @accessibility @PR @nightly', async ({ page }) => {
 });
 test('login to application', async ({ page }) => {
   await page.goto(testConfig.TEST_URL);
-  await  idamHelper.deleteAccount(testConfig.userData.user.email)
+  await idamHelper.deleteAccount(testConfig.userData.user.email);
   const userDetails = await idamHelper.createAccount(testConfig.userData);
   await new IdamPage(page).login(userDetails.email, testConfig.userData.password);
   await expect(new LandingPage(page).heading).toBeVisible();
-
 });

@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+
 import { Base } from '../base';
 
 export class IdamPage extends Base {
