@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Application, NextFunction, Request, Response } from 'express';
 import { Session } from 'express-session';
 import { UserInfoResponse } from 'openid-client';
 
@@ -35,6 +35,13 @@ describe('oidcMiddleware', () => {
         touch: jest.fn(),
         resetMaxAge: jest.fn(),
       } as CustomSession,
+      app: {
+        locals: {
+          nunjucksEnv: {
+            addGlobal: jest.fn(),
+          },
+        },
+      } as unknown as Application,
     };
     mockResponse = {
       redirect: jest.fn(),
@@ -53,6 +60,10 @@ describe('oidcMiddleware', () => {
 
     expect(nextFunction).toHaveBeenCalled();
     expect(mockResponse.redirect).not.toHaveBeenCalled();
+    expect(mockRequest.app?.locals.nunjucksEnv.addGlobal).toHaveBeenCalledWith(
+      'user',
+      (mockRequest.session as CustomSession).user
+    );
   });
 
   it('should redirect to /login when user is not present in session', () => {
