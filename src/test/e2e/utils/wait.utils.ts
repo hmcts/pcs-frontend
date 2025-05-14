@@ -1,4 +1,4 @@
-import { Locator } from "@playwright/test";
+import { Locator } from '@playwright/test';
 
 interface WaitOptions {
   visibility: boolean;
@@ -11,7 +11,7 @@ export class WaitUtils {
   private DEFAULT_TIMEOUT = 120_000;
 
   private async wait(ms: number): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(resolve, ms);
     });
   }
@@ -23,10 +23,7 @@ export class WaitUtils {
    * @param options {@link WaitOptions} - Additional options
    *
    */
-  public async waitForLocatorVisibility(
-    locator: Locator,
-    options: WaitOptions
-  ): Promise<void> {
+  public async waitForLocatorVisibility(locator: Locator, options: WaitOptions): Promise<void> {
     const delay = options.delay ? options.delay : this.DEFAULT_DELAY;
     const timeout = options.timeout ? options.timeout : this.DEFAULT_TIMEOUT;
     const startTime = Date.now();
