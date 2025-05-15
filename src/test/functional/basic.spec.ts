@@ -14,8 +14,8 @@ test('login to application', async ({ page }) => {
   await page.goto(testConfig.TEST_URL);
   await idamHelper.deleteAccount(testConfig.userData.user.email);
   console.log('Access token' + (await getAccessTokenFromIdam()));
-  const userDetails = await idamHelper.createAccount(testConfig.userData);
-  console.log('User details' + userDetails);
-  await new IdamPage(page).login(testConfig.userData.user.email, testConfig.userData.password);
-  await expect(new LandingPage(page).heading).toBeVisible();
+  await idamHelper.createAccount(testConfig.userData);
+  const pwd = (testConfig.userData.password === undefined) ? '' : testConfig.userData.password;
+  await new IdamPage(page).login(testConfig.userData.user.email, pwd);
+  await new LandingPage(page).heading.waitFor({ state: 'visible' });
 });

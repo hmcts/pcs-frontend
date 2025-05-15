@@ -16,7 +16,7 @@ export const retriedRequest = async (
   headers: Record<string, string>,
   body: BodyInit,
   method: string = 'POST',
-  expectedStatus = 200
+  expectedStatus = 201
 ): Promise<Response> => {
   // eslint-disable-next-line no-console
   console.log('Request details:', { url, headers, body, method });

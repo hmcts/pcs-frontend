@@ -5,6 +5,16 @@ process.on('unhandledRejection', reason => {
   throw reason;
 });
 
+function buildUser(role: string) {
+  return {
+    id: uuidv4(), // Make sure to run: yarn add uuid @types/uuid
+    email: `${role}-${Math.random().toString(36).slice(2, 9).toLowerCase()}@gmail.com`,
+    forename: `fn_citizen_${Math.random().toString(36).slice(2, 15)}`,
+    surname: `sn_citizen_${Math.random().toString(36).slice(2, 15)}`,
+    roleNames: ['citizen', 'caseworker-pcs'],
+  }
+}
+
 export const config = {
   TEST_URL: process.env.TEST_URL || 'http://localhost:3209',
   IDAM_API: process.env.IDAM_API || 'https://idam-api.aat.platform.hmcts.net',
@@ -15,14 +25,8 @@ export const config = {
   client_id: process.env.CLIENT_ID || 'civil_citizen_ui',
   helpers: {},
   userData: {
-    password: 'Pa$$w0rd',
-    user: {
-      id: uuidv4(), // Make sure to run: yarn add uuid @types/uuid
-      email: `claimantcitizen-${Math.random().toString(36).slice(2, 9).toLowerCase()}@gmail.com`,
-      forename: `fn_citizen_${Math.random().toString(36).slice(2, 15)}`,
-      surname: `sn_citizen_${Math.random().toString(36).slice(2, 15)}`,
-      roleNames: ['citizen', 'caseworker-pcs'],
-    },
+    password: process.env.PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD,
+    user: buildUser('citizen'),
   },
 };
 

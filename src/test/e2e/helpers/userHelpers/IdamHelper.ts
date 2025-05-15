@@ -30,7 +30,7 @@ export async function getAccessTokenFromIdam(): Promise<string> {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
   const url = `${idamUrl}/${loginEndpoint}`;
-  return retriedRequest(url, headers, body)
+  return request(url, headers, body)
     .then(response => response.json())
     .then((data: TokenEndpointResponse) => data.access_token);
 }
