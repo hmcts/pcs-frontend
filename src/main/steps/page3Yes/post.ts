@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { setFormData } from '../../app/controllers/sessionHelper';
+import { setFormData } from '../../app/controller/sessionHelper';
 
 export default class Page3YesPostController {
   post = (req: Request, res: Response): void => {

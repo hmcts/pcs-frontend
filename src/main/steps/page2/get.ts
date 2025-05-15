@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { generateContent } from './content';
-import { getFormData } from '../../app/controllers/sessionHelper';
+import { getFormData } from '../../app/controller/sessionHelper';
 
 export default class Page2GetController {
   constructor(private view: string) {}
