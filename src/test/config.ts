@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'; // Add this import at the top of the file
+import {v4 as uuidv4} from 'uuid'; // Add this import at the top of the file
 
 // better handling of unhandled exceptions
 process.on('unhandledRejection', reason => {
