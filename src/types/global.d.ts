@@ -13,7 +13,6 @@ interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
   user?: UserInfoResponseWithToken;
-  serviceToken?: string;
   returnTo?: string;
   formData?: Record<string, any>;
   destroy(callback: (err?: Error) => void): void;
