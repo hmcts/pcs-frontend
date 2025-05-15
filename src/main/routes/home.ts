@@ -13,6 +13,22 @@ export default function (app: Application): void {
       // console.error('pcs-api error', error.response.statusText);
     }
 
-    res.render('home', { apiResponse: apiGreeting });
+    // Get details of logged in user.
+    const user = req.session?.user;
+    const givenName = user?.given_name;
+    const familyName = user?.family_name;
+
+    // Get time.
+    const currentTime = new Date().toLocaleString('en-GB', {
+      timeZone: 'Europe/London',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+
+    res.render('home', { apiResponse: apiGreeting, givenName, familyName, currentTime });
   });
 }

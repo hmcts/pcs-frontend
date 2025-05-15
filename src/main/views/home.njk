@@ -2,7 +2,8 @@
 
 {% block content %}
   <h1 class="govuk-heading-xl">Welcome to the PCS home page</h1>
-
-<p>RESPONSE FROM API: {{ apiResponse }}</p>
+  <p>Welcome: {{ givenName }} {{ familyName }}</p>
+  <p>Current date and time: {{ currentTime }}</p>
+  <p>RESPONSE FROM API: {{ apiResponse }}</p>
 
 {% endblock %}
