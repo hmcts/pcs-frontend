@@ -18,7 +18,9 @@
     "ttlInSeconds": "REDIS_TTL"
   },
   "s2s": {
-    "url": "S2S_URL"
+    "url": "S2S_URL",
+    "ttl": "S2S_TTL",
+    "key": "S2S_KEY"
   },
   "oidc": {
     "issuer": "OIDC_ISSUER",
