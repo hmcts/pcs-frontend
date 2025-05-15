@@ -12,7 +12,7 @@ function buildUser(role: string) {
     forename: `fn_citizen_${Math.random().toString(36).slice(2, 15)}`,
     surname: `sn_citizen_${Math.random().toString(36).slice(2, 15)}`,
     roleNames: ['citizen', 'caseworker-pcs'],
-  }
+  };
 }
 
 export const config = {
