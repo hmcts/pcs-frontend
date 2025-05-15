@@ -1,7 +1,7 @@
 {% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block content %}
   {{ govukBackLink({
@@ -10,22 +10,31 @@
   }) }}
 
   <form method="post" action="/steps/page2">
-   {{ govukRadios({
-        name: "answer",
-        fieldset: {
-          legend: {
-            text: title,
-            isPageHeading: true,
-            classes: "govuk-fieldset__legend--l"
-          }
-        },
-        items: [
-          { value: "yes", text: "Yes", checked: selected == 'yes' },
-          { value: "no", text: "No", checked: selected == 'no' }
-        ]
-      })
-    }}
+    {% set errorMessageObj = error and { "text": error } or null %}
 
+    {{ govukRadios({
+      name: "answer",
+      fieldset: {
+        legend: {
+          text: title,
+          isPageHeading: true,
+          classes: "govuk-fieldset__legend--l"
+        }
+      },
+      errorMessage: errorMessageObj,
+      items: [
+        {
+          value: "yes",
+          text: yes,
+          checked: selected == 'yes'
+        },
+        {
+          value: "no",
+          text: no,
+          checked: selected == 'no'
+        }
+      ]
+    }) }}
 
     {{ govukButton({
       text: next,

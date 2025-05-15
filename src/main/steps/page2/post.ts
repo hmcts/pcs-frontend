@@ -1,31 +1,34 @@
 import { Request, Response } from 'express';
+import { generateContent } from './content';
 import { setFormData } from '../../app/controller/sessionHelper';
+import { validateForm, FormFieldConfig } from '../../app/controller/validation';
 
 export default class Page2PostController {
-  constructor(private fields: string[]) {}
-
   post = (req: Request, res: Response): void => {
-    const answer = req.body.answer;
+    const fieldConfig: FormFieldConfig[] = [
+      {
+        name: 'answer',
+        type: 'radio',
+        required: true,
+        errorMessage: 'Please select an option'
+      }
+    ];
 
-    if (!answer || !this.fields.includes(answer)) {
+    const errors = validateForm(req, fieldConfig);
+
+    if (Object.keys(errors).length > 0) {
       const content = {
-        title: 'Do you agree?',
-        error: 'Please select an option',
-        yes: 'Yes',
-        no: 'No',
-        next: 'Continue',
-        backUrl: '/steps/page1',
+        ...generateContent(),
+        error: errors.answer,
+        selected: req.body.answer,
         serviceName: 'Possession claims'
       };
-      return res.status(400).render('steps/page2/template.njk', {
-        ...content,
-        error: content.error
-      });
+      return res.status(400).render('steps/page2/template.njk', content);
     }
 
-    setFormData(req, 'page2', { answer });
+    setFormData(req, 'page2', { answer: req.body.answer });
 
-    const nextPage = answer === 'yes' ? '/steps/page3/yes' : '/steps/page3/no';
+    const nextPage = req.body.answer === 'yes' ? '/steps/page3/yes' : '/steps/page3/no';
     res.redirect(nextPage);
   };
 }

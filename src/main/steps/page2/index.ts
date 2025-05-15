@@ -9,5 +9,5 @@ export const step = {
   generateContent,
   stepDir: __dirname,
   getController: new Page2GetController('steps/page2/template.njk'),
-  postController: new Page2PostController(['yes', 'no'])
+  postController: new Page2PostController()
 };
