@@ -43,6 +43,7 @@ export async function createAccount(userData: Record<string, unknown>): Promise<
       JSON.stringify(userData)
     ).then(response => response.json());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error creating account:', error);
     throw error;
   }
