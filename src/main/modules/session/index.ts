@@ -9,8 +9,22 @@ export class Session {
   logger = Logger.getLogger('session');
   enableFor(app: Express): void {
     const redisConnectionString = config.get<string>('secrets.pcs.redis-connection-string');
+    this.logger.info('Connecting to Redis at:', redisConnectionString);
+
     const redis = new Redis(redisConnectionString);
-    redis.on('error', (err: typeof Error) => this.logger.error('REDIS ERROR', err));
+
+    redis.on('connect', () => {
+      this.logger.info('Successfully connected to Redis');
+    });
+
+    redis.on('error', (err: typeof Error) => {
+      this.logger.error('REDIS ERROR:', err);
+    });
+
+    redis.on('ready', () => {
+      this.logger.info('Redis client is ready');
+    });
+
     app.locals.redisClient = redis;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,5 +50,6 @@ export class Session {
 
     app.set('trust proxy', true);
     app.use(session(sessionMiddleware));
+    this.logger.info('Session middleware configured with Redis store');
   }
 }
