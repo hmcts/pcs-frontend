@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-export type TranslationFn = () => Record<string, string>;
+export type TranslationFn = (req: Request) => Record<string, any>;
 
 export class GetController {
   constructor(
@@ -9,12 +9,9 @@ export class GetController {
   ) {}
 
   get = (req: Request, res: Response): void => {
-    const content = this.generateContent();
+    const content = this.generateContent(req);
     res.render(this.view, {
-      ...content,
-      serviceName: 'Possession claims',
-      isLoggedIn: req.session?.isLoggedIn === true
+      ...content
     });
   };
 }
-

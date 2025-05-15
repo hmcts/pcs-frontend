@@ -1,0 +1,10 @@
+{
+  "title": "Do you agree?",
+  "yes": "Yes",
+  "no": "No",
+  "next": "Continue",
+  "backUrl": "/steps/page1",
+  "errors": {
+    "answerRequired": "Please select an option"
+  }
+}

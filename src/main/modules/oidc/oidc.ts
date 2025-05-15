@@ -137,7 +137,6 @@ export class OIDCModule {
 
     // Logout route
     app.get('/logout', (req: Request, res: Response) => {
-      req.session.isLoggedIn = false;
       // build the logout url
       const callbackUrl = OIDCModule.getCurrentUrl(req);
       const logoutUrl = client.buildEndSessionUrl(this.clientConfig, {

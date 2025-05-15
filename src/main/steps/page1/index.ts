@@ -1,13 +1,15 @@
-import Page1GetController from './get';
-import Page1PostController from './post';
-import { generateContent } from './content';
+import { createGetController, createPostRedirectController } from '../../app/controller/controllerFactory';
+import page1Content from '../../assets/locales/en/page1.json';
+import common from '../../assets/locales/en/common.json';
+
+const content = { ...common, ...page1Content };
 
 export const step = {
   url: '/steps/page1',
   name: 'page1',
   view: 'steps/page1/template.njk',
-  generateContent,
+  generateContent: () => content,
   stepDir: __dirname,
-  getController: new Page1GetController('steps/page1/template.njk'),
-  postController: new Page1PostController()
+  getController: createGetController(__dirname, 'page1', content),
+  postController: createPostRedirectController('/steps/page2')
 };
