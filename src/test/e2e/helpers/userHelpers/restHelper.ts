@@ -1,5 +1,3 @@
-import nodeFetch, { BodyInit, Response } from 'node-fetch';
-
 const { retry } = require('./retryHelper');
 
 export const request = (
@@ -8,7 +6,7 @@ export const request = (
   body: BodyInit | undefined,
   method = 'POST'
 ): Promise<Response> =>
-  nodeFetch(url, {
+  fetch(url, {
     method,
     body,
     headers,
