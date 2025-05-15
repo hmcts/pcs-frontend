@@ -5,7 +5,7 @@ const { retry } = require('./retryHelper');
 export const request = (
   url: string,
   headers: Record<string, string>,
-  body: BodyInit,
+  body: BodyInit | undefined,
   method = 'POST'
 ): Promise<Response> =>
   nodeFetch(url, {

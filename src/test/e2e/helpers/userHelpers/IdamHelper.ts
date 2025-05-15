@@ -1,3 +1,5 @@
+import { TokenEndpointResponse } from 'oauth4webapi';
+
 import { config as testConfig } from '../../../config';
 import { request, retriedRequest } from '../../helpers/userHelpers/restHelper';
 
@@ -30,10 +32,9 @@ export async function getAccessTokenFromIdam(): Promise<string> {
   const url = `${idamUrl}/${loginEndpoint}`;
   return retriedRequest(url, headers, body)
     .then(response => response.json())
-    .then(data => data.access_token);
+    .then((data: TokenEndpointResponse) => data.access_token);
 }
-
-export async function createAccount(userData: Record<string, unknown>): Promise<string> {
+export async function createAccount(userData: Record<string, unknown>): Promise<Response | unknown> {
   try {
     const authToken = await getAccessTokenFromIdam();
     return retriedRequest(
