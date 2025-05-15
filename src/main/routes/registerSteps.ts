@@ -6,7 +6,7 @@ export default function (app: Application): void {
     if (step.getController) {
       app.get(step.url, step.getController.get);
     }
-    if (step.postController) {
+    if (step.postController?.post) {
       app.post(step.url, step.postController.post);
     }
   }

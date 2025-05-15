@@ -1,22 +1,63 @@
-import { Request, Response } from 'express';
 import path from 'path';
+import { Request, Response } from 'express';
 import { GetController } from './GetController';
-import { getFormData } from './sessionHelper';
+import { getFormData, setFormData } from './sessionHelper';
+import { validateForm, FormFieldConfig } from './validation';
 
-export const createGetController = (stepDir: string, stepName: string, content: Record<string, any>) => {
+export const createGetController = (
+  stepDir: string,
+  stepName: string,
+  content: Record<string, any>,
+  extendContent?: (req: Request) => Record<string, any>
+) => {
   const view = path.join('steps', path.basename(stepDir), 'template.njk');
   return new GetController(view, (req: Request) => {
     const formData = getFormData(req, stepName);
     return {
       ...content,
       selected: formData?.answer || formData?.choices,
-      serviceName: content.serviceName
+      ...(extendContent ? extendContent(req) : {})
     };
   });
 };
 
 export const createPostRedirectController = (nextUrl: string) => {
   return {
-    post: (_req: Request, res: Response) => res.redirect(nextUrl)
+    post: (_req: Request, res: Response) => {
+      res.redirect(nextUrl);
+    }
+  };
+};
+
+export const validateAndStoreForm = (
+  stepName: string,
+  fields: FormFieldConfig[],
+  nextPage: string | ((body: Record<string, any>) => string)
+) => {
+  return {
+    post: (req: Request, res: Response) => {
+      const errors = validateForm(req, fields);
+
+      if (Object.keys(errors).length > 0) {
+        return res.status(400).render(`steps/${stepName}/template.njk`, {
+          error: Object.values(errors)[0],
+          ...req.body
+        });
+      }
+
+      for (const field of fields) {
+        if (field.type === 'checkbox') {
+          const value = req.body[field.name];
+          if (typeof value === 'string') {
+            req.body[field.name] = [value];
+          }
+        }
+      }
+
+      setFormData(req, stepName, req.body);
+
+      const redirectUrl = typeof nextPage === 'function' ? nextPage(req.body) : nextPage;
+      res.redirect(redirectUrl);
+    }
   };
 };

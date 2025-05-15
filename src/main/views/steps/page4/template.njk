@@ -1,0 +1,60 @@
+{% extends "template.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block content %}
+
+  {{ govukBackLink({
+    text: "Back",
+    href: "/steps/page3/yes"
+  }) }}
+
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: {
+          text: "Are you 18 or over?"
+        },
+        value: {
+          text: answer
+        },
+        actions: {
+          items: [
+            {
+              href: "/steps/page2",
+              text: "Change",
+              visuallyHiddenText: "answer to Do you agree?"
+            }
+          ]
+        }
+      },
+      {
+        key: {
+          text: "What are your grounds for possession?"
+        },
+        value: {
+          text: choices
+        },
+        actions: {
+          items: [
+            {
+              href: "/steps/page3/yes",
+              text: "Change",
+              visuallyHiddenText: "your selections"
+            }
+          ]
+        }
+      }
+    ]
+  }) }}
+
+  <form method="post" action="/dashboard/1">
+    {{ govukButton({
+      text: "Submit"
+    }) }}
+  </form>
+
+{% endblock %}

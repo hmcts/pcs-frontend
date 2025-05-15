@@ -1,5 +1,11 @@
 {
-  "title": "You selected YES",
+  "title": "What are your grounds for possession?",
+  "legend": "Select all that apply",
+    "options": {
+      "option1": "Rent arrears (ground 8)",
+      "option2": "Any rent arrears (ground 10)",
+      "option3": "Persistent arrears (ground 11)"
+    },
   "next": "Continue",
   "backUrl": "/steps/page2"
 }
