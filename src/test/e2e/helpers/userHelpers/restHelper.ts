@@ -18,8 +18,6 @@ export const retriedRequest = async (
   method: string = 'POST',
   expectedStatus = 201
 ): Promise<Response> => {
-  // eslint-disable-next-line no-console
-  console.log('Request details:', { url, headers, body, method });
   return retry(() => {
     return request(url, headers, body, method).then(response => {
       if (response.status !== expectedStatus) {
