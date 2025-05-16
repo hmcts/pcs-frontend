@@ -8,6 +8,9 @@ module.exports = {
   },
   moduleNameMapper: {
     '^openid-client$': '<rootDir>/src/test/unit/modules/oidc/__mocks__/openid-client.ts',
+    '^steps$': '<rootDir>/src/main/steps',
+    '^app/(.*)$': '<rootDir>/src/main/app/$1',
+    '^interfaces/(.*)$': '<rootDir>/src/main/interfaces/$1',
   },
   testPathIgnorePatterns: ['/__mocks__/'],
   coverageProvider: 'v8',

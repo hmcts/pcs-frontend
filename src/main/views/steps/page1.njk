@@ -1,0 +1,34 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+  <p class="govuk-body">{{ paragraph1 }}</p>
+  <p class="govuk-body">{{ paragraph2 }}</p>
+  <h2 class="govuk-heading-s">{{ subtitle1 }}</h2>
+  <p class="govuk-body">{{ paragraph3 }}</p>
+
+  <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+    <li>
+      {{ list1 }}
+    </li>
+    <li>
+      {{ list2 }}
+    </li>
+    <li>
+      {{ list3 }}
+    </li>
+    <li>
+      {{ list4 }}
+    </li>
+    <li>
+      {{ list5 }}
+    </li>
+  </ul>
+  <form method="post" action="/steps/page1">
+    {{ govukButton({
+      text: next,
+      preventDoubleClick: true
+    }) }}
+  </form>
+{% endblock %}

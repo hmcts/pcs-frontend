@@ -3,6 +3,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "module": "commonjs",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2020",
@@ -17,12 +18,21 @@
     "lib": ["es2020", "dom", "dom.iterable"],
     "baseUrl": "src/main",
     "paths": {
+      "app/*": ["app/*"],
+      "interfaces/*": ["main/interfaces/*"],
       "router/*": ["router/*"],
-      "routes/*": ["routes/*"]
+      "routes/*": ["routes/*"],
+      "steps": ["steps/index.ts"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["jest", "node", "express", "express-session"]
   },
-  "include": ["src/main/**/*", "src/types/**/*", "src/types/global.d.ts", "src/test/unit/middleware/oidc.test.ts"],
+  "include": [
+    "src/main/**/*",
+    "src/types/**/*",
+    "src/main/assets/locales/**/*",
+    "src/types/global.d.ts",
+    "src/test/unit/middleware/oidc.test.ts"
+  ],
   "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*", "src/test/**/*", "**/*.spec.ts", "**/*.e2e.ts"]
 }

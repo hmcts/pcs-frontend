@@ -1,0 +1,30 @@
+{% extends "govuk/template.njk" %}
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+
+{% block head %}
+  <title>{% block pageTitle %}Possession claims{% endblock %} - GOV.UK</title>
+  {% include "webpack/css.njk" %}
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    containerClasses: "govuk-width-container",
+    serviceName: serviceName or "Possession claims",
+    serviceUrl: "/"
+  }) }}
+  <div class="govuk-width-container">
+      {{ govukPhaseBanner({
+        tag: {
+          text: "Alpha"
+        },
+        html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+      }) }}
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+
+  {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
+  {% include "webpack/js.njk" %}
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block content %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backUrl
+  }) }}
+
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+  <p class="govuk-body">{{ message }}</p>
+
+  <form method="post" action="/steps/page3/no">
+    {{ govukButton({
+      text: "Exit application",
+      preventDoubleClick: true
+    }) }}
+  </form>
+{% endblock %}

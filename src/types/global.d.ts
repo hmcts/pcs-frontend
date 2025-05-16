@@ -15,6 +15,7 @@ interface CustomSessionData extends SessionData {
   user?: UserInfoResponseWithToken;
   serviceToken?: string;
   returnTo?: string;
+  formData?: Record<string, any>;
   destroy(callback: (err?: Error) => void): void;
 }
 
