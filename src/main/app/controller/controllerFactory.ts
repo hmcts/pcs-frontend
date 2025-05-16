@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
+
 import { GetController } from './GetController';
 import { getFormData, setFormData } from './sessionHelper';
-import { validateForm, FormFieldConfig } from './validation';
+import { FormFieldConfig, validateForm } from './validation';
 
 export const createGetController = (
   view: string,
@@ -21,17 +22,16 @@ export const createGetController = (
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
-      ...(extendContent ? extendContent(req) : {})
+      ...(extendContent ? extendContent(req) : {}),
     };
   });
 };
-
 
 export const createPostRedirectController = (nextUrl: string) => {
   return {
     post: (_req: Request, res: Response) => {
       res.redirect(nextUrl);
-    }
+    },
   };
 };
 
@@ -49,7 +49,7 @@ export const validateAndStoreForm = (
         return res.status(400).render(`steps/${stepName}.njk`, {
           ...content,
           error: Object.values(errors)[0],
-          ...req.body
+          ...req.body,
         });
       }
 
@@ -66,6 +66,6 @@ export const validateAndStoreForm = (
 
       const redirectUrl = typeof nextPage === 'function' ? nextPage(req.body) : nextPage;
       res.redirect(redirectUrl);
-    }
+    },
   };
 };

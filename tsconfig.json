@@ -24,6 +24,12 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["jest", "node", "express", "express-session"]
   },
-  "include": ["src/main/**/*", "src/types/**/*",  "src/main/assets/locales/**/*", "src/types/global.d.ts", "src/test/unit/middleware/oidc.test.ts"],
+  "include": [
+    "src/main/**/*",
+    "src/types/**/*",
+    "src/main/assets/locales/**/*",
+    "src/types/global.d.ts",
+    "src/test/unit/middleware/oidc.test.ts"
+  ],
   "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*", "src/test/**/*", "**/*.spec.ts", "**/*.e2e.ts"]
 }

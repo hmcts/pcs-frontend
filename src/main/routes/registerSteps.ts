@@ -1,5 +1,5 @@
-import { Application } from "express";
-import { stepsWithContent } from "steps";
+import { Application } from 'express';
+import { stepsWithContent } from 'steps';
 
 export default function (app: Application): void {
   for (const step of stepsWithContent) {

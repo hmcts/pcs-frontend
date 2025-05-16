@@ -1,7 +1,8 @@
-import { createGetController, createPostRedirectController } from '../../app/controller/controllerFactory';
-import page1Content from '../../assets/locales/en/page1.json';
-import common from '../../assets/locales/en/common.json';
 import { StepDefinition } from 'steps/types';
+
+import { createGetController, createPostRedirectController } from '../../app/controller/controllerFactory';
+import common from '../../assets/locales/en/common.json';
+import page1Content from '../../assets/locales/en/page1.json';
 
 const content = { ...common, ...page1Content };
 
@@ -12,5 +13,5 @@ export const step: StepDefinition = {
   generateContent: () => content,
   stepDir: __dirname,
   getController: createGetController('steps/page1.njk', 'page1', content),
-  postController: createPostRedirectController('/steps/page2')
+  postController: createPostRedirectController('/steps/page2'),
 };

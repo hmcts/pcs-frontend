@@ -11,7 +11,7 @@ export class GetController {
   get = (req: Request, res: Response): void => {
     const content = this.generateContent(req);
     res.render(this.view, {
-      ...content
+      ...content,
     });
   };
 }
