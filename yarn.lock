@@ -336,12 +336,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-browser@npm:4.11.1":
-  version: 4.11.1
-  resolution: "@azure/msal-browser@npm:4.11.1"
+"@azure/msal-browser@npm:4.12.0":
+  version: 4.12.0
+  resolution: "@azure/msal-browser@npm:4.12.0"
   dependencies:
-    "@azure/msal-common": "npm:15.5.2"
-  checksum: 10/fff6e0f607ab2410b3362762d0441e344441a61919dbc34099f995fc9d44e0e55ff39488875fecebe266c046d2a5ce4122937f2c5102892a8381d4db3fde77d8
+    "@azure/msal-common": "npm:15.6.0"
+  checksum: 10/1ce558363de16362c7091e2fe572d9e4ab33a85f65feac37f20832fa6676da0f686c4036961eeba74bbc1c60b48c235ff306ef4d762d51d39b548b8f35307f75
   languageName: node
   linkType: hard
 
@@ -356,6 +356,13 @@ __metadata:
   version: 15.5.2
   resolution: "@azure/msal-common@npm:15.5.2"
   checksum: 10/faa718d8f989cfc86db36b17d88e649ae4e24185559a98189c3478a9f12168034bdf7d249f55393f54cd6bae09c3bf2b878417fb6ae5577f6e49dd94518feace
+  languageName: node
+  linkType: hard
+
+"@azure/msal-common@npm:15.6.0":
+  version: 15.6.0
+  resolution: "@azure/msal-common@npm:15.6.0"
+  checksum: 10/975ad7821fa5bdc682c9ef08e02642923571b715f199e94c9fbda17248b301caae5cf9cddfa2fdf37f4a05cce7eaf3ddebaef28f83909d78f452caf72367022a
   languageName: node
   linkType: hard
 
@@ -7742,10 +7749,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"govuk-frontend@npm:5.10.0":
-  version: 5.10.0
-  resolution: "govuk-frontend@npm:5.10.0"
-  checksum: 10/6da3a76b807a8c5517e18f03c7eac5825b2e524aa6c7b26cb19b3b3934c9883bd9535c6f54e1856e5316d2fef0f00f7d89dded5745c7b54f293d3c4b3c25dcb2
+"govuk-frontend@npm:5.10.1":
+  version: 5.10.1
+  resolution: "govuk-frontend@npm:5.10.1"
+  checksum: 10/cc978baf6f3e971304d514e526072eb2cd5bd78f7b693fe3f3c8bd0f8c86d5710c70fa01ef78bb605fcd5d65796f7cbdc25a3bf386a9b31b93d3fb8957d8c45e
   languageName: node
   linkType: hard
 
@@ -10867,7 +10874,7 @@ __metadata:
     express-session: "npm:^1.18.1"
     git-rev-sync: "npm:^3.0.2"
     glob: "npm:^11.0.0"
-    govuk-frontend: "npm:5.10.0"
+    govuk-frontend: "npm:5.10.1"
     graphql: "npm:^16.10.0"
     helmet: "npm:^8.0.0"
     html-webpack-plugin: "npm:^5.5.3"
