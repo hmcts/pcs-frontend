@@ -68,7 +68,7 @@ describe('GET /', () => {
     expect(renderSpy).toHaveBeenCalledWith(
       'home',
       expect.objectContaining({
-        givenName: 'zxcv',
+        givenName: 'zxcy',
         familyName: 'bnml',
         apiResponse: 'Hello from PCS',
       })
@@ -96,7 +96,7 @@ describe('GET /', () => {
       'home',
       expect.objectContaining({
         apiResponse: 'default value',
-        givenName: 'zxcv',
+        givenName: 'zxcy',
         familyName: 'bnml',
       })
     );
