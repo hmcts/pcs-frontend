@@ -23,5 +23,5 @@ export const step: StepDefinition = {
   generateContent: () => content,
   stepDir: __dirname,
   getController: createGetController(__dirname, 'page3Yes', content),
-  postController: validateAndStoreForm('page3Yes', fields, '/steps/page4')
+  postController: validateAndStoreForm('page3Yes', fields, '/steps/page4', content)
 };

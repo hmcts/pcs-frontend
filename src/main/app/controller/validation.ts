@@ -13,15 +13,13 @@ export function validateForm(req: Request, fields: FormFieldConfig[]) {
   for (const field of fields) {
     const value = req.body[field.name];
 
-    if (field.required) {
-      const isMissing =
-        field.type === 'checkbox'
-          ? !value || (Array.isArray(value) && value.length === 0)
-          : !value;
+    const isMissing =
+      field.type === 'checkbox'
+        ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && value.trim() === '')
+        : value === undefined || value === null || value === '';
 
-      if (isMissing) {
-        errors[field.name] = field.errorMessage || 'This field is required';
-      }
+    if (field.required && isMissing) {
+      errors[field.name] = field.errorMessage || 'This field is required';
     }
   }
 

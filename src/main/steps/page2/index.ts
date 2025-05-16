@@ -19,5 +19,5 @@ export const step: StepDefinition = {
       required: true,
       errorMessage: content.errors.answerRequired
     }
-  ], (body) => body.answer === 'yes' ? '/steps/page3/yes' : '/steps/page3/no')
+  ], (body) => body.answer === 'yes' ? '/steps/page3/yes' : '/steps/page3/no', content)
 };

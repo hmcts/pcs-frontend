@@ -6,6 +6,9 @@
       "option2": "Any rent arrears (ground 10)",
       "option3": "Persistent arrears (ground 11)"
     },
+  "errors": {
+    "answerRequired": "Please check at least one option"
+  },
   "next": "Continue",
   "backUrl": "/steps/page2"
 }

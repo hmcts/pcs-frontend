@@ -12,6 +12,10 @@
   <h1 class="govuk-heading-l">{{ title }}</h1>
 
   <form method="post" action="/steps/page3/yes">
+
+    {% set errorMessageObj = error and { "text": error } or null %}
+    {% set selectedAnswer = selected or answer %}
+
     {{ govukCheckboxes({
       idPrefix: "choices",
       name: "choices",
@@ -22,21 +26,22 @@
           classes: "govuk-fieldset__legend--m"
         }
       },
+      errorMessage: errorMessageObj,
       items: [
         {
           value: "Rent arrears (ground 8)",
           text: "Rent arrears (ground 8)",
-          checked: selected and selected.includes("Rent arrears (ground 8)")
+          checked: selectedAnswer and selectedAnswer.includes("Rent arrears (ground 8)")
         },
         {
           value: "Any rent arrears (ground 10)",
           text: "Any rent arrears (ground 10)",
-          checked: selected and selected.includes("Any rent arrears (ground 10)")
+          checked: selectedAnswer and selectedAnswer.includes("Any rent arrears (ground 10)")
         },
         {
           value: "Persistent arrears (ground 11)",
           text: "Persistent arrears (ground 11)",
-          checked: selected and selected.includes("Persistent arrears (ground 11)")
+          checked: selectedAnswer and selectedAnswer.includes("Persistent arrears (ground 11)")
         }
       ]
     }) }}

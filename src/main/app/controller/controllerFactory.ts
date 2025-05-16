@@ -11,15 +11,24 @@ export const createGetController = (
   extendContent?: (req: Request) => Record<string, any>
 ) => {
   const view = path.join('steps', path.basename(stepDir), 'template.njk');
+
   return new GetController(view, (req: Request) => {
     const formData = getFormData(req, stepName);
+    const postData = req.body || {};
+
+    const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
+
     return {
       ...content,
-      selected: formData?.answer || formData?.choices,
+      selected,
+      answer: postData.answer ?? formData?.answer,
+      choices: postData.choices ?? formData?.choices,
+      error: postData.error,
       ...(extendContent ? extendContent(req) : {})
     };
   });
 };
+
 
 export const createPostRedirectController = (nextUrl: string) => {
   return {
@@ -32,7 +41,8 @@ export const createPostRedirectController = (nextUrl: string) => {
 export const validateAndStoreForm = (
   stepName: string,
   fields: FormFieldConfig[],
-  nextPage: string | ((body: Record<string, any>) => string)
+  nextPage: string | ((body: Record<string, any>) => string),
+  content?: Record<string, any>
 ) => {
   return {
     post: (req: Request, res: Response) => {
@@ -40,6 +50,7 @@ export const validateAndStoreForm = (
 
       if (Object.keys(errors).length > 0) {
         return res.status(400).render(`steps/${stepName}/template.njk`, {
+          ...content,
           error: Object.values(errors)[0],
           ...req.body
         });

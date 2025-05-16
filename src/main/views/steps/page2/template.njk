@@ -11,6 +11,7 @@
 
   <form method="post" action="/steps/page2">
     {% set errorMessageObj = error and { "text": error } or null %}
+    {% set selectedAnswer = selected or answer %}
 
     {{ govukRadios({
       name: "answer",
@@ -26,12 +27,12 @@
         {
           value: "yes",
           text: yes,
-          checked: selected == 'yes'
+          checked: selectedAnswer == 'yes'
         },
         {
           value: "no",
           text: no,
-          checked: selected == 'no'
+          checked: selectedAnswer == 'no'
         }
       ]
     }) }}
