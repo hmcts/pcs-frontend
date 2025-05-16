@@ -1,9 +1,14 @@
 import { Request, Response } from 'express';
-import { createGetController, createPostRedirectController, validateAndStoreForm } from 'app/controller/controllerFactory';
-import { GetController } from 'app/controller/GetController';
+
+import { GetController } from '../../../../main/app/controller/GetController';
+import {
+  createGetController,
+  createPostRedirectController,
+  validateAndStoreForm,
+} from '../../../../main/app/controller/controllerFactory';
 import type { FormFieldConfig } from '../../../../main/interfaces/formFieldConfig.interface';
 
-jest.mock('app/controller/GetController');
+jest.mock('../../../../main/app/controller/GetController');
 
 describe('controllerFactory', () => {
   describe('createGetController', () => {
@@ -51,7 +56,7 @@ describe('controllerFactory', () => {
       const nextPage = '/steps/page2';
       const req = {
         body: { answer: '' },
-        session: { formData: {} }
+        session: { formData: {} },
       } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as unknown as Response;
 
@@ -59,9 +64,12 @@ describe('controllerFactory', () => {
       controller.post(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.render).toHaveBeenCalledWith('steps/page1.njk', expect.objectContaining({
-        error: 'This field is required',
-      }));
+      expect(res.render).toHaveBeenCalledWith(
+        'steps/page1.njk',
+        expect.objectContaining({
+          error: 'This field is required',
+        })
+      );
     });
   });
 });

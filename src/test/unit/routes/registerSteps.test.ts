@@ -12,7 +12,7 @@ jest.mock('steps', () => ({
       getController: { get: jest.fn() },
       // no postController here
     },
-  ]
+  ],
 }));
 
 import registerSteps from '../../../main/routes/registerSteps';

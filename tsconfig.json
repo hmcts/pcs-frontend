@@ -19,6 +19,7 @@
     "baseUrl": "src/main",
     "paths": {
       "app/*": ["app/*"],
+      "interfaces/*": ["main/interfaces/*"],
       "router/*": ["router/*"],
       "routes/*": ["routes/*"],
       "steps": ["steps/index.ts"]
