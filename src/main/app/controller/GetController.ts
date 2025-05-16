@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 
-export type TranslationFn = (req: Request) => Record<string, any>;
+import type { StepFormData } from '../../interfaces/stepFormData.interface';
+
+export type TranslationFn = (req: Request) => StepFormData;
 
 export class GetController {
   constructor(

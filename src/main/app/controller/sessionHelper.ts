@@ -1,10 +1,14 @@
 import { Request } from 'express';
 
-export function getFormData<T = any>(req: Request, step: string): T | undefined {
-  return req.session.formData?.[step];
-}
+import type { StepFormData } from '../../interfaces/stepFormData.interface';
 
-export function setFormData(req: Request, step: string, data: Record<string, any>): void {
-  req.session.formData = req.session.formData || {};
-  req.session.formData[step] = data;
-}
+export const getFormData = (req: Request, stepName: string): StepFormData => {
+  return req.session.formData?.[stepName] || {};
+};
+
+export const setFormData = (req: Request, stepName: string, data: StepFormData): void => {
+  if (!req.session.formData) {
+    req.session.formData = {};
+  }
+  req.session.formData[stepName] = data;
+};

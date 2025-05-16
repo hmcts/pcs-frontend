@@ -1,13 +1,8 @@
 import { Request } from 'express';
 
-export interface FormFieldConfig {
-  name: string;
-  type: 'radio' | 'checkbox' | 'text';
-  required?: boolean;
-  errorMessage?: string;
-}
+import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
 
-export function validateForm(req: Request, fields: FormFieldConfig[]) {
+export function validateForm(req: Request, fields: FormFieldConfig[]): Record<string, string> {
   const errors: Record<string, string> = {};
 
   for (const field of fields) {

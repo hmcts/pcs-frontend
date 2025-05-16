@@ -1,8 +1,7 @@
-import { StepDefinition } from 'steps/types';
-
 import { createGetController, validateAndStoreForm } from '../../app/controller/controllerFactory';
 import common from '../../assets/locales/en/common.json';
 import page2Content from '../../assets/locales/en/page2.json';
+import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 
 const content = { ...common, ...page2Content };
 

@@ -1,15 +1,18 @@
 import { Request, Response } from 'express';
 
+import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
+import type { StepFormData } from '../../interfaces/stepFormData.interface';
+
 import { GetController } from './GetController';
 import { getFormData, setFormData } from './sessionHelper';
-import { FormFieldConfig, validateForm } from './validation';
+import { validateForm } from './validation';
 
 export const createGetController = (
   view: string,
   stepName: string,
-  content: Record<string, any>,
-  extendContent?: (req: Request) => Record<string, any>
-) => {
+  content: StepFormData,
+  extendContent?: (req: Request) => StepFormData
+): GetController => {
   return new GetController(view, (req: Request) => {
     const formData = getFormData(req, stepName);
     const postData = req.body || {};
@@ -27,7 +30,7 @@ export const createGetController = (
   });
 };
 
-export const createPostRedirectController = (nextUrl: string) => {
+export const createPostRedirectController = (nextUrl: string): { post: (req: Request, res: Response) => void } => {
   return {
     post: (_req: Request, res: Response) => {
       res.redirect(nextUrl);
@@ -38,9 +41,9 @@ export const createPostRedirectController = (nextUrl: string) => {
 export const validateAndStoreForm = (
   stepName: string,
   fields: FormFieldConfig[],
-  nextPage: string | ((body: Record<string, any>) => string),
-  content?: Record<string, any>
-) => {
+  nextPage: string | ((body: StepFormData) => string),
+  content?: StepFormData
+): { post: (req: Request, res: Response) => void } => {
   return {
     post: (req: Request, res: Response) => {
       const errors = validateForm(req, fields);

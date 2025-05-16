@@ -1,9 +1,8 @@
-import { FormFieldConfig } from 'app/controller/validation';
-import { StepDefinition } from 'steps/types';
-
 import { createGetController, validateAndStoreForm } from '../../app/controller/controllerFactory';
 import common from '../../assets/locales/en/common.json';
 import page3YesContent from '../../assets/locales/en/page3Yes.json';
+import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
+import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 
 const content = { ...common, ...page3YesContent };
 
