@@ -9,10 +9,10 @@ const content = { ...common, ...page4Content };
 export const step: StepDefinition = {
   url: '/steps/page4',
   name: 'page4',
-  view: 'steps/page4/template.njk',
+  view: 'steps/page4.njk',
   generateContent: () => content,
   stepDir: __dirname,
-  getController: createGetController(__dirname, 'page4', content, (req) => {
+  getController: createGetController('steps/page4.njk', 'page4', content, (req) => {
     const page2 = getFormData(req, 'page2');
     const page3Yes = getFormData(req, 'page3Yes');
     return {

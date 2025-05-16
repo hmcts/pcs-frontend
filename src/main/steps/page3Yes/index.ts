@@ -19,9 +19,9 @@ const fields: FormFieldConfig[] = [
 export const step: StepDefinition = {
   url: '/steps/page3/yes',
   name: 'page3Yes',
-  view: 'steps/page3Yes/template.njk',
+  view: 'steps/page3Yes.njk',
   generateContent: () => content,
   stepDir: __dirname,
-  getController: createGetController(__dirname, 'page3Yes', content),
+  getController: createGetController('steps/page3Yes.njk', 'page3Yes', content),
   postController: validateAndStoreForm('page3Yes', fields, '/steps/page4', content)
 };

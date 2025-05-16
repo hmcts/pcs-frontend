@@ -1,17 +1,14 @@
-import path from 'path';
 import { Request, Response } from 'express';
 import { GetController } from './GetController';
 import { getFormData, setFormData } from './sessionHelper';
 import { validateForm, FormFieldConfig } from './validation';
 
 export const createGetController = (
-  stepDir: string,
+  view: string,
   stepName: string,
   content: Record<string, any>,
   extendContent?: (req: Request) => Record<string, any>
 ) => {
-  const view = path.join('steps', path.basename(stepDir), 'template.njk');
-
   return new GetController(view, (req: Request) => {
     const formData = getFormData(req, stepName);
     const postData = req.body || {};
@@ -49,7 +46,7 @@ export const validateAndStoreForm = (
       const errors = validateForm(req, fields);
 
       if (Object.keys(errors).length > 0) {
-        return res.status(400).render(`steps/${stepName}/template.njk`, {
+        return res.status(400).render(`steps/${stepName}.njk`, {
           ...content,
           error: Object.values(errors)[0],
           ...req.body

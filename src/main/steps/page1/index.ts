@@ -8,9 +8,9 @@ const content = { ...common, ...page1Content };
 export const step: StepDefinition = {
   url: '/steps/page1',
   name: 'page1',
-  view: 'steps/page1/template.njk',
+  view: 'steps/page1.njk',
   generateContent: () => content,
   stepDir: __dirname,
-  getController: createGetController(__dirname, 'page1', content),
+  getController: createGetController('steps/page1.njk', 'page1', content),
   postController: createPostRedirectController('/steps/page2')
 };
