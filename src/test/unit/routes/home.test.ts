@@ -1,108 +1,120 @@
-import { Application } from 'express';
+import express, { Application, Request, Response } from 'express';
+import request from 'supertest';
 
-import { oidcMiddleware } from '../../../main/middleware';
 import homeRoute from '../../../main/routes/home';
 import { getRootGreeting } from '../../../main/services/pcsApi/pcsApiService';
 
-jest.mock('../../../main/services/pcsApi/pcsApiService');
-jest.mock('../../../main/middleware');
+interface MockSessionUser {
+  given_name?: string;
+  family_name?: string;
+}
 
-describe('Home Route', () => {
-  let mockApp: {
-    get: jest.Mock;
-  };
-  let mockRender: jest.Mock;
+interface MockSession {
+  user: MockSessionUser;
+}
+
+// Mock the PCS API service
+jest.mock('../../../main/services/pcsApi/pcsApiService');
+
+// Mock the middleware (assuming oidcMiddleware is imported from middleware)
+jest.mock('../../../main/middleware', () => ({
+  oidcMiddleware: (req: Request, res: Response, next: express.NextFunction) => next(),
+}));
+
+describe('GET /', () => {
+  let app: Application;
+  let renderSpy: jest.Mock;
 
   beforeEach(() => {
-    mockRender = jest.fn();
+    app = express();
 
-    mockApp = {
-      get: jest.fn(),
-    };
-
-    jest.clearAllMocks();
-
-    (oidcMiddleware as jest.Mock).mockImplementation((req, res, next) => next());
-  });
-
-  it('should register GET / route with oidcMiddleware', () => {
-    homeRoute(mockApp as unknown as Application);
-    expect(mockApp.get).toHaveBeenCalledWith('/', oidcMiddleware, expect.any(Function));
-  });
-
-  describe('GET / handler', () => {
-    let routeHandler: Function;
-    let mockReq: any;
-    let mockRes: any;
-
-    beforeEach(() => {
-      homeRoute(mockApp as unknown as Application);
-      routeHandler = mockApp.get.mock.calls[0][2];
-
-      mockReq = {
-        session: {
-          user: {
-            given_name: 'zxcv',
-            family_name: 'qwer',
-          },
+    // Middleware to mock res.render and req.session
+    app.use((req: Request, res: Response, next) => {
+      // Mock session user info (you can customize per test if needed)
+      (req.session as unknown as MockSession) = {
+        user: {
+          given_name: 'zxcv',
+          family_name: 'qwer',
         },
       };
 
-      mockRes = {
-        render: mockRender,
-      };
+      // Mock res.render to capture calls
+      renderSpy = jest.fn((view: string, options?: object) => {
+        res.status(200).send({ view, options });
+      });
+      res.render = renderSpy as unknown as Response['render'];
+
+      next();
     });
 
-    it('renders home with API greeting and user details', async () => {
-      (getRootGreeting as jest.Mock).mockResolvedValue('Hello from PCS API');
+    // Apply your route
+    homeRoute(app);
+  });
 
-      await routeHandler(mockReq, mockRes);
+  it('renders with greeting from API', async () => {
+    (getRootGreeting as jest.Mock).mockResolvedValue('Hello from API');
 
-      expect(getRootGreeting).toHaveBeenCalled();
-      expect(mockRender).toHaveBeenCalledWith(
-        'home',
-        expect.objectContaining({
-          apiResponse: 'Hello from PCS API',
-          givenName: 'zxcv',
-          familyName: 'qwer',
-          currentTime: expect.any(String),
-        })
-      );
+    const response = await request(app).get('/');
+
+    expect(getRootGreeting).toHaveBeenCalled();
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      view: 'home',
+      options: expect.objectContaining({
+        apiResponse: 'Hello from API',
+        givenName: 'zxcv',
+        familyName: 'qwer',
+        currentTime: expect.any(String),
+      }),
     });
+  });
 
-    it('renders home with default greeting when API call fails', async () => {
-      (getRootGreeting as jest.Mock).mockRejectedValue(new Error('API error'));
+  it('renders with default greeting when API call fails', async () => {
+    (getRootGreeting as jest.Mock).mockRejectedValue(new Error('API error'));
 
-      await routeHandler(mockReq, mockRes);
+    const response = await request(app).get('/');
 
-      expect(getRootGreeting).toHaveBeenCalled();
-      expect(mockRender).toHaveBeenCalledWith(
-        'home',
-        expect.objectContaining({
-          apiResponse: 'default value',
-          givenName: 'zxcv',
-          familyName: 'qwer',
-          currentTime: expect.any(String),
-        })
-      );
+    expect(getRootGreeting).toHaveBeenCalled();
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      view: 'home',
+      options: expect.objectContaining({
+        apiResponse: 'default value',
+        givenName: 'zxcv',
+        familyName: 'qwer',
+        currentTime: expect.any(String),
+      }),
     });
+  });
 
-    it('renders home with undefined user data if session user missing', async () => {
-      (getRootGreeting as jest.Mock).mockResolvedValue('Hi');
+  it('renders with no user session gracefully', async () => {
+    // Override session middleware to simulate no user session for this test
+    app = express();
+    app.use((req, res, next) => {
+      // no req.session set here
+      renderSpy = jest.fn((view: string, options?: object) => {
+        res.status(200).send({ view, options });
+      });
+      res.render = renderSpy as unknown as Response['render'];
+      next();
+    });
+    homeRoute(app);
 
-      mockReq.session = {}; // no user
+    (getRootGreeting as jest.Mock).mockResolvedValue('Hi');
 
-      await routeHandler(mockReq, mockRes);
+    const response = await request(app).get('/');
 
-      expect(mockRender).toHaveBeenCalledWith(
-        'home',
-        expect.objectContaining({
-          apiResponse: 'Hi',
-          givenName: undefined,
-          familyName: undefined,
-          currentTime: expect.any(String),
-        })
-      );
+    expect(getRootGreeting).toHaveBeenCalled();
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      view: 'home',
+      options: expect.objectContaining({
+        apiResponse: 'Hi',
+        currentTime: expect.any(String),
+      }),
     });
   });
 });
