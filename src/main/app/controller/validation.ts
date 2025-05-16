@@ -7,6 +7,7 @@ export interface FormFieldConfig {
   errorMessage?: string;
 }
 
+
 export function validateForm(req: Request, fields: FormFieldConfig[]) {
   const errors: Record<string, string> = {};
 
