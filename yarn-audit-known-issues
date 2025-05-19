@@ -1,1 +1,0 @@
-{"value":"node-domexception","children":{"ID":"node-domexception (deprecation)","Issue":"Use your platform's native DOMException instead","Severity":"moderate","Vulnerable Versions":"1.0.0","Tree Versions":["1.0.0"],"Dependents":["fetch-blob@npm:3.2.0"]}}
