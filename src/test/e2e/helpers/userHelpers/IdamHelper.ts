@@ -1,27 +1,28 @@
+import config from 'config';
 import { TokenEndpointResponse } from 'oauth4webapi';
 
-import { config as testConfig } from '../../../config';
+import { TestConfig, UserData } from '../../TestConfig';
 import { request, retriedRequest } from '../../helpers/userHelpers/restHelper';
 
-const idamUrl = testConfig.IDAM_API;
-const idamTestingSupportUrl = testConfig.IDAM_TESTING_SUPPORT_USERS_URL;
-const loginEndpoint = testConfig.IDAM_TOKEN_ENDPOINT;
-const username = process.env.USERNAME;
-const password = process.env.PASSWORD;
-const client_secret = process.env.CLIENT_SECRET;
+
+
+const testConfig = config.get<TestConfig>('e2e');
+const username = config.get<string>('secrets.pcs.pcs-frontend-idam-system-username');
+const password = config.get<string>('secrets.pcs.pcs-frontend-idam-system-password');
+const clientSecret = config.get<string>('secrets.pcs.pcs-frontend-idam-secret');
 
 export async function getAccessTokenFromIdam(): Promise<string> {
   const details = {
     username,
     password,
-    grant_type: testConfig.grant_type,
+    grant_type: testConfig.grantType,
     scope: testConfig.scope,
-    client_id: testConfig.client_id,
-    client_secret,
+    client_id: testConfig.clientId,
+    client_secret: clientSecret,
   };
   const body = new URLSearchParams();
   for (const property in details) {
-    const value = details[property as keyof typeof details];
+    const value = details[property];
     if (value !== undefined) {
       body.append(property, value);
     }
@@ -29,19 +30,24 @@ export async function getAccessTokenFromIdam(): Promise<string> {
   const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
-  const url = `${idamUrl}/${loginEndpoint}`;
+  const url = `${testConfig.idamUrl}/${testConfig.loginEndpoint}`; // https://idam-api.aat.platform.hmcts.net/o/token
+  //let responsePromise = await retriedRequest(url, headers, body, 'POST', 200);
   return request(url, headers, body)
     .then(response => response.json())
-    .then((data: TokenEndpointResponse) => data.access_token);
+    .then((data: TokenEndpointResponse) => {
+      return data.access_token;
+    });
 }
-export async function createAccount(userData: Record<string, unknown>): Promise<Response | unknown> {
+export async function createAccount(userData: UserData): Promise<Response | unknown> {
   try {
     const authToken = await getAccessTokenFromIdam();
     return retriedRequest(
-      `${idamTestingSupportUrl}/test/idam/users`,
+      `${testConfig.idamTestingSupportUrl}/test/idam/users`,
       { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
-      JSON.stringify(userData)
-    ).then(response => response.json());
+      JSON.stringify(userData) as BodyInit
+    ).then(response => {
+      return response.json();
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error creating account:', error);
@@ -53,7 +59,7 @@ export async function deleteAccount(email: string): Promise<void> {
   try {
     const method = 'DELETE';
     await request(
-      `${idamUrl}/testing-support/accounts/${email}`,
+      `${testConfig.idamTestingSupportUrl}/testing-support/accounts/${email}`,
       { 'Content-Type': 'application/json' },
       undefined,
       method

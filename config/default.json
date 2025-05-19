@@ -26,7 +26,10 @@
       "pcs-session-secret": "pcs-supersecret",
       "redis-connection-string": "redis://localhost:6379",
       "app-insights-connection-string": "InstrumentationKey=79536ccc-f225-4028-ae0f-edae519eb55f;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3598a202-277f-4848-bfd2-7c0877d11a8b",
-      "pcs-frontend-idam-secret": "AAAAAAAAAAAAAAAA"
+      "pcs-frontend-idam-secret": "AAAAAAAAAAAAAAAA",
+      "pcs-frontend-idam-system-username": "AAAAAAAAAAAA",
+      "pcs-frontend-idam-system-password": "AAAAAAAAAAAAAA",
+      "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA"
     }
   },
   "oidc": {
@@ -34,5 +37,13 @@
     "clientId": "pcs-frontend",
     "redirectUri": "http://localhost:3209/oauth2/callback",
     "scope": "openid profile roles"
+  },
+  "e2e": {
+    "idamUrl":  "https://idam-api.aat.platform.hmcts.net",
+    "idamTestingSupportUrl": "https://idam-testing-support-api.aat.platform.hmcts.net",
+    "loginEndpoint": "o/token",
+    "grantType": "password",
+    "scope": "profile openid roles",
+    "clientId":  "civil_citizen_ui"
   }
 }

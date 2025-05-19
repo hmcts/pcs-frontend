@@ -1,9 +1,12 @@
 import { expect, test } from '@playwright/test';
+import config from 'config';
 
 import { config as testConfig } from '../config';
+import { buildUserDataWithRole } from '../e2e/TestConfig';
 import * as idamHelper from '../e2e/helpers/userHelpers/IdamHelper';
 import { LandingPage } from '../e2e/page-objects/pages/cui/landing';
 import { IdamPage } from '../e2e/page-objects/pages/idam.login';
+
 
 test.skip('has title @accessibility @PR @nightly', async ({ page }) => {
   await page.goto(testConfig.TEST_URL);
@@ -11,9 +14,10 @@ test.skip('has title @accessibility @PR @nightly', async ({ page }) => {
 });
 test('login to application', async ({ page }) => {
   await page.goto(testConfig.TEST_URL);
-  await idamHelper.deleteAccount(testConfig.userData.user.email);
-  await idamHelper.createAccount(testConfig.userData);
-  const pwd = testConfig.userData.password === undefined ? '' : testConfig.userData.password;
-  await new IdamPage(page).login(testConfig.userData.user.email, pwd);
+  const password = config.get<string>('secrets.pcs.pcs-frontend-idam-user-temp-password');
+  const userData = buildUserDataWithRole('citizen', password);
+  await idamHelper.deleteAccount(userData.user.email);
+  await idamHelper.createAccount(userData);
+  await new IdamPage(page).login(userData.user.email, password);
   await new LandingPage(page).heading.waitFor({ state: 'visible' });
 });
