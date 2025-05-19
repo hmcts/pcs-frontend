@@ -5,7 +5,6 @@ process.on('unhandledRejection', reason => {
 
 export const config = {
   TEST_URL: process.env.TEST_URL || 'http://localhost:3209',
-
   helpers: {},
 };
 
