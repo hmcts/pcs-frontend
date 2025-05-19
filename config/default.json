@@ -39,11 +39,12 @@
     "scope": "openid profile roles"
   },
   "e2e": {
+    "testURL": "http://localhost:3209",
     "idamUrl": "https://idam-api.aat.platform.hmcts.net",
     "idamTestingSupportUrl": "https://idam-testing-support-api.aat.platform.hmcts.net",
     "loginEndpoint": "o/token",
     "grantType": "password",
     "scope": "profile openid roles",
-    "clientId": "civil_citizen_ui"
+    "clientId": "pcs-frontend"
   }
 }
