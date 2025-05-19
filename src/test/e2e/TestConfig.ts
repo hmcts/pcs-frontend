@@ -1,10 +1,9 @@
-
 import { v4 as uuidv4 } from 'uuid';
 
 export interface TestConfig {
- idamUrl: string;
- idamTestingSupportUrl: string;
- loginEndpoint: string;
+  idamUrl: string;
+  idamTestingSupportUrl: string;
+  loginEndpoint: string;
   grantType: string;
   scope: string;
   clientId: string;
