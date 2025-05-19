@@ -18,5 +18,5 @@ test('login to application', async ({ page }) => {
   await idamHelper.deleteAccount(userData.user.email);
   await idamHelper.createAccount(userData);
   await new IdamPage(page).login(userData.user.email, password);
-  await new LandingPage(page).heading.isVisible()
+  await new LandingPage(page).heading.isVisible();
 });
