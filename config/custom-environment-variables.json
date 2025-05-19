@@ -27,6 +27,7 @@
     "scope": "OIDC_SCOPE"
   },
   "e2e": {
+    "testURL": "TEST_URL",
     "idamApi": "IDAM_API",
     "idamTestingSupportUrl": "IDAM_TESTING_SUPPORT_URL",
     "loginEndpoint": "IDAM_TOKEN_ENDPOINT",
