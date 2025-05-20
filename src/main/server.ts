@@ -44,7 +44,7 @@ function gracefulShutdownHandler(signal: string) {
 
   setTimeout(async () => {
     logger.info('Shutting down application');
-    
+
     // Clean up S2S module
     if (app.locals.s2s) {
       try {
