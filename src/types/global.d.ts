@@ -2,6 +2,7 @@ import { type Session, type SessionData } from 'express-session';
 import { type TokenEndpointResponse, type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
 import { type Environment } from 'nunjucks';
+import { S2S } from '../main/modules/s2s';
 
 interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
@@ -33,6 +34,7 @@ declare module 'express' {
       redisClient?: Redis;
       shutdown?: boolean;
       ENV?: string;
+      s2s?: S2S;
     };
   }
 }
