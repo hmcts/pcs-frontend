@@ -5,9 +5,11 @@ import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 
 import type { CourtVenue } from '../../interfaces/courtVenue.interface';
+import { http } from '../../modules/http';
 
 import { type DashboardNotification } from './dashboardNotification.interface';
 import { type DashboardTaskGroup } from './dashboardTaskGroup.interface';
+
 
 const logger = Logger.getLogger('pcsApiService');
 
