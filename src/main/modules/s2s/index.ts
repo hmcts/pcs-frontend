@@ -15,14 +15,19 @@ export class S2S {
   private subscriber: Redis | null = null;
 
   private async publishTokenUpdate(redisClient: Redis, token: string): Promise<void> {
-    const decodedToken = jose.decodeJwt(token);
-    await redisClient.publish(
-      's2s-token-update',
-      JSON.stringify({
-        token,
-        expiry: decodedToken.exp,
-      })
-    );
+    try {
+      const decodedToken = jose.decodeJwt(token);
+      await redisClient.publish(
+        's2s-token-update',
+        JSON.stringify({
+          token,
+          expiry: decodedToken.exp,
+        })
+      );
+    } catch (error) {
+      this.logger.error('Failed to publish token update:', error);
+      throw error;
+    }
   }
 
   private setupRedisSubscription(redisClient: Redis): void {
@@ -80,50 +85,31 @@ export class S2S {
 
         // Store token in Redis with expiry
         await serviceConfig.redisClient.set(serviceConfig.key, serviceToken, 'EX', serviceConfig.ttl);
-
         // Publish token update to all instances
         await this.publishTokenUpdate(serviceConfig.redisClient, serviceToken);
       }
 
       return serviceToken;
     } catch (error) {
-      this.logger.error('Error getting service token:', error);
+      this.logger.error('[S2S] Error getting service token:', error);
       return null;
     }
   }
 
-  private async regenerateToken(): Promise<void> {
+  async regenerateToken(): Promise<void> {
     if (!this.serviceConfig) {
+      this.logger.error('S2S not initialized');
       throw new Error('S2S not initialized');
     }
 
-    const maxRetries = 3;
-    let lastError: Error | null = null;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        // Force token regeneration by removing from Redis
-        await this.serviceConfig.redisClient.del(this.serviceConfig.key);
-
-        // Get new token
-        const serviceToken = await this.getServiceToken(this.serviceConfig);
-        if (!serviceToken) {
-          throw new Error('Failed to regenerate S2S token');
-        }
-
-        // Token will be set in HTTP module via Redis pub/sub
-        return;
-      } catch (error) {
-        lastError = error as Error;
-        this.logger.error(`Token regeneration attempt ${attempt} failed:`, error);
-        if (attempt < maxRetries) {
-          // Wait before retrying (exponential backoff)
-          await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
-        }
-      }
+    // Get new token first
+    const serviceToken = await this.getServiceToken(this.serviceConfig);
+    if (!serviceToken) {
+      throw new Error('Failed to get new S2S token');
     }
 
-    throw new Error(`Failed to regenerate token after ${maxRetries} attempts: ${lastError?.message}`);
+    // Only delete old token after we have a new one
+    await this.serviceConfig.redisClient.del(this.serviceConfig.key);
   }
 
   async enableFor(app: Express): Promise<void> {
@@ -148,6 +134,7 @@ export class S2S {
     const serviceToken = await this.getServiceToken(this.serviceConfig);
 
     if (!serviceToken) {
+      this.logger.error('Failed to initialize S2S token');
       throw new Error('Failed to initialize S2S token');
     }
 

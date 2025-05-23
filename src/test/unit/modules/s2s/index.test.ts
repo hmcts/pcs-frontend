@@ -1,9 +1,9 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import axios from 'axios';
 import config from 'config';
-import { Express, NextFunction, Request, Response } from 'express';
+import { Express } from 'express';
 import { TOTP } from 'totp-generator';
 
+import { http } from '../../../../main/modules/http';
 import { S2S } from '../../../../main/modules/s2s';
 
 jest.mock('@hmcts/nodejs-logging', () => ({
@@ -18,7 +18,16 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 }));
 jest.mock('config');
 jest.mock('totp-generator');
-jest.mock('axios');
+jest.mock('ioredis');
+jest.mock('jose', () => ({
+  decodeJwt: jest.fn().mockReturnValue({ exp: 1234567890 }),
+}));
+jest.mock('../../../../main/modules/http', () => ({
+  http: {
+    setToken: jest.fn(),
+    setTokenRegenerator: jest.fn(),
+  },
+}));
 
 describe('S2S', () => {
   let s2s: S2S;
@@ -26,27 +35,38 @@ describe('S2S', () => {
   let mockRedisClient: {
     get: jest.Mock;
     set: jest.Mock;
+    del: jest.Mock;
+    duplicate: jest.Mock;
+    publish: jest.Mock;
   };
-  let mockRequest: Partial<Request>;
-  let mockResponse: Partial<Response>;
-  let mockNext: NextFunction;
+  let mockSubscriber: {
+    subscribe: jest.Mock;
+    on: jest.Mock;
+    quit: jest.Mock;
+    unsubscribe: jest.Mock;
+  };
   let mockLogger: Logger;
 
   beforeEach(() => {
     s2s = new S2S();
+    mockSubscriber = {
+      subscribe: jest.fn(),
+      on: jest.fn(),
+      quit: jest.fn(),
+      unsubscribe: jest.fn(),
+    };
     mockRedisClient = {
       get: jest.fn(),
       set: jest.fn(),
+      del: jest.fn(),
+      duplicate: jest.fn().mockReturnValue(mockSubscriber),
+      publish: jest.fn(),
     };
     mockApp = {
       locals: {
         redisClient: mockRedisClient,
       },
-      use: jest.fn(),
     } as unknown as Express;
-    mockRequest = {};
-    mockResponse = {};
-    mockNext = jest.fn();
     mockLogger = s2s.logger;
 
     // Mock config values
@@ -66,44 +86,55 @@ describe('S2S', () => {
     // Mock TOTP.generate
     (TOTP.generate as jest.Mock).mockReturnValue({ otp: '123456' });
 
-    // Mock axios defaults
-    axios.defaults.headers.common = {};
+    // Mock fetch globally
+    global.fetch = jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve('test-token'),
+      })
+    );
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
+    if (s2s) {
+      try {
+        await s2s.cleanup();
+      } catch (error) {
+        // Ignore cleanup errors in tests
+      }
+    }
+    // Reset global fetch mock
+    (global.fetch as jest.Mock).mockReset();
   });
 
   describe('enableFor', () => {
-    it('should set up middleware on the app', () => {
-      s2s.enableFor(mockApp);
-      expect(mockApp.use).toHaveBeenCalled();
-    });
-
-    it('should use cached token from Redis if available', async () => {
-      const cachedToken = 'cached-token';
-      mockRedisClient.get.mockResolvedValue(cachedToken);
-
-      s2s.enableFor(mockApp);
-      const middleware = (mockApp.use as jest.Mock).mock.calls[0][0];
-      await middleware(mockRequest, mockResponse, mockNext);
-
-      expect(mockRedisClient.get).toHaveBeenCalledWith('test-key');
-      expect(axios.defaults.headers.common['ServiceAuthorization']).toBe(`Bearer ${cachedToken}`);
-      expect(mockNext).toHaveBeenCalled();
-    });
-
-    it('should fetch new token when Redis cache is empty', async () => {
+    it('should set up Redis subscription for token updates', async () => {
       mockRedisClient.get.mockResolvedValue(null);
-      const newToken = 'new-token';
-      global.fetch = jest.fn().mockResolvedValue({
-        status: 200,
-        text: () => Promise.resolve(newToken),
-      });
+      mockRedisClient.set.mockResolvedValue('OK');
+      mockRedisClient.publish.mockResolvedValue(1);
 
-      s2s.enableFor(mockApp);
-      const middleware = (mockApp.use as jest.Mock).mock.calls[0][0];
-      await middleware(mockRequest, mockResponse, mockNext);
+      await s2s.enableFor(mockApp);
+
+      expect(mockRedisClient.duplicate).toHaveBeenCalled();
+      expect(mockSubscriber.subscribe).toHaveBeenCalledWith('s2s-token-update', expect.any(Function));
+      expect(mockSubscriber.on).toHaveBeenCalledWith('message', expect.any(Function));
+    }, 5000);
+
+    it('should get initial token and store it in Redis', async () => {
+      mockRedisClient.get.mockResolvedValue(null);
+      mockRedisClient.set.mockResolvedValue('OK');
+      mockRedisClient.publish.mockResolvedValue(1);
+
+      const newToken = 'new-token';
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(newToken),
+        })
+      );
+
+      await s2s.enableFor(mockApp);
 
       expect(global.fetch).toHaveBeenCalledWith('http://s2s-url/lease', {
         method: 'POST',
@@ -116,48 +147,106 @@ describe('S2S', () => {
         }),
       });
       expect(mockRedisClient.set).toHaveBeenCalledWith('test-key', newToken, 'EX', 3600);
-      expect(axios.defaults.headers.common['ServiceAuthorization']).toBe(`Bearer ${newToken}`);
-      expect(mockNext).toHaveBeenCalled();
-    });
+      expect(http.setToken).toHaveBeenCalledWith(newToken, 1234567890);
+    }, 5000);
+
+    it('should use cached token from Redis if available', async () => {
+      const cachedToken = 'cached-token';
+      mockRedisClient.get.mockResolvedValue(cachedToken);
+      mockRedisClient.set.mockResolvedValue('OK');
+
+      await s2s.enableFor(mockApp);
+
+      expect(mockRedisClient.get).toHaveBeenCalledWith('test-key');
+      expect(http.setToken).toHaveBeenCalledWith(cachedToken, 1234567890);
+    }, 5000);
 
     it('should handle S2S service error', async () => {
       mockRedisClient.get.mockResolvedValue(null);
-      global.fetch = jest.fn().mockResolvedValue({
-        status: 500,
-        text: () => Promise.resolve('Internal Server Error'),
-      });
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: false,
+          status: 500,
+          text: () => Promise.resolve('Internal Server Error'),
+        })
+      );
 
-      s2s.enableFor(mockApp);
-      const middleware = (mockApp.use as jest.Mock).mock.calls[0][0];
-      await middleware(mockRequest, mockResponse, mockNext);
-
+      await expect(s2s.enableFor(mockApp)).rejects.toThrow('Failed to initialize S2S token');
       expect(mockLogger.error).toHaveBeenCalled();
-      expect(mockNext).toHaveBeenCalled();
-      expect(axios.defaults.headers.common['ServiceAuthorization']).toBeUndefined();
-    }, 10000); // Increased timeout to 10 seconds
-
-    it('should not update header if token is already set correctly', async () => {
-      const existingToken = 'existing-token';
-      mockRedisClient.get.mockResolvedValue(existingToken);
-      axios.defaults.headers.common['ServiceAuthorization'] = `Bearer ${existingToken}`;
-
-      s2s.enableFor(mockApp);
-      const middleware = (mockApp.use as jest.Mock).mock.calls[0][0];
-      await middleware(mockRequest, mockResponse, mockNext);
-
-      expect(axios.defaults.headers.common['ServiceAuthorization']).toBe(`Bearer ${existingToken}`);
-      expect(mockNext).toHaveBeenCalled();
-    });
+    }, 5000);
 
     it('should handle Redis errors gracefully', async () => {
       mockRedisClient.get.mockRejectedValue(new Error('Redis error'));
 
-      s2s.enableFor(mockApp);
-      const middleware = (mockApp.use as jest.Mock).mock.calls[0][0];
-      await middleware(mockRequest, mockResponse, mockNext);
+      await expect(s2s.enableFor(mockApp)).rejects.toThrow('Failed to initialize S2S token');
+      expect(mockLogger.error).toHaveBeenCalled();
+    }, 5000);
+  });
 
-      expect(mockLogger.error).toHaveBeenCalledWith('Error in S2S middleware:', expect.any(Error));
-      expect(mockNext).toHaveBeenCalled();
-    });
+  describe('cleanup', () => {
+    it('should unsubscribe and quit Redis subscriber', async () => {
+      mockRedisClient.get.mockResolvedValue(null);
+      mockRedisClient.set.mockResolvedValue('OK');
+      mockRedisClient.publish.mockResolvedValue(1);
+      await s2s.enableFor(mockApp);
+      await s2s.cleanup();
+
+      expect(mockSubscriber.unsubscribe).toHaveBeenCalledWith('s2s-token-update');
+      expect(mockSubscriber.quit).toHaveBeenCalled();
+      expect(mockLogger.info).toHaveBeenCalledWith('S2S Redis subscriber cleaned up successfully');
+    }, 5000);
+
+    it('should handle cleanup errors gracefully', async () => {
+      mockRedisClient.get.mockResolvedValue(null);
+      mockRedisClient.set.mockResolvedValue('OK');
+      mockRedisClient.publish.mockResolvedValue(1);
+      await s2s.enableFor(mockApp);
+      mockSubscriber.unsubscribe.mockRejectedValue(new Error('Cleanup error'));
+      await s2s.cleanup();
+
+      expect(mockLogger.error).toHaveBeenCalledWith('Error cleaning up S2S Redis subscriber:', expect.any(Error));
+    }, 5000);
+  });
+
+  describe('regenerateToken', () => {
+    it('should regenerate token after removing from Redis', async () => {
+      mockRedisClient.get.mockResolvedValue(null);
+      mockRedisClient.set.mockResolvedValue('OK');
+      mockRedisClient.publish.mockResolvedValue(1);
+      await s2s.enableFor(mockApp);
+      const newToken = 'new-token';
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(newToken),
+        })
+      );
+
+      await s2s.regenerateToken();
+
+      expect(mockRedisClient.del).toHaveBeenCalledWith('test-key');
+      expect(global.fetch).toHaveBeenCalled();
+      expect(mockRedisClient.set).toHaveBeenCalledWith('test-key', newToken, 'EX', 3600);
+    }, 5000);
+
+    it('should throw error if S2S not initialized', async () => {
+      await expect(s2s.regenerateToken()).rejects.toThrow('S2S not initialized');
+    }, 5000);
+
+    it('should throw error if token regeneration fails', async () => {
+      mockRedisClient.get.mockResolvedValue(null);
+      mockRedisClient.set.mockResolvedValue('OK');
+      mockRedisClient.publish.mockResolvedValue(1);
+      await s2s.enableFor(mockApp);
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: false,
+          status: 500,
+          text: () => Promise.resolve('Internal Server Error'),
+        })
+      );
+
+      await expect(s2s.regenerateToken()).rejects.toThrow('Failed to get new S2S token');
+    }, 5000);
   });
 });

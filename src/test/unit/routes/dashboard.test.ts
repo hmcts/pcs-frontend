@@ -105,7 +105,7 @@ describe('Dashboard Route', () => {
           tasks: [
             {
               templateId: 'task1',
-              status: 'NOT_STARTED',
+              status: 'AVAILABLE',
               templateValues: {
                 dueDate: '2024-05-13',
               },
@@ -136,8 +136,7 @@ describe('Dashboard Route', () => {
                 },
                 href: '12345/group1/task1',
                 status: {
-                  tag: undefined,
-                  text: 'NOT_STARTED',
+                  tag: { text: 'Available', classes: 'govuk-tag--blue' },
                 },
                 title: {
                   html: 'Rendered components/taskGroup/group1/task1.njk',
@@ -156,7 +155,7 @@ describe('Dashboard Route', () => {
           tasks: [
             {
               templateId: 'task1',
-              status: 'NOT_STARTED',
+              status: 'AVAILABLE',
               templateValues: {
                 dueDate: '2024-05-13',
               },
@@ -197,8 +196,7 @@ describe('Dashboard Route', () => {
                 },
                 href: '12345/group1/task1',
                 status: {
-                  tag: undefined,
-                  text: 'NOT_STARTED',
+                  tag: { text: 'Available', classes: 'govuk-tag--blue' },
                 },
                 title: {
                   html: 'Rendered components/taskGroup/group1/task1.njk',
@@ -211,7 +209,6 @@ describe('Dashboard Route', () => {
                 href: '12345/group1/task2',
                 status: {
                   tag: { text: 'In progress', classes: 'govuk-tag--yellow' },
-                  text: 'IN_PROGRESS',
                 },
                 title: {
                   html: 'Rendered components/taskGroup/group1/task2.njk',
@@ -222,7 +219,6 @@ describe('Dashboard Route', () => {
                 href: undefined,
                 status: {
                   tag: { text: 'Not available yet', classes: 'govuk-tag--grey' },
-                  text: 'NOT_AVAILABLE',
                 },
                 title: {
                   html: 'Rendered components/taskGroup/group1/task3.njk',
@@ -241,7 +237,7 @@ describe('Dashboard Route', () => {
           tasks: [
             {
               templateId: 'task1',
-              status: 'NOT_STARTED',
+              status: 'AVAILABLE',
               templateValues: {
                 dueDate: '2024-05-13',
               },
