@@ -1,41 +1,93 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-
+import { Logger } from '@hmcts/nodejs-logging';
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 type TokenRegenerator = () => Promise<void>;
 
-class HttpService {
-  private axiosInstance: AxiosInstance;
+export class HttpService {
+  private instance: AxiosInstance;
   private s2sToken: string | null = null;
   private tokenExpiry: number | null = null;
   private tokenRegenerator: TokenRegenerator | null = null;
-  private isRegenerating: boolean = false;
+  private tokenRegenerationPromise: Promise<void> | null = null;
+  private readonly TOKEN_WAIT_TIMEOUT = 5000; // 5 seconds
+  private readonly TOKEN_WAIT_INTERVAL = 100; // 100ms
+  logger = Logger.getLogger('http');
 
   constructor() {
-    // Create axios instance with interceptor
-    this.axiosInstance = axios.create();
-    this.axiosInstance.interceptors.request.use(async config => {
+    this.instance = axios.create();
+
+    // Request interceptor
+    this.instance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+      if ((!this.s2sToken || this.isTokenExpired()) && !this.tokenRegenerator) {
+        this.logger.error('No token regenerator configured!');
+        throw new Error('No valid S2S token available and no regenerator configured');
+      }
+
       if (!this.s2sToken || this.isTokenExpired()) {
-        if (!this.tokenRegenerator) {
-          throw new Error('No valid S2S token available and no regenerator configured');
-        }
-
-        // Prevent multiple simultaneous regeneration attempts
-        if (this.isRegenerating) {
-          throw new Error('Token regeneration in progress');
-        }
-
-        try {
-          this.isRegenerating = true;
-          await this.tokenRegenerator();
-          if (!this.s2sToken) {
-            throw new Error('Failed to regenerate S2S token');
-          }
-        } finally {
-          this.isRegenerating = false;
-        }
+        await this.regenerateToken();
       }
       config.headers['ServiceAuthorization'] = `Bearer ${this.s2sToken}`;
       return config;
     });
+
+    // Response interceptor for handling 401s
+    this.instance.interceptors.response.use(
+      response => response,
+      async error => {
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest.__isRetryRequest) {
+          this.logger.warn('Received 401, attempting token regeneration and retry...');
+          try {
+            await this.regenerateToken();
+            originalRequest.__isRetryRequest = true;
+            return this.instance.request(originalRequest);
+          } catch (retryError) {
+            this.logger.error('Token regeneration on 401 failed:', retryError);
+            return Promise.reject(retryError);
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  private async regenerateToken(): Promise<void> {
+    if (!this.tokenRegenerator) {
+      this.logger.error('No token regenerator configured!');
+      throw new Error('No token regenerator configured');
+    }
+
+    if (!this.tokenRegenerationPromise) {
+      const regenerator = this.tokenRegenerator; // Store reference to avoid null check issues
+      this.tokenRegenerationPromise = (async () => {
+        try {
+          await regenerator();
+          // Wait for token to be set (with timeout)
+          const startTime = Date.now();
+          while (!this.s2sToken && Date.now() - startTime < this.TOKEN_WAIT_TIMEOUT) {
+            await new Promise(resolve => setTimeout(resolve, this.TOKEN_WAIT_INTERVAL));
+          }
+          if (!this.s2sToken) {
+            this.logger.error('Token regeneration failed: token not set within timeout');
+            throw new Error('Failed to regenerate S2S token - token not set within timeout');
+          }
+        } catch (error) {
+          // Clear the token if regeneration failed
+          this.s2sToken = null;
+          this.tokenExpiry = null;
+          this.logger.error('[HttpService] Token regeneration error:', error);
+          throw error;
+        }
+      })().finally(() => {
+        this.tokenRegenerationPromise = null;
+      });
+    }
+
+    return this.tokenRegenerationPromise;
   }
 
   private isTokenExpired(): boolean {
@@ -51,27 +103,89 @@ class HttpService {
     this.tokenExpiry = expiry;
   }
 
-  public setTokenRegenerator(regenerator: TokenRegenerator): void {
+  public setTokenRegenerator(regenerator: TokenRegenerator | null): void {
     this.tokenRegenerator = regenerator;
   }
 
-  // API methods
-  public async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.axiosInstance.get<T>(url, config);
+  // API methods matching Axios signatures exactly
+  public getUri(config?: AxiosRequestConfig): string {
+    return this.instance.getUri(config);
   }
 
-  public async post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.axiosInstance.post<T>(url, data, config);
+  public request<T = unknown, R = AxiosResponse<T>, D = unknown>(config: AxiosRequestConfig<D>): Promise<R> {
+    return this.instance.request<T, R, D>(config);
   }
 
-  public async put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.axiosInstance.put<T>(url, data, config);
+  public get<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
+    return this.instance.get<T, R, D>(url, config);
   }
 
-  public async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.axiosInstance.delete<T>(url, config);
+  public delete<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
+    return this.instance.delete<T, R, D>(url, config);
+  }
+
+  public head<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
+    return this.instance.head<T, R, D>(url, config);
+  }
+
+  public options<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
+    return this.instance.options<T, R, D>(url, config);
+  }
+
+  public post<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
+    return this.instance.post<T, R, D>(url, data, config);
+  }
+
+  public put<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
+    return this.instance.put<T, R, D>(url, data, config);
+  }
+
+  public patch<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
+    return this.instance.patch<T, R, D>(url, data, config);
+  }
+
+  public postForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
+    return this.instance.postForm<T, R, D>(url, data, config);
+  }
+
+  public putForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
+    return this.instance.putForm<T, R, D>(url, data, config);
+  }
+
+  public patchForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
+    return this.instance.patchForm<T, R, D>(url, data, config);
   }
 }
 
-// Create and export a single instance
-export const http = new HttpService();
+export const createHttp = (): HttpService => new HttpService();
+export const http: HttpService = createHttp(); // default instance for non-test code
