@@ -2,10 +2,10 @@ import * as fs from 'node:fs/promises';
 import * as path from 'path';
 
 import { Logger } from '@hmcts/nodejs-logging';
-import axios from 'axios';
 import config from 'config';
 
 import type { CourtVenue } from '../../interfaces/courtVenue.interface';
+import { http } from '../../modules/http';
 
 import { type DashboardNotification } from './dashboardNotification.interface';
 import { type DashboardTaskGroup } from './dashboardTaskGroup.interface';
@@ -18,7 +18,7 @@ function getBaseUrl(): string {
 
 export const getRootGreeting = async (): Promise<string> => {
   const pcsApiURL = getBaseUrl();
-  const response = await axios.get(pcsApiURL);
+  const response = await http.get<string>(pcsApiURL);
   return response.data;
 };
 
@@ -30,13 +30,13 @@ export const getCourtVenues = async (postcode: string, user: { accessToken: stri
     },
   };
   logger.info(`Calling PCS court search with URL: ${url}`);
-  const response = await axios.get<CourtVenue[]>(url, headersConfig);
+  const response = await http.get<CourtVenue[]>(url, headersConfig);
   return response.data;
 };
 
 export const getDashboardNotifications = async (caseReference: number): Promise<DashboardNotification[]> => {
   const pcsApiURL = getBaseUrl();
-  const response = await axios.get<DashboardNotification[]>(`${pcsApiURL}/dashboard/${caseReference}/notifications`);
+  const response = await http.get<DashboardNotification[]>(`${pcsApiURL}/dashboard/${caseReference}/notifications`);
   return response.data;
 };
 
