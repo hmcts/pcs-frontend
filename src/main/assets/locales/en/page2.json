@@ -1,0 +1,10 @@
+{
+  "title": "Are you 18 or over?",
+  "yes": "Yes",
+  "no": "No",
+  "next": "Continue",
+  "backUrl": "/steps/page1",
+  "errors": {
+    "answerRequired": "Please select an option"
+  }
+}
