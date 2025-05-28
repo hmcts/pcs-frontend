@@ -1,0 +1,46 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block content %}
+  {{ govukBackLink({ text: "Back", href: backUrl }) }}
+
+  <h1 class="govuk-heading-l">Enter your address</h1>
+
+  <form method="post" action="{{ url }}">
+    {{ govukInput({
+      id: "street",
+      name: "street",
+      label: { text: "Street" },
+      value: street,
+      errorMessage: error_street and { text: error_street }
+    }) }}
+
+    {{ govukInput({
+      id: "town",
+      name: "town",
+      label: { text: "Town or City" },
+      value: town,
+      errorMessage: error_town and { text: error_town }
+    }) }}
+
+    {{ govukInput({
+      id: "county",
+      name: "county",
+      label: { text: "County" },
+      value: county,
+      errorMessage: error_county and { text: error_county }
+    }) }}
+
+    {{ govukInput({
+      id: "postcode",
+      name: "postcode",
+      label: { text: "Postcode" },
+      value: postcode,
+      errorMessage: error_postcode and { text: error_postcode }
+    }) }}
+
+    {{ govukButton({ text: "Continue" }) }}
+  </form>
+{% endblock %}

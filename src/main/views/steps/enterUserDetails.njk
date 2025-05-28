@@ -1,0 +1,45 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block content %}
+  {{ govukBackLink({ text: "Back", href: backUrl }) }}
+
+  <h1 class="govuk-heading-l">Enter your details</h1>
+
+  <form method="post" action="{{ url }}">
+    {{ govukSelect({
+      id: "title",
+      name: "title",
+      label: { text: "Title" },
+      items: [
+        { value: "", text: "Select title" },
+        { value: "Mr", text: "Mr", selected: title == "Mr" },
+        { value: "Mrs", text: "Mrs", selected: title == "Mrs" },
+        { value: "Miss", text: "Miss", selected: title == "Miss" }
+      ]
+    }) }}
+
+    {{ govukInput({
+      id: "firstName",
+      name: "firstName",
+      label: { text: "First name" },
+      value: firstName,
+      errorMessage: error_firstName and { text: error_firstName }
+    }) }}
+
+    {{ govukInput({
+      id: "lastName",
+      name: "lastName",
+      label: { text: "Last name" },
+      value: lastName,
+      errorMessage: error_lastName and { text: error_lastName }
+    }) }}
+
+    {{ govukButton({ text: "Continue" }) }}
+  </form>
+{% endblock %}
+
