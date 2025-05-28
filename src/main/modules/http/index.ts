@@ -79,7 +79,7 @@ export class HttpService {
           // Clear the token if regeneration failed
           this.s2sToken = null;
           this.tokenExpiry = null;
-          this.logger.error('[HttpService] Token regeneration error:', error);
+          this.logger.error('Token regeneration error:', error);
           throw error;
         }
       })().finally(() => {

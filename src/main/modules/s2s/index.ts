@@ -91,7 +91,7 @@ export class S2S {
 
       return serviceToken;
     } catch (error) {
-      this.logger.error('[S2S] Error getting service token:', error);
+      this.logger.error('Error getting service token:', error);
       return null;
     }
   }
