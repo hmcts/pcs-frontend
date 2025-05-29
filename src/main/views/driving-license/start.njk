@@ -4,7 +4,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block content %}
-  <h1 class="govuk-heading-l">{{ step.title }}</h1>
 
   <form method="post">
     {% set legendText = step.fields.hasProvisional.label if step.fields.hasProvisional.label else 'Do you already have a provisional licence?' %}
@@ -18,6 +17,7 @@
       fieldset: {
         legend: {
           text: legendText,
+          isPageHeading: true,
           classes: 'govuk-fieldset__legend--l'
         }
       },

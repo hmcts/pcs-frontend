@@ -1,0 +1,21 @@
+{% extends "template.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">{{ step.title if step.title else 'Not eligible' }}</h1>
+  
+  <p class="govuk-body">Unfortunately, you are not eligible for this service based on your answers.</p>
+  
+  {% if previousStepUrl %}
+    <p class="govuk-body">
+      <a href="{{ previousStepUrl }}" class="govuk-link">Go back to change your answer</a>
+    </p>
+  {% endif %}
+
+  {{ govukButton({
+    text: 'Start again',
+    href: '/',
+    classes: 'govuk-button--secondary'
+  }) }}
+{% endblock %} 

@@ -1,0 +1,50 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+
+{% if previousStepUrl %}
+  {{ govukBackLink({
+    text: "Back",
+    href: previousStepUrl
+  }) }}
+{% endif %}
+
+  <form method="post">
+    {% set ageValue = data.age if data.age else '' %}
+    {% set ageError = errors.age if errors.age else false %}
+
+    {{ govukRadios({
+      name: "age",
+      fieldset: {
+        legend: {
+          text: step.title,
+          isPageHeading: true,
+          classes: "govuk-fieldset__legend--l"
+        }
+      },
+      errorMessage: { text: ageError } if ageError else null,
+      items: [
+        {
+          value: "yes",
+          text: "Yes",
+          checked: ageValue == 'yes'
+        },
+        {
+          value: "no",
+          text: "No",
+          checked: ageValue == 'no'
+        }
+      ]
+    }) }}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "Continue",
+        attributes: { type: 'submit' }
+      }) }}
+    </div>
+  </form>
+{% endblock %}
