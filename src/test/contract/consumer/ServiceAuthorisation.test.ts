@@ -18,11 +18,12 @@ describe('Service Authorisation Consumer Pact Test', () => {
     await mockProvider.finalize();
   });
 
-  const BASE_URL = 'http://localhost:5050';
   const MICRO_SERVICE_NAME = 'someMicroServiceName';
   const MICRO_SERVICE_TOKEN = 'someMicroServiceToken';
 
   test('should receive a token when making a request to the lease endpoint', async () => {
+    const BASE_URL = mockProvider.mockService.baseUrl;
+
     await mockProvider.addInteraction({
       state: 'microservice with valid credentials',
       uponReceiving: 'a request for a token',
