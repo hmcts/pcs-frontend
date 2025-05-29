@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
+import { Logger } from '@hmcts/nodejs-logging';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
 import { Journey, JourneySchema } from './schema';
@@ -41,6 +42,8 @@ export class WizardEngine {
   public readonly journey: Journey;
   public readonly slug: string;
   public readonly basePath: string;
+
+  logger = Logger.getLogger('WizardEngine');
 
   constructor(
     filePath: string,
@@ -98,14 +101,14 @@ export class WizardEngine {
       }
     }
 
-    console.log('Resolving next for step:', step.id);
-    console.log('Expression:', nxt.when);
-    console.log('All data:', allData);
-    console.log('Flattened data:', flattenedData);
+    this.logger.info('Resolving next for step:', step.id);
+    this.logger.info('Expression:', nxt.when);
+    this.logger.info('All data:', allData);
+    this.logger.info('Flattened data:', flattenedData);
 
     const ok = this.evalExpr(nxt.when, flattenedData);
-    console.log('Expression result:', ok);
-    console.log('Going to:', ok ? nxt.goto : nxt.else);
+    this.logger.info('Expression result:', ok);
+    this.logger.info('Going to:', ok ? nxt.goto : nxt.else);
 
     return ok ? nxt.goto : nxt.else;
   }
@@ -136,26 +139,42 @@ export class WizardEngine {
     const step = this.journey.steps[stepId];
     const stepType = step?.type;
 
+    this.logger.info('Resolving template for stepId:', stepId, 'stepType:', stepType, 'slug:', this.slug);
+
     // For generic step types, try default template first
-    if (stepType === 'summary' || stepType === 'confirmation') {
-      const defaultTemplatePath = path.join('_defaults', stepId);
+    const genericStepTypes = ['summary', 'confirmation', 'ineligible', 'error', 'complete', 'success'];
+    if (genericStepTypes.includes(stepType || stepId)) {
+      const templateName = stepType || stepId;
+      const defaultTemplatePath = path.join('_defaults', templateName);
+
       // Check if journey-specific template exists, otherwise use default
-      const journeySpecificPath = path.join(this.slug, stepId);
+      const journeySpecificPath = path.join(this.slug, templateName);
+
+      this.logger.info('Generic step detected. Journey specific path:', journeySpecificPath);
+      this.logger.info('Default path:', defaultTemplatePath);
 
       try {
         // Check if journey-specific template exists
-        const viewsDir = path.join(__dirname, '..', '..', 'views');
+        const viewsDir = path.join(__dirname, '..', '..', '..', 'views');
         const journeyTemplatePath = path.join(viewsDir, `${journeySpecificPath}.njk`);
+
+        this.logger.info('Checking for journey template at:', journeyTemplatePath);
         fs.accessSync(journeyTemplatePath);
+
+        this.logger.info('Journey-specific template found, using:', journeySpecificPath);
         return journeySpecificPath;
-      } catch {
+      } catch (error) {
+        this.logger.info('Journey-specific template not found, error:', error);
+        this.logger.info('Falling back to default template:', defaultTemplatePath);
         // Fall back to default template
         return defaultTemplatePath;
       }
     }
 
     // For all other steps, use journey-specific template
-    return path.join(this.slug, stepId);
+    const regularPath = path.join(this.slug, stepId);
+    this.logger.info('Regular step, using journey-specific template:', regularPath);
+    return regularPath;
   }
 
   private buildSummaryRows(
@@ -187,47 +206,44 @@ export class WizardEngine {
 
       // If step has fields defined, show individual field values
       if (stepConfig.fields) {
-        for (const [fieldName, fieldConfig] of Object.entries(stepConfig.fields)) {
-          const fieldValue = stepData[fieldName];
-          if (fieldValue) {
-            // Use field label if available, otherwise use field name
-            const fieldLabel = (fieldConfig as FieldConfig).label || fieldName;
-            const changeUrl = `${this.basePath}/${caseId}/${stepId}`;
-
-            summaryRows.push({
-              key: { text: fieldLabel },
-              value: { text: String(fieldValue) },
-              actions: {
-                items: [
-                  {
-                    href: changeUrl,
-                    text: 'Change',
-                    visuallyHiddenText: `change ${fieldLabel.toLowerCase()}`,
-                  },
-                ],
-              },
-            });
-          }
-        }
-      } else {
-        // If no fields defined, show step title with raw data
         const stepTitle = stepConfig.title || stepId;
         const changeUrl = `${this.basePath}/${caseId}/${stepId}`;
 
-        summaryRows.push({
-          key: { text: stepTitle },
-          value: { text: JSON.stringify(stepData) },
-          actions: {
-            items: [
-              {
-                href: changeUrl,
-                text: 'Change',
-                visuallyHiddenText: `change ${stepTitle.toLowerCase()}`,
-              },
-            ],
-          },
-        });
+        // Collect all field values for this step
+        const fieldValues: string[] = [];
+        for (const [fieldName] of Object.entries(stepConfig.fields)) {
+          const fieldValue = stepData[fieldName];
+          if (fieldValue) {
+            // Format the field value properly, especially for arrays
+            let displayValue: string;
+            if (Array.isArray(fieldValue)) {
+              // Join array values with proper spacing
+              displayValue = fieldValue.join(', ');
+            } else {
+              displayValue = String(fieldValue);
+            }
+            fieldValues.push(displayValue);
+          }
+        }
+
+        // Only add a row if there are actually field values
+        if (fieldValues.length > 0) {
+          summaryRows.push({
+            key: { text: stepTitle },
+            value: { text: fieldValues.join(', ') },
+            actions: {
+              items: [
+                {
+                  href: changeUrl,
+                  text: 'Change',
+                  visuallyHiddenText: `change ${stepTitle.toLowerCase()}`,
+                },
+              ],
+            },
+          });
+        }
       }
+      // Skip steps that don't have fields defined - these are typically navigation steps
     }
 
     return summaryRows;
