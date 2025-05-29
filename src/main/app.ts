@@ -11,6 +11,7 @@ import { HTTPError } from './HttpError';
 import { setupDev } from './development';
 import { AppInsights } from './modules/appinsights';
 import { Helmet } from './modules/helmet';
+import { Journey } from './modules/journey';
 import { Nunjucks } from './modules/nunjucks';
 import { OIDCModule } from './modules/oidc';
 import { PropertiesVolume } from './modules/properties-volume';
@@ -34,6 +35,7 @@ new Helmet(developmentMode).enableFor(app);
 new Session().enableFor(app);
 new S2S().enableFor(app);
 new OIDCModule().enableFor(app);
+new Journey().enableFor(app);
 
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
