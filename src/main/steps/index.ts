@@ -7,13 +7,15 @@ import { step as page4 } from './page4';
 
 import { step as enterUserDetails } from './userJourney/enter-user-details';
 import { step as enterAddress } from './userJourney/enter-address';
-import { step as summary } from './userJourney/summary';
+import { step as summary }  from './userJourney/summary';
 
-export const stepsWithContent: StepDefinition[] = [page1, page2, page3Yes, page3No, page4];
+export const stepsWithContent: StepDefinition[] = [page1, page2, page3Yes, page3No, page4, enterUserDetails,
+  enterAddress,
+  summary,];
 
 export const protectedSteps = [
-  enterUserDetails,
-  enterAddress,
-  summary,
+  // enterUserDetails,
+  // enterAddress,
+  // summary,
 ];
 

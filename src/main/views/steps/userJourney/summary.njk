@@ -1,0 +1,55 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block pageTitle %}
+  {{ title }}
+{% endblock %}
+
+{% block content %}
+ {{ govukBackLink({ text: "Back", href: backUrl }) }}
+
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+
+  <h2 class="govuk-heading-m">Your details</h2>
+  <dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Title</dt>
+      <dd class="govuk-summary-list__value">{{ userDetails.title or 'Not provided' }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">First name</dt>
+      <dd class="govuk-summary-list__value">{{ userDetails.firstName or 'Not provided' }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Last name</dt>
+      <dd class="govuk-summary-list__value">{{ userDetails.lastName or 'Not provided' }}</dd>
+    </div>
+  </dl>
+
+  <h2 class="govuk-heading-m">Address</h2>
+  <dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Street</dt>
+      <dd class="govuk-summary-list__value">{{ address.street or 'Not provided' }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Town</dt>
+      <dd class="govuk-summary-list__value">{{ address.town or 'Not provided' }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">County</dt>
+      <dd class="govuk-summary-list__value">{{ address.county or 'Not provided' }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Postcode</dt>
+      <dd class="govuk-summary-list__value">{{ address.postcode or 'Not provided' }}</dd>
+    </div>
+  </dl>
+
+  <form method="post">
+    <button class="govuk-button" data-module="govuk-button">
+      {{ buttons.continue }}
+    </button>
+  </form>
+
+{% endblock %}

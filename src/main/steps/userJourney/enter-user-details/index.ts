@@ -1,15 +1,24 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, validateAndStoreForm } from 'app/controller/controllerFactory';
-import common from 'assets/locales/en/common.json';
+import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
+import common from '../../../assets/locales/en/common.json';
 
-const content = { ...common, ...pageContent };
+const stepName = 'enter-user-details';
+
+const content = { ...common };
+
+const fields: FormFieldConfig[] = [
+  { name: 'title', type: 'text', required: true, errorMessage: 'Select a title' },
+  { name: 'firstName', type: 'text', required: true, errorMessage: 'Enter your first name' },
+  { name: 'lastName', type: 'text', required: true, errorMessage: 'Enter your last name' }
+];
 
 export const step: StepDefinition = {
-  url: '/user-journey/enter-user-details',
-  name: 'enter-user-details',
-  view: 'steps/userJourney/enter-user-details/template.njk',
-  generateContent: () => content,
+  url: '/steps/user-journey/enter-user-details',
+  name: stepName,
+  view: 'steps/userJourney/enterUserDetails.njk',
   stepDir: __dirname,
-  getController: createGetController('steps/userJourney/enter-user-details/template.njk', 'enter-user-details', content),
-  postController: validateAndStoreForm('enter-user-details', [{ name: 'firstName', type: 'text', required: true }], '/user-journey/enter-address', content),
+  generateContent: () => (content),
+  getController: createGetController('steps/userJourney/enterUserDetails.njk', stepName, content),
+  postController: validateAndStoreForm(stepName, fields, '/steps/user-journey/enter-address', content)
 };

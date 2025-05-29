@@ -6,8 +6,7 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block content %}
-  {{ govukBackLink({ text: "Back", href: backUrl }) }}
-
+ 
   <h1 class="govuk-heading-l">Enter your details</h1>
 
   <form method="post" action="{{ url }}">
