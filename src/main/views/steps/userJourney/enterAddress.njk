@@ -4,7 +4,9 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block content %}
-  {{ govukBackLink({ text: "Back", href: backUrl }) }}
+  {% if backUrl %}
+    {{ govukBackLink({ text: "Back", href: backUrl }) }}
+  {% endif %}
 
   <h1 class="govuk-heading-l">Enter your address</h1>
 

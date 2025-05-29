@@ -1,4 +1,5 @@
 import { createGetController, validateAndStoreForm } from 'app/controller/controllerFactory';
+import { getFormData } from 'app/controller/sessionHelper';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import common from '../../../assets/locales/en/common.json';
@@ -18,7 +19,18 @@ export const step: StepDefinition = {
   name: stepName,
   view: 'steps/userJourney/enterUserDetails.njk',
   stepDir: __dirname,
-  generateContent: () => (content),
-  getController: createGetController('steps/userJourney/enterUserDetails.njk', stepName, content),
+  generateContent: () => content,
+  getController: createGetController(
+    'steps/userJourney/enterUserDetails.njk',
+    stepName,
+    content,
+    req => {
+      const savedData = getFormData(req, stepName);
+      return {
+        ...content,
+        ...savedData,
+      };
+    }
+  ),
   postController: validateAndStoreForm(stepName, fields, '/steps/user-journey/enter-address', content)
 };
