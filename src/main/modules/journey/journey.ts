@@ -12,9 +12,7 @@ export class Journey {
   logger = Logger.getLogger('journey');
 
   enableFor(app: Express): void {
-    const journeyFiles = glob.sync(
-        path.resolve(__dirname, '..', '..', 'journeys', '*.@(json|yaml|yml)')
-      );
+    const journeyFiles = glob.sync(path.resolve(__dirname, '..', '..', 'journeys', '*.@(json|yaml|yml)'));
 
     journeyFiles.forEach(file => {
       const slug = path.basename(file, path.extname(file));
