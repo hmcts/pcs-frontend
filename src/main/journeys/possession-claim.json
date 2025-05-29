@@ -3,34 +3,40 @@
   "steps": {
     "start": {
       "title": "Before you start",
+      "next": "page2"
+    },
+    "page2": {
+      "title": "Are you 18 or over?",
       "fields": {
-        "hasProvisional": {
+        "age": {
           "type": "radios",
           "options": ["yes", "no"],
-          "validate": {
-            "required": "Select yes or no"
-          }
+          "validate": { "required": "Select yes or no" }
         }
       },
       "next": {
-        "when": "hasProvisional == 'yes'",
-        "goto": "summary",
-        "else": "personal-details"
+        "when": "age == 'yes'",
+        "goto": "page3",
+        "else": "ineligible"
       }
     },
-    "personal-details": {
-      "title": "Your personal details",
+    "ineligible": {
+      "title": "You are not eligible to make a claim",
+      "type": "ineligible"
+    },
+    "page3": {
+      "title": "What are your grounds for possession?",
       "fields": {
-        "firstName": {
-          "type": "text",
-          "validate": { "required": "Enter your first name" }
-        },
-        "lastName": {
-          "type": "text",
-          "validate": { "required": "Enter your last name" }
+        "grounds": {
+          "type": "checkboxes",
+          "options": ["Rent arrears (ground 8)", "Breach of contract (ground 9)", "Other (ground 10)"],
+          "validate": { "required": "Select at least one option" }
         }
       },
-      "next": "summary"
+      "next": {
+        "when": "grounds.length >= 1",
+        "goto": "summary"
+      }
     },
     "summary": {
       "title": "Check your answers",
