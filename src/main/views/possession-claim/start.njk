@@ -1,0 +1,34 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+  <p class="govuk-body">{{ paragraph1 }}</p>
+  <p class="govuk-body">{{ paragraph2 }}</p>
+  <h2 class="govuk-heading-s">{{ subtitle1 }}</h2>
+  <p class="govuk-body">{{ paragraph3 }}</p>
+
+  <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+    <li>
+      Information about the type of notice you've given and when it was given (if applicable)
+    </li>
+    <li>
+      Details about the property you'd like to claim possession of
+    </li>
+    <li>
+      The defendants' details (if known)
+    </li>
+    <li>
+      Your grounds for posession and details about your reasons for making a possession claim
+    </li>
+    <li>
+      Copies of relevant documents
+    </li>
+  </ul>
+  <form method="post">
+    {{ govukButton({
+      text: "Start",
+      preventDoubleClick: true
+    }) }}
+  </form>
+{% endblock %}

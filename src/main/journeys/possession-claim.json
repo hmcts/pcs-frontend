@@ -1,0 +1,45 @@
+{
+    "meta": { "name": "Possession Claim" },
+    "steps": {
+      "start": {
+        "title": "Before you start",
+        "fields": {
+          "hasProvisional": {
+            "type": "radios",
+            "options": ["yes", "no"],
+            "validate": {
+              "required": "Select yes or no"
+            }
+          }
+        },
+        "next": {
+          "when": "hasProvisional == 'yes'",
+          "goto": "summary",
+          "else": "personal-details"
+        }
+      },
+      "personal-details": {
+        "title": "Your personal details",
+        "fields": {
+          "firstName": {
+            "type": "text",
+            "validate": { "required": "Enter your first name" }
+          },
+          "lastName": {
+            "type": "text",
+            "validate": { "required": "Enter your last name" }
+          }
+        },
+        "next": "summary"
+      },
+      "summary": {
+          "title": "Check your answers",
+          "type": "summary",
+          "next": "confirmation"
+      },
+      "confirmation": {
+          "title": "Application complete",
+          "type": "confirmation"
+      }
+    }
+  } 
