@@ -88,7 +88,7 @@ export class WizardEngine {
     if (typeof nxt === 'string') {
       return nxt;
     }
-    
+
     // Flatten the data for expression evaluation
     // Convert {start: {hasProvisional: 'yes'}} to {hasProvisional: 'yes'}
     const flattenedData: Record<string, unknown> = {};
@@ -97,16 +97,16 @@ export class WizardEngine {
         Object.assign(flattenedData, stepData);
       }
     }
-    
+
     console.log('Resolving next for step:', step.id);
     console.log('Expression:', nxt.when);
     console.log('All data:', allData);
     console.log('Flattened data:', flattenedData);
-    
+
     const ok = this.evalExpr(nxt.when, flattenedData);
     console.log('Expression result:', ok);
     console.log('Going to:', ok ? nxt.goto : nxt.else);
-    
+
     return ok ? nxt.goto : nxt.else;
   }
 
@@ -135,13 +135,13 @@ export class WizardEngine {
     // Check if step has a generic type that should use default templates
     const step = this.journey.steps[stepId];
     const stepType = step?.type;
-    
+
     // For generic step types, try default template first
     if (stepType === 'summary' || stepType === 'confirmation') {
       const defaultTemplatePath = path.join('_defaults', stepId);
       // Check if journey-specific template exists, otherwise use default
       const journeySpecificPath = path.join(this.slug, stepId);
-      
+
       try {
         // Check if journey-specific template exists
         const viewsDir = path.join(__dirname, '..', '..', 'views');
@@ -153,27 +153,38 @@ export class WizardEngine {
         return defaultTemplatePath;
       }
     }
-    
+
     // For all other steps, use journey-specific template
     return path.join(this.slug, stepId);
   }
 
-  private buildSummaryRows(allData: Record<string, unknown>, caseId: string): { key: { text: string }; value: { text: string }; actions?: { items: { href: string; text: string; visuallyHiddenText: string }[] } }[] {
-    const summaryRows: { key: { text: string }; value: { text: string }; actions?: { items: { href: string; text: string; visuallyHiddenText: string }[] } }[] = [];
-    
+  private buildSummaryRows(
+    allData: Record<string, unknown>,
+    caseId: string
+  ): {
+    key: { text: string };
+    value: { text: string };
+    actions?: { items: { href: string; text: string; visuallyHiddenText: string }[] };
+  }[] {
+    const summaryRows: {
+      key: { text: string };
+      value: { text: string };
+      actions?: { items: { href: string; text: string; visuallyHiddenText: string }[] };
+    }[] = [];
+
     // Iterate through each step in the journey
     for (const [stepId, stepConfig] of Object.entries(this.journey.steps)) {
       // Skip summary and confirmation steps
       if (stepConfig.type === 'summary' || stepConfig.type === 'confirmation') {
         continue;
       }
-      
+
       // Check if this step has any data
       const stepData = allData[stepId] as Record<string, unknown>;
       if (!stepData) {
         continue;
       }
-      
+
       // If step has fields defined, show individual field values
       if (stepConfig.fields) {
         for (const [fieldName, fieldConfig] of Object.entries(stepConfig.fields)) {
@@ -182,7 +193,7 @@ export class WizardEngine {
             // Use field label if available, otherwise use field name
             const fieldLabel = (fieldConfig as FieldConfig).label || fieldName;
             const changeUrl = `${this.basePath}/${caseId}/${stepId}`;
-            
+
             summaryRows.push({
               key: { text: fieldLabel },
               value: { text: String(fieldValue) },
@@ -191,10 +202,10 @@ export class WizardEngine {
                   {
                     href: changeUrl,
                     text: 'Change',
-                    visuallyHiddenText: `change ${fieldLabel.toLowerCase()}`
-                  }
-                ]
-              }
+                    visuallyHiddenText: `change ${fieldLabel.toLowerCase()}`,
+                  },
+                ],
+              },
             });
           }
         }
@@ -202,7 +213,7 @@ export class WizardEngine {
         // If no fields defined, show step title with raw data
         const stepTitle = stepConfig.title || stepId;
         const changeUrl = `${this.basePath}/${caseId}/${stepId}`;
-        
+
         summaryRows.push({
           key: { text: stepTitle },
           value: { text: JSON.stringify(stepData) },
@@ -211,14 +222,14 @@ export class WizardEngine {
               {
                 href: changeUrl,
                 text: 'Change',
-                visuallyHiddenText: `change ${stepTitle.toLowerCase()}`
-              }
-            ]
-          }
+                visuallyHiddenText: `change ${stepTitle.toLowerCase()}`,
+              },
+            ],
+          },
         });
       }
     }
-    
+
     return summaryRows;
   }
 
@@ -248,10 +259,10 @@ export class WizardEngine {
         const { data } = await this.store.load(req, Number(caseId));
         const previousStepId = this.findPreviousStep(step.id, data);
         const previousStepUrl = previousStepId ? `${this.basePath}/${caseId}/${previousStepId}` : null;
-        
+
         // Build summary rows for summary-type steps
         const summaryRows = step.type === 'summary' ? this.buildSummaryRows(data, caseId) : [];
-        
+
         res.render(this.resolveTemplatePath(step.id), {
           data: data[step.id] ?? {},
           errors: null,
@@ -276,17 +287,15 @@ export class WizardEngine {
         const { data } = await this.store.load(req, Number(caseId));
         const previousStepId = this.findPreviousStep(step.id, data);
         const previousStepUrl = previousStepId ? `${this.basePath}/${caseId}/${previousStepId}` : null;
-        
-        return res
-          .status(400)
-          .render(this.resolveTemplatePath(step.id), { 
-            data: req.body, 
-            errors: error, 
-            allData: data, 
-            caseId, 
-            step,
-            previousStepUrl,
-          });
+
+        return res.status(400).render(this.resolveTemplatePath(step.id), {
+          data: req.body,
+          errors: error,
+          allData: data,
+          caseId,
+          step,
+          previousStepUrl,
+        });
       }
 
       try {
