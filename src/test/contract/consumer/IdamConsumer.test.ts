@@ -17,6 +17,7 @@ let BASE_URL: string;
 describe('Idam Consumer Pact Test', () => {
   beforeEach(async () => {
     await mockProvider.setup();
+    await new Promise(res => setTimeout(res, 100));
     BASE_URL = mockProvider.mockService.baseUrl;
   });
   afterEach(async () => {
