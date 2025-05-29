@@ -1,12 +1,11 @@
 import { Application } from 'express';
 
-import { stepsWithContent } from '../steps';
+import { stepsWithContent, protectedSteps } from '../steps';
 import { oidcMiddleware } from 'middleware/oidc';
 
 export default function registerSteps(app: Application): void {
   for (const step of stepsWithContent) {
-    // const isProtected = protectedSteps.includes(step);
-    const isProtected = false;
+    const isProtected = protectedSteps.includes(step);
     const middlewares = isProtected ? [oidcMiddleware] : [];
 
     if (step.getController) {

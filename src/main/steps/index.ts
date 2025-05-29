@@ -14,8 +14,8 @@ export const stepsWithContent: StepDefinition[] = [page1, page2, page3Yes, page3
   summary,];
 
 export const protectedSteps = [
-  // enterUserDetails,
-  // enterAddress,
-  // summary,
+  enterUserDetails,
+  enterAddress,
+  summary
 ];
 
