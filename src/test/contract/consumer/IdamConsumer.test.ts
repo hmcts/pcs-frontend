@@ -9,7 +9,7 @@ const mockProvider = new Pact({
   port: 5000,
   log: './pact/logs',
   dir: './pact/pacts',
-  logLevel: 'info',
+  logLevel: 'debug',
 });
 
 let BASE_URL: string;
@@ -24,7 +24,7 @@ describe('Idam Consumer Pact Test', () => {
     await mockProvider.finalize();
   });
 
-  const ACCESS_TOKEN = 'dummy-access-token';
+  const ACCESS_TOKEN = 'someAccessToken';
 
   test('should receive user information from /o/userinfo', async () => {
     const expectedUserInfo = {
