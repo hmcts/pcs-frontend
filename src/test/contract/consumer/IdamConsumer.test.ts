@@ -9,7 +9,7 @@ const mockProvider = new Pact({
   port: 5000,
   log: './pact/logs',
   dir: './pact/pacts',
-  logLevel: 'debug',
+  logLevel: 'info',
 });
 
 let BASE_URL: string;
