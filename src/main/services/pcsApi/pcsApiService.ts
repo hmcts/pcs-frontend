@@ -5,7 +5,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 
-import type { CourtVenue } from '../../interface/courtVenue.interface';
+import type { CourtVenue } from '../../interfaces/courtVenue.interface';
 
 import { type DashboardNotification } from './dashboardNotification.interface';
 import { type DashboardTaskGroup } from './dashboardTaskGroup.interface';
