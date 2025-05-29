@@ -33,13 +33,13 @@
       "next": "summary"
     },
     "summary": {
-        "title": "Check your answers",
-        "type": "summary",
-        "next": "confirmation"
+      "title": "Check your answers",
+      "type": "summary",
+      "next": "confirmation"
     },
     "confirmation": {
-        "title": "Application complete",
-        "type": "confirmation"
+      "title": "Application complete",
+      "type": "confirmation"
     }
   }
-} 
+}
