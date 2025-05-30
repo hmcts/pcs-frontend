@@ -10,33 +10,21 @@
   <h1 class="govuk-heading-l">Enter your details</h1>
 
   <form method="post" action="{{ url }}">
-    {{ govukSelect({
-      id: "title",
-      name: "title",
-      label: { text: "Title" },
-      errorMessage: error_title and { text: error_title },
-      items: [
-        { value: "", text: "Select title" },
-        { value: "Mr", text: "Mr", selected: title == "Mr" },
-        { value: "Mrs", text: "Mrs", selected: title == "Mrs" },
-        { value: "Miss", text: "Miss", selected: title == "Miss" }
-      ]
-    }) }}
 
     {{ govukInput({
-      id: "firstName",
-      name: "firstName",
+      id: "applicantForename",
+      name: "applicantForename",
       label: { text: "First name" },
-      value: firstName,
-      errorMessage: error_firstName and { text: error_firstName }
+      value: applicantForename,
+      errorMessage: error_applicantForename and { text: error_applicantForename }
     }) }}
 
     {{ govukInput({
-      id: "lastName",
-      name: "lastName",
+      id: "applicantSurname",
+      name: "applicantSurname",
       label: { text: "Last name" },
-      value: lastName,
-      errorMessage: error_lastName and { text: error_lastName }
+      value: applicantSurname,
+      errorMessage: error_applicantSurname and { text: error_applicantSurname }
     }) }}
 
     {{ govukButton({ text: "Continue" }) }}

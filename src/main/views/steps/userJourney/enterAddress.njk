@@ -4,19 +4,31 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block content %}
-  {% if backUrl %}
-    {{ govukBackLink({ text: "Back", href: backUrl }) }}
-  {% endif %}
+  {{ govukBackLink({ text: "Back", href: backUrl }) }}
 
   <h1 class="govuk-heading-l">Enter your address</h1>
 
   <form method="post" action="{{ url }}">
     {{ govukInput({
-      id: "street",
-      name: "street",
-      label: { text: "Street" },
-      value: street,
-      errorMessage: error_street and { text: error_street }
+      id: "addressLine1",
+      name: "addressLine1",
+      label: { text: "Address Line 1" },
+      value: addressLine1,
+      errorMessage: error_addressLine1 and { text: error_addressLine1 }
+    }) }}
+
+    {{ govukInput({
+      id: "addressLine2",
+      name: "addressLine2",
+      label: { text: "Address Line 2" },
+      value: addressLine2
+    }) }}
+
+    {{ govukInput({
+      id: "addressLine3",
+      name: "addressLine3",
+      label: { text: "Address Line 3" },
+      value: addressLine3
     }) }}
 
     {{ govukInput({
@@ -31,8 +43,7 @@
       id: "county",
       name: "county",
       label: { text: "County" },
-      value: county,
-      errorMessage: error_county and { text: error_county }
+      value: county
     }) }}
 
     {{ govukInput({
@@ -41,6 +52,14 @@
       label: { text: "Postcode" },
       value: postcode,
       errorMessage: error_postcode and { text: error_postcode }
+    }) }}
+
+    {{ govukInput({
+      id: "country",
+      name: "country",
+      label: { text: "Country" },
+      value: country,
+      errorMessage: error_country and { text: error_country }
     }) }}
 
     {{ govukButton({ text: "Continue" }) }}

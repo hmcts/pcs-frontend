@@ -12,6 +12,7 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   generateContent: () => content,
   getController: createGetController('steps/userJourney/summary.njk', 'summary', content, req => {
+    console.log('Session Data:', req.session?.formData);
     const userDetails = getFormData(req, 'enter-user-details');
     const address = getFormData(req, 'enter-address');
     return {

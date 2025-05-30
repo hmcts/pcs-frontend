@@ -9,9 +9,8 @@ const stepName = 'enter-user-details';
 const content = { ...common };
 
 const fields: FormFieldConfig[] = [
-  { name: 'title', type: 'text', required: true, errorMessage: 'Select a title' },
-  { name: 'firstName', type: 'text', required: true, errorMessage: 'Enter your first name' },
-  { name: 'lastName', type: 'text', required: true, errorMessage: 'Enter your last name' }
+  { name: 'applicantForename', type: 'text', required: true, errorMessage: 'Enter your first name' },
+  { name: 'applicantSurname', type: 'text', required: true, errorMessage: 'Enter your last name' }
 ];
 
 export const step: StepDefinition = {

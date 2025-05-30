@@ -5,10 +5,8 @@
 
 {% block content %}
 
-  {{ govukBackLink({
-    text: "Back",
-    href: "/steps/user-journey/enter-address"
-  }) }}
+  {{ govukBackLink({ text: "Back", href: backUrl }) }}
+
 
   <h1 class="govuk-heading-l">Check your details before submitting</h1>
 
@@ -16,27 +14,10 @@
     rows: [
       {
         key: {
-          text: "Title"
-        },
-        value: {
-          text: userDetails.title
-        },
-        actions: {
-          items: [
-            {
-              href: "/steps/user-journey/enter-user-details",
-              text: "Change",
-              visuallyHiddenText: "title"
-            }
-          ]
-        }
-      },
-      {
-        key: {
           text: "First name"
         },
         value: {
-          text: userDetails.firstName
+          text: userDetails.applicantForename
         },
         actions: {
           items: [
@@ -53,7 +34,7 @@
           text: "Last name"
         },
         value: {
-          text: userDetails.lastName
+          text: userDetails.applicantSurname
         },
         actions: {
           items: [
@@ -67,68 +48,23 @@
       },
       {
         key: {
-          text: "Street"
+          text: "Address"
         },
         value: {
-          text: address.street
+          html: (address.addressLine1 or '') + '<br>' +
+                (address.addressLine2 or '') + '<br>' +
+                (address.addressLine3 or '') + '<br>' +
+                (address.town or '') + '<br>' +
+                (address.county or '') + '<br>' +
+                (address.postcode or '') + '<br>' +
+                (address.country or '')
         },
         actions: {
           items: [
             {
               href: "/steps/user-journey/enter-address",
               text: "Change",
-              visuallyHiddenText: "street"
-            }
-          ]
-        }
-      },
-      {
-        key: {
-          text: "Town"
-        },
-        value: {
-          text: address.town
-        },
-        actions: {
-          items: [
-            {
-              href: "/steps/user-journey/enter-address",
-              text: "Change",
-              visuallyHiddenText: "town"
-            }
-          ]
-        }
-      },
-      {
-        key: {
-          text: "County"
-        },
-        value: {
-          text: address.county
-        },
-        actions: {
-          items: [
-            {
-              href: "/steps/user-journey/enter-address",
-              text: "Change",
-              visuallyHiddenText: "county"
-            }
-          ]
-        }
-      },
-      {
-        key: {
-          text: "Postcode"
-        },
-        value: {
-          text: address.postcode
-        },
-        actions: {
-          items: [
-            {
-              href: "/steps/user-journey/enter-address",
-              text: "Change",
-              visuallyHiddenText: "postcode"
+              visuallyHiddenText: "your address"
             }
           ]
         }

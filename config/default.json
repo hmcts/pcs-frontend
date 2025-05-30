@@ -20,6 +20,9 @@
     "microservice": "pcs_frontend",
     "url": "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   },
+  "ccd": {
+     "url": "ccd-data-store-api-pcs-api-pr-219.preview.platform.hmcts.net"
+  },
   "secrets": {
     "pcs": {
       "pcs-frontend-s2s-secret": "AAAAAAAAAAAAAAAA",

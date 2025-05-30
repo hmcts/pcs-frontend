@@ -21,6 +21,7 @@ export const createGetController = (
 
     return {
       ...content,
+      ...formData,
       selected,
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,

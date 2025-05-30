@@ -9,6 +9,26 @@ interface UserInfoResponseWithToken extends UserInfoResponse {
   refreshToken: string;
 }
 
+export interface CcdCaseData {
+  applicantForename: string;
+  applicantSurname: string;
+  applicantAddress: {
+    AddressLine1: string;
+    AddressLine2: string;
+    AddressLine3: string;
+    PostTown: string;
+    County: string;
+    PostCode: string;
+    Country: string;
+  };
+}
+
+
+export interface CcdCase {
+  id: string;
+  data: CcdCaseData;
+}
+
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
@@ -16,7 +36,9 @@ interface CustomSessionData extends SessionData {
   serviceToken?: string;
   returnTo?: string;
   formData?: Record<string, any>;
+  ccdCase?: CcdCase;
   destroy(callback: (err?: Error) => void): void;
+
 }
 
 declare module 'express-session' {

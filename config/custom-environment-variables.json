@@ -20,6 +20,9 @@
   "s2s": {
     "url": "S2S_URL"
   },
+   "ccd": {
+    "url": "CCD_URL"
+  },
   "oidc": {
     "issuer": "OIDC_ISSUER",
     "clientId": "OIDC_CLIENT_ID",
