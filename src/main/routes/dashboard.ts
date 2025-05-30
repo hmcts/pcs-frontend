@@ -15,8 +15,8 @@ interface MappedTask {
   hint?: { html: string };
   href?: string;
   status: {
-    text: string;
-    tag: { text: string; classes: string };
+    text?: string;
+    tag?: { text: string; classes?: string };
   };
 }
 
@@ -39,7 +39,6 @@ const mapTaskGroups =
             throw new Error('Nunjucks environment not initialized');
           }
 
-          const tag = STATUS_MAP[task.status];
           const taskGroupId = taskGroup.groupId.toLowerCase();
 
           const hint =
@@ -62,10 +61,7 @@ const mapTaskGroups =
             hint,
             // TODO: slugify the templateId
             href: task.status === 'NOT_AVAILABLE' ? undefined : `${caseReference}/${taskGroupId}/${task.templateId}`,
-            status: {
-              text: task.status,
-              tag,
-            },
+            status: STATUS_MAP[task.status],
           };
         }),
       };
