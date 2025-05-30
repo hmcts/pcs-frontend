@@ -6,9 +6,22 @@
 
 Running the application requires the following tools to be installed in your environment:
 
-- [Node.js](https://nodejs.org/) v20.0.0 or later
+- [Node.js](https://nodejs.org/) v22.0.0 or later
 - [yarn](https://yarnpkg.com/)
 - [Docker](https://www.docker.com)
+
+#### NVM
+
+A better alternative to installing nodejs directly is to use a version manager like [nvm](https://github.com/nvm-sh/nvm)
+then running the command
+
+```
+nvm use
+```
+
+will ensure you are running the same version of node as determined in the CICD pipelines (it autodetects the .nvmrc file within this repository).
+
+You can take this a step further and integrate auto-detection directly into your [shell](https://github.com/nvm-sh/nvm?tab=readme-ov-file#calling-nvm-use-automatically-in-a-directory-with-a-nvmrc-file)
 
 ### Running the application
 
@@ -18,10 +31,26 @@ Install dependencies by executing the following command:
 yarn install
 ```
 
+#### Development
+
 Bundle:
 
 ```bash
-yarn webpack
+yarn build
+```
+
+Run:
+
+```bash
+yarn start:dev
+```
+
+#### Production
+
+Bundle:
+
+```bash
+yarn build:prod
 ```
 
 Run:
@@ -61,7 +90,7 @@ alongside [sass-lint](https://github.com/sasstools/sass-lint)
 Running the linting with auto fix:
 
 ```bash
-yarn lint --fix
+yarn lint:fix
 ```
 
 ### Running the tests
@@ -72,6 +101,35 @@ the following command:
 ```bash
 yarn test
 ```
+
+### Creating IDAM users for tests
+
+Use this command to create a temporary IDAM user:
+
+```bash
+yarn createIdamUser --roles=<ROLES> --email=<EMAIL> [--surname=<SURNAME>] [--forename=<FORENAME>]
+```
+
+where
+
+- --roles: is a comma separated list of user roles without spaces
+- --email: should not match any existing user's email ID
+- [--surname]: is optional - defaults to 'Test' if not supplied
+- [--forename]: is optional - defaults to 'User' if not supplied
+
+For example, if you want to create an IDAM user with the email 'test@test.com', forename 'Dummy', Surname 'Casworker' and the roles 'citizen' and 'caseworker', use the following command:
+
+```bash
+yarn createIdamUser --roles=citizen,caseworker --email=test@test.com --surname=Caseworker --forename=Dummy
+```
+
+or with abbreviated param names and single role:
+
+```bash
+yarn createIdamUser -r=citizen -e=test2@test.com
+```
+
+Note: An auto-generated password will be output when the script runs.
 
 The functional UI tests use [Playwright](https://playwright.dev/), and the pr suite can be run with the following command:
 
@@ -136,13 +194,23 @@ Here's an example setup:
 
 Make sure you have those values set correctly for your application.
 
-### Healthcheck
+### Healthcheck endpoint
 
-The application exposes a health endpoint (https://localhost:3209/health), created with the use of
+The application exposes a health endpoint (http://localhost:3209/health), created with the use of
 [Nodejs Healthcheck](https://github.com/hmcts/nodejs-healthcheck) library. This endpoint is defined
-in [health.ts](src/main/routes/health.ts) file. Make sure you adjust it correctly in your application.
-In particular, remember to replace the sample check with checks specific to your frontend app,
-e.g. the ones verifying the state of each service it depends on.
+in [health.ts](src/main/routes/health.ts) file and currently checks the following components:
+
+- Redis
+- pcs-api
+
+### Info endpoint
+
+The application also exposes an info endpoint (http://localhost:3209/info), created with the use of
+[nodejs-info-provider](https://github.com/hmcts/nodejs-info-provider) library. This endpoint is defined
+in [info.ts](src/main/routes/info.ts) file and currently displays info from:
+
+- This service
+- pcs-api
 
 ## License
 

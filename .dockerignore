@@ -16,3 +16,5 @@
 !src/main/**
 !config/**
 !webpack.config.js
+!src/types/**
+!bin/**

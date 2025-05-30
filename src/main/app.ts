@@ -1,22 +1,22 @@
 import * as path from 'path';
 
-import { HTTPError } from './HttpError';
-import { AppInsights } from './modules/appinsights';
-import { Helmet } from './modules/helmet';
-import { Nunjucks } from './modules/nunjucks';
-import { PropertiesVolume } from './modules/properties-volume';
-import { S2S } from './modules/s2s';
-import { Session } from './modules/session';
-
+import { Logger } from '@hmcts/nodejs-logging';
 import * as bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
-const { setupDev } = require('./development');
-
-const { Logger } = require('@hmcts/nodejs-logging');
+import { HTTPError } from './HttpError';
+import { setupDev } from './development';
+import { AppInsights } from './modules/appinsights';
+import { Helmet } from './modules/helmet';
+import { Nunjucks } from './modules/nunjucks';
+import { OIDCModule } from './modules/oidc';
+import { PropertiesVolume } from './modules/properties-volume';
+import { S2S } from './modules/s2s';
+import { Session } from './modules/session';
+import registerSteps from './routes/registerSteps';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
@@ -33,6 +33,7 @@ new Nunjucks(developmentMode).enableFor(app);
 new Helmet(developmentMode).enableFor(app);
 new Session().enableFor(app);
 new S2S().enableFor(app);
+new OIDCModule().enableFor(app);
 
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
@@ -43,6 +44,8 @@ app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
   next();
 });
+
+registerSteps(app);
 
 glob
   .sync(__dirname + '/routes/**/*.+(ts|js)')
