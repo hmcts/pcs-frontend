@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ccdService } from '../services/ccdService';
-import { CcdCase } from '../../types/global';
+import { ccdCaseService } from '../services/ccdCaseService';
+import { CcdCase } from '../interfaces/ccdCase.interface';
 
 export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -12,30 +12,33 @@ export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextF
     }
 
     if(!req.session.ccdCase?.id){
-      let caseData: CcdCase | null = await ccdService.getCase(userId);
+      let caseData: CcdCase | null = await ccdCaseService.getCase(req.session.user);
 
       if (!caseData) {
-        caseData = await ccdService.createCase(userId);
+        caseData = await ccdCaseService.createCase(userId);
       }
 
-      req.session.ccdCase = caseData;
-      const address = caseData.data.applicantAddress;
-      req.session.formData = {
-        ...(req.session.formData || {}),
-        'enter-user-details': {
-          applicantForename: caseData.data.applicantForename,
-          applicantSurname: caseData.data.applicantSurname,
-        },
-        'enter-address': {
-          addressLine1: address.AddressLine1,
-          addressLine2: address.AddressLine2,
-          addressLine3: address.AddressLine3,
-          town: address.PostTown,
-          county: address.County,
-          postcode: address.PostCode,
-          country: address.Country,
-        }
-      };
+      if(caseData && caseData.id){
+        req.session.ccdCase = caseData;
+        const address = caseData.data.applicantAddress;
+        req.session.formData = {
+          ...(req.session.formData || {}),
+          'enter-user-details': {
+            applicantForename: caseData.data.applicantForename,
+            applicantSurname: caseData.data.applicantSurname,
+          },
+          'enter-address': {
+            addressLine1: address.AddressLine1,
+            addressLine2: address.AddressLine2,
+            addressLine3: address.AddressLine3,
+            town: address.PostTown,
+            county: address.County,
+            postcode: address.PostCode,
+            country: address.Country,
+          }
+        };
+      }
+
     }
     next();
   } catch (err) {
