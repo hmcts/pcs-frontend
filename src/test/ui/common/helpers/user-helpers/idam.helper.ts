@@ -1,8 +1,8 @@
 import config from 'config';
 import { TokenEndpointResponse } from 'oauth4webapi';
 
-import { TestConfig, UserData } from '../../TestConfig';
-import { request, retriedRequest } from '../../helpers/userHelpers/restHelper';
+import { TestConfig, UserData } from '../testConfig';
+import { request, retriedRequest } from './rest.helper';
 
 const testConfig = config.get<TestConfig>('e2e');
 const username = config.get<string>('secrets.pcs.pcs-frontend-idam-system-username');
@@ -16,7 +16,7 @@ export async function getAccessTokenFromIdam(): Promise<string> {
     grant_type: testConfig.grantType,
     scope: testConfig.scope,
     client_id: testConfig.clientId,
-    client_secret: clientSecret,
+    client_secret: clientSecret
   };
   const body = new URLSearchParams();
   for (const property in details) {
@@ -53,7 +53,7 @@ export async function createAccount(userData: UserData): Promise<Response | unkn
   }
 }
 
-export async function deleteAccount(email: string): Promise<void> {
+export async function deleteAccount(email: string){
   try {
     const method = 'DELETE';
     await request(

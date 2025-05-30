@@ -1,4 +1,4 @@
-const { retry } = require('./retryHelper');
+const { retry } = require('./retry.helper.js');
 
 export const request = (
   url: string,

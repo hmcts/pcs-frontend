@@ -1,6 +1,6 @@
 import { SimpleGit, simpleGit } from 'simple-git';
 
-export class ChangedTestsRunner {
+export class testRunner {
   public static async run(): Promise<void> {
     try {
       const changedTestFiles: string[] = await this.getChangedTestFiles();
@@ -55,6 +55,6 @@ export class ChangedTestsRunner {
   }
 }
 
-ChangedTestsRunner.run().catch(error => {
+testRunner.run().catch(error => {
   throw new Error('Execution failed:' + error);
 });

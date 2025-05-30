@@ -1,8 +1,7 @@
 import { Page } from '@playwright/test';
+import { Base } from './base';
 
-import { Base } from '../base';
-
-export class IdamPage extends Base {
+export class loginPageObjects extends Base {
   readonly heading = this.page.getByRole('heading', {
     name: 'Sign in or create an account',
   });
@@ -13,9 +12,5 @@ export class IdamPage extends Base {
   constructor(page: Page) {
     super(page);
   }
-  async login(email: string, password: string): Promise<void> {
-    await this.usernameInput.fill(email);
-    await this.passwordInput.fill(password);
-    await this.submitBtn.click();
-  }
 }
+
