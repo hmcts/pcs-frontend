@@ -7822,10 +7822,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"govuk-frontend@npm:5.10.1":
-  version: 5.10.1
-  resolution: "govuk-frontend@npm:5.10.1"
-  checksum: 10/cc978baf6f3e971304d514e526072eb2cd5bd78f7b693fe3f3c8bd0f8c86d5710c70fa01ef78bb605fcd5d65796f7cbdc25a3bf386a9b31b93d3fb8957d8c45e
+"govuk-frontend@npm:5.10.2":
+  version: 5.10.2
+  resolution: "govuk-frontend@npm:5.10.2"
+  checksum: 10/0e20ad26da3e412d79478b1f2a77eb547b489882b7597a3fe8e1ea43d5e614e02696d330b8d9018b0e540e913bd81a7c7cf463dd3e90978ed5093d2285520944
   languageName: node
   linkType: hard
 
@@ -10265,7 +10265,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^3.3.8":
+"nanoid@npm:^3.3.11":
   version: 3.3.11
   resolution: "nanoid@npm:3.3.11"
   bin:
@@ -10947,7 +10947,7 @@ __metadata:
     express-session: "npm:^1.18.1"
     git-rev-sync: "npm:^3.0.2"
     glob: "npm:^11.0.0"
-    govuk-frontend: "npm:5.10.1"
+    govuk-frontend: "npm:5.10.2"
     graphql: "npm:^16.10.0"
     helmet: "npm:^8.0.0"
     html-webpack-plugin: "npm:^5.5.3"
@@ -11339,13 +11339,13 @@ __metadata:
   linkType: hard
 
 "postcss@npm:^8.4.27, postcss@npm:^8.4.33, postcss@npm:^8.5.3":
-  version: 8.5.3
-  resolution: "postcss@npm:8.5.3"
+  version: 8.5.4
+  resolution: "postcss@npm:8.5.4"
   dependencies:
-    nanoid: "npm:^3.3.8"
+    nanoid: "npm:^3.3.11"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10/6d7e21a772e8b05bf102636918654dac097bac013f0dc8346b72ac3604fc16829646f94ea862acccd8f82e910b00e2c11c1f0ea276543565d278c7ca35516a7c
+  checksum: 10/b037b55182aa3aa2f7c4ffb0f37518b35855bb0107222cc46e1b6fa13a4462cb2747d88d3bf66640e7cad20f465354b18d5eafffd44eba97364683a72a336695
   languageName: node
   linkType: hard
 
@@ -13341,8 +13341,8 @@ __metadata:
   linkType: hard
 
 "ts-jest@npm:^29.2.6":
-  version: 29.3.3
-  resolution: "ts-jest@npm:29.3.3"
+  version: 29.3.4
+  resolution: "ts-jest@npm:29.3.4"
   dependencies:
     bs-logger: "npm:^0.2.6"
     ejs: "npm:^3.1.10"
@@ -13374,7 +13374,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: 10/b3de49404bc3eafb66f95795c718c321a25a0e934324b79ce500641cd8ecc84f2d691cba97699d2e45bad3655b1595c3e52cbd38ae1910a603162aff68b35d9c
+  checksum: 10/9f22469ef9cbdfb819fe03c4554a83af66d810e7ac72efca433d098f09b73c15b5f5d83a56732e01b40baf621e288c2e0178fad45d304ff69d18d8e0490498d3
   languageName: node
   linkType: hard
 
@@ -13902,8 +13902,8 @@ __metadata:
   linkType: hard
 
 "webpack@npm:^5.88.2":
-  version: 5.99.8
-  resolution: "webpack@npm:5.99.8"
+  version: 5.99.9
+  resolution: "webpack@npm:5.99.9"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.6"
@@ -13934,7 +13934,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10/e66b9bcc0ae2ea7fd08b90a551ecf066bf71841923d744edc83713a7fdacd0c121a1f6236164d1d18fce6d44642f2960cee2a102e5445c2ef7634c457334c9ae
+  checksum: 10/cf4a217239bcaa892f93702639ac837a16510edb7a1326955fb042d499d297cbdb16f20a81f3be6ec041b22ab47c599c757e505fdee1dd89b7f7a1ce4337fbf3
   languageName: node
   linkType: hard
 
