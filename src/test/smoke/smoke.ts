@@ -1,24 +1,15 @@
-import { fail } from 'node:assert';
+import { expect } from 'chai';
+import request from 'supertest';
 
-// import axios, { AxiosResponse } from 'axios';
-import { describe, expect, test } from '@jest/globals';
+import { app } from '../../main/app';
 
-// const testUrl = process.env.TEST_URL || 'http://localhost:3209';
-
-describe('Smoke Test', () => {
-  describe('Home page loads', () => {
-    test('with correct content', async () => {
-      try {
-        /* const response: AxiosResponse = await axios.get(testUrl, {
-          headers: {
-            'Accept-Encoding': 'gzip',
-          },
-        }); */
-        // expect(response.data).toContain('<h1 class="govuk-heading-xl">Welcome to the PCS home page</h1>');
-        expect(true).toBe(true);
-      } catch {
-        fail('Heading not present and/or correct');
-      }
+/* eslint-disable jest/expect-expect */
+describe('Home page', () => {
+  describe('on GET', () => {
+    test('should return sample home page', async () => {
+      await request(app)
+        .get('/')
+        .expect(res => expect(res.status).to.equal(200));
     });
   });
 });
