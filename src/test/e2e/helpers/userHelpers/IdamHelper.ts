@@ -36,6 +36,7 @@ export async function getAccessTokenFromIdam(): Promise<string> {
       return data.access_token;
     });
 }
+
 export async function createAccount(userData: UserData): Promise<Response | unknown> {
   try {
     const authToken = await getAccessTokenFromIdam();
@@ -70,3 +71,34 @@ export async function deleteAccount(email: string): Promise<void> {
     throw error;
   }
 }
+
+export async function getS2SToken(): Promise<string> {
+  const s2sUrl = config.get('s2s.url');
+  const body = JSON.stringify({ microservice: 'pcs_frontend' });
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  const url = `${s2sUrl}/testing-support/lease`;
+
+  return request(url, headers, body).then(async response => {
+    if (response.status !== 200) {
+      throw new Error(`Failed to get S2S token, status code: ${response.status}`);
+    }
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let result = '';
+    let done = false;
+
+    while (!done) {
+      const { value, done: streamDone } = await reader?.read()!;
+      done = streamDone;
+      if (value) {
+        result += decoder.decode(value, { stream: true });
+      }
+    }
+    console.log('response is fetching' + result);
+    return result; // Return the full string
+  });
+}
+
+//http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease

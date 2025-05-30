@@ -1,0 +1,25 @@
+[
+  {
+    "templateId": "Notice.AAA3.ClaimIssue.ClaimSubmit.Required",
+    "templateValues": {
+      "appointmentTime": "2025-05-20T10:30:00Z",
+      "location": "London",
+      "amount": 76.0,
+      "dueDate": "2025-05-20"
+    }
+  },
+  {
+    "templateId": "Notice.AAA3.DefResponse.ResponseTimeElapsed.Claimant",
+    "templateValues": {
+      "claimantName": "Patricia Person",
+      "responseTimeDays": 28
+    }
+  },
+  {
+    "templateId": "Notice.AAA3.DefResponse.MoreTimeRequested.Defendant",
+    "templateValues": {
+      "defendantName": "Delia Defendant",
+      "result": "approved"
+    }
+  }
+]
