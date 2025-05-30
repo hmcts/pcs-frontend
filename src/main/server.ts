@@ -42,8 +42,19 @@ function gracefulShutdownHandler(signal: string) {
   // stop the server from accepting new connections
   app.locals.shutdown = true;
 
-  setTimeout(() => {
+  setTimeout(async () => {
     logger.info('Shutting down application');
+
+    // Clean up S2S module
+    if (app.locals.s2s) {
+      try {
+        await app.locals.s2s.cleanup();
+        logger.info('S2S module cleaned up');
+      } catch (error) {
+        logger.error('Error cleaning up S2S module:', error);
+      }
+    }
+
     app.locals.redisClient?.quit(async (err: Error | null) => {
       if (err) {
         logger.error('Error quitting Redis client', err);
