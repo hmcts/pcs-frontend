@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
 
 module.exports = defineConfig({
-  testDir: './src/test/',
+  testDir: './src/test/ui',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

@@ -1,13 +1,15 @@
-import {Locator, expect} from '@playwright/test';
+import { Locator, expect } from '@playwright/test';
 
 export class webElementsHelper {
   async compareElementText(
     element: Locator,
     expected: string | RegExp,
     options: { exact?: boolean; trim?: boolean } = {}
-  ) {
+  ): Promise<void> {
     const actual = await element.textContent();
-    if (actual === null) throw new Error('Element not found');
+    if (actual === null) {
+      throw new Error('Element not found');
+    }
 
     const text = options.trim !== false ? actual.trim() : actual;
 
