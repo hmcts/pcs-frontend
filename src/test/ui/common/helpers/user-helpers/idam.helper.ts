@@ -2,6 +2,7 @@ import config from 'config';
 import { TokenEndpointResponse } from 'oauth4webapi';
 
 import { TestConfig, UserData } from '../testConfig';
+
 import { request, retriedRequest } from './rest.helper';
 
 const testConfig = config.get<TestConfig>('e2e');
@@ -16,7 +17,7 @@ export async function getAccessTokenFromIdam(): Promise<string> {
     grant_type: testConfig.grantType,
     scope: testConfig.scope,
     client_id: testConfig.clientId,
-    client_secret: clientSecret
+    client_secret: clientSecret,
   };
   const body = new URLSearchParams();
   for (const property in details) {
@@ -53,7 +54,7 @@ export async function createAccount(userData: UserData): Promise<Response | unkn
   }
 }
 
-export async function deleteAccount(email: string){
+export async function deleteAccount(email: string): Promise<void> {
   try {
     const method = 'DELETE';
     await request(

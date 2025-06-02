@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+
 import { Base } from './base';
 
 export class loginPageObjects extends Base {
@@ -13,4 +14,3 @@ export class loginPageObjects extends Base {
     super(page);
   }
 }
-
