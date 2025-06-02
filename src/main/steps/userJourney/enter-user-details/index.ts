@@ -1,4 +1,4 @@
-import { createGetController, validateAndStoreForm } from 'app/controller/controllerFactory';
+import { createGetController } from 'app/controller/controllerFactory';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import common from '../../../assets/locales/en/common.json';
@@ -40,7 +40,7 @@ postController: {
       const errors = validateForm(req, fields);
 
       if (Object.keys(errors).length > 0) {
-        return res.status(400).render('steps/userJourney/enterAddress.njk', {
+        return res.status(400).render('steps/userJourney/enterUserDetails.njk', {
           ...content,
           ...req.body,
           error: Object.values(errors)[0],
@@ -50,30 +50,23 @@ postController: {
       // Store form data in session
       setFormData(req, stepName, req.body);
 
-      // CCD Case Update
+      // Get CCD case ID from session
       const ccdCase = req.session.ccdCase;
       const user = req.session.user;
 
-      if (ccdCase?.id && user?.accessToken) {
-        await ccdCaseService.updateCase(user,
-          {
+      // If case ID exists, update the case
+      if (ccdCase?.id) {
+        await ccdCaseService.updateCase(user, {
           id: ccdCase.id,
           data: {
             ...ccdCase.data,
-             applicantAddress: {
-              AddressLine1: req.body.addressLine1,
-              AddressLine2: req.body.addressLine2,
-              AddressLine3: req.body.addressLine3,
-              PostTown: req.body.town,
-              County: req.body.county,
-              PostCode: req.body.postcode,
-              Country: req.body.country
-            }
+            applicantForename: req.body.applicantForename,
+            applicantSurname: req.body.applicantSurname
           }
         });
       }
 
-      res.redirect('/steps/user-journey/summary');
+      res.redirect('/steps/user-journey/enter-address');
     }
   }
 };

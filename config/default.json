@@ -23,7 +23,7 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-     "url": "http://ccd-data-store-api-pcs-api-pr-219.preview.platform.hmcts.net"
+     "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
   },
   "secrets": {
     "pcs": {

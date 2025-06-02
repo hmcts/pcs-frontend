@@ -4,7 +4,6 @@ import { CcdCase } from '../interfaces/ccdCase.interface';
 
 export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('ccdCaseMiddleware user ===> ', req.session.user);
     const userId = req.session.user?.uid;
 
     if (!userId) {
@@ -38,7 +37,6 @@ export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextF
           }
         };
       }
-
     }
     next();
   } catch (err) {

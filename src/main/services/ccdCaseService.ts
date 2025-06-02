@@ -27,9 +27,18 @@ async function getEventToken(
   userToken: string,
   eventId: string
 ): Promise<string> {
-  const url = `${getBaseUrl()}/case-types/PCS/event-triggers/${eventId}`;
-  const response = await http.get<any>(url, getCaseHeaders(userToken));
-  return response.data.token;
+  try {
+    const url = `${getBaseUrl()}/case-types/PCS/event-triggers/${eventId}`;
+    const response = await http.get<any>(url, getCaseHeaders(userToken));
+    console.log('response => ', response);
+    return response.data.token;
+  } catch (error) {
+    const axiosError = error as AxiosError;
+
+    logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+    return 'event token';
+    // throw error;
+  }
 }
 
 async function submitEvent(
@@ -50,8 +59,19 @@ async function submitEvent(
     ignore_warning: false
   };
 
-  const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-  return response.data;
+   try {
+      const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
+      console.log('response => ', response);
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+      return {
+        id: 'id',
+        data
+      }
+    // throw error;
+  }
 }
 
 
@@ -83,7 +103,8 @@ export const ccdCaseService = {
       }
 
       logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
-      throw error;
+      return null;
+     // throw error;
     }
   },
 
@@ -91,19 +112,22 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(user?.accessToken || '', 'citizenCreateApplication');
     const url = `${getBaseUrl()}/case-types/PCS/cases`;
 
-    const data = {
-      // applicantForename: 'Jane',
-      // applicantSurname: 'Doe',
-      // applicantAddress: {
-      //   AddressLine1: 'Line 1',
-      //   AddressLine2: 'Line 2',
-      //   AddressLine3: 'Line 3',
-      //   PostTown: 'Town',
-      //   County: 'County',
-      //   PostCode: 'Postcode',
-      //   Country: 'Country'
-      // }
-    };
+    const data =  {
+      id: 'id',
+      data:{
+        applicantForename: '',
+        applicantSurname: '',
+        applicantAddress: {
+          AddressLine1: '',
+          AddressLine2: '',
+          AddressLine3: '',
+          PostTown: '',
+          County: '',
+          PostCode: '',
+          Country: ''
+        }
+      }
+    }
 
     return submitEvent(user?.accessToken || '', url, 'citizenCreateApplication', eventToken, data);
   },
