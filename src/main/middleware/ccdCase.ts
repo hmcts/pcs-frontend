@@ -15,7 +15,7 @@ export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextF
       let caseData: CcdCase | null = await ccdCaseService.getCase(req.session.user);
 
       if (!caseData) {
-        caseData = await ccdCaseService.createCase(userId);
+        caseData = await ccdCaseService.createCase(req.session.user);
       }
 
       if(caseData && caseData.id){

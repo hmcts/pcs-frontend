@@ -12,6 +12,48 @@ function getBaseUrl(): string {
   return config.get('ccd.url');
 }
 
+function getCaseHeaders(token: string) {
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      experimental: 'true',
+      Accept: '*/*',
+      'Content-Type': 'application/json'
+    }
+  };
+}
+
+async function getEventToken(
+  userToken: string,
+  eventId: string
+): Promise<string> {
+  const url = `${getBaseUrl()}/case-types/PCS/event-triggers/${eventId}`;
+  const response = await http.get<any>(url, getCaseHeaders(userToken));
+  return response.data.token;
+}
+
+async function submitEvent(
+  userToken: string,
+  url: string,
+  eventId: string,
+  eventToken: string,
+  data: any
+): Promise<CcdCase> {
+  const payload = {
+    data,
+    event: {
+      id: eventId,
+      summary: `Citizen ${eventId} summary`,
+      description: `Citizen ${eventId} description`
+    },
+    event_token: eventToken,
+    ignore_warning: false
+  };
+
+  const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
+  return response.data;
+}
+
 
 export const ccdCaseService = {
   async getCase(user: UserInfoResponseWithToken | undefined): Promise<CcdCase | null> {
@@ -19,12 +61,7 @@ export const ccdCaseService = {
     console.log('getCase userId => ', user?.uid);
 
     const url = `${getBaseUrl()}/searchCases?ctid=PCS`;
-    const headersConfig = {
-      headers: {
-        Authorization: `Bearer ${user?.accessToken}`,
-         'Content-Type': 'application/json'
-      },
-    };
+    const headersConfig = getCaseHeaders(user?.accessToken || '');
 
     const requestBody = {
       query: { match_all: {} },
@@ -50,24 +87,30 @@ export const ccdCaseService = {
     }
   },
 
-  async createCase(userId: string): Promise<CcdCase> {
-    // TODO: Implement real CCD case creation
-    console.log('createCase userId => ', userId);
-    return {
-      id: 'test',
-      data: {
-        applicantForename: 'test1',
-        applicantSurname: 'test2',
-        applicantAddress: {
-          AddressLine1: 'test',
-          AddressLine2: 'test',
-          AddressLine3: 'test',
-          PostTown: 'test',
-          County: 'test',
-          PostCode: 'test',
-          Country: 'test',
-        }
-      },
+  async createCase(user: UserInfoResponseWithToken | undefined): Promise<CcdCase> {
+    const eventToken = await getEventToken(user?.accessToken || '', 'citizenCreateApplication');
+    const url = `${getBaseUrl()}/case-types/PCS/cases`;
+
+    const data = {
+      // applicantForename: 'Jane',
+      // applicantSurname: 'Doe',
+      // applicantAddress: {
+      //   AddressLine1: 'Line 1',
+      //   AddressLine2: 'Line 2',
+      //   AddressLine3: 'Line 3',
+      //   PostTown: 'Town',
+      //   County: 'County',
+      //   PostCode: 'Postcode',
+      //   Country: 'Country'
+      // }
     };
+
+    return submitEvent(user?.accessToken || '', url, 'citizenCreateApplication', eventToken, data);
+  },
+
+  async updateCase(user: UserInfoResponseWithToken | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+    const eventToken = await getEventToken(user?.accessToken || '', 'citizenUpdateApplication');
+    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
+    return submitEvent(user?.accessToken || '', url, 'citizenUpdateApplication', eventToken, ccdCase.data);
   }
 };

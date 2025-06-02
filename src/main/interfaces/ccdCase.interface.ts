@@ -1,4 +1,3 @@
-
 export interface CcdUserCases {
   total: number;
   cases: CcdCase[];
