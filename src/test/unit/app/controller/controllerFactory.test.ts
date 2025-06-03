@@ -124,9 +124,11 @@ describe('controllerFactory', () => {
       const result = contentFunction(req);
 
       expect(extendContent).toHaveBeenCalledWith(req);
-      expect(result).toEqual(expect.objectContaining({
-        additionalData: 'extra',
-      }));
+      expect(result).toEqual(
+        expect.objectContaining({
+          additionalData: 'extra',
+        })
+      );
     });
 
     it('should handle undefined req.body', () => {
@@ -194,8 +196,7 @@ describe('controllerFactory', () => {
 
     beforeEach(() => {
       mockValidateForm.mockReturnValue({});
-      mockSetFormData.mockImplementation(() => {
-      });
+      mockSetFormData.mockImplementation(() => {});
     });
 
     it('should validate, store form data, and redirect with string nextPage', () => {
@@ -266,28 +267,25 @@ describe('controllerFactory', () => {
       const controller = validateAndStoreForm(stepName, fields, nextPage, content);
       controller.post(req, res);
 
-      expect(res.render).toHaveBeenCalledWith(
-        'steps/page1.njk',
-        {
-          title: 'Test Page',
-          serviceName: 'Test Service',
-          error: 'This field is required',
-          answer: '',
-          otherField: 'value',
-        }
-      );
+      expect(res.render).toHaveBeenCalledWith('steps/page1.njk', {
+        title: 'Test Page',
+        serviceName: 'Test Service',
+        error: 'This field is required',
+        answer: '',
+        otherField: 'value',
+      });
     });
 
     it('should handle checkbox fields by converting single values to arrays', () => {
       const checkboxFields: FormFieldConfig[] = [
         { name: 'checkboxField', type: 'checkbox', required: false },
-        { name: 'regularField', type: 'text', required: false }
+        { name: 'regularField', type: 'text', required: false },
       ];
 
       const req = {
         body: {
           checkboxField: 'singleValue',
-          regularField: 'textValue'
+          regularField: 'textValue',
         },
         session: { formData: {} },
       } as unknown as Request;
@@ -302,13 +300,11 @@ describe('controllerFactory', () => {
     });
 
     it('should not modify checkbox fields that are already arrays', () => {
-      const checkboxFields: FormFieldConfig[] = [
-        { name: 'checkboxField', type: 'checkbox', required: false }
-      ];
+      const checkboxFields: FormFieldConfig[] = [{ name: 'checkboxField', type: 'checkbox', required: false }];
 
       const req = {
         body: {
-          checkboxField: ['value1', 'value2']
+          checkboxField: ['value1', 'value2'],
         },
         session: { formData: {} },
       } as unknown as Request;
@@ -324,7 +320,7 @@ describe('controllerFactory', () => {
     it('should handle multiple validation errors and use the first one', () => {
       const validationErrors = {
         answer: 'This field is required',
-        otherField: 'This field is also required'
+        otherField: 'This field is also required',
       };
       mockValidateForm.mockReturnValue(validationErrors);
 
@@ -370,7 +366,7 @@ describe('controllerFactory', () => {
       const res = {
         status: jest.fn().mockReturnThis(),
         render: jest.fn(),
-        redirect: jest.fn()
+        redirect: jest.fn(),
       } as unknown as Response;
 
       const controller = validateAndStoreForm(stepName, fields, nextPage);
