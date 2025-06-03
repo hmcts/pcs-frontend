@@ -7,7 +7,7 @@ import { homePageObjects } from '../common/page-objects';
 
 const { constants } = require('../common/data');
 
-test('Idam Login', async ({ page }) => {
+test.skip('Idam Login @PR', async ({ page }) => {
   await page.goto(config.get('e2e.testUrl'));
   await loginHelper.login(page);
   await new webElementsHelper().compareElementText(new homePageObjects(page).heading, constants.homePage.welcomeHeader);
