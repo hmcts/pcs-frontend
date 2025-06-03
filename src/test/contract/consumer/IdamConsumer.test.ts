@@ -107,4 +107,61 @@ describe('Idam Consumer Pact Test', () => {
       access_token: ACCESS_TOKEN,
     });
   });
+
+  test('a request made to a .well-known endpoint', async () => {
+    const expectedResponse = {
+      request_parameter_supported: true,
+      claims_parameter_supported: false,
+      scopes_supported: ['openid'],
+      issuer: 'https://idam-web-public.aat.platform.hmcts.net/o',
+      id_token_encryption_enc_values_supported: ['A256GCM'],
+      acr_values_supported: [],
+      authorization_endpoint: 'https://idam-web-public.aat.platform.hmcts.net/o/authorize',
+      request_object_encryption_enc_values_supported: ['A256GCM'],
+      rcs_request_encryption_alg_values_supported: ['RSA-OAEP'],
+      claims_supported: [],
+      rcs_request_signing_alg_values_supported: ['PS384'],
+      token_endpoint_auth_methods_supported: ['client_secret_post'],
+      token_endpoint: 'https://idam-web-public.aat.platform.hmcts.net/o/token',
+      response_types_supported: ['code'],
+      request_uri_parameter_supported: true,
+      rcs_response_encryption_enc_values_supported: ['A256GCM'],
+      end_session_endpoint: 'https://idam-web-public.aat.platform.hmcts.net/o/endSession',
+      rcs_request_encryption_enc_values_supported: ['A256GCM'],
+      version: '3.0',
+      rcs_response_encryption_alg_values_supported: ['RSA-OAEP'],
+      userinfo_endpoint: 'https://idam-web-public.aat.platform.hmcts.net/o/userinfo',
+      id_token_encryption_alg_values_supported: ['RSA-OAEP'],
+      jwks_uri: 'https://idam-web-public.aat.platform.hmcts.net/o/jwks',
+      subject_types_supported: ['public'],
+      id_token_signing_alg_values_supported: ['ES384'],
+      request_object_signing_alg_values_supported: ['ES384'],
+      request_object_encryption_alg_values_supported: ['RSA-OAEP'],
+      rcs_response_signing_alg_values_supported: ['PS384'],
+    };
+
+    await mockProvider.addInteraction({
+      state: '.well-known endpoint',
+      uponReceiving: 'a request for configuration',
+      withRequest: {
+        method: 'GET',
+        path: '/o/.well-known/openid-configuration',
+      },
+      willRespondWith: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: like(expectedResponse),
+      },
+    });
+
+    const response = await axios.get(`${BASE_URL}/o/.well-known/openid-configuration`, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.data).toEqual(expectedResponse);
+  });
 });
