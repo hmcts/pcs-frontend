@@ -16,7 +16,7 @@ function getCaseHeaders(token: string) {
   return {
     headers: {
       Authorization: `Bearer ${token}`,
-      experimental: 'true',
+      experimental: true,
       Accept: '*/*',
       'Content-Type': 'application/json'
     }
@@ -28,7 +28,9 @@ async function getEventToken(
   eventId: string
 ): Promise<string> {
   try {
+
     const url = `${getBaseUrl()}/case-types/PCS/event-triggers/${eventId}`;
+    console.log('url => ', url);
     const response = await http.get<any>(url, getCaseHeaders(userToken));
     console.log('response => ', response);
     return response.data.token;
@@ -60,6 +62,7 @@ async function submitEvent(
   };
 
    try {
+      console.log('submit event => ', url, payload);
       const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
       console.log('response => ', response);
       return response.data;
@@ -91,6 +94,7 @@ export const ccdCaseService = {
     logger.info(`[pcsApiService] Calling ccdCaseService search with URL: ${url}`);
 
     try {
+      console.log('headersConfig => ', headersConfig);
       const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
       const cases = response?.data?.cases;
       return cases && cases.length > 0 ? cases[0] : null;
