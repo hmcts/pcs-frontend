@@ -12,11 +12,11 @@ export class loginHelper {
     const password = config.get<string>('secrets.pcs.pcs-frontend-idam-user-temp-password');
     const userData = buildUserDataWithRole(config.get('e2e.roles'), password);
 
-    await idamHelper.deleteAccount(userData.user.email);
     await idamHelper.createAccount(userData);
 
     await loginPage.usernameInput.fill(userData.user.email);
     await loginPage.passwordInput.fill(password);
     await loginPage.submitBtn.click();
+    await idamHelper.deleteAccount(userData.user.email);
   }
 }

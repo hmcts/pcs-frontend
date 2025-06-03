@@ -24,7 +24,7 @@ export function buildUserDataWithRole(role: string, password: string): UserData 
     password,
     user: {
       id: uuidv4(),
-      email: `${role}-${Math.random().toString(36).slice(2, 9).toLowerCase()}@gmail.com`,
+      email: `pcs-${role}-${Math.random().toString(36).slice(2, 9).toLowerCase()}@gmail.com`,
       forename: `fn_${role}_${Math.random().toString(36).slice(2, 15)}`,
       surname: `sn_${role}_${Math.random().toString(36).slice(2, 15)}`,
       roleNames: ['citizen'],
