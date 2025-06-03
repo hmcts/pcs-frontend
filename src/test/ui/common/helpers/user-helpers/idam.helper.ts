@@ -1,8 +1,9 @@
 import config from 'config';
 import { TokenEndpointResponse } from 'oauth4webapi';
 
-import { TestConfig, UserData } from '../../TestConfig';
-import { request, retriedRequest } from '../../helpers/userHelpers/restHelper';
+import { TestConfig, UserData } from '../testConfig';
+
+import { request, retriedRequest } from './rest.helper';
 
 const testConfig = config.get<TestConfig>('e2e');
 const username = config.get<string>('secrets.pcs.pcs-frontend-idam-system-username');
