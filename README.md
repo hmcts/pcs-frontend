@@ -118,6 +118,7 @@ where
 - [--forename]: is optional - defaults to 'User' if not supplied
 
 For example, if you want to create an IDAM user with the email 'test@test.com', forename 'Dummy', Surname 'Casworker' and the roles 'citizen' and 'caseworker', use the following command:
+testing
 
 ```bash
 yarn createIdamUser --roles=citizen,caseworker --email=test@test.com --surname=Caseworker --forename=Dummy
