@@ -25,7 +25,7 @@ describe('Idam Consumer Pact Test', () => {
     await mockProvider.finalize();
   });
 
-  const ACCESS_TOKEN = 'dummy-access-token';
+  const ACCESS_TOKEN = 'someAccessToken';
 
   test('should receive user information from /o/userinfo', async () => {
     const expectedUserInfo = {
