@@ -70,6 +70,8 @@ describe('Idam Consumer Pact Test', () => {
       grant_type: 'authorization_code',
       redirect_uri: 'http://someRedirectURL',
       code: 'some_code',
+      username: 'caseworker@fake.hmcts.net',
+      password: 'password'
     };
 
     const formBodyString = new URLSearchParams(formData).toString();
