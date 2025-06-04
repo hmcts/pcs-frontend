@@ -1,12 +1,19 @@
+export interface CcdUserCase {
+  id: string;
+  jurisdiction: string;
+  case_type_id: string;
+  case_data: CcdCaseData;
+}
+
 export interface CcdUserCases {
   total: number;
-  cases: CcdCase[];
+  cases: CcdUserCase[];
 }
 
 export interface CcdCaseData {
-  applicantForename: string;
-  applicantSurname: string;
-  applicantAddress: {
+  applicantForename?: string;
+  applicantSurname?: string;
+  applicantAddress?: {
     AddressLine1: string;
     AddressLine2: string;
     AddressLine3: string;

@@ -7,18 +7,13 @@ export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextF
   try {
     const userId = req.session.user?.uid;
 
-    console.log('user ===> ', req.session.user);
-
     if (!userId) {
       throw new Error('User not authenticated');
     }
 
+    console.log('req.session.ccdCase => ', req.session.ccdCase);
     if(!req.session.ccdCase?.id){
       let caseData: CcdCase | null = await ccdCaseService.getCase(req.session.user);
-
-      if (!caseData) {
-        caseData = await ccdCaseService.createCase(req.session.user);
-      }
 
      if (caseData && caseData.id) {
         req.session.ccdCase = caseData;

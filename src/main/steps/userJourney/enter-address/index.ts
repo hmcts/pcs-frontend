@@ -31,8 +31,6 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   generateContent: () => content,
   getController: createGetController('steps/userJourney/enterAddress.njk', stepName, content),
-   // postController: validateAndStoreForm(stepName, fields, '/steps/user-journey/summary', content),
-
   postController: {
       post: async (req: Request, res: Response) => {
         const errors = validateForm(req, fields);
@@ -53,7 +51,7 @@ export const step: StepDefinition = {
         const user = req.session.user;
 
         if (ccdCase?.id && user?.accessToken) {
-          await ccdCaseService.updateCase(user,
+           const updatedCase = await ccdCaseService.updateCase(user,
             {
             id: ccdCase.id,
             data: {
@@ -69,10 +67,11 @@ export const step: StepDefinition = {
               }
             }
           });
+          req.session.ccdCase = updatedCase;
         }
 
         res.redirect('/steps/user-journey/summary');
       }
     }
-  
+
 };

@@ -17,13 +17,13 @@
     "url": "http://pcs-api-aat.service.core-compute-aat.internal"
   },
   "s2s": {
-    "microservice": "ccd_data",
+    "microservice": "pcs_frontend",
     "url": "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
     "ttl": 3600,
     "key": "s2s:service-token"
   },
   "ccd": {
-     "url": "https://ccd-data-store-api-pcs-api-pr-239.preview.platform.hmcts.net"
+     "url": "http://localhost:4452"
   },
   "secrets": {
     "pcs": {

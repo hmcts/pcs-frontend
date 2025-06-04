@@ -1,0 +1,13 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block content %}
+  {{ govukPanel({
+    titleText: "Application submitted",
+    html: "Your application has been received."
+  }) }}
+
+  <p class="govuk-body">
+    <a class="govuk-link" href="/">Return to homepage</a>
+  </p>
+{% endblock %}

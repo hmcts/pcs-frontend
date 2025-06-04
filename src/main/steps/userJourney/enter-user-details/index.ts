@@ -34,8 +34,7 @@ export const step: StepDefinition = {
       };
     }
   ),
-//  postController: validateAndStoreForm(stepName, fields, '/steps/user-journey/enter-address', content)
-postController: {
+  postController: {
     post: async (req: Request, res: Response) => {
       const errors = validateForm(req, fields);
 
@@ -47,16 +46,12 @@ postController: {
         });
       }
 
-      // Store form data in session
       setFormData(req, stepName, req.body);
-
-      // Get CCD case ID from session
       const ccdCase = req.session.ccdCase;
       const user = req.session.user;
 
-      // If case ID exists, update the case
-      if (ccdCase?.id) {
-        await ccdCaseService.updateCase(user, {
+     if (ccdCase?.id) {
+        const updatedCase = await ccdCaseService.updateCase(user, {
           id: ccdCase.id,
           data: {
             ...ccdCase.data,
@@ -64,6 +59,13 @@ postController: {
             applicantSurname: req.body.applicantSurname
           }
         });
+        req.session.ccdCase = updatedCase;
+      } else {
+        const newCase = await ccdCaseService.createCase(user, {
+          applicantForename: req.body.applicantForename,
+          applicantSurname: req.body.applicantSurname
+        });
+        req.session.ccdCase = newCase;
       }
 
       res.redirect('/steps/user-journey/enter-address');
