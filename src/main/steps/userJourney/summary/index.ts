@@ -18,7 +18,6 @@ export const step: StepDefinition = {
     stepName,
     content,
     req => {
-      console.log('Session Data:', req.session?.formData);
       const userDetails = req.session.formData?.['enter-user-details'];
       const address = req.session.formData?.['enter-address'];
       return {
@@ -32,13 +31,10 @@ export const step: StepDefinition = {
     post: async (req: Request, res: Response) => {
       try {
         if (req.session.ccdCase && req.session.user) {
-          console.log('CALLING SUBMIT CASE====');
           await ccdCaseService.submitCase(req.session.user, req.session.ccdCase);
         }
-
         res.redirect('/steps/user-journey/application-submitted');
       } catch (error) {
-        console.error('Failed to submit case:', error);
         res.status(500).send('There was an error submitting your application.');
       }
     }

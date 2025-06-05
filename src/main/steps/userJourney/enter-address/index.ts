@@ -15,13 +15,13 @@ const content = {
 };
 
 const fields: FormFieldConfig[] = [
-  { name: 'addressLine1', type: 'text', required: true, errorMessage: 'Enter address line 1' },
+  { name: 'addressLine1', type: 'text', required: false, errorMessage: 'Enter address line 1' },
   { name: 'addressLine2', type: 'text', required: false },
   { name: 'addressLine3', type: 'text', required: false },
-  { name: 'town', type: 'text', required: true, errorMessage: 'Enter the town or city' },
+  { name: 'town', type: 'text', required: false, errorMessage: 'Enter the town or city' },
   { name: 'county', type: 'text', required: false },
-  { name: 'postcode', type: 'text', required: true, errorMessage: 'Enter the postcode' },
-  { name: 'country', type: 'text', required: true, errorMessage: 'Enter the country' },
+  { name: 'postcode', type: 'text', required: false, errorMessage: 'Enter the postcode' },
+  { name: 'country', type: 'text', required: false, errorMessage: 'Enter the country' },
 ];
 
 export const step: StepDefinition = {
@@ -43,10 +43,7 @@ export const step: StepDefinition = {
           });
         }
 
-        // Store form data in session
         setFormData(req, stepName, req.body);
-
-        // CCD Case Update
         const ccdCase = req.session.ccdCase;
         const user = req.session.user;
 
@@ -69,7 +66,6 @@ export const step: StepDefinition = {
           });
           req.session.ccdCase = updatedCase;
         }
-
         res.redirect('/steps/user-journey/summary');
       }
     }

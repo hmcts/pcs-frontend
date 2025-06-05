@@ -133,8 +133,6 @@ export class S2S {
     // Get initial token
     const serviceToken = await this.getServiceToken(this.serviceConfig);
 
-    console.log('service Token =========> ', serviceToken);
-
     if (!serviceToken) {
       this.logger.error('Failed to initialize S2S token');
       throw new Error('Failed to initialize S2S token');

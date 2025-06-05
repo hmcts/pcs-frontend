@@ -1,5 +1,11 @@
+export enum CaseState {
+  DRAFT = 'Draft',
+  SUBMITTED = 'Submitted'
+}
+
 export interface CcdUserCase {
   id: string;
+  state: CaseState;
   jurisdiction: string;
   case_type_id: string;
   case_data: CcdCaseData;

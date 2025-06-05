@@ -30,7 +30,7 @@ export const step: StepDefinition = {
       const savedData = getFormData(req, stepName);
       return {
         ...content,
-        ...savedData,
+        ...savedData
       };
     }
   ),
@@ -38,11 +38,12 @@ export const step: StepDefinition = {
     post: async (req: Request, res: Response) => {
       const errors = validateForm(req, fields);
 
-      if (Object.keys(errors).length > 0) {
+     if (Object.keys(errors).length > 0) {
+        const firstField = Object.keys(errors)[0];
         return res.status(400).render('steps/userJourney/enterUserDetails.njk', {
           ...content,
           ...req.body,
-          error: Object.values(errors)[0],
+          error: { field: firstField, text: errors[firstField] },
         });
       }
 
