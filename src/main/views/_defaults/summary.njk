@@ -2,8 +2,17 @@
 
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block content %}
+
+  {% if previousStepUrl %}
+    {{ govukBackLink({
+      text: "Back",
+      href: previousStepUrl
+    }) }}
+  {% endif %}
+
   <h1 class="govuk-heading-l">{{ step.title }}</h1>
 
   {% if summaryRows and summaryRows | length > 0 %}
@@ -20,14 +29,6 @@
         text: 'Submit',
         attributes: { type: 'submit' }
       }) }}
-      
-      {% if previousStepUrl %}
-        {{ govukButton({
-          text: 'Back',
-          href: previousStepUrl,
-          classes: 'govuk-button--secondary'
-        }) }}
-      {% endif %}
     </div>
   </form>
 {% endblock %} 

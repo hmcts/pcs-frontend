@@ -24,4 +24,10 @@ export const ccdStore: JourneyStore = {
     // TODO: Implement CCD store
     return { data: {}, version: 0 };
   },
+
+  async generateReference(_req: Request, journeySlug: string, caseId: number) {
+    // TODO: Implement CCD store - generate from API/database
+    const prefix = journeySlug === 'possession-claim' ? 'PCR' : 'REF';
+    return `${prefix}-${Date.now()}-${caseId}`;
+  },
 };
