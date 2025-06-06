@@ -10,7 +10,7 @@ interface TypedSession {
   };
 }
 
-export function sessionStoreFor(slug: string): JourneyStore {
+export const sessionStore = (slug: string): JourneyStore => {
   return {
     async load(req: Request, caseId: number) {
       // Create structure if needed
@@ -38,5 +38,10 @@ export function sessionStoreFor(slug: string): JourneyStore {
 
       return { data: merged, version };
     },
+
+    async generateReference(_req: Request, journeySlug: string, caseId: number) {
+      const prefix = journeySlug === 'possession-claim' ? 'PCR' : 'REF';
+      return `${prefix}-${Date.now()}-${caseId}`;
+    },
   };
-}
+};
