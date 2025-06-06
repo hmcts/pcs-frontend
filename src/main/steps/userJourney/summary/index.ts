@@ -1,11 +1,12 @@
 import { createGetController } from 'app/controller/controllerFactory';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import common from '../../../assets/locales/en/common.json';
 import type { Request, Response } from 'express';
 import { ccdCaseService } from 'services/ccdCaseService';
 
+import common from '../../../assets/locales/en/common.json';
+import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+
 const stepName = 'summary';
-const content = { ...common, backUrl: '/steps/user-journey/enter-address'};
+const content = { ...common, backUrl: '/steps/user-journey/enter-address' };
 
 export const step: StepDefinition = {
   url: '/steps/user-journey/summary',
@@ -13,20 +14,15 @@ export const step: StepDefinition = {
   view: 'steps/userJourney/summary.njk',
   stepDir: __dirname,
   generateContent: () => content,
-  getController: createGetController(
-    'steps/userJourney/summary.njk',
-    stepName,
-    content,
-    req => {
-      const userDetails = req.session.formData?.['enter-user-details'];
-      const address = req.session.formData?.['enter-address'];
-      return {
-        ...content,
-        userDetails,
-        address,
-      };
-    }
-  ),
+  getController: createGetController('steps/userJourney/summary.njk', stepName, content, req => {
+    const userDetails = req.session.formData?.['enter-user-details'];
+    const address = req.session.formData?.['enter-address'];
+    return {
+      ...content,
+      userDetails,
+      address,
+    };
+  }),
   postController: {
     post: async (req: Request, res: Response) => {
       try {
@@ -37,6 +33,6 @@ export const step: StepDefinition = {
       } catch (error) {
         res.status(500).send('There was an error submitting your application.');
       }
-    }
-  }
+    },
+  },
 };

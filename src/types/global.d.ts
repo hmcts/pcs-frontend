@@ -19,7 +19,6 @@ interface CustomSessionData extends SessionData {
   formData?: Record<string, any>;
   ccdCase?: CcdCase;
   destroy(callback: (err?: Error) => void): void;
-
 }
 
 declare module 'express-session' {

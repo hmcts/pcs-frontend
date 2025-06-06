@@ -1,6 +1,6 @@
 export enum CaseState {
   DRAFT = 'Draft',
-  SUBMITTED = 'Submitted'
+  SUBMITTED = 'Submitted',
 }
 
 export interface CcdUserCase {
@@ -29,7 +29,6 @@ export interface CcdCaseData {
     Country: string;
   };
 }
-
 
 export interface CcdCase {
   id: string;

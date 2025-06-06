@@ -23,8 +23,8 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-     "url": "http://localhost:4452",
-     "caseTypeId": "PCS"
+    "url": "http://localhost:4452",
+    "caseTypeId": "PCS"
   },
   "secrets": {
     "pcs": {

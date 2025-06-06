@@ -1,11 +1,13 @@
 import { createGetController } from 'app/controller/controllerFactory';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import common from '../../../assets/locales/en/common.json';
+import { setFormData } from 'app/controller/sessionHelper';
+import { validateForm } from 'app/controller/validation';
 import type { Request, Response } from 'express';
 import { ccdCaseService } from 'services/ccdCaseService';
-import { validateForm } from 'app/controller/validation';
-import { setFormData } from 'app/controller/sessionHelper';
+
+import common from '../../../assets/locales/en/common.json';
+import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
+import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+
 
 const stepName = 'enter-address';
 
@@ -32,42 +34,40 @@ export const step: StepDefinition = {
   generateContent: () => content,
   getController: createGetController('steps/userJourney/enterAddress.njk', stepName, content),
   postController: {
-      post: async (req: Request, res: Response) => {
-        const errors = validateForm(req, fields);
+    post: async (req: Request, res: Response) => {
+      const errors = validateForm(req, fields);
 
-        if (Object.keys(errors).length > 0) {
-          return res.status(400).render('steps/userJourney/enterAddress.njk', {
-            ...content,
-            ...req.body,
-            error: Object.values(errors)[0],
-          });
-        }
-
-        setFormData(req, stepName, req.body);
-        const ccdCase = req.session.ccdCase;
-        const user = req.session.user;
-
-        if (ccdCase?.id && user?.accessToken) {
-           const updatedCase = await ccdCaseService.updateCase(user,
-            {
-            id: ccdCase.id,
-            data: {
-              ...ccdCase.data,
-               applicantAddress: {
-                AddressLine1: req.body.addressLine1,
-                AddressLine2: req.body.addressLine2,
-                AddressLine3: req.body.addressLine3,
-                PostTown: req.body.town,
-                County: req.body.county,
-                PostCode: req.body.postcode,
-                Country: req.body.country
-              }
-            }
-          });
-          req.session.ccdCase = updatedCase;
-        }
-        res.redirect('/steps/user-journey/summary');
+      if (Object.keys(errors).length > 0) {
+        return res.status(400).render('steps/userJourney/enterAddress.njk', {
+          ...content,
+          ...req.body,
+          error: Object.values(errors)[0],
+        });
       }
-    }
 
+      setFormData(req, stepName, req.body);
+      const ccdCase = req.session.ccdCase;
+      const user = req.session.user;
+
+      if (ccdCase?.id && user?.accessToken) {
+        const updatedCase = await ccdCaseService.updateCase(user, {
+          id: ccdCase.id,
+          data: {
+            ...ccdCase.data,
+            applicantAddress: {
+              AddressLine1: req.body.addressLine1,
+              AddressLine2: req.body.addressLine2,
+              AddressLine3: req.body.addressLine3,
+              PostTown: req.body.town,
+              County: req.body.county,
+              PostCode: req.body.postcode,
+              Country: req.body.country,
+            },
+          },
+        });
+        req.session.ccdCase = updatedCase;
+      }
+      res.redirect('/steps/user-journey/summary');
+    },
+  },
 };

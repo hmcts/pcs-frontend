@@ -18,15 +18,13 @@ export function mapCaseDataToFormData(caseData: CcdCase | null): Record<string, 
 
   if (
     applicantAddress &&
-    (
-      applicantAddress.AddressLine1 ||
+    (applicantAddress.AddressLine1 ||
       applicantAddress.AddressLine2 ||
       applicantAddress.AddressLine3 ||
       applicantAddress.PostTown ||
       applicantAddress.County ||
       applicantAddress.PostCode ||
-      applicantAddress.Country
-    )
+      applicantAddress.Country)
   ) {
     formData['enter-address'] = {
       addressLine1: applicantAddress.AddressLine1 || '',

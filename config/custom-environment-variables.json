@@ -22,7 +22,7 @@
     "ttl": "S2S_TTL",
     "key": "S2S_KEY"
   },
-   "ccd": {
+  "ccd": {
     "url": "CCD_URL"
   },
   "oidc": {

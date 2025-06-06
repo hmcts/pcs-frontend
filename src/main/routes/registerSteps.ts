@@ -1,7 +1,7 @@
 import { Application } from 'express';
+import { ccdCaseMiddleware, oidcMiddleware } from 'middleware';
 
-import { stepsWithContent, protectedSteps } from '../steps';
-import { oidcMiddleware, ccdCaseMiddleware } from 'middleware';
+import { protectedSteps, stepsWithContent } from '../steps';
 
 export default function registerSteps(app: Application): void {
   for (const step of stepsWithContent) {
