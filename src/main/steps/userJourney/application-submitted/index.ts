@@ -1,6 +1,6 @@
-import { createGetController } from 'app/controller/controllerFactory';
 import type { Request, Response } from 'express';
 
+import { createGetController } from '../../../app/controller/controllerFactory';
 import common from '../../../assets/locales/en/common.json';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 

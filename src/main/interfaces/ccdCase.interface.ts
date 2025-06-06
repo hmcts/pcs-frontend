@@ -34,3 +34,19 @@ export interface CcdCase {
   id: string;
   data: CcdCaseData;
 }
+
+export interface CcdFormDataMap {
+  'enter-user-details'?: {
+    applicantForename: string;
+    applicantSurname: string;
+  };
+  'enter-address'?: {
+    addressLine1: string;
+    addressLine2: string;
+    addressLine3: string;
+    town: string;
+    county: string;
+    postcode: string;
+    country: string;
+  };
+}

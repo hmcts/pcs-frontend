@@ -1,13 +1,12 @@
-import { createGetController } from 'app/controller/controllerFactory';
-import { getFormData, setFormData } from 'app/controller/sessionHelper';
-import { validateForm } from 'app/controller/validation';
 import type { Request, Response } from 'express';
-import { ccdCaseService } from 'services/ccdCaseService';
 
+import { createGetController } from '../../../app/controller/controllerFactory';
+import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
+import { validateForm } from '../../../app/controller/validation';
 import common from '../../../assets/locales/en/common.json';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-
+import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const stepName = 'enter-user-details';
 
@@ -49,7 +48,7 @@ export const step: StepDefinition = {
       const user = req.session.user;
 
       if (ccdCase?.id) {
-        const updatedCase = await ccdCaseService.updateCase(user, {
+        const updatedCase = await ccdCaseService.updateCase(user?.accessToken, {
           id: ccdCase.id,
           data: {
             ...ccdCase.data,
@@ -59,7 +58,7 @@ export const step: StepDefinition = {
         });
         req.session.ccdCase = updatedCase;
       } else {
-        const newCase = await ccdCaseService.createCase(user, {
+        const newCase = await ccdCaseService.createCase(user?.accessToken, {
           applicantForename: req.body.applicantForename,
           applicantSurname: req.body.applicantSurname,
         });

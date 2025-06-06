@@ -4,7 +4,7 @@ import { mapCaseDataToFormData } from '../app/utils/sessionCaseMapper';
 import { CcdCase } from '../interfaces/ccdCase.interface';
 import { ccdCaseService } from '../services/ccdCaseService';
 
-export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.session.user?.uid;
 
@@ -13,7 +13,7 @@ export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextF
     }
 
     if (!req.session.ccdCase?.id) {
-      const caseData: CcdCase | null = await ccdCaseService.getCase(req.session.user);
+      const caseData: CcdCase | null = await ccdCaseService.getCase(req.session.user?.accessToken);
 
       if (caseData && caseData.id) {
         req.session.ccdCase = caseData;

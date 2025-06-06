@@ -1,9 +1,9 @@
-import { createGetController } from 'app/controller/controllerFactory';
 import type { Request, Response } from 'express';
-import { ccdCaseService } from 'services/ccdCaseService';
 
+import { createGetController } from '../../../app/controller/controllerFactory';
 import common from '../../../assets/locales/en/common.json';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const stepName = 'summary';
 const content = { ...common, backUrl: '/steps/user-journey/enter-address' };
@@ -27,7 +27,7 @@ export const step: StepDefinition = {
     post: async (req: Request, res: Response) => {
       try {
         if (req.session.ccdCase && req.session.user) {
-          await ccdCaseService.submitCase(req.session.user, req.session.ccdCase);
+          await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
         }
         res.redirect('/steps/user-journey/application-submitted');
       } catch (error) {

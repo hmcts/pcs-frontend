@@ -1,6 +1,6 @@
 import { Application } from 'express';
-import { ccdCaseMiddleware, oidcMiddleware } from 'middleware';
 
+import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
 import { protectedSteps, stepsWithContent } from '../steps';
 
 export default function registerSteps(app: Application): void {
