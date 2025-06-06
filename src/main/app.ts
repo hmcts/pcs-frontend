@@ -28,7 +28,7 @@ app.locals.ENV = env;
 const logger = Logger.getLogger('app');
 
 new PropertiesVolume().enableFor(app);
-new AppInsights().enable();
+new AppInsights(developmentMode).enable();
 new Nunjucks(developmentMode).enableFor(app);
 // secure the application by adding various HTTP headers to its responses
 new Helmet(developmentMode).enableFor(app);
