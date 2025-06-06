@@ -46,7 +46,6 @@ describe('registerSteps', () => {
   it('registers GET and POST with middlewares for protected steps', () => {
     registerSteps(app);
 
-    // Protected step should have both middlewares
     expect(mockGet).toHaveBeenCalledWith(
       '/steps/protected',
       expect.any(Function),
