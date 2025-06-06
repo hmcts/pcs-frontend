@@ -1,17 +1,30 @@
 {
-  "meta": { "name": "Possession Claim" },
+  "meta": {
+    "name": "Possession Claim",
+    "description": "Start a possession claim",
+    "version": "1.0.0"
+  },
   "steps": {
     "start": {
       "title": "Before you start",
+      "description": "Information about what you'll need for your possession claim",
       "next": "page2"
     },
     "page2": {
       "title": "Are you 18 or over?",
+      "description": "You must be 18 or over to make a possession claim",
       "fields": {
         "age": {
           "type": "radios",
-          "options": ["yes", "no"],
-          "validate": { "required": "Select yes or no" }
+          "label": "Are you 18 or over?",
+          "options": [
+            { "value": "yes", "text": "Yes" },
+            { "value": "no", "text": "No" }
+          ],
+          "validate": {
+            "required": true,
+            "customMessage": "Select yes or no"
+          }
         }
       },
       "next": {
@@ -22,30 +35,85 @@
     },
     "ineligible": {
       "title": "You are not eligible to make a claim",
-      "type": "ineligible"
+      "type": "ineligible",
+      "description": "You must be 18 or over to use this service"
     },
     "page3": {
       "title": "What are your grounds for possession?",
+      "description": "Select all grounds that apply to your case",
       "fields": {
         "grounds": {
           "type": "checkboxes",
-          "options": ["Rent arrears (ground 8)", "Breach of contract (ground 9)", "Other (ground 10)"],
-          "validate": { "required": "Select at least one option" }
+          "label": "Select all that apply",
+          "options": [
+            {
+              "value": "rent-arrears-8",
+              "text": "Rent arrears (ground 8)",
+              "hint": "The tenant owes at least 2 months' rent"
+            },
+            {
+              "value": "breach-contract-9",
+              "text": "Breach of contract (ground 9)",
+              "hint": "The tenant has broken terms of the tenancy agreement"
+            },
+            {
+              "value": "other-10",
+              "text": "Other (ground 10)",
+              "hint": "Other statutory grounds for possession"
+            }
+          ],
+          "validate": {
+            "required": true,
+            "minLength": 1,
+            "customMessage": "Select at least one option"
+          }
         }
       },
       "next": {
         "when": "grounds.length >= 1",
-        "goto": "summary"
+        "goto": "page4"
       }
+    },
+    "page4": {
+      "title": "What is your address?",
+      "description": "We need to know your address to send you a copy of the claim",
+      "fields": {
+        "address": {
+          "type": "text",
+          "label": "Address"
+        },
+        "date": {
+          "type": "date",
+          "label": "Date of birth"
+        },
+        "postcode": {
+          "type": "text",
+          "label": "Postcode"
+        }
+      },
+      "next": "summary"
     },
     "summary": {
       "title": "Check your answers",
       "type": "summary",
+      "description": "Review your answers before submitting your claim",
       "next": "confirmation"
     },
     "confirmation": {
       "title": "Application complete",
-      "type": "confirmation"
+      "type": "confirmation",
+      "data": {
+        "referenceNumber": true,
+        "nextSteps": "Your claim will be reviewed within 5 working days"
+      }
+    }
+  },
+  "config": {
+    "store": {
+      "type": "redis"
+    },
+    "auth": {
+      "required": true
     }
   }
 }
