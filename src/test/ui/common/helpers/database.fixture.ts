@@ -23,7 +23,6 @@ type DBHelpers = {
 };
 
 export const test = base.extend<{ connectDB: DBHelpers }>({
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   connectDB: async ({}, use) => {
     const client = new Client({
       host: dbconfig.host,
