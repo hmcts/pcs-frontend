@@ -1,7 +1,7 @@
 import { Application } from 'express';
 
+import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
 import registerSteps from '../../../main/routes/registerSteps';
-import { oidcMiddleware, ccdCaseMiddleware } from '../../../main/middleware';
 
 jest.mock('steps', () => {
   const protectedStep = {
@@ -64,14 +64,8 @@ describe('registerSteps', () => {
   it('registers GET and POST without middlewares for unprotected steps', () => {
     registerSteps(app);
 
-    expect(mockGet).toHaveBeenCalledWith(
-      '/steps/unprotected',
-      expect.any(Function)
-    );
+    expect(mockGet).toHaveBeenCalledWith('/steps/unprotected', expect.any(Function));
 
-    expect(mockPost).toHaveBeenCalledWith(
-      '/steps/unprotected',
-      expect.any(Function)
-    );
+    expect(mockPost).toHaveBeenCalledWith('/steps/unprotected', expect.any(Function));
   });
 });

@@ -1,12 +1,11 @@
-import { ccdCaseMiddleware } from '../../../main/middleware/ccdCase';
-import { ccdCaseService } from '../../../main/services/ccdCaseService';
-import { mapCaseDataToFormData } from '../../../main/app/utils/sessionCaseMapper';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Session } from 'express-session';
 import { UserInfoResponse } from 'openid-client';
+
+import { mapCaseDataToFormData } from '../../../main/app/utils/sessionCaseMapper';
 import { CcdCase } from '../../../main/interfaces/ccdCase.interface';
-
-
+import { ccdCaseMiddleware } from '../../../main/middleware/ccdCase';
+import { ccdCaseService } from '../../../main/services/ccdCaseService';
 
 interface CustomSession extends Session {
   user?: UserInfoResponse & {
@@ -15,10 +14,9 @@ interface CustomSession extends Session {
     idToken: string;
     refreshToken: string;
   };
-  formData?: Record<string, any>;
+  formData?: Record<string, unknown>;
   ccdCase?: CcdCase;
 }
-
 
 jest.mock('../../../main/services/ccdCaseService');
 jest.mock('../../../main/app/utils/sessionCaseMapper');

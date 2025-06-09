@@ -1,7 +1,8 @@
-import { ccdCaseService } from '../../../main/services/ccdCaseService';
-import { http } from '../../../main/modules/http';
 import config from 'config';
+
 import { CaseState } from '../../../main/interfaces/ccdCase.interface';
+import { http } from '../../../main/modules/http';
+import { ccdCaseService } from '../../../main/services/ccdCaseService';
 
 jest.mock('config');
 jest.mock('../../../main/modules/http');
@@ -13,8 +14,12 @@ const accessToken = 'token';
 const mockUrl = 'http://ccd.example.com';
 
 (config.get as jest.Mock).mockImplementation(key => {
-  if (key === 'ccd.url') return mockUrl;
-  if (key === 'ccd.caseTypeId') return 'PCS';
+  if (key === 'ccd.url') {
+    return mockUrl;
+  }
+  if (key === 'ccd.caseTypeId') {
+    return 'PCS';
+  }
 });
 
 describe('ccdCaseService', () => {
