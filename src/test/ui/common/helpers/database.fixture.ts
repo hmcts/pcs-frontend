@@ -23,14 +23,15 @@ type DBHelpers = {
 };
 
 export const test = base.extend<{ connectDB: DBHelpers }>({
-  connectDB: async (_, use) => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  connectDB: async ({}, use) => {
     const client = new Client({
       host: dbconfig.host,
       port: dbconfig.port ? Number(dbconfig.port) : undefined,
       database: dbconfig.database,
       user: dbconfig.user,
       password: dbconfig.password,
-      ssl: dbconfig.ssl,
+      //ssl: dbconfig.ssl,
     });
     await client.connect();
 

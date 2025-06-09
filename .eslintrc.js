@@ -50,6 +50,7 @@ module.exports = {
     'jest/valid-expect': 'off',
     'linebreak-style': ['error', 'unix'],
     'no-console': 'warn',
+    'no-empty-pattern': 'off',
     'no-prototype-builtins': 'off',
     'no-return-await': 'error',
     'no-unneeded-ternary': [
