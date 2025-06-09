@@ -215,3 +215,12 @@ in [info.ts](src/main/routes/info.ts) file and currently displays info from:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+## Database Environment Variables
+
+Set the following environment variables to configure the database connection:
+
+- DB_USERNAME – Database username
+- DB_PASSWORD – Database password
+- DB_PORT – Database port (AAT5432, Preview:6000)
+- DB_NAME – Database name (AAT: pcs, Preview: javadatabase)

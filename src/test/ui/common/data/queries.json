@@ -1,0 +1,5 @@
+{
+  "dbQueries": {
+    "postcodeQuery": "SELECT postcode, epimid FROM postcode_court_mapping"
+  }
+}

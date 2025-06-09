@@ -1,1 +1,4 @@
-{}
+{
+  "table": "postcode_court_mapping",
+  "columns": ["postcode", "epimid"]
+}
