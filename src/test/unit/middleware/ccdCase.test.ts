@@ -9,7 +9,6 @@ import { ccdCaseService } from '../../../main/services/ccdCaseService';
 
 interface CustomSession extends Session {
   user?: UserInfoResponse & {
-    user: UserInfoResponse;
     accessToken: string;
     idToken: string;
     refreshToken: string;
@@ -29,10 +28,24 @@ describe('ccdCaseMiddleware', () => {
   beforeEach(() => {
     mockReq = {
       session: {
-        user: { uid: '123', accessToken: 'token' },
+        user: {
+          sub: 'user-123',
+          uid: '123',
+          accessToken: 'token',
+          idToken: 'dummy-id-token',
+          refreshToken: 'dummy-refresh-token',
+        },
         ccdCase: undefined,
         formData: {},
-      } as CustomSession,
+        id: 'mock-session-id',
+        cookie: {},
+        regenerate: jest.fn(),
+        destroy: jest.fn(),
+        reload: jest.fn(),
+        save: jest.fn(),
+        touch: jest.fn(),
+        resetMaxAge: jest.fn(),
+      } as unknown as CustomSession,
     };
 
     mockRes = {};
