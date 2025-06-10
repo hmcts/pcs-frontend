@@ -23,8 +23,12 @@ def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
     secret('idam-system-user-name', 'IDAM_SYSTEM_USERNAME'),
-    secret('idam-system-user-password', 'IDAM_SYSTEM_USER_PASSWORD'),
-    secret('pcs-frontend-idam-user-temp-password', 'PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD')
+    secret('idam-system-user-password', 'IDAM_SYSTEM_PASSWORD'),
+    secret('pcs-frontend-idam-user-temp-password', 'PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD'),
+    secret('api-preview-POSTGRES-DATABASE', 'DB_NAME'),
+    secret('api-preview-POSTGRES-USER', 'DB_USERNAME'),
+    secret('api-preivew-POSTGRES-PASS', 'DB_PASSWORD'),
+    secret('api-preivew-POSTGRES-PORT', 'DB_PORT'),
   ]
 ]
 
