@@ -3,7 +3,7 @@ import { StepConfig, createFieldValidationSchema } from './schema';
 export interface ValidationResult {
   success: boolean;
   data?: Record<string, unknown>;
-  errors?: Record<string, string>;
+  errors?: Record<string, string | { day?: string; month?: string; year?: string; message: string }>;
 }
 
 export class JourneyValidator {
@@ -12,7 +12,7 @@ export class JourneyValidator {
       return { success: true, data: submission };
     }
 
-    const errors: Record<string, string> = {};
+    const errors: Record<string, string | { day?: string; month?: string; year?: string; message: string }> = {};
     const validatedData: Record<string, unknown> = {};
 
     // Validate each field using Zod
@@ -36,10 +36,20 @@ export class JourneyValidator {
         const dateVal = fieldValue as { day?: string; month?: string; year?: string };
         // GOV.UK error priority: required, incomplete, invalid, future
         if (!dateVal.day && !dateVal.month && !dateVal.year) {
-          errors[fieldName] = fieldConfig.errorMessages?.required || 'Please enter a valid date';
+          errors[fieldName] = {
+            day: fieldConfig.validate?.errorMessages?.day,
+            month: fieldConfig.validate?.errorMessages?.month,
+            year: fieldConfig.validate?.errorMessages?.year,
+            message: fieldConfig.validate?.errorMessages?.required || 'Please enter a valid date',
+          };
           continue;
         } else if (!dateVal.day || !dateVal.month || !dateVal.year) {
-          errors[fieldName] = fieldConfig.errorMessages?.incomplete || 'Date must include a day, month and year';
+          errors[fieldName] = {
+            day: !dateVal.day ? (fieldConfig.validate?.errorMessages?.day || 'Enter a valid day') : undefined,
+            month: !dateVal.month ? (fieldConfig.validate?.errorMessages?.month || 'Enter a valid month') : undefined,
+            year: !dateVal.year ? (fieldConfig.validate?.errorMessages?.year || 'Enter a valid year') : undefined,
+            message: fieldConfig.validate?.errorMessages?.incomplete || 'Date must include a day, month and year',
+          };
           continue;
         } else {
           const year = parseInt(dateVal.year, 10);
@@ -47,7 +57,12 @@ export class JourneyValidator {
           const day = parseInt(dateVal.day, 10);
           const date = new Date(year, month - 1, day);
           if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
-            errors[fieldName] = fieldConfig.errorMessages?.invalid || 'Please enter a valid date';
+            errors[fieldName] = {
+              day: fieldConfig.validate?.errorMessages?.day,
+              month: fieldConfig.validate?.errorMessages?.month,
+              year: fieldConfig.validate?.errorMessages?.year,
+              message: fieldConfig.validate?.errorMessages?.invalid || 'Please enter a valid date',
+            };
             continue;
           }
         }
