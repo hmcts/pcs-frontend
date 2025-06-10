@@ -21,7 +21,7 @@ interface JourneyContext {
   step: StepConfig;
   data: Record<string, unknown>;
   allData: Record<string, unknown>;
-  errors?: Record<string, string>;
+  errors?: Record<string, string | { day?: string; month?: string; year?: string; message: string }>;
   previousStepUrl?: string | null;
   summaryRows?: SummaryRow[];
 }
@@ -171,8 +171,16 @@ export class WizardEngine {
         const stepData = allData[stepId] as Record<string, unknown>;
         const fieldValues = Object.entries(stepConfig.fields!)
           .filter(([fieldName]) => stepData[fieldName])
-          .map(([fieldName]) => {
+          .map(([fieldName, fieldConfig]) => {
             const value = stepData[fieldName];
+            if (
+              fieldConfig.type === 'date' &&
+              value &&
+              typeof value === 'object' &&
+              'day' in value && 'month' in value && 'year' in value
+            ) {
+              return `${value.day || ''}/${value.month || ''}/${value.year || ''}`;
+            }
             return Array.isArray(value) ? value.join(', ') : String(value);
           });
 
@@ -259,19 +267,51 @@ export class WizardEngine {
     step: StepConfig,
     caseId: string,
     allData: Record<string, unknown>,
-    errors?: Record<string, string>
-  ): JourneyContext {
+    errors?: Record<string, string | { day?: string; month?: string; year?: string; message: string }>
+  ): JourneyContext & { dateItems?: Record<string, { name: string; classes: string; value: string }[]> } {
     const previousStepUrl = this.findPreviousStep(step.id, allData);
     const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData, caseId) : undefined;
+    const data = (allData[step.id] as Record<string, unknown>) || {};
+
+    // Build dateItems for all date fields
+    const dateItems: Record<string, { name: string; classes: string; value: string }[]> = {};
+    if (step.fields) {
+      for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+        if (fieldConfig.type === 'date') {
+          const fieldValue = data[fieldName] as Record<'day'|'month'|'year', string|undefined>;
+          const fieldError = errors && errors[fieldName];
+          dateItems[fieldName] = (['day', 'month', 'year'] as ('day'|'month'|'year')[]).map(part => {
+            let hasError = false;
+            if (fieldError) {
+              if (typeof fieldError === 'object' && fieldError[part]) {
+                hasError = true;
+              } else if (typeof fieldError === 'string' && fieldError.includes(part)) {
+                hasError = true;
+              }
+            }
+            return {
+              name: part,
+              classes:
+                (part === 'day' ? 'govuk-input--width-2' :
+                part === 'month' ? 'govuk-input--width-2' :
+                'govuk-input--width-4') +
+                (hasError ? ' govuk-input--error' : ''),
+              value: fieldValue?.[part] || ''
+            };
+          });
+        }
+      }
+    }
 
     return {
       caseId,
       step,
-      data: (allData[step.id] as Record<string, unknown>) || {},
+      data,
       allData,
       errors,
       previousStepUrl,
       summaryRows,
+      ...(Object.keys(dateItems).length > 0 ? { dateItems } : {})
     };
   }
 
@@ -432,11 +472,25 @@ export class WizardEngine {
 
       if (!validationResult.success) {
         const { data } = await this.store.load(req, Number(caseId));
-        const context = this.buildJourneyContext(step, caseId, data, validationResult.errors);
+        // Reconstruct nested date fields from req.body for template
+        const reconstructedData = { ...req.body };
+        if (step.fields) {
+          for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+            if (fieldConfig.type === 'date') {
+              reconstructedData[fieldName] = {
+                day: req.body[`${fieldName}-day`] || '',
+                month: req.body[`${fieldName}-month`] || '',
+                year: req.body[`${fieldName}-year`] || ''
+              };
+            }
+          }
+        }
+        // Patch the current step's data with reconstructedData for this render
+        const patchedAllData = { ...data, [step.id]: reconstructedData };
+        const context = this.buildJourneyContext(step, caseId, patchedAllData, validationResult.errors);
 
         return res.status(400).render(this.resolveTemplatePath(step.id), {
           ...context,
-          data: req.body, // Show submitted data on error
           errors: validationResult.errors,
         });
       }
