@@ -178,7 +178,6 @@
           }) }}
           
         {% elif fieldConfig.type == 'date' %}
-          {% set dateValue = data[fieldName] if data[fieldName] else {} %}
           {{ govukDateInput({
             id: fieldName,
             namePrefix: fieldName,
@@ -189,33 +188,8 @@
               }
             },
             hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
-            errorMessage: { text: fieldError } if fieldError else null,
-            items: [
-              {
-                name: "day",
-                classes: "govuk-input--width-2" + (
-                  (fieldError and (not dateValue.day or (fieldError contains 'day')))
-                  ? ' govuk-input--error' : ''
-                ),
-                value: dateValue.day or ""
-              },
-              {
-                name: "month",
-                classes: "govuk-input--width-2" + (
-                  (fieldError and (not dateValue.month or (fieldError contains 'month')))
-                  ? ' govuk-input--error' : ''
-                ),
-                value: dateValue.month or ""
-              },
-              {
-                name: "year",
-                classes: "govuk-input--width-4" + (
-                  (fieldError and (not dateValue.year or (fieldError contains 'year')))
-                  ? ' govuk-input--error' : ''
-                ),
-                value: dateValue.year or ""
-              }
-            ]
+            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null,
+            items: dateItems[fieldName]
           }) }}
         {% endif %}
       {% endfor %}
