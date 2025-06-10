@@ -15,7 +15,7 @@ test('Idam Login @accessibility @PR @nightly', async ({ page }) => {
   await new webElementsHelper().compareElementText(new homePageObjects(page).heading, constants.homePage.welcomeHeader);
 });
 
-test('DB connection', async ({ connectDB }) => {
+test('DB connection @PR', async ({ connectDB }) => {
   //table name and columns are defined in src/test/common/data/test-data.ts
   const res = await connectDB.fetchTable(testData.table);
   console.log(res);
