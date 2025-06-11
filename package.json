@@ -153,7 +153,8 @@
     "@types/node": "22.15.31",
     "glob": "^11.0.0",
     "@azure/msal-browser": "4.13.0",
-    "superagent": "10.2.1"
+    "superagent": "10.2.1",
+    "brace-expansion": "^4.0.1"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
