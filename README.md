@@ -120,7 +120,7 @@ where
 For example, if you want to create an IDAM user with the email 'test@test.com', forename 'Dummy', Surname 'Casworker' and the roles 'citizen' and 'caseworker', use the following command:
 
 ```bash
-yarn createIdamUser --roles=citizen,caseworker --email=test@test.com --surname=Caseworker --forename=Dummy
+yarn createIdamUser --roles=citizen,caseworker --email=testUser@test.com --surname=Caseworker --forename=Dummy
 ```
 
 or with abbreviated param names and single role:

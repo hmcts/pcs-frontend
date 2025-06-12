@@ -24,8 +24,8 @@ module.exports = defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chromium',
-        screenshot: 'off',
-        video: 'off',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
         trace: 'on-first-retry',
         javaScriptEnabled: true,
         viewport: DEFAULT_VIEWPORT,
