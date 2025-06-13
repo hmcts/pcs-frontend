@@ -1,0 +1,81 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block content %}
+
+  {{ govukBackLink({ text: "Back", href: backUrl }) }}
+
+
+  <h1 class="govuk-heading-l">Check your details before submitting</h1>
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: {
+          text: "First name"
+        },
+        value: {
+          text: userDetails.applicantForename
+        },
+        actions: {
+          items: [
+            {
+              href: "/steps/user-journey/enter-user-details",
+              text: "Change",
+              visuallyHiddenText: "first name"
+            }
+          ]
+        }
+      },
+      {
+        key: {
+          text: "Last name"
+        },
+        value: {
+          text: userDetails.applicantSurname
+        },
+        actions: {
+          items: [
+            {
+              href: "/steps/user-journey/enter-user-details",
+              text: "Change",
+              visuallyHiddenText: "last name"
+            }
+          ]
+        }
+      },
+      {
+        key: {
+          text: "Address"
+        },
+        value: {
+          html: (address.addressLine1 or '') + '<br>' +
+                (address.addressLine2 or '') + '<br>' +
+                (address.addressLine3 or '') + '<br>' +
+                (address.town or '') + '<br>' +
+                (address.county or '') + '<br>' +
+                (address.postcode or '') + '<br>' +
+                (address.country or '')
+        },
+        actions: {
+          items: [
+            {
+              href: "/steps/user-journey/enter-address",
+              text: "Change",
+              visuallyHiddenText: "your address"
+            }
+          ]
+        }
+      }
+    ]
+  }) }}
+
+  <form method="post" action="{{ url }}">
+    {{ govukButton({
+      text: "Submit"
+    }) }}
+  </form>
+
+{% endblock %}
