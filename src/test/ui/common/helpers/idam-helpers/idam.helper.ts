@@ -1,7 +1,7 @@
 import config from 'config';
 import { TokenEndpointResponse } from 'oauth4webapi';
 
-import { TestConfig, UserData } from '../testConfig';
+import { TestConfig, UserData } from './testConfig';
 
 import { request, retriedRequest } from './rest.helper';
 
