@@ -33,6 +33,7 @@ export class OIDCModule {
       );
     } catch (error) {
       this.logger.error('Failed to setup OIDC client:', error);
+      throw new OIDCAuthenticationError('Failed to initialize OIDC client');
     }
   }
 
@@ -49,8 +50,12 @@ export class OIDCModule {
 
     app.use(async (req: Request, res: Response, next: NextFunction) => {
       if (!this.clientConfig) {
-        this.logger.error('Client config not found, retrieving...');
-        await this.setupClient();
+        try {
+          this.logger.error('Client config not found, retrieving...');
+          await this.setupClient();
+        } catch (error) {
+          next(error);
+        }
       }
       next();
     });
