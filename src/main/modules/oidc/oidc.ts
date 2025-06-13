@@ -13,7 +13,6 @@ export class OIDCModule {
   private readonly logger = Logger.getLogger('oidc');
 
   private async setupClient(): Promise<void> {
-    
     this.logger.info('setting up client');
 
     try {
