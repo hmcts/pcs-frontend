@@ -9,7 +9,7 @@ import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
 export class OIDCModule {
   private clientConfig!: Configuration;
-  private oidcConfig!: OIDCConfig;
+  private oidcConfig: OIDCConfig = config.get<OIDCConfig>('oidc');
   private readonly logger = Logger.getLogger('oidc');
 
   constructor() {
@@ -17,7 +17,6 @@ export class OIDCModule {
   }
 
   private async setupClient(): Promise<void> {
-    this.oidcConfig = config.get<OIDCConfig>('oidc');
     this.logger.info('setting up client');
 
     try {
@@ -53,6 +52,18 @@ export class OIDCModule {
   public enableFor(app: Express): void {
     app.set('trust proxy', true);
 
+    app.use(async (req: Request, res: Response, next: NextFunction) => {
+      if (!this.clientConfig) {
+        try {
+          this.logger.error('Client config not found, retrieving...');
+          await this.setupClient();
+        } catch (error) {
+          next(error);
+        }
+      }
+      next();
+    });
+
     // Login route
     app.get('/login', async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -72,8 +83,6 @@ export class OIDCModule {
           parameters.nonce = req.session.nonce;
         }
 
-        this.logger.info('parameters =>>>>>> ', parameters);
-
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
         res.redirect(redirectTo.href);
       } catch (error) {
@@ -86,9 +95,6 @@ export class OIDCModule {
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
       try {
         const { codeVerifier, nonce } = req.session;
-
-        this.logger.info('codeVerifier =>>>>>> ', codeVerifier);
-        this.logger.info('nonce =>>>>>> ', nonce);
 
         const callbackUrl = OIDCModule.getCurrentUrl(req);
 
