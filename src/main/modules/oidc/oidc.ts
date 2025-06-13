@@ -13,11 +13,11 @@ export class OIDCModule {
   private readonly logger = Logger.getLogger('oidc');
 
   constructor() {
-    this.setupClient();
+    this.oidcConfig = config.get<OIDCConfig>('oidc');
   }
 
   private async setupClient(): Promise<void> {
-    this.oidcConfig = config.get<OIDCConfig>('oidc');
+    
     this.logger.info('setting up client');
 
     try {
@@ -38,7 +38,6 @@ export class OIDCModule {
       );
     } catch (error) {
       this.logger.error('Failed to setup OIDC client:', error);
-      throw new OIDCAuthenticationError('Failed to initialize OIDC client');
     }
   }
 
@@ -52,6 +51,14 @@ export class OIDCModule {
 
   public enableFor(app: Express): void {
     app.set('trust proxy', true);
+
+    app.use(async (req: Request, res: Response, next: NextFunction) => {
+      if (!this.clientConfig) {
+        this.logger.error('Client config not found, retrying...');
+        await this.setupClient();
+      }
+      next();
+    });
 
     // Login route
     app.get('/login', async (req: Request, res: Response, next: NextFunction) => {
