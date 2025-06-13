@@ -26,6 +26,7 @@ module.exports = defineConfig({
         channel: 'chromium',
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
+        headless: true,
         trace: 'on-first-retry',
         javaScriptEnabled: true,
         viewport: DEFAULT_VIEWPORT,

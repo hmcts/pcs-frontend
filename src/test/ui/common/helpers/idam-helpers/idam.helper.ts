@@ -1,9 +1,8 @@
 import config from 'config';
 import { TokenEndpointResponse } from 'oauth4webapi';
 
-import { TestConfig, UserData } from '../testConfig';
-
 import { request, retriedRequest } from './rest.helper';
+import { TestConfig, UserData } from './testConfig';
 
 const testConfig = config.get<TestConfig>('e2e');
 const username =
