@@ -116,7 +116,7 @@ export class WizardEngine {
     return nxt.else || step.id;
   }
 
-  private resolveTemplatePath(stepId: string): string {
+  private async resolveTemplatePath(stepId: string): Promise<string> {
     const step = this.journey.steps[stepId];
     if (!step) {
       return stepId;
@@ -127,26 +127,23 @@ export class WizardEngine {
       return step.template;
     }
 
-    // For generic step types, use default templates
-    const genericStepTypes = ['summary', 'confirmation', 'ineligible', 'error', 'complete', 'success'];
-    if (step.type && genericStepTypes.includes(step.type)) {
-      return `_defaults/${step.type}`;
-    }
-
-    // For regular steps with fields, use generic form template
-    if (step.fields && Object.keys(step.fields).length > 0) {
-      return '_defaults/form';
-    }
-
-    // Try journey-specific template
+    // Try journey-specific template first
     const regularPath = path.join(this.slug, stepId);
     try {
       const viewsDir = path.join(__dirname, '..', '..', '..', 'views');
       const journeyTemplatePath = path.join(viewsDir, `${regularPath}.njk`);
-      fs.accessSync(journeyTemplatePath);
+      await fs.promises.access(journeyTemplatePath);
       return regularPath;
     } catch {
-      // Fallback to the regular path
+      // If no journey-specific template found, use default templates
+      if (step.type && ['summary', 'confirmation', 'ineligible', 'error', 'complete', 'success'].includes(step.type)) {
+        return `_defaults/${step.type}`;
+      }
+      // For regular steps with fields, use generic form template
+      if (step.fields && Object.keys(step.fields).length > 0) {
+        return '_defaults/form';
+      }
+      // If no specific template or default found, fall back to regular path
       return regularPath;
     }
   }
@@ -447,7 +444,7 @@ export class WizardEngine {
 
         const context = this.buildJourneyContext(step, caseId, data);
 
-        res.render(this.resolveTemplatePath(step.id), {
+        res.render(await this.resolveTemplatePath(step.id), {
           ...context,
           // Legacy compatibility
           data: context.data,
@@ -489,7 +486,7 @@ export class WizardEngine {
         const patchedAllData = { ...data, [step.id]: reconstructedData };
         const context = this.buildJourneyContext(step, caseId, patchedAllData, validationResult.errors);
 
-        return res.status(400).render(this.resolveTemplatePath(step.id), {
+        return res.status(400).render(await this.resolveTemplatePath(step.id), {
           ...context,
           errors: validationResult.errors,
         });
