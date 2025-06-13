@@ -9,12 +9,8 @@ import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
 export class OIDCModule {
   private clientConfig!: Configuration;
-  private oidcConfig!: OIDCConfig;
+  private oidcConfig: OIDCConfig = config.get<OIDCConfig>('oidc');
   private readonly logger = Logger.getLogger('oidc');
-
-  constructor() {
-    this.oidcConfig = config.get<OIDCConfig>('oidc');
-  }
 
   private async setupClient(): Promise<void> {
     
@@ -54,7 +50,7 @@ export class OIDCModule {
 
     app.use(async (req: Request, res: Response, next: NextFunction) => {
       if (!this.clientConfig) {
-        this.logger.error('Client config not found, retrying...');
+        this.logger.error('Client config not found, retrieving...');
         await this.setupClient();
       }
       next();
@@ -79,8 +75,6 @@ export class OIDCModule {
           parameters.nonce = req.session.nonce;
         }
 
-        this.logger.info('parameters =>>>>>> ', parameters);
-
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
         res.redirect(redirectTo.href);
       } catch (error) {
@@ -93,9 +87,6 @@ export class OIDCModule {
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
       try {
         const { codeVerifier, nonce } = req.session;
-
-        this.logger.info('codeVerifier =>>>>>> ', codeVerifier);
-        this.logger.info('nonce =>>>>>> ', nonce);
 
         const callbackUrl = OIDCModule.getCurrentUrl(req);
 
