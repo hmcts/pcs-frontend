@@ -12,6 +12,10 @@ export class OIDCModule {
   private oidcConfig: OIDCConfig = config.get<OIDCConfig>('oidc');
   private readonly logger = Logger.getLogger('oidc');
 
+  constructor() {
+    this.setupClient();
+  }
+
   private async setupClient(): Promise<void> {
     this.logger.info('setting up client');
 
