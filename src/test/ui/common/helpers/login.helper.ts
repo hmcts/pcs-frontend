@@ -2,9 +2,8 @@ import { Page } from '@playwright/test';
 import config from 'config';
 
 import { initActionHelper, performAction } from './element-helpers';
-
-import { buildUserDataWithRole } from './idam-helpers/testConfig';
 import * as idamHelper from './idam-helpers/idam.helper';
+import { buildUserDataWithRole } from './idam-helpers/testConfig';
 
 export class loginHelper {
   static async login(page: Page): Promise<void> {
