@@ -20,8 +20,8 @@ export const ValidationRuleSchema = z.object({
   min: z.number().optional().default(0),
   max: z.number().optional().default(100),
   pattern: z.string().optional(),
-  email: z.boolean().optional(),
-  url: z.boolean().optional(),
+  email: z.email().optional(),
+  url: z.url().optional(),
   customMessage: z.string().optional(),
   errorMessages: ErrorMessagesSchema,
 }).optional();
