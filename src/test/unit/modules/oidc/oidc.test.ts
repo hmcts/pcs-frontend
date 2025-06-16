@@ -82,6 +82,7 @@ describe('OIDCModule', () => {
     mockApp = {
       get: jest.fn(),
       set: jest.fn(),
+      use: jest.fn(),
       locals: {
         nunjucksEnv: {
           addGlobal: jest.fn(),
@@ -171,6 +172,7 @@ describe('OIDCModule', () => {
         mockApp = {
           get: jest.fn(),
           set: jest.fn(),
+          use: jest.fn(),
           locals: {
             nunjucksEnv: {
               addGlobal: jest.fn(),
