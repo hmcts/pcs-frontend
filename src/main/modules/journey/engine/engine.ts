@@ -68,7 +68,7 @@ export class WizardEngine {
     // Validate and parse the journey JSON using Zod
     const parseResult = JourneySchema.safeParse(raw);
     if (!parseResult.success) {
-      this.logger.error('Invalid journey configuration:', parseResult.error.issues);
+      this.logger.error('Invalid journey configuration:', parseResult.error.issues, `${filePath}: ${parseResult.error.issues[0]?.message}`);
       throw new Error(`Invalid journey configuration in ${filePath}: ${parseResult.error.issues[0]?.message}`);
     }
 

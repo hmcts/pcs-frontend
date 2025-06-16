@@ -8,6 +8,7 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block content %}
 
@@ -27,6 +28,21 @@
     
     <h1 class="govuk-heading-l">{{ step.title }}</h1>
 
+    {% if errors %}
+      {% set errorList = [] %}
+      {% for fieldName, error in errors %}
+        {% set errorList = errorList.concat([{
+          text: error.message if error.message else error,
+          href: "#" + fieldName
+        }]) %}
+      {% endfor %}
+      
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: errorList
+      }) }}
+    {% endif %}
+
     <form method="post">
       {% for fieldName, fieldConfig in step.fields %}
         {% set fieldValue = data[fieldName] %}
@@ -45,7 +61,7 @@
             value: fieldValue,
             classes: fieldConfig.classes,
             attributes: fieldConfig.attributes,
-            errorMessage: { text: fieldError } if fieldError else null
+            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
           
         {% elif fieldConfig.type == 'textarea' %}
@@ -60,7 +76,7 @@
             value: fieldValue,
             classes: fieldConfig.classes,
             attributes: fieldConfig.attributes,
-            errorMessage: { text: fieldError } if fieldError else null
+            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
           
         {% elif fieldConfig.type == 'radios' %}
@@ -94,7 +110,7 @@
             },
             hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
             items: radioItems,
-            errorMessage: { text: fieldError } if fieldError else null
+            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
           
         {% elif fieldConfig.type == 'checkboxes' %}
@@ -128,7 +144,7 @@
             },
             hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
             items: checkboxItems,
-            errorMessage: { text: fieldError } if fieldError else null
+            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
           
         {% elif fieldConfig.type == 'select' %}
@@ -158,7 +174,7 @@
             },
             hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
             items: selectItems,
-            errorMessage: { text: fieldError } if fieldError else null
+            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
           
         {% elif fieldConfig.type == 'number' %}
@@ -174,7 +190,7 @@
             value: fieldValue,
             classes: fieldConfig.classes,
             attributes: fieldConfig.attributes,
-            errorMessage: { text: fieldError } if fieldError else null
+            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
           
         {% elif fieldConfig.type == 'date' %}
