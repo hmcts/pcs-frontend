@@ -9,7 +9,7 @@ export default function (app: Application): void {
 
     try {
       apiGreeting = await getRootGreeting();
-    } catch (error) {
+    } catch {
       // console.error('pcs-api error', error.response.statusText);
     }
 
