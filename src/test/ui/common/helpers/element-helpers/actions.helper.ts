@@ -1,84 +1,84 @@
 import { Page, expect } from '@playwright/test';
 
-let _page: Page | null = null;
+class ActionHelper {
+  private static currentPage: Page | null = null;
 
-export async function initActionHelper(page: Page): Promise<void> {
-  _page = page;
-}
-
-export async function performAction(action: 'verifyPageTitle', value: string): Promise<void>;
-
-export async function performAction(
-  action: 'fill' | 'click' | 'check',
-  identifier: string,
-  value?: string
-): Promise<void>;
-
-export async function performAction(action: string, identifierOrValue: string, value?: string): Promise<void> {
-  if (!_page) {
-    throw new Error('Call initActionHelper() with a page');
+  static initialize(page: Page): void {
+    ActionHelper.currentPage = page;
   }
 
-  const actions = {
-    fill: async (id: string, val: string): Promise<void> => {
-      if (!val) {
-        throw new Error('Fill requires value');
-      }
-      const locator = _page!
-        .locator(
-          `
-        //*[@aria-label="${id}" or
-         @name="${id}" or
-         (label[contains(., "${id}")]/following::input[1])]
-      `
-        )
-        .first();
-      await locator.fill(val);
-    },
+  private static getActivePage(): Page {
+    if (!ActionHelper.currentPage) {
+      throw new Error('ActionHelper not initialized. Call initActionHelper(page) before using performAction()');
+    }
+    return ActionHelper.currentPage;
+  }
 
-    click: async (id: string): Promise<void> => {
-      const locator = _page!
-        .locator(
-          `
-        //*[contains(@class, 'button') and @value='${id}' or
-         @aria-label="${id}" or
-         @name="${id}" or
-         (label[contains(., "${id}")]/following::button[1])]
-      `
-        )
-        .first();
-      await locator.click();
-    },
-
-    check: async (id: string): Promise<void> => {
-      const locator = _page!
-        .locator(
-          `
-        //input[@type="checkbox" and
-         (@aria-label="${id}" or
-          @name="${id}" or
-          following::label[contains(., "${id}")])]
-      `
-        )
-        .first();
-      await locator.check();
-    },
-
+  private static actions = {
     verifyPageTitle: async (title: string): Promise<void> => {
-      await expect(_page!).toHaveTitle(title);
+      await expect(ActionHelper.getActivePage()).toHaveTitle(title);
+    },
+    fill: async (identifier: string, value: string): Promise<void> => {
+      await ActionHelper.getActivePage()
+        .locator(
+          `label:has-text("${identifier}") + input,
+           label:has-text("${identifier}") ~ input,
+           [aria-label="${identifier}"],
+           [placeholder="${identifier}"]`
+        )
+        .first()
+        .fill(value);
+    },
+    click: async (identifier: string): Promise<void> => {
+      await ActionHelper.getActivePage()
+        .locator(
+          `button:has-text("${identifier}"),
+           [value="${identifier}"],
+           [aria-label="${identifier}"],
+           [name="${identifier}"],
+           label:has-text("${identifier}") + button,
+           label:has-text("${identifier}") ~ button`
+        )
+        .first()
+        .click();
+    },
+    check: async (identifier: string): Promise<void> => {
+      await ActionHelper.getActivePage()
+        .locator(
+          `input[type="checkbox"][aria-label="${identifier}"],
+           input[type="checkbox"][name="${identifier}"],
+           label:has-text("${identifier}") input[type="checkbox"]`
+        )
+        .first()
+        .check();
     },
   };
 
-  switch (action) {
-    case 'verifyPageTitle':
-      await actions[action](identifierOrValue); // Uses the first parameter as value
-      break;
-    case 'fill':
-    case 'click':
-    case 'check':
-      await actions[action](identifierOrValue, value!);
-      break;
-    default:
+  static performAction(action: 'verifyPageTitle', value: string): Promise<void>;
+  static performAction(action: 'fill', identifier: string, value: string): Promise<void>;
+  static performAction(action: 'click' | 'check', identifier: string): Promise<void>;
+  static async performAction(action: string, ...args: string[]): Promise<void> {
+    if (!(action in ActionHelper.actions)) {
       throw new Error(`Unknown action: ${action}`);
+    }
+
+    const actionFunction = ActionHelper.actions[action as keyof typeof ActionHelper.actions];
+    switch (action) {
+      case 'verifyPageTitle':
+        await (actionFunction as (title: string) => Promise<void>)(args[0]);
+        break;
+      case 'fill':
+        await (actionFunction as (id: string, value: string) => Promise<void>)(args[0], args[1]);
+        break;
+      case 'click':
+      case 'check':
+        await (actionFunction as (id: string) => Promise<void>)(args[0]);
+        break;
+      default:
+        throw new Error(`Unknown action: ${action}`);
+    }
   }
 }
+
+export const performAction = ActionHelper.performAction;
+export const initActionHelper = ActionHelper.initialize;
