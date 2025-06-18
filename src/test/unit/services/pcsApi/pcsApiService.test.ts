@@ -1,6 +1,3 @@
-import * as fs from 'node:fs/promises';
-import * as path from 'path';
-
 import config from 'config';
 
 import { CourtVenue } from '../../../../main/interfaces/courtVenue.interface';
@@ -100,8 +97,7 @@ describe('pcsApiService', () => {
   test('should fetch dashboard task groups by case reference', async () => {
     const expectedTaskGroups = [
       {
-        id: 'group-1',
-        title: 'Task Group 1',
+        groupId: 'CLAIM',
         tasks: [
           {
             templateId: 'task-1',
@@ -112,16 +108,13 @@ describe('pcsApiService', () => {
       },
     ];
 
-    const mockFilePath = '/mock/path/to/taskgroups.json';
-    (path.join as jest.Mock).mockReturnValue(mockFilePath);
-    (fs.readFile as jest.Mock).mockResolvedValue(JSON.stringify(expectedTaskGroups));
+    mockHttp.get.mockResolvedValue({ data: expectedTaskGroups });
 
     const caseReference = 123456;
     const actualTaskGroups = await getDashboardTaskGroups(caseReference);
 
     expect(actualTaskGroups).toEqual(expectedTaskGroups);
-    expect(path.join).toHaveBeenCalledWith(expect.any(String), '../../assets/fixtures/taskgroups.json');
-    expect(fs.readFile).toHaveBeenCalledWith(mockFilePath, 'utf8');
+    expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/dashboard/${caseReference}/tasks`);
   });
 
   test('should handle error when fetching root greeting', async () => {
@@ -155,14 +148,11 @@ describe('pcsApiService', () => {
   });
 
   test('should handle error when fetching dashboard task groups', async () => {
-    const error = new Error('File not found');
-    const mockFilePath = '/mock/path/to/taskgroups.json';
-    (path.join as jest.Mock).mockReturnValue(mockFilePath);
-    (fs.readFile as jest.Mock).mockRejectedValue(error);
+    const error = new Error('Case not found');
+    mockHttp.get.mockRejectedValue(error);
 
     const caseReference = 999999;
-    await expect(getDashboardTaskGroups(caseReference)).rejects.toThrow('File not found');
-    expect(path.join).toHaveBeenCalledWith(expect.any(String), '../../assets/fixtures/taskgroups.json');
-    expect(fs.readFile).toHaveBeenCalledWith(mockFilePath, 'utf8');
+    await expect(getDashboardTaskGroups(caseReference)).rejects.toThrow('Case not found');
+    expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/dashboard/${caseReference}/tasks`);
   });
 });
