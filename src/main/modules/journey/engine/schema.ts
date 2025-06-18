@@ -1,4 +1,5 @@
 import { z } from 'zod/v4';
+import isPostalCode from 'validator/lib/isPostalCode'
 
 // Common error message schema
 const ErrorMessagesSchema = z.object({
@@ -20,8 +21,9 @@ export const ValidationRuleSchema = z.object({
   min: z.number().optional().default(0),
   max: z.number().optional().default(100),
   pattern: z.string().optional(),
-  email: z.string().optional(),
-  url: z.string().optional(),
+  email: z.email().optional(),
+  postalCode: z.string().refine(val => isPostalCode(val, 'GB'), { message: 'Postal code must be 4 characters long' }).optional(),
+  url: z.url().optional(),
   customMessage: z.string().optional(),
   errorMessages: ErrorMessagesSchema,
 }).optional();
