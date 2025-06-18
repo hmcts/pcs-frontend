@@ -35,7 +35,7 @@ describe('mapCaseDataToFormData', () => {
     const caseData: CcdCase = {
       id: '1234',
       data: {
-        applicantAddress: {
+        propertyAddress: {
           AddressLine1: '123 Street',
           AddressLine2: 'Apt 4',
           AddressLine3: '',
@@ -68,7 +68,7 @@ describe('mapCaseDataToFormData', () => {
       data: {
         applicantForename: 'Alice',
         applicantSurname: 'Smith',
-        applicantAddress: {
+        propertyAddress: {
           AddressLine1: '456 Lane',
           AddressLine2: '',
           AddressLine3: 'Building 7',

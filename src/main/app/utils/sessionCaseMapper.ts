@@ -7,7 +7,7 @@ export function mapCaseDataToFormData(caseData: CcdCase | null): Partial<CcdForm
 
   const formData: Partial<CcdFormDataMap> = {};
 
-  const { applicantForename, applicantSurname, applicantAddress } = caseData.data;
+  const { applicantForename, applicantSurname, propertyAddress } = caseData.data;
 
   if (applicantForename || applicantSurname) {
     formData['enter-user-details'] = {
@@ -17,23 +17,23 @@ export function mapCaseDataToFormData(caseData: CcdCase | null): Partial<CcdForm
   }
 
   if (
-    applicantAddress &&
-    (applicantAddress.AddressLine1 ||
-      applicantAddress.AddressLine2 ||
-      applicantAddress.AddressLine3 ||
-      applicantAddress.PostTown ||
-      applicantAddress.County ||
-      applicantAddress.PostCode ||
-      applicantAddress.Country)
+    propertyAddress &&
+    (propertyAddress.AddressLine1 ||
+      propertyAddress.AddressLine2 ||
+      propertyAddress.AddressLine3 ||
+      propertyAddress.PostTown ||
+      propertyAddress.County ||
+      propertyAddress.PostCode ||
+      propertyAddress.Country)
   ) {
     formData['enter-address'] = {
-      addressLine1: applicantAddress.AddressLine1 || '',
-      addressLine2: applicantAddress.AddressLine2 || '',
-      addressLine3: applicantAddress.AddressLine3 || '',
-      town: applicantAddress.PostTown || '',
-      county: applicantAddress.County || '',
-      postcode: applicantAddress.PostCode || '',
-      country: applicantAddress.Country || '',
+      addressLine1: propertyAddress.AddressLine1 || '',
+      addressLine2: propertyAddress.AddressLine2 || '',
+      addressLine3: propertyAddress.AddressLine3 || '',
+      town: propertyAddress.PostTown || '',
+      county: propertyAddress.County || '',
+      postcode: propertyAddress.PostCode || '',
+      country: propertyAddress.Country || '',
     };
   }
 

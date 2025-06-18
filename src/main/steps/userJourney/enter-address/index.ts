@@ -53,7 +53,7 @@ export const step: StepDefinition = {
           id: ccdCase.id,
           data: {
             ...ccdCase.data,
-            applicantAddress: {
+            propertyAddress: {
               AddressLine1: req.body.addressLine1,
               AddressLine2: req.body.addressLine2,
               AddressLine3: req.body.addressLine3,

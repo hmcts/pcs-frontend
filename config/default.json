@@ -23,8 +23,8 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-239.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-239"
+    "url": "https://ccd-data-store-api-pcs-api-pr-287.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-287"
   },
   "secrets": {
     "pcs": {
