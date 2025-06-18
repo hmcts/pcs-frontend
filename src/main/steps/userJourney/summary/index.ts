@@ -30,7 +30,7 @@ export const step: StepDefinition = {
           await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
         }
         res.redirect('/steps/user-journey/application-submitted');
-      } catch (error) {
+      } catch {
         res.status(500).send('There was an error submitting your application.');
       }
     },
