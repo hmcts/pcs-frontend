@@ -1,14 +1,13 @@
 import { Page } from '@playwright/test';
 import config from 'config';
 
-import { loginPageObjects } from '../page-objects';
-
-import { buildUserDataWithRole } from './testConfig';
-import * as idamHelper from './user-helpers/idam.helper';
+import { initActionHelper, performAction } from './element-helpers';
+import * as idamHelper from './idam-helpers/idam.helper';
+import { buildUserDataWithRole } from './idam-helpers/testConfig';
 
 export class loginHelper {
   static async login(page: Page): Promise<void> {
-    const loginPage = new loginPageObjects(page);
+    initActionHelper(page);
     const password =
       (process.env.PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD as string) ||
       config.get<string>('secrets.pcs.pcs-frontend-idam-user-temp-password');
@@ -16,9 +15,9 @@ export class loginHelper {
 
     await idamHelper.createAccount(userData);
 
-    await loginPage.usernameInput.fill(userData.user.email);
-    await loginPage.passwordInput.fill(password);
-    await loginPage.submitBtn.click();
+    await performAction('fill', 'Email address', userData.user.email);
+    await performAction('fill', 'Password', password);
+    await performAction('click', 'Sign in');
     await idamHelper.deleteAccount(userData.user.email);
   }
 }
