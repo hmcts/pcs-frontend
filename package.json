@@ -67,6 +67,7 @@
     "require-directory": "^2.1.1",
     "serve-favicon": "^2.5.0",
     "totp-generator": "^1.0.0",
+    "validator": "^13.15.15",
     "zod": "^3.25.32"
   },
   "devDependencies": {
@@ -99,6 +100,7 @@
     "@types/serve-favicon": "^2.5.4",
     "@types/supertest": "^6.0.0",
     "@types/totp-generator": "^0.0.8",
+    "@types/validator": "^13",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "axios-debug-log": "^1.0.0",
