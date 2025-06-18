@@ -69,6 +69,7 @@
     "require-directory": "^2.1.1",
     "serve-favicon": "^2.5.0",
     "totp-generator": "^1.0.0",
+    "validator": "^13.15.15",
     "zod": "^3.25.32"
   },
   "devDependencies": {
@@ -110,6 +111,7 @@
     "allure-commandline": "^2.34.1",
     "allure-js-commons": "^3.3.0",
     "allure-playwright": "^3.3.0",
+    "@types/validator": "^13",
     "axios-debug-log": "^1.0.0",
     "babel-loader": "^10.0.0",
     "chai": "^5.0.0",
