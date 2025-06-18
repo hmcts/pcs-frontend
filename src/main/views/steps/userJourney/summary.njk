@@ -51,13 +51,15 @@
           text: "Address"
         },
         value: {
-          html: (address.addressLine1 or '') + '<br>' +
-                (address.addressLine2 or '') + '<br>' +
-                (address.addressLine3 or '') + '<br>' +
-                (address.town or '') + '<br>' +
-                (address.county or '') + '<br>' +
-                (address.postcode or '') + '<br>' +
-                (address.country or '')
+          html: ([
+            address.addressLine1,
+            address.addressLine2,
+            address.addressLine3,
+            address.town,
+            address.county,
+            address.postcode,
+            address.country
+          ] | reject("falsy") | join("<br>"))
         },
         actions: {
           items: [
