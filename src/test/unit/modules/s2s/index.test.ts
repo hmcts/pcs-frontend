@@ -100,7 +100,7 @@ describe('S2S', () => {
     if (s2s) {
       try {
         await s2s.cleanup();
-      } catch (error) {
+      } catch {
         // Ignore cleanup errors in tests
       }
     }
