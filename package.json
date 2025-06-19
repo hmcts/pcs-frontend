@@ -156,9 +156,9 @@
     "chai": "5.2.0",
     "@types/node": "22.15.32",
     "glob": "^11.0.0",
-    "@azure/msal-browser": "4.13.1",
+    "@azure/msal-browser": "4.13.2",
     "superagent": "10.2.1",
-    "brace-expansion": "2.0.2"
+    "brace-expansion": "4.0.1"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
