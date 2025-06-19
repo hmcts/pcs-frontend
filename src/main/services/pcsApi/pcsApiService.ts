@@ -1,6 +1,3 @@
-import * as fs from 'node:fs/promises';
-import * as path from 'path';
-
 import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 
@@ -41,8 +38,7 @@ export const getDashboardNotifications = async (caseReference: number): Promise<
 };
 
 export const getDashboardTaskGroups = async (caseReference: number): Promise<DashboardTaskGroup[]> => {
-  logger.info(`Reading task groups from file for case ${caseReference}`);
-  const filePath = path.join(__dirname, '../../assets/fixtures/taskgroups.json');
-  const fileContent = await fs.readFile(filePath, 'utf8');
-  return JSON.parse(fileContent);
+  const pcsApiURL = getBaseUrl();
+  const response = await http.get<DashboardTaskGroup[]>(`${pcsApiURL}/dashboard/${caseReference}/tasks`);
+  return response.data;
 };
