@@ -2,22 +2,32 @@ services:
   pcs-frontend:
     build:
       context: .
+      target: development
       args:
         - http_proxy
         - https_proxy
         - no_proxy
     ports:
       - '3209:3209'
+    command: ${COMMAND:-yarn start:dev}
     depends_on:
       cache:
         condition: service_healthy
     environment:
       - REDIS_CONNECTION_STRING=redis://cache:6379
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.yarn
+
     networks:
       - pcs-frontend-network
 
   cache:
-    image: bitnami/redis:7.4.2
+    image: bitnami/redis:8.0.2
     ports:
       - '6379:6379'
     volumes:

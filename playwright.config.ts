@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
 
 module.exports = defineConfig({
-  testDir: './src/test/functional',
+  testDir: './src/test/ui',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -24,8 +24,9 @@ module.exports = defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chromium',
-        screenshot: 'off',
-        video: 'off',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+        headless: true,
         trace: 'on-first-retry',
         javaScriptEnabled: true,
         viewport: DEFAULT_VIEWPORT,

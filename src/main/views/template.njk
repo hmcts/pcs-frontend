@@ -1,7 +1,21 @@
 {% extends "govuk/template.njk" %}
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+
+
 
 {% block head %}
   {% include "webpack/css.njk" %}
+{% endblock %}
+
+{% block header %}
+{{ govukHeader({
+  navigation: [
+    {
+      text: 'logout',
+      href: '/logout'
+    }
+  ]
+}) }}
 {% endblock %}
 
 {% block bodyEnd %}

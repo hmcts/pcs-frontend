@@ -10,9 +10,30 @@ def component = "frontend"
 
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
+static Map < String, Object > secret(String secretName, String envVariable) {
+  [
+    $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    envVariable: envVariable
+  ]
+}
+
+def secrets = [
+  'pcs-${env}': [
+    secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
+    secret('idam-system-user-name', 'IDAM_SYSTEM_USERNAME'),
+    secret('idam-system-user-password', 'IDAM_SYSTEM_USER_PASSWORD'),
+    secret('pcs-frontend-idam-user-temp-password', 'PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD')
+  ]
+]
+
 withPipeline(type, product, component) {
+  loadVaultSecrets(secrets)
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
+    // enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     afterAlways('functionalTest:preview') {
       try {
         publishHTML([
@@ -23,7 +44,7 @@ withPipeline(type, product, component) {
           reportFiles          : 'index.html',
           reportName           : 'PCS Frontend Functional Test Report'
         ])
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/*'
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       }
@@ -62,7 +83,7 @@ withPipeline(type, product, component) {
           reportFiles          : 'index.html',
           reportName           : 'PCS Frontend Functional Test Report'
         ])
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesAccessibility/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/*'
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       }
