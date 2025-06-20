@@ -34,5 +34,8 @@
     "idamTestingSupportUrl": "IDAM_TESTING_SUPPORT_URL",
     "loginEndpoint": "IDAM_TOKEN_ENDPOINT",
     "userTempPassword": "PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD"
+  },
+  "osPostcodeLookup": {
+    "token": "PCS_FRONTEND_OS_POSTCODE_LOOKUP"
   }
 }

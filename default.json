@@ -28,10 +28,11 @@
       "pcs-session-secret": "pcs-supersecret",
       "redis-connection-string": "redis://localhost:6379",
       "app-insights-connection-string": "InstrumentationKey=79536ccc-f225-4028-ae0f-edae519eb55f;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3598a202-277f-4848-bfd2-7c0877d11a8b",
-      "pcs-frontend-idam-secret": "AAAAAAAAAAAAAAAA",
+      "ppropertyAddress": "AAAAAAAAAAAAAAAA",
       "pcs-frontend-idam-system-username": "AAAAAAAAAAAA",
       "pcs-frontend-idam-system-password": "AAAAAAAAAAAAAA",
-      "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA"
+      "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA",
+      "pcs-frontend-postcode-os-lookup": "AAAAAAAAAAAAAAAA"
     }
   },
   "oidc": {
@@ -40,9 +41,9 @@
     "redirectUri": "http://localhost:3209/oauth2/callback",
     "scope": "openid profile roles"
   },
-  "osPostcodeLookup": {
+  "postcodeLookup": {
     "url": "https://api.os.uk/search/places/v1",
-    "token": "pcs-frontend-os-postcode-lookup"
+    "token": "pcs-frontend-os-postcode"
   },
   "e2e": {
     "testUrl": "http://localhost:3209",

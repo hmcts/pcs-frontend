@@ -6,7 +6,7 @@ import express, { NextFunction, Request, Response, Router } from 'express';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
 
-import { JourneyConfig, JourneySchema, StepConfig, FieldConfig } from './schema';
+import { FieldConfig, JourneyConfig, JourneySchema, StepConfig } from './schema';
 import { JourneyStore } from './storage/index';
 import { JourneyValidator } from './validation';
 
@@ -68,7 +68,11 @@ export class WizardEngine {
     // Validate and parse the journey JSON using Zod
     const parseResult = JourneySchema.safeParse(raw);
     if (!parseResult.success) {
-      this.logger.error('Invalid journey configuration:', parseResult.error.issues, `${filePath}: ${parseResult.error.issues[0]?.message}`);
+      this.logger.error(
+        'Invalid journey configuration:',
+        parseResult.error.issues,
+        `${filePath}: ${parseResult.error.issues[0]?.message}`
+      );
       throw new Error(`Invalid journey configuration in ${filePath}: ${parseResult.error.issues[0]?.message}`);
     }
 
@@ -177,7 +181,9 @@ export class WizardEngine {
               typedFieldConfig.type === 'date' &&
               value &&
               typeof value === 'object' &&
-              'day' in value && 'month' in value && 'year' in value
+              'day' in value &&
+              'month' in value &&
+              'year' in value
             ) {
               return `${value.day || ''}/${value.month || ''}/${value.year || ''}`;
             }
@@ -280,9 +286,9 @@ export class WizardEngine {
       for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
         const typedFieldConfig = fieldConfig as FieldConfig;
         if (typedFieldConfig.type === 'date') {
-          const fieldValue = data[fieldName] as Record<'day'|'month'|'year', string|undefined>;
+          const fieldValue = data[fieldName] as Record<'day' | 'month' | 'year', string | undefined>;
           const fieldError = errors && errors[fieldName];
-          dateItems[fieldName] = (['day', 'month', 'year'] as ('day'|'month'|'year')[]).map(part => {
+          dateItems[fieldName] = (['day', 'month', 'year'] as ('day' | 'month' | 'year')[]).map(part => {
             let hasError = false;
             if (fieldError) {
               if (typeof fieldError === 'object' && fieldError[part]) {
@@ -294,11 +300,12 @@ export class WizardEngine {
             return {
               name: part,
               classes:
-                (part === 'day' ? 'govuk-input--width-2' :
-                part === 'month' ? 'govuk-input--width-2' :
-                'govuk-input--width-4') +
-                (hasError ? ' govuk-input--error' : ''),
-              value: fieldValue?.[part] || ''
+                (part === 'day'
+                  ? 'govuk-input--width-2'
+                  : part === 'month'
+                    ? 'govuk-input--width-2'
+                    : 'govuk-input--width-4') + (hasError ? ' govuk-input--error' : ''),
+              value: fieldValue?.[part] || '',
             };
           });
         }
@@ -313,7 +320,7 @@ export class WizardEngine {
       errors,
       previousStepUrl,
       summaryRows,
-      ...(Object.keys(dateItems).length > 0 ? { dateItems } : {})
+      ...(Object.keys(dateItems).length > 0 ? { dateItems } : {}),
     };
   }
 
@@ -428,7 +435,7 @@ export class WizardEngine {
         // Check if the requested step is accessible based on journey progress
         if (!this.isStepAccessible(step.id, data)) {
           // Find the first incomplete step
-          const stepIds = Object.keys(this.journey.steps); 
+          const stepIds = Object.keys(this.journey.steps);
           let firstIncompleteStep = stepIds[0];
 
           for (const stepId of stepIds) {
@@ -466,7 +473,7 @@ export class WizardEngine {
     });
 
     // ─── POST ───
-    router.post('/:caseId/:step', express.urlencoded({ extended: true }), async (req, res, next) => { 
+    router.post('/:caseId/:step', express.urlencoded({ extended: true }), async (req, res, next) => {
       const { caseId } = req.params;
       const step = (req as RequestWithStep).step!;
 
@@ -484,7 +491,7 @@ export class WizardEngine {
               reconstructedData[fieldName] = {
                 day: req.body[`${fieldName}-day`] || '',
                 month: req.body[`${fieldName}-month`] || '',
-                year: req.body[`${fieldName}-year`] || ''
+                year: req.body[`${fieldName}-year`] || '',
               };
             }
           }

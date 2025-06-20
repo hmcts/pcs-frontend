@@ -8,6 +8,20 @@
     "start": {
       "title": "Before you start",
       "description": "Information about what you'll need for your possession claim",
+      "next": "page1"
+    },
+    "page1": {
+      "title": "What's the address of the property you're claiming possession of",
+      "description": "Enter address details",
+      "fields": {
+        "postcode": {
+          "type": "text",
+          "label": "Enter a UK postcode",
+          "validate": {
+            "required": true
+          }
+        }
+      },
       "next": "page2"
     },
     "page2": {
