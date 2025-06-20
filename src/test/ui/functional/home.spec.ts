@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import config from 'config';
 
 import { loginHelper } from '../common/helpers';
@@ -16,4 +16,10 @@ test('Idam Login @accessibility @PR @nightly', async ({ page }) => {
   await page.goto(test_url);
   await loginHelper.login(page);
   await performAction('verifyPageTitle', constants.homePage.title);
+});
+
+test('Home page displays Hello from Alex Date', async ({ page }) => {
+  await page.goto(test_url);
+  await loginHelper.login(page);
+  await expect(page.getByText('Hello from Alex')).toBeVisible();
 });

@@ -13,6 +13,6 @@ export default function (app: Application): void {
       // console.error('pcs-api error', error.response.statusText);
     }
 
-    res.render('home', { apiResponse: apiGreeting });
+        res.render('home', { apiResponse: apiGreeting, datestamp: new Date().toLocaleDateString('en-GB') });
   });
 }
