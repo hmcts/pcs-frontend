@@ -1,5 +1,5 @@
+import isPostalCode from 'validator/lib/isPostalCode';
 import { z } from 'zod/v4';
-import isPostalCode from 'validator/lib/isPostalCode'
 
 // Common error message schema
 const ErrorMessagesSchema = z.object({
