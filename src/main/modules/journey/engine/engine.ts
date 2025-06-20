@@ -6,7 +6,7 @@ import express, { NextFunction, Request, Response, Router } from 'express';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
 
-import { JourneyConfig, JourneySchema, StepConfig } from './schema';
+import { JourneyConfig, JourneySchema, StepConfig, FieldConfig } from './schema';
 import { JourneyStore } from './storage/index';
 import { JourneyValidator } from './validation';
 
@@ -152,12 +152,13 @@ export class WizardEngine {
   private buildSummaryRows(allData: Record<string, unknown>, caseId: string): SummaryRow[] {
     return Object.entries(this.journey.steps)
       .filter(([stepId, stepConfig]) => {
+        const typedStepConfig = stepConfig as StepConfig;
         // Skip summary and confirmation steps
-        if (stepConfig.type === 'summary' || stepConfig.type === 'confirmation') {
+        if (typedStepConfig.type === 'summary' || typedStepConfig.type === 'confirmation') {
           return false;
         }
         // Skip steps without fields
-        if (!stepConfig.fields || Object.keys(stepConfig.fields).length === 0) {
+        if (!typedStepConfig.fields || Object.keys(typedStepConfig.fields).length === 0) {
           return false;
         }
         // Skip steps without data
@@ -165,13 +166,15 @@ export class WizardEngine {
         return stepData && Object.keys(stepData).length > 0;
       })
       .map(([stepId, stepConfig]) => {
+        const typedStepConfig = stepConfig as StepConfig;
         const stepData = allData[stepId] as Record<string, unknown>;
-        const fieldValues = Object.entries(stepConfig.fields!)
+        const fieldValues = Object.entries(typedStepConfig.fields!)
           .filter(([fieldName]) => stepData[fieldName])
           .map(([fieldName, fieldConfig]) => {
+            const typedFieldConfig = fieldConfig as FieldConfig;
             const value = stepData[fieldName];
             if (
-              fieldConfig.type === 'date' &&
+              typedFieldConfig.type === 'date' &&
               value &&
               typeof value === 'object' &&
               'day' in value && 'month' in value && 'year' in value
@@ -182,14 +185,14 @@ export class WizardEngine {
           });
 
         return {
-          key: { text: stepConfig.title || stepId },
+          key: { text: typedStepConfig.title || stepId },
           value: { text: fieldValues.join(', ') },
           actions: {
             items: [
               {
                 href: `${this.basePath}/${caseId}/${stepId}`,
                 text: 'Change',
-                visuallyHiddenText: `change ${(stepConfig.title || stepId).toLowerCase()}`,
+                visuallyHiddenText: `change ${(typedStepConfig.title || stepId).toLowerCase()}`,
               },
             ],
           },
@@ -201,7 +204,8 @@ export class WizardEngine {
   private findPreviousStep(currentStepId: string, allData: Record<string, unknown>): string | null {
     // Find which step(s) can lead to the current step
     for (const [stepId, stepConfig] of Object.entries(this.journey.steps)) {
-      const next = stepConfig.next;
+      const typedStepConfig = stepConfig as StepConfig;
+      const next = typedStepConfig.next;
 
       if (!next) {
         continue;
@@ -274,7 +278,8 @@ export class WizardEngine {
     const dateItems: Record<string, { name: string; classes: string; value: string }[]> = {};
     if (step.fields) {
       for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
-        if (fieldConfig.type === 'date') {
+        const typedFieldConfig = fieldConfig as FieldConfig;
+        if (typedFieldConfig.type === 'date') {
           const fieldValue = data[fieldName] as Record<'day'|'month'|'year', string|undefined>;
           const fieldError = errors && errors[fieldName];
           dateItems[fieldName] = (['day', 'month', 'year'] as ('day'|'month'|'year')[]).map(part => {
@@ -328,7 +333,8 @@ export class WizardEngine {
     // Build a map of step dependencies
     const stepDependencies = new Map<string, Set<string>>();
     for (const [id, step] of Object.entries(this.journey.steps)) {
-      if (!step.next) {
+      const typedStep = step as StepConfig;
+      if (!typedStep.next) {
         continue;
       }
 
@@ -339,12 +345,12 @@ export class WizardEngine {
         stepDependencies.get(nextStep)!.add(id);
       };
 
-      if (typeof step.next === 'string') {
-        addDependency(step.next);
+      if (typeof typedStep.next === 'string') {
+        addDependency(typedStep.next);
       } else {
-        addDependency(step.next.goto);
-        if (step.next.else) {
-          addDependency(step.next.else);
+        addDependency(typedStep.next.goto);
+        if (typedStep.next.else) {
+          addDependency(typedStep.next.else);
         }
       }
     }
@@ -364,7 +370,7 @@ export class WizardEngine {
           continue;
         }
 
-        const dependencyStep = this.journey.steps[dependency];
+        const dependencyStep = this.journey.steps[dependency] as StepConfig;
         if (!dependencyStep.fields || Object.keys(dependencyStep.fields).length === 0) {
           continue;
         }
@@ -382,9 +388,9 @@ export class WizardEngine {
   }
 
   router(): Router {
-    const r = Router();
+    const router = Router();
 
-    r.use((req, res, next) => {
+    router.use((req, res, next) => {
       res.locals.journey = this.journey;
       res.locals.slug = this.slug;
       next();
@@ -392,17 +398,17 @@ export class WizardEngine {
 
     // Apply authentication middleware if required
     if (this.journey.config?.auth?.required !== false) {
-      r.use(oidcMiddleware);
+      router.use(oidcMiddleware);
     }
 
     // Add route to start a new journey
-    r.get('/', (req, res) => {
+    router.get('/', (req, res) => {
       // Generate a new case ID using timestamp and random number
       const caseId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
       res.redirect(`${this.basePath}/${caseId}/${Object.keys(this.journey.steps)[0]}`);
     });
 
-    r.param('step', (req: Request, res: Response, next: NextFunction, stepId: string) => {
+    router.param('step', (req: Request, res: Response, next: NextFunction, stepId: string) => {
       const step = this.journey.steps[stepId];
       if (!step) {
         return res.status(404).send('Unknown step');
@@ -412,7 +418,7 @@ export class WizardEngine {
     });
 
     // ─── GET ───
-    r.get('/:caseId/:step', async (req, res, next) => {
+    router.get('/:caseId/:step', async (req, res, next) => {
       const { caseId } = req.params;
       const step = (req as RequestWithStep).step!;
 
@@ -422,11 +428,11 @@ export class WizardEngine {
         // Check if the requested step is accessible based on journey progress
         if (!this.isStepAccessible(step.id, data)) {
           // Find the first incomplete step
-          const stepIds = Object.keys(this.journey.steps);
+          const stepIds = Object.keys(this.journey.steps); 
           let firstIncompleteStep = stepIds[0];
 
           for (const stepId of stepIds) {
-            const stepConfig = this.journey.steps[stepId];
+            const stepConfig = this.journey.steps[stepId] as StepConfig;
             // Skip steps without fields
             if (!stepConfig.fields || Object.keys(stepConfig.fields).length === 0) {
               continue;
@@ -460,7 +466,7 @@ export class WizardEngine {
     });
 
     // ─── POST ───
-    r.post('/:caseId/:step', express.urlencoded({ extended: true }), async (req, res, next) => {
+    router.post('/:caseId/:step', express.urlencoded({ extended: true }), async (req, res, next) => { 
       const { caseId } = req.params;
       const step = (req as RequestWithStep).step!;
 
@@ -473,7 +479,8 @@ export class WizardEngine {
         const reconstructedData = { ...req.body };
         if (step.fields) {
           for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
-            if (fieldConfig.type === 'date') {
+            const typedFieldConfig = fieldConfig as FieldConfig;
+            if (typedFieldConfig.type === 'date') {
               reconstructedData[fieldName] = {
                 day: req.body[`${fieldName}-day`] || '',
                 month: req.body[`${fieldName}-month`] || '',
@@ -517,6 +524,6 @@ export class WizardEngine {
       }
     });
 
-    return r;
+    return router;
   }
 }
