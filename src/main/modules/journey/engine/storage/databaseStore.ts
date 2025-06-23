@@ -1,18 +1,18 @@
-import { JourneyStore } from './types';
+import { JourneyStore } from './journeyStore.interface';
 
-export const databaseStore = (slug: string): JourneyStore => {
+export const databaseStore = (): JourneyStore => {
   return {
-    async load(req, caseId) {
+    async load() {
       // TODO: Implement database storage
       return { data: {}, version: 0 };
     },
-    async save(req, caseId, version, data) {
+    async save(_req, _caseId, version) {
       // TODO: Implement database storage
       return { data: {}, version: version + 1 };
     },
-    async generateReference(req, slug, caseId) {
+    async generateReference() {
       // TODO: Implement database storage
-      return `REF-${caseId}`;
-    }
+      return 'REF-0';
+    },
   };
-}; 
+};

@@ -326,6 +326,33 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         .optional();
     }
 
+    case 'address': {
+      const addressSchema = z.object({
+        addressLine1: z.string().optional(),
+        addressLine2: z.string().optional(),
+        addressLine3: z.string().optional(),
+        town: z.string().optional(),
+        county: z.string().optional(),
+        postcode: z.string().optional(),
+        country: z.string().optional(),
+        // For manual entry
+        manualEntry: z.boolean().optional(),
+      });
+
+      if (rules?.required === true) {
+        return addressSchema.refine(
+          val => {
+            // At minimum, we need either a postcode or some address lines
+            return val.postcode || val.addressLine1 || val.town;
+          },
+          {
+            message: rules?.customMessage || 'Please enter an address',
+          }
+        );
+      }
+      return addressSchema.optional();
+    }
+
     default: {
       let schema = z.string();
       if (rules?.minLength !== undefined) {

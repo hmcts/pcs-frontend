@@ -187,6 +187,23 @@ export class WizardEngine {
             ) {
               return `${value.day || ''}/${value.month || ''}/${value.year || ''}`;
             }
+            if (typedFieldConfig.type === 'address' && value && typeof value === 'object') {
+              const addressValue = value as {
+                addressLine1?: string;
+                addressLine2?: string;
+                addressLine3?: string;
+                town?: string;
+                postcode?: string;
+              };
+              const addressParts = [
+                addressValue.addressLine1,
+                addressValue.addressLine2,
+                addressValue.addressLine3,
+                addressValue.town,
+                addressValue.postcode,
+              ].filter(Boolean);
+              return addressParts.join(', ');
+            }
             return Array.isArray(value) ? value.join(', ') : String(value);
           });
 
@@ -394,6 +411,19 @@ export class WizardEngine {
     return true;
   }
 
+  // Perform address lookup using the OS Postcode service
+  private async performAddressLookup(postcode: string): Promise<Record<string, unknown>[]> {
+    try {
+      const { getAddressesByPostcode } = await import('../../../services/osPostcodeLookupService');
+      const addresses = await getAddressesByPostcode(postcode);
+      this.logger.info('Addresses:', addresses);
+      return addresses as unknown as Record<string, unknown>[];
+    } catch (error) {
+      this.logger.error('Address lookup failed:', error);
+      return [];
+    }
+  }
+
   router(): Router {
     const router = Router();
 
@@ -476,8 +506,116 @@ export class WizardEngine {
     router.post('/:caseId/:step', express.urlencoded({ extended: true }), async (req, res, next) => {
       const { caseId } = req.params;
       const step = (req as RequestWithStep).step!;
+      const action = req.query.action as string;
 
-      // Validate using Zod-based validation
+      // Handle address field actions
+      if (action && ['lookup', 'select', 'manual'].includes(action)) {
+        try {
+          const { data } = await this.store.load(req, Number(caseId));
+          const stepData = (data[step.id] as Record<string, unknown>) || {};
+
+          if (action === 'lookup') {
+            // Handle postcode lookup
+            const postcodeField = Object.keys(step.fields || {}).find(
+              fieldName => step.fields![fieldName].type === 'address'
+            );
+
+            if (postcodeField) {
+              const postcode = req.body[`postcode-${postcodeField}`]?.trim();
+              if (postcode) {
+                try {
+                  const addresses = await this.performAddressLookup(postcode);
+                  const updatedStepData = {
+                    ...stepData,
+                    [postcodeField]: {
+                      postcode,
+                      addresses,
+                      manualEntry: false,
+                    },
+                  };
+
+                  this.logger.info('Updated step data:', updatedStepData);
+
+                  await this.store.save(req, Number(caseId), 0, {
+                    [step.id]: updatedStepData,
+                  });
+
+                  return res.redirect(`${this.basePath}/${caseId}/${step.id}`);
+                } catch (error) {
+                  // Handle lookup error - redirect back with error
+                  return res.redirect(`${this.basePath}/${caseId}/${step.id}?error=lookup_failed`);
+                }
+              }
+            }
+          } else if (action === 'select') {
+            // Handle address selection
+            const addressField = Object.keys(step.fields || {}).find(
+              fieldName => step.fields![fieldName].type === 'address'
+            );
+
+            if (addressField) {
+              const selectedIndex = req.body[`selected-address-${addressField}`];
+              const currentAddressData = stepData[addressField] as Record<string, unknown>;
+
+              if (selectedIndex !== undefined && currentAddressData?.addresses) {
+                const addresses = currentAddressData.addresses as Record<string, unknown>[];
+                const selectedAddress = addresses[parseInt(selectedIndex)];
+                if (selectedAddress) {
+                  const updatedStepData = {
+                    ...stepData,
+                    [addressField]: {
+                      ...selectedAddress,
+                      manualEntry: false,
+                    },
+                  };
+
+                  await this.store.save(req, Number(caseId), 0, {
+                    [step.id]: updatedStepData,
+                  });
+
+                  return res.redirect(`${this.basePath}/${caseId}/${step.id}`);
+                }
+              }
+            }
+          } else if (action === 'manual') {
+            // Handle manual address entry
+            const addressField = Object.keys(step.fields || {}).find(
+              fieldName => step.fields![fieldName].type === 'address'
+            );
+
+            if (addressField) {
+              const manualAddress = {
+                addressLine1: req.body[`addressLine1-${addressField}`] || '',
+                addressLine2: req.body[`addressLine2-${addressField}`] || '',
+                addressLine3: req.body[`addressLine3-${addressField}`] || '',
+                town: req.body[`town-${addressField}`] || '',
+                county: req.body[`county-${addressField}`] || '',
+                postcode: req.body[`manual-postcode-${addressField}`] || '',
+                manualEntry: true,
+              };
+
+              const updatedStepData = {
+                ...stepData,
+                [addressField]: manualAddress,
+              };
+
+              await this.store.save(req, Number(caseId), 0, {
+                [step.id]: updatedStepData,
+              });
+
+              return res.redirect(`${this.basePath}/${caseId}/${step.id}`);
+            }
+          }
+
+          // If we get here, redirect back to the step
+          return res.redirect(`${this.basePath}/${caseId}/${step.id}`);
+        } catch (err) {
+          next(err);
+        }
+        return; // Exit early for address actions
+      }
+
+      // Normal form validation and processing
       const validationResult = this.validator.validate(step, req.body);
 
       if (!validationResult.success) {
@@ -493,6 +631,20 @@ export class WizardEngine {
                 month: req.body[`${fieldName}-month`] || '',
                 year: req.body[`${fieldName}-year`] || '',
               };
+            }
+            // Handle address fields - they come as JSON strings
+            if (typedFieldConfig.type === 'address') {
+              try {
+                const addressData = req.body[fieldName];
+                if (addressData && typeof addressData === 'string') {
+                  reconstructedData[fieldName] = JSON.parse(addressData);
+                } else {
+                  reconstructedData[fieldName] = addressData || {};
+                }
+              } catch (e) {
+                // If JSON parsing fails, use empty object
+                reconstructedData[fieldName] = {};
+              }
             }
           }
         }

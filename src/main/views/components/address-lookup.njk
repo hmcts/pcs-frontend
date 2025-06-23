@@ -1,0 +1,196 @@
+{% macro addressLookup(fieldName, fieldConfig, fieldValue, fieldError, caseId, stepId) %}
+  <div class="govuk-form-group {% if fieldError %}govuk-form-group--error{% endif %}" data-address-field="{{ fieldName }}">
+    
+    {% if fieldError %}
+      <span class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span>
+        {{ fieldError.message if fieldError.message else fieldError }}
+      </span>
+    {% endif %}
+
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 class="govuk-fieldset__heading">
+          {{ fieldConfig.label or 'Find an address' }}
+        </h1>
+      </legend>
+      
+      {% if fieldConfig.hint %}
+        <div class="govuk-hint">
+          {{ fieldConfig.hint }}
+        </div>
+      {% endif %}
+
+      <!-- Step 1: Postcode Entry -->
+      {% if not fieldValue.postcode or not fieldValue.addresses %}
+        <form method="post" action="?step={{ stepId }}&action=lookup">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="postcode-{{ fieldName }}">
+              Postcode
+            </label>
+            <div class="govuk-hint">
+              For example, AA3 1AB.
+            </div>
+            <input
+              class="govuk-input govuk-input--width-5"
+              id="postcode-{{ fieldName }}"
+              name="postcode-{{ fieldName }}"
+              type="text"
+              value="{{ fieldValue.postcode if fieldValue and fieldValue.postcode else '' }}"
+              aria-describedby="postcode-hint-{{ fieldName }}"
+            >
+          </div>
+
+          <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" name="action" value="lookup">
+              Find address
+            </button>
+            <a href="?step={{ stepId }}&action=manual" class="govuk-link">Enter address manually</a>
+          </div>
+        </form>
+      {% endif %}
+
+      <!-- Step 2: Address Selection -->
+      {% if fieldValue.postcode and fieldValue.addresses %}
+        <form method="post" action="?step={{ stepId }}&action=select">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="address-select-{{ fieldName }}">
+              Select an address
+            </label>
+            <div class="govuk-hint">
+              {{ fieldValue.addresses | length }} address{{ 'es' if fieldValue.addresses | length != 1 else '' }} found for {{ fieldValue.postcode }}
+            </div>
+            <select class="govuk-select" id="address-select-{{ fieldName }}" name="selected-address-{{ fieldName }}">
+              <option value="">Choose an address</option>
+              {% for address in fieldValue.addresses %}
+                <option value="{{ loop.index0 }}" {% if fieldValue.selectedAddressIndex == loop.index0 %}selected{% endif %}>
+                  {{ address.addressLine1 }}{% if address.addressLine2 %}, {{ address.addressLine2 }}{% endif %}{% if address.addressLine3 %}, {{ address.addressLine3 }}{% endif %}, {{ address.town }}, {{ address.postcode }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" name="action" value="select">
+              Use this address
+            </button>
+            <a href="?step={{ stepId }}&action=lookup" class="govuk-link">Search again</a>
+            <a href="?step={{ stepId }}&action=manual" class="govuk-link">Enter address manually</a>
+          </div>
+        </form>
+      {% endif %}
+
+      <!-- Step 3: Manual Address Entry -->
+      {% if fieldValue.manualEntry %}
+        <form method="post" action="?step={{ stepId }}&action=manual">
+          <h2 class="govuk-heading-m">Enter address manually</h2>
+          
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="addressLine1-{{ fieldName }}">
+              Address line 1
+            </label>
+            <input
+              class="govuk-input"
+              id="addressLine1-{{ fieldName }}"
+              name="addressLine1-{{ fieldName }}"
+              type="text"
+              value="{{ fieldValue.addressLine1 if fieldValue and fieldValue.addressLine1 else '' }}"
+            >
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="addressLine2-{{ fieldName }}">
+              Address line 2 (optional)
+            </label>
+            <input
+              class="govuk-input"
+              id="addressLine2-{{ fieldName }}"
+              name="addressLine2-{{ fieldName }}"
+              type="text"
+              value="{{ fieldValue.addressLine2 if fieldValue and fieldValue.addressLine2 else '' }}"
+            >
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="addressLine3-{{ fieldName }}">
+              Address line 3 (optional)
+            </label>
+            <input
+              class="govuk-input"
+              id="addressLine3-{{ fieldName }}"
+              name="addressLine3-{{ fieldName }}"
+              type="text"
+              value="{{ fieldValue.addressLine3 if fieldValue and fieldValue.addressLine3 else '' }}"
+            >
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="town-{{ fieldName }}">
+              Town or city
+            </label>
+            <input
+              class="govuk-input"
+              id="town-{{ fieldName }}"
+              name="town-{{ fieldName }}"
+              type="text"
+              value="{{ fieldValue.town if fieldValue and fieldValue.town else '' }}"
+            >
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="county-{{ fieldName }}">
+              County (optional)
+            </label>
+            <input
+              class="govuk-input"
+              id="county-{{ fieldName }}"
+              name="county-{{ fieldName }}"
+              type="text"
+              value="{{ fieldValue.county if fieldValue and fieldValue.county else '' }}"
+            >
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="manual-postcode-{{ fieldName }}">
+              Postcode
+            </label>
+            <input
+              class="govuk-input govuk-input--width-5"
+              id="manual-postcode-{{ fieldName }}"
+              name="manual-postcode-{{ fieldName }}"
+              type="text"
+              value="{{ fieldValue.postcode if fieldValue and fieldValue.postcode else '' }}"
+            >
+          </div>
+
+          <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" name="action" value="manual">
+              Save address
+            </button>
+            <a href="?step={{ stepId }}&action=lookup" class="govuk-link">Use postcode lookup</a>
+          </div>
+        </form>
+      {% endif %}
+
+      <!-- Step 4: Confirmation -->
+      {% if fieldValue.addressLine1 and not fieldValue.manualEntry and not fieldValue.addresses %}
+        <div class="govuk-inset-text">
+          <h3 class="govuk-heading-s">Selected address</h3>
+          <p class="govuk-body">
+            {{ fieldValue.addressLine1 }}<br>
+            {% if fieldValue.addressLine2 %}{{ fieldValue.addressLine2 }}<br>{% endif %}
+            {% if fieldValue.addressLine3 %}{{ fieldValue.addressLine3 }}<br>{% endif %}
+            {{ fieldValue.town }}<br>
+            {{ fieldValue.postcode }}
+          </p>
+          <p class="govuk-body">
+            <a href="?step={{ stepId }}&action=lookup" class="govuk-link">Change address</a>
+          </p>
+        </div>
+      {% endif %}
+
+      <!-- Hidden field for form submission -->
+      <input type="hidden" name="{{ fieldName }}" value="{{ fieldValue | stringify if fieldValue else '{}' }}">
+    </fieldset>
+  </div>
+{% endmacro %} 

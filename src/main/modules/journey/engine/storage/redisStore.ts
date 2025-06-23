@@ -1,18 +1,18 @@
-import { JourneyStore } from './types';
+import { JourneyStore } from './journeyStore.interface';
 
-export const redisStore = (slug: string): JourneyStore => {
+export const redisStore = (): JourneyStore => {
   return {
-    async load(req, caseId) {
+    async load() {
       // TODO: Implement Redis storage
       return { data: {}, version: 0 };
     },
-    async save(req, caseId, version, data) {
+    async save(_req, _caseId, version) {
       // TODO: Implement Redis storage
       return { data: {}, version: version + 1 };
     },
-    async generateReference(req, slug, caseId) {
+    async generateReference() {
       // TODO: Implement Redis storage
-      return `REF-${caseId}`;
-    }
+      return 'REF-0';
+    },
   };
-}; 
+};

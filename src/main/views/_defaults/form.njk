@@ -9,6 +9,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "components/address-lookup.njk" import addressLookup %}
 
 {% block content %}
 
@@ -207,6 +208,8 @@
             errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null,
             items: dateItems[fieldName]
           }) }}
+        {% elif fieldConfig.type == 'address' %}
+          {{ addressLookup(fieldName, fieldConfig, fieldValue, fieldError, caseId, step.id) }}
         {% endif %}
       {% endfor %}
 

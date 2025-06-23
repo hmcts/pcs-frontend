@@ -68,6 +68,19 @@ export class JourneyValidator {
         }
       }
 
+      // Handle address fields
+      if (fieldConfig.type === 'address') {
+        // Address can be either from lookup or manual entry
+        const addressData = submission[fieldName];
+        if (typeof addressData === 'object' && addressData !== null) {
+          // This is a structured address (from lookup or manual entry)
+          fieldValue = addressData;
+        } else {
+          // This might be a simple string or empty value
+          fieldValue = addressData || {};
+        }
+      }
+
       const fieldSchema = createFieldValidationSchema(fieldConfig);
       const result = fieldSchema.safeParse(fieldValue);
 

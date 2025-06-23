@@ -14,11 +14,13 @@
       "title": "What's the address of the property you're claiming possession of",
       "description": "Enter address details",
       "fields": {
-        "postcode": {
-          "type": "text",
-          "label": "Enter a UK postcode",
+        "address": {
+          "type": "address",
+          "label": "Your address",
+          "hint": "Enter your full address",
           "validate": {
-            "required": true
+            "required": true,
+            "customMessage": "Please enter your address"
           }
         }
       },
@@ -92,10 +94,6 @@
       "title": "What is your address?",
       "description": "We need to know your address to send you a copy of the claim",
       "fields": {
-        "address": {
-          "type": "text",
-          "label": "Address"
-        },
         "date": {
           "type": "date",
           "label": "Date of birth",
@@ -110,10 +108,6 @@
               "future": "Date of birth must be in the past!!!!!"
             }
           }
-        },
-        "postcode": {
-          "type": "text",
-          "label": "Postcode"
         }
       },
       "next": "summary"
