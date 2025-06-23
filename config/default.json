@@ -26,6 +26,10 @@
     "url": "https://ccd-data-store-api-pcs-api-pr-287.preview.platform.hmcts.net",
     "caseTypeId": "PCS-287"
   },
+  "osPostcodeLookup": {
+    "url": "https://api.os.uk/search/places/v1",
+    "token": "NDXNuOmAmh3EzzFXcd2wkNuO2OcGdBGv"
+  },
   "secrets": {
     "pcs": {
       "pcs-frontend-s2s-secret": "AAAAAAAAAAAAAAAA",
