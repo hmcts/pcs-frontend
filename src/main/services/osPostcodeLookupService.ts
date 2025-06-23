@@ -40,6 +40,7 @@ export interface OSResponse {
 }
 
 export interface Address {
+  fullAddress: string;
   addressLine1: string;
   addressLine2: string;
   addressLine3: string;
@@ -68,6 +69,7 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
 
     return response.data.results.map(({ DPA }) => {
       const {
+        ADDRESS = '',
         BUILDING_NUMBER = '',
         SUB_BUILDING_NAME = '',
         BUILDING_NAME = '',
@@ -83,6 +85,7 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
       } = DPA;
 
       return {
+        fullAddress: ADDRESS,
         addressLine1: [BUILDING_NUMBER, THOROUGHFARE_NAME].filter(Boolean).join(' ').trim(),
         addressLine2: [SUB_BUILDING_NAME, BUILDING_NAME].filter(Boolean).join(', ').trim(),
         addressLine3: [ORGANISATION_NAME, DEPENDENT_THOROUGHFARE_NAME, DEPENDENT_LOCALITY, DOUBLE_DEPENDENT_LOCALITY]
