@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export default {
-  trailOrHearingScheduled: (deadline: string) => {
+  trialOrHearingScheduled: (deadline: string) => {
     return {
       title: 'Trial or hearing scheduled',
       content: `Your appointment is on ${deadline} at 11:30am in London. You need to pay £76.00 by ${deadline}. View the hearing notice.`,
