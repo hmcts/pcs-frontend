@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 class ActionHelper {
   private static currentPage: Page | null = null;
@@ -15,9 +15,6 @@ class ActionHelper {
   }
 
   private static actions = {
-    verifyPageTitle: async (title: string): Promise<void> => {
-      await expect(ActionHelper.getActivePage()).toHaveTitle(title);
-    },
     fill: async (identifier: string, value: string): Promise<void> => {
       await ActionHelper.getActivePage()
         .locator(
@@ -54,9 +51,9 @@ class ActionHelper {
     },
   };
 
-  static performAction(action: 'verifyPageTitle', value: string): Promise<void>;
   static performAction(action: 'fill', identifier: string, value: string): Promise<void>;
   static performAction(action: 'click' | 'check', identifier: string): Promise<void>;
+
   static async performAction(action: string, ...args: string[]): Promise<void> {
     if (!(action in ActionHelper.actions)) {
       throw new Error(`Unknown action: ${action}`);
@@ -64,9 +61,6 @@ class ActionHelper {
 
     const actionFunction = ActionHelper.actions[action as keyof typeof ActionHelper.actions];
     switch (action) {
-      case 'verifyPageTitle':
-        await (actionFunction as (title: string) => Promise<void>)(args[0]);
-        break;
       case 'fill':
         await (actionFunction as (id: string, value: string) => Promise<void>)(args[0], args[1]);
         break;
