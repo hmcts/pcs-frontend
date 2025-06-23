@@ -22,7 +22,7 @@ test('Idam Login @accessibility @PR @nightly', async () => {
 });
 
 test('Dashboard Notifications @accessibility @PR @nightly', async ({ page }) => {
-  const dashboardURL = test_url + 'dashboard/1';
+  const dashboardURL = test_url + '/dashboard/1';
   await page.goto(dashboardURL);
   await page.waitForURL(dashboardURL);
   const notifications1 = dashboard.responseTimeElapsed('28');
