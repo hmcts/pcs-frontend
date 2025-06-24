@@ -29,4 +29,5 @@ test('Dashboard Notifications @accessibility @PR @nightly', async ({ page }) => 
     'Your appointment is on 20 May 2025 at 11:30am in London. You need to pay £76.00 by 20 May 2025. View the hearing notice.');
 
   await performVerification('taskInList', 'verify-text-link', 'Make a claim / View claim', 'Available');
+  await performVerification('taskInList', 'verify-text', "View documents", 'Not available yet');
 });
