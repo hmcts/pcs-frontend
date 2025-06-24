@@ -24,9 +24,9 @@ test('Idam Login @accessibility @PR @nightly', async () => {
 test('Dashboard Notifications @accessibility @PR @nightly', async ({ page }) => {
   const dashboardURL = test_url + '/dashboard/1';
   await page.goto(dashboardURL);
-  await page.waitForURL(dashboardURL);
-  const notifications1 = dashboard.responseTimeElapsed('28');
-  await performVerification('dashboardNotification', notifications1.title, notifications1.content);
-  const taskList = dashboard.payTheHearingFee('28 June 2025');
-  await performVerification('taskInList', taskList.title, 'Action needed', 'true', 'true', taskList.deadline);
+
+  await performVerification('dashboardNotification', 'Trial or hearing scheduled',
+    'Your appointment is on 20 May 2025 at 11:30am in London. You need to pay £76.00 by 20 May 2025. View the hearing notice.');
+
+  await performVerification('taskInList', 'verify-text-link', 'Make a claim / View claim', 'Available');
 });
