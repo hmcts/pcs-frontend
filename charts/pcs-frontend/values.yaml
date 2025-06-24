@@ -21,6 +21,7 @@ nodejs:
         - app-insights-connection-string
         - pcs-frontend-s2s-secret
         - pcs-frontend-idam-secret
+        - pcs-os-client-lookup-key
   environment:
     REDIS_TTL: 6000
     REDIS_SESSION_PREFIX: 'pcs'

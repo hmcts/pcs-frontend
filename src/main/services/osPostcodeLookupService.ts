@@ -54,7 +54,7 @@ function getBaseUrl(): string {
 }
 
 function getToken(): string {
-  return config.get('osPostcodeLookup.token');
+  return config.get<string>('secrets.pcs.pcs-os-client-lookup-key');
 }
 
 export const getAddressesByPostcode = async (postcode: string): Promise<Address[]> => {

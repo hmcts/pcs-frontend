@@ -27,8 +27,7 @@
     "caseTypeId": "PCS-287"
   },
   "osPostcodeLookup": {
-    "url": "https://api.os.uk/search/places/v1",
-    "token": "NDXNuOmAmh3EzzFXcd2wkNuO2OcGdBGv"
+    "url": "https://api.os.uk/search/places/v1"
   },
   "secrets": {
     "pcs": {
@@ -39,7 +38,8 @@
       "pcs-frontend-idam-secret": "AAAAAAAAAAAAAAAA",
       "pcs-frontend-idam-system-username": "AAAAAAAAAAAA",
       "pcs-frontend-idam-system-password": "AAAAAAAAAAAAAA",
-      "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA"
+      "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA",
+      "pcs-os-client-lookup-key": "AAAAAAAAAAAAAA"
     }
   },
   "oidc": {
