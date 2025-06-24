@@ -18,7 +18,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('Idam Login @accessibility @PR @nightly', async () => {
-  await performVerification('verifyPageTitle', constants.homePage.title);
+  await performVerification('verifyPageTitle', "GOV.UK - The best place to find government services and information");
 });
 
 test('Dashboard Notifications @accessibility @PR @nightly', async ({ page }) => {
