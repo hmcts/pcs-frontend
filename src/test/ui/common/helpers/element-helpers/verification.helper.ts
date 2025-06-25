@@ -28,48 +28,50 @@ class VerificationHelper {
         },
         taskInList: async (
             verificationType: string,
-            tasklist: string,
-            status: string,
-            isDeadlinePresent = false,
-            deadline: string
+            identifier: string,
+            value: string = "",
         ): Promise<void> => {
             let task: Locator;
             let taskStatus: Locator;
+            let deadline: Locator;
             switch (verificationType) {
                 case 'verify-text-link':
                     task = VerificationHelper.getActivePage().locator(
-                        `//a[contains(@class, "govuk-link")][normalize-space(.)="${tasklist}"]`);
-                    taskStatus = VerificationHelper.getActivePage().locator(
-                        `//a[contains(.,"${tasklist}")]/../following-sibling::div[contains(.,"${status}")]`);
+                        `//a[contains(@class, "govuk-link")][normalize-space(.)="${identifier}"]`);
+                    await expect(task).toBeVisible();
+                    await expect(task).toHaveText(identifier);
                     break;
                 case 'verify-text':
-                    task = VerificationHelper.getActivePage().locator(`//div[normalize-space(.)="${tasklist}"]`).first();
-                    taskStatus = VerificationHelper.getActivePage().locator(
-                        `//div[contains(.,"${tasklist}")]/../following-sibling::div[contains(.,"${status}")]`);
+                    task = VerificationHelper.getActivePage().locator(`//div[normalize-space(.)="${identifier}"]`).first();
+                    await expect(task).toBeVisible();
+                    await expect(task).toHaveText(identifier);
+                    break;
+                case 'verify-status':
+                    task = VerificationHelper.getActivePage().locator(`//*[normalize-space(.)="${identifier}"]`);
+                    taskStatus = task.locator(`../following-sibling::div[contains(.,"${value}")]`);
+                    await expect(taskStatus).toBeVisible();
+                    await expect(taskStatus).toHaveText(value);
+                    break;
+                case 'verify-deadline':
+                    task = VerificationHelper.getActivePage().locator(
+                        `//a[contains(@class, "govuk-link")][normalize-space(.)="${identifier}"]`);
+                   deadline = task.locator('//following-sibling::div');
+                    await expect(deadline).toBeVisible();
+                    await expect(deadline).toHaveText(value);
                     break;
                 default:
                     throw new Error(`Unknown verificationType: ${verificationType}`);
             }
-
-            if (isDeadlinePresent) {
-                await expect(task.locator('//following-sibling::div')).toHaveText(deadline);
-            }
-            await expect(task).toBeVisible();
-            await expect(taskStatus).toBeVisible();
-            await expect(task).toHaveText(tasklist);
-            await expect(taskStatus).toHaveText(status);
         },
     };
 
-    static performVerification(action: 'verifyPageTitle', value: string): Promise<void>;
+    static performVerification(verify: 'verifyPageTitle', value: string): Promise<void>;
     static performVerification(verify: 'dashboardNotification', identifier: string, value: string): Promise<void>;
     static performVerification(
         verify: 'taskInList',
         verificationType: string,
-        tasklist: string,
-        status: string,
-        isDeadlinePresent?: string,
-        deadline?: string
+        identifier: string,
+        value: string,
     ): Promise<void>;
 
     static async performVerification(verify: string, ...args: string[]): Promise<void> {
@@ -86,17 +88,13 @@ class VerificationHelper {
                 await (actionFunction as (identifier: string, value: string) => Promise<void>)(args[0], args[1]);
                 break;
             case 'taskInList': {
-
-                const isDeadlinePresent = args[3] !== undefined ? args[3] === 'true' : false;
                 await (
                     actionFunction as (
                         verificationType: string,
-                        tasklist: string,
-                        status: string,
-                        isDeadlinePresent?: boolean,
-                        deadline?: string
+                        identifier: string,
+                        value: string,
                     ) => Promise<void>
-                )(args[0], args[1], args[2], isDeadlinePresent, args[4]);
+                )(args[0], args[1], args[2]);
                 break;
             }
             default:

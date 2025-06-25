@@ -28,11 +28,11 @@ test('Dashboard Notifications @accessibility @PR @nightly', async ({ page }) => 
   await performVerification('dashboardNotification', 'Trial or hearing scheduled',
     'Your appointment is on 20 May 2025 at 11:30am in London. You need to pay £76.00 by 20 May 2025. View the hearing notice.');
 
-  await performVerification('taskInList', 'verify-text-link', 'Upload hearing documents', 'Action needed','true', '20 May 2025');
+ // await performVerification('taskInList', 'verify-text-link', 'Upload hearing documents', 'Action needed','true', '20 May 2025');
 
 
-  await performVerification('taskInList', 'verify-text', "Upload hearing documents");
-  await performVerification('taskInList', 'verify-text-link', "Upload hearing documents");
+  await performVerification('taskInList', 'verify-text-link', "Upload hearing documents", "");
   await performVerification('taskInList','verify-status','Upload hearing documents','Action needed');
   await performVerification('taskInList', 'verify-deadline', "Upload hearing documents", 'Deadline is 4:00 pm on 20 May 2025');
+
 });
