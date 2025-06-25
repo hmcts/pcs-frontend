@@ -21,7 +21,7 @@ test('Idam Login @accessibility @PR @nightly', async () => {
   await performVerification('verifyPageTitle', constants.homePage.title);
 });
 
-test('Dashboard Notifications @accessibility @PR @nightly', async ({ page }) => {
+test('Dashboard Notifications @PR @nightly', async ({ page }) => {
   const dashboardURL = test_url + '/dashboard/1';
   await page.goto(dashboardURL);
   await page.waitForURL(dashboardURL);
