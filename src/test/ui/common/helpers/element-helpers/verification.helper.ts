@@ -9,7 +9,7 @@ class VerificationHelper {
 
   private static getActivePage(): Page {
     if (!VerificationHelper.currentPage) {
-      throw new Error('ActionHelper not initialized. Call initActionHelper(page) before using performAction()');
+      throw new Error('VerificationHelper not initialized. Call initVerificationHelper(page) before using performVerification()');
     }
     return VerificationHelper.currentPage;
   }
@@ -56,7 +56,7 @@ class VerificationHelper {
     },
   };
 
-  static performVerification(action: 'verifyPageTitle', value: string): Promise<void>;
+  static performVerification(verify: 'verifyPageTitle', value: string): Promise<void>;
   static performVerification(verify: 'dashboardNotification', identifier: string, value: string): Promise<void>;
   static performVerification(
     verify: 'TaskListItem',
@@ -68,7 +68,7 @@ class VerificationHelper {
 
   static async performVerification(verify: string, ...args: string[]): Promise<void> {
     if (!(verify in VerificationHelper.verifies)) {
-      throw new Error(`Unknown action: ${verify}`);
+      throw new Error(`Unknown verification: ${verify}`);
     }
 
     const actionFunction = VerificationHelper.verifies[verify as keyof typeof VerificationHelper.verifies];
