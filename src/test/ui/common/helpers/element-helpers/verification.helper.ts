@@ -76,7 +76,7 @@ class VerificationHelper {
 
   static async performVerification(verify: string, ...args: string[]): Promise<void> {
     if (!(verify in VerificationHelper.verifies)) {
-      throw new Error(`Unknown action: ${verify}`);
+      throw new Error(`Unknown verification: ${verify}`);
     }
 
     const actionFunction = VerificationHelper.verifies[verify as keyof typeof VerificationHelper.verifies];
