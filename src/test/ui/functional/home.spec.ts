@@ -1,4 +1,5 @@
 import { test } from '@playwright/test';
+import * as allure from 'allure-js-commons';
 import config from 'config';
 
 import { loginHelper } from '../common/helpers';
@@ -10,6 +11,7 @@ const test_url = (process.env.TEST_URL as string) || config.get('e2e.testUrl');
 
 test.beforeEach(async ({ page }) => {
   initActionHelper(page);
+  await allure.parentSuite('Home Page');
 });
 
 test('Idam Login @accessibility @PR @nightly', async ({ page }) => {
