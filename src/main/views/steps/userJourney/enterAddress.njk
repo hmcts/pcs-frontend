@@ -5,126 +5,126 @@
 
 {% block content %}
   {{ govukBackLink({ text: "Back", href: backUrl }) }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">Enter your address</h1>
 
-  <h1 class="govuk-heading-l">Enter your address</h1>
+      {% if error %}
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
+          <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+          <div class="govuk-error-summary__body">
+            <ul class="govuk-list govuk-error-summary__list">
+              <li>{{ error }}</li>
+            </ul>
+          </div>
+        </div>
+      {% endif %}
 
-  {% if error %}
-    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
-      <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
-      <div class="govuk-error-summary__body">
-        <ul class="govuk-list govuk-error-summary__list">
-          <li>{{ error }}</li>
-        </ul>
-      </div>
-    </div>
-  {% endif %}
+      <form method="post" action="{{ url }}">
+        <div class="govuk-form-group">
+          <label class="govuk-label" for="lookupPostcode">Enter a UK postcode</label>
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-half">
+              <input class="govuk-input" id="lookupPostcode" name="lookupPostcode" value="{{ lookupPostcode }}">
+              <button class="govuk-button" name="action" value="find-address" type="submit">Find address</button>
+            </div>
+          </div>
+        </div>
 
-  <form method="post" action="{{ url }}">
-  <div class="govuk-form-group">
-    <label class="govuk-label govuk-label--m" for="lookupPostcode">Postcode</label>
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-quarter">
-        <input class="govuk-input" id="lookupPostcode" name="lookupPostcode" value="{{ lookupPostcode }}">
-      </div>
-      <div class="govuk-grid-column-one-quarter">
-        <button class="govuk-button" name="action" value="find-address" type="submit">Find address</button>
-      </div>
-    </div>
+        {% if addressResults and addressResults.length > 0 %}
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="selectedAddress">Select your address</label>
+            <select class="govuk-select" id="selectedAddress" name="selectedAddressIndex">
+              <option value="">-- Select an address --</option>
+              {% for address in addressResults %}
+                <option value="{{ loop.index0 }}" {% if selectedAddressIndex|int == loop.index0 %}selected{% endif %}>{{ address.fullAddress }}</option>
+              {% endfor %}
+            </select>
+
+            <input type="hidden" name="action" value="select-address">
+            <button class="govuk-button govuk-button--secondary" type="submit">Use this address</button>
+          </div>
+        {% endif %}
+
+        {{ govukInput({
+          id: "addressLine1",
+          name: "addressLine1",
+          label: { text: "Address Line 1" },
+          value: addressLine1,
+          classes: "govuk-!-width-three-quarters",
+          attributes: {
+              maxlength: 50
+          },
+          errorMessage: error_addressLine1 and { text: error_addressLine1 }
+        }) }}
+
+        {{ govukInput({
+          id: "addressLine2",
+          name: "addressLine2",
+          label: { text: "Address Line 2 (Optional)" },
+          value: addressLine2,
+          classes: "govuk-!-width-three-quarters",
+          attributes: {
+              maxlength: 50
+          }
+        }) }}
+
+        {{ govukInput({
+          id: "addressLine3",
+          name: "addressLine3",
+          label: { text: "Address Line 3 (Optional)" },
+          value: addressLine3,
+          classes: "govuk-!-width-three-quarters",
+          attributes: {
+              maxlength: 50
+          },
+        }) }}
+
+        {{ govukInput({
+          id: "town",
+          name: "town",
+          label: { text: "Town or City" },
+          value: town,
+          classes: "govuk-!-width-three-quarters",
+          errorMessage: error_town and { text: error_town },
+          attributes: {
+              maxlength: 50
+          },
+        }) }}
+
+        {{ govukInput({
+          id: "county",
+          name: "county",
+          label: { text: "County (Optional)" },
+          value: county,
+          classes: "govuk-!-width-three-quarters",
+          attributes: {
+              maxlength: 50
+          },
+        }) }}
+
+        {{ govukInput({
+          id: "postcode",
+          name: "postcode",
+          label: { text: "Postcode" },
+          value: postcode,
+          classes: "govuk-!-width-one-quarter"
+          errorMessage: error_postcode and { text: error_postcode }
+        }) }}
+
+        {{ govukInput({
+          id: "country",
+          name: "country",
+          label: { text: "Country (Optional)" },
+          value: country,
+          errorMessage: error_country and { text: error_country },
+          attributes: {
+              maxlength: 50
+          },
+        }) }}
+
+        {{ govukButton({ text: "Continue" }) }}
+      </form>
   </div>
-
-    {% if addressResults and addressResults.length > 0 %}
-      <div class="govuk-form-group">
-        <label class="govuk-label" for="selectedAddress">Select your address</label>
-        <select class="govuk-select" id="selectedAddress" name="selectedAddressIndex">
-          <option value="">-- Select an address --</option>
-          {% for address in addressResults %}
-            <option value="{{ loop.index0 }}">{{ address.fullAddress }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    {% endif %}
-
-    {{ govukInput({
-      id: "addressLine1",
-      name: "addressLine1",
-      label: { text: "Address Line 1" },
-      value: addressLine1,
-      errorMessage: error_addressLine1 and { text: error_addressLine1 }
-    }) }}
-
-    {{ govukInput({
-      id: "addressLine2",
-      name: "addressLine2",
-      label: { text: "Address Line 2 (Optional)" },
-      value: addressLine2
-    }) }}
-
-    {{ govukInput({
-      id: "addressLine3",
-      name: "addressLine3",
-      label: { text: "Address Line 3 (Optional)" },
-      value: addressLine3
-    }) }}
-
-    {{ govukInput({
-      id: "town",
-      name: "town",
-      label: { text: "Town or City" },
-      value: town,
-      errorMessage: error_town and { text: error_town }
-    }) }}
-
-    {{ govukInput({
-      id: "county",
-      name: "county",
-      label: { text: "County" },
-      value: county
-    }) }}
-
-    {{ govukInput({
-      id: "postcode",
-      name: "postcode",
-      label: { text: "Postcode" },
-      value: postcode,
-      errorMessage: error_postcode and { text: error_postcode }
-    }) }}
-
-    {{ govukInput({
-      id: "country",
-      name: "country",
-      label: { text: "Country" },
-      value: country,
-      errorMessage: error_country and { text: error_country }
-    }) }}
-
-    {{ govukButton({ text: "Continue" }) }}
-  </form>
-
-
-  {% if addressResults %}
-    <script>
-      const addressList = {{ addressResults | dump | safe }};
-    </script>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        const dropdown = document.getElementById('selectedAddress');
-        if (!dropdown) return;
-
-        dropdown.addEventListener('change', function () {
-          const selectedIndex = this.value;
-          const address = addressList[selectedIndex];
-          if (!address) return;
-
-          document.getElementById('addressLine1').value = address.addressLine1 || '';
-          document.getElementById('addressLine2').value = address.addressLine2 || '';
-          document.getElementById('addressLine3').value = address.addressLine3 || '';
-          document.getElementById('town').value = address.town || '';
-          document.getElementById('county').value = address.county || '';
-          document.getElementById('postcode').value = address.postcode || '';
-          document.getElementById('country').value = address.country || '';
-        });
-      });
-    </script>
-  {% endif %}
+</div>
 {% endblock %}

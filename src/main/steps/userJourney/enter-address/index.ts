@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
-import { setFormData } from '../../../app/controller/sessionHelper';
+import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
 import { validateForm } from '../../../app/controller/validation';
 import common from '../../../assets/locales/en/common.json';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
@@ -23,7 +23,7 @@ const fields: FormFieldConfig[] = [
   { name: 'town', type: 'text', required: true, errorMessage: 'Enter the town or city' },
   { name: 'county', type: 'text', required: false },
   { name: 'postcode', type: 'text', required: true, errorMessage: 'Enter the postcode' },
-  { name: 'country', type: 'text', required: true, errorMessage: 'Enter the country' },
+  { name: 'country', type: 'text', required: false, errorMessage: 'Enter the country' },
 ];
 
 export const step: StepDefinition = {
@@ -32,10 +32,25 @@ export const step: StepDefinition = {
   view: 'steps/userJourney/enterAddress.njk',
   stepDir: __dirname,
   generateContent: () => content,
-  getController: createGetController('steps/userJourney/enterAddress.njk', stepName, content),
+  getController: createGetController('steps/userJourney/enterAddress.njk', stepName, content, req => {
+    const savedData = getFormData(req, stepName);
+
+    return {
+      ...content,
+      ...savedData, // This ensures prefilled form values
+      lookupPostcode: '',
+      addressResults: null,
+      selectedAddressIndex: null,
+    };
+  }),
   postController: {
     post: async (req: Request, res: Response) => {
+      console.log('POST BODY:', req.body);
       const { action, lookupPostcode, selectedAddressIndex } = req.body;
+
+      console.log('postController ======> ', action);
+      console.log('postController lookupPostcode ======> ', lookupPostcode);
+      console.log('postController selectedAddressIndex ======> ', selectedAddressIndex);
 
       // Step 1: User clicked "Find address"
       if (action === 'find-address') {
@@ -77,11 +92,23 @@ export const step: StepDefinition = {
       }
 
       // Step 2: User selected an address from dropdown
-      if (selectedAddressIndex !== undefined && req.session.postcodeLookupResult) {
+      if (action === 'select-address' && selectedAddressIndex !== undefined && req.session.postcodeLookupResult) {
         const index = parseInt(selectedAddressIndex, 10);
         const selected = req.session.postcodeLookupResult[index];
 
         if (selected) {
+          // Save selected address to session form data
+          setFormData(req, stepName, {
+            selectedAddressIndex,
+            addressLine1: selected.addressLine1,
+            addressLine2: selected.addressLine2,
+            addressLine3: selected.addressLine3,
+            town: selected.town,
+            county: selected.county,
+            postcode: selected.postcode,
+            country: selected.country,
+          });
+
           return res.render('steps/userJourney/enterAddress.njk', {
             ...content,
             lookupPostcode,
