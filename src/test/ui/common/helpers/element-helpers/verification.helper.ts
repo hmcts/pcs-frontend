@@ -9,7 +9,7 @@ class VerificationHelper {
 
   private static getActivePage(): Page {
     if (!VerificationHelper.currentPage) {
-      throw new Error('ActionHelper not initialized. Call initActionHelper(page) before using performAction()');
+      throw new Error('VerificationHelper not initialized. Call VerificationHelper(page) before using performAction()');
     }
     return VerificationHelper.currentPage;
   }
