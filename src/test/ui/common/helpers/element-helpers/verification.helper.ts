@@ -26,11 +26,11 @@ class VerificationHelper {
       await notification.isVisible();
       await expect(notification).toHaveText(`${notificationContent}`);
     },
-    taskInList: async (
+    TaskListItem: async (
       tasklist: string,
       status: string,
       isTaskALink = false,
-      isDeadlinePresent = false,
+      // isDeadlinePresent = false,
       deadline: string
     ): Promise<void> => {
       let task: Locator;
@@ -48,7 +48,7 @@ class VerificationHelper {
           `//div[contains(.,"${tasklist}")]/../following-sibling::div[contains(.,"${status}")]`
         );
       }
-      if (isDeadlinePresent) {
+      if (deadline !== null) {
         await expect(task.locator('//following-sibling::div')).toHaveText(deadline);
       }
       await expect(task).toHaveText(tasklist);
@@ -59,11 +59,10 @@ class VerificationHelper {
   static performVerification(action: 'verifyPageTitle', value: string): Promise<void>;
   static performVerification(verify: 'dashboardNotification', identifier: string, value: string): Promise<void>;
   static performVerification(
-    verify: 'taskInList',
+    verify: 'TaskListItem',
     tasklist: string,
     status: string,
     isTaskALink?: string,
-    isDeadlinePresent?: string,
     deadline?: string
   ): Promise<void>;
 
@@ -80,18 +79,16 @@ class VerificationHelper {
       case 'dashboardNotification':
         await (actionFunction as (identifier: string, value: string) => Promise<void>)(args[0], args[1]);
         break;
-      case 'taskInList': {
+      case 'TaskListItem': {
         const isTaskALink = args[2] !== undefined ? args[2] === 'true' : false;
-        const isDeadlinePresent = args[3] !== undefined ? args[3] === 'true' : false;
         await (
           actionFunction as (
             tasklist: string,
             status: string,
             isTaskALink?: boolean,
-            isDeadlinePresent?: boolean,
             deadline?: string
           ) => Promise<void>
-        )(args[0], args[1], isTaskALink, isDeadlinePresent, args[4]);
+        )(args[0], args[1], isTaskALink, args[3]);
         break;
       }
       default:
