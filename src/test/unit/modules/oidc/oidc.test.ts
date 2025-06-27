@@ -1,14 +1,14 @@
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import {
+  authorizationCodeGrant,
+  buildAuthorizationUrl,
+  buildEndSessionUrl,
+  calculatePKCECodeChallenge,
   discovery,
+  fetchUserInfo,
   randomNonce,
   randomPKCECodeVerifier,
-  calculatePKCECodeChallenge,
-  buildAuthorizationUrl,
-  authorizationCodeGrant,
-  fetchUserInfo,
-  buildEndSessionUrl,
 } from 'openid-client';
 
 import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
