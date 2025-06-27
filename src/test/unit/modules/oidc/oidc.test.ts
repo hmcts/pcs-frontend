@@ -2,8 +2,8 @@ import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import {
   discovery,
-  randomPKCECodeVerifier,
   randomNonce,
+  randomPKCECodeVerifier,
   calculatePKCECodeChallenge,
   buildAuthorizationUrl,
   authorizationCodeGrant,
