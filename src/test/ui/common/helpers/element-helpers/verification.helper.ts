@@ -25,7 +25,7 @@ class VerificationHelper {
         `
                     //h2[contains(.,"${notificationTitle}")]/../following-sibling::div[normalize-space(.)="${notificationContent}"]`
       );
-      await notification.isVisible();
+      await expect(notification).toBeVisible();
       await expect(notification).toHaveText(`${notificationContent}`);
     },
     TaskListItem: async (
@@ -38,14 +38,12 @@ class VerificationHelper {
       let task: Locator;
       let taskStatus: Locator;
       if (isTaskALink) {
-        task = VerificationHelper.getActivePage().locator(
-          `//a[contains(@class, "govuk-link")][normalize-space(.)="${tasklist}"]`
-        );
+        task = VerificationHelper.getActivePage().locator(`a.govuk-link:text("${tasklist}")`);
         taskStatus = VerificationHelper.getActivePage().locator(
           `//a[contains(.,"${tasklist}")]/../following-sibling::div[contains(.,"${status}")]`
         );
       } else {
-        task = VerificationHelper.getActivePage().locator(`//div[normalize-space(.)="${tasklist}"]`).first();
+        task = VerificationHelper.getActivePage().locator(`div:text("${tasklist}")`).first();
         taskStatus = VerificationHelper.getActivePage().locator(
           `//div[contains(.,"${tasklist}")]/../following-sibling::div[contains(.,"${status}")]`
         );

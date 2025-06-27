@@ -27,8 +27,8 @@ test.describe('Verify Notifications and Tasks on Dashboard @PR @nightly', async 
     const notification = dashboard.responseTimeElapsed('28');
     await performVerification('dashboardNotification', notification.title, notification.content);
   });
-  test('Verify Upload hearing documents task', async () => {
-    const taskList = dashboard.payTheHearingFee('28 June 2025');
-    await performVerification('TaskListItem', taskList.title, 'Action needed', 'true', taskList.deadline);
+  test('Verify Pay Hearing Fee task', async () => {
+    const payTheHearingFeeTaskList = dashboard.payTheHearingFee('28 June 2025');
+    await performVerification('TaskListItem', payTheHearingFeeTaskList.title, 'Action needed', 'true', payTheHearingFeeTaskList.deadline);
   });
 });
