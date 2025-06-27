@@ -34,7 +34,7 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
         allowMissing: true,
         alwaysLinkToLastBuild: true,
         keepAll: true,
-        reportDir: "playwright-report",
+        reportDir: "allure-report",
         reportFiles: 'index.html',
         reportName: "Full ${browser} E2E Test Report"
       ])
