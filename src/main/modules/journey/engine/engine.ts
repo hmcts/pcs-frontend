@@ -2,11 +2,12 @@ import fs from 'fs';
 import path from 'path';
 
 import { Logger } from '@hmcts/nodejs-logging';
+import * as LDClient from '@launchdarkly/node-server-sdk';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
 
-import { JourneyConfig, JourneySchema, StepConfig, FieldConfig } from './schema';
+import { FieldConfig, JourneyConfig, JourneySchema, StepConfig } from './schema';
 import { JourneyStore } from './storage/index';
 import { JourneyValidator } from './validation';
 
@@ -68,7 +69,11 @@ export class WizardEngine {
     // Validate and parse the journey JSON using Zod
     const parseResult = JourneySchema.safeParse(raw);
     if (!parseResult.success) {
-      this.logger.error('Invalid journey configuration:', parseResult.error.issues, `${filePath}: ${parseResult.error.issues[0]?.message}`);
+      this.logger.error(
+        'Invalid journey configuration:',
+        parseResult.error.issues,
+        `${filePath}: ${parseResult.error.issues[0]?.message}`
+      );
       throw new Error(`Invalid journey configuration in ${filePath}: ${parseResult.error.issues[0]?.message}`);
     }
 
@@ -149,7 +154,7 @@ export class WizardEngine {
   }
 
   // Build summary rows for summary pages
-  private buildSummaryRows(allData: Record<string, unknown>, caseId: string): SummaryRow[] {
+  private buildSummaryRows(allData: Record<string, unknown>): SummaryRow[] {
     return Object.entries(this.journey.steps)
       .filter(([stepId, stepConfig]) => {
         const typedStepConfig = stepConfig as StepConfig;
@@ -177,7 +182,9 @@ export class WizardEngine {
               typedFieldConfig.type === 'date' &&
               value &&
               typeof value === 'object' &&
-              'day' in value && 'month' in value && 'year' in value
+              'day' in value &&
+              'month' in value &&
+              'year' in value
             ) {
               return `${value.day || ''}/${value.month || ''}/${value.year || ''}`;
             }
@@ -190,7 +197,7 @@ export class WizardEngine {
           actions: {
             items: [
               {
-                href: `${this.basePath}/${caseId}/${stepId}`,
+                href: `${this.basePath}/${stepId}`,
                 text: 'Change',
                 visuallyHiddenText: `change ${(typedStepConfig.title || stepId).toLowerCase()}`,
               },
@@ -271,7 +278,7 @@ export class WizardEngine {
     errors?: Record<string, string | { day?: string; month?: string; year?: string; message: string }>
   ): JourneyContext & { dateItems?: Record<string, { name: string; classes: string; value: string }[]> } {
     const previousStepUrl = this.findPreviousStep(step.id, allData);
-    const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData, caseId) : undefined;
+    const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData) : undefined;
     const data = (allData[step.id] as Record<string, unknown>) || {};
 
     // Build dateItems for all date fields
@@ -280,9 +287,9 @@ export class WizardEngine {
       for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
         const typedFieldConfig = fieldConfig as FieldConfig;
         if (typedFieldConfig.type === 'date') {
-          const fieldValue = data[fieldName] as Record<'day'|'month'|'year', string|undefined>;
+          const fieldValue = data[fieldName] as Record<'day' | 'month' | 'year', string | undefined>;
           const fieldError = errors && errors[fieldName];
-          dateItems[fieldName] = (['day', 'month', 'year'] as ('day'|'month'|'year')[]).map(part => {
+          dateItems[fieldName] = (['day', 'month', 'year'] as ('day' | 'month' | 'year')[]).map(part => {
             let hasError = false;
             if (fieldError) {
               if (typeof fieldError === 'object' && fieldError[part]) {
@@ -294,11 +301,12 @@ export class WizardEngine {
             return {
               name: part,
               classes:
-                (part === 'day' ? 'govuk-input--width-2' :
-                part === 'month' ? 'govuk-input--width-2' :
-                'govuk-input--width-4') +
-                (hasError ? ' govuk-input--error' : ''),
-              value: fieldValue?.[part] || ''
+                (part === 'day'
+                  ? 'govuk-input--width-2'
+                  : part === 'month'
+                    ? 'govuk-input--width-2'
+                    : 'govuk-input--width-4') + (hasError ? ' govuk-input--error' : ''),
+              value: fieldValue?.[part] || '',
             };
           });
         }
@@ -313,7 +321,7 @@ export class WizardEngine {
       errors,
       previousStepUrl,
       summaryRows,
-      ...(Object.keys(dateItems).length > 0 ? { dateItems } : {})
+      ...(Object.keys(dateItems).length > 0 ? { dateItems } : {}),
     };
   }
 
@@ -387,6 +395,138 @@ export class WizardEngine {
     return true;
   }
 
+  /**
+   * Remove any fields (and optionally whole steps) that are behind a LaunchDarkly flag which evaluates to false.
+   * The original step config coming from the cached journey MUST NOT be mutated because it is shared
+   * between requests. We therefore create a shallow copy with a new `fields` object when filtering.
+   */
+  private async applyLaunchDarklyFlags(original: StepConfig, req: Request): Promise<StepConfig> {
+    const ldClient = (req.app?.locals?.launchDarklyClient as LDClient.LDClient | undefined) ?? undefined;
+
+    // If LaunchDarkly is not initialised just return the original config
+    if (!ldClient) {
+      return original;
+    }
+
+    // Helper to evaluate a flag. If `flagKey` is undefined we treat the element as enabled
+    // but still allow LaunchDarkly to override by convention-based flag keys.
+    const isEnabled = async (explicitKey: string | undefined, fallbackKey: string): Promise<boolean> => {
+      const keyToCheck = explicitKey ?? fallbackKey;
+
+      // If *both* explicit and derived keys are empty – which shouldn't happen – enable by default.
+      if (!keyToCheck) {
+        return true;
+      }
+
+      try {
+        const context: LDClient.LDContext = {
+          kind: 'user',
+          key: req.session?.user?.uid as string ?? 'anonymous',
+          name: req.session?.user?.name ?? 'anonymous',
+          email: req.session?.user?.email ?? 'anonymous',
+          firstName: req.session?.user?.given_name ?? 'anonymous',
+          lastName: req.session?.user?.family_name ?? 'anonymous',
+          custom: {
+            roles: req.session?.user?.roles ?? [],
+          },
+        };
+
+        this.logger.info('ISENABLED ===>> LaunchDarkly Flag Evaluation', { context, keyToCheck });
+
+        // If the flag does not exist LD will return the default (true) so UI remains visible by default.
+        return await ldClient.variation(keyToCheck, context, true);
+      } catch (err) {
+        this.logger.warn('LaunchDarkly evaluation failed', err);
+        return true;
+      }
+    };
+
+    const stepDefaultKey = `${this.slug}-${original.id}`;
+
+    // If the whole step is disabled hide it entirely (return empty fields)
+    if (!(await isEnabled(original.flag, stepDefaultKey))) {
+      return { ...original, fields: {} } as StepConfig;
+    }
+
+    if (!original.fields || Object.keys(original.fields).length === 0) {
+      return original;
+    }
+
+    const newFields: Record<string, FieldConfig> = {};
+    for (const [name, config] of Object.entries(original.fields)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const cfg: any = config;
+      const fieldDefaultKey = `${this.slug}-${original.id}-${name}`;
+      const isEnabledFlag = await isEnabled(cfg.flag, fieldDefaultKey);
+      this.logger.info('IN LOOP ===>>LaunchDarkly Flag Evaluation', { fieldDefaultKey, isEnabledFlag });
+      if (isEnabledFlag) {
+        newFields[name] = config as FieldConfig;
+      }
+    }
+
+    // If nothing changed return original reference to avoid unnecessary allocations
+    if (Object.keys(newFields).length === Object.keys(original.fields).length) {
+      return original;
+    }
+
+    return { ...original, fields: newFields } as StepConfig;
+  }
+
+  private async getPreviousVisibleStep(
+    currentStepId: string,
+    req: Request,
+    allData: Record<string, unknown>
+  ): Promise<string | null> {
+    let prevId = this.findPreviousStep(currentStepId, allData);
+    while (prevId) {
+      let prevStep = { id: prevId, ...this.journey.steps[prevId] } as StepConfig;
+      prevStep = await this.applyLaunchDarklyFlags(prevStep, req);
+
+      const hasVisibleFields = prevStep.fields ? Object.keys(prevStep.fields).length > 0 : false;
+      this.logger.info('Checking prev step visibility', { prevId, fields: prevStep.fields, hasVisibleFields });
+      if (hasVisibleFields) {
+        return prevId;
+      }
+
+      prevId = this.findPreviousStep(prevId, allData);
+    }
+    return null;
+  }
+
+  private async applyLdOverride(step: StepConfig, req: Request): Promise<StepConfig> {
+    const ld = req.app.locals.launchDarklyClient as LDClient.LDClient|undefined;
+    if (!ld) {
+      return step;
+    }
+
+    const ctx: LDClient.LDContext = { kind: 'user', key: req.session?.user?.uid as string ?? 'anon' };
+    const flagKey = `${this.slug}-${step.id}-override`;
+    const patch = await ld.variation(flagKey, ctx, null);
+
+    if (!patch) {
+      return step;
+    }
+
+    // start with a shallow copy so we never mutate the cached journey
+    const merged: StepConfig = { ...step, ...patch } as StepConfig;
+
+    // Remove keys whose override value is null
+    const pruneNulls = (obj: Record<string, unknown>) => {
+      for (const k of Object.keys(obj)) {
+        if (obj[k] === null) {
+          delete obj[k];
+        } else if (typeof obj[k] === 'object') {
+          pruneNulls(obj[k] as Record<string, unknown>);
+        }
+      }
+    };
+    pruneNulls(merged);
+
+    // optional: validate merged with Zod again
+
+    return merged as StepConfig;
+  }
+
   router(): Router {
     const router = Router();
 
@@ -401,11 +541,25 @@ export class WizardEngine {
       router.use(oidcMiddleware);
     }
 
-    // Add route to start a new journey
+    // Helper to retrieve or generate a caseId stored in the session so it never appears in the URL
+    const getOrCreateCaseId = (req: Request): string => {
+      const session = req.session as unknown as Record<string, unknown>;
+      const key = `journey_${this.slug}_caseId`;
+      let caseId = session?.[key] as string | undefined;
+      if (!caseId) {
+        // Generate a new case ID using timestamp and random string (same format as before)
+        caseId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        if (session) {
+          session[key] = caseId;
+        }
+      }
+      return caseId;
+    };
+
+    // Add route to start a new journey (creates caseId in the session and redirects to first step)
     router.get('/', (req, res) => {
-      // Generate a new case ID using timestamp and random number
-      const caseId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-      res.redirect(`${this.basePath}/${caseId}/${Object.keys(this.journey.steps)[0]}`);
+      getOrCreateCaseId(req);
+      res.redirect(`${this.basePath}/${Object.keys(this.journey.steps)[0]}`);
     });
 
     router.param('step', (req: Request, res: Response, next: NextFunction, stepId: string) => {
@@ -418,17 +572,29 @@ export class WizardEngine {
     });
 
     // ─── GET ───
-    router.get('/:caseId/:step', async (req, res, next) => {
-      const { caseId } = req.params;
-      const step = (req as RequestWithStep).step!;
+    router.get('/:step', async (req, res, next) => {
+      const caseId = getOrCreateCaseId(req);
+      let step = (req as RequestWithStep).step!;
+      step = await this.applyLdOverride(step, req);
+      step = await this.applyLaunchDarklyFlags(step, req);
+
+      this.logger.info('LaunchDarkly Flag Evaluation', { step });
 
       try {
         const { data } = await this.store.load(req, Number(caseId));
 
+        // Auto-skip steps that have no visible fields after LaunchDarkly filtering
+        if ((step.type === 'form' || (!step.type && step.fields)) && (!step.fields || Object.keys(step.fields).length === 0)) {
+          const nextId = this.resolveNext(step, data);
+          if (nextId && nextId !== step.id) {
+            return res.redirect(`${this.basePath}/${nextId}`);
+          }
+        }
+
         // Check if the requested step is accessible based on journey progress
         if (!this.isStepAccessible(step.id, data)) {
           // Find the first incomplete step
-          const stepIds = Object.keys(this.journey.steps); 
+          const stepIds = Object.keys(this.journey.steps);
           let firstIncompleteStep = stepIds[0];
 
           for (const stepId of stepIds) {
@@ -445,10 +611,19 @@ export class WizardEngine {
           }
 
           // Redirect to the first incomplete step
-          return res.redirect(`${this.basePath}/${caseId}/${firstIncompleteStep}`);
+          return res.redirect(`${this.basePath}/${firstIncompleteStep}`);
         }
 
-        const context = this.buildJourneyContext(step, caseId, data);
+        let context = this.buildJourneyContext(step, caseId, data);
+
+        // Re-calculate previousStepUrl to skip hidden steps
+        const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
+        context = {
+          ...context,
+          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
+        };
+
+        this.logger.info('previousStepUrl sent to template', context.previousStepUrl);
 
         res.render(await this.resolveTemplatePath(step.id), {
           ...context,
@@ -466,9 +641,18 @@ export class WizardEngine {
     });
 
     // ─── POST ───
-    router.post('/:caseId/:step', express.urlencoded({ extended: true }), async (req, res, next) => { 
-      const { caseId } = req.params;
-      const step = (req as RequestWithStep).step!;
+    router.post('/:step', express.urlencoded({ extended: true }), async (req, res, next) => {
+      const caseId = getOrCreateCaseId(req);
+      let step = (req as RequestWithStep).step!;
+      step = await this.applyLdOverride(step, req);
+      step = await this.applyLaunchDarklyFlags(step, req);
+
+      // Auto-skip steps that have no visible fields after LaunchDarkly filtering
+      if ((step.type === 'form' || (!step.type && step.fields)) && (!step.fields || Object.keys(step.fields).length === 0)) {
+        const { data } = await this.store.load(req, Number(caseId));
+        const nextId = this.resolveNext(step, data);
+        return res.redirect(`${this.basePath}/${nextId}`);
+      }
 
       // Validate using Zod-based validation
       const validationResult = this.validator.validate(step, req.body);
@@ -484,14 +668,21 @@ export class WizardEngine {
               reconstructedData[fieldName] = {
                 day: req.body[`${fieldName}-day`] || '',
                 month: req.body[`${fieldName}-month`] || '',
-                year: req.body[`${fieldName}-year`] || ''
+                year: req.body[`${fieldName}-year`] || '',
               };
             }
           }
         }
         // Patch the current step's data with reconstructedData for this render
         const patchedAllData = { ...data, [step.id]: reconstructedData };
-        const context = this.buildJourneyContext(step, caseId, patchedAllData, validationResult.errors);
+        let context = this.buildJourneyContext(step, caseId, patchedAllData, validationResult.errors);
+        const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
+        context = {
+          ...context,
+          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
+        };
+
+        this.logger.info('previousStepUrl sent to template', context.previousStepUrl);
 
         return res.status(400).render(await this.resolveTemplatePath(step.id), {
           ...context,
@@ -518,7 +709,7 @@ export class WizardEngine {
           });
         }
 
-        res.redirect(`${this.basePath}/${caseId}/${nextId}`);
+        res.redirect(`${this.basePath}/${nextId}`);
       } catch (err) {
         next(err);
       }
