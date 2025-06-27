@@ -34,5 +34,8 @@
     "src/types/global.d.ts",
     "src/test/unit/middleware/oidc.test.ts"
   ],
-  "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*", "src/test/**/*", "**/*.spec.ts", "**/*.e2e.ts"]
+  "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*", "src/test/**/*", "**/*.spec.ts", "**/*.e2e.ts"],
+  "ts-node": {
+    "files": true
+  }
 }

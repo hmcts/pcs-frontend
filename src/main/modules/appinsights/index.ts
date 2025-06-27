@@ -1,13 +1,12 @@
+import * as appInsights from 'applicationinsights';
 import config from 'config';
-
-const appInsights = require('applicationinsights');
 
 export class AppInsights {
   constructor(public developmentMode: boolean) {
     this.developmentMode = developmentMode;
   }
 
-  enable(): void {
+  enableFor(): void {
     if (config.get<string>('secrets.pcs.app-insights-connection-string') && !this.developmentMode) {
       appInsights.setup(config.get<string>('secrets.pcs.app-insights-connection-string')).setSendLiveMetrics(true);
 

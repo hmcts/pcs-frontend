@@ -23,7 +23,7 @@ export class Journey {
       app.use(engine.basePath, engine.router());
 
       if (process.env.NODE_ENV !== 'test') {
-        this.logger.info(`Wizard "${engine.journey.meta.name}" mounted at ${engine.basePath}/:caseId/:step`);
+        this.logger.info(`Wizard "${engine.journey.meta.name}" mounted at ${engine.basePath}/:step`);
       }
     });
   }
