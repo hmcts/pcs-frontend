@@ -421,7 +421,7 @@ export class WizardEngine {
       try {
         const context: LDClient.LDContext = {
           kind: 'user',
-          key: req.session?.user?.uid as string ?? 'anonymous',
+          key: (req.session?.user?.uid as string) ?? 'anonymous',
           name: req.session?.user?.name ?? 'anonymous',
           email: req.session?.user?.email ?? 'anonymous',
           firstName: req.session?.user?.given_name ?? 'anonymous',
@@ -494,12 +494,12 @@ export class WizardEngine {
   }
 
   private async applyLdOverride(step: StepConfig, req: Request): Promise<StepConfig> {
-    const ld = req.app.locals.launchDarklyClient as LDClient.LDClient|undefined;
+    const ld = req.app.locals.launchDarklyClient as LDClient.LDClient | undefined;
     if (!ld) {
       return step;
     }
 
-    const ctx: LDClient.LDContext = { kind: 'user', key: req.session?.user?.uid as string ?? 'anon' };
+    const ctx: LDClient.LDContext = { kind: 'user', key: (req.session?.user?.uid as string) ?? 'anon' };
     const flagKey = `${this.slug}-${step.id}-override`;
     const patch = await ld.variation(flagKey, ctx, null);
 
@@ -584,7 +584,10 @@ export class WizardEngine {
         const { data } = await this.store.load(req, Number(caseId));
 
         // Auto-skip steps that have no visible fields after LaunchDarkly filtering
-        if ((step.type === 'form' || (!step.type && step.fields)) && (!step.fields || Object.keys(step.fields).length === 0)) {
+        if (
+          (step.type === 'form' || (!step.type && step.fields)) &&
+          (!step.fields || Object.keys(step.fields).length === 0)
+        ) {
           const nextId = this.resolveNext(step, data);
           if (nextId && nextId !== step.id) {
             return res.redirect(`${this.basePath}/${nextId}`);
@@ -648,7 +651,10 @@ export class WizardEngine {
       step = await this.applyLaunchDarklyFlags(step, req);
 
       // Auto-skip steps that have no visible fields after LaunchDarkly filtering
-      if ((step.type === 'form' || (!step.type && step.fields)) && (!step.fields || Object.keys(step.fields).length === 0)) {
+      if (
+        (step.type === 'form' || (!step.type && step.fields)) &&
+        (!step.fields || Object.keys(step.fields).length === 0)
+      ) {
         const { data } = await this.store.load(req, Number(caseId));
         const nextId = this.resolveNext(step, data);
         return res.redirect(`${this.basePath}/${nextId}`);

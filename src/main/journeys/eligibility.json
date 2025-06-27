@@ -47,7 +47,7 @@
           "label": "Do you agree to the terms and conditions?",
           "options": [
             { "value": "yes", "text": "Yes" },
-            { "value": "no", "text": "No"}
+            { "value": "no", "text": "No" }
           ],
           "validate": {
             "required": true,
