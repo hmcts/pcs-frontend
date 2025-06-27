@@ -23,33 +23,25 @@ class VerificationHelper {
     dashboardNotification: async (notificationTitle: string, notificationContent: string): Promise<void> => {
       const notification = VerificationHelper.getActivePage().locator(
         `
-                    //h2[contains(.,"${notificationTitle}")]/../following-sibling::div[normalize-space(.)="${notificationContent}"]`
+                   div:has(h2:text("${notificationTitle}"))~ div:has-text("${notificationContent}")`
       );
       await expect(notification).toBeVisible();
       await expect(notification).toHaveText(`${notificationContent}`);
     },
-    TaskListItem: async (
-      tasklist: string,
-      status: string,
-      isTaskALink = false,
-      // isDeadlinePresent = false,
-      deadline: string
-    ): Promise<void> => {
+    TaskListItem: async (tasklist: string, status: string, isTaskALink = false, deadline: string): Promise<void> => {
       let task: Locator;
       let taskStatus: Locator;
       if (isTaskALink) {
         task = VerificationHelper.getActivePage().locator(`a.govuk-link:text("${tasklist}")`);
         taskStatus = VerificationHelper.getActivePage().locator(
-          `//a[contains(.,"${tasklist}")]/../following-sibling::div[contains(.,"${status}")]`
+          `div:has(a:text("${tasklist}"))~ div:has-text("${status}")`
         );
       } else {
         task = VerificationHelper.getActivePage().locator(`div:text("${tasklist}")`).first();
-        taskStatus = VerificationHelper.getActivePage().locator(
-          `//div[contains(.,"${tasklist}")]/../following-sibling::div[contains(.,"${status}")]`
-        );
+        taskStatus = VerificationHelper.getActivePage().locator(`div:has("${tasklist}")~ div:has-text("${status}")`);
       }
       if (deadline !== null) {
-        await expect(task.locator('//following-sibling::div')).toHaveText(deadline);
+        await expect(task.locator('~ div')).toHaveText(deadline);
       }
       await expect(task).toHaveText(tasklist);
       await expect(taskStatus).toHaveText(status);
