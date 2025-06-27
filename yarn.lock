@@ -11329,10 +11329,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"legacy-javascript@npm:latest":
-  version: 0.0.1
-  resolution: "legacy-javascript@npm:0.0.1"
-  checksum: 10/aa39f4bf327272ef1481f9d23a98d97f713ff3a8030434f7da5a239c85b21c2ccb62d2ae7eff68c1237509b13b9a3937f29788f0395a7ad9367192fe5dcab13e
+"launchdarkly-eventsource@npm:2.2.0":
+  version: 2.2.0
+  resolution: "launchdarkly-eventsource@npm:2.2.0"
+  checksum: 10/9269ca3bc7dead8271e16c26efa4578e33dcf416ad35d05ff10d82d904df162ac4fe0e7a9cd89b9ca219bb5ef0e30005fcce5f8a837acbe3a8db38a7f6acfff6
   languageName: node
   linkType: hard
 
