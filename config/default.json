@@ -3,7 +3,8 @@
   "appInsights": {
     "instrumentationKey": false
   },
-  "node-env": "dev",
+  "node-env": "development",
+  "use-ssl": false,
   "session": {
     "prefix": "pcs-session",
     "ttlInSeconds": 1200,
@@ -35,7 +36,8 @@
       "pcs-frontend-idam-secret": "AAAAAAAAAAAAAAAA",
       "pcs-frontend-idam-system-username": "AAAAAAAAAAAA",
       "pcs-frontend-idam-system-password": "AAAAAAAAAAAAAA",
-      "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA"
+      "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA",
+      "launchdarkly-sdk-key": "sdk-00000000-0000-0000-0000-000000000000"
     }
   },
   "oidc": {
