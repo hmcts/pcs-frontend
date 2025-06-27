@@ -45,9 +45,9 @@ export class JourneyValidator {
           continue;
         } else if (!dateVal.day || !dateVal.month || !dateVal.year) {
           errors[fieldName] = {
-            day: !dateVal.day ? (fieldConfig.validate?.errorMessages?.day || 'Enter a valid day') : undefined,
-            month: !dateVal.month ? (fieldConfig.validate?.errorMessages?.month || 'Enter a valid month') : undefined,
-            year: !dateVal.year ? (fieldConfig.validate?.errorMessages?.year || 'Enter a valid year') : undefined,
+            day: !dateVal.day ? fieldConfig.validate?.errorMessages?.day || 'Enter a valid day' : undefined,
+            month: !dateVal.month ? fieldConfig.validate?.errorMessages?.month || 'Enter a valid month' : undefined,
+            year: !dateVal.year ? fieldConfig.validate?.errorMessages?.year || 'Enter a valid year' : undefined,
             message: fieldConfig.validate?.errorMessages?.incomplete || 'Date must include a day, month and year',
           };
           continue;

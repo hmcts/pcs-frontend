@@ -6,8 +6,8 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback ts-node -r tsconfig-paths/register --files src/main/server.ts",
-    "start:dev": "NODE_ENV=dev ts-node -r tsconfig-paths/register --files src/main/server.ts",
+    "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development USE_SSL=true OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback yarn start:dev",
+    "start:dev": "node --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/server.ts",
     "start": "NODE_ENV=production dist/main/server.js",
     "createIdamUser": "./bin/dev/createIdamUser.sh",
     "start:watch": "nodemon --config nodemon.json",
@@ -41,6 +41,7 @@
     "@hmcts/nodejs-logging": "^4.0.4",
     "@hmcts/playwright-common": "1.0.29",
     "@hmcts/properties-volume": "^1.2.0",
+    "@launchdarkly/node-server-sdk": "^9.10.0",
     "applicationinsights": "3.7.0",
     "axios": "^1.4.0",
     "body-parser": "^2.0.0",
