@@ -8,7 +8,7 @@ import {
   buildAuthorizationUrl,
   authorizationCodeGrant,
   fetchUserInfo,
-  buildEndSessionUrl
+  buildEndSessionUrl,
 } from 'openid-client';
 
 import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
@@ -317,7 +317,7 @@ describe('OIDCModule', () => {
         mockRequest.session = createMockSession({
           codeVerifier: 'test-verifier',
           nonce: 'test-nonce',
-          save: jest.fn().mockImplementation(function(callback) {
+          save: jest.fn().mockImplementation(function (callback) {
             callback(null);
           }),
         });
@@ -355,7 +355,7 @@ describe('OIDCModule', () => {
           codeVerifier: 'test-verifier',
           nonce: 'test-nonce',
           returnTo: '/dashboard',
-          save: jest.fn().mockImplementation(function(callback) {
+          save: jest.fn().mockImplementation(function (callback) {
             callback(null);
           }),
         });
@@ -423,7 +423,7 @@ describe('OIDCModule', () => {
         mockRequest.session = createMockSession({
           codeVerifier: 'test-verifier',
           nonce: 'test-nonce',
-          save: jest.fn().mockImplementation(function(callback) {
+          save: jest.fn().mockImplementation(function (callback) {
             callback(null);
           }),
         });
@@ -472,7 +472,7 @@ describe('OIDCModule', () => {
           user: {
             idToken: 'test-id-token',
           },
-          destroy: jest.fn().mockImplementation(function(callback) {
+          destroy: jest.fn().mockImplementation(function (callback) {
             callback(null);
           }),
         });
@@ -500,7 +500,7 @@ describe('OIDCModule', () => {
           user: {
             idToken: 'test-id-token',
           },
-          destroy: jest.fn().mockImplementation(function(callback) {
+          destroy: jest.fn().mockImplementation(function (callback) {
             callback(new Error('Destroy failed'));
           }),
         });
@@ -517,7 +517,7 @@ describe('OIDCModule', () => {
         (buildEndSessionUrl as jest.Mock).mockReturnValue({ href: mockLogoutUrl });
 
         mockRequest.session = createMockSession({
-          destroy: jest.fn().mockImplementation(function(callback) {
+          destroy: jest.fn().mockImplementation(function (callback) {
             callback(null);
           }),
         });
