@@ -15,6 +15,14 @@ const content = {
   ...common,
   backUrl: '/steps/user-journey/enter-user-details',
 };
+export const ukPostcodePattern =
+  '^([Gg][Ii][Rr]\\s?0[Aa]{2})|' +
+  '((([A-Za-z][0-9]{1,2})|' +
+  '(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|' +
+  '(([A-Za-z][0-9][A-Za-z])|' +
+  '([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z]?))))\\s?[0-9][A-Za-z]{2})$';
+
+const postcodeRegex = new RegExp(ukPostcodePattern);
 
 const fields: FormFieldConfig[] = [
   { name: 'addressLine1', type: 'text', required: true, errorMessage: 'Enter address line 1' },
@@ -22,7 +30,7 @@ const fields: FormFieldConfig[] = [
   { name: 'addressLine3', type: 'text', required: false },
   { name: 'town', type: 'text', required: true, errorMessage: 'Enter the town or city' },
   { name: 'county', type: 'text', required: false },
-  { name: 'postcode', type: 'text', required: true, errorMessage: 'Enter the postcode' },
+  { name: 'postcode', type: 'text', required: true, errorMessage: 'Enter the postcode', pattern: ukPostcodePattern },
   { name: 'country', type: 'text', required: false, errorMessage: 'Enter the country' },
 ];
 
@@ -37,7 +45,7 @@ export const step: StepDefinition = {
 
     return {
       ...content,
-      ...savedData, // This ensures prefilled form values
+      ...savedData,
       lookupPostcode: '',
       addressResults: null,
       selectedAddressIndex: null,
@@ -52,13 +60,12 @@ export const step: StepDefinition = {
       console.log('postController lookupPostcode ======> ', lookupPostcode);
       console.log('postController selectedAddressIndex ======> ', selectedAddressIndex);
 
-      // Step 1: User clicked "Find address"
       if (action === 'find-address') {
-        if (!lookupPostcode) {
+        if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
           return res.status(400).render('steps/userJourney/enterAddress.njk', {
             ...content,
             ...req.body,
-            error: 'Enter a postcode to look up your address',
+            error: 'Enter a valid UK postcode to look up your address',
           });
         }
 
@@ -91,13 +98,11 @@ export const step: StepDefinition = {
         }
       }
 
-      // Step 2: User selected an address from dropdown
       if (action === 'select-address' && selectedAddressIndex !== undefined && req.session.postcodeLookupResult) {
         const index = parseInt(selectedAddressIndex, 10);
         const selected = req.session.postcodeLookupResult[index];
 
         if (selected) {
-          // Save selected address to session form data
           setFormData(req, stepName, {
             selectedAddressIndex,
             addressLine1: selected.addressLine1,
@@ -125,41 +130,42 @@ export const step: StepDefinition = {
         }
       }
 
-      // Step 3: User submitted the filled-in form (normal flow)
-      const errors = validateForm(req, fields);
+      if (action === 'submit-form') {
+        const errors = validateForm(req, fields);
 
-      if (Object.keys(errors).length > 0) {
-        return res.status(400).render('steps/userJourney/enterAddress.njk', {
-          ...content,
-          ...req.body,
-          error: Object.values(errors)[0],
-        });
-      }
+        if (Object.keys(errors).length > 0) {
+          return res.status(400).render('steps/userJourney/enterAddress.njk', {
+            ...content,
+            ...req.body,
+            error: Object.values(errors)[0],
+          });
+        }
 
-      setFormData(req, stepName, req.body);
-      const ccdCase = req.session.ccdCase;
-      const user = req.session.user;
+        setFormData(req, stepName, req.body);
+        const ccdCase = req.session.ccdCase;
+        const user = req.session.user;
 
-      if (ccdCase?.id && user?.accessToken) {
-        const updatedCase = await ccdCaseService.updateCase(user.accessToken, {
-          id: ccdCase.id,
-          data: {
-            ...ccdCase.data,
-            propertyAddress: {
-              AddressLine1: req.body.addressLine1,
-              AddressLine2: req.body.addressLine2,
-              AddressLine3: req.body.addressLine3,
-              PostTown: req.body.town,
-              County: req.body.county,
-              PostCode: req.body.postcode,
-              Country: req.body.country,
+        if (ccdCase?.id && user?.accessToken) {
+          const updatedCase = await ccdCaseService.updateCase(user.accessToken, {
+            id: ccdCase.id,
+            data: {
+              ...ccdCase.data,
+              propertyAddress: {
+                AddressLine1: req.body.addressLine1,
+                AddressLine2: req.body.addressLine2,
+                AddressLine3: req.body.addressLine3,
+                PostTown: req.body.town,
+                County: req.body.county,
+                PostCode: req.body.postcode,
+                Country: req.body.country,
+              },
             },
-          },
-        });
-        req.session.ccdCase = updatedCase;
-      }
+          });
+          req.session.ccdCase = updatedCase;
+        }
 
-      res.redirect('/steps/user-journey/summary');
+        res.redirect('/steps/user-journey/summary');
+      }
     },
   },
 };

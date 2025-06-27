@@ -21,16 +21,15 @@
       {% endif %}
 
       <form method="post" action="{{ url }}">
-
         {{ govukInput({
           id: "applicantForename",
           name: "applicantForename",
           label: { text: "First name" },
           value: applicantForename,
           classes: "govuk-!-width-three-quarters",
-            attributes: {
-                                        maxlength: 50
-                                    },
+          attributes: {
+              maxlength: 50
+          },
           errorMessage: error?.field === "applicantForename" and { text: error.text }
         }) }}
 
@@ -40,9 +39,9 @@
           label: { text: "Last name" },
           value: applicantSurname,
           classes: "govuk-!-width-three-quarters",
-            attributes: {
-                                        maxlength: 50
-                                    },
+          attributes: {
+              maxlength: 50
+          },
           errorMessage: error?.field === "applicantSurname" and { text: error.text }
         }) }}
 
