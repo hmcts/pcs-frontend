@@ -33,7 +33,7 @@ test.describe('Verify Notifications and Tasks on Dashboard @PR @nightly', async 
     await performVerification('dashboardNotification', notification.title, notification.content);
   });
   test('Verify Pay Hearing Fee task', async () => {
-    const payTheHearingFeeTaskList = dashboard.payTheHearingFee('28 June 2025');
+    const payTheHearingFeeTaskList = dashboard.payTheHearingFee('28 June 2025', '4:00');
     await performVerification(
       'TaskListItem',
       payTheHearingFeeTaskList.title,
