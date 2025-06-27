@@ -22,6 +22,10 @@
     "ttl": 3600,
     "key": "s2s:service-token"
   },
+  "ccd": {
+    "url": "https://ccd-data-store-api-pcs-api-pr-316.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-316"
+  },
   "secrets": {
     "pcs": {
       "pcs-frontend-s2s-secret": "AAAAAAAAAAAAAAAA",

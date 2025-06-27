@@ -1,0 +1,13 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  {{ govukPanel({
+    titleText: "Application submitted",
+    html: "Your application has been received."
+  }) }}
+  <form method="post" action="{{ url }}">
+    {{ govukButton({ text: "Start a new application" }) }}
+  </form>
+{% endblock %}
