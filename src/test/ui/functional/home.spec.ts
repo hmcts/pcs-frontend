@@ -14,9 +14,6 @@ const test_url = (process.env.TEST_URL as string) || config.get('e2e.testUrl');
 test.beforeEach(async ({ page }) => {
   initActionHelper(page);
   await parentSuite('Home Page');
-});
-
-test('Idam Login @accessibility @PR @nightly', async ({ page }) => {
   initVerificationHelper(page);
   await page.goto(test_url);
   await loginHelper.login(page);
