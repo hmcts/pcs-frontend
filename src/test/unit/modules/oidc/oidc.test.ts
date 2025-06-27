@@ -175,7 +175,7 @@ describe('OIDCModule', () => {
       });
 
       it('should setup client when config does not exist and call next', async () => {
-        oidcModule['clientConfig'] = undefined as any;
+        oidcModule['clientConfig'] = undefined as unknown as (typeof oidcModule)['clientConfig'];
         oidcModule.enableFor(mockApp);
         const middleware = (mockApp.use as jest.Mock).mock.calls[0][0];
 
@@ -186,7 +186,7 @@ describe('OIDCModule', () => {
       });
 
       it('should call next with error when setup fails', async () => {
-        oidcModule['clientConfig'] = undefined as any;
+        oidcModule['clientConfig'] = undefined as unknown as (typeof oidcModule)['clientConfig'];
         (discovery as jest.Mock).mockRejectedValue(new Error('Setup failed'));
 
         oidcModule.enableFor(mockApp);
