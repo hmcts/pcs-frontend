@@ -1,21 +1,31 @@
 import { Application } from 'express';
 
-jest.mock('steps', () => ({
-  stepsWithContent: [
-    {
-      url: '/steps/page1',
-      getController: { get: jest.fn() },
-      postController: { post: jest.fn() },
-    },
-    {
-      url: '/steps/page2',
-      getController: { get: jest.fn() },
-      // no postController here
-    },
-  ],
-}));
-
+import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
 import registerSteps from '../../../main/routes/registerSteps';
+
+jest.mock('steps', () => {
+  const protectedStep = {
+    url: '/steps/protected',
+    getController: { get: jest.fn() },
+    postController: { post: jest.fn() },
+  };
+
+  const unprotectedStep = {
+    url: '/steps/unprotected',
+    getController: { get: jest.fn() },
+    postController: { post: jest.fn() },
+  };
+
+  return {
+    stepsWithContent: [protectedStep, unprotectedStep],
+    protectedSteps: [protectedStep], // ← Only this one is protected
+  };
+});
+
+jest.mock('../../../main/middleware', () => ({
+  oidcMiddleware: jest.fn((req, res, next) => next()),
+  ccdCaseMiddleware: jest.fn((req, res, next) => next()),
+}));
 
 describe('registerSteps', () => {
   const mockGet = jest.fn();
@@ -29,19 +39,33 @@ describe('registerSteps', () => {
   beforeEach(() => {
     mockGet.mockClear();
     mockPost.mockClear();
+    (oidcMiddleware as jest.Mock).mockClear();
+    (ccdCaseMiddleware as jest.Mock).mockClear();
   });
 
-  it('registers GET routes for all steps', () => {
+  it('registers GET and POST with middlewares for protected steps', () => {
     registerSteps(app);
 
-    expect(mockGet).toHaveBeenCalledWith('/steps/page1', expect.any(Function));
-    expect(mockGet).toHaveBeenCalledWith('/steps/page2', expect.any(Function));
+    expect(mockGet).toHaveBeenCalledWith(
+      '/steps/protected',
+      expect.any(Function),
+      expect.any(Function),
+      expect.any(Function)
+    );
+
+    expect(mockPost).toHaveBeenCalledWith(
+      '/steps/protected',
+      expect.any(Function),
+      expect.any(Function),
+      expect.any(Function)
+    );
   });
 
-  it('registers POST routes only for steps with postController', () => {
+  it('registers GET and POST without middlewares for unprotected steps', () => {
     registerSteps(app);
 
-    expect(mockPost).toHaveBeenCalledWith('/steps/page1', expect.any(Function));
-    expect(mockPost).not.toHaveBeenCalledWith('/steps/page2', expect.any(Function));
+    expect(mockGet).toHaveBeenCalledWith('/steps/unprotected', expect.any(Function));
+
+    expect(mockPost).toHaveBeenCalledWith('/steps/unprotected', expect.any(Function));
   });
 });
