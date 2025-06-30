@@ -1,3 +1,4 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
@@ -8,6 +9,8 @@ import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
+
+const logger = Logger.getLogger('steps/enter-address');
 
 const stepName = 'enter-address';
 
@@ -53,12 +56,8 @@ export const step: StepDefinition = {
   }),
   postController: {
     post: async (req: Request, res: Response) => {
-      console.log('POST BODY:', req.body);
       const { action, lookupPostcode, selectedAddressIndex } = req.body;
-
-      console.log('postController ======> ', action);
-      console.log('postController lookupPostcode ======> ', lookupPostcode);
-      console.log('postController selectedAddressIndex ======> ', selectedAddressIndex);
+      logger.info(`[osPostcodeLookupService] Response data: ${JSON.stringify(req.body, null, 2)}`);
 
       if (action === 'find-address') {
         if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
@@ -81,7 +80,6 @@ export const step: StepDefinition = {
           }
 
           req.session.postcodeLookupResult = addressResults;
-
           return res.render('steps/userJourney/enterAddress.njk', {
             ...content,
             ...req.body,

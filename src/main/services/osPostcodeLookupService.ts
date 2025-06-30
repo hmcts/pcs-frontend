@@ -2,52 +2,8 @@ import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 
+import { Address, OSResponse } from '../interfaces/osPostcodeLookup.interface';
 const logger = Logger.getLogger('osPostcodeLookupService');
-export interface OSHeader {
-  uri: string;
-  query: string;
-  offset: number;
-  totalresults: number;
-  format: string;
-  dataset: string;
-  lr: string;
-  maxresults: number;
-  epoch: string;
-  lastupdate: string;
-  output_srs: string;
-}
-
-export interface OSResponse {
-  header: OSHeader;
-  results: {
-    DPA: {
-      ADDRESS: string;
-      BUILDING_NUMBER?: string;
-      SUB_BUILDING_NAME?: string;
-      BUILDING_NAME?: string;
-      ORGANISATION_NAME?: string;
-      THOROUGHFARE_NAME?: string;
-      DEPENDENT_THOROUGHFARE_NAME?: string;
-      DEPENDENT_LOCALITY?: string;
-      DOUBLE_DEPENDENT_LOCALITY?: string;
-      POST_TOWN: string;
-      LOCAL_CUSTODIAN_CODE_DESCRIPTION?: string;
-      POSTCODE: string;
-      COUNTRY_CODE_DESCRIPTION?: string;
-    };
-  }[];
-}
-
-export interface Address {
-  fullAddress: string;
-  addressLine1: string;
-  addressLine2: string;
-  addressLine3: string;
-  town: string;
-  county: string;
-  postcode: string;
-  country: string;
-}
 
 function getBaseUrl(): string {
   return config.get('osPostcodeLookup.url');
@@ -98,8 +54,8 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
         country: COUNTRY_CODE_DESCRIPTION,
       };
     });
-  } catch (err) {
-    logger.error('Error fetching addresses from OS Places API', err);
-    return [];
+  } catch {
+    logger.error('Error fetching addresses from OS Places API');
+    throw new Error('OS API error');
   }
 };
