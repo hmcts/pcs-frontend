@@ -22,6 +22,9 @@
     "ttl": "S2S_TTL",
     "key": "S2S_KEY"
   },
+  "ccd": {
+    "url": "CCD_URL"
+  },
   "oidc": {
     "issuer": "OIDC_ISSUER",
     "clientId": "OIDC_CLIENT_ID",
