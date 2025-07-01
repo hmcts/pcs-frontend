@@ -2,7 +2,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 
-import { Address, OSResponse } from '../interfaces/osPostcodeLookup.interface';
+import type { Address, OSResponse } from '../interfaces/osPostcodeLookup.interface';
 const logger = Logger.getLogger('osPostcodeLookupService');
 
 function getBaseUrl(): string {
