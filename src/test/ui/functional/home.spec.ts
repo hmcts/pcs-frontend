@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { parentSuite } from 'allure-js-commons';
 import config from 'config';
 
@@ -39,4 +39,10 @@ test.describe('Verify Notifications and Tasks on Dashboard @PR @nightly', async 
       payTheHearingFeeTaskList.deadline
     );
   });
+});
+
+test('Home page displays Hello from Alex Date', async ({ page }) => {
+  await page.goto(test_url);
+  await loginHelper.login(page);
+  await expect(page.getByText('Hello from Alex')).toBeVisible();
 });
