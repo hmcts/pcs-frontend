@@ -13,10 +13,9 @@ test.beforeEach(async ({ page }) => {
   initActionHelper(page);
   await parentSuite('Home Page');
   initVerificationHelper(page);
-  await page.goto(test_url);
-  await loginHelper.login(page);
   const dashboardURL = test_url + '/dashboard/1';
   await page.goto(dashboardURL);
+  await loginHelper.login(page);
 });
 
 test.describe('Verify Notifications and Tasks on Dashboard @PR @nightly', async () => {

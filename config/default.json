@@ -53,7 +53,7 @@
     "scope": "profile openid roles",
     "clientId": "pcs-frontend",
     "roles": "citizen",
-    "pwDebug": true
+    "playwrightDebug": true
   },
   "claimFormTestData": {
     "pageRoute": "/steps/page1"
