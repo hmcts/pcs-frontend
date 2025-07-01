@@ -52,7 +52,8 @@
     "grantType": "password",
     "scope": "profile openid roles",
     "clientId": "pcs-frontend",
-    "roles": "citizen"
+    "roles": "citizen",
+    "pwDebug": true
   },
   "claimFormTestData": {
     "pageRoute": "/steps/page1"
