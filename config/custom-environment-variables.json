@@ -36,6 +36,7 @@
     "idamApi": "IDAM_API",
     "idamTestingSupportUrl": "IDAM_TESTING_SUPPORT_URL",
     "loginEndpoint": "IDAM_TOKEN_ENDPOINT",
-    "userTempPassword": "PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD"
+    "userTempPassword": "PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD",
+    "playwrightDebug": "PWDEBUG"
   }
 }
