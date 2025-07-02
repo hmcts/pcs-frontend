@@ -68,9 +68,9 @@ describe('getAddressesByPostcode', () => {
     expect(result).toEqual([
       {
         fullAddress: '123 Test Street',
-        addressLine1: '123 Test Street',
-        addressLine2: '',
-        addressLine3: 'Org Ltd',
+        addressLine1: 'Org Ltd',
+        addressLine2: '123 Test Street',
+        addressLine3: '',
         town: 'Testville',
         county: 'Test County',
         postcode: 'TE57 1NG',
@@ -79,6 +79,47 @@ describe('getAddressesByPostcode', () => {
     ]);
 
     expect(mockAxiosGet).toHaveBeenCalledWith(`${baseUrl}/postcode?postcode=TE571NG&key=${token}`);
+  });
+
+  it('should skip any result that does not have a DPA property', async () => {
+    const mockResponse = {
+      data: {
+        results: [
+          { DPA: null }, // invalid
+          {
+            DPA: {
+              ADDRESS: '456 Another Street',
+              BUILDING_NUMBER: '456',
+              ORGANISATION_NAME: '',
+              SUB_BUILDING_NAME: '',
+              BUILDING_NAME: '',
+              THOROUGHFARE_NAME: 'Another Street',
+              POST_TOWN: 'Elsewhere',
+              LOCAL_CUSTODIAN_CODE_DESCRIPTION: 'Else County',
+              POSTCODE: 'EL57 2RE',
+              COUNTRY_CODE_DESCRIPTION: 'England',
+            },
+          },
+        ],
+      },
+    };
+
+    mockAxiosGet.mockResolvedValue(mockResponse);
+
+    const result = await getAddressesByPostcode('EL572RE');
+
+    expect(result).toEqual([
+      {
+        fullAddress: '456 Another Street',
+        addressLine1: '456 Another Street',
+        addressLine2: '',
+        addressLine3: '',
+        town: 'Elsewhere',
+        county: 'Else County',
+        postcode: 'EL57 2RE',
+        country: 'England',
+      },
+    ]);
   });
 
   it('should return an empty array if results are missing in response', async () => {

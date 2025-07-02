@@ -18,14 +18,8 @@ const content = {
   ...common,
   backUrl: '/steps/user-journey/enter-user-details',
 };
-export const ukPostcodePattern =
-  '^([Gg][Ii][Rr]\\s?0[Aa]{2})|' +
-  '((([A-Za-z][0-9]{1,2})|' +
-  '(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|' +
-  '(([A-Za-z][0-9][A-Za-z])|' +
-  '([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z]?))))\\s?[0-9][A-Za-z]{2})$';
-
-const postcodeRegex = new RegExp(ukPostcodePattern);
+export const partialUkPostcodePattern = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9]?[A-Z]{0,2}$/i;
+const postcodeRegex = new RegExp(partialUkPostcodePattern);
 
 const fields: FormFieldConfig[] = [
   { name: 'addressLine1', type: 'text', required: true, errorMessage: 'Enter address line 1' },
@@ -33,7 +27,13 @@ const fields: FormFieldConfig[] = [
   { name: 'addressLine3', type: 'text', required: false },
   { name: 'town', type: 'text', required: true, errorMessage: 'Enter the town or city' },
   { name: 'county', type: 'text', required: false },
-  { name: 'postcode', type: 'text', required: true, errorMessage: 'Enter the postcode', pattern: ukPostcodePattern },
+  {
+    name: 'postcode',
+    type: 'text',
+    required: true,
+    errorMessage: 'Enter the postcode',
+    pattern: partialUkPostcodePattern.source,
+  },
   { name: 'country', type: 'text', required: false, errorMessage: 'Enter the country' },
 ];
 
@@ -64,7 +64,7 @@ export const step: StepDefinition = {
           return res.status(400).render('steps/userJourney/enterAddress.njk', {
             ...content,
             ...req.body,
-            error: 'Enter a valid UK postcode to look up your address',
+            error: 'Enter a valid or partial UK postcode',
           });
         }
 
