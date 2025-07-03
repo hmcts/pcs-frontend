@@ -91,7 +91,6 @@ export class WizardEngine {
   }
 
   private setStore(storeType: string) {
-     
     const storeModule = require(`./storage/${storeType}Store`);
     const factoryName = `${storeType}Store`;
     const storeFactory = (storeModule[factoryName] ?? storeModule.default) as (slug: string) => JourneyStore;
