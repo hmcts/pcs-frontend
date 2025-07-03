@@ -133,7 +133,7 @@
   },
   "config": {
     "store": {
-      "type": "redis"
+      "type": "session"
     },
     "auth": {
       "required": true
