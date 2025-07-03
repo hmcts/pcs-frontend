@@ -127,7 +127,7 @@ export const JourneySchema = z
       .object({
         store: z
           .object({
-            type: z.enum(['session', 'database', 'redis', 'memory']).default('session'),
+            type: z.enum(['session', 'database', 'redis', 'memory', 'ccd']).default('session'),
             options: z.record(z.string(), z.unknown()).optional(),
           })
           .optional(),
