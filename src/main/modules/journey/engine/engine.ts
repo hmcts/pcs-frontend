@@ -8,7 +8,7 @@ import express, { NextFunction, Request, Response, Router } from 'express';
 import { oidcMiddleware } from '../../../middleware/oidc';
 
 import { FieldConfig, JourneyConfig, JourneySchema, StepConfig } from './schema';
-import { JourneyStore } from './storage/index';
+import { type JourneyStore } from './storage/index';
 import { JourneyValidator } from './validation';
 
 // Extend Express Request interface
@@ -45,14 +45,17 @@ export class WizardEngine {
   public readonly basePath: string;
   private readonly validator: JourneyValidator;
   private static validatedJourneys: Map<string, JourneyConfig> = new Map();
+  private readonly store!: JourneyStore;
 
   logger = Logger.getLogger('WizardEngine');
 
   constructor(
     filePath: string,
-    private readonly store: JourneyStore,
     slug: string
   ) {
+
+    let storeType;
+
     // Check if we already have a validated journey for this slug
     const cachedJourney = WizardEngine.validatedJourneys.get(slug);
     if (cachedJourney) {
@@ -60,6 +63,9 @@ export class WizardEngine {
       this.slug = slug;
       this.basePath = `/${slug}`;
       this.validator = new JourneyValidator();
+      // Initialise the store based on cached journey config
+      storeType = this.journey.config?.store?.type ?? 'session';
+      this.store = this.setStore(storeType);
       return;
     }
 
@@ -84,6 +90,19 @@ export class WizardEngine {
     this.slug = slug;
     this.basePath = `/${slug}`;
     this.validator = new JourneyValidator();
+    storeType = this.journey.config?.store?.type ?? 'session';
+    this.store = this.setStore(storeType);
+  }
+
+  private setStore(storeType: string) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const storeModule = require(`./storage/${storeType}Store`);
+    const factoryName = `${storeType}Store`;
+    const storeFactory = (storeModule[factoryName] ?? storeModule.default) as (slug: string) => JourneyStore;
+    if (!storeFactory) {
+      throw new Error(`Store implementation for type "${this.journey.config?.store?.type}" not found`);
+    }
+    return storeFactory(this.slug);
   }
 
   // Simplified next step resolution
@@ -433,6 +452,9 @@ export class WizardEngine {
 
         this.logger.info('ISENABLED ===>> LaunchDarkly Flag Evaluation', { context, keyToCheck });
 
+        const flags = await ldClient.allFlagsState(context);
+        this.logger.info('FLAGS ===>> LaunchDarkly ALLLLL Flag Evaluation', flags.allValues(), flags.toJSON());
+
         // If the flag does not exist LD will return the default (true) so UI remains visible by default.
         return await ldClient.variation(keyToCheck, context, true);
       } catch (err) {
@@ -482,9 +504,11 @@ export class WizardEngine {
       let prevStep = { id: prevId, ...this.journey.steps[prevId] } as StepConfig;
       prevStep = await this.applyLaunchDarklyFlags(prevStep, req);
 
+      const firstStepId = Object.keys(this.journey.steps)[0];
       const hasVisibleFields = prevStep.fields ? Object.keys(prevStep.fields).length > 0 : false;
       this.logger.info('Checking prev step visibility', { prevId, fields: prevStep.fields, hasVisibleFields });
-      if (hasVisibleFields) {
+
+      if (prevId === firstStepId || hasVisibleFields) {
         return prevId;
       }
 
@@ -565,7 +589,7 @@ export class WizardEngine {
     router.param('step', (req: Request, res: Response, next: NextFunction, stepId: string) => {
       const step = this.journey.steps[stepId];
       if (!step) {
-        return res.status(404).send('Unknown step');
+        return res.status(404).render('not-found');
       }
       (req as RequestWithStep).step = { id: stepId, ...step };
       next();
@@ -581,13 +605,14 @@ export class WizardEngine {
       this.logger.info('LaunchDarkly Flag Evaluation', { step });
 
       try {
-        const { data } = await this.store.load(req, Number(caseId));
+        const { data } = await this.store.load(req, caseId);
 
-        // Auto-skip steps that have no visible fields after LaunchDarkly filtering
-        if (
-          (step.type === 'form' || (!step.type && step.fields)) &&
-          (!step.fields || Object.keys(step.fields).length === 0)
-        ) {
+        // Auto-skip only if the original step had fields but all of them are now hidden
+        const originalFields = this.journey.steps[step.id]?.fields;
+        const originallyHadFields = originalFields && Object.keys(originalFields).length > 0;
+        const nowHasNoFields = !step.fields || Object.keys(step.fields).length === 0;
+
+        if (originallyHadFields && nowHasNoFields) {
           const nextId = this.resolveNext(step, data);
           if (nextId && nextId !== step.id) {
             return res.redirect(`${this.basePath}/${nextId}`);
@@ -630,7 +655,6 @@ export class WizardEngine {
 
         res.render(await this.resolveTemplatePath(step.id), {
           ...context,
-          // Legacy compatibility
           data: context.data,
           errors: null,
           allData: context.allData,
@@ -650,21 +674,13 @@ export class WizardEngine {
       step = await this.applyLdOverride(step, req);
       step = await this.applyLaunchDarklyFlags(step, req);
 
-      // Auto-skip steps that have no visible fields after LaunchDarkly filtering
-      if (
-        (step.type === 'form' || (!step.type && step.fields)) &&
-        (!step.fields || Object.keys(step.fields).length === 0)
-      ) {
-        const { data } = await this.store.load(req, Number(caseId));
-        const nextId = this.resolveNext(step, data);
-        return res.redirect(`${this.basePath}/${nextId}`);
-      }
+      // We don't skip steps during POST; validation will pass for visible fields
 
       // Validate using Zod-based validation
       const validationResult = this.validator.validate(step, req.body);
 
       if (!validationResult.success) {
-        const { data } = await this.store.load(req, Number(caseId));
+        const { data } = await this.store.load(req, caseId);
         // Reconstruct nested date fields from req.body for template
         const reconstructedData = { ...req.body };
         if (step.fields) {
@@ -697,8 +713,8 @@ export class WizardEngine {
       }
 
       try {
-        const { version } = await this.store.load(req, Number(caseId));
-        const { data: merged } = await this.store.save(req, Number(caseId), version, {
+        const { version } = await this.store.load(req, caseId);
+        const { data: merged } = await this.store.save(req, caseId, version, {
           [step.id]: validationResult.data || {},
         });
 
@@ -707,10 +723,10 @@ export class WizardEngine {
 
         // If transitioning to a confirmation step, generate reference number
         if (nextStep?.type === 'confirmation' && nextStep.data?.referenceNumber) {
-          const referenceNumber = await this.store.generateReference(req, this.slug, Number(caseId));
+          const referenceNumber = await this.store.generateReference(req, this.slug, caseId);
 
           // Save the generated reference to the confirmation step data
-          await this.store.save(req, Number(caseId), version + 1, {
+          await this.store.save(req, caseId, version + 1, {
             [nextId]: { referenceNumber },
           });
         }

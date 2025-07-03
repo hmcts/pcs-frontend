@@ -7,6 +7,9 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
  * @param next
  */
 export const oidcMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
+  // eslint-disable-next-line no-console
+  console.log('OIDC MIDDLEWARE ===>>', req.session);
+
   if (req.session?.user) {
     req.app.locals.nunjucksEnv.addGlobal('user', req.session.user);
     return next();
