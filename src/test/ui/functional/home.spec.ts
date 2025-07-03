@@ -9,13 +9,15 @@ import { initVerificationHelper, performVerification } from '../common/helpers/e
 
 const { constants } = require('../common/data');
 
-const test_url = (process.env.TEST_URL as string) || config.get('e2e.testUrl');
+const test_url: string = config.get('e2e.testURL');
 
 test.beforeEach(async ({ page }) => {
+  await test.step("Navigating to Home Page", async () => {
+    await page.goto(test_url);
+  });
   initActionHelper(page);
   await parentSuite('Home Page');
   initVerificationHelper(page);
-  await page.goto(test_url);
   await loginHelper.login(page);
 });
 
