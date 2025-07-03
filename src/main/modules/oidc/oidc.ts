@@ -30,11 +30,6 @@ export class OIDCModule {
 
       // Create the client configuration with the server discovery
       this.clientConfig = await client.discovery(issuer, clientId, clientSecret);
-
-      this.logger.info(
-        'Client configuration created with metadata:',
-        JSON.stringify(this.clientConfig.serverMetadata(), null, 2)
-      );
     } catch (error) {
       this.logger.error('Failed to setup OIDC client:', error);
       throw new OIDCAuthenticationError('Failed to initialize OIDC client');

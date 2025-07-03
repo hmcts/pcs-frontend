@@ -4,15 +4,14 @@ import { type JourneyStore } from './journeyStore.interface';
 
 // Provide typed structure for session
 interface TypedSession {
-  [key: string]: unknown; // Base session properties
-  [caseId: number]: {
+  [caseId: string]: {
     [slug: string]: Record<string, unknown>;
   };
 }
 
 export const sessionStore = (slug: string): JourneyStore => {
   return {
-    async load(req: Request, caseId: number) {
+    async load(req: Request, caseId: string) {
       // Create structure if needed
       const session = req.session as unknown as TypedSession;
 
@@ -24,7 +23,7 @@ export const sessionStore = (slug: string): JourneyStore => {
       return { data, version: 0 };
     },
 
-    async save(req: Request, caseId: number, version: number, patch: Record<string, unknown>) {
+    async save(req: Request, caseId: string, version: number, patch: Record<string, unknown>) {
       // Create structure if needed
       const session = req.session as unknown as TypedSession;
 
@@ -39,7 +38,7 @@ export const sessionStore = (slug: string): JourneyStore => {
       return { data: merged, version };
     },
 
-    async generateReference(_req: Request, journeySlug: string, caseId: number) {
+    async generateReference(_req: Request, journeySlug: string, caseId: string) {
       const prefix = journeySlug === 'possession-claim' ? 'PCR' : 'REF';
       return `${prefix}-${Date.now()}-${caseId}`;
     },
