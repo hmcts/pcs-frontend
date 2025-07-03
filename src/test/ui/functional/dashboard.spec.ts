@@ -12,7 +12,7 @@ const test_url: string = config.get('e2e.testURL');
 test.beforeEach(async ({ page }, testInfo) => {
   const dashboardURL = test_url + '/dashboard/1';
   await testInfo.attach('Page URL', {
-    body: page.url(),
+    body: dashboardURL,
     contentType: 'text/plain',
   });
   initActionHelper(page);
