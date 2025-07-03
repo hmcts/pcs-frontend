@@ -49,11 +49,7 @@ export class WizardEngine {
 
   logger = Logger.getLogger('WizardEngine');
 
-  constructor(
-    filePath: string,
-    slug: string
-  ) {
-
+  constructor(filePath: string, slug: string) {
     let storeType;
 
     // Check if we already have a validated journey for this slug
@@ -95,7 +91,7 @@ export class WizardEngine {
   }
 
   private setStore(storeType: string) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const storeModule = require(`./storage/${storeType}Store`);
     const factoryName = `${storeType}Store`;
     const storeFactory = (storeModule[factoryName] ?? storeModule.default) as (slug: string) => JourneyStore;
