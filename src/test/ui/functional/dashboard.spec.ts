@@ -9,15 +9,17 @@ import { initVerificationHelper, performVerification } from '../common/helpers/e
 
 const test_url: string = config.get('e2e.testURL');
 
-test.beforeEach(async ({ page }) => {
-  await test.step('Navigating to Home Page', async () => {
-    await page.goto(test_url);
+test.beforeEach(async ({ page }, testInfo) => {
+  const dashboardURL = test_url + '/dashboard/1';
+  await testInfo.attach('Page URL', {
+    body: dashboardURL,
+    contentType: 'text/plain',
   });
   initActionHelper(page);
   await parentSuite('Home Page');
   initVerificationHelper(page);
+  page.goto(test_url);
   await loginHelper.login(page);
-  const dashboardURL = test_url + '/dashboard/1';
   await page.goto(dashboardURL);
 });
 

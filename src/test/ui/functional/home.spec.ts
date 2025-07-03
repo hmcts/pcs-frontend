@@ -11,10 +11,13 @@ const { constants } = require('../common/data');
 
 const test_url: string = config.get('e2e.testURL');
 
-test.beforeEach(async ({ page }) => {
-  await test.step('Navigating to Home Page', async () => {
-    await page.goto(test_url);
+test.beforeEach(async ({ page }, testInfo) => {
+  await testInfo.attach('Page URL', {
+    body: test_url,
+    contentType: 'text/plain',
   });
+  await page.goto(test_url);
+  console.log('Navigated to Home Page' + test_url);
   initActionHelper(page);
   await parentSuite('Home Page');
   initVerificationHelper(page);
