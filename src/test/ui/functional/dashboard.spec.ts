@@ -10,7 +10,7 @@ import { initVerificationHelper, performVerification } from '../common/helpers/e
 const test_url: string = config.get('e2e.testURL');
 
 test.beforeEach(async ({ page }) => {
-  await test.step("Navigating to Home Page", async () => {
+  await test.step('Navigating to Home Page', async () => {
     await page.goto(test_url);
   });
   initActionHelper(page);
