@@ -13,7 +13,7 @@ const test_url: string = config.get('e2e.testURL');
 
 test.beforeEach(async ({ page }, testInfo) => {
   await testInfo.attach('Page URL', {
-    body: test_url,
+    body: page.url(),
     contentType: 'text/plain',
   });
   await page.goto(test_url);
