@@ -32,21 +32,29 @@
           </div>
         </div>
       </form>
+
         {% if addressResults and addressResults.length > 0 %}
         {% set addressCount = addressResults.length %}
-        <form method="post" action="{{ url }}">
-          <div class="govuk-form-group">
+        <div class="govuk-form-group">
             <label class="govuk-label" for="selectedAddress">Select your address</label>
-            <select class="govuk-select govuk-!-width-three-quarters" id="selectedAddress" name="selectedAddressIndex">
+            <select class="govuk-select govuk-!-width-three-quarters" id="selectedAddress">
               <option value="">-- {{ addressCount }} address{% if addressCount != 1 %}es{% endif %} found --</option>
               {% for address in addressResults %}
-                <option value="{{ loop.index0 }}" {% if selectedAddressIndex|int == loop.index0 %}selected{% endif %}>{{ address.fullAddress }}</option>
+                <option
+                  value="{{ loop.index0 }}"
+                  data-line1="{{ address.addressLine1 }}"
+                  data-line2="{{ address.addressLine2 }}"
+                  data-line3="{{ address.addressLine3 }}"
+                  data-town="{{ address.town }}"
+                  data-county="{{ address.county }}"
+                  data-postcode="{{ address.postcode }}"
+                  {% if selectedAddressIndex|int == loop.index0 %}selected{% endif %}
+                >
+                  {{ address.fullAddress }}
+                </option>
               {% endfor %}
             </select>
-            <input type="hidden" name="action" value="select-address">
-            <button class="govuk-button govuk-button--secondary" type="submit">Use this address</button>
-          </div>
-        </form>
+        </div>
         {% endif %}
 
         {% set manualAddressHtml %}
