@@ -63,12 +63,13 @@ export const StepSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   type: z.enum(['form', 'summary', 'confirmation', 'ineligible', 'error', 'complete', 'success']).default('form'),
+  id: z.string().optional(),
   fields: z.record(z.string(), FieldSchema).optional(),
   next: z
     .union([
       z.string(),
       z.object({
-        when: z.string(),
+        when: z.any(),
         goto: z.string(),
         else: z.string().optional(),
       }),
@@ -216,11 +217,18 @@ export const JourneySchema = z
     { error: 'All steps must be reachable from the start step' }
   );
 
+// Parsed/validated type (all defaults applied)
+export type StepConfig = z.infer<typeof StepSchema> & { id: string };
+
+// Authoring/input type (fields optional before defaults)
+export type StepDraft = z.input<typeof StepSchema> & { id: string };
+
+export type JourneyDraft = z.input<typeof JourneySchema>;
+
 // Type inference
 export type ValidationRule = z.infer<typeof ValidationRuleSchema>;
 export type FieldOption = z.infer<typeof FieldOptionSchema>;
 export type FieldConfig = z.infer<typeof FieldSchema>;
-export type StepConfig = z.infer<typeof StepSchema> & { id: string };
 export type JourneyConfig = z.infer<typeof JourneySchema>;
 
 // Field validation schema factory
