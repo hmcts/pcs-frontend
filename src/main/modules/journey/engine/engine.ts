@@ -7,7 +7,7 @@ import express, { NextFunction, Request, Response, Router } from 'express';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
 
-import { FieldConfig, JourneyConfig, JourneySchema, StepConfig } from './schema';
+import { FieldConfig, JourneyConfig, JourneyDraft, JourneySchema, StepConfig } from './schema';
 import { type JourneyStore } from './storage/index';
 import { JourneyValidator } from './validation';
 
@@ -49,40 +49,24 @@ export class WizardEngine {
 
   logger = Logger.getLogger('WizardEngine');
 
-  constructor(filePath: string, slug: string) {
+  constructor(journeyConfig: JourneyDraft, slug: string) {
     let storeType;
 
-    // Check if we already have a validated journey for this slug
+    // If we already validated this slug, reuse it
     const cachedJourney = WizardEngine.validatedJourneys.get(slug);
     if (cachedJourney) {
       this.journey = cachedJourney;
-      this.slug = slug;
-      this.basePath = `/${slug}`;
-      this.validator = new JourneyValidator();
-      // Initialise the store based on cached journey config
-      storeType = this.journey.config?.store?.type ?? 'session';
-      this.store = this.setStore(storeType);
-      return;
+    } else {
+      // Validate the supplied TypeScript journey object
+      const parseResult = JourneySchema.safeParse(journeyConfig);
+      if (!parseResult.success) {
+        this.logger.error('Invalid journey configuration:', parseResult.error.issues);
+        throw new Error(`Invalid journey configuration for slug "${slug}": ${parseResult.error.issues[0]?.message}`);
+      }
+      this.journey = parseResult.data;
+      WizardEngine.validatedJourneys.set(slug, this.journey);
     }
 
-    // If not cached, load and validate the journey
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
-    // Validate and parse the journey JSON using Zod
-    const parseResult = JourneySchema.safeParse(raw);
-    if (!parseResult.success) {
-      this.logger.error(
-        'Invalid journey configuration:',
-        parseResult.error.issues,
-        `${filePath}: ${parseResult.error.issues[0]?.message}`
-      );
-      throw new Error(`Invalid journey configuration in ${filePath}: ${parseResult.error.issues[0]?.message}`);
-    }
-
-    // Store the validated journey in the static cache
-    WizardEngine.validatedJourneys.set(slug, parseResult.data);
-
-    this.journey = parseResult.data;
     this.slug = slug;
     this.basePath = `/${slug}`;
     this.validator = new JourneyValidator();
@@ -115,23 +99,21 @@ export class WizardEngine {
       return nxt.else || step.id;
     }
 
-    // Handle simple equality checks like "age == 'yes'"
-    const equalityMatch = nxt.when.match(/(\w+)\s*==\s*['"]([^'"]+)['"]/);
-    if (equalityMatch) {
-      const [, fieldName, expectedValue] = equalityMatch;
-      const actualValue = stepData[fieldName];
-      return actualValue === expectedValue ? nxt.goto : nxt.else || step.id;
+    // If when is a function, evaluate it directly
+    if (typeof nxt.when === 'function') {
+      try {
+        const conditionMet = (nxt.when as (sd: Record<string, unknown>, ad: Record<string, unknown>) => boolean)(
+          stepData ?? {},
+          allData ?? {}
+        );
+        return conditionMet ? nxt.goto : nxt.else || step.id;
+      } catch (err) {
+        this.logger.warn(`Error evaluating next.when() for step ${step.id}:`, err);
+        return nxt.else || step.id;
+      }
     }
 
-    // Handle array length checks like "grounds.length >= 1"
-    const lengthMatch = nxt.when.match(/(\w+)\.length\s*>=\s*(\d+)/);
-    if (lengthMatch) {
-      const [, fieldName, minLength] = lengthMatch;
-      const fieldValue = stepData[fieldName];
-      const length = Array.isArray(fieldValue) ? fieldValue.length : 0;
-      return length >= parseInt(minLength) ? nxt.goto : nxt.else || step.id;
-    }
-
+    // If we reach here and when is not a function (or threw), default to else or stay
     return nxt.else || step.id;
   }
 
@@ -141,30 +123,38 @@ export class WizardEngine {
       return stepId;
     }
 
-    // Use custom template if specified
+    // Use explicit template if author provided one
     if (step.template) {
       return step.template;
     }
 
-    // Try journey-specific template first
-    const regularPath = path.join(this.slug, stepId);
-    try {
-      const viewsDir = path.join(__dirname, '..', '..', '..', 'views');
-      const journeyTemplatePath = path.join(viewsDir, `${regularPath}.njk`);
-      await fs.promises.access(journeyTemplatePath);
-      return regularPath;
-    } catch {
-      // If no journey-specific template found, use default templates
-      if (step.type && ['summary', 'confirmation', 'ineligible', 'error', 'complete', 'success'].includes(step.type)) {
-        return `_defaults/${step.type}`;
+    const checkExists = async (candidate: string): Promise<boolean> => {
+      try {
+        await fs.promises.access(candidate);
+        return true;
+      } catch {
+        return false;
       }
-      // For regular steps with fields, use generic form template
-      if (step.fields && Object.keys(step.fields).length > 0) {
-        return '_defaults/form';
-      }
-      // If no specific template or default found, fall back to regular path
-      return regularPath;
+    };
+
+    // New DSL layout: journeys/<slug>/steps/<stepId>/<stepId>.njk (viewsDir may include journeys root)
+    const newPath = path.join(this.slug, 'steps', stepId, stepId);
+    const journeysRoot = path.join(__dirname, '..', '..', '..', 'journeys');
+    const newTemplate = path.join(journeysRoot, `${newPath}.njk`);
+    if (await checkExists(newTemplate)) {
+      return newPath;
     }
+
+    // If no journey-specific template found, use default templates
+    if (step.type && ['summary', 'confirmation', 'ineligible', 'error', 'complete', 'success'].includes(step.type)) {
+      return `_defaults/${step.type}`;
+    }
+    // For regular steps with fields, use generic form template
+    if (step.fields && Object.keys(step.fields).length > 0) {
+      return '_defaults/form';
+    }
+    // If no specific template or default found, fall back to regular path
+    return stepId;
   }
 
   // Build summary rows for summary pages
@@ -244,41 +234,21 @@ export class WizardEngine {
           continue;
         }
 
-        // Handle simple equality checks like "age == 'yes'"
-        const equalityMatch = next.when.match(/(\w+)\s*==\s*['"]([^'"]+)['"]/);
-        if (equalityMatch) {
-          const [, fieldName, expectedValue] = equalityMatch;
-          const actualValue = stepData[fieldName];
-
-          // Check if this step's goto leads to current step
-          if (next.goto === currentStepId && actualValue === expectedValue) {
+        // Handle functional conditions first
+        if (typeof next.when === 'function') {
+          const conditionMet = (next.when as (sd: Record<string, unknown>, ad: Record<string, unknown>) => boolean)(
+            stepData ?? {},
+            allData ?? {}
+          );
+          if (conditionMet && next.goto === currentStepId) {
             return stepId;
           }
-
-          // Check if this step's else leads to current step
-          if (next.else === currentStepId && actualValue !== expectedValue) {
+          if (!conditionMet && next.else === currentStepId) {
             return stepId;
           }
         }
 
-        // Handle array length checks like "grounds.length >= 1"
-        const lengthMatch = next.when.match(/(\w+)\.length\s*>=\s*(\d+)/);
-        if (lengthMatch) {
-          const [, fieldName, minLength] = lengthMatch;
-          const fieldValue = stepData[fieldName];
-          const length = Array.isArray(fieldValue) ? fieldValue.length : 0;
-          const meetsLength = length >= parseInt(minLength);
-
-          // Check if this step's goto leads to current step
-          if (next.goto === currentStepId && meetsLength) {
-            return stepId;
-          }
-
-          // Check if this step's else leads to current step
-          if (next.else === currentStepId && !meetsLength) {
-            return stepId;
-          }
-        }
+        // If next.when is not a function we cannot reliably determine previous; skip
       }
     }
 
