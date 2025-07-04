@@ -10,12 +10,20 @@ export class Journey {
   logger = Logger.getLogger('journey');
 
   enableFor(app: Express): void {
-    const journeyFiles = glob.sync(path.resolve(__dirname, '..', '..', 'journeys', '*.json'));
+    // Load all journeys defined by an `index.ts` (or .js) file inside each journey directory
+    const journeyFiles = glob.sync(
+      path.resolve(__dirname, '..', '..', 'journeys', '**', 'index.{ts,js}')
+    );
 
     journeyFiles.forEach(file => {
-      const slug = path.basename(file, path.extname(file));
+      // Slug is the parent directory name of the index file
+      const slug = path.basename(path.dirname(file));
 
-      const engine = new WizardEngine(file, slug);
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const journeyModule = require(file);
+      const journeyConfig = (journeyModule.default ?? journeyModule) as import('./engine/schema').JourneyConfig;
+
+      const engine = new WizardEngine(journeyConfig, slug);
       app.use(engine.basePath, engine.router());
 
       if (process.env.NODE_ENV !== 'test') {

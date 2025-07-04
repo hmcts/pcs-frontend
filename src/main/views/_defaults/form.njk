@@ -21,11 +21,11 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    
+
     {% if step.description %}
       <span class="govuk-caption-l">{{ step.description }}</span>
     {% endif %}
-    
+
     <h1 class="govuk-heading-l">{{ step.title }}</h1>
 
     {% if errors %}
@@ -36,7 +36,7 @@
           href: "#" + fieldName
         }]) %}
       {% endfor %}
-      
+
       {{ govukErrorSummary({
         titleText: "There is a problem",
         errorList: errorList
@@ -47,7 +47,7 @@
       {% for fieldName, fieldConfig in step.fields %}
         {% set fieldValue = data[fieldName] %}
         {% set fieldError = errors[fieldName] if errors else false %}
-        
+
         {% if fieldConfig.type == 'text' or fieldConfig.type == 'email' or fieldConfig.type == 'tel' %}
           {{ govukInput({
             id: fieldName,
@@ -63,7 +63,7 @@
             attributes: fieldConfig.attributes,
             errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
-          
+
         {% elif fieldConfig.type == 'textarea' %}
           {{ govukTextarea({
             id: fieldName,
@@ -78,7 +78,7 @@
             attributes: fieldConfig.attributes,
             errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
-          
+
         {% elif fieldConfig.type == 'radios' %}
           {% set radioItems = [] %}
           {% for option in fieldConfig.options %}
@@ -97,7 +97,7 @@
               }]) %}
             {% endif %}
           {% endfor %}
-          
+
           {{ govukRadios({
             idPrefix: fieldName,
             name: fieldName,
@@ -112,7 +112,7 @@
             items: radioItems,
             errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
-          
+
         {% elif fieldConfig.type == 'checkboxes' %}
           {% set checkboxItems = [] %}
           {% for option in fieldConfig.options %}
@@ -131,7 +131,7 @@
               }]) %}
             {% endif %}
           {% endfor %}
-          
+
           {{ govukCheckboxes({
             idPrefix: fieldName,
             name: fieldName,
@@ -146,7 +146,7 @@
             items: checkboxItems,
             errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
-          
+
         {% elif fieldConfig.type == 'select' %}
           {% set selectItems = [{ value: '', text: 'Choose an option' }] %}
           {% for option in fieldConfig.options %}
@@ -164,7 +164,7 @@
               }]) %}
             {% endif %}
           {% endfor %}
-          
+
           {{ govukSelect({
             id: fieldName,
             name: fieldName,
@@ -176,7 +176,7 @@
             items: selectItems,
             errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
-          
+
         {% elif fieldConfig.type == 'number' %}
           {{ govukInput({
             id: fieldName,
@@ -192,7 +192,7 @@
             attributes: fieldConfig.attributes,
             errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
           }) }}
-          
+
         {% elif fieldConfig.type == 'date' %}
           {{ govukDateInput({
             id: fieldName,
@@ -220,4 +220,4 @@
   </div>
 </div>
 
-{% endblock %} 
+{% endblock %}
