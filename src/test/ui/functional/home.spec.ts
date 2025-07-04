@@ -4,18 +4,20 @@ import { parentSuite } from 'allure-js-commons';
 import config from 'config';
 
 import { loginHelper } from '../common/helpers';
-import { initActionHelper } from '../common/helpers/element-helpers';
 import { initVerificationHelper, performVerification } from '../common/helpers/element-helpers/verification.helper';
 
 const { constants } = require('../common/data');
 
-const test_url = (process.env.TEST_URL as string) || config.get('e2e.testUrl');
+const test_url: string = config.get('e2e.testURL');
 
-test.beforeEach(async ({ page }) => {
-  initActionHelper(page);
+test.beforeEach(async ({ page }, testInfo) => {
   await parentSuite('Home Page');
-  initVerificationHelper(page);
+  await testInfo.attach('Page URL', {
+    body: test_url,
+    contentType: 'text/plain',
+  });
   await page.goto(test_url);
+  initVerificationHelper(page);
   await loginHelper.login(page);
 });
 
