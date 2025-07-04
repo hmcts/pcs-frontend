@@ -4,16 +4,18 @@ import config from 'config';
 
 import dashboard from '../common/data/dashboard';
 import { loginHelper } from '../common/helpers';
-import { initActionHelper } from '../common/helpers/element-helpers';
 import { initVerificationHelper, performVerification } from '../common/helpers/element-helpers/verification.helper';
 
-const test_url = config.get('e2e.testUrl') as string;
+const test_url: string = config.get('e2e.testURL');
 
-test.beforeEach(async ({ page }) => {
-  initActionHelper(page);
+test.beforeEach(async ({ page }, testInfo) => {
   await parentSuite('Home Page');
-  initVerificationHelper(page);
   const dashboardURL = test_url + '/dashboard/1';
+  await testInfo.attach('Page URL', {
+    body: dashboardURL,
+    contentType: 'text/plain',
+  });
+  initVerificationHelper(page);
   await page.goto(dashboardURL);
   await loginHelper.login(page);
 });
