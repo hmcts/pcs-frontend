@@ -6,78 +6,80 @@
 {% block content %}
 
   {{ govukBackLink({ text: "Back", href: backUrl }) }}
+   <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
+      <h1 class="govuk-heading-l">Check your details before submitting</h1>
 
-  <h1 class="govuk-heading-l">Check your details before submitting</h1>
-
-  {{ govukSummaryList({
-    rows: [
-      {
-        key: {
-          text: "First name"
-        },
-        value: {
-          text: userDetails.applicantForename
-        },
-        actions: {
-          items: [
-            {
-              href: "/steps/user-journey/enter-user-details",
-              text: "Change",
-              visuallyHiddenText: "first name"
+      {{ govukSummaryList({
+        rows: [
+          {
+            key: {
+              text: "First name"
+            },
+            value: {
+              text: userDetails.applicantForename
+            },
+            actions: {
+              items: [
+                {
+                  href: "/steps/user-journey/enter-user-details",
+                  text: "Change",
+                  visuallyHiddenText: "first name"
+                }
+              ]
             }
-          ]
-        }
-      },
-      {
-        key: {
-          text: "Last name"
-        },
-        value: {
-          text: userDetails.applicantSurname
-        },
-        actions: {
-          items: [
-            {
-              href: "/steps/user-journey/enter-user-details",
-              text: "Change",
-              visuallyHiddenText: "last name"
+          },
+          {
+            key: {
+              text: "Last name"
+            },
+            value: {
+              text: userDetails.applicantSurname
+            },
+            actions: {
+              items: [
+                {
+                  href: "/steps/user-journey/enter-user-details",
+                  text: "Change",
+                  visuallyHiddenText: "last name"
+                }
+              ]
             }
-          ]
-        }
-      },
-      {
-        key: {
-          text: "Address"
-        },
-        value: {
-          html: ([
-            address.addressLine1,
-            address.addressLine2,
-            address.addressLine3,
-            address.town,
-            address.county,
-            address.postcode,
-            address.country
-          ] | reject("falsy") | join("<br>"))
-        },
-        actions: {
-          items: [
-            {
-              href: "/steps/user-journey/enter-address",
-              text: "Change",
-              visuallyHiddenText: "your address"
+          },
+          {
+            key: {
+              text: "Address"
+            },
+            value: {
+              html: ([
+                address.addressLine1,
+                address.addressLine2,
+                address.addressLine3,
+                address.town,
+                address.county,
+                address.postcode,
+                address.country
+              ] | reject("falsy") | join("<br>"))
+            },
+            actions: {
+              items: [
+                {
+                  href: "/steps/user-journey/enter-address",
+                  text: "Change",
+                  visuallyHiddenText: "your address"
+                }
+              ]
             }
-          ]
-        }
-      }
-    ]
-  }) }}
+          }
+        ]
+      }) }}
 
-  <form method="post" action="{{ url }}">
-    {{ govukButton({
-      text: "Submit"
-    }) }}
-  </form>
-
+      <form method="post" action="{{ url }}">
+        {{ govukButton({
+          text: "Submit"
+        }) }}
+      </form>
+  </div>
+</div>
 {% endblock %}

@@ -3,11 +3,15 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block content %}
-  {{ govukPanel({
-    titleText: "Application submitted",
-    html: "Your application has been received."
-  }) }}
-  <form method="post" action="{{ url }}">
-    {{ govukButton({ text: "Start a new application" }) }}
-  </form>
+ <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govukPanel({
+        titleText: "Application submitted",
+        html: "Your application has been received."
+      }) }}
+      <form method="post" action="{{ url }}">
+        {{ govukButton({ text: "Start a new application" }) }}
+      </form>
+  </div>
+</div>
 {% endblock %}
