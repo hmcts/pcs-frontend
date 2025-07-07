@@ -8,7 +8,7 @@ import { initVerificationHelper, performVerification } from '../common/helpers/e
 
 const { constants } = require('../common/data');
 
-const test_url: string = config.get('e2e.testURL');
+const test_url: string = config.get('e2e.testUrl');
 
 test.beforeEach(async ({ page }, testInfo) => {
   await parentSuite('Home Page');
@@ -16,8 +16,8 @@ test.beforeEach(async ({ page }, testInfo) => {
     body: test_url,
     contentType: 'text/plain',
   });
-  await page.goto(test_url);
   initVerificationHelper(page);
+  await page.goto(test_url);
   await loginHelper.login(page);
 });
 
