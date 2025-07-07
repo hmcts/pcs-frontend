@@ -5,9 +5,9 @@ import { request, retriedRequest } from './rest.helper';
 import { TestConfig, UserData } from './testConfig';
 
 const testConfig = config.get<TestConfig>('e2e');
-const username = config.get<string>('secrets.pcs.pcs-frontend-idam-system-username');
-const password = config.get<string>('secrets.pcs.pcs-frontend-idam-system-password');
-const clientSecret = config.get<string>('secrets.pcs.pcs-frontend-idam-secret');
+const username = config.get<string>('e2e.secrets.pcs-frontend-idam-system-username');
+const password = config.get<string>('e2e.secrets.pcs-frontend-idam-system-password');
+const clientSecret = config.get<string>('e2e.secrets.pcs-frontend-idam-secret');
 
 export async function getAccessTokenFromIdam(): Promise<string> {
   const details = {
