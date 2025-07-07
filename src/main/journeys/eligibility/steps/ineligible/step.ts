@@ -7,4 +7,4 @@ const step: StepDraft = {
   description: 'You must be 18 or over to use this service',
 };
 
-export default step; 
+export default step;

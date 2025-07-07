@@ -8,4 +8,4 @@ const step: StepDraft = {
   next: 'page2',
 };
 
-export default step; 
+export default step;

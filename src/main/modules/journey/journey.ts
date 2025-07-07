@@ -11,15 +11,12 @@ export class Journey {
 
   enableFor(app: Express): void {
     // Load all journeys defined by an `index.ts` (or .js) file inside each journey directory
-    const journeyFiles = glob.sync(
-      path.resolve(__dirname, '..', '..', 'journeys', '**', 'index.{ts,js}')
-    );
+    const journeyFiles = glob.sync(path.resolve(__dirname, '..', '..', 'journeys', '**', 'index.{ts,js}'));
 
     journeyFiles.forEach(file => {
       // Slug is the parent directory name of the index file
       const slug = path.basename(path.dirname(file));
 
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const journeyModule = require(file);
       const journeyConfig = (journeyModule.default ?? journeyModule) as import('./engine/schema').JourneyConfig;
 

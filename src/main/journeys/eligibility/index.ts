@@ -1,12 +1,12 @@
 import { JourneyDraft } from '../../modules/journey/engine/schema';
 
-import start from './steps/start/step';
-import page2 from './steps/page2/step';
+import confirmation from './steps/confirmation/step';
 import ineligible from './steps/ineligible/step';
+import page2 from './steps/page2/step';
 import page3 from './steps/page3/step';
 import page4 from './steps/page4/step';
+import start from './steps/start/step';
 import summary from './steps/summary/step';
-import confirmation from './steps/confirmation/step';
 
 const journey: JourneyDraft = {
   meta: {
@@ -33,4 +33,4 @@ const journey: JourneyDraft = {
   },
 };
 
-export default journey; 
+export default journey;

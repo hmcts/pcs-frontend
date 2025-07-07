@@ -54,4 +54,4 @@ const step: StepDraft = {
   },
 };
 
-export default step; 
+export default step;

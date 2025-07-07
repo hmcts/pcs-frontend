@@ -33,4 +33,4 @@ const step: StepDraft = {
   next: 'summary',
 };
 
-export default step; 
+export default step;

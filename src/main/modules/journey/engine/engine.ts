@@ -50,8 +50,6 @@ export class WizardEngine {
   logger = Logger.getLogger('WizardEngine');
 
   constructor(journeyConfig: JourneyDraft, slug: string) {
-    let storeType;
-
     // If we already validated this slug, reuse it
     const cachedJourney = WizardEngine.validatedJourneys.get(slug);
     if (cachedJourney) {
@@ -70,7 +68,7 @@ export class WizardEngine {
     this.slug = slug;
     this.basePath = `/${slug}`;
     this.validator = new JourneyValidator();
-    storeType = this.journey.config?.store?.type ?? 'session';
+    const storeType = this.journey.config?.store?.type ?? 'session';
     this.store = this.setStore(storeType);
   }
 
