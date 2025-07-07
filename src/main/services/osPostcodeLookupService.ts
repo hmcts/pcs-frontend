@@ -40,7 +40,6 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
           DEPENDENT_LOCALITY = '',
           DOUBLE_DEPENDENT_LOCALITY = '',
           POST_TOWN,
-          LOCAL_CUSTODIAN_CODE_DESCRIPTION = '',
           POSTCODE,
           COUNTRY_CODE_DESCRIPTION = '',
         } = DPA;
@@ -75,7 +74,6 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
           addressLine2,
           addressLine3,
           town: POST_TOWN,
-          county: LOCAL_CUSTODIAN_CODE_DESCRIPTION,
           postcode: POSTCODE,
           country: COUNTRY_CODE_DESCRIPTION,
         };
