@@ -14,9 +14,9 @@
       "pcs-frontend-idam-system-password": "IDAM_SYSTEM_PASSWORD",
       "pcs-idam-test-user-password": "PCS_IDAM_TEST_USER_PASSWORD",
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
+    },
+    "claimFormTestData": {
+      "pageRoute": "/steps/page1"
     }
-  },
-  "claimFormTestData": {
-    "pageRoute": "/steps/page1"
   }
 }
