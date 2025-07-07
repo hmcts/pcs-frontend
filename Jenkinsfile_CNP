@@ -24,12 +24,13 @@ def secrets = [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
     secret('idam-system-user-name', 'IDAM_SYSTEM_USERNAME'),
     secret('idam-system-user-password', 'IDAM_SYSTEM_PASSWORD'),
-    secret('pcs-frontend-idam-user-temp-password', 'PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD')
+    secret('pcs-idam-test-user-password', 'PCS_IDAM_TEST_USER_PASSWORD')
   ]
 ]
 
 withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
+  NODE_CONFIG_ENV=test;
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
