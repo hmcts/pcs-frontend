@@ -19,6 +19,7 @@ export interface CcdUserCases {
 export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
+  pcqId?: string;
   propertyAddress?: {
     AddressLine1: string;
     AddressLine2: string;
