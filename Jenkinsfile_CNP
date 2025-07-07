@@ -30,7 +30,7 @@ def secrets = [
 
 withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
-  NODE_CONFIG_ENV=test,
+  env.NODE_CONFIG_ENV = 'test'
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
