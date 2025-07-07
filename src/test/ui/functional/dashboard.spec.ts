@@ -6,7 +6,7 @@ import dashboard from '../common/data/dashboard';
 import { loginHelper } from '../common/helpers';
 import { initVerificationHelper, performVerification } from '../common/helpers/element-helpers/verification.helper';
 
-const test_url: string = config.get('e2e.testURL');
+const test_url: string = config.get('e2e.testUrl');
 
 test.beforeEach(async ({ page }, testInfo) => {
   await parentSuite('Home Page');
