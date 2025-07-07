@@ -23,15 +23,15 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-316.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-316"
+    "url": "https://ccd-data-store-api-pcs-api-pr-340.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-340"
   },
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
   },
   "pcq": {
     "name": "Equality and Diversity Service",
-    "url": "'https://pcq.aat.platform.hmcts.net",
+    "url": "https://pcq.aat.platform.hmcts.net",
     "path": "/service-endpoint",
     "port": 4000,
     "tokenKey": "PCQ_TOKEN_KEY"
