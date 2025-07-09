@@ -3,9 +3,9 @@ import { test } from '@playwright/test';
 import { parentSuite } from 'allure-js-commons';
 import config from 'config';
 
-import { initializeExecutor, performAction } from '../utils/test-executor';
+import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-// const { constants } = require('../utils/data');
+const { constants } = require('../data');
 
 const test_url: string = config.get('e2e.testUrl');
 
@@ -16,10 +16,10 @@ test.beforeEach(async ({ page }, testInfo) => {
     contentType: 'text/plain',
   });
   initializeExecutor(page);
-  await performAction('login', 'newIdamUser');
+  await performAction('login', 'citizen');
 });
 
 test('Idam Login @accessibility @PR @nightly', async ({ page }) => {
-  // await performVerification('verifyPageTitle', constants.homePage.title);
+  await performValidation('pageTitle', { title: constants.homePage.title });
   await new AxeUtils(page).audit();
 });

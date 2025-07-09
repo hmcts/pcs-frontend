@@ -2,36 +2,34 @@ import { test } from '@playwright/test';
 import { parentSuite } from 'allure-js-commons';
 import config from 'config';
 
-// import dashboard from '../utils/data/dashboard';
-import { initializeExecutor, performAction } from '../utils/test-executor';
+import dashboard from '../data/dashboard';
+import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const test_url: string = config.get('e2e.testURL');
+const dashboardURL: string = config.get('dashboard.pageUrl');
 
 test.beforeEach(async ({ page }, testInfo) => {
   await parentSuite('Home Page');
-  const dashboardURL = test_url + '/dashboard/1';
   await testInfo.attach('Page URL', {
     body: dashboardURL,
     contentType: 'text/plain',
   });
   initializeExecutor(page);
-  // initVerificationHelper(page);
-  await performAction('login', 'newIdamUser');
+  await performAction('login', 'citizen');
+  await performAction('NavigateToPage', dashboardURL);
 });
 
 test.describe('Verify Notifications and Tasks on Dashboard @PR @nightly', async () => {
   test('Verify hearing notification', async () => {
-    // const notification = dashboard.responseTimeElapsed('28');
-    // await performVerification('dashboardNotification', notification.title, notification.content);
+    const notification = dashboard.responseTimeElapsed('28');
+    await performValidation('dashboardNotification', { title: notification.title, content: notification.content });
   });
   test('Verify Pay Hearing Fee task', async () => {
-    // const payTheHearingFeeTaskList = dashboard.payTheHearingFee('28 June 2025', '4:00');
-    // await performVerification(
-    //   'TaskListItem',
-    //   payTheHearingFeeTaskList.title,
-    //   'Action needed',
-    //   'true',
-    //   payTheHearingFeeTaskList.deadline
-    // );
+    const payTheHearingFeeTaskList = dashboard.payTheHearingFee('28 June 2025', '4:00');
+    await performValidation('TaskListItem', {
+      title: payTheHearingFeeTaskList.title,
+      status: 'Action needed',
+      taskHasLink: true,
+      deadline: payTheHearingFeeTaskList.deadline,
+    });
   });
 });
