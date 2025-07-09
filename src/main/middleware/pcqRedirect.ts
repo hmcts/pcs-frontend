@@ -4,36 +4,37 @@ import config from 'config';
 import { NextFunction, Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 
+import { ccdCaseService } from '../services/ccdCaseService';
 import { createToken } from '../services/pcq/createToken';
-// import { ccdCaseService } from '../services/ccdCaseService';
 
 const logger = Logger.getLogger('pcqRedirectMiddleware');
 
 export function pcqRedirectMiddleware() {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const tokenKey: string = config.get('pcq.tokenKey');
+    // TODO: Set pcq.enabled back to TRUE and remove this when we actually onboard with PCQ
+    const pcqEnabled = config.get<boolean>('pcq.enabled');
+    if (!pcqEnabled) {
+      logger.warn('PCQ is not enabled.');
+      return next();
+    }
+
+    const tokenKey: string = config.get<string>('secrets.pcs.pcs-pcq-token-key');
     const pcqUrl = config.get('pcq.url');
     const pcqPath = config.get('pcq.path');
     const healthUrl = `${pcqUrl}/health`;
+    const serviceId = config.get<string>('pcq.serviceId');
+    const actor = config.get<string>('pcq.actor');
 
     const ccdCase = req.session?.ccdCase;
     const user = req.session?.user;
-
-    logger.info('calling pcqRedirectMiddleware============= ');
-
-    if (!tokenKey) {
-      logger.warn('PCQ token key is not configured.');
-      return next();
-    }
 
     if (!ccdCase?.id || !user?.accessToken) {
       logger.warn('Missing CCD case or user session  skipping PCQ redirect');
       return next();
     }
 
-    // Already has a PCQ ID – skip redirect
-    if (ccdCase.data?.pcqId) {
-      logger.info(`PCQ id found ${ccdCase.data?.pcqId}`);
+    if (ccdCase.data?.userPcqIdSet === 'Yes') {
+      logger.info(`PCQ id found ${ccdCase.data?.userPcqIdSet}`);
       return next();
     }
 
@@ -50,20 +51,17 @@ export function pcqRedirectMiddleware() {
     }
 
     const pcqId = uuid();
-    logger.info(`Create a new pcqId => ${pcqId}`);
-    // const protocol = req.app.locals?.developmentMode ? 'http://' : '';
-    // const port = req.app.locals?.developmentMode ? `:${config.get('port')}` : '';
 
     const partyId = encodeURIComponent(user.email || '');
     const returnUrl = `${req.protocol}://${req.get('host')}/steps/user-journey/summary`;
 
     const params = {
-      serviceId: 'PCS',
-      actor: 'APPLICANT',
+      serviceId,
+      actor,
       pcqId,
       partyId,
       returnUrl,
-      language: 'en',
+      language: 'en', // TODO: update the language when the translation is implemented
       ccdCaseId: ccdCase.id,
     };
 
@@ -73,21 +71,20 @@ export function pcqRedirectMiddleware() {
       token,
     };
 
-    // Save PCQ ID to CCD
-    // try {
-    //   const updatedCase = await ccdCaseService.updateCase(user.accessToken, {
-    //     id: ccdCase.id,
-    //     data: {
-    //       ...ccdCase.data,
-    //       pcqId,
-    //     },
-    //   });
+    try {
+      const updatedCase = await ccdCaseService.updateCase(user.accessToken, {
+        id: ccdCase.id,
+        data: {
+          ...ccdCase.data,
+          userPcqId: pcqId,
+        },
+      });
 
-    //   req.session.ccdCase = updatedCase;
-    // } catch (err) {
-    //   logger.error('Failed to update CCD with PCQ ID:', err);
-    //   return next();
-    // }
+      req.session.ccdCase = updatedCase;
+    } catch (err) {
+      logger.error('Failed to update CCD with PCQ ID:', err);
+      return next();
+    }
 
     await new Promise<void>((resolve, reject) => {
       req.session.save(err => {
@@ -97,7 +94,7 @@ export function pcqRedirectMiddleware() {
         }
 
         const qs = new URLSearchParams(redirectQuery).toString();
-        logger.info(`Redirect to URL : ${pcqUrl}${pcqPath}?${qs}`);
+        logger.info(`Redirect to PCQ URL : ${pcqUrl}${pcqPath}?${qs}`);
         res.redirect(`${pcqUrl}${pcqPath}?${qs}`);
         return resolve();
       });

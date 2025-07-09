@@ -1,3 +1,4 @@
+import config from 'config';
 import * as express from 'express';
 import helmet from 'helmet';
 
@@ -25,6 +26,13 @@ export class Helmet {
       scriptSrc.push("'unsafe-eval'");
     }
 
+    const formAction = [self];
+
+    const pcqDomain: string = config.get('pcq.url');
+    if (pcqDomain) {
+      formAction.push(pcqDomain);
+    }
+
     app.use(
       helmet({
         contentSecurityPolicy: {
@@ -37,6 +45,7 @@ export class Helmet {
             scriptSrc,
             styleSrc: [self],
             manifestSrc: [self],
+            formAction: [self, pcqDomain],
           },
         },
         referrerPolicy: { policy: 'origin' },

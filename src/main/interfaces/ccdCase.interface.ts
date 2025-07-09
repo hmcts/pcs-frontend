@@ -19,7 +19,8 @@ export interface CcdUserCases {
 export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
-  pcqId?: string;
+  userPcqId?: string;
+  userPcqIdSet?: string;
   propertyAddress?: {
     AddressLine1: string;
     AddressLine2: string;
