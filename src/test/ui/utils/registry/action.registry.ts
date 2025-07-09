@@ -1,4 +1,5 @@
 import { LoginAction } from '../actions/custom-actions/login.action';
+import { NavigateAction } from '../actions/custom-actions/navigate.action';
 import { CheckAction } from '../actions/element-actions/check.action';
 import { ClickAction } from '../actions/element-actions/click.action';
 import { FillAction } from '../actions/element-actions/fill.action';
@@ -10,6 +11,7 @@ export class ActionRegistry {
     ['fill', new FillAction()],
     ['check', new CheckAction()],
     ['login', new LoginAction()],
+    ['NavigateToPage', new NavigateAction()],
   ]);
 
   static getAction(actionName: string): IAction {
@@ -20,10 +22,6 @@ export class ActionRegistry {
       );
     }
     return action;
-  }
-
-  static registerAction(actionName: string, action: IAction): void {
-    this.actions.set(actionName, action);
   }
 
   static getAvailableActions(): string[] {

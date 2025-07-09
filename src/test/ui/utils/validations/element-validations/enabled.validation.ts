@@ -1,7 +1,6 @@
-// validations/enabled.validation.ts
 import { Page, expect } from '@playwright/test';
 
-import { IValidation, ValidationData } from '../interfaces/validation.interface';
+import { IValidation, ValidationData } from '../../interfaces/validation.interface';
 
 export class EnabledValidation implements IValidation {
   async validate(page: Page, fieldName: string, data: ValidationData): Promise<void> {

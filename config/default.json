@@ -45,7 +45,7 @@
     "scope": "openid profile roles"
   },
   "e2e": {
-    "testUrl": "http://localhost:3209",
+    "testUrl": "https://pcs.aat.platform.hmcts.net/",
     "idamUrl": "https://idam-api.aat.platform.hmcts.net",
     "idamTestingSupportUrl": "https://idam-testing-support-api.aat.platform.hmcts.net",
     "loginEndpoint": "o/token",
@@ -56,6 +56,9 @@
     "playwrightDebug": true
   },
   "claimFormTestData": {
-    "pageRoute": "/steps/page1"
+    "pageUrl": "https://pcs.aat.platform.hmcts.net/page1"
+  },
+  "dashboard": {
+    "pageUrl": "https://pcs.aat.platform.hmcts.net/dashboard/1"
   }
 }

@@ -12,11 +12,13 @@ module.exports = defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  timeout: 20 * 1000,
+  timeout: 10 * 1000,
   expect: { timeout: 60_000 },
   /* Report slow tests if they take longer than 5 mins */
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   workers: process.env.FUNCTIONAL_TESTS_WORKERS ? parseInt(process.env.FUNCTIONAL_TESTS_WORKERS) : 4,
+  globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
+  globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
   reporter: [
     ['list'],
     [

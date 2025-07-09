@@ -1,13 +1,62 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 import config from 'config';
 import { TokenEndpointResponse } from 'oauth4webapi';
 
+import { permanentUsersData } from '../../../data/permanent-users.data';
+
 import { request, retriedRequest } from './rest.helper';
-import { TestConfig, UserData } from './testConfig';
+import { TestConfig, UserData, buildUserDataWithRole } from './testConfig';
 
 const testConfig = config.get<TestConfig>('e2e');
 const username = config.get<string>('secrets.pcs.pcs-frontend-idam-system-username');
 const password = config.get<string>('secrets.pcs.pcs-frontend-idam-system-password');
 const clientSecret = config.get<string>('secrets.pcs.pcs-frontend-idam-secret');
+
+export async function createTempUser(key: string, roles: string[]): Promise<void> {
+  const Password = 'Pa$$w0rd';
+  const userData = buildUserDataWithRole(roles, Password);
+  await createAccount(userData);
+
+  setTempUser(key, {
+    email: userData.user.email,
+    password: Password,
+    temp: true,
+    roles,
+  });
+}
+
+export async function cleanupTempUsers(): Promise<void> {
+  const all = getAllUsers();
+  for (const [key, creds] of Object.entries(all)) {
+    if (creds.temp) {
+      await deleteAccount(creds.email);
+      deleteTempUser(key);
+    }
+  }
+}
+
+export async function createAccount(userData: UserData): Promise<Response | unknown> {
+  const authToken = await getAccessTokenFromIdam();
+  return retriedRequest(
+    `${testConfig.idamTestingSupportUrl}/test/idam/users`,
+    { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+    JSON.stringify(userData) as BodyInit
+  ).then(response => {
+    return response.json();
+  });
+}
+
+export async function deleteAccount(email: string): Promise<void> {
+  const method = 'DELETE';
+  await request(
+    `${testConfig.idamTestingSupportUrl}/testing-support/accounts/${email}`,
+    { 'Content-Type': 'application/json' },
+    undefined,
+    method
+  );
+}
 
 export async function getAccessTokenFromIdam(): Promise<string> {
   const details = {
@@ -35,37 +84,41 @@ export async function getAccessTokenFromIdam(): Promise<string> {
       return data.access_token;
     });
 }
-export async function createAccount(userData: UserData): Promise<Response | unknown> {
-  try {
-    const authToken = await getAccessTokenFromIdam();
-    return retriedRequest(
-      `${testConfig.idamTestingSupportUrl}/test/idam/users`,
-      { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
-      JSON.stringify(userData) as BodyInit
-    ).then(response => {
-      return response.json();
-    });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error creating account:', error);
-    throw error;
-  }
+
+export interface UserCredentials {
+  email: string;
+  password: string;
+  temp?: boolean;
+  roles: string[];
 }
 
-export async function deleteAccount(email: string): Promise<void> {
-  try {
-    const method = 'DELETE';
-    await request(
-      `${testConfig.idamTestingSupportUrl}/testing-support/accounts/${email}`,
-      { 'Content-Type': 'application/json' },
-      undefined,
-      method
-    );
-    // eslint-disable-next-line no-console
-    console.log('Account deleted: ' + email);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error deleting account:', error);
-    throw error;
-  }
+const storePath = path.resolve(__dirname, './../../../data/.temp-users.data.json');
+
+let tempUsers: Record<string, UserCredentials> = {};
+
+if (fs.existsSync(storePath)) {
+  const data = fs.readFileSync(storePath, 'utf-8');
+  tempUsers = JSON.parse(data);
+}
+
+function saveTempUsers(): void {
+  fs.writeFileSync(storePath, JSON.stringify(tempUsers, null, 2));
+}
+
+export function setTempUser(key: string, creds: UserCredentials): void {
+  tempUsers[key] = creds;
+  saveTempUsers();
+}
+
+export function deleteTempUser(key: string): void {
+  delete tempUsers[key];
+  saveTempUsers();
+}
+
+export function getUser(key: string): UserCredentials | undefined {
+  return tempUsers[key] || permanentUsersData[key];
+}
+
+export function getAllUsers(): Record<string, UserCredentials> {
+  return { ...permanentUsersData, ...tempUsers };
 }

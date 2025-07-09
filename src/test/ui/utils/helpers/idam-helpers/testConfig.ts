@@ -19,7 +19,7 @@ export interface UserData {
   };
 }
 
-export function buildUserDataWithRole(role: string, password: string): UserData {
+export function buildUserDataWithRole(role: string[], password: string): UserData {
   return {
     password,
     user: {
