@@ -22,11 +22,14 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
+    {% if step.title %}
+      <h1 class="govuk-heading-l">{{ step.title }}</h1>
+    {% endif %}
+
     {% if step.description %}
       <span class="govuk-caption-l">{{ step.description }}</span>
     {% endif %}
 
-    <h1 class="govuk-heading-l">{{ step.title }}</h1>
 
     {% if errors %}
       {% set errorList = [] %}
@@ -45,168 +48,23 @@
 
     <form method="post">
       {% for fieldName, fieldConfig in step.fields %}
-        {% set fieldValue = data[fieldName] %}
-        {% set fieldError = errors[fieldName] if errors else false %}
-
-        {% if fieldConfig.type == 'text' or fieldConfig.type == 'email' or fieldConfig.type == 'tel' %}
-          {{ govukInput({
-            id: fieldName,
-            name: fieldName,
-            type: fieldConfig.type if fieldConfig.type != 'text' else 'text',
-            label: {
-              text: fieldConfig.label or fieldName,
-              classes: 'govuk-label--m'
-            },
-            hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
-            value: fieldValue,
-            classes: fieldConfig.classes,
-            attributes: fieldConfig.attributes,
-            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
-          }) }}
+        {% if fieldConfig.type in ['text', 'email', 'tel', 'password', 'url', 'number'] %}
+          {{ govukInput(fieldConfig) }}
 
         {% elif fieldConfig.type == 'textarea' %}
-          {{ govukTextarea({
-            id: fieldName,
-            name: fieldName,
-            label: {
-              text: fieldConfig.label or fieldName,
-              classes: 'govuk-label--m'
-            },
-            hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
-            value: fieldValue,
-            classes: fieldConfig.classes,
-            attributes: fieldConfig.attributes,
-            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
-          }) }}
+          {{ govukTextarea(fieldConfig) }}
 
         {% elif fieldConfig.type == 'radios' %}
-          {% set radioItems = [] %}
-          {% for option in fieldConfig.options %}
-            {% if option.value is defined %}
-              {% set radioItems = radioItems.concat([{
-                value: option.value,
-                text: option.text,
-                hint: { text: option.hint } if option.hint else null,
-                checked: fieldValue == option.value
-              }]) %}
-            {% else %}
-              {% set radioItems = radioItems.concat([{
-                value: option,
-                text: option,
-                checked: fieldValue == option
-              }]) %}
-            {% endif %}
-          {% endfor %}
-
-          {{ govukRadios({
-            idPrefix: fieldName,
-            name: fieldName,
-            fieldset: {
-              legend: {
-                text: fieldConfig.label or step.title,
-                isPageHeading: not fieldConfig.label,
-                classes: 'govuk-fieldset__legend--m'
-              }
-            },
-            hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
-            items: radioItems,
-            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
-          }) }}
+          {{ govukRadios(fieldConfig) }}
 
         {% elif fieldConfig.type == 'checkboxes' %}
-          {% set checkboxItems = [] %}
-          {% for option in fieldConfig.options %}
-            {% if option.value is defined %}
-              {% set checkboxItems = checkboxItems.concat([{
-                value: option.value,
-                text: option.text,
-                hint: { text: option.hint } if option.hint else null,
-                checked: fieldValue and fieldValue.includes(option.value)
-              }]) %}
-            {% else %}
-              {% set checkboxItems = checkboxItems.concat([{
-                value: option,
-                text: option,
-                checked: fieldValue and fieldValue.includes(option)
-              }]) %}
-            {% endif %}
-          {% endfor %}
-
-          {{ govukCheckboxes({
-            idPrefix: fieldName,
-            name: fieldName,
-            fieldset: {
-              legend: {
-                text: fieldConfig.label or step.title,
-                isPageHeading: not fieldConfig.label,
-                classes: 'govuk-fieldset__legend--m'
-              }
-            },
-            hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
-            items: checkboxItems,
-            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
-          }) }}
+          {{ govukCheckboxes(fieldConfig) }}
 
         {% elif fieldConfig.type == 'select' %}
-          {% set selectItems = [{ value: '', text: 'Choose an option' }] %}
-          {% for option in fieldConfig.options %}
-            {% if option.value is defined %}
-              {% set selectItems = selectItems.concat([{
-                value: option.value,
-                text: option.text,
-                selected: fieldValue == option.value
-              }]) %}
-            {% else %}
-              {% set selectItems = selectItems.concat([{
-                value: option,
-                text: option,
-                selected: fieldValue == option
-              }]) %}
-            {% endif %}
-          {% endfor %}
-
-          {{ govukSelect({
-            id: fieldName,
-            name: fieldName,
-            label: {
-              text: fieldConfig.label or fieldName,
-              classes: 'govuk-label--m'
-            },
-            hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
-            items: selectItems,
-            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
-          }) }}
-
-        {% elif fieldConfig.type == 'number' %}
-          {{ govukInput({
-            id: fieldName,
-            name: fieldName,
-            type: 'number',
-            label: {
-              text: fieldConfig.label or fieldName,
-              classes: 'govuk-label--m'
-            },
-            hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
-            value: fieldValue,
-            classes: fieldConfig.classes,
-            attributes: fieldConfig.attributes,
-            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null
-          }) }}
+          {{ govukSelect(fieldConfig) }}
 
         {% elif fieldConfig.type == 'date' %}
-          {{ govukDateInput({
-            id: fieldName,
-            namePrefix: fieldName,
-            fieldset: {
-              legend: {
-                text: fieldConfig.label or fieldName,
-                classes: 'govuk-fieldset__legend--m'
-              }
-            },
-            hint: { text: fieldConfig.hint } if fieldConfig.hint else null,
-            errorMessage: { text: fieldError.message if fieldError and fieldError.message else fieldError } if fieldError else null,
-            items: dateItems[fieldName]
-          }) }}
+          {{ govukDateInput(fieldConfig) }}
         {% endif %}
       {% endfor %}
 

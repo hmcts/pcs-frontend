@@ -2,13 +2,17 @@ import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
   id: 'page2',
-  title: 'Are you 18 or over?',
   type: 'form',
-  description: 'You must be 18 or over to make a possession claim',
   fields: {
     age: {
       type: 'radios',
-      label: 'Are you 18 or over?',
+      fieldset: {
+        legend: {
+          text: 'Are you 18 or over?',
+          isPageHeading: true,
+          classes: 'govuk-fieldset__legend--l',
+        },
+      },
       options: [
         { value: 'yes', text: 'Yes' },
         { value: 'no', text: 'No' },

@@ -49,7 +49,7 @@ export class WizardEngine {
 
   logger = Logger.getLogger('WizardEngine');
 
-  constructor(journeyConfig: JourneyDraft, slug: string) {
+  constructor(journeyConfig: JourneyDraft, slug: string, sourcePath?: string) {
     // If we already validated this slug, reuse it
     const cachedJourney = WizardEngine.validatedJourneys.get(slug);
     if (cachedJourney) {
@@ -58,8 +58,12 @@ export class WizardEngine {
       // Validate the supplied TypeScript journey object
       const parseResult = JourneySchema.safeParse(journeyConfig);
       if (!parseResult.success) {
-        this.logger.error('Invalid journey configuration:', parseResult.error.issues);
-        throw new Error(`Invalid journey configuration for slug "${slug}": ${parseResult.error.issues[0]?.message}`);
+        const issue = parseResult.error.issues[0];
+        const loc = issue.path.join('.') || '(root)';
+        const fileInfo = sourcePath ? ` in file ${sourcePath}` : '';
+        const detailedMsg = `Invalid journey configuration${fileInfo} (slug "${slug}", path "${loc}"): ${issue.message}`;
+        this.logger.error(detailedMsg, parseResult.error.issues);
+        throw new Error(detailedMsg);
       }
       this.journey = parseResult.data;
       WizardEngine.validatedJourneys.set(slug, this.journey);
@@ -190,6 +194,17 @@ export class WizardEngine {
             ) {
               return `${value.day || ''}/${value.month || ''}/${value.year || ''}`;
             }
+            if (typedFieldConfig.type === 'checkboxes') {
+              // return the text of the options that are selected
+              const selected = typedFieldConfig.options
+                ?.filter(option => {
+                  const optionValue = typeof option === 'string' ? option : option.value;
+                  return (value as string[]).includes(optionValue);
+                })
+                .map(option => (typeof option === 'string' ? option : option.text))
+                .join(', ');
+              return selected ?? '';
+            }
             return Array.isArray(value) ? value.join(', ') : String(value);
           });
 
@@ -295,6 +310,105 @@ export class WizardEngine {
       }
     }
 
+    // Preprocess fields for template rendering
+    const processedFields: Record<string, FieldConfig> = {};
+    if (step.fields) {
+      for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+        const typedFieldConfig = fieldConfig as FieldConfig;
+
+        // Clone to avoid mutating cached journey config
+        const processed: FieldConfig = { ...typedFieldConfig } as FieldConfig;
+
+        // Ensure id / name
+        if (!processed.id) {
+          processed.id = fieldName;
+        }
+        if (!processed.name) {
+          processed.name = fieldName;
+        }
+
+        const fieldValue = data[fieldName] as unknown;
+        const fieldError = errors && errors[fieldName];
+
+        // Standardised errorMessage for macros
+        if (fieldError) {
+          // GOV.UK macro expects { text }
+          const msg = typeof fieldError === 'object' && 'message' in fieldError ? fieldError.message : fieldError;
+
+          processed.errorMessage = { text: String(msg) };
+        }
+
+        switch (typedFieldConfig.type) {
+          case 'text':
+          case 'email':
+          case 'tel':
+          case 'url':
+          case 'password':
+          case 'number': {
+            // @ts-expect-error value is not typed
+            processed.value = fieldValue ?? '';
+            break;
+          }
+          case 'textarea': {
+            // @ts-expect-error value is not typed
+            processed.value = fieldValue ?? '';
+            break;
+          }
+          case 'radios':
+          case 'checkboxes':
+          case 'select': {
+            const baseOptions = (typedFieldConfig.items ?? typedFieldConfig.options ?? []) as (
+              | string
+              | Record<string, unknown>
+            )[];
+            const items = baseOptions.map(option => {
+              if (typeof option === 'string') {
+                const obj = { value: option, text: option } as Record<string, unknown>;
+                if (typedFieldConfig.type === 'checkboxes') {
+                  obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(option);
+                } else if (typedFieldConfig.type === 'select') {
+                  obj['selected'] = fieldValue === option;
+                } else {
+                  obj['checked'] = fieldValue === option;
+                }
+                return obj;
+              } else {
+                const obj = { ...option } as Record<string, unknown>;
+                const optVal = (option as Record<string, unknown>).value as string;
+                if (typedFieldConfig.type === 'checkboxes') {
+                  obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(optVal);
+                } else if (typedFieldConfig.type === 'select') {
+                  obj['selected'] = fieldValue === optVal;
+                } else {
+                  obj['checked'] = fieldValue === optVal;
+                }
+                return obj;
+              }
+            });
+
+            // For selects add default prompt if author didn't supply one
+            if (typedFieldConfig.type === 'select' && !(typedFieldConfig.items && typedFieldConfig.items.length)) {
+              items.unshift({ value: '', text: 'Choose an option' });
+            }
+
+            // @ts-expect-error value is not typed
+            processed.items = items;
+            break;
+          }
+          case 'date': {
+            // handled earlier building dateItems list, attach now
+            processed.items = dateItems[fieldName] ?? [];
+            break;
+          }
+        }
+
+        processedFields[fieldName] = processed;
+      }
+
+      // Create a new step object with processed fields to avoid mutating original
+      step = { ...step, fields: processedFields } as StepConfig;
+    }
+
     return {
       caseId,
       step,
@@ -303,7 +417,6 @@ export class WizardEngine {
       errors,
       previousStepUrl,
       summaryRows,
-      ...(Object.keys(dateItems).length > 0 ? { dateItems } : {}),
     };
   }
 
@@ -616,7 +729,22 @@ export class WizardEngine {
 
         this.logger.info('previousStepUrl sent to template', context.previousStepUrl);
 
-        res.render(await this.resolveTemplatePath(step.id), {
+        const templatePath = await this.resolveTemplatePath(step.id);
+
+        // If we are rendering the confirmation (or other terminal) step, clear the session so the user can start a new journey.
+        if (step.type === 'confirmation') {
+          const session = req.session as unknown as Record<string, unknown>;
+          // Remove the per-journey caseId key so a new journey generates a fresh id next time.
+          const caseIdKey = `journey_${this.slug}_caseId`;
+          delete session[caseIdKey];
+
+          // Also remove any stored data for this case from the session store implementation (if using sessionStore).
+          if (session[caseId]) {
+            delete session[caseId as keyof typeof session];
+          }
+        }
+
+        res.render(templatePath, {
           ...context,
           data: context.data,
           errors: null,

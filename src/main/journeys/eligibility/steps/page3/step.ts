@@ -6,18 +6,6 @@ const step: StepDraft = {
   type: 'form',
   description: 'Select all grounds that apply to your case',
   fields: {
-    terms: {
-      type: 'radios',
-      label: 'Do you agree to the terms and conditions?',
-      options: [
-        { value: 'yes', text: 'Yes' },
-        { value: 'no', text: 'No' },
-      ],
-      validate: {
-        required: true,
-        customMessage: 'Select yes or no',
-      },
-    },
     grounds: {
       type: 'checkboxes',
       label: 'Select all that apply',

@@ -20,6 +20,8 @@ app.locals.ENV = env;
 
 const logger = Logger.getLogger('app');
 
+setupDev(app, developmentMode);
+
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const moduleInstance = new (modules as any)[moduleName](developmentMode);
@@ -43,7 +45,6 @@ glob
   .map(filename => require(filename))
   .forEach(route => route.default(app));
 
-setupDev(app, developmentMode);
 // returning "not found" page for requests with paths not resolved by the router
 app.use((req, res) => {
   res.status(404);
