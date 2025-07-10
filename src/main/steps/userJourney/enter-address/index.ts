@@ -18,7 +18,9 @@ const content = {
   ...common,
   backUrl: '/steps/user-journey/enter-user-details',
 };
-export const partialUkPostcodePattern = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9]?[A-Z]{0,2}$/i;
+
+export const partialUkPostcodePattern = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s*[0-9]?[A-Z]{0,2}$/i;
+
 const postcodeRegex = new RegExp(partialUkPostcodePattern);
 
 const fields: FormFieldConfig[] = [
@@ -31,7 +33,7 @@ const fields: FormFieldConfig[] = [
     name: 'postcode',
     type: 'text',
     required: true,
-    errorMessage: 'Enter the postcode',
+    errorMessage: 'Enter the valid postcode',
     pattern: partialUkPostcodePattern.source,
   },
   { name: 'country', type: 'text', required: false, errorMessage: 'Enter the country' },
@@ -129,6 +131,13 @@ export const step: StepDefinition = {
       }
 
       if (action === 'submit-form') {
+        if (req.body.postcode) {
+          req.body.postcode = req.body.postcode
+            .toUpperCase()
+            .replace(/\s+/g, '')
+            .replace(/(.{3})$/, ' $1')
+            .trim();
+        }
         const errors = validateForm(req, fields);
 
         if (Object.keys(errors).length > 0) {
