@@ -16,7 +16,10 @@
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
     },
     "claimFormTestData": {
-      "pageRoute": "/steps/page1"
+      "pageUrl": "https://pcs.aat.platform.hmcts.net/steps/page1"
+    },
+    "dashboard": {
+      "pageUrl": "https://pcs.aat.platform.hmcts.net/dashboard/1"
     }
   }
 }
