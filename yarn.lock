@@ -2327,13 +2327,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts/playwright-common@npm:1.0.27":
-  version: 1.0.27
-  resolution: "@hmcts/playwright-common@npm:1.0.27"
+"@hmcts/playwright-common@npm:1.0.29":
+  version: 1.0.29
+  resolution: "@hmcts/playwright-common@npm:1.0.29"
   dependencies:
     "@axe-core/playwright": "npm:^4.10.0"
     "@eslint/js": "npm:^9.11.1"
-    "@types/node": "npm:^22.6.1"
     "@typescript-eslint/eslint-plugin": "npm:^8.8.0"
     eslint: "npm:^9.11.1"
     eslint-plugin-playwright: "npm:^1.6.2"
@@ -2344,8 +2343,8 @@ __metadata:
     typescript: "npm:^5.6.2"
     typescript-eslint: "npm:^8.8.0"
   peerDependencies:
-    "@playwright/test": ^1.49.0
-  checksum: 10/f1efbc69fe18bac8bff9acf2aec166b349ea641551712cfadd4839c21ffce7cf01a6f408697db453c46cd30dde2ffbe8a45a5d290764a3945bc94ec3a56d1477
+    "@playwright/test": ^1.53.0
+  checksum: 10/397feb0bcca06371b60aec0dc270771d2f0559acce425fbbced968b6dd4e81fa48abc95242acbd7c4d23387ffa40211e96d09a8d8e4c2778838372c2e0fcc9ea
   languageName: node
   linkType: hard
 
@@ -12758,7 +12757,7 @@ __metadata:
     "@hmcts/info-provider": "npm:^1.1.0"
     "@hmcts/nodejs-healthcheck": "npm:^1.8.0"
     "@hmcts/nodejs-logging": "npm:^4.0.4"
-    "@hmcts/playwright-common": "npm:1.0.27"
+    "@hmcts/playwright-common": "npm:1.0.29"
     "@hmcts/properties-volume": "npm:^1.2.0"
     "@pact-foundation/pact": "npm:^15.0.0"
     "@pact-foundation/pact-cli": "npm:^16.0.7"
@@ -14982,9 +14981,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"superagent@npm:10.2.1":
-  version: 10.2.1
-  resolution: "superagent@npm:10.2.1"
+"superagent@npm:10.2.2":
+  version: 10.2.2
+  resolution: "superagent@npm:10.2.2"
   dependencies:
     component-emitter: "npm:^1.3.0"
     cookiejar: "npm:^2.1.4"
@@ -14995,7 +14994,7 @@ __metadata:
     methods: "npm:^1.1.2"
     mime: "npm:2.6.0"
     qs: "npm:^6.11.0"
-  checksum: 10/fb91785361955e45d3be7d69f11b64b072678385acbd50ae38f713d6f4862384f138bd9842aff96f475c139b3afda96ea6b016dd544e9a984cf0bcc9e0c103b7
+  checksum: 10/e89ae49163df0db50e6a77316a7304a16640df11a8d2219bef11e69f59c74e54c16670ec250c2ab59f06887f71bb5d6e5933f735b931cbdbe34ba490d78b5d70
   languageName: node
   linkType: hard
 

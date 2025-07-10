@@ -8,7 +8,7 @@ import { buildUserDataWithRole } from './idam-helpers/testConfig';
 export class loginHelper {
   static async login(page: Page): Promise<void> {
     initActionHelper(page);
-    const password = config.get<string>('secrets.pcs.pcs-frontend-idam-user-temp-password');
+    const password = config.get<string>('e2e.secrets.pcs-idam-test-user-password');
     const userData = buildUserDataWithRole(config.get('e2e.roles'), password);
 
     await idamHelper.createAccount(userData);

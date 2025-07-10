@@ -47,19 +47,5 @@
     "clientId": "pcs-frontend",
     "redirectUri": "http://localhost:3209/oauth2/callback",
     "scope": "openid profile roles"
-  },
-  "e2e": {
-    "testUrl": "http://localhost:3209",
-    "idamUrl": "https://idam-api.aat.platform.hmcts.net",
-    "idamTestingSupportUrl": "https://idam-testing-support-api.aat.platform.hmcts.net",
-    "loginEndpoint": "o/token",
-    "grantType": "password",
-    "scope": "profile openid roles",
-    "clientId": "pcs-frontend",
-    "roles": "citizen",
-    "playwrightDebug": true
-  },
-  "claimFormTestData": {
-    "pageRoute": "/steps/page1"
   }
 }
