@@ -3,7 +3,6 @@ import { DashboardNotificationValidation } from '../validations/custom-validatio
 import { DashboardTasksValidation } from '../validations/custom-validations/dashboardTasks.validation';
 import { AttributeValidation } from '../validations/element-validations/attribute.validation';
 import { CheckedValidation } from '../validations/element-validations/checked.validation';
-import { ContainsTextValidation } from '../validations/element-validations/contains-text.validation';
 import { CountValidation } from '../validations/element-validations/count.validation';
 import { CssValidation } from '../validations/element-validations/css.validation';
 import { EnabledValidation } from '../validations/element-validations/enabled.validation';
@@ -21,7 +20,6 @@ export class ValidationRegistry {
     ['checked', new CheckedValidation()],
     ['count', new CountValidation()],
     ['attribute', new AttributeValidation()],
-    ['containsText', new ContainsTextValidation()],
     ['css', new CssValidation()],
     ['pageTitle', new PageTitleValidation()],
     ['dashboardNotification', new DashboardNotificationValidation()],

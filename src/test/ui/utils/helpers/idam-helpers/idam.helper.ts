@@ -4,8 +4,6 @@ import * as path from 'path';
 import config from 'config';
 import { TokenEndpointResponse } from 'oauth4webapi';
 
-import { permanentUsersData } from '../../../data/permanent-users.data';
-
 import { request, retriedRequest } from './rest.helper';
 import { TestConfig, UserData, buildUserDataWithRole } from './testConfig';
 
@@ -13,12 +11,12 @@ const testConfig = config.get<TestConfig>('e2e');
 const username = config.get<string>('e2e.secrets.pcs-frontend-idam-system-username');
 const password = config.get<string>('e2e.secrets.pcs-frontend-idam-system-password');
 const clientSecret = config.get<string>('e2e.secrets.pcs-frontend-idam-secret');
-export async function createTempUser(key: string, roles: string[]): Promise<void> {
+export async function createTempUser(userKey: string, roles: string[]): Promise<void> {
   const Password = config.get<string>('e2e.secrets.pcs-idam-test-user-password');
-  const userData = buildUserDataWithRole(roles, Password);
+  const userData = buildUserDataWithRole(roles, Password, userKey);
   await createAccount(userData);
 
-  setTempUser(key, {
+  setTempUser(userKey, {
     email: userData.user.email,
     password: Password,
     temp: true,
@@ -115,9 +113,9 @@ export function deleteTempUser(key: string): void {
 }
 
 export function getUser(key: string): UserCredentials | undefined {
-  return tempUsers[key] || permanentUsersData[key];
+  return tempUsers[key];
 }
 
 export function getAllUsers(): Record<string, UserCredentials> {
-  return { ...permanentUsersData, ...tempUsers };
+  return { ...tempUsers };
 }

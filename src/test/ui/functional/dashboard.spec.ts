@@ -5,7 +5,7 @@ import config from 'config';
 import dashboard from '../data/dashboard';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const dashboard_url: string = config.get('e2e.dashboard.pageUrl');
+const dashboard_url = ((config.get('e2e.testUrl') as string) + config.get('e2e.dashboard.pageRoute')) as string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   await parentSuite('Home Page');

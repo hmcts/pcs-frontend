@@ -25,11 +25,11 @@ export class DashboardTasksValidation implements IValidation {
 
     // Get locators
     const taskLocator = data.taskHasLink
-      ? page.locator(`a.govuk-link:text("${data.title}")`)
-      : page.locator(`div:text("${data.title}")`).first();
+      ? page.locator(`a.govuk-link:has-text("${data.title}")`)
+      : page.locator(`div:has-text("${data.title}")`).first();
 
     const statusLocator = page.locator(
-      `:has(> a:text("${data.title}"), > div:text("${data.title}")) ~ div:has-text("${data.status}")`
+      `:has(> a:has-text("${data.title}"), > div:has-text("${data.title}")) ~ div:has-text("${data.status}")`
     );
 
     await softAssert(() => expect(taskLocator).toBeVisible(), 'Task element not visible');
