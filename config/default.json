@@ -35,7 +35,7 @@
     "url": "https://pcq.aat.platform.hmcts.net",
     "path": "/service-endpoint",
     "port": 4000,
-    "serviceId": "PROBATE",
+    "serviceId": "PCS",
     "actor": "APPLICANT"
   },
   "secrets": {
