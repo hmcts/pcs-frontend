@@ -1,5 +1,5 @@
 import { LoginAction } from '../actions/custom-actions/login.action';
-import { NavigateAction } from '../actions/custom-actions/navigate.action';
+import { NavigateToUrlAction } from '../actions/custom-actions/navigateToUrl.action';
 import { CheckAction } from '../actions/element-actions/check.action';
 import { ClickButtonAction } from '../actions/element-actions/clickButton.action';
 import { clickRadioButton } from '../actions/element-actions/clickRadioButton.action';
@@ -13,7 +13,7 @@ export class ActionRegistry {
     ['check', new CheckAction()],
     ['clickRadioButton', new clickRadioButton()],
     ['login', new LoginAction()],
-    ['NavigateToPage', new NavigateAction()],
+    ['NavigateToUrl', new NavigateToUrlAction()],
   ]);
 
   static getAction(actionName: string): IAction {

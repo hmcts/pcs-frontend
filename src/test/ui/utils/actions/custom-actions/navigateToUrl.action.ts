@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 
 import { IAction } from '../../interfaces/action.interface';
 
-export class NavigateAction implements IAction {
+export class NavigateToUrlAction implements IAction {
   async execute(page: Page, url: string): Promise<void> {
     if (!url) {
       throw new Error('URL is required for navigation');

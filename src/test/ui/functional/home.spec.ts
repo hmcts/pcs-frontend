@@ -16,6 +16,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     contentType: 'text/plain',
   });
   initializeExecutor(page);
+  await performAction('NavigateToUrl', test_url);
   await performAction('login', 'citizen');
 });
 

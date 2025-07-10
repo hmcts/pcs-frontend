@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     contentType: 'text/plain',
   });
   initializeExecutor(page);
-  await performAction('NavigateToPage', claim_url);
+  await performAction('NavigateToUrl', claim_url);
 });
 
 test.describe('Possession claims @PR @nightly', async () => {
