@@ -32,7 +32,19 @@ export const sessionStore = (slug: string): JourneyStore => {
       }
 
       const old = session[caseId][slug] ?? {};
-      const merged = { ...old, ...patch };
+      // Deep-merge at the first level: keep existing step data while updating only the fields provided in the patch.
+      const merged: Record<string, unknown> = { ...old };
+
+      for (const [stepId, stepPatch] of Object.entries(patch)) {
+        const previousStepData = (old as Record<string, unknown>)[stepId] as Record<string, unknown> | undefined;
+
+        // Only merge objects – if stepPatch is not an object, replace it entirely.
+        if (typeof stepPatch === 'object' && stepPatch !== null && !Array.isArray(stepPatch)) {
+          merged[stepId] = { ...(previousStepData ?? {}), ...(stepPatch as Record<string, unknown>) };
+        } else {
+          merged[stepId] = stepPatch;
+        }
+      }
       session[caseId][slug] = merged;
 
       return { data: merged, version };

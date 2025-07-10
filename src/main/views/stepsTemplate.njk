@@ -11,7 +11,13 @@
   {{ govukHeader({
     containerClasses: "govuk-width-container",
     serviceName: serviceName or "Possession claims",
-    serviceUrl: "/"
+    serviceUrl: "/",
+    navigation: [
+    {
+      text: 'logout',
+      href: '/logout'
+    }
+  ]
   }) }}
   <div class="govuk-width-container">
       {{ govukPhaseBanner({

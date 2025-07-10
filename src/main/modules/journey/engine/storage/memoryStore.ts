@@ -14,9 +14,22 @@ export const memoryStore = (slug: string): JourneyStore => {
       void req;
       const key = `${slug}:${caseId}`;
       const existing = store.get(key) || { data: {}, version: 0 };
-      const newData = { ...existing.data, ...data };
-      store.set(key, { data: newData, version: version + 1 });
-      return { data: newData, version: version + 1 };
+
+      const old = existing.data as Record<string, unknown>;
+      const merged: Record<string, unknown> = { ...old };
+
+      for (const [stepId, stepPatch] of Object.entries(data)) {
+        const previousStepData = (old as Record<string, unknown>)[stepId] as Record<string, unknown> | undefined;
+
+        if (typeof stepPatch === 'object' && stepPatch !== null && !Array.isArray(stepPatch)) {
+          merged[stepId] = { ...(previousStepData ?? {}), ...(stepPatch as Record<string, unknown>) };
+        } else {
+          merged[stepId] = stepPatch;
+        }
+      }
+
+      store.set(key, { data: merged, version: version + 1 });
+      return { data: merged, version: version + 1 };
     },
     async generateReference(req, journeySlug, caseId) {
       void req;

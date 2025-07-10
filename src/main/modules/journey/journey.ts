@@ -20,11 +20,16 @@ export class Journey {
       const journeyModule = require(file);
       const journeyConfig = (journeyModule.default ?? journeyModule) as import('./engine/schema').JourneyConfig;
 
-      const engine = new WizardEngine(journeyConfig, slug);
-      app.use(engine.basePath, engine.router());
+      try {
+        const engine = new WizardEngine(journeyConfig, slug, file);
+        app.use(engine.basePath, engine.router());
 
-      if (process.env.NODE_ENV !== 'test') {
-        this.logger.info(`Wizard "${engine.journey.meta.name}" mounted at ${engine.basePath}/:step`);
+        if (process.env.NODE_ENV !== 'test') {
+          this.logger.info(`Wizard "${engine.journey.meta.name}" mounted at ${engine.basePath}/:step (from ${file})`);
+        }
+      } catch (err) {
+        this.logger.error(`Failed to load journey from ${file}:`, err);
+        throw err;
       }
     });
   }

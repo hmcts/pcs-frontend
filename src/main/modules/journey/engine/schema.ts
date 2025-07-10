@@ -24,37 +24,154 @@ export const ValidationRuleSchema = z
     min: z.number().optional().default(0),
     max: z.number().optional().default(100),
     pattern: z.string().optional(),
-    email: z.email().optional(),
-    postalCode: z
-      .string()
-      .refine(val => isPostalCode(val, 'GB'), { message: 'Postal code must be 4 characters long' })
-      .optional(),
-    url: z.url().optional(),
+    email: z.boolean().optional().default(false),
+    postalCode: z.boolean().optional().default(false),
+    url: z.boolean().optional().default(false),
     customMessage: z.string().optional(),
     errorMessages: ErrorMessagesSchema,
   })
   .optional();
 
+// ────────────────────────────────────────────────────────────────────────────────
+// GOV.UK Design System macro option schemas
+// These match the documented Nunjucks macro parameters for form components so
+// authors can copy-and-paste directly from the Design System into a journey
+// config and have it validate correctly.
+
+// Generic label / legend object used by many components
+const LabelObjectSchema = z
+  .object({
+    text: z.string().optional(),
+    html: z.string().optional(),
+    classes: z.string().optional(),
+    isPageHeading: z.boolean().optional(),
+  })
+  .strict();
+
+// Allows a primitive string *or* the rich label object
+const LabelSchema = z.union([z.string(), LabelObjectSchema]);
+
+// Generic hint object
+const HintObjectSchema = z
+  .object({
+    text: z.string().optional(),
+    html: z.string().optional(),
+    classes: z.string().optional(),
+  })
+  .strict();
+const HintSchema = z.union([z.string(), HintObjectSchema]);
+
+// Single error message object used by GOV.UK macros (different to the per-rule
+// errorMessages we already support).
+const GovukErrorMessageSchema = z
+  .object({
+    text: z.string().optional(),
+    html: z.string().optional(),
+    classes: z.string().optional(),
+    visuallyHiddenText: z.string().optional(),
+  })
+  .strict();
+
+// Form-group wrapper classes
+const FormGroupSchema = z
+  .object({
+    classes: z.string().optional(),
+    attributes: z.record(z.string(), z.unknown()).optional(),
+  })
+  .strict();
+
+// Fieldset with optional legend
+const FieldsetSchema = z
+  .object({
+    legend: LabelSchema.optional(),
+    classes: z.string().optional(),
+    attributes: z.record(z.string(), z.unknown()).optional(),
+  })
+  .strict();
+
+// Prefix / suffix objects for input component
+const AffixSchema = z
+  .object({
+    text: z.string().optional(),
+    html: z.string().optional(),
+    classes: z.string().optional(),
+  })
+  .strict();
+
 // Field option schema
 export const FieldOptionSchema = z.union([
   z.string(),
-  z.object({
-    value: z.string(),
-    text: z.string(),
-    hint: z.string().optional(),
-  }),
+  z
+    .object({
+      value: z.string(),
+      text: z.string().optional(),
+      html: z.string().optional(),
+      label: LabelSchema.optional(),
+      hint: HintSchema.optional(),
+      divider: z.string().optional(),
+      checked: z.boolean().optional(),
+      selected: z.boolean().optional(),
+      disabled: z.boolean().optional(),
+      conditional: z.record(z.string(), z.unknown()).optional(),
+      attributes: z.record(z.string(), z.unknown()).optional(),
+    })
+    .strict(),
 ]);
 
 // Field configuration schema
 export const FieldSchema = z.object({
-  type: z.enum(['text', 'textarea', 'radios', 'checkboxes', 'select', 'date', 'number', 'email', 'tel', 'url']),
-  label: z.string().optional(),
-  hint: z.string().optional(),
+  // Supported form component types
+  type: z.enum([
+    'text',
+    'textarea',
+    'radios',
+    'checkboxes',
+    'select',
+    'date',
+    'number',
+    'email',
+    'tel',
+    'url',
+    'password',
+    'file',
+  ]),
+
+  // Core GOV.UK macro options (all optional so existing journeys continue to work)
+  id: z.string().optional(),
+  name: z.string().optional(),
+  label: LabelSchema.optional(),
+  hint: HintSchema.optional(),
+  errorMessage: GovukErrorMessageSchema.optional(),
+
+  // Original specialised errorMessages remain supported for rule-level messages
   errorMessages: ErrorMessagesSchema,
-  options: z.array(FieldOptionSchema).optional(),
+
+  fieldset: FieldsetSchema.optional(),
+  formGroup: FormGroupSchema.optional(),
+
+  prefix: AffixSchema.optional(),
+  suffix: AffixSchema.optional(),
+
+  // Choices / select style components
+  items: z.array(FieldOptionSchema).optional(), // direct GOV.UK naming
+  options: z.array(FieldOptionSchema).optional(), // legacy naming our engine uses
+
+  // Validation rules remain unchanged
   validate: ValidationRuleSchema,
+
+  // Presentation helpers
   classes: z.string().optional(),
-  attributes: z.record(z.string(), z.string()).optional(),
+  attributes: z.record(z.string(), z.unknown()).optional(),
+
+  autocomplete: z.string().optional(),
+  disabled: z.boolean().optional(),
+  readonly: z.boolean().optional(),
+  spellcheck: z.boolean().optional(),
+  enterKeyHint: z.string().optional(),
+
+  rows: z.number().optional(), // textarea
+  width: z.string().optional(), // input width modifier classes
+
   flag: z.string().optional(),
 });
 
@@ -270,6 +387,23 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       return rules?.required === false ? schema.optional() : schema;
     }
 
+    case 'select': {
+      const opts = (fieldConfig.items ?? fieldConfig.options ?? []) as (string | { value?: string })[];
+      const allowed = opts
+        .map(o => (typeof o === 'string' ? o : (o.value ?? '')))
+        .filter(v => v !== '' && v !== null && v !== undefined) as string[];
+
+      if (allowed.length === 0) {
+        // Fallback to simple string validation if no options found
+        return z.string();
+      }
+
+      // z.enum requires tuple type; assert non-empty
+      const enumSchema = z.enum(allowed as [string, ...string[]]);
+
+      return rules?.required === false ? enumSchema.optional() : enumSchema;
+    }
+
     case 'checkboxes': {
       if (rules?.required === true || rules?.minLength !== undefined) {
         const minItems = rules?.minLength || 1;
@@ -334,6 +468,25 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       }
       if (rules?.pattern) {
         schema = schema.regex(new RegExp(rules.pattern), { error: rules.customMessage });
+      }
+
+      // Enforce non-empty when required but no explicit minLength provided
+      if (rules?.required === true && (rules?.minLength === undefined || rules.minLength < 1)) {
+        schema = schema.min(1, { error: rules.customMessage || 'Enter a value' });
+      }
+
+      if (rules?.email) {
+        schema = z.string().email({ message: rules.customMessage });
+      }
+
+      if (rules?.url) {
+        schema = z.string().url({ message: rules.customMessage });
+      }
+
+      if (rules?.postalCode) {
+        schema = schema.refine(val => isPostalCode(val, 'GB'), {
+          error: rules.customMessage ?? 'Enter a valid postcode',
+        });
       }
       return rules?.required === false ? schema.optional() : schema;
     }
