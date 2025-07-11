@@ -52,7 +52,7 @@ export function pcqRedirectMiddleware() {
 
     const pcqId = uuid();
 
-    const partyId = encodeURIComponent(user.email || '');
+    const partyId = encodeURIComponent(user.email || ''); //TODO: Might want to change partyId to IDAM ID instead.
     const returnUrl = `${req.protocol}://${req.get('host')}/steps/user-journey/summary`;
 
     const params = {
