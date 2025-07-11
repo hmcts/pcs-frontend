@@ -1,3 +1,4 @@
+import { AxeUtils } from '@hmcts/playwright-common';
 import { test } from '@playwright/test';
 import { parentSuite } from 'allure-js-commons';
 import config from 'config';
@@ -17,17 +18,23 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Possession claims @PR @nightly', async () => {
-  test('Journey of a claimant aged over 18', async () => {
+  test('Journey of a claimant aged over 18', async ({ page }) => {
+    await new AxeUtils(page).audit();
     await performAction('clickButton', 'Start');
+    await new AxeUtils(page).audit();
     await performAction('clickRadioButton', 'Yes');
     await performAction('clickButton', 'Continue');
+    await new AxeUtils(page).audit();
     await performAction('check', 'Persistent arrears (ground 11)');
     await performAction('clickButton', 'Continue');
+    await new AxeUtils(page).audit();
   });
-  test('Journey of a claimant aged under 18', async () => {
+  test('Journey of a claimant aged under 18', async ({ page }) => {
     await performAction('clickButton', 'Start');
     await performAction('clickRadioButton', 'No');
     await performAction('clickButton', 'Continue');
+    await new AxeUtils(page).audit();
     await performAction('clickButton', 'Exit application');
+    await new AxeUtils(page).audit();
   });
 });
