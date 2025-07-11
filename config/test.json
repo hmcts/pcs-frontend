@@ -17,6 +17,9 @@
     },
     "claimFormTestData": {
       "pageRoute": "/steps/page1"
+    },
+    "dashboard": {
+      "pageRoute": "/dashboard/1"
     }
   }
 }

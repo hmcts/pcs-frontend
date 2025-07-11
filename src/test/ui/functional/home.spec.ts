@@ -3,10 +3,9 @@ import { test } from '@playwright/test';
 import { parentSuite } from 'allure-js-commons';
 import config from 'config';
 
-import { loginHelper } from '../common/helpers';
-import { initVerificationHelper, performVerification } from '../common/helpers/element-helpers/verification.helper';
+import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const { constants } = require('../common/data');
+const { constants } = require('../data');
 
 const test_url: string = config.get('e2e.testUrl');
 
@@ -16,12 +15,12 @@ test.beforeEach(async ({ page }, testInfo) => {
     body: test_url,
     contentType: 'text/plain',
   });
-  initVerificationHelper(page);
-  await page.goto(test_url);
-  await loginHelper.login(page);
+  initializeExecutor(page);
+  await performAction('NavigateToUrl', test_url);
+  await performAction('login', 'citizen');
 });
 
 test('Idam Login @accessibility @PR @nightly', async ({ page }) => {
-  await performVerification('verifyPageTitle', constants.homePage.title);
+  await performValidation('pageTitle', { title: constants.homePage.title });
   await new AxeUtils(page).audit();
 });
