@@ -24,4 +24,5 @@ export interface StepDefinition {
   generateContent: () => StepFormData;
   getController: GetController;
   postController?: { post: RequestHandler };
+  middleware?: RequestHandler[];
 }
