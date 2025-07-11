@@ -5,7 +5,9 @@
       "pcs-frontend-s2s-secret": "S2S_SECRET",
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET",
       "pcs-frontend-idam-system-username": "IDAM_SYSTEM_USERNAME",
-      "pcs-frontend-idam-system-password": "IDAM_SYSTEM_PASSWORD"
+      "pcs-frontend-idam-system-password": "IDAM_SYSTEM_PASSWORD",
+      "pcs-frontend-idam-user-temp-password": "PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD",
+      "pcs-os-client-lookup-key": "OS_CLIENT_LOOKUP_SECRET"
     }
   },
   "api": {

@@ -15,6 +15,14 @@ export function validateForm(req: Request, fields: FormFieldConfig[]): Record<st
 
     if (field.required && isMissing) {
       errors[field.name] = field.errorMessage || 'This field is required';
+      continue;
+    }
+
+    if (field.pattern && typeof value === 'string' && value.trim() !== '') {
+      const regex = new RegExp(field.pattern);
+      if (!regex.test(value.trim())) {
+        errors[field.name] = field.errorMessage || 'Invalid format';
+      }
     }
   }
 

@@ -13,6 +13,7 @@ module.exports = {
   plugins: [...govukFrontend.plugins, ...scss.plugins, ...HtmlWebpack.plugins],
   entry: path.resolve(sourcePath, 'index.ts'),
   mode: devMode ? 'development' : 'production',
+  devtool: devMode ? 'source-map' : false,
   module: {
     rules: [
       ...scss.rules,
