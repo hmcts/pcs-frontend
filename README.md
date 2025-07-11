@@ -41,8 +41,10 @@ yarn build
 
 Run:
 
+Get the secret value from the azure keyvault
+
 ```bash
-yarn start:dev
+PCS_FRONTEND_IDAM_SECRET=XXX S2S_SECRET=XXX OS_CLIENT_LOOKUP_SECRET=XXX yarn start:dev
 ```
 
 #### Production
