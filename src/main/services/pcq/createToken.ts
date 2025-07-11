@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import { PcqParameters } from './PcqParameters.interface';
+import type { PcqParameters } from './PcqParameters.interface';
 
 const algorithm = 'aes-256-gcm';
 const bufferSize = 16;

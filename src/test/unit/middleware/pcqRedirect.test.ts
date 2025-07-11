@@ -3,7 +3,7 @@ import config from 'config';
 import { NextFunction, Request, Response } from 'express';
 import { Session } from 'express-session';
 
-import { CcdCase } from '../../../main/interfaces/ccdCase.interface';
+import type { CcdCase } from '../../../main/interfaces/ccdCase.interface';
 import { pcqRedirectMiddleware } from '../../../main/middleware/pcqRedirect';
 import { ccdCaseService } from '../../../main/services/ccdCaseService';
 import * as createTokenModule from '../../../main/services/pcq/createToken';

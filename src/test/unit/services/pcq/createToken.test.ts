@@ -1,4 +1,4 @@
-import { PcqParameters } from '../../../../main/services/pcq/PcqParameters.interface';
+import type { PcqParameters } from '../../../../main/services/pcq/PcqParameters.interface';
 import { createToken } from '../../../../main/services/pcq/createToken';
 
 describe('createToken', () => {
