@@ -3,6 +3,8 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
+export type YesNoValue = 'Yes' | 'No' | null;
+
 export interface CcdUserCase {
   id: string;
   state: CaseState;
@@ -20,7 +22,7 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   userPcqId?: string;
-  userPcqIdSet?: string;
+  userPcqIdSet?: YesNoValue;
   propertyAddress?: {
     AddressLine1: string;
     AddressLine2: string;

@@ -14,7 +14,7 @@ export function pcqRedirectMiddleware() {
     // TODO: Set pcq.enabled back to TRUE and remove this when we actually onboard with PCQ
     const pcqEnabled = config.get<boolean>('pcq.enabled');
     if (!pcqEnabled) {
-      logger.warn('PCQ is not enabled.');
+      logger.debug('PCQ is not enabled.');
       return next();
     }
 
@@ -34,7 +34,7 @@ export function pcqRedirectMiddleware() {
     }
 
     if (ccdCase.data?.userPcqIdSet === 'Yes') {
-      logger.info(`PCQ id found ${ccdCase.data?.userPcqIdSet}`);
+      logger.debug('User already have PcqId set');
       return next();
     }
 
