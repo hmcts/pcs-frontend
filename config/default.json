@@ -23,8 +23,8 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-340.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-340"
+    "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal/",
+    "caseTypeId": "PCS"
   },
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
@@ -37,9 +37,6 @@
     "port": 4000,
     "serviceId": "PCS",
     "actor": "APPLICANT"
-  },
-  "osPostcodeLookup": {
-    "url": "https://api.os.uk/search/places/v1"
   },
   "secrets": {
     "pcs": {
