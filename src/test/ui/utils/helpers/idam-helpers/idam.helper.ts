@@ -28,7 +28,6 @@ export async function cleanupTempUsers(): Promise<void> {
   const all = getAllUsers();
   for (const [key, creds] of Object.entries(all)) {
     if (creds.temp) {
-      await deleteAccount(creds.email);
       deleteTempUser(key);
     }
   }
@@ -43,16 +42,6 @@ export async function createAccount(userData: UserData): Promise<Response | unkn
   ).then(response => {
     return response.json();
   });
-}
-
-export async function deleteAccount(email: string): Promise<void> {
-  const method = 'DELETE';
-  await request(
-    `${testConfig.idamTestingSupportUrl}/testing-support/accounts/${email}`,
-    { 'Content-Type': 'application/json' },
-    undefined,
-    method
-  );
 }
 
 export async function getAccessTokenFromIdam(): Promise<string> {
@@ -82,7 +71,7 @@ export async function getAccessTokenFromIdam(): Promise<string> {
     });
 }
 
-export interface UserCredentials {
+export interface UserDetails {
   email: string;
   password: string;
   temp?: boolean;
@@ -91,7 +80,7 @@ export interface UserCredentials {
 
 const storePath = path.resolve(__dirname, './../../../data/.temp-users.data.json');
 
-let tempUsers: Record<string, UserCredentials> = {};
+let tempUsers: Record<string, UserDetails> = {};
 
 if (fs.existsSync(storePath)) {
   const data = fs.readFileSync(storePath, 'utf-8');
@@ -102,7 +91,7 @@ function saveTempUsers(): void {
   fs.writeFileSync(storePath, JSON.stringify(tempUsers, null, 2));
 }
 
-export function setTempUser(key: string, creds: UserCredentials): void {
+export function setTempUser(key: string, creds: UserDetails): void {
   tempUsers[key] = creds;
   saveTempUsers();
 }
@@ -112,10 +101,10 @@ export function deleteTempUser(key: string): void {
   saveTempUsers();
 }
 
-export function getUser(key: string): UserCredentials | undefined {
+export function getUser(key: string): UserDetails | undefined {
   return tempUsers[key];
 }
 
-export function getAllUsers(): Record<string, UserCredentials> {
+export function getAllUsers(): Record<string, UserDetails> {
   return { ...tempUsers };
 }
