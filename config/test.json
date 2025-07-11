@@ -1,1 +1,25 @@
-{}
+{
+  "e2e": {
+    "testUrl": "http://localhost:3209/",
+    "idamUrl": "https://idam-api.aat.platform.hmcts.net",
+    "idamTestingSupportUrl": "https://idam-testing-support-api.aat.platform.hmcts.net",
+    "loginEndpoint": "o/token",
+    "grantType": "password",
+    "scope": "profile openid roles",
+    "clientId": "pcs-frontend",
+    "roles": "citizen",
+    "playwrightDebug": true,
+    "secrets": {
+      "pcs-frontend-idam-system-username": "IDAM_SYSTEM_USERNAME",
+      "pcs-frontend-idam-system-password": "IDAM_SYSTEM_PASSWORD",
+      "pcs-idam-test-user-password": "PCS_IDAM_TEST_USER_PASSWORD",
+      "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
+    },
+    "claimFormTestData": {
+      "pageRoute": "/steps/page1"
+    },
+    "dashboard": {
+      "pageRoute": "/dashboard/1"
+    }
+  }
+}
