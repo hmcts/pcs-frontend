@@ -18,6 +18,7 @@ interface CustomSessionData extends SessionData {
   returnTo?: string;
   formData?: Record<string, any>;
   ccdCase?: CcdCase;
+  postcodeLookupResult?: any[];
   destroy(callback: (err?: Error) => void): void;
 }
 
