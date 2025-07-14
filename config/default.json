@@ -23,11 +23,20 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-316.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-316"
+    "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
+    "caseTypeId": "PCS"
   },
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
+  },
+  "pcq": {
+    "enabled": false,
+    "name": "Equality and Diversity Service",
+    "url": "https://pcq.aat.platform.hmcts.net",
+    "path": "/service-endpoint",
+    "port": 4000,
+    "serviceId": "PCS",
+    "actor": "APPLICANT"
   },
   "secrets": {
     "pcs": {
@@ -39,7 +48,8 @@
       "pcs-frontend-idam-system-username": "AAAAAAAAAAAA",
       "pcs-frontend-idam-system-password": "AAAAAAAAAAAAAA",
       "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA",
-      "pcs-os-client-lookup-key": "AAAAAAAAAAAAAA"
+      "pcs-os-client-lookup-key": "AAAAAAAAAAAAAA",
+      "pcs-pcq-token-key": "AAAAAAAAA"
     }
   },
   "oidc": {
