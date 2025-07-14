@@ -8,8 +8,10 @@ export default function registerSteps(app: Application): void {
     const isProtected = protectedSteps.includes(step);
     const middlewares = isProtected ? [oidcMiddleware, ccdCaseMiddleware] : [];
 
+    const allGetMiddleware = step.middleware ? [...middlewares, ...step.middleware] : middlewares;
+
     if (step.getController) {
-      app.get(step.url, ...middlewares, step.getController.get);
+      app.get(step.url, ...allGetMiddleware, step.getController.get);
     }
     if (step.postController?.post) {
       app.post(step.url, ...middlewares, step.postController.post);
