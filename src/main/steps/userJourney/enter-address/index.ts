@@ -18,9 +18,7 @@ const content = {
   ...common,
   backUrl: '/steps/user-journey/enter-user-details',
 };
-
 export const partialUkPostcodePattern = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s*[0-9]?[A-Z]{0,2}$/i;
-
 const postcodeRegex = new RegExp(partialUkPostcodePattern);
 
 const fields: FormFieldConfig[] = [

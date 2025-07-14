@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import { createGetController } from '../../../app/controller/controllerFactory';
 import common from '../../../assets/locales/en/common.json';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const stepName = 'summary';
@@ -14,6 +15,7 @@ export const step: StepDefinition = {
   view: 'steps/userJourney/summary.njk',
   stepDir: __dirname,
   generateContent: () => content,
+  middleware: [pcqRedirectMiddleware()],
   getController: createGetController('steps/userJourney/summary.njk', stepName, content, req => {
     const userDetails = req.session.formData?.['enter-user-details'];
     const address = req.session.formData?.['enter-address'];
