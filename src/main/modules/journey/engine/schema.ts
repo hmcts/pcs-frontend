@@ -25,9 +25,14 @@ export const ValidationRuleSchema = z
     max: z.number().optional().default(100),
     pattern: z.string().optional(),
     email: z.boolean().optional().default(false),
-    postalCode: z.boolean().optional().default(false),
+    postcode: z.boolean().optional().default(false),
     url: z.boolean().optional().default(false),
-    customMessage: z.string().optional(),
+    // Allows either a static string or a function (val => typeof val === 'string' | 'function')
+    customMessage: z
+      .custom< string | ((code: string) => string) >(val => typeof val === 'string' || typeof val === 'function', {
+        message: 'customMessage must be a string or function',
+      })
+      .optional(),
     errorMessages: ErrorMessagesSchema,
   })
   .optional();
@@ -353,36 +358,55 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
   const rules = fieldConfig.validate;
   const errorMessages = rules?.errorMessages;
 
+  // Helper to resolve the correct error message for a specific validation failure.
+  // If `customMessage` is a function it will be invoked with the error code so that
+  // the developer can dynamically return a string. Otherwise, fall back to any
+  // provided string (or undefined so Zod will use its default).
+  const getMessage = (code: string): string | undefined => {
+    if (!rules) return undefined;
+    const { customMessage } = rules;
+    if (typeof customMessage === 'function') {
+      try {
+        // Pass the error code plus any additional context you may need
+        return customMessage(code);
+      } catch (err) {
+        console.error('customMessage function threw', err);
+        return undefined;
+      }
+    }
+    return customMessage as string | undefined;
+  };
+
   switch (fieldConfig.type) {
     case 'number': {
       let schema = z.coerce.number();
       if (rules?.min !== undefined) {
-        schema = schema.min(rules.min, { error: rules.customMessage });
+        schema = schema.min(rules.min, { error: getMessage('min') });
       }
       if (rules?.max !== undefined) {
-        schema = schema.max(rules.max, { error: rules.customMessage });
+        schema = schema.max(rules.max, { error: getMessage('max') });
       }
       return rules?.required === false ? schema.optional() : schema;
     }
 
     case 'email': {
-      let schema = z.email({ error: rules?.customMessage });
+      let schema = z.email({ error: getMessage('email') });
       if (rules?.minLength !== undefined) {
-        schema = schema.min(rules.minLength, { error: rules.customMessage });
+        schema = schema.min(rules.minLength, { error: getMessage('minLength') });
       }
       if (rules?.maxLength !== undefined) {
-        schema = schema.max(rules.maxLength, { error: rules.customMessage });
+        schema = schema.max(rules.maxLength, { error: getMessage('maxLength') });
       }
       return rules?.required === false ? schema.optional() : schema;
     }
 
     case 'url': {
-      let schema = z.url({ error: rules?.customMessage });
+      let schema = z.url({ error: getMessage('url') });
       if (rules?.minLength !== undefined) {
-        schema = schema.min(rules.minLength, { error: rules.customMessage });
+        schema = schema.min(rules.minLength, { error: getMessage('minLength') });
       }
       if (rules?.maxLength !== undefined) {
-        schema = schema.max(rules.maxLength, { error: rules.customMessage });
+        schema = schema.max(rules.maxLength, { error: getMessage('maxLength') });
       }
       return rules?.required === false ? schema.optional() : schema;
     }
@@ -407,9 +431,9 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     case 'checkboxes': {
       if (rules?.required === true || rules?.minLength !== undefined) {
         const minItems = rules?.minLength || 1;
-        let schema = z.array(z.string()).min(minItems, { error: rules?.customMessage || 'Select at least one option' });
+        let schema = z.array(z.string()).min(minItems, { error: getMessage('minLength') || 'Select at least one option' });
         if (rules?.maxLength !== undefined) {
-          schema = schema.max(rules.maxLength, { error: rules.customMessage });
+          schema = schema.max(rules.maxLength, { error: getMessage('maxLength') });
         }
         return schema;
       }
@@ -461,31 +485,31 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     default: {
       let schema = z.string();
       if (rules?.minLength !== undefined) {
-        schema = schema.min(rules.minLength, { error: rules.customMessage });
+        schema = schema.min(rules.minLength, { error: getMessage('minLength') });
       }
       if (rules?.maxLength !== undefined) {
-        schema = schema.max(rules.maxLength, { error: rules.customMessage });
+        schema = schema.max(rules.maxLength, { error: getMessage('maxLength') });
       }
       if (rules?.pattern) {
-        schema = schema.regex(new RegExp(rules.pattern), { error: rules.customMessage });
+        schema = schema.regex(new RegExp(rules.pattern), { error: getMessage('pattern') });
       }
 
       // Enforce non-empty when required but no explicit minLength provided
       if (rules?.required === true && (rules?.minLength === undefined || rules.minLength < 1)) {
-        schema = schema.min(1, { error: rules.customMessage || 'Enter a value' });
+        schema = schema.min(1, { error: getMessage('required') || 'Enter a value' });
       }
 
       if (rules?.email) {
-        schema = z.string().email({ message: rules.customMessage });
+        schema = z.string().email({ message: getMessage('email') });
       }
 
       if (rules?.url) {
-        schema = z.string().url({ message: rules.customMessage });
+        schema = z.string().url({ message: getMessage('url') });
       }
 
-      if (rules?.postalCode) {
+      if (rules?.postcode) {
         schema = schema.refine(val => isPostalCode(val, 'GB'), {
-          error: rules.customMessage ?? 'Enter a valid postcode',
+          error: getMessage('postcode') ?? 'Enter a valid postcode',
         });
       }
       return rules?.required === false ? schema.optional() : schema;
