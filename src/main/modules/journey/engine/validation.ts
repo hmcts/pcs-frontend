@@ -32,40 +32,76 @@ export class JourneyValidator {
 
       // Collect day/month/year for date fields
       if (fieldConfig.type === 'date') {
+        // TODO: this is a hack to get the date validation working. We need to refactor this to be more robust.
+
+        const fieldLevelErrors = fieldConfig.errorMessages ?? fieldConfig.validate?.errorMessages;
         fieldValue = {
           day: submission[`${fieldName}-day`],
           month: submission[`${fieldName}-month`],
           year: submission[`${fieldName}-year`],
         };
         const dateVal = fieldValue as { day?: string; month?: string; year?: string };
+
         // GOV.UK error priority: required, incomplete, invalid, future
         if (!dateVal.day && !dateVal.month && !dateVal.year) {
           errors[fieldName] = {
-            day: fieldConfig.validate?.errorMessages?.day,
-            month: fieldConfig.validate?.errorMessages?.month,
-            year: fieldConfig.validate?.errorMessages?.year,
-            message: fieldConfig.validate?.errorMessages?.required || 'Please enter a valid date',
+            day: fieldLevelErrors?.day,
+            month: fieldLevelErrors?.month,
+            year: fieldLevelErrors?.year,
+            message: fieldLevelErrors?.required || 'Please enter a valid date',
           };
           continue;
         } else if (!dateVal.day || !dateVal.month || !dateVal.year) {
           errors[fieldName] = {
-            day: !dateVal.day ? fieldConfig.validate?.errorMessages?.day || 'Enter a valid day' : undefined,
-            month: !dateVal.month ? fieldConfig.validate?.errorMessages?.month || 'Enter a valid month' : undefined,
-            year: !dateVal.year ? fieldConfig.validate?.errorMessages?.year || 'Enter a valid year' : undefined,
-            message: fieldConfig.validate?.errorMessages?.incomplete || 'Date must include a day, month and year',
+            day: !dateVal.day ? fieldLevelErrors?.day || 'Enter a valid day' : undefined,
+            month: !dateVal.month ? fieldLevelErrors?.month || 'Enter a valid month' : undefined,
+            year: !dateVal.year ? fieldLevelErrors?.year || 'Enter a valid year' : undefined,
+            message: fieldLevelErrors?.incomplete || 'Date must include a day, month and year',
           };
           continue;
         } else {
           const year = parseInt(dateVal.year, 10);
           const month = parseInt(dateVal.month, 10);
           const day = parseInt(dateVal.day, 10);
-          const date = new Date(year, month - 1, day);
-          if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+
+          // Collect any part-specific errors
+          const partErrors: Record<string, string | undefined> = {};
+
+          if (isNaN(month) || month < 1 || month > 12) {
+            partErrors.month = fieldLevelErrors?.month || 'Enter a valid month';
+          }
+
+          if (isNaN(day) || day < 1 || day > 31) {
+            partErrors.day = fieldLevelErrors?.day || 'Enter a valid day';
+          }
+
+          if (isNaN(year) || year < 1000) {
+            partErrors.year = fieldLevelErrors?.year || 'Enter a valid year';
+          }
+
+          // If basic range checks passed, verify the composed date is valid
+          if (Object.keys(partErrors).length === 0) {
+            const date = new Date(year, month - 1, day);
+            if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+              partErrors.day = fieldLevelErrors?.day || 'Enter a valid day';
+            }
+          }
+
+          if (Object.keys(partErrors).length > 0) {
+            const firstPart = partErrors.day ? 'day' : partErrors.month ? 'month' : partErrors.year ? 'year' : null;
             errors[fieldName] = {
-              day: fieldConfig.validate?.errorMessages?.day,
-              month: fieldConfig.validate?.errorMessages?.month,
-              year: fieldConfig.validate?.errorMessages?.year,
-              message: fieldConfig.validate?.errorMessages?.invalid || 'Please enter a valid date',
+              ...partErrors,
+              // Use the first part-specific message as the summary line
+              message:
+                partErrors.day ??
+                partErrors.month ??
+                partErrors.year ??
+                fieldLevelErrors?.invalid ??
+                'Please enter a valid date',
+              // Extra property used by the template to focus the correct input
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              anchor: firstPart ? `${fieldName}-${firstPart}` : fieldName,
             };
             continue;
           }

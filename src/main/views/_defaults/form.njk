@@ -34,9 +34,10 @@
     {% if errors %}
       {% set errorList = [] %}
       {% for fieldName, error in errors %}
+        {% set anchorId = error.anchor if error.anchor else fieldName %}
         {% set errorList = errorList.concat([{
           text: error.message if error.message else error,
-          href: "#" + fieldName
+          href: "#" + anchorId
         }]) %}
       {% endfor %}
 

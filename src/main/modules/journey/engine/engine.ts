@@ -339,6 +339,7 @@ export class WizardEngine {
                 hasError = true;
               }
             }
+            // Name stays as day/month/year – macro will apply the field prefix.
             return {
               name: part,
               classes:
@@ -440,8 +441,11 @@ export class WizardEngine {
             break;
           }
           case 'date': {
-            // handled earlier building dateItems list, attach now
+            // handled earlier building dateItems list, attach now, and set namePrefix so
+            // the govukDateInput macro prefixes each item name/id with the field key.
             processed.items = dateItems[fieldName] ?? [];
+            // @ts-expect-error namePrefix not in type but allowed by macro
+            processed.namePrefix = fieldName;
             break;
           }
         }
@@ -570,10 +574,10 @@ export class WizardEngine {
           },
         };
 
-        this.logger.info('ISENABLED ===>> LaunchDarkly Flag Evaluation', { context, keyToCheck });
+        // this.logger.info('ISENABLED ===>> LaunchDarkly Flag Evaluation', { context, keyToCheck });
 
-        const flags = await ldClient.allFlagsState(context);
-        this.logger.info('FLAGS ===>> LaunchDarkly ALLLLL Flag Evaluation', flags.allValues(), flags.toJSON());
+        // const flags = await ldClient.allFlagsState(context);
+        // this.logger.info('FLAGS ===>> LaunchDarkly ALLLLL Flag Evaluation', flags.allValues(), flags.toJSON());
 
         // If the flag does not exist LD will return the default (true) so UI remains visible by default.
         return await ldClient.variation(keyToCheck, context, true);
@@ -600,7 +604,7 @@ export class WizardEngine {
       const cfg: any = config;
       const fieldDefaultKey = `${this.slug}-${original.id}-${name}`;
       const isEnabledFlag = await isEnabled(cfg.flag, fieldDefaultKey);
-      this.logger.info('IN LOOP ===>>LaunchDarkly Flag Evaluation', { fieldDefaultKey, isEnabledFlag });
+      // this.logger.info('IN LOOP ===>>LaunchDarkly Flag Evaluation', { fieldDefaultKey, isEnabledFlag });
       if (isEnabledFlag) {
         newFields[name] = config as FieldConfig;
       }
@@ -626,7 +630,7 @@ export class WizardEngine {
 
       const firstStepId = Object.keys(this.journey.steps)[0];
       const hasVisibleFields = prevStep.fields ? Object.keys(prevStep.fields).length > 0 : false;
-      this.logger.info('Checking prev step visibility', { prevId, fields: prevStep.fields, hasVisibleFields });
+      // this.logger.info('Checking prev step visibility', { prevId, fields: prevStep.fields, hasVisibleFields });
 
       if (prevId === firstStepId || hasVisibleFields) {
         return prevId;
@@ -722,7 +726,7 @@ export class WizardEngine {
       step = await this.applyLdOverride(step, req);
       step = await this.applyLaunchDarklyFlags(step, req);
 
-      this.logger.info('LaunchDarkly Flag Evaluation', { step });
+      // this.logger.info('LaunchDarkly Flag Evaluation', { step });
 
       try {
         const { data } = await this.store.load(req, caseId);
@@ -770,8 +774,6 @@ export class WizardEngine {
           ...context,
           previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
         };
-
-        this.logger.info('previousStepUrl sent to template', context.previousStepUrl);
 
         const templatePath = await this.resolveTemplatePath(step.id);
 
@@ -838,8 +840,6 @@ export class WizardEngine {
           ...context,
           previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
         };
-
-        this.logger.info('previousStepUrl sent to template', context.previousStepUrl);
 
         return res.status(400).render(await this.resolveTemplatePath(step.id), {
           ...context,
