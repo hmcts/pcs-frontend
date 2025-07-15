@@ -21,10 +21,11 @@ export class Journey {
       // Slug is the parent directory name of the index file
       const slug = path.basename(path.dirname(file));
 
-      const journeyModule = require(file);
-      const journeyConfig: JourneyConfig = journeyModule.default ?? journeyModule;
-
       try {
+        const journeyModule = require(file);
+        const journeyConfig: JourneyConfig = journeyModule.default ?? journeyModule;
+        this.logger.info(`Loaded journey from ${file}: ${journeyConfig.meta.name}`);
+
         const engine = new WizardEngine(journeyConfig, slug, file);
         app.use(engine.basePath, engine.router());
 
