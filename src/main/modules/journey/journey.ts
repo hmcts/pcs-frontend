@@ -5,6 +5,7 @@ import { Express } from 'express';
 import { glob } from 'glob';
 
 import { WizardEngine } from './engine/engine';
+import { JourneyConfig } from './engine/schema';
 
 export class Journey {
   logger = Logger.getLogger('journey');
@@ -18,7 +19,7 @@ export class Journey {
       const slug = path.basename(path.dirname(file));
 
       const journeyModule = require(file);
-      const journeyConfig = (journeyModule.default ?? journeyModule) as import('./engine/schema').JourneyConfig;
+      const journeyConfig: JourneyConfig = journeyModule.default ?? journeyModule;
 
       try {
         const engine = new WizardEngine(journeyConfig, slug, file);

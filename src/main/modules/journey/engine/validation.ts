@@ -74,9 +74,23 @@ export class JourneyValidator {
       if (result.success) {
         validatedData[fieldName] = result.data;
       } else {
-        // Get the first error message
-        const errorMessage = result.error.issues[0]?.message || 'Invalid value';
-        errors[fieldName] = fieldConfig.validate?.customMessage || errorMessage;
+        // Get the first error message produced by Zod (our schema already injects dynamic messages)
+        const issue = result.error.issues[0];
+        const fallbackMessage = issue?.message || 'Invalid value';
+
+        const custom = fieldConfig.validate?.customMessage;
+        if (typeof custom === 'function') {
+          try {
+            errors[fieldName] = custom(issue?.code || 'unknown');
+          } catch (err) {
+            console.error('customMessage function error', err);
+            errors[fieldName] = fallbackMessage;
+          }
+        } else if (typeof custom === 'string') {
+          errors[fieldName] = custom;
+        } else {
+          errors[fieldName] = fallbackMessage;
+        }
       }
     }
 

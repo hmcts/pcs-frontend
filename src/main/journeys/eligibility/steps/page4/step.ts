@@ -14,15 +14,8 @@ const step: StepDraft = {
       type: 'date',
       label: 'Date of birth',
       validate: {
-        errorMessages: {
-          day: 'Enter a valid day!!!!',
-          month: 'Enter a valid month!!!!',
-          year: 'Enter a valid year!!!!',
-          required: 'Enter your date of birth!!!!',
-          incomplete: 'Date of birth must include a day, month and year!!!!',
-          invalid: 'Date of birth must be a real date!!!!',
-          future: 'Date of birth must be in the past!!!!!',
-        },
+        required: true,
+        customMessage: 'Enter a valid date of birth',
       },
     },
     postcode: {

@@ -6,6 +6,7 @@ import * as LDClient from '@launchdarkly/node-server-sdk';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
+import { TTLCache } from '../../../utils/ttlCache';
 
 import { FieldConfig, JourneyConfig, JourneyDraft, JourneySchema, StepConfig } from './schema';
 import { type JourneyStore } from './storage/index';
@@ -46,6 +47,9 @@ export class WizardEngine {
   private readonly validator: JourneyValidator;
   private static validatedJourneys: Map<string, JourneyConfig> = new Map();
   private readonly store!: JourneyStore;
+
+  private static readonly TEMPLATE_CACHE_TTL_MS = process.env.NODE_ENV === 'development' ? 5000 : undefined as number | undefined;
+  private static readonly templatePathCache = new TTLCache<string, string>(WizardEngine.TEMPLATE_CACHE_TTL_MS);
 
   logger = Logger.getLogger('WizardEngine');
 
@@ -120,6 +124,12 @@ export class WizardEngine {
   }
 
   private async resolveTemplatePath(stepId: string): Promise<string> {
+    const cacheKey = `${this.slug}:${stepId}`;
+    const cached = WizardEngine.templatePathCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const step = this.journey.steps[stepId];
     if (!step) {
       return stepId;
@@ -127,6 +137,7 @@ export class WizardEngine {
 
     // Use explicit template if author provided one
     if (step.template) {
+      WizardEngine.templatePathCache.set(cacheKey, step.template);
       return step.template;
     }
 
@@ -144,18 +155,24 @@ export class WizardEngine {
     const journeysRoot = path.join(__dirname, '..', '..', '..', 'journeys');
     const newTemplate = path.join(journeysRoot, `${newPath}.njk`);
     if (await checkExists(newTemplate)) {
+      WizardEngine.templatePathCache.set(cacheKey, newPath);
       return newPath;
     }
 
     // If no journey-specific template found, use default templates
     if (step.type && ['summary', 'confirmation', 'ineligible', 'error', 'complete', 'success'].includes(step.type)) {
-      return `_defaults/${step.type}`;
+      const defaultPath = `_defaults/${step.type}`;
+      WizardEngine.templatePathCache.set(cacheKey, defaultPath);
+      return defaultPath;
     }
     // For regular steps with fields, use generic form template
     if (step.fields && Object.keys(step.fields).length > 0) {
-      return '_defaults/form';
+      const formPath = '_defaults/form';
+      WizardEngine.templatePathCache.set(cacheKey, formPath);
+      return formPath;
     }
     // If no specific template or default found, fall back to regular path
+    WizardEngine.templatePathCache.set(cacheKey, stepId);
     return stepId;
   }
 
@@ -179,6 +196,26 @@ export class WizardEngine {
       .map(([stepId, stepConfig]) => {
         const typedStepConfig = stepConfig as StepConfig;
         const stepData = allData[stepId] as Record<string, unknown>;
+
+        // Determine label to use for the summary row. If any field within this step has
+        // a legend marked `isPageHeading: true` prefer that legend text over the step
+        // title. This allows authors to rely on the GOV.UK Design System convention of
+        // promoting a fieldset legend to the page heading instead of duplicating the
+        // text in the step title.
+        let rowLabel: string = typedStepConfig.title || stepId;
+        if (typedStepConfig.fields) {
+          for (const fieldCfg of Object.values(typedStepConfig.fields)) {
+            // fieldCfg.fieldset?.legend may be a string or an object. Only objects can
+            // have the `isPageHeading` boolean flag so we narrow the type accordingly.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const legend = (fieldCfg as FieldConfig).fieldset?.legend as any;
+            if (legend && typeof legend === 'object' && legend.isPageHeading) {
+              rowLabel = legend.text ?? legend.html ?? rowLabel;
+              break;
+            }
+          }
+        }
+
         const fieldValues = Object.entries(typedStepConfig.fields!)
           .filter(([fieldName]) => stepData[fieldName])
           .map(([fieldName, fieldConfig]) => {
@@ -194,12 +231,14 @@ export class WizardEngine {
             ) {
               return `${value.day || ''}/${value.month || ''}/${value.year || ''}`;
             }
-            if (typedFieldConfig.type === 'checkboxes') {
-              // return the text of the options that are selected
-              const selected = typedFieldConfig.options
+            if (typedFieldConfig.type === 'checkboxes' || typedFieldConfig.type === 'radios' || typedFieldConfig.type === 'select') {
+               // return the text of the options that are selected
+
+              const items = typedFieldConfig.items ?? typedFieldConfig.options;
+              const selected = items
                 ?.filter(option => {
                   const optionValue = typeof option === 'string' ? option : option.value;
-                  return (value as string[]).includes(optionValue);
+                  return (value as string[]).includes(optionValue) && optionValue !== '' && optionValue !== null;
                 })
                 .map(option => (typeof option === 'string' ? option : option.text))
                 .join(', ');
@@ -209,14 +248,14 @@ export class WizardEngine {
           });
 
         return {
-          key: { text: typedStepConfig.title || stepId },
+          key: { text: rowLabel },
           value: { text: fieldValues.join(', ') },
           actions: {
             items: [
               {
                 href: `${this.basePath}/${stepId}`,
                 text: 'Change',
-                visuallyHiddenText: `change ${(typedStepConfig.title || stepId).toLowerCase()}`,
+                visuallyHiddenText: `change ${rowLabel.toLowerCase()}`,
               },
             ],
           },
