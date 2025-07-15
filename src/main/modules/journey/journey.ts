@@ -12,7 +12,10 @@ export class Journey {
 
   enableFor(app: Express): void {
     // Load all journeys defined by an `index.ts` (or .js) file inside each journey directory
-    const journeyFiles = glob.sync(path.resolve(__dirname, '..', '..', 'journeys', '**', 'index.{ts,js}'));
+    const journeyPath = path.resolve(__dirname, '..', '..', 'journeys', '**', 'index.{ts,js}');
+    const journeyFiles = glob.sync(journeyPath);
+
+    this.logger.info(`Loading ${journeyFiles.length} journeys from ${journeyPath}`);
 
     journeyFiles.forEach(file => {
       // Slug is the parent directory name of the index file

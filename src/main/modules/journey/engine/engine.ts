@@ -136,10 +136,15 @@ export class WizardEngine {
       return stepId;
     }
 
+    const sanitizePathSegment = (segment: string): string => {
+      return segment.replace(/[^a-zA-Z0-9_-]/g, '');
+    };
+
     // Use explicit template if author provided one
     if (step.template) {
-      WizardEngine.templatePathCache.set(cacheKey, step.template);
-      return step.template;
+      const sanitizedTemplate = sanitizePathSegment(step.template);
+      WizardEngine.templatePathCache.set(cacheKey, sanitizedTemplate);
+      return sanitizedTemplate;
     }
 
     const checkExists = async (candidate: string): Promise<boolean> => {
@@ -152,7 +157,8 @@ export class WizardEngine {
     };
 
     // New DSL layout: journeys/<slug>/steps/<stepId>/<stepId>.njk (viewsDir may include journeys root)
-    const newPath = path.join(this.slug, 'steps', stepId, stepId);
+    const sanitizedStepId = sanitizePathSegment(stepId);
+    const newPath = path.join(this.slug, 'steps', sanitizedStepId, sanitizedStepId);
     const journeysRoot = path.join(__dirname, '..', '..', '..', 'journeys');
     const newTemplate = path.join(journeysRoot, `${newPath}.njk`);
     if (await checkExists(newTemplate)) {
@@ -173,8 +179,8 @@ export class WizardEngine {
       return formPath;
     }
     // If no specific template or default found, fall back to regular path
-    WizardEngine.templatePathCache.set(cacheKey, stepId);
-    return stepId;
+    WizardEngine.templatePathCache.set(cacheKey, sanitizedStepId);
+    return sanitizedStepId;
   }
 
   // Build summary rows for summary pages
