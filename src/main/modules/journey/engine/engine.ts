@@ -48,7 +48,8 @@ export class WizardEngine {
   private static validatedJourneys: Map<string, JourneyConfig> = new Map();
   private readonly store!: JourneyStore;
 
-  private static readonly TEMPLATE_CACHE_TTL_MS = process.env.NODE_ENV === 'development' ? 5000 : undefined as number | undefined;
+  private static readonly TEMPLATE_CACHE_TTL_MS =
+    process.env.NODE_ENV === 'development' ? 5000 : (undefined as number | undefined);
   private static readonly templatePathCache = new TTLCache<string, string>(WizardEngine.TEMPLATE_CACHE_TTL_MS);
 
   logger = Logger.getLogger('WizardEngine');
@@ -231,8 +232,12 @@ export class WizardEngine {
             ) {
               return `${value.day || ''}/${value.month || ''}/${value.year || ''}`;
             }
-            if (typedFieldConfig.type === 'checkboxes' || typedFieldConfig.type === 'radios' || typedFieldConfig.type === 'select') {
-               // return the text of the options that are selected
+            if (
+              typedFieldConfig.type === 'checkboxes' ||
+              typedFieldConfig.type === 'radios' ||
+              typedFieldConfig.type === 'select'
+            ) {
+              // return the text of the options that are selected
 
               const items = typedFieldConfig.items ?? typedFieldConfig.options;
               const selected = items

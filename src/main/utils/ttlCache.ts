@@ -33,4 +33,4 @@ export class TTLCache<K, V> {
   clear(): void {
     this.store.clear();
   }
-} 
+}
