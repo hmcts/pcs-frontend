@@ -29,7 +29,7 @@ export const ValidationRuleSchema = z
     url: z.boolean().optional().default(false),
     // Allows either a static string or a function (val => typeof val === 'string' | 'function')
     customMessage: z
-      .custom< string | ((code: string) => string) >(val => typeof val === 'string' || typeof val === 'function', {
+      .custom<string | ((code: string) => string)>(val => typeof val === 'string' || typeof val === 'function', {
         message: 'customMessage must be a string or function',
       })
       .optional(),
@@ -363,13 +363,16 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
   // the developer can dynamically return a string. Otherwise, fall back to any
   // provided string (or undefined so Zod will use its default).
   const getMessage = (code: string): string | undefined => {
-    if (!rules) return undefined;
+    if (!rules) {
+      return undefined;
+    }
     const { customMessage } = rules;
     if (typeof customMessage === 'function') {
       try {
         // Pass the error code plus any additional context you may need
         return customMessage(code);
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error('customMessage function threw', err);
         return undefined;
       }
@@ -431,7 +434,9 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     case 'checkboxes': {
       if (rules?.required === true || rules?.minLength !== undefined) {
         const minItems = rules?.minLength || 1;
-        let schema = z.array(z.string()).min(minItems, { error: getMessage('minLength') || 'Select at least one option' });
+        let schema = z
+          .array(z.string())
+          .min(minItems, { error: getMessage('minLength') || 'Select at least one option' });
         if (rules?.maxLength !== undefined) {
           schema = schema.max(rules.maxLength, { error: getMessage('maxLength') });
         }

@@ -1,4 +1,5 @@
 import { $ZodIssue } from 'zod/v4/core';
+
 import { JourneyDraft, StepDraft } from '../../modules/journey/engine/schema';
 
 // Helper to simplify next linking
@@ -30,12 +31,15 @@ const stepsById: Record<string, StepDraft> = {
           minLength: 1,
           maxLength: 6,
           customMessage: (code: $ZodIssue['code']) => {
-            console.log('code', code);
             switch (code) {
-              case 'too_small':  return 'Please fill this in';
-              case 'too_big': return 'Too many characters! Max 6';
-              case 'invalid_type': return 'Need at least 1 character';
-              default:          return 'Something went wrong';
+              case 'too_small':
+                return 'Please fill this in';
+              case 'too_big':
+                return 'Too many characters! Max 6';
+              case 'invalid_type':
+                return 'Need at least 1 character';
+              default:
+                return 'Something went wrong';
             }
           },
         },
@@ -108,13 +112,17 @@ const stepsById: Record<string, StepDraft> = {
           { value: 'green', text: 'Green' },
           { value: 'blue', text: 'Blue' },
         ],
-        validate: { required: true, customMessage: (code: $ZodIssue['code']) => {
-          console.log('code', code);
-          switch (code) {
-            case 'invalid_value': return 'Please select at least one colour';
-            default: return 'Something went wrong';
-          }
-        } },
+        validate: {
+          required: true,
+          customMessage: (code: $ZodIssue['code']) => {
+            switch (code) {
+              case 'invalid_value':
+                return 'Please select at least one colour';
+              default:
+                return 'Something went wrong';
+            }
+          },
+        },
       },
     },
   },
