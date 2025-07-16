@@ -32,6 +32,12 @@ const step: StepDraft = {
         customMessage: 'Select at least one option',
       },
     },
+    continueButton: {
+      type: 'button',
+      attributes: {
+        type: 'submit',
+      },
+    },
   },
   next: {
     when: (_stepData: Record<string, unknown>, allData: Record<string, unknown>) => {

@@ -5,6 +5,15 @@ const step: StepDraft = {
   title: 'Before you start',
   type: 'form',
   description: "Information about what you'll need for your possession claim",
+  fields: {
+    startButton: {
+      type: 'button',
+      text: 'Start',
+      attributes: {
+        type: 'submit',
+      },
+    },
+  },
   next: 'page2',
 };
 

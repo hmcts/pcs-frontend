@@ -22,6 +22,12 @@ const step: StepDraft = {
       type: 'text',
       label: 'Postcode',
     },
+    continueButton: {
+      type: 'button',
+      attributes: {
+        type: 'submit',
+      },
+    },
   },
   next: 'summary',
 };

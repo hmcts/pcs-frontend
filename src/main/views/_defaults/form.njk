@@ -31,20 +31,8 @@
     {% endif %}
 
 
-    {% if errors %}
-      {% set errorList = [] %}
-      {% for fieldName, error in errors %}
-        {% set anchorId = error.anchor if error.anchor else fieldName %}
-        {% set errorList = errorList.concat([{
-          text: error.message if error.message else error,
-          href: "#" + anchorId
-        }]) %}
-      {% endfor %}
-
-      {{ govukErrorSummary({
-        titleText: "There is a problem",
-        errorList: errorList
-      }) }}
+    {% if errorSummary %}
+      {{ govukErrorSummary(errorSummary) }}
     {% endif %}
 
     <form method="post">
@@ -66,15 +54,20 @@
 
         {% elif fieldConfig.type == 'date' %}
           {{ govukDateInput(fieldConfig) }}
+
+        {% elif fieldConfig.type == 'button' %}
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: fieldConfig.text or 'Continue',
+              href: fieldConfig.href,
+              classes: fieldConfig.classes,
+              attributes: fieldConfig.attributes or { type: 'submit' }
+            }) }}
+          </div>
         {% endif %}
+
       {% endfor %}
 
-      <div class="govuk-button-group">
-        {{ govukButton({
-          text: 'Continue',
-          attributes: { type: 'submit' }
-        }) }}
-      </div>
     </form>
   </div>
 </div>
