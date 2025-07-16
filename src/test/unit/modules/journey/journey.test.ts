@@ -30,7 +30,11 @@ const createVirtualJourneyModule = (filePath: string): void => {
   jest.doMock(
     filePath,
     () => ({
-      default: {}, // The real contents are irrelevant for these unit tests
+      default: {
+        meta: {
+          name: 'Test Journey'
+        }
+      }, // The real contents are irrelevant for these unit tests
     }),
     { virtual: true }
   );
