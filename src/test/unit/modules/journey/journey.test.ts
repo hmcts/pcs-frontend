@@ -32,8 +32,8 @@ const createVirtualJourneyModule = (filePath: string): void => {
     () => ({
       default: {
         meta: {
-          name: 'Test Journey'
-        }
+          name: 'Test Journey',
+        },
       }, // The real contents are irrelevant for these unit tests
     }),
     { virtual: true }
