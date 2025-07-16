@@ -22,6 +22,12 @@ const step: StepDraft = {
         customMessage: 'Select yes or no',
       },
     },
+    continueButton: {
+      type: 'button',
+      attributes: {
+        type: 'submit',
+      },
+    },
   },
   next: {
     when: (stepData: Record<string, unknown>) => stepData['age'] === 'yes',

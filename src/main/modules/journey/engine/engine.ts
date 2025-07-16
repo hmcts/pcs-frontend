@@ -8,6 +8,7 @@ import express, { NextFunction, Request, Response, Router } from 'express';
 import { oidcMiddleware } from '../../../middleware/oidc';
 import { TTLCache } from '../../../utils/ttlCache';
 
+import { processErrorsForTemplate } from './errorUtils';
 import { FieldConfig, JourneyConfig, JourneyDraft, JourneySchema, StepConfig } from './schema';
 import { type JourneyStore } from './storage/index';
 import { JourneyValidator } from './validation';
@@ -23,7 +24,8 @@ interface JourneyContext {
   step: StepConfig;
   data: Record<string, unknown>;
   allData: Record<string, unknown>;
-  errors?: Record<string, string | { day?: string; month?: string; year?: string; message: string }>;
+  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>;
+  errorSummary?: { titleText: string; errorList: { text: string; href: string }[] } | null;
   previousStepUrl?: string | null;
   summaryRows?: SummaryRow[];
 }
@@ -55,8 +57,13 @@ export class WizardEngine {
   logger = Logger.getLogger('WizardEngine');
 
   constructor(journeyConfig: JourneyDraft, slug: string, sourcePath?: string) {
-    // If we already validated this slug, reuse it
-    const cachedJourney = WizardEngine.validatedJourneys.get(slug);
+    // Disable caching when running unit tests so each instantiation can supply
+    // its own journey configuration – tests often reuse the same slug with
+    // different configs which would otherwise be ignored due to the cache.
+    const cachingEnabled = process.env.NODE_ENV !== 'test';
+
+    const cachedJourney = cachingEnabled ? WizardEngine.validatedJourneys.get(slug) : undefined;
+
     if (cachedJourney) {
       this.journey = cachedJourney;
     } else {
@@ -70,8 +77,13 @@ export class WizardEngine {
         this.logger.error(detailedMsg, parseResult.error.issues);
         throw new Error(detailedMsg);
       }
+
       this.journey = parseResult.data;
-      WizardEngine.validatedJourneys.set(slug, this.journey);
+
+      // Only cache when enabled (i.e. not in test mode)
+      if (cachingEnabled) {
+        WizardEngine.validatedJourneys.set(slug, this.journey);
+      }
     }
 
     this.slug = slug;
@@ -322,7 +334,7 @@ export class WizardEngine {
     step: StepConfig,
     caseId: string,
     allData: Record<string, unknown>,
-    errors?: Record<string, string | { day?: string; month?: string; year?: string; message: string }>
+    errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
   ): JourneyContext & { dateItems?: Record<string, { name: string; classes: string; value: string }[]> } {
     const previousStepUrl = this.findPreviousStep(step.id, allData);
     const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData) : undefined;
@@ -340,8 +352,6 @@ export class WizardEngine {
             let hasError = false;
             if (fieldError) {
               if (typeof fieldError === 'object' && fieldError[part]) {
-                hasError = true;
-              } else if (typeof fieldError === 'string' && fieldError.includes(part)) {
                 hasError = true;
               }
             }
@@ -384,7 +394,7 @@ export class WizardEngine {
         // Standardised errorMessage for macros
         if (fieldError) {
           // GOV.UK macro expects { text }
-          const msg = typeof fieldError === 'object' && 'message' in fieldError ? fieldError.message : fieldError;
+          const msg = fieldError.message;
 
           processed.errorMessage = { text: String(msg) };
         }
@@ -454,6 +464,15 @@ export class WizardEngine {
             processed.namePrefix = fieldName;
             break;
           }
+          case 'button': {
+            // Merge default text and attributes for button fields
+            if (!processed.text) {
+              processed.text = 'Continue';
+            }
+            const existingAttrs = processed.attributes ?? {};
+            processed.attributes = { type: 'submit', ...existingAttrs };
+            break;
+          }
         }
 
         processedFields[fieldName] = processed;
@@ -469,9 +488,17 @@ export class WizardEngine {
       data,
       allData,
       errors,
+      errorSummary: processErrorsForTemplate(errors),
       previousStepUrl,
       summaryRows,
     };
+  }
+
+  private hasInputFields(stepConfig: StepConfig): boolean {
+    if (!stepConfig.fields) {
+      return false;
+    }
+    return Object.values(stepConfig.fields).some(f => (f as FieldConfig).type !== 'button');
   }
 
   // Check if a step is accessible based on journey progress
@@ -528,7 +555,7 @@ export class WizardEngine {
         }
 
         const dependencyStep = this.journey.steps[dependency] as StepConfig;
-        if (!dependencyStep.fields || Object.keys(dependencyStep.fields).length === 0) {
+        if (!this.hasInputFields(dependencyStep)) {
           continue;
         }
 
@@ -757,8 +784,8 @@ export class WizardEngine {
 
           for (const stepId of stepIds) {
             const stepConfig = this.journey.steps[stepId] as StepConfig;
-            // Skip steps without fields
-            if (!stepConfig.fields || Object.keys(stepConfig.fields).length === 0) {
+            // Skip steps without input fields
+            if (!this.hasInputFields(stepConfig)) {
               continue;
             }
             // If this step has no data, it's the first incomplete step

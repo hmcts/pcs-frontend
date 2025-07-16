@@ -139,6 +139,7 @@ export const FieldSchema = z.object({
     'url',
     'password',
     'file',
+    'button',
   ]),
 
   // Core GOV.UK macro options (all optional so existing journeys continue to work)
@@ -176,6 +177,7 @@ export const FieldSchema = z.object({
 
   rows: z.number().optional(), // textarea
   width: z.string().optional(), // input width modifier classes
+  text: z.string().optional(), // button text
 
   flag: z.string().optional(),
 });
@@ -485,6 +487,10 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
           year: z.string().optional(),
         })
         .optional();
+    }
+
+    case 'button': {
+      return z.any().optional();
     }
 
     default: {

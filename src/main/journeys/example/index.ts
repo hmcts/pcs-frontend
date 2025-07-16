@@ -44,6 +44,12 @@ const stepsById: Record<string, StepDraft> = {
           },
         },
       },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
+      },
     },
   },
   textarea: {
@@ -56,6 +62,12 @@ const stepsById: Record<string, StepDraft> = {
         label: 'Tell us about yourself',
         rows: 5,
         validate: { required: true },
+      },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
       },
     },
   },
@@ -79,6 +91,12 @@ const stepsById: Record<string, StepDraft> = {
         ],
         validate: { required: true },
       },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
+      },
     },
   },
   checkboxes: {
@@ -95,6 +113,12 @@ const stepsById: Record<string, StepDraft> = {
           { value: 'orange', text: 'Orange' },
         ],
         validate: { required: true, minLength: 1, customMessage: 'Please select at least one fruit' },
+      },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
       },
     },
   },
@@ -124,6 +148,12 @@ const stepsById: Record<string, StepDraft> = {
           },
         },
       },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
+      },
     },
   },
   date: {
@@ -145,6 +175,12 @@ const stepsById: Record<string, StepDraft> = {
           year: 'Please enter a valid year',
         },
       },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
+      },
     },
   },
   number: {
@@ -156,6 +192,12 @@ const stepsById: Record<string, StepDraft> = {
         type: 'number',
         label: 'Quantity',
         validate: { required: true, min: 1, max: 100 },
+      },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
       },
     },
   },
@@ -169,6 +211,12 @@ const stepsById: Record<string, StepDraft> = {
         label: 'Email address',
         validate: { required: true, email: true },
       },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
+      },
     },
   },
   tel: {
@@ -180,6 +228,12 @@ const stepsById: Record<string, StepDraft> = {
         type: 'tel',
         label: 'Telephone number',
         validate: { required: true },
+      },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
       },
     },
   },
@@ -193,6 +247,12 @@ const stepsById: Record<string, StepDraft> = {
         label: 'Website URL',
         validate: { required: true, url: true },
       },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
+      },
     },
   },
   password: {
@@ -204,6 +264,12 @@ const stepsById: Record<string, StepDraft> = {
         type: 'password',
         label: 'Password',
         validate: { required: true, minLength: 8 },
+      },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
       },
     },
   },
@@ -217,6 +283,12 @@ const stepsById: Record<string, StepDraft> = {
         label: 'Postcode',
         validate: { required: true, postcode: true },
       },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
+      },
     },
   },
   file: {
@@ -228,6 +300,12 @@ const stepsById: Record<string, StepDraft> = {
         type: 'file',
         label: 'Choose a file to upload',
         validate: { required: true },
+      },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
       },
     },
   },

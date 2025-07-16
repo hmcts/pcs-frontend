@@ -5,7 +5,7 @@ import { StepConfig, createFieldValidationSchema } from './schema';
 export interface ValidationResult {
   success: boolean;
   data?: Record<string, unknown>;
-  errors?: Record<string, string | { day?: string; month?: string; year?: string; message: string }>;
+  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>;
 }
 
 export class JourneyValidator {
@@ -16,7 +16,8 @@ export class JourneyValidator {
       return { success: true, data: submission };
     }
 
-    const errors: Record<string, string | { day?: string; month?: string; year?: string; message: string }> = {};
+    const errors: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }> =
+      {};
     const validatedData: Record<string, unknown> = {};
 
     // Validate each field using Zod
@@ -98,9 +99,6 @@ export class JourneyValidator {
                 partErrors.year ??
                 fieldLevelErrors?.invalid ??
                 'Please enter a valid date',
-              // Extra property used by the template to focus the correct input
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
               anchor: firstPart ? `${fieldName}-${firstPart}` : fieldName,
             };
             continue;
@@ -121,15 +119,15 @@ export class JourneyValidator {
         const custom = fieldConfig.validate?.customMessage;
         if (typeof custom === 'function') {
           try {
-            errors[fieldName] = custom(issue?.code || 'unknown');
+            errors[fieldName] = { message: custom(issue?.code || 'unknown') };
           } catch (err) {
             this.logger.error('customMessage function error', err);
-            errors[fieldName] = fallbackMessage;
+            errors[fieldName] = { message: fallbackMessage };
           }
         } else if (typeof custom === 'string') {
-          errors[fieldName] = custom;
+          errors[fieldName] = { message: custom };
         } else {
-          errors[fieldName] = fallbackMessage;
+          errors[fieldName] = { message: fallbackMessage };
         }
       }
     }
