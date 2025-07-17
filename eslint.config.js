@@ -73,7 +73,7 @@ module.exports = defineConfig([
       eqeqeq: 'error',
       'import/no-duplicates': 'error',
       'import/no-named-as-default': 'error',
-
+      'import/no-named-as-default-member': 'off',
       'import/order': [
         'error',
         {

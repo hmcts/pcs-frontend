@@ -11,6 +11,7 @@ import { HTTPError } from './HttpError';
 import { setupDev } from './development';
 import { AppInsights } from './modules/appinsights';
 import { Helmet } from './modules/helmet';
+import { I18n } from './modules/i18n';
 import { Nunjucks } from './modules/nunjucks';
 import { OIDCModule } from './modules/oidc';
 import { PropertiesVolume } from './modules/properties-volume';
@@ -26,15 +27,6 @@ app.locals.ENV = env;
 
 const logger = Logger.getLogger('app');
 
-new PropertiesVolume().enableFor(app);
-new AppInsights().enable();
-new Nunjucks(developmentMode).enableFor(app);
-// secure the application by adding various HTTP headers to its responses
-new Helmet(developmentMode).enableFor(app);
-new Session().enableFor(app);
-new S2S().enableFor(app);
-new OIDCModule().enableFor(app);
-
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -44,6 +36,16 @@ app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
   next();
 });
+
+new I18n().enableFor(app);
+new PropertiesVolume().enableFor(app);
+new AppInsights().enable();
+new Nunjucks(developmentMode).enableFor(app);
+// secure the application by adding various HTTP headers to its responses
+new Helmet(developmentMode).enableFor(app);
+new Session().enableFor(app);
+new S2S().enableFor(app);
+new OIDCModule().enableFor(app);
 
 registerSteps(app);
 

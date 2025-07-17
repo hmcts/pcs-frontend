@@ -1,0 +1,24 @@
+{% macro languageToggle(currentLang = 'en', pageUrl = '/') %}
+  {# Set the otherLang and toggleText safely using if/else #}
+  {% if currentLang == 'en' %}
+    {% set otherLang = 'cy' %}
+    {% set toggleText = 'Cymraeg' %}
+  {% else %}
+    {% set otherLang = 'en' %}
+    {% set toggleText = 'English' %}
+  {% endif %}
+
+  {# Construct the updated URL #}
+  {% set updatedUrl = '' %}
+  {% if 'lang=' in pageUrl %}
+    {% set updatedUrl = pageUrl | replace('lang=' ~ currentLang, 'lang=' ~ otherLang) %}
+  {% else %}
+    {% if '?' in pageUrl %}
+      {% set updatedUrl = pageUrl ~ '&lang=' ~ otherLang %}
+    {% else %}
+      {% set updatedUrl = pageUrl ~ '?lang=' ~ otherLang %}
+    {% endif %}
+  {% endif %}
+
+  <a class="govuk-link govuk-!-text-align-right" href="{{ updatedUrl }}">{{ toggleText }}</a>
+{% endmacro %}

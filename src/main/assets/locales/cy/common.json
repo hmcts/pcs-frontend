@@ -1,0 +1,11 @@
+{
+  "serviceName": "cyPossession claims",
+  "phase": "Alpha",
+  "feedback": "cyThis is a new service – your <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"external noopener noreferrer\">feedback</a> will help us to improve it.",
+  "languageToggle": "<a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
+  "buttons": {
+    "continue": "cyContinue",
+    "back": "cyBack",
+    "cancel": "cyCancel"
+  }
+}
