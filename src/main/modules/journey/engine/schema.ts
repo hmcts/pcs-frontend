@@ -494,7 +494,10 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     }
 
     default: {
-      let schema = z.string();
+      // Use a relaxed type here as the schema may switch between string, email, and URL validators
+      // during the following conditional transformations.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let schema: any = z.string();
       if (rules?.minLength !== undefined) {
         schema = schema.min(rules.minLength, { error: getMessage('minLength') });
       }
@@ -511,15 +514,15 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       }
 
       if (rules?.email) {
-        schema = z.string().email({ message: getMessage('email') });
+        schema = z.email({ error: getMessage('email') });
       }
 
       if (rules?.url) {
-        schema = z.string().url({ message: getMessage('url') });
+        schema = z.url({ error: getMessage('url') });
       }
 
       if (rules?.postcode) {
-        schema = schema.refine(val => isPostalCode(val, 'GB'), {
+        schema = schema.refine((val: string) => isPostalCode(val, 'GB'), {
           error: getMessage('postcode') ?? 'Enter a valid postcode',
         });
       }
