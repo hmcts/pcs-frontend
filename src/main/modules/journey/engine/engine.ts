@@ -136,25 +136,26 @@ export class WizardEngine {
     return nxt.else || step.id;
   }
 
+  private sanitizePathSegment(segment: string): string {
+    return segment.replace(/[^a-zA-Z0-9_-]/g, '');
+  }
+
   private async resolveTemplatePath(stepId: string): Promise<string> {
-    const cacheKey = `${this.slug}:${stepId}`;
+    const sanitizedStepId = this.sanitizePathSegment(stepId);
+    const cacheKey = `${this.slug}:${sanitizedStepId}`;
     const cached = WizardEngine.templatePathCache.get(cacheKey);
     if (cached) {
       return cached;
     }
 
-    const step = this.journey.steps[stepId];
+    const step = this.journey.steps[sanitizedStepId];
     if (!step) {
-      return stepId;
+      return sanitizedStepId;
     }
-
-    const sanitizePathSegment = (segment: string): string => {
-      return segment.replace(/[^a-zA-Z0-9_-]/g, '');
-    };
 
     // Use explicit template if author provided one
     if (step.template) {
-      const sanitizedTemplate = sanitizePathSegment(step.template);
+      const sanitizedTemplate = this.sanitizePathSegment(step.template);
       WizardEngine.templatePathCache.set(cacheKey, sanitizedTemplate);
       return sanitizedTemplate;
     }
@@ -169,7 +170,6 @@ export class WizardEngine {
     };
 
     // New DSL layout: journeys/<slug>/steps/<stepId>/<stepId>.njk (viewsDir may include journeys root)
-    const sanitizedStepId = sanitizePathSegment(stepId);
     const newPath = path.join(this.slug, 'steps', sanitizedStepId, sanitizedStepId);
     const journeysRoot = path.join(__dirname, '..', '..', '..', 'journeys');
     const newTemplate = path.join(journeysRoot, `${newPath}.njk`);
@@ -744,11 +744,12 @@ export class WizardEngine {
     });
 
     router.param('step', (req: Request, res: Response, next: NextFunction, stepId: string) => {
-      const step = this.journey.steps[stepId];
+      const sanitizedStepId = this.sanitizePathSegment(stepId);
+      const step = this.journey.steps[sanitizedStepId];
       if (!step) {
         return res.status(404).render('not-found');
       }
-      (req as RequestWithStep).step = { id: stepId, ...step };
+      (req as RequestWithStep).step = { id: sanitizedStepId, ...step };
       next();
     });
 
