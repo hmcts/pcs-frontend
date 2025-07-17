@@ -9706,6 +9706,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"i18next-http-middleware@npm:^3.7.4":
+  version: 3.7.4
+  resolution: "i18next-http-middleware@npm:3.7.4"
+  checksum: 10/d9d8a9f62a09e7797bdd726118856c4f39b63901a4aa71db3ae8ed0d645e7d8a04e68b80912341e18742d13e8129eca55ad3e6c744d0241a6835ca0f06e8d79d
+  languageName: node
+  linkType: hard
+
 "i18next@npm:^25.3.2":
   version: 25.3.2
   resolution: "i18next@npm:25.3.2"
@@ -12892,6 +12899,7 @@ __metadata:
     i18next: "npm:^25.3.2"
     i18next-express-middleware: "npm:^2.0.0"
     i18next-fs-backend: "npm:^2.6.0"
+    i18next-http-middleware: "npm:^3.7.4"
     ioredis: "npm:^5.4.1"
     jest: "npm:^29.6.2"
     jest-environment-jsdom: "npm:^30.0.4"

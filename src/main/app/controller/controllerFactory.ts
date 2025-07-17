@@ -14,6 +14,15 @@ export const createGetController = (
   extendContent?: (req: Request) => StepFormData
 ): GetController => {
   return new GetController(view, (req: Request) => {
+    const supportedLanguages = ['en', 'cy'];
+    const requestedLang = req.query.lang as string;
+
+    if (requestedLang && supportedLanguages.includes(requestedLang) && req.session) {
+      req.session.lang = requestedLang;
+    }
+
+    const lang = supportedLanguages.includes(req.session?.lang) ? req.session.lang : 'en';
+
     const formData = getFormData(req, stepName);
     const postData = req.body || {};
 
@@ -22,6 +31,7 @@ export const createGetController = (
     return {
       ...content,
       ...formData,
+      lang,
       selected,
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
