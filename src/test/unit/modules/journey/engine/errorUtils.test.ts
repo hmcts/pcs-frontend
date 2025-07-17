@@ -1,4 +1,3 @@
- 
 const errorUtils = require('../../../../../main/modules/journey/engine/errorUtils');
 
 describe('errorUtils', () => {
