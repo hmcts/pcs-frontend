@@ -1,4 +1,3 @@
- 
 const { WizardEngine } = require('../../../../../main/modules/journey/engine/engine');
 
 describe('Button Field Type', () => {

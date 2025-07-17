@@ -756,6 +756,12 @@ export class WizardEngine {
     router.get('/:step', async (req, res, next) => {
       const caseId = getOrCreateCaseId(req);
       let step = (req as RequestWithStep).step!;
+
+      // TODO: Not keen on this implementation. It's a bit of a hack to get the
+      // override to work. Also means multiple calls to LaunchDarkly, with O(n)
+      // complexity. Ideally we would only call LaunchDarkly once per step, perhaps using getAllFlags and then
+      // checking the flags for the step.
+
       step = await this.applyLdOverride(step, req);
       step = await this.applyLaunchDarklyFlags(step, req);
 
