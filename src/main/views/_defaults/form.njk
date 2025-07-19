@@ -1,0 +1,75 @@
+{% extends "template.njk" %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block content %}
+
+{% if previousStepUrl %}
+  {{ govukBackLink({
+    text: "Back",
+    href: previousStepUrl
+  }) }}
+{% endif %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if step.title %}
+      <h1 class="govuk-heading-l">{{ step.title }}</h1>
+    {% endif %}
+
+    {% if step.description %}
+      <span class="govuk-caption-l">{{ step.description }}</span>
+    {% endif %}
+
+
+    {% if errorSummary %}
+      {{ govukErrorSummary(errorSummary) }}
+    {% endif %}
+
+    <form method="post">
+      {% for fieldName, fieldConfig in step.fields %}
+        {% if fieldConfig.type in ['text', 'email', 'tel', 'password', 'url', 'number'] %}
+          {{ govukInput(fieldConfig) }}
+
+        {% elif fieldConfig.type == 'textarea' %}
+          {{ govukTextarea(fieldConfig) }}
+
+        {% elif fieldConfig.type == 'radios' %}
+          {{ govukRadios(fieldConfig) }}
+
+        {% elif fieldConfig.type == 'checkboxes' %}
+          {{ govukCheckboxes(fieldConfig) }}
+
+        {% elif fieldConfig.type == 'select' %}
+          {{ govukSelect(fieldConfig) }}
+
+        {% elif fieldConfig.type == 'date' %}
+          {{ govukDateInput(fieldConfig) }}
+
+        {% elif fieldConfig.type == 'button' %}
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: fieldConfig.text or 'Continue',
+              href: fieldConfig.href,
+              classes: fieldConfig.classes,
+              attributes: fieldConfig.attributes or { type: 'submit' }
+            }) }}
+          </div>
+        {% endif %}
+
+      {% endfor %}
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}
