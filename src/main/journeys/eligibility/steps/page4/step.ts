@@ -2,25 +2,34 @@ import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
   id: 'page4',
-  title: 'What is your address?',
+  title: 'Enter your personal details',
   type: 'form',
-  description: 'We need to know your address to send you a copy of the claim',
   fields: {
-    address: {
-      type: 'text',
-      label: 'Address',
+    title: {
+      type: 'select',
+      label: 'Title',
+      items: [
+        { value: 'Mr', text: 'Mr' },
+        { value: 'Ms', text: 'Ms' },
+        { value: 'Miss', text: 'Miss' },
+        { value: 'Mrs', text: 'Mrs' },
+      ],
     },
-    date: {
-      type: 'date',
-      label: 'Date of birth',
+    firstName: {
+      type: 'text',
+      label: 'First Name',
       validate: {
         required: true,
-        customMessage: 'Enter a valid date of birth',
+        customMessage: 'Enter a first name',
       },
     },
-    postcode: {
+    lastName: {
       type: 'text',
-      label: 'Postcode',
+      label: 'Last Name',
+      validate: {
+        required: true,
+        customMessage: 'Enter a last name',
+      },
     },
     continueButton: {
       type: 'button',
@@ -29,7 +38,7 @@ const step: StepDraft = {
       },
     },
   },
-  next: 'summary',
+  next: 'page5',
 };
 
 export default step;

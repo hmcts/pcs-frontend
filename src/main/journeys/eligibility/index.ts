@@ -5,6 +5,7 @@ import ineligible from './steps/ineligible/step';
 import page2 from './steps/page2/step';
 import page3 from './steps/page3/step';
 import page4 from './steps/page4/step';
+import page5 from './steps/page5/step';
 import start from './steps/start/step';
 import summary from './steps/summary/step';
 
@@ -20,6 +21,7 @@ const journey: JourneyDraft = {
     ineligible,
     page3,
     page4,
+    page5,
     summary,
     confirmation,
   },
