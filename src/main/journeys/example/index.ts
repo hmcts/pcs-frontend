@@ -1,5 +1,3 @@
-import { $ZodIssue } from 'zod/v4/core';
-
 import { JourneyDraft, StepDraft } from '../../modules/journey/engine/schema';
 
 // Helper to simplify next linking
@@ -25,12 +23,14 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       text: {
         type: 'text',
-        label: 'Full name',
+        label: {
+          text: 'Full name',
+        },
         validate: {
           required: true,
           minLength: 1,
           maxLength: 6,
-          customMessage: (code: $ZodIssue['code']) => {
+          customMessage: (code: string) => {
             switch (code) {
               case 'too_small':
                 return 'Please fill this in';
@@ -59,7 +59,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       description: {
         type: 'textarea',
-        label: 'Tell us about yourself',
+        label: {
+          text: 'Tell us about yourself',
+        },
         rows: 5,
         validate: { required: true },
       },
@@ -106,7 +108,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       fruits: {
         type: 'checkboxes',
-        label: 'Which fruits do you like?',
+        hint: {
+          text: 'Which fruits do you like?',
+        },
         items: [
           { value: 'apple', text: 'Apple' },
           { value: 'banana', text: 'Banana' },
@@ -129,7 +133,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       colour: {
         type: 'select',
-        label: 'Favourite colour',
+        label: {
+          text: 'Favourite colour',
+        },
         items: [
           { value: '', text: 'Select a colour' },
           { value: 'red', text: 'Red' },
@@ -138,7 +144,7 @@ const stepsById: Record<string, StepDraft> = {
         ],
         validate: {
           required: true,
-          customMessage: (code: $ZodIssue['code']) => {
+          customMessage: (code: string) => {
             switch (code) {
               case 'invalid_value':
                 return 'Please select at least one colour';
@@ -190,7 +196,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       quantity: {
         type: 'number',
-        label: 'Quantity',
+        label: {
+          text: 'Quantity',
+        },
         validate: { required: true, min: 1, max: 100 },
       },
       continueButton: {
@@ -208,7 +216,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       email: {
         type: 'email',
-        label: 'Email address',
+        label: {
+          text: 'Email address',
+        },
         validate: { required: true, email: true },
       },
       continueButton: {
@@ -226,7 +236,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       phone: {
         type: 'tel',
-        label: 'Telephone number',
+        label: {
+          text: 'Telephone number',
+        },
         validate: { required: true },
       },
       continueButton: {
@@ -244,7 +256,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       website: {
         type: 'url',
-        label: 'Website URL',
+        label: {
+          text: 'Website URL',
+        },
         validate: { required: true, url: true },
       },
       continueButton: {
@@ -262,7 +276,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       password: {
         type: 'password',
-        label: 'Password',
+        label: {
+          text: 'Password',
+        },
         validate: { required: true, minLength: 8 },
       },
       continueButton: {
@@ -280,7 +296,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       postalCode: {
         type: 'text',
-        label: 'Postcode',
+        label: {
+          text: 'Postcode',
+        },
         validate: { required: true, postcode: true },
       },
       continueButton: {
@@ -298,7 +316,9 @@ const stepsById: Record<string, StepDraft> = {
     fields: {
       upload: {
         type: 'file',
-        label: 'Choose a file to upload',
+        label: {
+          text: 'Choose a file to upload',
+        },
         validate: { required: true },
       },
       continueButton: {

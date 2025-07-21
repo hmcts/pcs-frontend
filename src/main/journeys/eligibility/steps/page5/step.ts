@@ -7,7 +7,7 @@ const step: StepDraft = {
   fields: {
     date: {
       type: 'date',
-      label: {
+      hint: {
         text: 'Date of birth',
       },
       validate: { required: true },
