@@ -1,0 +1,11 @@
+{
+  "title": "Check your details before submitting",
+  "labels": {
+    "firstName": "cyFirst name",
+    "lastName": "cyLast name",
+    "address": "cyAddress"
+  },
+  "buttons": {
+    "submit": "cySubmit"
+  }
+}

@@ -13,7 +13,8 @@ const stepName = 'enter-address';
 export const partialUkPostcodePattern = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s*[0-9]?[A-Z]{0,2}$/i;
 const postcodeRegex = new RegExp(partialUkPostcodePattern);
 
-const generateContent = (lang = 'en'): Record<string, string> => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const generateContent = (lang = 'en'): Record<string, any> => {
   const common = require(`../../../assets/locales/${lang}/common.json`);
   const pageContent = require(`../../../assets/locales/${lang}/userJourney/enterAddress.json`);
   return { ...common, ...pageContent };

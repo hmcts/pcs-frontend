@@ -6,8 +6,10 @@
   "buttons": {
     "continue": "Continue",
     "back": "Back",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "finish": "Start a new application"
   },
+  "change": "Change",
   "defaultRequired": "This field is required",
   "defaultInvalid": "Invalid format"
 }

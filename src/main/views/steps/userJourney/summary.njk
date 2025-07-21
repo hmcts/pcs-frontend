@@ -4,53 +4,42 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block content %}
+  {{ govukBackLink({ text: common.buttons.back, href: backUrl }) }}
 
-  {{ govukBackLink({ text: "Back", href: backUrl }) }}
-   <div class="govuk-grid-row">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-
-      <h1 class="govuk-heading-l">Check your details before submitting</h1>
+      <h1 class="govuk-heading-l">{{ title }}</h1>
 
       {{ govukSummaryList({
         rows: [
           {
-            key: {
-              text: "First name"
-            },
-            value: {
-              text: userDetails.applicantForename
-            },
+            key: { text: labels.firstName },
+            value: { text: userDetails.applicantForename },
             actions: {
               items: [
                 {
                   href: "/steps/user-journey/enter-user-details",
-                  text: "Change",
-                  visuallyHiddenText: "first name"
+                  text: change,
+                  visuallyHiddenText: labels.firstName
                 }
               ]
             }
           },
           {
-            key: {
-              text: "Last name"
-            },
-            value: {
-              text: userDetails.applicantSurname
-            },
+            key: { text: labels.lastName },
+            value: { text: userDetails.applicantSurname },
             actions: {
               items: [
                 {
                   href: "/steps/user-journey/enter-user-details",
-                  text: "Change",
-                  visuallyHiddenText: "last name"
+                  text: change,
+                  visuallyHiddenText: labels.lastName
                 }
               ]
             }
           },
           {
-            key: {
-              text: "Address"
-            },
+            key: { text: labels.address },
             value: {
               html: ([
                 address.addressLine1,
@@ -66,8 +55,8 @@
               items: [
                 {
                   href: "/steps/user-journey/enter-address",
-                  text: "Change",
-                  visuallyHiddenText: "your address"
+                  text: change,
+                  visuallyHiddenText: labels.address
                 }
               ]
             }
@@ -76,10 +65,8 @@
       }) }}
 
       <form method="post" action="{{ url }}">
-        {{ govukButton({
-          text: "Submit"
-        }) }}
+        {{ govukButton({ text: buttons.submit }) }}
       </form>
+    </div>
   </div>
-</div>
 {% endblock %}

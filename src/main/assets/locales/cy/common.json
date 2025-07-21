@@ -6,8 +6,10 @@
   "buttons": {
     "continue": "cyContinue",
     "back": "cyBack",
-    "cancel": "cyCancel"
+    "cancel": "cyCancel",
+    "finish": "cyStart a new application"
   },
+  "change": "cyChange",
   "defaultRequired": "cyThis field is required",
   "defaultInvalid": "cyInvalid format"
 }

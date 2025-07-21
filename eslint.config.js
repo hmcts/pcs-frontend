@@ -65,6 +65,8 @@ module.exports = defineConfig([
         'error',
         {
           ignoreRestSiblings: true,
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
         },
       ],
 
