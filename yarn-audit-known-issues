@@ -1,1 +1,0 @@
-{"value":"brace-expansion","children":{"ID":1105422,"Issue":"brace-expansion Regular Expression Denial of Service vulnerability","URL":"https://github.com/advisories/GHSA-v6h2-p8h4-qcjw","Severity":"low","Vulnerable Versions":">=2.0.1 <=4.0.0","Tree Versions":["2.0.1"],"Dependents":["minimatch@npm:10.0.1"]}}
