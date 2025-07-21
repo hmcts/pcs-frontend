@@ -1,0 +1,21 @@
+{
+  "title": "cyEnter your address",
+  "enterPostcodeLabel": "cyEnter a UK postcode",
+  "findAddress": "cyFind address",
+  "selectAddressLabel": "cySelect your address",
+  "manualEntryTitle": "cyEnter an address manually",
+  "addressLine1": "cyAddress Line 1",
+  "addressLine2": "cyAddress Line 2 (Optional)",
+  "addressLine3": "cyAddress Line 3 (Optional)",
+  "town": "cyTown or City",
+  "county": "cyCounty (Optional)",
+  "postcode": "cyPostcode",
+  "errors": {
+    "addressLine1": "cyEnter address line 1",
+    "town": "cyEnter the town or city",
+    "postcode": "cyEnter the valid postcode",
+    "invalidPostcode": "cyEnter a valid or partial UK postcode",
+    "noAddressFound": "cyNo addresses found for that postcode",
+    "lookupError": "cyThere was a problem finding addresses. Please try again."
+  }
+}

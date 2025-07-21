@@ -11,10 +11,10 @@ export default function registerSteps(app: Application): void {
     const allGetMiddleware = step.middleware ? [...middlewares, ...step.middleware] : middlewares;
 
     if (step.getController) {
-      app.get(step.url, ...allGetMiddleware, (req, res, next) => {
+      app.get(step.url, ...allGetMiddleware, (req, res) => {
         const lang = (req.query.lang as string) || 'en';
         const controller = typeof step.getController === 'function' ? step.getController(lang) : step.getController;
-        return controller.get(req, res, next);
+        return controller.get(req, res);
       });
     }
 

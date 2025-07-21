@@ -2,10 +2,12 @@
   "serviceName": "Possession claims",
   "phase": "Alpha",
   "feedback": "This is a new service – your <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"external noopener noreferrer\">feedback</a> will help us to improve it.",
-  "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link language\">Cymraeg</a>",
+  "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link float-right\">Cymraeg</a>",
   "buttons": {
     "continue": "Continue",
     "back": "Back",
     "cancel": "Cancel"
-  }
+  },
+  "defaultRequired": "This field is required",
+  "defaultInvalid": "Invalid format"
 }
