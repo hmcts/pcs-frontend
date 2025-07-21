@@ -8,7 +8,9 @@ const step: StepDraft = {
   fields: {
     grounds: {
       type: 'checkboxes',
-      label: 'Select all that apply',
+      label: {
+        text: 'Select all that apply',
+      },
       options: [
         {
           value: 'rent-arrears-8',

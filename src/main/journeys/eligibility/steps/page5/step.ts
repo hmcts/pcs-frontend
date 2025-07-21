@@ -7,7 +7,9 @@ const step: StepDraft = {
   fields: {
     date: {
       type: 'date',
-      label: 'Date of birth',
+      label: {
+        text: 'Date of birth',
+      },
       validate: { required: true },
       errorMessages: {
         required: 'Please enter a date',
@@ -19,7 +21,9 @@ const step: StepDraft = {
     },
     email: {
       type: 'email',
-      label: 'Email address',
+      label: {
+        text: 'Email address',
+      },
       validate: { required: true, email: true },
     },
     continueButton: {

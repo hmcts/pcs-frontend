@@ -7,7 +7,9 @@ const step: StepDraft = {
   fields: {
     title: {
       type: 'select',
-      label: 'Title',
+      label: {
+        text: 'Title',
+      },
       items: [
         { value: 'Mr', text: 'Mr' },
         { value: 'Ms', text: 'Ms' },
@@ -17,7 +19,9 @@ const step: StepDraft = {
     },
     firstName: {
       type: 'text',
-      label: 'First Name',
+      label: {
+        text: 'First Name',
+      },
       validate: {
         required: true,
         customMessage: 'Enter a first name',
@@ -25,7 +29,9 @@ const step: StepDraft = {
     },
     lastName: {
       type: 'text',
-      label: 'Last Name',
+      label: {
+        text: 'Last Name',
+      },
       validate: {
         required: true,
         customMessage: 'Enter a last name',
