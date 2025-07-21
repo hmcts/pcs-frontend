@@ -4,12 +4,12 @@ import { createGetController } from '../../../app/controller/controllerFactory';
 import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
 import { validateForm } from '../../../app/controller/validation';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { StepDefinition, StepFormData } from '../../../interfaces/stepFormData.interface';
+import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const stepName = 'enter-user-details';
 
-const generateContent = (lang = 'en'): StepFormData => {
+const generateContent = (lang = 'en'): Record<string, string> => {
   const common = require(`../../../assets/locales/${lang}/common.json`);
   const pageContent = require(`../../../assets/locales/${lang}/userJourney/enterUserDetails.json`);
   return { ...common, ...pageContent };
@@ -43,7 +43,7 @@ export const step: StepDefinition = {
       return {
         ...content,
         ...savedData,
-        common: content, // makes `common.buttons.continue` etc. available in template
+        common: content,
         labels: content.labels,
         errors: content.errors,
         title: content.title,

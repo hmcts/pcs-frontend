@@ -1,70 +1,75 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
 import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
 import { validateForm } from '../../../app/controller/validation';
-import common from '../../../assets/locales/en/common.json';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
 
-const logger = Logger.getLogger('steps/enter-address');
-
 const stepName = 'enter-address';
 
-const content = {
-  ...common,
-  backUrl: '/steps/user-journey/enter-user-details',
-};
 export const partialUkPostcodePattern = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s*[0-9]?[A-Z]{0,2}$/i;
 const postcodeRegex = new RegExp(partialUkPostcodePattern);
 
-const fields: FormFieldConfig[] = [
-  { name: 'addressLine1', type: 'text', required: true, errorMessage: 'Enter address line 1' },
-  { name: 'addressLine2', type: 'text', required: false },
-  { name: 'addressLine3', type: 'text', required: false },
-  { name: 'town', type: 'text', required: true, errorMessage: 'Enter the town or city' },
-  { name: 'county', type: 'text', required: false },
-  {
-    name: 'postcode',
-    type: 'text',
-    required: true,
-    errorMessage: 'Enter the valid postcode',
-    pattern: partialUkPostcodePattern.source,
-  },
-  { name: 'country', type: 'text', required: false, errorMessage: 'Enter the country' },
-];
+const generateContent = (lang = 'en'): Record<string, string> => {
+  const common = require(`../../../assets/locales/${lang}/common.json`);
+  const pageContent = require(`../../../assets/locales/${lang}/userJourney/enterAddress.json`);
+  return { ...common, ...pageContent };
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getFields = (t: Record<string, any> = {}): FormFieldConfig[] => {
+  const errors = t.errors || {};
+  return [
+    { name: 'addressLine1', type: 'text', required: true, errorMessage: errors.addressLine1 || 'Enter address line 1' },
+    { name: 'addressLine2', type: 'text', required: false },
+    { name: 'addressLine3', type: 'text', required: false },
+    { name: 'town', type: 'text', required: true, errorMessage: errors.town || 'Enter the town or city' },
+    { name: 'county', type: 'text', required: false },
+    {
+      name: 'postcode',
+      type: 'text',
+      required: true,
+      errorMessage: errors.postcode || 'Enter the valid postcode',
+      pattern: partialUkPostcodePattern.source,
+    },
+    { name: 'country', type: 'text', required: false },
+  ];
+};
 
 export const step: StepDefinition = {
   url: '/steps/user-journey/enter-address',
   name: stepName,
   view: 'steps/userJourney/enterAddress.njk',
   stepDir: __dirname,
-  generateContent: () => content,
-  getController: createGetController('steps/userJourney/enterAddress.njk', stepName, content, req => {
-    const savedData = getFormData(req, stepName);
-
-    return {
-      ...content,
-      ...savedData,
-      lookupPostcode: '',
-      addressResults: null,
-      selectedAddressIndex: null,
-    };
-  }),
+  generateContent,
+  getController: (lang = 'en') => {
+    const content = generateContent(lang);
+    return createGetController('steps/userJourney/enterAddress.njk', stepName, content, req => {
+      const savedData = getFormData(req, stepName);
+      return {
+        ...content,
+        ...savedData,
+        lookupPostcode: '',
+        addressResults: null,
+        selectedAddressIndex: null,
+      };
+    });
+  },
   postController: {
     post: async (req: Request, res: Response) => {
       const { action, lookupPostcode, selectedAddressIndex } = req.body;
-      logger.info(`[osPostcodeLookupService] Response data: ${JSON.stringify(req.body, null, 2)}`);
+      const lang = req.query.lang?.toString() || 'en';
+      const content = generateContent(lang);
 
       if (action === 'find-address') {
         if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
           return res.status(400).render('steps/userJourney/enterAddress.njk', {
             ...content,
             ...req.body,
-            error: 'Enter a valid or partial UK postcode',
+            error: content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode',
           });
         }
 
@@ -75,7 +80,7 @@ export const step: StepDefinition = {
             return res.status(404).render('steps/userJourney/enterAddress.njk', {
               ...content,
               ...req.body,
-              error: 'No addresses found for that postcode',
+              error: content.errors?.noAddressesFound || 'No addresses found for that postcode',
             });
           }
 
@@ -91,7 +96,7 @@ export const step: StepDefinition = {
             ...content,
             ...req.body,
             lookupPostcode,
-            error: 'There was a problem finding addresses. Please try again.',
+            error: content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
           });
         }
       }
@@ -136,6 +141,8 @@ export const step: StepDefinition = {
             .replace(/(.{3})$/, ' $1')
             .trim();
         }
+
+        const fields = getFields(content);
         const errors = validateForm(req, fields);
 
         if (Object.keys(errors).length > 0) {
@@ -169,7 +176,7 @@ export const step: StepDefinition = {
           req.session.ccdCase = updatedCase;
         }
 
-        res.redirect('/steps/user-journey/summary');
+        res.redirect(`/steps/user-journey/summary?lang=${lang}`);
       }
     },
   },
