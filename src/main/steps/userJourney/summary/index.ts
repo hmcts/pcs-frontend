@@ -28,6 +28,7 @@ export const step: StepDefinition = {
         ...generateContent(lang),
         userDetails,
         address,
+        backUrl: `/steps/user-journey/enter-address?lang=${lang}`,
       };
     }),
   postController: {

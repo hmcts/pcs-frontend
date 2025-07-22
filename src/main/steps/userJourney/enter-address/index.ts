@@ -56,6 +56,7 @@ export const step: StepDefinition = {
         lookupPostcode: '',
         addressResults: null,
         selectedAddressIndex: null,
+        backUrl: `/steps/user-journey/enter-user-details?lang=${lang}`,
       };
     });
   },
