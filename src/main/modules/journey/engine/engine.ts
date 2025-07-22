@@ -278,7 +278,7 @@ export class WizardEngine {
               {
                 href: `${this.basePath}/${stepId}`,
                 text: 'Change',
-                visuallyHiddenText: `change ${rowLabel.toLowerCase()}`,
+                visuallyHiddenText: `${rowLabel.toLowerCase()}`,
               },
             ],
           },

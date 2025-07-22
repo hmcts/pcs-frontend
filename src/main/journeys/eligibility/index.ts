@@ -30,7 +30,7 @@ const journey: JourneyDraft = {
       type: 'session',
     },
     auth: {
-      required: false,
+      required: true,
     },
   },
 };
