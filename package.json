@@ -60,7 +60,6 @@
     "http-status-codes": "^2.3.0",
     "http-terminator": "^3.2.0",
     "i18next": "^25.3.2",
-    "i18next-express-middleware": "^2.0.0",
     "i18next-fs-backend": "^2.6.0",
     "i18next-http-middleware": "^3.7.4",
     "ioredis": "^5.4.1",
