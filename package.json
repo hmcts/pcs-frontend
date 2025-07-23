@@ -42,7 +42,7 @@
     "@hmcts/playwright-common": "1.0.32",
     "@hmcts/properties-volume": "^1.2.0",
     "applicationinsights": "3.7.0",
-    "axios": "^1.4.0",
+    "axios": "^1.11.0",
     "body-parser": "^2.0.0",
     "chai": "5.2.1",
     "config": "^3.3.9",
