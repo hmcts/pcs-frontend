@@ -24,9 +24,10 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
+      const lang = req.query.lang?.toString() || 'en';
       delete req.session.ccdCase;
       delete req.session.formData;
-      res.redirect('/steps/user-journey/enter-user-details');
+      res.redirect(`/steps/user-journey/enter-user-details?lang=${lang}`);
     },
   },
 };
