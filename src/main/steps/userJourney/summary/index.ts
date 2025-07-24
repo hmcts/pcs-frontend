@@ -1,16 +1,15 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
+import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const stepName = 'summary';
 
-const generateContent = (lang = 'en'): Record<string, string> => {
-  const common = require(`../../../assets/locales/${lang}/common.json`);
-  const summaryContent = require(`../../../assets/locales/${lang}/userJourney/summary.json`);
-  return { ...common, ...summaryContent };
+const generateContent = (lang = 'en'): TranslationContent => {
+  return loadTranslations(lang, ['common', 'userJourney/summary']);
 };
 
 export const step: StepDefinition = {

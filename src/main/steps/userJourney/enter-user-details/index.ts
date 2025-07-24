@@ -3,19 +3,18 @@ import type { Request, Response } from 'express';
 import { createGetController } from '../../../app/controller/controllerFactory';
 import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
 import { validateForm } from '../../../app/controller/validation';
+import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const stepName = 'enter-user-details';
 
-const generateContent = (lang = 'en'): Record<string, string> => {
-  const common = require(`../../../assets/locales/${lang}/common.json`);
-  const pageContent = require(`../../../assets/locales/${lang}/userJourney/enterUserDetails.json`);
-  return { ...common, ...pageContent };
+const generateContent = (lang = 'en'): TranslationContent => {
+  return loadTranslations(lang, ['common', 'userJourney/enterUserDetails']);
 };
 
-const getFields = (t: Record<string, string>): FormFieldConfig[] => [
+const getFields = (t: TranslationContent): FormFieldConfig[] => [
   {
     name: 'applicantForename',
     type: 'text',

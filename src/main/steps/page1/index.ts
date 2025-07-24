@@ -6,8 +6,8 @@ export const step: StepDefinition = {
   name: 'page1',
   view: 'steps/page1.njk',
   generateContent: (lang = 'en') => {
-    const common = require(`../../assets/locales/${lang}/common.json`);
-    const page1Content = require(`../../assets/locales/${lang}/page1.json`);
+    const common = require(`../../../locales/${lang}/common.json`);
+    const page1Content = require(`../../../locales/${lang}/page1.json`);
     return { ...common, ...page1Content };
   },
   stepDir: __dirname,

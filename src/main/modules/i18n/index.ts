@@ -18,7 +18,7 @@ export class I18n {
           fallbackLng: 'en',
           preload: ['en', 'cy'],
           backend: {
-            loadPath: path.resolve(__dirname, '../../assets/locales/{{lng}}/{{ns}}.json'),
+            loadPath: path.resolve(__dirname, '../../../locales/{{lng}}/{{ns}}.json'),
           },
           detection: {
             order: ['querystring', 'cookie', 'session'],

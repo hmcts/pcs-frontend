@@ -1,14 +1,15 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
+import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 
 const stepName = 'application-submitted';
-const generateContent = (lang = 'en'): Record<string, string> => {
-  const common = require(`../../../assets/locales/${lang}/common.json`);
-  const pageContent = require(`../../../assets/locales/${lang}/userJourney/applicationSubmitted.json`);
-  return { ...common, ...pageContent };
+
+const generateContent = (lang = 'en'): TranslationContent => {
+  return loadTranslations(lang, ['common', 'userJourney/applicationSubmitted']);
 };
+
 export const step: StepDefinition = {
   url: '/steps/user-journey/application-submitted',
   name: stepName,
