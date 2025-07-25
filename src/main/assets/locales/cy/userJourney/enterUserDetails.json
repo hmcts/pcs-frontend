@@ -1,0 +1,11 @@
+{
+  "title": "cyEnter your details",
+  "firstNameLabel": "cyFirst name",
+  "lastNameLabel": "cyLast name",
+  "continue": "cyContinue",
+  "errorSummaryTitle": "cyThere is a problem",
+  "errors": {
+    "firstName": "cyEnter your first name",
+    "lastName": "cyEnter your last name"
+  }
+}
