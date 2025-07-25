@@ -1,6 +1,6 @@
 {
   "serviceName": "cyPossession claims",
-  "phase": "Alpha",
+  "phase": "cyAlpha",
   "feedback": "cyThis is a new service – your <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"external noopener noreferrer\">feedback</a> will help us to improve it.",
   "languageToggle": "<span class=\"language\"><a href=\"?lang=en\" class=\"govuk-link\">English</a> | Cymraeg</span>",
   "buttons": {
@@ -11,5 +11,6 @@
   },
   "change": "cyChange",
   "defaultRequired": "cyThis field is required",
-  "defaultInvalid": "cyInvalid format"
+  "defaultInvalid": "cyInvalid format",
+  "back": "cyBack"
 }

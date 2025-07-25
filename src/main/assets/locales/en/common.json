@@ -11,5 +11,6 @@
   },
   "change": "Change",
   "defaultRequired": "This field is required",
-  "defaultInvalid": "Invalid format"
+  "defaultInvalid": "Invalid format",
+  "back": "Back"
 }
