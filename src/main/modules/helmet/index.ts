@@ -16,7 +16,7 @@ export class Helmet {
 
   public enableFor(app: express.Express): void {
     // include default helmet functions
-    const scriptSrc = [self, googleAnalyticsDomain, "'sha256-+6WnXIl4mbFTCARd8N3COQmT3bJJmo32N8q8ZSQAIcU='"];
+    const scriptSrc = [self, googleAnalyticsDomain];
 
     if (this.developmentMode) {
       // Uncaught EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval'
@@ -24,6 +24,9 @@ export class Helmet {
       // "script-src 'self' *.google-analytics.com 'sha256-+6WnXIl4mbFTCARd8N3COQmT3bJJmo32N8q8ZSQAIcU='".
       // seems to be related to webpack
       scriptSrc.push("'unsafe-eval'");
+      scriptSrc.push("'unsafe-inline'");
+    } else {
+      scriptSrc.push("'sha256-+6WnXIl4mbFTCARd8N3COQmT3bJJmo32N8q8ZSQAIcU='");
     }
 
     const formAction = [self];

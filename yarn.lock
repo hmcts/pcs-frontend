@@ -3038,6 +3038,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@launchdarkly/js-sdk-common@npm:2.18.0":
+  version: 2.18.0
+  resolution: "@launchdarkly/js-sdk-common@npm:2.18.0"
+  checksum: 10/1dd45dce7b81d94c96af8d0c9fb834def91ef1c31c258f4c2d4e8e96a8ae32d1a152b2aa4dcf08ae72719c86bfdfa5351f616802fc4db4ac829b8757da2adfdb
+  languageName: node
+  linkType: hard
+
+"@launchdarkly/js-server-sdk-common@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@launchdarkly/js-server-sdk-common@npm:2.16.0"
+  dependencies:
+    "@launchdarkly/js-sdk-common": "npm:2.18.0"
+    semver: "npm:7.5.4"
+  checksum: 10/ac20f99d66da5683def615f8e60a357b0d8f3d7305c392396015eca5a081fcde5ecd4c3a8af8900709557486839c14b6aa385235be281cde50d25c17ec7c1b67
+  languageName: node
+  linkType: hard
+
+"@launchdarkly/node-server-sdk@npm:^9.10.0":
+  version: 9.10.0
+  resolution: "@launchdarkly/node-server-sdk@npm:9.10.0"
+  dependencies:
+    "@launchdarkly/js-server-sdk-common": "npm:2.16.0"
+    https-proxy-agent: "npm:^5.0.1"
+    launchdarkly-eventsource: "npm:2.2.0"
+  checksum: 10/1ca53f2e020141aaab5e31dd700bcadbe912d58cd034eac538bc3dcd09b2ccaf1c33a4f1c08b6f945b5e8378ab3b01136a36dcd96daad95fd99bb545b31588a1
+  languageName: node
+  linkType: hard
+
 "@microsoft/applicationinsights-web-snippet@npm:^1.2.1":
   version: 1.2.1
   resolution: "@microsoft/applicationinsights-web-snippet@npm:1.2.1"
@@ -5092,6 +5120,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/validator@npm:^13":
+  version: 13.15.2
+  resolution: "@types/validator@npm:13.15.2"
+  checksum: 10/0d6e349329359c6781b1a6b4f48349fe3221b655041887bdf9e3e3c3508716106f3fe00db9a33002288e5a4b5abdcc49d7128d5b1d3edcfac11bda7aa696b34d
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.3
   resolution: "@types/yargs-parser@npm:21.0.3"
@@ -5759,6 +5794,15 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 10/77f2de5051a631cf1729c090e5759148459cdb76b5f5c70f890503d629cf5052357b0ce783c0f976dd8a93c5150f59f6d18df1def3f502396a20f81282482fa4
+  languageName: node
+  linkType: hard
+
+"agent-base@npm:6":
+  version: 6.0.2
+  resolution: "agent-base@npm:6.0.2"
+  dependencies:
+    debug: "npm:4"
+  checksum: 10/21fb903e0917e5cb16591b4d0ef6a028a54b83ac30cd1fca58dece3d4e0990512a8723f9f83130d88a41e2af8b1f7be1386fda3ea2d181bb1a62155e75e95e23
   languageName: node
   linkType: hard
 
@@ -9668,6 +9712,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"https-proxy-agent@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "https-proxy-agent@npm:5.0.1"
+  dependencies:
+    agent-base: "npm:6"
+    debug: "npm:4"
+  checksum: 10/f0dce7bdcac5e8eaa0be3c7368bb8836ed010fb5b6349ffb412b172a203efe8f807d9a6681319105ea1b6901e1972c7b5ea899672a7b9aad58309f766dcbe0df
+  languageName: node
+  linkType: hard
+
 "https-proxy-agent@npm:^7.0.0, https-proxy-agent@npm:^7.0.1, https-proxy-agent@npm:^7.0.4, https-proxy-agent@npm:^7.0.6":
   version: 7.0.6
   resolution: "https-proxy-agent@npm:7.0.6"
@@ -11348,6 +11402,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"launchdarkly-eventsource@npm:2.2.0":
+  version: 2.2.0
+  resolution: "launchdarkly-eventsource@npm:2.2.0"
+  checksum: 10/9269ca3bc7dead8271e16c26efa4578e33dcf416ad35d05ff10d82d904df162ac4fe0e7a9cd89b9ca219bb5ef0e30005fcce5f8a837acbe3a8db38a7f6acfff6
+  languageName: node
+  linkType: hard
+
 "legacy-javascript@npm:latest":
   version: 0.0.1
   resolution: "legacy-javascript@npm:0.0.1"
@@ -12840,6 +12901,7 @@ __metadata:
     "@hmcts/nodejs-logging": "npm:^4.0.4"
     "@hmcts/playwright-common": "npm:1.0.32"
     "@hmcts/properties-volume": "npm:^1.2.0"
+    "@launchdarkly/node-server-sdk": "npm:^9.10.0"
     "@pact-foundation/pact": "npm:^15.0.0"
     "@pact-foundation/pact-cli": "npm:^16.0.7"
     "@playwright/test": "npm:^1.49.0"
@@ -12865,6 +12927,7 @@ __metadata:
     "@types/supertest": "npm:^6.0.0"
     "@types/totp-generator": "npm:^0.0.8"
     "@types/uuid": "npm:^10.0.0"
+    "@types/validator": "npm:^13"
     "@typescript-eslint/eslint-plugin": "npm:^8.0.0"
     "@typescript-eslint/parser": "npm:^8.0.0"
     allure-commandline: "npm:^2.34.1"
@@ -12938,10 +13001,12 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tsconfig-paths: "npm:^4.2.0"
     typescript: "npm:>=4.7.4 <5.9.0"
+    validator: "npm:^13.15.15"
     webpack: "npm:^5.88.2"
     webpack-cli: "npm:^6.0.0"
     webpack-dev-middleware: "npm:^7.0.0"
     webpack-node-externals: "npm:^3.0.0"
+    zod: "npm:^3.25.32"
   languageName: unknown
   linkType: soft
 
@@ -15908,6 +15973,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"validator@npm:^13.15.15":
+  version: 13.15.15
+  resolution: "validator@npm:13.15.15"
+  checksum: 10/a43d9271c879468b1ad6dd5d2597b71719a185d2c7ceb3d68f3c9c8c17c25af0d90a53edfa7efaa6ac0d4425ba0345684b9c7d8111bde0d06d915a634a287018
+  languageName: node
+  linkType: hard
+
 "vary@npm:^1.1.2, vary@npm:~1.1.2":
   version: 1.1.2
   resolution: "vary@npm:1.1.2"
@@ -16437,8 +16509,15 @@ __metadata:
   linkType: hard
 
 "zod@npm:^3.24.1":
-  version: 3.25.67
-  resolution: "zod@npm:3.25.67"
-  checksum: 10/0e35432dcca7f053e63f5dd491a87c78abe0d981817547252c3b6d05f0f58788695d1a69724759c6501dff3fd62929be24c9f314a3625179bee889150f7a61fa
+  version: 3.25.71
+  resolution: "zod@npm:3.25.71"
+  checksum: 10/5467883fa8635ea0b88cdac1d494e84ee3dc1a4f0a5aaf0a1a0644d09a529bc3c6344114e95987981f47896f1743ee2677330ed0732ce2a448a4173ed31ce3a1
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.25.32":
+  version: 3.25.32
+  resolution: "zod@npm:3.25.32"
+  checksum: 10/58504f7e0382b04313f8e4f63d215d2a19b1d23ccdf45bf9d54c7ac9fa6362e43ba41349e251129a5d3596f4396b78d9a239d177842c04c7287e78a729b7f4bc
   languageName: node
   linkType: hard
