@@ -1,0 +1,33 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+
+  {{ govukPanel({
+    titleText: step.title,
+    html: "Your reference number<br><strong>" + (allData.confirmation.referenceNumber if allData.confirmation and allData.confirmation.referenceNumber else "PCR-PENDING") + "</strong>"
+  }) }}
+
+  <p class="govuk-body">We have sent you a confirmation email.</p>
+
+  <h2 class="govuk-heading-m">What happens next</h2>
+  
+  <p class="govuk-body">Your possession claim will be reviewed by the court.</p>
+  <p class="govuk-body">You will be contacted within 5 working days with next steps.</p>
+
+  <h2 class="govuk-heading-m">Help and support</h2>
+  
+  <p class="govuk-body">
+    <a href="#" class="govuk-link">Find legal advice and support</a> if you need help with your possession claim.
+  </p>
+
+  <div class="govuk-button-group">
+    {{ govukButton({
+      text: "Exit",
+      href: "/",
+      classes: "govuk-button--secondary"
+    }) }}
+  </div>
+
+{% endblock %} 

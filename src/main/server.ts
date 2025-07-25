@@ -4,6 +4,7 @@ import * as https from 'https';
 import * as path from 'path';
 
 import { Logger } from '@hmcts/nodejs-logging';
+import config from 'config';
 import { type HttpTerminator, createHttpTerminator } from 'http-terminator';
 
 import { app } from './app';
@@ -18,7 +19,7 @@ app.locals.shutdown = false;
 // TODO: set the right port for your application
 const port: number = parseInt(process.env.PORT || '3209', 10);
 
-if (app.locals.ENV === 'development') {
+if (config.get<boolean>('use-ssl')) {
   const sslDirectory = path.join(__dirname, 'resources', 'localhost-ssl');
   const sslOptions = {
     cert: fs.readFileSync(path.join(sslDirectory, 'localhost.crt')),
@@ -73,6 +74,14 @@ function gracefulShutdownHandler(signal: string) {
         logger.info('HTTP terminator terminated');
       }
     });
+    if (app.locals.launchDarklyClient) {
+      try {
+        await app.locals.launchDarklyClient.close();
+        logger.info('LaunchDarkly module cleaned up');
+      } catch (error) {
+        logger.error('Error cleaning up LaunchDarkly module:', error);
+      }
+    }
   }, 500);
 }
 
