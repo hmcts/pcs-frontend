@@ -1,7 +1,9 @@
-import { cleanupTempUsers } from '../utils/helpers/idam-helpers/idam.helper';
+import { ActionRegistry } from '../utils/registry/action.registry';
+import { ValidationRegistry } from '../utils/registry/validation.registry';
 
 async function globalTeardownConfig(): Promise<void> {
-  await cleanupTempUsers();
+  ActionRegistry.updateReadmeSection();
+  ValidationRegistry.updateReadmeSection();
 }
 
 export default globalTeardownConfig;
