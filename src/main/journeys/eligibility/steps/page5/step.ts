@@ -13,10 +13,10 @@ const step: StepDraft = {
       validate: { required: true },
       errorMessages: {
         required: 'Please enter a date',
-        invalid: 'Please enter a valid date now!!!',
         day: 'Please enter a valid day',
         month: 'Please enter a valid month',
         year: 'Please enter a valid year',
+        invalid: 'Please enter a valid date of birth',
       },
     },
     email: {
