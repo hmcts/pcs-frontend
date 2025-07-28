@@ -1,5 +1,9 @@
 import isPostalCode from 'validator/lib/isPostalCode';
+import { DateTime } from 'luxon';
 import { z } from 'zod/v4';
+import { Logger } from '@hmcts/nodejs-logging';
+
+const logger = Logger.getLogger('journey-engine-schema');
 
 // Common error message schema
 const ErrorMessagesSchema = z
@@ -358,28 +362,41 @@ export type JourneyConfig = z.infer<typeof JourneySchema>;
 // Field validation schema factory
 export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodTypeAny => {
   const rules = fieldConfig.validate;
-  const errorMessages = rules?.errorMessages;
+  // Prefer field-level errorMessages, otherwise fall back to any defined inside the rules block
+  const errorMessages = fieldConfig.errorMessages ?? rules?.errorMessages;
 
-  // Helper to resolve the correct error message for a specific validation failure.
-  // If `customMessage` is a function it will be invoked with the error code so that
-  // the developer can dynamically return a string. Otherwise, fall back to any
-  // provided string (or undefined so Zod will use its default).
-  const getMessage = (code: string): string | undefined => {
+  const getMessage = (
+    code: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): string | ((iss: any) => string | undefined) | undefined => {
     if (!rules) {
       return undefined;
     }
-    const { customMessage } = rules;
-    if (typeof customMessage === 'function') {
-      try {
-        // Pass the error code plus any additional context you may need
-        return customMessage(code);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('customMessage function threw', err);
-        return undefined;
-      }
+
+    // Specific rule-level message wins
+    const errorMessagesMap = errorMessages as Record<string, string | undefined> | undefined;
+    if (errorMessagesMap && errorMessagesMap[code]) {
+      return errorMessagesMap[code];
     }
-    return customMessage as string | undefined;
+
+    const { customMessage } = rules;
+
+    if (typeof customMessage === 'string') {
+      return customMessage;
+    }
+
+    if (typeof customMessage === 'function') {
+      return (issue: { code: string }) => {
+        try {
+          return customMessage(issue.code);
+        } catch (err) {
+          logger.error('customMessage function threw', err);
+          return undefined;
+        }
+      };
+    }
+
+    return undefined;
   };
 
   switch (fieldConfig.type) {
@@ -449,6 +466,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
 
     case 'date': {
       if (rules?.required === true) {
+        
         const schema = z
           .object({
             day: z.string(),
@@ -460,15 +478,22 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
               if (!val.day || !val.month || !val.year) {
                 return false;
               }
-              const iso = `${val.year.padStart(4, '0')}-${val.month.padStart(2, '0')}-${val.day.padStart(2, '0')}`;
-              if (isNaN(Date.parse(iso))) {
+
+              const date = DateTime.fromObject({
+                day: parseInt(val.day, 10),
+                month: parseInt(val.month, 10),
+                year: parseInt(val.year, 10),
+              });
+
+              if (!date.isValid) {
                 return false;
               }
-              const date = new Date(iso);
-              return date.getTime() <= Date.now();
+
+              // TODO: currently only checks that the date is not in the future e.g. DOB field
+              return date.toMillis() <= DateTime.now().toMillis();
             },
             {
-              message: errorMessages?.invalid || 'Enter a valid date',
+              message: (getMessage('invalid') as string) ?? 'Enter a valid date',
               path: ['date'],
             }
           )
@@ -476,7 +501,11 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
             day: val.day,
             month: val.month,
             year: val.year,
-            iso: `${val.year.padStart(4, '0')}-${val.month.padStart(2, '0')}-${val.day.padStart(2, '0')}`,
+            iso: DateTime.fromObject({
+              day: parseInt(val.day, 10),
+              month: parseInt(val.month, 10),
+              year: parseInt(val.year, 10),
+            }).toISO(),
           }));
         return schema;
       }
