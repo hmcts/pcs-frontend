@@ -155,9 +155,8 @@ export class WizardEngine {
 
     // Use explicit template if author provided one
     if (step.template) {
-      const sanitizedTemplate = this.sanitizePathSegment(step.template);
-      WizardEngine.templatePathCache.set(cacheKey, sanitizedTemplate);
-      return sanitizedTemplate;
+      WizardEngine.templatePathCache.set(cacheKey, step.template);
+      return step.template;
     }
 
     const checkExists = async (candidate: string): Promise<boolean> => {
@@ -607,11 +606,6 @@ export class WizardEngine {
           },
         };
 
-        // this.logger.info('ISENABLED ===>> LaunchDarkly Flag Evaluation', { context, keyToCheck });
-
-        // const flags = await ldClient.allFlagsState(context);
-        // this.logger.info('FLAGS ===>> LaunchDarkly ALLLLL Flag Evaluation', flags.allValues(), flags.toJSON());
-
         // If the flag does not exist LD will return the default (true) so UI remains visible by default.
         return await ldClient.variation(keyToCheck, context, true);
       } catch (err) {
@@ -744,12 +738,11 @@ export class WizardEngine {
     });
 
     router.param('step', (req: Request, res: Response, next: NextFunction, stepId: string) => {
-      const sanitizedStepId = this.sanitizePathSegment(stepId);
-      const step = this.journey.steps[sanitizedStepId];
+      const step = this.journey.steps[stepId];
       if (!step) {
         return res.status(404).render('not-found');
       }
-      (req as RequestWithStep).step = { id: sanitizedStepId, ...step };
+      (req as RequestWithStep).step = { id: stepId, ...step };
       next();
     });
 

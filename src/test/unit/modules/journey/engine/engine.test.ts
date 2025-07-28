@@ -1,0 +1,272 @@
+import fs from 'fs';
+import path from 'path';
+import type { Request } from 'express';
+
+const { WizardEngine } = require('../../../../../main/modules/journey/engine/engine');
+const { JourneyValidator } = require('../../../../../main/modules/journey/engine/validation');
+const { memoryStore } = require('../../../../../main/modules/journey/engine/storage/memoryStore');
+const { sessionStore } = require('../../../../../main/modules/journey/engine/storage/sessionStore');
+
+
+jest.mock('@hmcts/nodejs-logging', () => {
+  const loggerInstance = { info: jest.fn(), error: jest.fn(), warn: jest.fn() };
+  return { Logger: { getLogger: jest.fn(() => loggerInstance) } };
+});
+
+// LaunchDarkly client mock – suites manipulate variationMock as required
+const variationMock = jest.fn();
+
+afterEach(() => {
+  variationMock.mockReset();
+});
+
+jest.mock('@launchdarkly/node-server-sdk', () => ({
+  init: () => ({ variation: variationMock }),
+}));
+
+
+
+const makeReq = () =>
+  ({
+    app: { locals: { launchDarklyClient: { variation: variationMock } } },
+    session: { user: { uid: 'u123', name: 'Test' } },
+  } as unknown as Request);
+
+// Minimal Express request stub for memoryStore tests that do not need LD data
+const reqStub = {} as unknown as { session?: Record<string, unknown> };
+
+describe('WizardEngine - core utilities & validator', () => {
+  const journeyConfig = {
+    meta: {
+      name: 'Utility Test Journey',
+      description: 'Journey used exclusively for unit testing utility functions',
+      version: '1.0.0',
+    },
+    steps: {
+      start: {
+        id: 'start',
+        title: 'Start',
+        type: 'form',
+        fields: {
+          field1: { type: 'text' },
+        },
+        next: 'mid',
+      },
+      mid: {
+        id: 'mid',
+        title: 'Mid',
+        type: 'form',
+        fields: {
+          choice: { type: 'text' },
+        },
+        next: {
+          when: (stepData: Record<string, unknown>) => stepData.choice === 'yes',
+          goto: 'yesStep',
+          else: 'noStep',
+        },
+      },
+      yesStep: { id: 'yesStep', title: 'Yes branch', type: 'confirmation' },
+      noStep: { id: 'noStep', title: 'No branch', type: 'confirmation' },
+    },
+    config: { store: { type: 'memory' } },
+  } as const;
+
+  const engine = new WizardEngine(journeyConfig, 'utility-tests');
+
+  it('sanitizePathSegment strips disallowed characters', () => {
+    expect(engine['sanitizePathSegment']('hello/world?bad%chars!')).toBe('helloworldbadchars');
+  });
+
+  describe('resolveNext helper', () => {
+    const midStep = engine['journey'].steps.mid;
+
+    it('returns static next when next is string', () => {
+      const startStep = engine['journey'].steps.start;
+      expect(engine['resolveNext'](startStep, {})).toBe('mid');
+    });
+
+    it('evaluates functional branching (true branch)', () => {
+      const nextId = engine['resolveNext'](midStep, { mid: { choice: 'yes' } });
+      expect(nextId).toBe('yesStep');
+    });
+
+    it('evaluates functional branching (else branch)', () => {
+      const nextId = engine['resolveNext'](midStep, { mid: { choice: 'no' } });
+      expect(nextId).toBe('noStep');
+    });
+  });
+
+  it('findPreviousStep identifies previous step in linear flow', () => {
+    expect(engine['findPreviousStep']('mid', {})).toBe('start');
+  });
+
+  it('isStepAccessible respects journey progress', () => {
+    expect(engine['isStepAccessible']('mid', {})).toBe(false);
+    expect(engine['isStepAccessible']('mid', { start: { field1: 'x' } })).toBe(true);
+  });
+
+  it('buildSummaryRows returns formatted data', () => {
+    const rows = engine['buildSummaryRows']({ start: { field1: 'abc' }, mid: { choice: 'y' } });
+    expect(rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ key: { text: 'Start' }, value: { text: 'abc' } }),
+      ]),
+    );
+  });
+
+  // Validator happy / unhappy path
+  const validator = new JourneyValidator();
+  const stepCfg = {
+    id: 'emailStep',
+    type: 'form',
+    fields: { email: { type: 'email', validate: { required: true } } },
+  } as const;
+
+  it('JourneyValidator success path', () => {
+    const res = validator.validate(stepCfg as any, { email: 'test@example.com' });
+    expect(res.success).toBe(true);
+  });
+
+  it('JourneyValidator failure path', () => {
+    const res = validator.validate(stepCfg as any, { email: 'bad' });
+    expect(res.success).toBe(false);
+  });
+
+  // memoryStore deep-merge behaviour
+  it('memoryStore deep-merges step patches', async () => {
+    const store = memoryStore('test-slug');
+    await store.save(reqStub, 'case1', 0, { stepA: { foo: 'bar' } });
+    await store.save(reqStub, 'case1', 1, { stepA: { baz: 'qux' }, stepB: 'val' });
+    const { data } = await store.load(reqStub, 'case1');
+    expect(data).toEqual({ stepA: { foo: 'bar', baz: 'qux' }, stepB: 'val' });
+  });
+});
+
+describe('WizardEngine - buildJourneyContext', () => {
+  const createEngine = () => {
+    const journey = {
+      meta: { name: 'CTX', description: 'ctx', version: '1.0.0' },
+      steps: {
+        start: {
+          id: 'start',
+          title: 'Start',
+          type: 'form',
+          fields: {
+            dob: { type: 'date' },
+            gender: { type: 'radios', items: ['M', 'F'] },
+            country: { type: 'select', items: ['UK', 'US'] },
+            submit: { type: 'button' },
+          },
+          next: 'confirmation',
+        },
+        confirmation: { id: 'confirmation', type: 'confirmation', title: 'Done' },
+      },
+    } as const;
+    return new WizardEngine(journey, 'ctx-slug');
+  };
+
+  const engine = createEngine();
+  const step = engine.journey.steps.start;
+
+  it('buildJourneyContext processes complex fields', () => {
+    const ctx = engine['buildJourneyContext'](step, 'case-1', {
+      start: { dob: { day: '01', month: '02', year: '2000' }, gender: 'M', country: 'UK' },
+    });
+
+    const dobItems = (ctx.step.fields?.dob as any).items;
+    expect(dobItems).toHaveLength(3);
+    expect((ctx.step.fields?.submit as any).text).toBe('Continue');
+  });
+
+  it('resolveTemplatePath falls back to defaults & custom templates', async () => {
+    expect(await engine['resolveTemplatePath']('confirmation')).toBe('_defaults/confirmation');
+    expect(await engine['resolveTemplatePath']('start')).toBe('_defaults/form');
+
+    const engine2 = (() => {
+      const journey = { ...createEngine().journey } as any;
+      const eng = new WizardEngine(journey, 'custom-slug');
+      eng.journey.steps.start.template = 'custom/my-template';
+      return eng;
+    })();
+    expect(await engine2['resolveTemplatePath']('start')).toBe('custom/my-template');
+  });
+
+  it('resolveTemplatePath detects DSL template on disk', async () => {
+    const accessSpy = jest.spyOn(fs.promises, 'access').mockResolvedValueOnce(undefined as any);
+    const engine3 = new WizardEngine(createEngine().journey, 'dsl-slug');
+    const expectedRel = path.join('dsl-slug', 'steps', 'start', 'start');
+    expect(await engine3['resolveTemplatePath']('start')).toBe(expectedRel);
+    expect(accessSpy).toHaveBeenCalled();
+  });
+
+  it('applyLaunchDarklyFlags hides fields when flag false', async () => {
+    variationMock.mockResolvedValue(false);
+    const filtered = await engine['applyLaunchDarklyFlags'](step, makeReq());
+    expect(filtered.fields).toEqual({});
+  });
+});
+
+describe('WizardEngine - buildSummaryRows', () => {
+  const journey = {
+    meta: { name: 'Summary', description: 'Summary', version: '1.0.0' },
+    steps: {
+      start: { id: 'start', type: 'form', fields: { name: { type: 'text' } }, next: 'details' },
+      details: {
+        id: 'details',
+        type: 'form',
+        fields: {
+          dob: { type: 'date' },
+          pets: { type: 'checkboxes', items: ['Dog', 'Cat'] },
+        },
+        next: 'summary',
+      },
+      summary: { id: 'summary', type: 'summary', title: 'Check', next: 'confirmation' },
+      confirmation: { id: 'confirmation', type: 'confirmation', title: 'Done' },
+    },
+    config: { store: { type: 'redis' } },
+  } as const;
+
+  const engine = new WizardEngine(journey, 'extra');
+
+  it('buildSummaryRows formats date & checkbox values', () => {
+    const rows = engine['buildSummaryRows']({
+      start: { name: 'Alice' },
+      details: { dob: { day: '01', month: '02', year: '2000' }, pets: ['Dog', 'Cat'] },
+    });
+    expect(rows.length).toBeGreaterThanOrEqual(2);
+    const combinedTexts = rows.map((r: any) => r.value.text).join(' ');
+    expect(combinedTexts).toContain('01/02/2000');
+    expect(combinedTexts).toContain('Dog, Cat');
+  });
+
+  it('isStepAccessible blocks non-confirmation after completion', () => {
+    expect(engine['isStepAccessible']('details', { confirmation: { ref: 'x' } })).toBe(false);
+    expect(engine['isStepAccessible']('confirmation', { confirmation: { ref: 'x' } })).toBe(true);
+  });
+
+  it('resolveNext returns else when when-clause is not function', () => {
+    const dummyStep = {
+      id: 'dummy',
+      type: 'form',
+      fields: {},
+      next: { when: 'bad', goto: 'x', else: 'y' },
+    } as any;
+    expect(engine['resolveNext'](dummyStep, { dummy: {} })).toBe('y');
+  });
+
+  // LaunchDarkly helper combinations
+  it('applyLdOverride merges & prunes nulls', async () => {
+    variationMock.mockResolvedValueOnce({ title: 'Override', some: null });
+    const patched = await engine['applyLdOverride'](engine.journey.steps.start, makeReq());
+    expect(patched.title).toBe('Override');
+    expect(patched.some).toBeUndefined();
+  });
+
+  // sessionStore behaviour
+  it('sessionStore read / write', async () => {
+    const store = sessionStore('sess-test');
+    const req = { session: {} } as unknown as Request;
+    await store.save(req, 'caseZ', 0, { a: 'b' });
+    expect((await store.load(req, 'caseZ')).data).toEqual({ a: 'b' });
+  });
+}); 
