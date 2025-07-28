@@ -1,6 +1,5 @@
-export {};
-
 import type { Request } from 'express';
+import { type Redis } from 'ioredis';
 
 // Mock logger to keep console clean
 jest.mock('@hmcts/nodejs-logging', () => ({
@@ -11,7 +10,7 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 const { redisStore } = require('../../../../../../main/modules/journey/engine/storage/redisStore');
 
 // Helper to create a fake Express request with injected redis client + session
-const makeReq = (client?: { get: jest.Mock; set: jest.Mock }, uid = 'u1'): Request => {
+const makeReq = (client?: Redis, uid = 'u1'): Request => {
   return {
     app: { locals: { redisClient: client } },
     session: { user: { uid } },
@@ -37,7 +36,7 @@ describe('redisStore', () => {
   it('uses redis client to read/write and deep-merge data keyed by user', async () => {
     const getMock = jest.fn();
     const setMock = jest.fn();
-    const client = { get: getMock, set: setMock } as any;
+    const client = { get: getMock, set: setMock } as unknown as Redis;
 
     // First call: no existing data -> get returns null
     getMock.mockResolvedValueOnce(null);
@@ -66,4 +65,4 @@ describe('redisStore', () => {
     expect(secondSetPayload.data).toEqual({ step1: { foo: 'bar', baz: 'qux' }, step2: 'val' });
     expect(secondSetPayload.version).toBe(2);
   });
-}); 
+});
