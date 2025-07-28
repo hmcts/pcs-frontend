@@ -22,35 +22,37 @@ A structured, maintainable test automation solution built on Playwright that:
 ### Prerequisites
 
 ```bash
-Node.js 16+ | Playwright 1.30+ | TypeScript 4.9+
+Playwright 1.30+ | TypeScript 4.9+
 ```
 
 ## 4. Available Actions and Validations
 
 ### Actions
 
-| Action | Example Usage |
-| fill | `performAction('fill', 'Email', 'test@example.com')` |
-| check | `performAction('check', 'RememberMe')` |
-| clickButton | `performAction('clickButton', 'Submit')` |
-| clickRadioButton | `performAction('clickRadioButton', 'testRadio')` |
-| login | `performAction('login', 'citizen')` |
-| navigateToUrl | `performAction('navigateToUrl', 'testUrl')` |
+| Action           | Example Usage                                        |
+| ---------------- | ---------------------------------------------------- |
+| fill             | `performAction('fill', 'Email', 'test@example.com')` |
+| check            | `performAction('check', 'RememberMe')`               |
+| clickButton      | `performAction('clickButton', 'Submit')`             |
+| clickRadioButton | `performAction('clickRadioButton', 'testRadio')`     |
+| login            | `performAction('login', 'citizen')`                  |
+| navigateToUrl    | `performAction('navigateToUrl', 'testUrl')`          |
 
 ### Validations
 
-| Validation | Example Usage |
-| text | `performValidation('text', 'testElement')` |
-| value | `performValidation('value', 'testElement')` |
-| visibility | `performValidation('visibility', 'testElement')` |
-| enabled | `performValidation('enabled', 'testElement')` |
-| checked | `performValidation('checked', 'testElement')` |
-| count | `performValidation('count', 'testElement')` |
-| css | `performValidation('css', 'testElement')` |
-| attribute | `performValidation('attribute', 'testElement', 'attributeName')` |
-| pageTitle | `performValidation('pageTitle', 'title')` |
-| dashboardNotification | `performValidation('dashboardNotification', {title: 'test'})` |
-| dashboardTask | `performValidation('dashboardTask', {title: 'test'})` |
+| Validation            | Example Usage                                                    |
+| --------------------- | ---------------------------------------------------------------- |
+| text                  | `performValidation('text', 'testElement')`                       |
+| value                 | `performValidation('value', 'testElement')`                      |
+| visibility            | `performValidation('visibility', 'testElement')`                 |
+| enabled               | `performValidation('enabled', 'testElement')`                    |
+| checked               | `performValidation('checked', 'testElement')`                    |
+| count                 | `performValidation('count', 'testElement')`                      |
+| css                   | `performValidation('css', 'testElement')`                        |
+| attribute             | `performValidation('attribute', 'testElement', 'attributeName')` |
+| pageTitle             | `performValidation('pageTitle', 'title')`                        |
+| dashboardNotification | `performValidation('dashboardNotification', {title: 'test'})`    |
+| dashboardTask         | `performValidation('dashboardTask', {title: 'test'})`            |
 
 ### Basic Test
 
@@ -125,8 +127,9 @@ yarn test:functional
 
 ## 8. Troubleshooting
 
-| Issue | Solution |
-| "Action not found" | Check registration |
-| "Validation not found" | Check registration |
-| Locator failures | Verify fieldName matches UI text/attributes |
-| Timeout errors | Add explicit waits in components |
+| Issue                  | Solution                                    |
+| ---------------------- | ------------------------------------------- |
+| "Action not found"     | Check registration                          |
+| "Validation not found" | Check registration                          |
+| Locator failures       | Verify fieldName matches UI text/attributes |
+| Timeout errors         | Add explicit waits in components            |
