@@ -1,0 +1,26 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block content %}
+
+{% if previousStepUrl %}
+  {{ govukBackLink({
+    text: "Back",
+    href: previousStepUrl
+  }) }}
+{% endif %}
+
+  <h1 class="govuk-heading-l">{{ step.title }}</h1>
+
+  <p class="govuk-body">You need to be 18 or over to make a possession claim.</p>
+  <p class="govuk-body">If you think this is incorrect, you can go back and change your answer.</p>
+
+  <div class="govuk-button-group">
+    {{ govukButton({
+      text: "Exit application",
+      href: "/"
+    }) }}
+  </div>
+
+{% endblock %}

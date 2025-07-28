@@ -10,7 +10,13 @@
   {{ govukHeader({
     containerClasses: "govuk-width-container",
     serviceName: serviceName or "Possession claims",
-    serviceUrl: "/"
+    serviceUrl: "/",
+    navigation: [
+    {
+      text: 'logout',
+      href: '/logout'
+    }
+  ]
   }) }}
 {% endblock %}
 
