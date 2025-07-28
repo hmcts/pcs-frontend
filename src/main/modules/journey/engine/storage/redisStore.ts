@@ -5,14 +5,12 @@ import { JourneyStore } from './journeyStore.interface';
 
 export const redisStore = (slug: string): JourneyStore => {
   const keyFor = (req: Request, caseId: string): string => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userId = (req.session as any)?.user?.uid ?? 'anon';
     return `${slug}:${userId}:${caseId}`;
   };
 
-  const deepMerge = (
-    target: Record<string, unknown>,
-    patch: Record<string, unknown>
-  ): Record<string, unknown> => {
+  const deepMerge = (target: Record<string, unknown>, patch: Record<string, unknown>): Record<string, unknown> => {
     const merged: Record<string, unknown> = { ...target };
 
     for (const [stepId, stepPatch] of Object.entries(patch)) {

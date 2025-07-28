@@ -1,5 +1,3 @@
-export {};
-
 import type { Request } from 'express';
 
 // Silence logger
@@ -14,7 +12,7 @@ describe('sessionStore', () => {
   const caseId = 'case-1';
   const store = sessionStore(slug);
 
-  const makeReq = (): Request => ({ session: {} } as unknown as Request);
+  const makeReq = (): Request => ({ session: {} }) as unknown as Request;
 
   it('returns empty data on first load', async () => {
     const req = makeReq();
@@ -46,4 +44,4 @@ describe('sessionStore', () => {
     const ref = await store.generateReference(req, 'possession-claim', caseId);
     expect(ref.startsWith('PCR-')).toBe(true);
   });
-}); 
+});
