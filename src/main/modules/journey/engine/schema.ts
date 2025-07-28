@@ -1,7 +1,7 @@
-import isPostalCode from 'validator/lib/isPostalCode';
-import { DateTime } from 'luxon';
-import { z } from 'zod/v4';
 import { Logger } from '@hmcts/nodejs-logging';
+import { DateTime } from 'luxon';
+import isPostalCode from 'validator/lib/isPostalCode';
+import { z } from 'zod/v4';
 
 const logger = Logger.getLogger('journey-engine-schema');
 
@@ -466,7 +466,6 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
 
     case 'date': {
       if (rules?.required === true) {
-        
         const schema = z
           .object({
             day: z.string(),

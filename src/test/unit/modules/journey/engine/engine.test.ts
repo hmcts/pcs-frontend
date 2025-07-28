@@ -1,12 +1,14 @@
 import fs from 'fs';
 import path from 'path';
+
 import type { Request } from 'express';
 
+import { FieldConfig, JourneyConfig, StepConfig } from '../../../../../main/modules/journey/engine/schema';
+
 const { WizardEngine } = require('../../../../../main/modules/journey/engine/engine');
-const { JourneyValidator } = require('../../../../../main/modules/journey/engine/validation');
 const { memoryStore } = require('../../../../../main/modules/journey/engine/storage/memoryStore');
 const { sessionStore } = require('../../../../../main/modules/journey/engine/storage/sessionStore');
-
+const { JourneyValidator } = require('../../../../../main/modules/journey/engine/validation');
 
 jest.mock('@hmcts/nodejs-logging', () => {
   const loggerInstance = { info: jest.fn(), error: jest.fn(), warn: jest.fn() };
@@ -24,13 +26,11 @@ jest.mock('@launchdarkly/node-server-sdk', () => ({
   init: () => ({ variation: variationMock }),
 }));
 
-
-
 const makeReq = () =>
   ({
     app: { locals: { launchDarklyClient: { variation: variationMock } } },
     session: { user: { uid: 'u123', name: 'Test' } },
-  } as unknown as Request);
+  }) as unknown as Request;
 
 // Minimal Express request stub for memoryStore tests that do not need LD data
 const reqStub = {} as unknown as { session?: Record<string, unknown> };
@@ -108,9 +108,7 @@ describe('WizardEngine - core utilities & validator', () => {
   it('buildSummaryRows returns formatted data', () => {
     const rows = engine['buildSummaryRows']({ start: { field1: 'abc' }, mid: { choice: 'y' } });
     expect(rows).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ key: { text: 'Start' }, value: { text: 'abc' } }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ key: { text: 'Start' }, value: { text: 'abc' } })])
     );
   });
 
@@ -123,12 +121,12 @@ describe('WizardEngine - core utilities & validator', () => {
   } as const;
 
   it('JourneyValidator success path', () => {
-    const res = validator.validate(stepCfg as any, { email: 'test@example.com' });
+    const res = validator.validate(stepCfg as unknown as StepConfig, { email: 'test@example.com' });
     expect(res.success).toBe(true);
   });
 
   it('JourneyValidator failure path', () => {
-    const res = validator.validate(stepCfg as any, { email: 'bad' });
+    const res = validator.validate(stepCfg as unknown as StepConfig, { email: 'bad' });
     expect(res.success).toBe(false);
   });
 
@@ -173,9 +171,9 @@ describe('WizardEngine - buildJourneyContext', () => {
       start: { dob: { day: '01', month: '02', year: '2000' }, gender: 'M', country: 'UK' },
     });
 
-    const dobItems = (ctx.step.fields?.dob as any).items;
+    const dobItems = (ctx.step.fields?.dob as unknown as FieldConfig).items;
     expect(dobItems).toHaveLength(3);
-    expect((ctx.step.fields?.submit as any).text).toBe('Continue');
+    expect((ctx.step.fields?.submit as unknown as FieldConfig).text).toBe('Continue');
   });
 
   it('resolveTemplatePath falls back to defaults & custom templates', async () => {
@@ -183,7 +181,7 @@ describe('WizardEngine - buildJourneyContext', () => {
     expect(await engine['resolveTemplatePath']('start')).toBe('_defaults/form');
 
     const engine2 = (() => {
-      const journey = { ...createEngine().journey } as any;
+      const journey = { ...createEngine().journey } as unknown as JourneyConfig;
       const eng = new WizardEngine(journey, 'custom-slug');
       eng.journey.steps.start.template = 'custom/my-template';
       return eng;
@@ -192,7 +190,7 @@ describe('WizardEngine - buildJourneyContext', () => {
   });
 
   it('resolveTemplatePath detects DSL template on disk', async () => {
-    const accessSpy = jest.spyOn(fs.promises, 'access').mockResolvedValueOnce(undefined as any);
+    const accessSpy = jest.spyOn(fs.promises, 'access').mockResolvedValueOnce(undefined as unknown as void);
     const engine3 = new WizardEngine(createEngine().journey, 'dsl-slug');
     const expectedRel = path.join('dsl-slug', 'steps', 'start', 'start');
     expect(await engine3['resolveTemplatePath']('start')).toBe(expectedRel);
@@ -234,7 +232,7 @@ describe('WizardEngine - buildSummaryRows', () => {
       details: { dob: { day: '01', month: '02', year: '2000' }, pets: ['Dog', 'Cat'] },
     });
     expect(rows.length).toBeGreaterThanOrEqual(2);
-    const combinedTexts = rows.map((r: any) => r.value.text).join(' ');
+    const combinedTexts = rows.map((r: unknown) => (r as { value: { text: string } }).value.text).join(' ');
     expect(combinedTexts).toContain('01/02/2000');
     expect(combinedTexts).toContain('Dog, Cat');
   });
@@ -250,7 +248,7 @@ describe('WizardEngine - buildSummaryRows', () => {
       type: 'form',
       fields: {},
       next: { when: 'bad', goto: 'x', else: 'y' },
-    } as any;
+    } as unknown as StepConfig;
     expect(engine['resolveNext'](dummyStep, { dummy: {} })).toBe('y');
   });
 
@@ -313,7 +311,6 @@ describe('WizardEngine - applyLaunchDarklyFlags', () => {
   const engine = new WizardEngine(journey, 'more');
 
   it('hasInputFields returns false when only button present', () => {
-    // @ts-ignore
     expect(engine['hasInputFields'](journey.steps.buttonOnly)).toBe(false);
   });
 
@@ -338,4 +335,4 @@ describe('WizardEngine - applyLaunchDarklyFlags', () => {
     const prev = await engine['getPreviousVisibleStep']('end', makeReq(), { start: { name: 'Alice' } });
     expect(prev).toBeNull();
   });
-}); 
+});

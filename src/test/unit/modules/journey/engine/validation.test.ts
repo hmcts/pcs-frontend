@@ -1,4 +1,4 @@
-export {};
+import { StepConfig } from '../../../../../main/modules/journey/engine/schema';
 
 const loggerMock = { info: jest.fn(), error: jest.fn(), warn: jest.fn() };
 
@@ -33,7 +33,7 @@ describe('JourneyValidator – additional coverage', () => {
       },
     } as const;
 
-    const result = validator.validate(stepConfig as any, {});
+    const result = validator.validate(stepConfig as unknown as StepConfig, {});
     expect(result.success).toBe(false);
     expect(result.errors?.dob?.message).toBe('Enter your date of birth');
   });
@@ -51,7 +51,7 @@ describe('JourneyValidator – additional coverage', () => {
       },
     } as const;
 
-    const result = validator.validate(stepCfg as any, {});
+    const result = validator.validate(stepCfg as unknown as StepConfig, {});
     expect(result.success).toBe(false);
     expect(result.errors?.animals).toBeDefined();
   });
@@ -69,7 +69,7 @@ describe('JourneyValidator – additional coverage', () => {
       },
     } as const;
 
-    const result = validator.validate(stepCfg as any, { animals: 'Dog' });
+    const result = validator.validate(stepCfg as unknown as StepConfig, { animals: 'Dog' });
     expect(result.success).toBe(true);
     expect(result.data?.animals).toEqual(['Dog']);
   });
@@ -88,7 +88,7 @@ describe('JourneyValidator – additional coverage', () => {
       },
     } as const;
 
-    const res = validator.validate(stepCfg as any, { personalEmail: 'not-an-email' });
+    const res = validator.validate(stepCfg as unknown as StepConfig, { personalEmail: 'not-an-email' });
     expect(res.success).toBe(false);
     expect(res.errors?.personalEmail?.message.startsWith('custom-')).toBe(true);
   });
@@ -105,7 +105,7 @@ describe('JourneyValidator – additional coverage', () => {
       },
     } as const;
 
-    const res = validator.validate(cfg as any, { 'dob-day': '01', 'dob-year': '2000' });
+    const res = validator.validate(cfg as unknown as StepConfig, { 'dob-day': '01', 'dob-year': '2000' });
     expect(res.success).toBe(false);
     expect(res.errors?.dob?.message).toBe('incomplete-msg');
     // Anchor is only added for invalid part errors, not incomplete
@@ -117,7 +117,11 @@ describe('JourneyValidator – additional coverage', () => {
       type: 'form',
       fields: { dob: { type: 'date' } },
     } as const;
-    const res = validator.validate(cfg as any, { 'dob-day': '10', 'dob-month': '13', 'dob-year': '2000' });
+    const res = validator.validate(cfg as unknown as StepConfig, {
+      'dob-day': '10',
+      'dob-month': '13',
+      'dob-year': '2000',
+    });
     expect(res.success).toBe(false);
     expect(res.errors?.dob?.month).toMatch(/valid month/);
   });
@@ -139,8 +143,8 @@ describe('JourneyValidator – additional coverage', () => {
       },
     } as const;
 
-    const res = validator.validate(cfg as any, { age: 5 });
+    const res = validator.validate(cfg as unknown as StepConfig, { age: 5 });
     expect(res.success).toBe(false);
     expect(res.errors?.age?.message).toMatch(/10/);
   });
-}); 
+});

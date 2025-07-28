@@ -1,5 +1,3 @@
-export {};
-
 const loggerMock = { info: jest.fn(), error: jest.fn(), warn: jest.fn() };
 
 jest.mock('@hmcts/nodejs-logging', () => ({
@@ -8,7 +6,11 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 
 jest.mock('@launchdarkly/node-server-sdk', () => ({ init: () => ({ variation: jest.fn() }) }));
 
-import { createFieldValidationSchema, JourneySchema, type FieldConfig } from '../../../../../main/modules/journey/engine/schema';
+import {
+  type FieldConfig,
+  JourneySchema,
+  createFieldValidationSchema,
+} from '../../../../../main/modules/journey/engine/schema';
 
 describe('createFieldValidationSchema - branch coverage', () => {
   const mustFail = (fieldCfg: FieldConfig, value: unknown) => {
@@ -55,16 +57,23 @@ describe('JourneySchema circular detection', () => {
   it('rejects circular journey', () => {
     const bad = {
       meta: { name: 'Bad', description: 'Circ' },
-      steps: { a: { id: 'a', type: 'form', next: 'b', fields: { f: { type: 'text' } } }, b: { id: 'b', type: 'form', next: 'a', fields: { f: { type: 'text' } } } },
+      steps: {
+        a: { id: 'a', type: 'form', next: 'b', fields: { f: { type: 'text' } } },
+        b: { id: 'b', type: 'form', next: 'a', fields: { f: { type: 'text' } } },
+      },
     } as unknown;
     const res = JourneySchema.safeParse(bad);
     expect(res.success).toBe(false);
     if (!res.success) {
+      // eslint-disable-next-line jest/no-conditional-expect
       expect(res.error.issues[0].message).toMatch(/circular/);
     }
   });
   it('accepts minimal valid journey', () => {
-    const good = { meta: { name: 'Good', description: 'Ok' }, steps: { start: { id: 'start', type: 'form', fields: { f: { type: 'text' } } } } } as unknown;
+    const good = {
+      meta: { name: 'Good', description: 'Ok' },
+      steps: { start: { id: 'start', type: 'form', fields: { f: { type: 'text' } } } },
+    } as unknown;
     expect(JourneySchema.safeParse(good).success).toBe(true);
   });
-}); 
+});
