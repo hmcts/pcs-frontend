@@ -269,4 +269,73 @@ describe('WizardEngine - buildSummaryRows', () => {
     await store.save(req, 'caseZ', 0, { a: 'b' });
     expect((await store.load(req, 'caseZ')).data).toEqual({ a: 'b' });
   });
+});
+
+describe('WizardEngine - applyLaunchDarklyFlags', () => {
+  const journey = {
+    meta: { name: 'More', description: 'Cover', version: '1.0.0' },
+    steps: {
+      start: {
+        id: 'start',
+        title: 'StartTitle',
+        type: 'form',
+        fields: {
+          name: {
+            type: 'text',
+            fieldset: { legend: { text: 'Your name', isPageHeading: true } },
+          },
+        },
+        next: 'buttonOnly',
+      },
+      buttonOnly: {
+        id: 'buttonOnly',
+        type: 'form',
+        fields: { continue: { type: 'button' } },
+        next: 'logic',
+      },
+      logic: {
+        id: 'logic',
+        type: 'form',
+        fields: { choice: { type: 'text' } },
+        next: {
+          when: () => {
+            throw new Error('test err');
+          },
+          goto: 'end',
+          else: 'end',
+        },
+      },
+      end: { id: 'end', type: 'confirmation', title: 'Done', flag: 'disable-end' },
+    },
+    config: { store: { type: 'memory' } },
+  } as const;
+
+  const engine = new WizardEngine(journey, 'more');
+
+  it('hasInputFields returns false when only button present', () => {
+    // @ts-ignore
+    expect(engine['hasInputFields'](journey.steps.buttonOnly)).toBe(false);
+  });
+
+  it('buildSummaryRows prefers fieldset legend when isPageHeading true', () => {
+    const rows = engine['buildSummaryRows']({ start: { name: 'Alice' } });
+    expect(rows[0].key.text).toBe('Your name');
+  });
+
+  it('resolveNext uses else branch when when-function throws', () => {
+    const next = engine['resolveNext'](journey.steps.logic, { logic: { choice: 'x' } });
+    expect(next).toBe('end');
+  });
+
+  it('applyLaunchDarklyFlags disables entire step when flag false', async () => {
+    variationMock.mockResolvedValue(false);
+    const filtered = await engine['applyLaunchDarklyFlags'](journey.steps.end, makeReq());
+    expect(filtered.fields).toEqual({});
+  });
+
+  it('getPreviousVisibleStep skips hidden step', async () => {
+    variationMock.mockResolvedValue(false);
+    const prev = await engine['getPreviousVisibleStep']('end', makeReq(), { start: { name: 'Alice' } });
+    expect(prev).toBeNull();
+  });
 }); 
