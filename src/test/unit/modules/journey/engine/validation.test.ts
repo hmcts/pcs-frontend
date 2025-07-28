@@ -92,4 +92,55 @@ describe('JourneyValidator – additional coverage', () => {
     expect(res.success).toBe(false);
     expect(res.errors?.personalEmail?.message.startsWith('custom-')).toBe(true);
   });
+
+  it('detects incomplete date (missing month) and returns incomplete message', () => {
+    const cfg = {
+      id: 'dateStep',
+      type: 'form',
+      fields: {
+        dob: {
+          type: 'date',
+          errorMessages: { incomplete: 'incomplete-msg', month: 'bad-month' },
+        },
+      },
+    } as const;
+
+    const res = validator.validate(cfg as any, { 'dob-day': '01', 'dob-year': '2000' });
+    expect(res.success).toBe(false);
+    expect(res.errors?.dob?.message).toBe('incomplete-msg');
+    // Anchor is only added for invalid part errors, not incomplete
+  });
+
+  it('detects invalid month out of range', () => {
+    const cfg = {
+      id: 'd2',
+      type: 'form',
+      fields: { dob: { type: 'date' } },
+    } as const;
+    const res = validator.validate(cfg as any, { 'dob-day': '10', 'dob-month': '13', 'dob-year': '2000' });
+    expect(res.success).toBe(false);
+    expect(res.errors?.dob?.month).toMatch(/valid month/);
+  });
+
+  it('falls back when customMessage throws', () => {
+    const cfg = {
+      id: 'num',
+      type: 'form',
+      fields: {
+        age: {
+          type: 'number',
+          validate: {
+            min: 10,
+            customMessage: () => {
+              throw new Error('boom');
+            },
+          },
+        },
+      },
+    } as const;
+
+    const res = validator.validate(cfg as any, { age: 5 });
+    expect(res.success).toBe(false);
+    expect(res.errors?.age?.message).toMatch(/10/);
+  });
 }); 
