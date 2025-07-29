@@ -28,7 +28,7 @@ const stepsById: Record<string, StepDraft> = {
         },
         validate: {
           required: true,
-          minLength: 1,
+          minLength: 2,
           maxLength: 6,
           customMessage: (code: string) => {
             switch (code) {
