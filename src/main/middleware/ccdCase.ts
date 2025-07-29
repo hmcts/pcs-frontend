@@ -16,6 +16,12 @@ export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextF
       const caseData: CcdCase | null = await ccdCaseService.getCase(req.session.user?.accessToken);
 
       if (caseData && caseData.id) {
+        // Clear previous address session values (from old journey)
+        req.session.formData = {};
+        delete req.session.lookupPostcode;
+        delete req.session.selectedAddressIndex;
+        delete req.session.postcodeLookupResult;
+
         req.session.ccdCase = caseData;
         const mappedFormData = mapCaseDataToFormData(caseData);
         req.session.formData = {

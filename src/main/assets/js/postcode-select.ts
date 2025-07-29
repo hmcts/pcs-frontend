@@ -40,5 +40,24 @@ export function initPostcodeSelection(): void {
     if (details && !details.open) {
       details.open = true;
     }
+
+    const form = addressSelect.closest('form') as HTMLFormElement | null;
+    if (form) {
+      form.querySelectorAll('input[name="action"], input[name="selectedAddressIndex"]').forEach(el => el.remove());
+
+      const actionInput = document.createElement('input');
+      actionInput.type = 'hidden';
+      actionInput.name = 'action';
+      actionInput.value = 'select-address';
+      form.appendChild(actionInput);
+
+      const indexInput = document.createElement('input');
+      indexInput.type = 'hidden';
+      indexInput.name = 'selectedAddressIndex';
+      indexInput.value = addressSelect.selectedIndex.toString();
+      form.appendChild(indexInput);
+
+      form.submit();
+    }
   });
 }

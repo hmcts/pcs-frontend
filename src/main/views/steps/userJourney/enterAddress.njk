@@ -40,34 +40,30 @@
 
       <!-- 📍 Address Selection Dropdown -->
       {% if addressResults and addressResults.length > 0 %}
-        {% set addressCount = addressResults.length %}
-       {% if addressCount == 1 %}
-          {% set addressCountText = t['addressFoundSingle'] | replace("{{count}}", addressCount) %}
-        {% else %}
-          {% set addressCountText = t['addressFoundPlural'] | replace("{{count}}", addressCount) %}
-        {% endif %}
+  <form method="post" action="{{ url }}">
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="selectedAddress">{{ labels.selectAddress }}</label>
+      <select class="govuk-select govuk-!-width-three-quarters" id="selectedAddress">
+        <option value="">-- {{ addressCountText }} --</option>
+        {% for address in addressResults %}
+          <option
+            value="{{ loop.index0 }}"
+            data-line1="{{ address.addressLine1 }}"
+            data-line2="{{ address.addressLine2 }}"
+            data-line3="{{ address.addressLine3 }}"
+            data-town="{{ address.town }}"
+            data-county="{{ address.county }}"
+            data-postcode="{{ address.postcode }}"
+            {% if selectedAddressIndex|int == loop.index0 %}selected{% endif %}
+          >
+            {{ address.fullAddress }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+{% endif %}
 
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="selectedAddress">{{ labels.selectAddress }}</label>
-          <select class="govuk-select govuk-!-width-three-quarters" id="selectedAddress">
-            <option value="">-- {{ addressCountText }} --</option>
-            {% for address in addressResults %}
-              <option
-                value="{{ loop.index0 }}"
-                data-line1="{{ address.addressLine1 }}"
-                data-line2="{{ address.addressLine2 }}"
-                data-line3="{{ address.addressLine3 }}"
-                data-town="{{ address.town }}"
-                data-county="{{ address.county }}"
-                data-postcode="{{ address.postcode }}"
-                {% if selectedAddressIndex|int == loop.index0 %}selected{% endif %}
-              >
-                {{ address.fullAddress }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-      {% endif %}
 
       <!-- ✍️ Manual Address Entry -->
       {% set manualAddressHtml %}

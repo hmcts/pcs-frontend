@@ -50,9 +50,9 @@ export const step: StepDefinition = {
       return {
         ...content,
         ...savedData,
-        lookupPostcode: '',
-        addressResults: null,
-        selectedAddressIndex: null,
+        lookupPostcode: savedData?.lookupPostcode || req.session.lookupPostcode || '',
+        addressResults: req.session.postcodeLookupResult || null,
+        selectedAddressIndex: savedData?.selectedAddressIndex ?? req.session.selectedAddressIndex ?? null,
         backUrl: `/steps/user-journey/enter-user-details?lang=${lang}`,
       };
     });
@@ -101,11 +101,18 @@ export const step: StepDefinition = {
       }
 
       if (action === 'select-address' && selectedAddressIndex !== undefined && req.session.postcodeLookupResult) {
-        const index = parseInt(selectedAddressIndex, 10);
+        const index = parseInt(
+          Array.isArray(selectedAddressIndex) ? selectedAddressIndex[0] : selectedAddressIndex,
+          10
+        );
         const selected = req.session.postcodeLookupResult[index];
 
         if (selected) {
+          req.session.lookupPostcode = lookupPostcode;
+          req.session.selectedAddressIndex = selectedAddressIndex;
+
           setFormData(req, stepName, {
+            lookupPostcode,
             selectedAddressIndex,
             addressLine1: selected.addressLine1,
             addressLine2: selected.addressLine2,

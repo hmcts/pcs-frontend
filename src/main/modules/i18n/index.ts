@@ -25,7 +25,7 @@ export class I18n {
             lookupQuerystring: 'lang',
             lookupCookie: 'lang',
             lookupSession: 'lang',
-            caches: ['cookie'],
+            caches: ['session'],
           },
           debug: false,
           saveMissing: false,

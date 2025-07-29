@@ -81,6 +81,10 @@ export const step: StepDefinition = {
         });
         req.session.ccdCase = updatedCase;
       } else {
+        req.session.formData = {};
+        delete req.session.lookupPostcode;
+        delete req.session.selectedAddressIndex;
+        delete req.session.postcodeLookupResult;
         const newCase = await ccdCaseService.createCase(user?.accessToken, {
           applicantForename: req.body.applicantForename,
           applicantSurname: req.body.applicantSurname,
