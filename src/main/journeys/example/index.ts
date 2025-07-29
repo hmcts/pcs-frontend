@@ -33,9 +33,9 @@ const stepsById: Record<string, StepDraft> = {
           customMessage: (code: string) => {
             switch (code) {
               case 'too_small':
-                return 'Please fill this in';
+                return 'Need at least 2 characters';
               case 'too_big':
-                return 'Too many characters! Max 6';
+                return 'Too many characters, max 6';
               case 'invalid_type':
                 return 'Need at least 1 character';
               default:
@@ -116,7 +116,7 @@ const stepsById: Record<string, StepDraft> = {
           { value: 'banana', text: 'Banana' },
           { value: 'orange', text: 'Orange' },
         ],
-        validate: { required: true, minLength: 1, customMessage: 'Please select at least one fruit' },
+        validate: { required: true, minLength: 1, customMessage: 'Select at least one fruit' },
       },
       continueButton: {
         type: 'button',
@@ -147,7 +147,7 @@ const stepsById: Record<string, StepDraft> = {
           customMessage: (code: string) => {
             switch (code) {
               case 'invalid_value':
-                return 'Please select at least one colour';
+                return 'Select at least one colour';
               default:
                 return 'Something went wrong';
             }
@@ -174,11 +174,11 @@ const stepsById: Record<string, StepDraft> = {
         },
         validate: { required: true },
         errorMessages: {
-          required: 'Please enter a date',
-          invalid: 'Please enter a valid date now!!!',
-          day: 'Please enter a valid day',
-          month: 'Please enter a valid month',
-          year: 'Please enter a valid year',
+          required: 'Enter a date',
+          invalid: 'Enter a valid date',
+          day: 'Enter a valid day',
+          month: 'Enter a valid month',
+          year: 'Enter a valid year',
         },
       },
       continueButton: {
@@ -239,7 +239,7 @@ const stepsById: Record<string, StepDraft> = {
         label: {
           text: 'Telephone number',
         },
-        validate: { required: true },
+        validate: { required: true, customMessage: 'Enter a phone number' },
       },
       continueButton: {
         type: 'button',
@@ -290,11 +290,11 @@ const stepsById: Record<string, StepDraft> = {
     },
   },
   postalCode: {
-    id: 'postalCode',
-    title: 'Enter a postal code',
+    id: 'postCode',
+    title: 'Enter a postcode',
     type: 'form',
     fields: {
-      postalCode: {
+      postCode: {
         type: 'text',
         label: {
           text: 'Postcode',
@@ -336,7 +336,7 @@ const stepsById: Record<string, StepDraft> = {
   },
   confirmation: {
     id: 'confirmation',
-    title: 'All done!',
+    title: 'All done',
     type: 'confirmation',
     data: {
       referenceNumber: true,
