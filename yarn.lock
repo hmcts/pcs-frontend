@@ -3018,31 +3018,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-sdk-common@npm:2.18.0":
-  version: 2.18.0
-  resolution: "@launchdarkly/js-sdk-common@npm:2.18.0"
-  checksum: 10/1dd45dce7b81d94c96af8d0c9fb834def91ef1c31c258f4c2d4e8e96a8ae32d1a152b2aa4dcf08ae72719c86bfdfa5351f616802fc4db4ac829b8757da2adfdb
+"@launchdarkly/js-sdk-common@npm:2.19.0":
+  version: 2.19.0
+  resolution: "@launchdarkly/js-sdk-common@npm:2.19.0"
+  checksum: 10/864f0a206ca8f0347a739293cde30e73290e6f45c34460f1361c8568bae79c5c497b4968d2b95bd2fc14b16b0166bc9df2148cf042ae4d5065eca110c0cec350
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-server-sdk-common@npm:2.16.0":
-  version: 2.16.0
-  resolution: "@launchdarkly/js-server-sdk-common@npm:2.16.0"
+"@launchdarkly/js-server-sdk-common@npm:2.16.1":
+  version: 2.16.1
+  resolution: "@launchdarkly/js-server-sdk-common@npm:2.16.1"
   dependencies:
-    "@launchdarkly/js-sdk-common": "npm:2.18.0"
+    "@launchdarkly/js-sdk-common": "npm:2.19.0"
     semver: "npm:7.5.4"
-  checksum: 10/ac20f99d66da5683def615f8e60a357b0d8f3d7305c392396015eca5a081fcde5ecd4c3a8af8900709557486839c14b6aa385235be281cde50d25c17ec7c1b67
+  checksum: 10/3d2fcf5f64ea1716646ab269c80b5a851c56eaed5ba4015d7b3d7dfabde9a1eed38bd33e4b5e6e91f98889d13a3f8cc3f3df3893c2a11b0d35c2958c8c5420fe
   languageName: node
   linkType: hard
 
 "@launchdarkly/node-server-sdk@npm:^9.10.0":
-  version: 9.10.0
-  resolution: "@launchdarkly/node-server-sdk@npm:9.10.0"
+  version: 9.10.1
+  resolution: "@launchdarkly/node-server-sdk@npm:9.10.1"
   dependencies:
-    "@launchdarkly/js-server-sdk-common": "npm:2.16.0"
-    https-proxy-agent: "npm:^5.0.1"
+    "@launchdarkly/js-server-sdk-common": "npm:2.16.1"
+    https-proxy-agent: "npm:^7.0.6"
     launchdarkly-eventsource: "npm:2.2.0"
-  checksum: 10/1ca53f2e020141aaab5e31dd700bcadbe912d58cd034eac538bc3dcd09b2ccaf1c33a4f1c08b6f945b5e8378ab3b01136a36dcd96daad95fd99bb545b31588a1
+  checksum: 10/b22b38787e1f91348a82f03f1a70a1d5d19e78f61dada0ecd84e23bac97ec42e23199f877b1ff045325a06349c86fccf22002cbd512c32d487a0071e6df8b388
   languageName: node
   linkType: hard
 
@@ -5774,15 +5774,6 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 10/77f2de5051a631cf1729c090e5759148459cdb76b5f5c70f890503d629cf5052357b0ce783c0f976dd8a93c5150f59f6d18df1def3f502396a20f81282482fa4
-  languageName: node
-  linkType: hard
-
-"agent-base@npm:6":
-  version: 6.0.2
-  resolution: "agent-base@npm:6.0.2"
-  dependencies:
-    debug: "npm:4"
-  checksum: 10/21fb903e0917e5cb16591b4d0ef6a028a54b83ac30cd1fca58dece3d4e0990512a8723f9f83130d88a41e2af8b1f7be1386fda3ea2d181bb1a62155e75e95e23
   languageName: node
   linkType: hard
 
@@ -9617,16 +9608,6 @@ __metadata:
     roarr: "npm:^7.0.4"
     type-fest: "npm:^2.3.3"
   checksum: 10/82d06be231c5705d3ecce1bce0d26e41df975cdfc470a6edfdfa64e9a19b273bf9114266acfe64f9aca245ead3dc618e718eaa415e18c36af1c2cdd923a3d19c
-  languageName: node
-  linkType: hard
-
-"https-proxy-agent@npm:^5.0.1":
-  version: 5.0.1
-  resolution: "https-proxy-agent@npm:5.0.1"
-  dependencies:
-    agent-base: "npm:6"
-    debug: "npm:4"
-  checksum: 10/f0dce7bdcac5e8eaa0be3c7368bb8836ed010fb5b6349ffb412b172a203efe8f807d9a6681319105ea1b6901e1972c7b5ea899672a7b9aad58309f766dcbe0df
   languageName: node
   linkType: hard
 
