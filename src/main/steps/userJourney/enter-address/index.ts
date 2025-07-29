@@ -63,6 +63,37 @@ export const step: StepDefinition = {
       const lang = req.query.lang?.toString() || 'en';
       const content = generateContent(lang);
 
+      if (action === 'save-and-switch-lang') {
+        const sessionAddressIndex = req.session.selectedAddressIndex;
+        const sessionAddresses = req.session.postcodeLookupResult || [];
+        let selectedAddressData = {};
+
+        if (sessionAddressIndex !== undefined) {
+          const index = parseInt(Array.isArray(sessionAddressIndex) ? sessionAddressIndex[0] : sessionAddressIndex, 10);
+          const selected = sessionAddresses[index];
+
+          if (selected) {
+            selectedAddressData = {
+              addressLine1: selected.addressLine1,
+              addressLine2: selected.addressLine2,
+              addressLine3: selected.addressLine3,
+              town: selected.town,
+              county: selected.county,
+              postcode: selected.postcode,
+              country: selected.country,
+            };
+          }
+        }
+
+        setFormData(req, stepName, {
+          ...req.body,
+          ...selectedAddressData,
+        });
+
+        const nextLang = req.body.nextLang || 'en';
+        return res.redirect(`${req.originalUrl.split('?')[0]}?lang=${nextLang}`);
+      }
+
       if (action === 'find-address') {
         if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
           return res.status(400).render('steps/userJourney/enterAddress.njk', {
@@ -123,19 +154,7 @@ export const step: StepDefinition = {
             country: selected.country,
           });
 
-          return res.render('steps/userJourney/enterAddress.njk', {
-            ...content,
-            lookupPostcode,
-            addressResults: req.session.postcodeLookupResult,
-            selectedAddressIndex,
-            addressLine1: selected.addressLine1,
-            addressLine2: selected.addressLine2,
-            addressLine3: selected.addressLine3,
-            town: selected.town,
-            county: selected.county,
-            postcode: selected.postcode,
-            country: selected.country,
-          });
+          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
         }
       }
 

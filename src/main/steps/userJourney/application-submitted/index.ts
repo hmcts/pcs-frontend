@@ -24,6 +24,11 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
+      if (req.body.action === 'save-and-switch-lang') {
+        const nextLang = req.body.nextLang || 'en';
+        return res.redirect(`${req.originalUrl.split('?')[0]}?lang=${nextLang}`);
+      }
+
       const lang = req.query.lang?.toString() || 'en';
       delete req.session.ccdCase;
       delete req.session.formData;

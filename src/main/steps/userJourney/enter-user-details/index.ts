@@ -51,50 +51,55 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
-      const lang = req.query.lang?.toString() || 'en';
-      const content = generateContent(lang);
-      const fields = getFields(content);
+      if (req.body.action === 'save-and-switch-lang') {
+        setFormData(req, stepName, req.body);
+        const nextLang = req.body.nextLang || 'en';
+        return res.redirect(`${req.originalUrl.split('?')[0]}?lang=${nextLang}`);
+      } else {
+        const lang = req.query.lang?.toString() || 'en';
+        const content = generateContent(lang);
+        const fields = getFields(content);
+        const errors = validateForm(req, fields, content);
 
-      const errors = validateForm(req, fields, content);
+        if (Object.keys(errors).length > 0) {
+          const firstField = Object.keys(errors)[0];
+          return res.status(400).render('steps/userJourney/enterUserDetails.njk', {
+            ...content,
+            ...req.body,
+            error: { field: firstField, text: errors[firstField] },
+          });
+        }
 
-      if (Object.keys(errors).length > 0) {
-        const firstField = Object.keys(errors)[0];
-        return res.status(400).render('steps/userJourney/enterUserDetails.njk', {
-          ...content,
-          ...req.body,
-          error: { field: firstField, text: errors[firstField] },
-        });
-      }
+        setFormData(req, stepName, req.body);
+        const ccdCase = req.session.ccdCase;
+        const user = req.session.user;
 
-      setFormData(req, stepName, req.body);
-      const ccdCase = req.session.ccdCase;
-      const user = req.session.user;
-
-      if (ccdCase?.id) {
-        const updatedCase = await ccdCaseService.updateCase(user?.accessToken, {
-          id: ccdCase.id,
-          data: {
-            ...ccdCase.data,
+        if (ccdCase?.id) {
+          const updatedCase = await ccdCaseService.updateCase(user?.accessToken, {
+            id: ccdCase.id,
+            data: {
+              ...ccdCase.data,
+              applicantForename: req.body.applicantForename,
+              applicantSurname: req.body.applicantSurname,
+            },
+          });
+          req.session.ccdCase = updatedCase;
+        } else {
+          req.session.formData = {};
+          delete req.session.lookupPostcode;
+          delete req.session.selectedAddressIndex;
+          delete req.session.postcodeLookupResult;
+          const newCase = await ccdCaseService.createCase(user?.accessToken, {
             applicantForename: req.body.applicantForename,
             applicantSurname: req.body.applicantSurname,
-          },
-        });
-        req.session.ccdCase = updatedCase;
-      } else {
-        req.session.formData = {};
-        delete req.session.lookupPostcode;
-        delete req.session.selectedAddressIndex;
-        delete req.session.postcodeLookupResult;
-        const newCase = await ccdCaseService.createCase(user?.accessToken, {
-          applicantForename: req.body.applicantForename,
-          applicantSurname: req.body.applicantSurname,
-          //TODO: This need to be removed once the backend issue is fixed. (PR: https://github.com/hmcts/pcs-api/pull/395)
-          paymentStatus: 'UNPAID',
-        });
-        req.session.ccdCase = newCase;
-      }
+            //TODO: This need to be removed once the backend issue is fixed. (PR: https://github.com/hmcts/pcs-api/pull/395)
+            paymentStatus: 'UNPAID',
+          });
+          req.session.ccdCase = newCase;
+        }
 
-      res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
+        res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
+      }
     },
   },
 };

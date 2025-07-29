@@ -54,9 +54,10 @@ export function initPostcodeSelection(): void {
       const indexInput = document.createElement('input');
       indexInput.type = 'hidden';
       indexInput.name = 'selectedAddressIndex';
-      indexInput.value = addressSelect.selectedIndex.toString();
+      indexInput.value = addressSelect.value;
       form.appendChild(indexInput);
 
+      window.scrollTo(0, 0);
       form.submit();
     }
   });

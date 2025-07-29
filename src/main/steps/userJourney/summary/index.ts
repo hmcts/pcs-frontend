@@ -33,6 +33,11 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       try {
+        if (req.body.action === 'save-and-switch-lang') {
+          const nextLang = req.body.nextLang || 'en';
+          return res.redirect(`${req.originalUrl.split('?')[0]}?lang=${nextLang}`);
+        }
+
         const lang = req.query.lang?.toString() || 'en';
         if (req.session.ccdCase && req.session.user) {
           await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
