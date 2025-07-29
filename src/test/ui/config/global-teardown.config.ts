@@ -1,9 +1,9 @@
-import { ActionRegistry } from '../utils/registry/action.registry';
-import { ValidationRegistry } from '../utils/registry/validation.registry';
+import { updateTestReadme } from '../update-testReadme';
 
 async function globalTeardownConfig(): Promise<void> {
-  ActionRegistry.updateReadmeSection();
-  ValidationRegistry.updateReadmeSection();
+  if (!process.env.CI) {
+    await updateTestReadme();
+  }
 }
 
 export default globalTeardownConfig;
