@@ -26,7 +26,8 @@ export const step: StepDefinition = {
     post: async (req: Request, res: Response) => {
       if (req.body.action === 'save-and-switch-lang') {
         const nextLang = req.body.nextLang || 'en';
-        return res.redirect(`${req.originalUrl.split('?')[0]}?lang=${nextLang}`);
+        const basePath = '/steps/user-journey/application-submitted';
+        return res.redirect(`${basePath}?lang=${nextLang}`);
       }
 
       const lang = req.query.lang?.toString() || 'en';

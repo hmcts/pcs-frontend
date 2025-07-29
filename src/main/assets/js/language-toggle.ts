@@ -11,7 +11,7 @@ export function initLanguageToggle(): void {
       }
 
       if (!form) {
-        window.location.href = `${window.location.pathname}?lang=${lang}`;
+        window.location.href = `${window.location.pathname}?lang=${encodeURIComponent(lang)}`;
         return;
       }
 

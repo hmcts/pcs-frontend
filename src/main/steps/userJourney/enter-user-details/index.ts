@@ -54,7 +54,7 @@ export const step: StepDefinition = {
       if (req.body.action === 'save-and-switch-lang') {
         setFormData(req, stepName, req.body);
         const nextLang = req.body.nextLang || 'en';
-        return res.redirect(`${req.originalUrl.split('?')[0]}?lang=${nextLang}`);
+        return res.redirect(`/steps/user-journey/enter-user-details?lang=${nextLang}`);
       } else {
         const lang = req.query.lang?.toString() || 'en';
         const content = generateContent(lang);
@@ -85,7 +85,6 @@ export const step: StepDefinition = {
           });
           req.session.ccdCase = updatedCase;
         } else {
-          req.session.formData = {};
           delete req.session.lookupPostcode;
           delete req.session.selectedAddressIndex;
           delete req.session.postcodeLookupResult;

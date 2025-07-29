@@ -91,7 +91,7 @@ export const step: StepDefinition = {
         });
 
         const nextLang = req.body.nextLang || 'en';
-        return res.redirect(`${req.originalUrl.split('?')[0]}?lang=${nextLang}`);
+        return res.redirect(`/steps/user-journey/enter-address?lang=${nextLang}`);
       }
 
       if (action === 'find-address') {

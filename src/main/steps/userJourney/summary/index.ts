@@ -35,7 +35,7 @@ export const step: StepDefinition = {
       try {
         if (req.body.action === 'save-and-switch-lang') {
           const nextLang = req.body.nextLang || 'en';
-          return res.redirect(`${req.originalUrl.split('?')[0]}?lang=${nextLang}`);
+          return res.redirect(`/steps/user-journey/summary?lang=${nextLang}`);
         }
 
         const lang = req.query.lang?.toString() || 'en';
