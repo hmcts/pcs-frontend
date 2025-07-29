@@ -3,13 +3,13 @@ import { NavigateToUrlAction } from '../actions/custom-actions/navigateToUrl.act
 import { CheckAction } from '../actions/element-actions/check.action';
 import { ClickButtonAction } from '../actions/element-actions/clickButton.action';
 import { clickRadioButton } from '../actions/element-actions/clickRadioButton.action';
-import { FillAction } from '../actions/element-actions/fill.action';
+import { InputTextAction } from '../actions/element-actions/inputText.action';
 import { IAction } from '../interfaces/action.interface';
 
 export class ActionRegistry {
   private static actions: Map<string, IAction> = new Map([
     ['clickButton', new ClickButtonAction()],
-    ['fill', new FillAction()],
+    ['inputText', new InputTextAction()],
     ['check', new CheckAction()],
     ['clickRadioButton', new clickRadioButton()],
     ['login', new LoginAction()],

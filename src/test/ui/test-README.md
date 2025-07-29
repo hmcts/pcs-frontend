@@ -8,14 +8,52 @@ A structured, maintainable test automation solution built on Playwright that:
 - Separates test logic from implementation details
 - Provides ready-to-use components for UI interactions and validations
 
+## 1.1 Folder Structure
+
+```
+ui/
+├── config/                    # Configuration files
+│   ├── global-setup.config.ts  # Global test setup configuration
+│   └── global-teardown.config.ts # Global teardown configuration
+├── data/                      # Test data files
+├── functional/                # Test/spec files
+├── utils/                     # Core framework utilities
+│   ├── actions/               # Action implementations
+│   │   ├── custom-actions/    # Application-specific actions
+│   │   └── element-actions/   # Generic element interactions
+│   ├── validations/           # Validation implementations
+│   │   ├── custom-validations/ # Application-specific validations
+│   │   └── element-validations/ # Generic element validations
+│   ├── interfaces/            # Type definitions
+│   │   ├── action.interface.ts # Action interface
+│   │   └── validation.interface.ts # Validation interface
+│   ├── registry/              # Component registration
+│   │   ├── action.registry.ts # Action registry
+│   │   └── validation.registry.ts # Validation registry
+│   └── controller.ts          # Controls the usage of actions and validations
+├── testREADME.md              # Framework documentation
+└── update-testReadMe.ts       # Documentation auto-update script
+```
+
+_Note: The `update-testReadMe.ts` script automatically updates this documentation file with available actions/validations through the global teardown hook that runs in local development environments._
+
 ## 2. Core Architecture
 
-### Key Components
+The framework's modular design consists of these key layers:
 
-1. Controller: Defines performAction/s and performValidation/s
-2. Actions: Perform UI interactions
-3. Validations: Verify application state
-4. Registries: Component directories
+| Layer                   | Folder/File                              | Description                                                      |
+| ----------------------- | ---------------------------------------- | ---------------------------------------------------------------- |
+| **Configuration**       | `config/`                                | Manages environment setup and test lifecycle hooks               |
+| **Test Data**           | `data/`                                  | Stores test data files for data-driven testing                   |
+| **Test Specs**          | `functional/`                            | Contains feature-organized test specifications                   |
+| **Controller**          | `utils/controller.ts`                    | Orchestrates test execution through action/validation interfaces |
+| **Element Actions**     | `utils/actions/element-actions/`         | Implements core browser interactions (clicks, fills, etc.)       |
+| **Custom Actions**      | `utils/actions/custom-actions/`          | Handles domain-specific workflows (login, navigation)            |
+| **Element Validations** | `utils/validations/element-validations/` | Verifies basic element states (visibility, text, etc.)           |
+| **Custom Validations**  | `utils/validations/custom-validations/`  | Validates business rules and complex scenarios                   |
+| **Interfaces**          | `utils/interfaces/`                      | Defines implementation contracts for actions and validations     |
+| **Registry**            | `utils/registry/`                        | Maintains component registration and lookup system               |
+| **Documentation**       | `testREADME.md` + `update-testReadMe.ts` | Auto-updating framework documentation system                     |
 
 ## 3. Getting Started
 
@@ -29,14 +67,14 @@ Playwright 1.30+ | TypeScript 4.9+
 
 ### Actions
 
-| Action           | Example Usage                                        |
-| ---------------- | ---------------------------------------------------- |
-| fill             | `performAction('fill', 'Email', 'test@example.com')` |
-| check            | `performAction('check', 'RememberMe')`               |
-| clickButton      | `performAction('clickButton', 'Submit')`             |
-| clickRadioButton | `performAction('clickRadioButton', 'testRadio')`     |
-| login            | `performAction('login', 'citizen')`                  |
-| navigateToUrl    | `performAction('navigateToUrl', 'testUrl')`          |
+| Action           | Example Usage                                             |
+| ---------------- | --------------------------------------------------------- |
+| inputText        | `performAction('inputText', 'Email', 'test@example.com')` |
+| check            | `performAction('check', 'RememberMe')`                    |
+| clickButton      | `performAction('clickButton', 'Submit')`                  |
+| clickRadioButton | `performAction('clickRadioButton', 'testRadio')`          |
+| login            | `performAction('login', 'citizen')`                       |
+| navigateToUrl    | `performAction('navigateToUrl', 'testUrl')`               |
 
 ### Validations
 
@@ -67,7 +105,7 @@ await performValidation('text', 'WelcomeMsg', 'Welcome!');
 ```typescript
 await performActionGroup(
   'Login',
-  { action: 'fill', fieldName: 'Email', value: 'test@example.com' },
+  { action: 'inputText', fieldName: 'Email', value: 'test@example.com' },
   { action: 'clickButton', fieldName: 'Submit' }
 );
 

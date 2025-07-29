@@ -10,8 +10,8 @@ export class LoginAction implements IAction {
     if (!userCreds) {
       throw new Error(`No credentials found for key: ${userKey}`);
     }
-    await performAction('fill', 'Email address', userCreds.email);
-    await performAction('fill', 'Password', userCreds.password);
+    await performAction('inputText', 'Email address', userCreds.email);
+    await performAction('inputText', 'Password', userCreds.password);
     await performAction('clickButton', 'Sign in');
   }
 }
