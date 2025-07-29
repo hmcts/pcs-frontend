@@ -1,7 +1,9 @@
-import { cleanupTempUsers } from '../utils/helpers/idam-helpers/idam.helper';
+import { updateTestReadme } from '../update-testReadme';
 
 async function globalTeardownConfig(): Promise<void> {
-  await cleanupTempUsers();
+  if (!process.env.CI) {
+    await updateTestReadme();
+  }
 }
 
 export default globalTeardownConfig;
