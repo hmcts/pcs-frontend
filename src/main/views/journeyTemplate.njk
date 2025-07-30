@@ -3,7 +3,7 @@
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 
 {% block head %}
-  <title>{% block pageTitle %}{{ journey.meta.name }}{% endblock %} - GOV.UK</title>
+  <title>{% block pageTitle %}GOV.UK - {{ journey.meta.name }}{% endblock %}</title>
   {% include "webpack/css.njk" %}
 {% endblock %}
 
