@@ -289,8 +289,8 @@ const stepsById: Record<string, StepDraft> = {
       },
     },
   },
-  postalCode: {
-    id: 'postCode',
+  postcode: {
+    id: 'postcode',
     title: 'Enter a postcode',
     type: 'form',
     fields: {
@@ -355,7 +355,7 @@ const orderedIds = [
   'email',
   'tel',
   'url',
-  'postalCode',
+  'postcode',
   'password',
   // 'file',
   'summary',
