@@ -3018,31 +3018,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-sdk-common@npm:2.18.0":
-  version: 2.18.0
-  resolution: "@launchdarkly/js-sdk-common@npm:2.18.0"
-  checksum: 10/1dd45dce7b81d94c96af8d0c9fb834def91ef1c31c258f4c2d4e8e96a8ae32d1a152b2aa4dcf08ae72719c86bfdfa5351f616802fc4db4ac829b8757da2adfdb
+"@launchdarkly/js-sdk-common@npm:2.19.0":
+  version: 2.19.0
+  resolution: "@launchdarkly/js-sdk-common@npm:2.19.0"
+  checksum: 10/864f0a206ca8f0347a739293cde30e73290e6f45c34460f1361c8568bae79c5c497b4968d2b95bd2fc14b16b0166bc9df2148cf042ae4d5065eca110c0cec350
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-server-sdk-common@npm:2.16.0":
-  version: 2.16.0
-  resolution: "@launchdarkly/js-server-sdk-common@npm:2.16.0"
+"@launchdarkly/js-server-sdk-common@npm:2.16.1":
+  version: 2.16.1
+  resolution: "@launchdarkly/js-server-sdk-common@npm:2.16.1"
   dependencies:
-    "@launchdarkly/js-sdk-common": "npm:2.18.0"
+    "@launchdarkly/js-sdk-common": "npm:2.19.0"
     semver: "npm:7.5.4"
-  checksum: 10/ac20f99d66da5683def615f8e60a357b0d8f3d7305c392396015eca5a081fcde5ecd4c3a8af8900709557486839c14b6aa385235be281cde50d25c17ec7c1b67
+  checksum: 10/3d2fcf5f64ea1716646ab269c80b5a851c56eaed5ba4015d7b3d7dfabde9a1eed38bd33e4b5e6e91f98889d13a3f8cc3f3df3893c2a11b0d35c2958c8c5420fe
   languageName: node
   linkType: hard
 
 "@launchdarkly/node-server-sdk@npm:^9.10.0":
-  version: 9.10.0
-  resolution: "@launchdarkly/node-server-sdk@npm:9.10.0"
+  version: 9.10.1
+  resolution: "@launchdarkly/node-server-sdk@npm:9.10.1"
   dependencies:
-    "@launchdarkly/js-server-sdk-common": "npm:2.16.0"
-    https-proxy-agent: "npm:^5.0.1"
+    "@launchdarkly/js-server-sdk-common": "npm:2.16.1"
+    https-proxy-agent: "npm:^7.0.6"
     launchdarkly-eventsource: "npm:2.2.0"
-  checksum: 10/1ca53f2e020141aaab5e31dd700bcadbe912d58cd034eac538bc3dcd09b2ccaf1c33a4f1c08b6f945b5e8378ab3b01136a36dcd96daad95fd99bb545b31588a1
+  checksum: 10/b22b38787e1f91348a82f03f1a70a1d5d19e78f61dada0ecd84e23bac97ec42e23199f877b1ff045325a06349c86fccf22002cbd512c32d487a0071e6df8b388
   languageName: node
   linkType: hard
 
@@ -3925,56 +3925,56 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-darwin-arm64@npm:16.0.8":
-  version: 16.0.8
-  resolution: "@pact-foundation/pact-cli-darwin-arm64@npm:16.0.8"
+"@pact-foundation/pact-cli-darwin-arm64@npm:16.1.2":
+  version: 16.1.2
+  resolution: "@pact-foundation/pact-cli-darwin-arm64@npm:16.1.2"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-darwin-x64@npm:16.0.8":
-  version: 16.0.8
-  resolution: "@pact-foundation/pact-cli-darwin-x64@npm:16.0.8"
+"@pact-foundation/pact-cli-darwin-x64@npm:16.1.2":
+  version: 16.1.2
+  resolution: "@pact-foundation/pact-cli-darwin-x64@npm:16.1.2"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-linux-arm64@npm:16.0.8":
-  version: 16.0.8
-  resolution: "@pact-foundation/pact-cli-linux-arm64@npm:16.0.8"
+"@pact-foundation/pact-cli-linux-arm64@npm:16.1.2":
+  version: 16.1.2
+  resolution: "@pact-foundation/pact-cli-linux-arm64@npm:16.1.2"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-linux-x64@npm:16.0.8":
-  version: 16.0.8
-  resolution: "@pact-foundation/pact-cli-linux-x64@npm:16.0.8"
+"@pact-foundation/pact-cli-linux-x64@npm:16.1.2":
+  version: 16.1.2
+  resolution: "@pact-foundation/pact-cli-linux-x64@npm:16.1.2"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-windows-x64@npm:16.0.8":
-  version: 16.0.8
-  resolution: "@pact-foundation/pact-cli-windows-x64@npm:16.0.8"
+"@pact-foundation/pact-cli-windows-x64@npm:16.1.2":
+  version: 16.1.2
+  resolution: "@pact-foundation/pact-cli-windows-x64@npm:16.1.2"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
 "@pact-foundation/pact-cli@npm:^16.0.7":
-  version: 16.0.8
-  resolution: "@pact-foundation/pact-cli@npm:16.0.8"
+  version: 16.1.2
+  resolution: "@pact-foundation/pact-cli@npm:16.1.2"
   dependencies:
-    "@pact-foundation/pact-cli-darwin-arm64": "npm:16.0.8"
-    "@pact-foundation/pact-cli-darwin-x64": "npm:16.0.8"
-    "@pact-foundation/pact-cli-linux-arm64": "npm:16.0.8"
-    "@pact-foundation/pact-cli-linux-x64": "npm:16.0.8"
-    "@pact-foundation/pact-cli-windows-x64": "npm:16.0.8"
+    "@pact-foundation/pact-cli-darwin-arm64": "npm:16.1.2"
+    "@pact-foundation/pact-cli-darwin-x64": "npm:16.1.2"
+    "@pact-foundation/pact-cli-linux-arm64": "npm:16.1.2"
+    "@pact-foundation/pact-cli-linux-x64": "npm:16.1.2"
+    "@pact-foundation/pact-cli-windows-x64": "npm:16.1.2"
     chalk: "npm:4.1.2"
     check-types: "npm:11.2.3"
     cross-spawn: "npm:7.0.6"
     mkdirp: "npm:3.0.1"
     needle: "npm:^3.3.1"
-    pino: "npm:^9.5.0"
+    pino: "npm:^9.7.0"
     pino-pretty: "npm:^13.0.0"
     promise-timeout: "npm:1.3.0"
     rimraf: "npm:4.4.1"
@@ -3994,11 +3994,15 @@ __metadata:
     pact: bin/pact.js
     pact-broker: bin/pact-broker.js
     pact-message: bin/pact-message.js
+    pact-mock-server: bin/pact-mock-server.js
     pact-mock-service: bin/pact-mock-service.js
+    pact-plugin: bin/pact-plugin.js
     pact-provider-verifier: bin/pact-provider-verifier.js
+    pact-stub-server: bin/pact-stub-server.js
     pact-stub-service: bin/pact-stub-service.js
+    pact-verifier: bin/pact-verifier.js
     pactflow: bin/pactflow.js
-  checksum: 10/0eccc14d4feef433a0b58a31bba1db5a8ecc357675355eb643638a8279190beb0ee581962f73e821d31287562c4c1bbbe5e5b8e6928cc72dc7daf3f8fd633853
+  checksum: 10/127f685fba3a3c8275f63b0e4b87ebd7806a9dafd0c3e560d2fd69a00d703eec4ef014da70bdfca5e1dfc00cf7e6961d9f2a00d0229def28fa31654302535aab
   conditions: (os=darwin | os=linux | os=win32) & (cpu=x64 | cpu=arm64)
   languageName: node
   linkType: hard
@@ -5774,15 +5778,6 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 10/77f2de5051a631cf1729c090e5759148459cdb76b5f5c70f890503d629cf5052357b0ce783c0f976dd8a93c5150f59f6d18df1def3f502396a20f81282482fa4
-  languageName: node
-  linkType: hard
-
-"agent-base@npm:6":
-  version: 6.0.2
-  resolution: "agent-base@npm:6.0.2"
-  dependencies:
-    debug: "npm:4"
-  checksum: 10/21fb903e0917e5cb16591b4d0ef6a028a54b83ac30cd1fca58dece3d4e0990512a8723f9f83130d88a41e2af8b1f7be1386fda3ea2d181bb1a62155e75e95e23
   languageName: node
   linkType: hard
 
@@ -9620,16 +9615,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"https-proxy-agent@npm:^5.0.1":
-  version: 5.0.1
-  resolution: "https-proxy-agent@npm:5.0.1"
-  dependencies:
-    agent-base: "npm:6"
-    debug: "npm:4"
-  checksum: 10/f0dce7bdcac5e8eaa0be3c7368bb8836ed010fb5b6349ffb412b172a203efe8f807d9a6681319105ea1b6901e1972c7b5ea899672a7b9aad58309f766dcbe0df
-  languageName: node
-  linkType: hard
-
 "https-proxy-agent@npm:^7.0.0, https-proxy-agent@npm:^7.0.1, https-proxy-agent@npm:^7.0.4, https-proxy-agent@npm:^7.0.6":
   version: 7.0.6
   resolution: "https-proxy-agent@npm:7.0.6"
@@ -13136,16 +13121,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino@npm:^9.5.0":
-  version: 9.6.0
-  resolution: "pino@npm:9.6.0"
+"pino@npm:^9.7.0":
+  version: 9.7.0
+  resolution: "pino@npm:9.7.0"
   dependencies:
     atomic-sleep: "npm:^1.0.0"
     fast-redact: "npm:^3.1.1"
     on-exit-leak-free: "npm:^2.1.0"
     pino-abstract-transport: "npm:^2.0.0"
     pino-std-serializers: "npm:^7.0.0"
-    process-warning: "npm:^4.0.0"
+    process-warning: "npm:^5.0.0"
     quick-format-unescaped: "npm:^4.0.3"
     real-require: "npm:^0.2.0"
     safe-stable-stringify: "npm:^2.3.1"
@@ -13153,7 +13138,7 @@ __metadata:
     thread-stream: "npm:^3.0.0"
   bin:
     pino: bin.js
-  checksum: 10/0a36125718dc2350bbaff243e4856108a80805dc1b305da1e246460cd22396d11a8b3a78b39b0b270cce4fb8ae6aa6e584f5387f6c2ee47348aae5db49d919e6
+  checksum: 10/01f489e01457ceeb46aa73189922381a6e6c7e0b8599a49d2d18e4d765e7898e36534b7bfd389aca9702c57d680f14dc87d66ab4e80792266f928b051ba8872a
   languageName: node
   linkType: hard
 
@@ -13464,10 +13449,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"process-warning@npm:^4.0.0":
-  version: 4.0.1
-  resolution: "process-warning@npm:4.0.1"
-  checksum: 10/8b0ec9129845215c1e4a72f3a66082e3aa76f81e265374de6c70f2213f4516856316ed88338b8520e9274dab947d6b3750684b448f45148f57757f365e96793f
+"process-warning@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "process-warning@npm:5.0.0"
+  checksum: 10/10f3e00ac9fc1943ec4566ff41fff2b964e660f853c283e622257719839d340b4616e707d62a02d6aa0038761bb1fa7c56bc7308d602d51bd96f05f9cd305dcd
   languageName: node
   linkType: hard
 
@@ -16440,16 +16425,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.24.1":
-  version: 3.25.71
-  resolution: "zod@npm:3.25.71"
-  checksum: 10/5467883fa8635ea0b88cdac1d494e84ee3dc1a4f0a5aaf0a1a0644d09a529bc3c6344114e95987981f47896f1743ee2677330ed0732ce2a448a4173ed31ce3a1
-  languageName: node
-  linkType: hard
-
-"zod@npm:^3.25.32":
-  version: 3.25.32
-  resolution: "zod@npm:3.25.32"
-  checksum: 10/58504f7e0382b04313f8e4f63d215d2a19b1d23ccdf45bf9d54c7ac9fa6362e43ba41349e251129a5d3596f4396b78d9a239d177842c04c7287e78a729b7f4bc
+"zod@npm:^3.24.1, zod@npm:^3.25.32":
+  version: 3.25.76
+  resolution: "zod@npm:3.25.76"
+  checksum: 10/f0c963ec40cd96858451d1690404d603d36507c1fc9682f2dae59ab38b578687d542708a7fdbf645f77926f78c9ed558f57c3d3aa226c285f798df0c4da16995
   languageName: node
   linkType: hard
