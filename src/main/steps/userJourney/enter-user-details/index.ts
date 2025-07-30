@@ -84,8 +84,6 @@ export const step: StepDefinition = {
         const newCase = await ccdCaseService.createCase(user?.accessToken, {
           applicantForename: req.body.applicantForename,
           applicantSurname: req.body.applicantSurname,
-          //TODO: This need to be removed once the backend issue is fixed. (PR: https://github.com/hmcts/pcs-api/pull/395)
-          paymentStatus: 'UNPAID',
         });
         req.session.ccdCase = newCase;
       }
