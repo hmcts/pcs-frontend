@@ -16,7 +16,8 @@ export interface ErrorSummaryData {
  * @returns Error summary data for template rendering
  */
 export function processErrorsForTemplate(
-  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
+  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>,
+  step?: { fields?: Record<string, { type: string }> }
 ): ErrorSummaryData | null {
   if (!errors || Object.keys(errors).length === 0) {
     return null;
@@ -40,10 +41,12 @@ export function processErrorsForTemplate(
 
     // if generic error, target the first input
     if (!hasSpecific) {
-
+      // Check if this field is actually a date type by looking at the step configuration
+      const isDateField = step?.fields?.[fieldName]?.type === 'date';
+      const anchorId = error.anchor ?? (isDateField ? `${fieldName}-day` : fieldName);
       errorList.push({
         text: error.message,
-        href: `#${fieldName}-day`,
+        href: `#${anchorId}`,
       });
     }
   }

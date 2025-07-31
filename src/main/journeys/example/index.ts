@@ -189,6 +189,33 @@ const stepsById: Record<string, StepDraft> = {
       },
     },
   },
+  date_optional: {
+    id: 'date_optional',
+    title: 'Enter a date (optional)',
+    type: 'form',
+    fields: {
+      dob: {
+        type: 'date',
+        fieldset: {
+          legend: { text: 'Date of birth', isPageHeading: true },
+        },
+        validate: { required: false },
+        errorMessages: {
+          required: 'Enter a date',
+          invalid: 'Enter a valid date',
+          day: 'Enter a valid day',
+          month: 'Enter a valid month',
+          year: 'Enter a valid year',
+        },
+      },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
+      },
+    },
+  },
   number: {
     id: 'number',
     title: 'Enter a number',
@@ -355,6 +382,7 @@ const orderedIds = [
   'checkboxes',
   'select',
   'date',
+  'date_optional',
   'number',
   'email',
   'tel',
