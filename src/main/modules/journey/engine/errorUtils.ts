@@ -25,11 +25,27 @@ export function processErrorsForTemplate(
   const errorList: ProcessedError[] = [];
 
   for (const [fieldName, error] of Object.entries(errors)) {
-    const anchorId = error.anchor || fieldName;
-    errorList.push({
-      text: error.message,
-      href: `#${anchorId}`,
+    // Add part-specific error messages (day/month/year) first so each invalid component is listed
+    let hasSpecific = false;
+    (['day', 'month', 'year'] as const).forEach(part => {
+      const partMessage = (error as Record<string, string | undefined>)[part];
+      if (partMessage) {
+        hasSpecific = true;
+        errorList.push({
+          text: String(partMessage),
+          href: `#${fieldName}-${part}`,
+        });
+      }
     });
+
+    // if generic error, target the first input
+    if (!hasSpecific) {
+
+      errorList.push({
+        text: error.message,
+        href: `#${fieldName}-day`,
+      });
+    }
   }
 
   return {
