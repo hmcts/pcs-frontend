@@ -43,7 +43,8 @@ FROM dependencies AS development
 WORKDIR /app
 # Install bash for development
 USER root
-RUN apk add --no-cache bash
+RUN apk add --no-cache \
+    bash=~5
 USER hmcts
 
 # Copy all source files
