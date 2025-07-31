@@ -11,7 +11,7 @@ jest.mock('@launchdarkly/node-server-sdk', () => ({ init: () => ({ variation: je
 
 const { JourneyValidator } = require('../../../../../main/modules/journey/engine/validation');
 
-describe('JourneyValidator – additional coverage', () => {
+describe('JourneyValidator – date fields and checkbox arrays', () => {
   const validator = new JourneyValidator();
 
   it('returns detailed errors for missing required date field parts', () => {
@@ -22,6 +22,7 @@ describe('JourneyValidator – additional coverage', () => {
       fields: {
         dob: {
           type: 'date',
+          validate: { required: true },
           errorMessages: {
             required: 'Enter your date of birth',
             incomplete: 'Date must include a day, month and year',
