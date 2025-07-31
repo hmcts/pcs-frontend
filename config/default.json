@@ -50,7 +50,7 @@
       "pcs-frontend-idam-system-password": {
         "__name": "AAAAAAAAAAAA"
       },
-      "launchdarkly-sdk-key": "sdk-00000000-0000-0000-0000-000000000000",
+      "launchdarkly-sdk-key": "sdk-placeholder",
       "pcs-frontend-idam-user-temp-password": {
         "__name": "AAAAAAAAAAAA"
       },
