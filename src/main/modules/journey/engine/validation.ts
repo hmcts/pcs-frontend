@@ -43,8 +43,14 @@ export class JourneyValidator {
         };
         const dateVal = fieldValue as { day?: string; month?: string; year?: string };
 
+        const isRequired = fieldConfig.validate?.required === true;
+
         // GOV.UK error priority: required, incomplete, invalid, future
         if (!dateVal.day && !dateVal.month && !dateVal.year) {
+          if (!isRequired) {
+            // Optional date left blank – treat as valid and skip further checks
+            continue;
+          }
           errors[fieldName] = {
             day: fieldLevelErrors?.day,
             month: fieldLevelErrors?.month,
