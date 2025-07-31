@@ -27,6 +27,7 @@ export const step: StepDefinition = {
       const lang = req.query.lang?.toString() || 'en';
       delete req.session.ccdCase;
       delete req.session.formData;
+      delete req.session.postcodeLookupResult;
       res.redirect(`/steps/user-journey/enter-user-details?lang=${lang}`);
     },
   },
