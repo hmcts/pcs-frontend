@@ -45,14 +45,19 @@ export const step: StepDefinition = {
   generateContent,
   getController: (lang = 'en') => {
     const content = generateContent(lang);
+
     return createGetController('steps/userJourney/enterAddress.njk', stepName, content, req => {
       const savedData = getFormData(req, stepName);
+      const lookupPostcode = req.session.lookupPostcode || '';
+      const addressResults = req.session.postcodeLookupResult || null;
+
+      delete req.session.lookupPostcode;
       return {
         ...content,
         ...savedData,
-        lookupPostcode: '',
-        addressResults: null,
-        selectedAddressIndex: null,
+        lookupPostcode,
+        addressResults,
+        selectedAddressIndex: savedData?.selectedAddressIndex || null,
         backUrl: `/steps/user-journey/enter-user-details?lang=${lang}`,
       };
     });
@@ -83,13 +88,9 @@ export const step: StepDefinition = {
             });
           }
 
+          req.session.lookupPostcode = lookupPostcode;
           req.session.postcodeLookupResult = addressResults;
-          return res.render('steps/userJourney/enterAddress.njk', {
-            ...content,
-            ...req.body,
-            lookupPostcode,
-            addressResults,
-          });
+          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
         } catch {
           return res.status(500).render('steps/userJourney/enterAddress.njk', {
             ...content,
@@ -116,19 +117,21 @@ export const step: StepDefinition = {
             country: selected.country,
           });
 
-          return res.render('steps/userJourney/enterAddress.njk', {
-            ...content,
-            lookupPostcode,
-            addressResults: req.session.postcodeLookupResult,
-            selectedAddressIndex,
-            addressLine1: selected.addressLine1,
-            addressLine2: selected.addressLine2,
-            addressLine3: selected.addressLine3,
-            town: selected.town,
-            county: selected.county,
-            postcode: selected.postcode,
-            country: selected.country,
-          });
+          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
+
+          // return res.render('steps/userJourney/enterAddress.njk', {
+          //   ...content,
+          //   lookupPostcode,
+          //   addressResults: req.session.postcodeLookupResult,
+          //   selectedAddressIndex,
+          //   addressLine1: selected.addressLine1,
+          //   addressLine2: selected.addressLine2,
+          //   addressLine3: selected.addressLine3,
+          //   town: selected.town,
+          //   county: selected.county,
+          //   postcode: selected.postcode,
+          //   country: selected.country,
+          // });
         }
       }
 
