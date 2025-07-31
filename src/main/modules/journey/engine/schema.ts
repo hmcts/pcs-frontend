@@ -514,7 +514,50 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
           month: z.string().optional(),
           year: z.string().optional(),
         })
-        .optional();
+        .refine(
+          val => {
+            // Pass when nothing entered – field truly omitted
+            if (!val.day && !val.month && !val.year) {
+              return true;
+            }
+
+            // Fail when some but not all parts entered
+            if (!val.day || !val.month || !val.year) {
+              return false;
+            }
+
+            const date = DateTime.fromObject({
+              day: parseInt(val.day, 10),
+              month: parseInt(val.month, 10),
+              year: parseInt(val.year, 10),
+            });
+            if (!date.isValid) {
+              return false;
+            }
+
+            // Reject future dates (mirrors required-path logic)
+            return date.toMillis() <= DateTime.now().toMillis();
+          },
+          {
+            message: (getMessage('invalid') as string) ?? 'Enter a valid date',
+            path: ['date'],
+          }
+        )
+        .transform(val => {
+          if (!val.day && !val.month && !val.year) {
+            return val; // leave blank optional date untouched
+          }
+          return {
+            day: val.day,
+            month: val.month,
+            year: val.year,
+            iso: DateTime.fromObject({
+              day: parseInt(val.day!, 10),
+              month: parseInt(val.month!, 10),
+              year: parseInt(val.year!, 10),
+            }).toISO(),
+          };
+        });
     }
 
     case 'button': {

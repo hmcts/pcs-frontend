@@ -4,12 +4,12 @@ import path from 'path';
 import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import express, { NextFunction, Request, Response, Router } from 'express';
+import { DateTime } from 'luxon';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
 import { TTLCache } from '../../../utils/ttlCache';
 
 import { processErrorsForTemplate } from './errorUtils';
-import { DateTime } from 'luxon';
 import { FieldConfig, JourneyConfig, JourneyDraft, JourneySchema, StepConfig } from './schema';
 import { type JourneyStore } from './storage/index';
 import { JourneyValidator } from './validation';
@@ -534,7 +534,7 @@ export class WizardEngine {
       data,
       allData,
       errors,
-      errorSummary: processErrorsForTemplate(errors),
+      errorSummary: processErrorsForTemplate(errors, step),
       previousStepUrl,
       summaryRows,
     };
