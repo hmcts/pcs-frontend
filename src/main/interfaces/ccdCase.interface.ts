@@ -23,7 +23,6 @@ export interface CcdCaseData {
   applicantSurname?: string;
   userPcqId?: string;
   userPcqIdSet?: YesNoValue;
-  paymentStatus: string;
   propertyAddress?: {
     AddressLine1: string;
     AddressLine2: string;
