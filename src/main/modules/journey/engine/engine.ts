@@ -9,6 +9,7 @@ import { oidcMiddleware } from '../../../middleware/oidc';
 import { TTLCache } from '../../../utils/ttlCache';
 
 import { processErrorsForTemplate } from './errorUtils';
+import { DateTime } from 'luxon';
 import { FieldConfig, JourneyConfig, JourneyDraft, JourneySchema, StepConfig } from './schema';
 import { type JourneyStore } from './storage/index';
 import { JourneyValidator } from './validation';
@@ -286,7 +287,14 @@ export class WizardEngine {
               'month' in value &&
               'year' in value
             ) {
-              return `${value.day || ''}/${value.month || ''}/${value.year || ''}`;
+              const dt = DateTime.fromObject({
+                day: Number((value as Record<string, string>).day),
+                month: Number((value as Record<string, string>).month),
+                year: Number((value as Record<string, string>).year),
+              });
+              return dt.isValid
+                ? dt.toFormat('d MMMM yyyy')
+                : `${(value as Record<string, string>).day || ''}/${(value as Record<string, string>).month || ''}/${(value as Record<string, string>).year || ''}`;
             }
             if (
               typedFieldConfig.type === 'checkboxes' ||

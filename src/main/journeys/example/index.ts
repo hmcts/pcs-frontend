@@ -91,7 +91,7 @@ const stepsById: Record<string, StepDraft> = {
           { value: 'yes', text: 'Yes' },
           { value: 'no', text: 'No' },
         ],
-        validate: { required: true },
+        validate: { required: true, customMessage: 'Select yes or no' },
       },
       continueButton: {
         type: 'button',
@@ -259,7 +259,11 @@ const stepsById: Record<string, StepDraft> = {
         label: {
           text: 'Website URL',
         },
-        validate: { required: true, url: true },
+        validate: {
+          required: true,
+          url: true,
+          customMessage: 'Enter a valid website URL, including http:// or https://',
+        },
       },
       continueButton: {
         type: 'button',

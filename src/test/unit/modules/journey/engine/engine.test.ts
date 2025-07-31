@@ -233,7 +233,7 @@ describe('WizardEngine - buildSummaryRows', () => {
     });
     expect(rows.length).toBeGreaterThanOrEqual(2);
     const combinedTexts = rows.map((r: unknown) => (r as { value: { text: string } }).value.text).join(' ');
-    expect(combinedTexts).toContain('01/02/2000');
+    expect(combinedTexts).toContain('1 February 2000');
     expect(combinedTexts).toContain('Dog, Cat');
   });
 
