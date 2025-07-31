@@ -50,13 +50,18 @@ export const step: StepDefinition = {
       const savedData = getFormData(req, stepName);
       const lookupPostcode = req.session.lookupPostcode || '';
       const addressResults = req.session.postcodeLookupResult || null;
+      const error = req.session.lookupError || undefined;
 
+      // ✅ Clear transient session values
       delete req.session.lookupPostcode;
+      delete req.session.lookupError;
+
       return {
         ...content,
         ...savedData,
         lookupPostcode,
         addressResults,
+        error,
         selectedAddressIndex: savedData?.selectedAddressIndex || null,
         backUrl: `/steps/user-journey/enter-user-details?lang=${lang}`,
       };
@@ -68,39 +73,35 @@ export const step: StepDefinition = {
       const lang = req.query.lang?.toString() || 'en';
       const content = generateContent(lang);
 
+      // 🔹 Handle Find Address
       if (action === 'find-address') {
         if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
-          return res.status(400).render('steps/userJourney/enterAddress.njk', {
-            ...content,
-            ...req.body,
-            error: content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode',
-          });
+          req.session.lookupPostcode = lookupPostcode;
+          req.session.lookupError = content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode';
+          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
         }
 
         try {
           const addressResults = await getAddressesByPostcode(lookupPostcode);
 
           if (addressResults.length === 0) {
-            return res.status(404).render('steps/userJourney/enterAddress.njk', {
-              ...content,
-              ...req.body,
-              error: content.errors?.noAddressesFound || 'No addresses found for that postcode',
-            });
+            req.session.lookupPostcode = lookupPostcode;
+            req.session.lookupError = content.errors?.noAddressesFound || 'No addresses found for that postcode';
+            return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
           }
 
           req.session.lookupPostcode = lookupPostcode;
           req.session.postcodeLookupResult = addressResults;
           return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
         } catch {
-          return res.status(500).render('steps/userJourney/enterAddress.njk', {
-            ...content,
-            ...req.body,
-            lookupPostcode,
-            error: content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
-          });
+          req.session.lookupPostcode = lookupPostcode;
+          req.session.lookupError =
+            content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.';
+          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
         }
       }
 
+      // 🔹 Handle Selecting an Address
       if (action === 'select-address' && selectedAddressIndex !== undefined && req.session.postcodeLookupResult) {
         const index = parseInt(selectedAddressIndex, 10);
         const selected = req.session.postcodeLookupResult[index];
@@ -116,25 +117,12 @@ export const step: StepDefinition = {
             postcode: selected.postcode,
             country: selected.country,
           });
-
-          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
-
-          // return res.render('steps/userJourney/enterAddress.njk', {
-          //   ...content,
-          //   lookupPostcode,
-          //   addressResults: req.session.postcodeLookupResult,
-          //   selectedAddressIndex,
-          //   addressLine1: selected.addressLine1,
-          //   addressLine2: selected.addressLine2,
-          //   addressLine3: selected.addressLine3,
-          //   town: selected.town,
-          //   county: selected.county,
-          //   postcode: selected.postcode,
-          //   country: selected.country,
-          // });
         }
+
+        return res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
       }
 
+      // 🔹 Handle Final Submission
       if (action === 'submit-form') {
         if (req.body.postcode) {
           req.body.postcode = req.body.postcode
@@ -148,11 +136,8 @@ export const step: StepDefinition = {
         const errors = validateForm(req, fields);
 
         if (Object.keys(errors).length > 0) {
-          return res.status(400).render('steps/userJourney/enterAddress.njk', {
-            ...content,
-            ...req.body,
-            error: Object.values(errors)[0],
-          });
+          req.session.lookupError = Object.values(errors)[0];
+          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
         }
 
         setFormData(req, stepName, req.body);
@@ -178,7 +163,7 @@ export const step: StepDefinition = {
           req.session.ccdCase = updatedCase;
         }
 
-        res.redirect(`/steps/user-journey/summary?lang=${lang}`);
+        return res.redirect(`/steps/user-journey/summary?lang=${lang}`);
       }
     },
   },
