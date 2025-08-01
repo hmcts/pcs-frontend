@@ -548,6 +548,56 @@ export class WizardEngine {
   }
 
   // Check if a step is accessible based on journey progress
+  private isStepComplete(stepId: string, allData: Record<string, unknown>): boolean {
+    const stepConfig = this.journey.steps[stepId] as StepConfig;
+    const stepData = allData[stepId] as Record<string, unknown>;
+
+    // If no data exists for the step, check if it has required fields
+    if (!stepData) {
+      if (!stepConfig.fields) {
+        return true; // No fields means no validation needed
+      }
+
+      const hasRequiredFields = Object.values(stepConfig.fields).some((field: FieldConfig) => {
+        // Skip button fields as they are not input fields
+        if (field.type === 'button') {
+          return false;
+        }
+        // Fields are required by default unless explicitly set to false
+        return field.validate?.required !== false;
+      });
+
+      return !hasRequiredFields; // If no required fields, step is complete even with no data
+    }
+
+    // If step has data, check that all required fields are present
+    if (stepConfig.fields) {
+      for (const [fieldName, fieldConfig] of Object.entries(stepConfig.fields)) {
+        const typedFieldConfig = fieldConfig as FieldConfig;
+        // Skip button fields as they are not input fields
+        if (typedFieldConfig.type === 'button') {
+          continue;
+        }
+        // Fields are required by default unless explicitly set to false
+        if (typedFieldConfig.validate?.required !== false) {
+          const fieldValue = stepData[fieldName];
+
+          // For date fields, check if all components are present
+          if (typedFieldConfig.type === 'date') {
+            const dateValue = fieldValue as { day?: string; month?: string; year?: string };
+            if (!dateValue || !dateValue.day || !dateValue.month || !dateValue.year) {
+              return false;
+            }
+          } else if (!fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === '')) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
   private isStepAccessible(stepId: string, allData: Record<string, unknown>): boolean {
     // Always allow access to the first step
     const firstStepId = Object.keys(this.journey.steps)[0];
@@ -605,8 +655,7 @@ export class WizardEngine {
           continue;
         }
 
-        const dependencyData = allData[dependency] as Record<string, unknown>;
-        if (!dependencyData || Object.keys(dependencyData).length === 0) {
+        if (!this.isStepComplete(dependency, allData)) {
           return false;
         }
 
@@ -847,8 +896,8 @@ export class WizardEngine {
             if (!this.hasInputFields(stepConfig)) {
               continue;
             }
-            // If this step has no data, it's the first incomplete step
-            if (!data[stepId] || Object.keys(data[stepId] as Record<string, unknown>).length === 0) {
+            // If this step is not complete, it's the first incomplete step
+            if (!this.isStepComplete(stepId, data)) {
               firstIncompleteStep = stepId;
               break;
             }
