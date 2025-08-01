@@ -41,10 +41,10 @@
       <!-- 📍 Address Selection Dropdown -->
       {% if addressResults and addressResults.length > 0 %}
         {% set addressCount = addressResults.length %}
-       {% if addressCount == 1 %}
-          {% set addressCountText = t['addressFoundSingle'] | replace("{{count}}", addressCount) %}
+        {% if addressCount == 1 %}
+          {% set addressCountText = addressFoundSingle | replace("{{count}}", addressCount | string) %}
         {% else %}
-          {% set addressCountText = t['addressFoundPlural'] | replace("{{count}}", addressCount) %}
+          {% set addressCountText = addressFoundPlural | replace("{{count}}", addressCount | string) %}
         {% endif %}
 
         <div class="govuk-form-group">
