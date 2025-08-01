@@ -105,6 +105,213 @@ describe('WizardEngine - core utilities & validator', () => {
     expect(engine['isStepAccessible']('mid', { start: { field1: 'x' } })).toBe(true);
   });
 
+  it('isStepComplete correctly handles optional and required fields', () => {
+    // Create a journey with mixed optional and required fields
+    const testJourneyConfig = {
+      meta: {
+        name: 'Test Journey',
+        description: 'Journey with mixed fields',
+        version: '1.0.0',
+      },
+      steps: {
+        optional: {
+          id: 'optional',
+          title: 'Optional Step',
+          type: 'form',
+          fields: {
+            optionalField: {
+              type: 'date',
+              validate: { required: false },
+            },
+          },
+          next: 'mixed',
+        },
+        mixed: {
+          id: 'mixed',
+          title: 'Mixed Step',
+          type: 'form',
+          fields: {
+            requiredField: {
+              type: 'text',
+              validate: { required: true },
+            },
+            optionalField: {
+              type: 'date',
+              validate: { required: false },
+            },
+          },
+          next: 'confirmation',
+        },
+        confirmation: {
+          id: 'confirmation',
+          title: 'Done',
+          type: 'confirmation',
+        },
+      },
+      config: { store: { type: 'memory' } },
+    } as const;
+
+    const testEngine = new WizardEngine(testJourneyConfig, 'test-tests');
+
+    // Optional step with no data should be complete
+    expect(testEngine['isStepComplete']('optional', {})).toBe(true);
+
+    // Optional step with empty data should be complete
+    expect(testEngine['isStepComplete']('optional', { optional: {} })).toBe(true);
+
+    // Optional step with partial data should be complete
+    expect(testEngine['isStepComplete']('optional', { optional: { optionalField: { day: '01' } } })).toBe(true);
+
+    // Mixed step with no data should be incomplete (has required field)
+    expect(testEngine['isStepComplete']('mixed', {})).toBe(false);
+
+    // Mixed step with only optional data should be incomplete
+    expect(testEngine['isStepComplete']('mixed', { mixed: { optionalField: { day: '01' } } })).toBe(false);
+
+    // Mixed step with required data should be complete
+    expect(testEngine['isStepComplete']('mixed', { mixed: { requiredField: 'some value' } })).toBe(true);
+
+    // Mixed step with both required and optional data should be complete
+    expect(
+      testEngine['isStepComplete']('mixed', {
+        mixed: {
+          requiredField: 'some value',
+          optionalField: { day: '01', month: '02', year: '2000' },
+        },
+      })
+    ).toBe(true);
+
+    // Mixed step with incomplete required date field should be incomplete
+    expect(
+      testEngine['isStepComplete']('mixed', {
+        mixed: {
+          requiredField: 'some value',
+          optionalField: { day: '01' }, // missing month and year
+        },
+      })
+    ).toBe(true); // This should still be complete since optionalField is not required
+  });
+
+  it('isStepComplete correctly excludes button fields from validation', () => {
+    // Create a journey with button fields
+    const buttonJourneyConfig = {
+      meta: {
+        name: 'Button Test Journey',
+        description: 'Journey with button fields',
+        version: '1.0.0',
+      },
+      steps: {
+        withButton: {
+          id: 'withButton',
+          title: 'Step with Button',
+          type: 'form',
+          fields: {
+            textField: {
+              type: 'text',
+              validate: { required: true },
+            },
+            continueButton: {
+              type: 'button',
+              attributes: {
+                type: 'submit',
+              },
+            },
+          },
+          next: 'confirmation',
+        },
+        confirmation: {
+          id: 'confirmation',
+          title: 'Done',
+          type: 'confirmation',
+        },
+      },
+      config: { store: { type: 'memory' } },
+    } as const;
+
+    const buttonEngine = new WizardEngine(buttonJourneyConfig, 'button-tests');
+
+    // Step with button should be incomplete when required field is missing
+    expect(buttonEngine['isStepComplete']('withButton', {})).toBe(false);
+
+    // Step with button should be complete when required field has data
+    expect(buttonEngine['isStepComplete']('withButton', { withButton: { textField: 'some value' } })).toBe(true);
+
+    // Step with button should be complete when required field has data (button field should be ignored)
+    expect(
+      buttonEngine['isStepComplete']('withButton', {
+        withButton: {
+          textField: 'some value',
+          continueButton: 'button value', // This should be ignored
+        },
+      })
+    ).toBe(true);
+  });
+
+  it('isStepAccessible allows progression with optional fields left blank', () => {
+    // Create a journey with optional fields
+    const optionalJourneyConfig = {
+      meta: {
+        name: 'Optional Test Journey',
+        description: 'Journey with optional fields',
+        version: '1.0.0',
+      },
+      steps: {
+        optional: {
+          id: 'optional',
+          title: 'Optional Step',
+          type: 'form',
+          fields: {
+            optionalField: {
+              type: 'date',
+              validate: { required: false },
+            },
+          },
+          next: 'next',
+        },
+        next: {
+          id: 'next',
+          title: 'Next Step',
+          type: 'form',
+          fields: {
+            requiredField: {
+              type: 'text',
+              validate: { required: true },
+            },
+          },
+          next: 'confirmation',
+        },
+        confirmation: {
+          id: 'confirmation',
+          title: 'Done',
+          type: 'confirmation',
+        },
+      },
+      config: { store: { type: 'memory' } },
+    } as const;
+
+    const optionalEngine = new WizardEngine(optionalJourneyConfig, 'optional-tests');
+
+    // Should be able to access 'next' step even when optional step has no data
+    expect(optionalEngine['isStepAccessible']('next', {})).toBe(true);
+
+    // Should be able to access 'next' step when optional step has empty data
+    expect(optionalEngine['isStepAccessible']('next', { optional: {} })).toBe(true);
+
+    // Should be able to access 'next' step when optional step has partial data
+    expect(optionalEngine['isStepAccessible']('next', { optional: { optionalField: { day: '01' } } })).toBe(true);
+
+    // Should NOT be able to access 'next' step when it has required fields but no data
+    expect(optionalEngine['isStepAccessible']('confirmation', { optional: {} })).toBe(false);
+
+    // Should be able to access 'confirmation' when 'next' has required data
+    expect(
+      optionalEngine['isStepAccessible']('confirmation', {
+        optional: {},
+        next: { requiredField: 'some value' },
+      })
+    ).toBe(true);
+  });
+
   it('buildSummaryRows returns formatted data', () => {
     const rows = engine['buildSummaryRows']({ start: { field1: 'abc' }, mid: { choice: 'y' } });
     expect(rows).toEqual(
