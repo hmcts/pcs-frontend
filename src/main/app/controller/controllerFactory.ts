@@ -18,11 +18,13 @@ export const createGetController = (
     const postData = req.body || {};
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
-
     return {
       ...content,
       ...formData,
+      lang: req.language || 'en',
+      pageUrl: req.originalUrl || '/',
       selected,
+      t: req.t,
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
       error: postData.error,

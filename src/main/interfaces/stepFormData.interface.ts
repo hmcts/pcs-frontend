@@ -21,8 +21,8 @@ export interface StepDefinition {
   name: string;
   view: string;
   stepDir: string;
-  generateContent: () => StepFormData;
-  getController: GetController;
+  generateContent: (lang?: string) => StepFormData;
+  getController: GetController | ((lang?: string) => GetController);
   postController?: { post: RequestHandler };
   middleware?: RequestHandler[];
 }
