@@ -47,9 +47,13 @@
       "app-insights-connection-string": "InstrumentationKey=79536ccc-f225-4028-ae0f-edae519eb55f;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3598a202-277f-4848-bfd2-7c0877d11a8b",
       "pcs-frontend-idam-secret": "AAAAAAAAAAAAAAAA",
       "pcs-frontend-idam-system-username": "AAAAAAAAAAAA",
-      "pcs-frontend-idam-system-password": "AAAAAAAAAAAAAA",
-      "launchdarkly-sdk-key": "sdk-00000000-0000-0000-0000-000000000000",
-      "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA",
+      "pcs-frontend-idam-system-password": {
+        "__name": "AAAAAAAAAAAA"
+      },
+      "launchdarkly-sdk-key": "sdk-placeholder",
+      "pcs-frontend-idam-user-temp-password": {
+        "__name": "AAAAAAAAAAAA"
+      },
       "pcs-os-client-lookup-key": "AAAAAAAAAAAAAA",
       "pcs-pcq-token-key": "AAAAAAAAA"
     }
