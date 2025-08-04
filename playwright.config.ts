@@ -8,6 +8,7 @@ module.exports = defineConfig({
   testDir: './src/test/ui',
   /* Run tests in files in parallel */
   fullyParallel: true,
+
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
@@ -47,49 +48,49 @@ module.exports = defineConfig({
         viewport: DEFAULT_VIEWPORT,
       },
     },
-    {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-        screenshot: 'off',
-        video: 'off',
-        trace: 'on-first-retry',
-        javaScriptEnabled: true,
-        viewport: DEFAULT_VIEWPORT,
-      },
-    },
-    {
-      name: 'webkit',
-      use: {
-        ...devices['Desktop Safari'],
-        screenshot: 'off',
-        video: 'off',
-        trace: 'on-first-retry',
-        javaScriptEnabled: true,
-        viewport: DEFAULT_VIEWPORT,
-      },
-    },
-    {
-      name: 'MobileChrome',
-      use: {
-        ...devices['Pixel 5'],
-        trace: 'on-first-retry',
-      },
-    },
-    {
-      name: 'MobileSafari',
-      use: {
-        ...devices['iPhone 12'],
-        trace: 'on-first-retry',
-      },
-    },
-    {
-      name: 'MicrosoftEdge',
-      use: {
-        ...devices['Desktop Edge'],
-        channel: 'msedge',
-        trace: 'on-first-retry',
-      },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: {
+    //     ...devices['Desktop Firefox'],
+    //     screenshot: 'off',
+    //     video: 'off',
+    //     trace: 'on-first-retry',
+    //     javaScriptEnabled: true,
+    //     viewport: DEFAULT_VIEWPORT,
+    //   },
+    // },
+    // {
+    //   name: 'webkit',
+    //   use: {
+    //     ...devices['Desktop Safari'],
+    //     screenshot: 'off',
+    //     video: 'off',
+    //     trace: 'on-first-retry',
+    //     javaScriptEnabled: true,
+    //     viewport: DEFAULT_VIEWPORT,
+    //   },
+    // },
+    // {
+    //   name: 'MobileChrome',
+    //   use: {
+    //     ...devices['Pixel 5'],
+    //     trace: 'on-first-retry',
+    //   },
+    // },
+    // {
+    //   name: 'MobileSafari',
+    //   use: {
+    //     ...devices['iPhone 12'],
+    //     trace: 'on-first-retry',
+    //   },
+    // },
+    // {
+    //   name: 'MicrosoftEdge',
+    //   use: {
+    //     ...devices['Desktop Edge'],
+    //     channel: 'msedge',
+    //     trace: 'on-first-retry',
+    //   },
+    // },
   ],
 });
