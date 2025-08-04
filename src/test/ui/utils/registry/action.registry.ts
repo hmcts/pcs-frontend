@@ -1,4 +1,4 @@
-import { LoginAction } from '../actions/custom-actions/login.action';
+import { CreateUserAndLoginAction } from '../actions/custom-actions/createUserAndLogin.action';
 import { NavigateToUrlAction } from '../actions/custom-actions/navigateToUrl.action';
 import { CheckAction } from '../actions/element-actions/check.action';
 import { ClickButtonAction } from '../actions/element-actions/clickButton.action';
@@ -12,7 +12,7 @@ export class ActionRegistry {
     ['inputText', new InputTextAction()],
     ['check', new CheckAction()],
     ['clickRadioButton', new clickRadioButton()],
-    ['login', new LoginAction()],
+    ['createUserAndLogin', new CreateUserAndLoginAction()],
     ['navigateToUrl', new NavigateToUrlAction()],
   ]);
 

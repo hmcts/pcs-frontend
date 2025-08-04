@@ -14,8 +14,8 @@ test.beforeEach(async ({ page }, testInfo) => {
     contentType: 'text/plain',
   });
   initializeExecutor(page);
-  await performAction('NavigateToUrl', dashboard_url);
-  await performAction('login', 'citizen');
+  await performAction('navigateToUrl', dashboard_url);
+  await performAction('createUserAndLogin', 'citizen');
 });
 
 test.describe('Verify Notifications and Tasks on Dashboard @PR @nightly', async () => {

@@ -67,14 +67,14 @@ Playwright 1.30+ | TypeScript 4.9+
 
 ### Actions
 
-| Action           | Example Usage                                             |
-| ---------------- | --------------------------------------------------------- |
-| inputText        | `performAction('inputText', 'Email', 'test@example.com')` |
-| check            | `performAction('check', 'RememberMe')`                    |
-| clickButton      | `performAction('clickButton', 'Submit')`                  |
-| clickRadioButton | `performAction('clickRadioButton', 'testRadio')`          |
-| login            | `performAction('login', 'citizen')`                       |
-| navigateToUrl    | `performAction('navigateToUrl', 'testUrl')`               |
+| Action             | Example Usage                                             |
+| ------------------ | --------------------------------------------------------- |
+| inputText          | `performAction('inputText', 'Email', 'test@example.com')` |
+| check              | `performAction('check', 'RememberMe')`                    |
+| clickButton        | `performAction('clickButton', 'Submit')`                  |
+| clickRadioButton   | `performAction('clickRadioButton', 'testRadio')`          |
+| navigateToUrl      | `performAction('navigateToUrl', 'testUrl')`               |
+| createUserAndLogin | `performAction('createUserAndLogin', ...)`                |
 
 ### Validations
 
