@@ -24,8 +24,8 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "http://ccd-data-store-api-pcs-api-pr-520.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-520"
+    "url": "http://ccd-data-store-api-pcs-api-pr-316.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-316"
   },
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
