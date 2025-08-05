@@ -1,0 +1,21 @@
+{
+  "title": "Before you start",
+  "intro": {
+    "p1": "We're building a new service. Different designs are being tested and changed based on feedback from users.",
+    "p2": "You'll be asked some questions to check you're eligible to use this service."
+  },
+  "sectionHeading": "What you'll need",
+  "explanation": "To make your claim, you'll need the following information to hand:",
+  "bulletPoints": [
+    "Information about the type of notice you've given and when it was given (if applicable)",
+    "Details about the property you'd like to claim possession of",
+    "The defendants' details (if known)",
+    "Your grounds for possession and details about your reasons for making a possession claim",
+    "Copies of relevant documents"
+  ],
+  "fields": {
+    "startButton": {
+      "text": "Start"
+    }
+  }
+}

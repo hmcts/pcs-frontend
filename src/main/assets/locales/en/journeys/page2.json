@@ -1,0 +1,15 @@
+{
+  "fields": {
+    "age": {
+      "legend": "Are you 18 or over?",
+      "options": {
+        "yes": "Yes",
+        "no": "No"
+      },
+      "customMessage": "Select yes or no"
+    },
+    "continueButton": {
+      "text": "Continue"
+    }
+  }
+}

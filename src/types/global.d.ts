@@ -21,6 +21,7 @@ interface CustomSessionData extends SessionData {
   postcodeLookupResult?: any[];
   lookupPostcode?: string;
   lookupError?: string;
+  lang?: string;
   destroy(callback: (err?: Error) => void): void;
 }
 

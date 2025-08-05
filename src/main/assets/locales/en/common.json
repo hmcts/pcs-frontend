@@ -1,5 +1,6 @@
 {
   "serviceName": "Possession claims",
+  "logout": "logout",
   "phase": "Alpha",
   "feedback": "This is a new service – your <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"external noopener noreferrer\">feedback</a> will help us to improve it.",
   "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link language\">Cymraeg</a>",
