@@ -770,7 +770,7 @@ export class WizardEngine {
       const firstStepId = Object.keys(this.journey.steps)[0];
       const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
       if (validatedFirstStepId) {
-        res.redirect(`${this.basePath}/${validatedFirstStepId}`);
+        res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}`);
       } else {
         this.logger.error('Critical error: No valid step IDs found in journey configuration');
         res.status(500).send('Internal server error');
@@ -815,7 +815,7 @@ export class WizardEngine {
           if (nextId && nextId !== step.id) {
             const validatedNextId = this.validateStepIdForRedirect(nextId);
             if (validatedNextId) {
-              return res.redirect(`${this.basePath}/${validatedNextId}`);
+              return res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}`);
             }
             // If validation fails, stay on current step
             this.logger.warn(`Invalid next step ID for redirect: ${nextId}`);
@@ -844,14 +844,14 @@ export class WizardEngine {
           // Redirect to the first incomplete step
           const validatedFirstIncompleteStep = this.validateStepIdForRedirect(firstIncompleteStep);
           if (validatedFirstIncompleteStep) {
-            return res.redirect(`${this.basePath}/${validatedFirstIncompleteStep}`);
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstIncompleteStep)}`);
           }
           // If validation fails, redirect to the first step in the journey
           const firstStepId = Object.keys(this.journey.steps)[0];
           const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
           if (validatedFirstStepId) {
             this.logger.warn(`Invalid first incomplete step ID for redirect: ${firstIncompleteStep}`);
-            return res.redirect(`${this.basePath}/${validatedFirstStepId}`);
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}`);
           }
           // If even the first step is invalid, this is a critical error
           this.logger.error('Critical error: No valid step IDs found in journey configuration');
@@ -960,7 +960,7 @@ export class WizardEngine {
 
         const validatedNextId = this.validateStepIdForRedirect(nextId);
         if (validatedNextId) {
-          res.redirect(`${this.basePath}/${validatedNextId}`);
+          res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}`);
         } else {
           this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
           res.status(500).send('Internal server error');
