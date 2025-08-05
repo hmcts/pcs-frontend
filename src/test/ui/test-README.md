@@ -74,7 +74,7 @@ Playwright 1.30+ | TypeScript 4.9+
 | clickButton        | `performAction('clickButton', 'Submit')`                  |
 | clickRadioButton   | `performAction('clickRadioButton', 'testRadio')`          |
 | navigateToUrl      | `performAction('navigateToUrl', 'testUrl')`               |
-| createUserAndLogin | `performAction('createUserAndLogin', ...)`                |
+| createUserAndLogin | `performAction('createUserAndLogin', 'citizen')`          |
 
 ### Validations
 
