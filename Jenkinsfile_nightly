@@ -96,6 +96,19 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
   }
 }
 
+def publishE2EReport() {
+  stage("Publish E2E Test Report") {
+    publishHTML([
+      allowMissing: true,
+      alwaysLinkToLastBuild: true,
+      keepAll: true,
+      reportDir: "src/e2eTest/allure-report",
+      reportFiles: 'index.html',
+      reportName: "Full CUI E2E Test Report"
+    ])
+  }
+}
+
 def runAccessibilityTests(yarnBuilder) {
   stage("Full Accessibility Test") {
     try {
@@ -113,18 +126,5 @@ def runAccessibilityTests(yarnBuilder) {
       ])
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
     }
-  }
-}
-
-def publishE2EReport() {
-  stage("Publish E2E Test Report") {
-    publishHTML([
-      allowMissing: true,
-      alwaysLinkToLastBuild: true,
-      keepAll: true,
-      reportDir: "src/e2eTest/allure-report",
-      reportFiles: 'index.html',
-      reportName: "Full CUI E2E Test Report"
-    ])
   }
 }
