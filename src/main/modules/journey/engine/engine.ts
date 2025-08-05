@@ -157,7 +157,7 @@ export class WizardEngine {
     }
 
     const sanitizedStepId = this.sanitizePathSegment(stepId);
-    
+
     // If sanitization changed the step ID, it contained unsafe characters
     if (sanitizedStepId !== stepId) {
       this.logger.warn(`Step ID contained unsafe characters: ${stepId}`);
