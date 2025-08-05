@@ -33,14 +33,6 @@ withPipeline(type, product, component) {
   env.NODE_CONFIG_ENV = 'test'
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-
-    // TODO: remove this after Fortify Scan is fixed
-    enableFortifyScan()
-    afterAlways('fortify-scan') {
-      steps.archiveArtifacts allowEmptyArchive: true,
-        artifacts: '**/Fortify Scan/**/*'
-    }
-
     // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
     // enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     afterAlways('functionalTest:preview') {

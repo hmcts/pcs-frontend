@@ -16,11 +16,11 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 withNightlyPipeline(type, product, component) {
   env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
   enableSlackNotifications('#pcs-tech')
-//  enableFortifyScan()
-//  afterSuccess('fortify-scan') {
-//    steps.archiveArtifacts allowEmptyArchive: true,
-//      artifacts: '**/Fortify Scan/**/*'
-//  }
+  enableFortifyScan()
+  afterSuccess('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true,
+      artifacts: '**/Fortify Scan/**/*'
+  }
 //  afterAlways('FortifyScan') {
 //    runE2ETestsForBrowser(yarnBuilder, 'Chrome')
 //    runE2ETestsForBrowser(yarnBuilder, 'Firefox')
