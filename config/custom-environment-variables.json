@@ -5,9 +5,13 @@
       "pcs-frontend-s2s-secret": "S2S_SECRET",
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET",
       "pcs-frontend-idam-system-username": "IDAM_SYSTEM_USERNAME",
-      "pcs-frontend-idam-system-password": "IDAM_SYSTEM_PASSWORD",
+      "pcs-frontend-idam-system-password": {
+        "__name": "IDAM_SYSTEM_PASSWORD"
+      },
       "launchdarkly-sdk-key": "LAUNCHDARKLY_SDK_KEY",
-      "pcs-frontend-idam-user-temp-password": "PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD",
+      "pcs-frontend-idam-user-temp-password": {
+        "__name": "PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD"
+      },
       "pcs-os-client-lookup-key": "OS_CLIENT_LOOKUP_SECRET",
       "pcs-pcq-token-key": "PCQ_TOKEN_KEY"
     }
@@ -42,8 +46,12 @@
     "playwrightDebug": "PWDEBUG",
     "secrets": {
       "pcs-frontend-idam-system-username": "IDAM_SYSTEM_USERNAME",
-      "pcs-frontend-idam-system-password": "IDAM_SYSTEM_PASSWORD",
-      "pcs-idam-test-user-password": "PCS_IDAM_TEST_USER_PASSWORD",
+      "pcs-frontend-idam-system-password": {
+        "__name": "IDAM_SYSTEM_PASSWORD"
+      },
+      "pcs-idam-test-user-password": {
+        "__name": "PCS_IDAM_TEST_USER_PASSWORD"
+      },
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
     }
   }
