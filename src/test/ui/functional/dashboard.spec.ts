@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   });
   initializeExecutor(page);
   await performAction('navigateToUrl', dashboard_url);
-  await performAction('createUserAndLogin', 'citizen');
+  await performAction('createUserAndLogin', ['citizen']);
 });
 
 test.describe('Verify Notifications and Tasks on Dashboard @PR @nightly', async () => {
