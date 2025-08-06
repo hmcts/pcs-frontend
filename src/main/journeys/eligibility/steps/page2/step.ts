@@ -8,18 +8,18 @@ const step: StepDraft = {
       type: 'radios',
       fieldset: {
         legend: {
-          text: 'Are you 18 or over?',
+          text: 'stepAre you 18 or over?',
           isPageHeading: true,
           classes: 'govuk-fieldset__legend--l',
         },
       },
       options: [
-        { value: 'yes', text: 'Yes' },
-        { value: 'no', text: 'No' },
+        { value: 'yes', text: 'stepYes' },
+        { value: 'no', text: 'stepNo' },
       ],
       validate: {
         required: true,
-        customMessage: 'Select yes or no',
+        customMessage: 'stepSelect yes or no',
       },
     },
     continueButton: {

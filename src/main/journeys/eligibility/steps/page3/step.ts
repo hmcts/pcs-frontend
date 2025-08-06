@@ -2,36 +2,24 @@ import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
   id: 'page3',
-  title: 'What are your grounds for possession?',
   type: 'form',
-  description: 'Select all grounds that apply to your case',
   fields: {
-    grounds: {
-      type: 'checkboxes',
-      label: {
-        text: 'Select all that apply',
+    claimantType: {
+      type: 'radios',
+      fieldset: {
+        legend: {
+          text: 'claimantTypeLegend', // ⬅️ comes from locales
+          isPageHeading: true,
+          classes: 'govuk-fieldset__legend--l',
+        },
       },
       options: [
-        {
-          value: 'rent-arrears-8',
-          text: 'Rent arrears (ground 8)',
-          hint: "The tenant owes at least 2 months' rent",
-        },
-        {
-          value: 'breach-contract-9',
-          text: 'Breach of contract (ground 9)',
-          hint: 'The tenant has broken terms of the tenancy agreement',
-        },
-        {
-          value: 'other-10',
-          text: 'Other (ground 10)',
-          hint: 'Other statutory grounds for possession',
-        },
+        { value: 'individual', text: 'claimantTypeIndividual' }, // ⬅️ from locales
+        { value: 'organisation', text: 'claimantTypeOrganisation' },
       ],
       validate: {
         required: true,
-        minLength: 1,
-        customMessage: 'Select at least one option',
+        customMessage: 'claimantTypeError', // ⬅️ from locales
       },
     },
     continueButton: {
@@ -42,11 +30,9 @@ const step: StepDraft = {
     },
   },
   next: {
-    when: (_stepData: Record<string, unknown>, allData: Record<string, unknown>) => {
-      const grounds = (allData['page3'] as { grounds?: unknown[] })?.grounds ?? [];
-      return Array.isArray(grounds) && grounds.length >= 1;
-    },
-    goto: 'page4',
+    when: (stepData: Record<string, unknown>) => stepData['claimantType'] === 'individual',
+    goto: 'page4-individual',
+    else: 'page4-organisation',
   },
 };
 

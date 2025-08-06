@@ -19,6 +19,14 @@ interface RequestWithStep extends Request {
   step?: StepConfig;
 }
 
+interface TranslatableOption {
+  value?: string;
+  text?: string;
+  hint?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
 // Simplified journey context
 interface JourneyContext {
   caseId: string;
@@ -830,22 +838,27 @@ export class WizardEngine {
           for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
             const translatedField = translations.fields[fieldName];
 
-            // Set .text directly (used by buttons and simple fields)
+            // Apply .text for simple fields (like buttons)
             if (translatedField?.text) {
               fieldConfig.text = translatedField.text;
             }
 
-            // Set .label for inputs
+            // Apply .label
             if (translatedField?.label) {
               fieldConfig.label = translatedField.label;
             }
 
-            // Set .hint
+            // Apply .hint
             if (translatedField?.hint) {
               fieldConfig.hint = translatedField.hint;
             }
 
-            // Set .fieldset.legend.text for radios/checkboxes
+            // Apply .errorMessage
+            if (translatedField?.errorMessage) {
+              fieldConfig.errorMessage = { text: translatedField.errorMessage };
+            }
+
+            // Apply .fieldset.legend.text (radios/checkboxes/date)
             if (
               translatedField?.legend &&
               fieldConfig.fieldset?.legend &&
@@ -854,28 +867,34 @@ export class WizardEngine {
               fieldConfig.fieldset.legend.text = translatedField.legend;
             }
 
-            // Set .options[x].text for radios/checkboxes/select
             if (Array.isArray(translatedField?.options) && Array.isArray(fieldConfig.options)) {
-              fieldConfig.options = fieldConfig.options.map((opt, index) => {
-                const translatedOption = translatedField.options?.[index];
+              const translatedOptionsMap = new Map<string, TranslatableOption>();
 
-                if (typeof opt === 'object' && opt !== null) {
-                  return {
-                    ...opt,
-                    text: translatedOption?.text ?? opt.text,
-                    hint: translatedOption?.hint ?? opt.hint,
-                  };
+              for (const opt of translatedField.options) {
+                if (typeof opt === 'string') {
+                  translatedOptionsMap.set(opt, { text: opt });
+                } else if (typeof opt === 'object' && opt?.value) {
+                  translatedOptionsMap.set(opt.value, opt);
                 }
+              }
+
+              fieldConfig.options = fieldConfig.options.map(opt => {
+                const value = typeof opt === 'string' ? opt : opt.value;
+                const translatedOption = translatedOptionsMap.get(value);
 
                 if (typeof opt === 'string') {
                   return {
-                    value: opt,
-                    text: translatedOption?.text ?? opt,
+                    value,
+                    text: translatedOption?.text ?? value,
                     hint: translatedOption?.hint,
                   };
                 }
 
-                return opt;
+                return {
+                  ...opt,
+                  text: translatedOption?.text ?? opt.text,
+                  hint: translatedOption?.hint ?? opt.hint,
+                };
               });
             }
           }
