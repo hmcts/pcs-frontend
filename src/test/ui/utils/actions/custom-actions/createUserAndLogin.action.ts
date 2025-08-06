@@ -3,7 +3,7 @@ import { Page } from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 
 import { performAction } from '../../controller';
-import { IAction } from '../../interfaces/action.interface';
+import { IAction, actionData } from '../../interfaces/action.interface';
 
 type UserInfo = {
   email: string;
@@ -13,14 +13,14 @@ type UserInfo = {
   sessionFile?: string;
 };
 export class CreateUserAndLoginAction implements IAction {
-  async execute(page: Page, roles: string): Promise<void> {
-    const userCreds = await this.createUser(roles);
+  async execute(page: Page, roles: actionData): Promise<void> {
+    const userCreds = await this.createUser(roles as string[]);
     await performAction('inputText', 'Email address', userCreds.email);
     await performAction('inputText', 'Password', userCreds.password);
     await performAction('clickButton', 'Sign in');
   }
 
-  public async createUser(roles: string): Promise<UserInfo> {
+  public async createUser(roles: string[]): Promise<UserInfo> {
     const token = process.env.CREATE_USER_BEARER_TOKEN as string;
     const password = process.env.IDAM_CITIZEN_USER_PASSWORD as string;
     const uniqueId = uuidv4();
@@ -34,7 +34,7 @@ export class CreateUserAndLoginAction implements IAction {
         email,
         forename,
         surname,
-        roleNames: [roles],
+        roleNames: roles,
       },
     });
     return {

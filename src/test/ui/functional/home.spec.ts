@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   });
   initializeExecutor(page);
   await performAction('navigateToUrl', test_url);
-  await performAction('createUserAndLogin', 'citizen');
+  await performAction('createUserAndLogin', ['citizen']);
 });
 
 test('Idam Login @accessibility @PR @nightly', async ({ page }) => {
