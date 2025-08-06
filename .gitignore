@@ -50,3 +50,5 @@ version
 /.yarn/cache/
 /.yarn/unplugged/
 /pact/
+/src/test/java/build/
+/src/test/java/.gradle/
