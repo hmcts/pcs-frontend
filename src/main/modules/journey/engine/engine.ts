@@ -882,7 +882,8 @@ export class WizardEngine {
           }
         }
 
-        res.render(templatePath, {
+        // explicitly set the template type to njk
+        res.render(`${templatePath}.njk`, {
           ...context,
           data: context.data,
           errors: null,
