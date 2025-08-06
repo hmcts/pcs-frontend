@@ -141,6 +141,18 @@ export class WizardEngine {
   }
 
   /**
+   * Sanitizes a full template path by filtering every segment through sanitizePathSegment.
+   * This prevents path traversal or injection when the template name is dynamic.
+   */
+  private sanitizeTemplatePath(template: string): string {
+    return template
+      .split('/')
+      .map(seg => this.sanitizePathSegment(seg))
+      .filter(Boolean)
+      .join('/');
+  }
+
+  /**
    * Validates a step ID for use in redirect URLs - internal data used in redirects should be sanitized to prevent XSS attacks
    * @param stepId - The step ID to validate
    * @returns The validated step ID or null if invalid
@@ -868,6 +880,7 @@ export class WizardEngine {
         };
 
         const templatePath = await this.resolveTemplatePath(step.id);
+        const safeTemplate = `${this.sanitizeTemplatePath(templatePath)}.njk`;
 
         // If we are rendering the confirmation (or other terminal) step, clear the session so the user can start a new journey.
         if (step.type === 'confirmation') {
@@ -883,7 +896,7 @@ export class WizardEngine {
         }
 
         // explicitly set the template type to njk
-        res.render(`${templatePath}.njk`, {
+        res.render(safeTemplate, {
           ...context,
           data: context.data,
           errors: null,
@@ -934,7 +947,8 @@ export class WizardEngine {
           previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
         };
 
-        return res.status(400).render(await this.resolveTemplatePath(step.id), {
+        const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+        return res.status(400).render(postTemplatePath, {
           ...context,
           errors: validationResult.errors,
         });
