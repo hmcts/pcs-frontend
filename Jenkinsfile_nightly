@@ -21,11 +21,11 @@ withNightlyPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true,
       artifacts: '**/Fortify Scan/**/*'
   }
-//  afterAlways('FortifyScan') {
-//    runE2ETestsForBrowser(yarnBuilder, 'Chrome')
-//    runE2ETestsForBrowser(yarnBuilder, 'Firefox')
-//    runE2ETestsForBrowser(yarnBuilder, 'Safari')
-//  }
+ afterAlways('FortifyScan') {
+   runE2ETestsForBrowser(yarnBuilder, 'Chrome')
+   runE2ETestsForBrowser(yarnBuilder, 'Firefox')
+   runE2ETestsForBrowser(yarnBuilder, 'Safari')
+ }
 }
 
 def runE2ETestsForBrowser(yarnBuilder, String browser) {
