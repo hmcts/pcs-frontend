@@ -1,7 +1,7 @@
 {
   "e2e": {
     "testUrl": "http://localhost:3209/",
-    "idamUrl": "https://idam-web-public.aat.platform.hmcts.net",
+    "idamUrl": "https://idam-api.aat.platform.hmcts.net",
     "idamTestingSupportUrl": "https://idam-testing-support-api.aat.platform.hmcts.net",
     "loginEndpoint": "o/token",
     "grantType": "password",
