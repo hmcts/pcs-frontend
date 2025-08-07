@@ -62,10 +62,12 @@ withPipeline(type, product, component) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       }
     }
-    stage('Validate Test Target') {
-      if (params.PR_NUMBER?.trim()) {
-        error("Tests passed but were run against PR ${params.PR_NUMBER}. " +
-          "To merge this PR, run tests against master by leaving PR_NUMBER parameter blank.")
+    afterAlways('functionalTest:preview') {
+      stage('Validate Test Target') {
+        if (params.PR_NUMBER?.trim()) {
+          error("Tests passed but were run against PR ${params.PR_NUMBER}. " +
+            "To merge this PR, run tests against master by leaving PR_NUMBER parameter blank.")
+        }
       }
     }
   }
