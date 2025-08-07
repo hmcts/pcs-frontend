@@ -27,12 +27,24 @@ export function initPostcodeSelection(): void {
       return;
     }
 
-    if (addressLine1) {addressLine1.value = selected.dataset.line1 || '';}
-    if (addressLine2) {addressLine2.value = selected.dataset.line2 || '';}
-    if (addressLine3) {addressLine3.value = selected.dataset.line3 || '';}
-    if (town) {town.value = selected.dataset.town || '';}
-    if (county) {county.value = selected.dataset.county || '';}
-    if (postcode) {postcode.value = selected.dataset.postcode || '';}
+    if (addressLine1) {
+      addressLine1.value = selected.dataset.line1 || '';
+    }
+    if (addressLine2) {
+      addressLine2.value = selected.dataset.line2 || '';
+    }
+    if (addressLine3) {
+      addressLine3.value = selected.dataset.line3 || '';
+    }
+    if (town) {
+      town.value = selected.dataset.town || '';
+    }
+    if (county) {
+      county.value = selected.dataset.county || '';
+    }
+    if (postcode) {
+      postcode.value = selected.dataset.postcode || '';
+    }
 
     const details = document.querySelector('.govuk-details') as HTMLDetailsElement | null;
     if (details && !details.open) {

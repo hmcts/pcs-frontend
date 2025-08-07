@@ -136,8 +136,18 @@ export const step: StepDefinition = {
         const errors = validateForm(req, fields);
 
         if (Object.keys(errors).length > 0) {
-          req.session.lookupError = Object.values(errors)[0];
-          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
+          const firstField = Object.keys(errors)[0];
+          return res.status(400).render('steps/userJourney/enterAddress.njk', {
+            ...content,
+            ...req.body,
+            error: {
+              field: firstField,
+              text: errors[firstField],
+            },
+            errorSummaryTitle: content.errorSummaryTitle,
+            addressResults: req.session.postcodeLookupResult || null,
+            backUrl: `/steps/user-journey/enter-user-details?lang=${lang}`,
+          });
         }
 
         setFormData(req, stepName, req.body);
