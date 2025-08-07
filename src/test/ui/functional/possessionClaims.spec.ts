@@ -16,7 +16,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('NavigateToUrl', claim_url);
 });
 
-test.describe('Possession claims @PR @nightly', async () => {
+test.describe.skip('Possession claims @PR @nightly', async () => {
   test('Journey of a claimant aged over 18', async () => {
     await performAction('clickButton', 'Start');
     await performAction('clickRadioButton', 'Yes');

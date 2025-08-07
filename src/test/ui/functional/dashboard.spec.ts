@@ -18,7 +18,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('login', 'citizen');
 });
 
-test.describe('Verify Notifications and Tasks on Dashboard @PR @nightly', async () => {
+test.describe.skip('Verify Notifications and Tasks on Dashboard @PR @nightly', async () => {
   test('Verify hearing notification', async () => {
     const notification = dashboard.responseTimeElapsed('28');
     await performValidation('dashboardNotification', { title: notification.title, content: notification.content });

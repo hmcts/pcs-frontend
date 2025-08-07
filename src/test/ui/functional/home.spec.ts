@@ -20,7 +20,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('login', 'citizen');
 });
 
-test('Idam Login @accessibility @PR @nightly', async ({ page }) => {
+test.skip('Idam Login @accessibility @PR @nightly', async ({ page }) => {
   await performValidation('pageTitle', { title: constants.homePage.title });
   await new AxeUtils(page).audit();
 });

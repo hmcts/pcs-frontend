@@ -6,7 +6,7 @@ properties([
     string(
       name: 'PR_NUMBER',
       defaultValue: '',
-      description: 'PR number (REQUIRED if environment is other, leave blank otherwise).'
+      description: 'PR number (REQUIRED if running against another PR, leave blank otherwise).'
     ),
   ])
 ])
@@ -63,8 +63,10 @@ withPipeline(type, product, component) {
       }
     }
     if (params.PR_NUMBER?.trim()) {
-      error("Tests passed but were run against PR ${params.PR_NUMBER}. " +
-        "To merge this PR, run tests against master by leaving PR_NUMBER parameter blank.")
+      stage('Validate Test Target') {
+          error("Tests passed but were run against PR ${params.PR_NUMBER}. " +
+            "To merge this PR, run tests against master by leaving PR_NUMBER parameter blank.")
+      }
     }
   }
 
