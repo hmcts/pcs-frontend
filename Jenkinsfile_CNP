@@ -43,13 +43,13 @@ withPipeline(type, product, component) {
   validateInputs()
   loadVaultSecrets(secrets)
   env.NODE_CONFIG_ENV = 'test'
+  if (params.PR_NUMBER?.trim()) {
+    echo "PR_NUMBER: ${params.PR_NUMBER}"
+    env.TEST_URL = "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
+    echo "TEST_URL set to: ${env.TEST_URL}"
+  }
 
   onPR() {
-    if (params.PR_NUMBER?.trim()) {
-      echo "PR_NUMBER: ${params.PR_NUMBER}"
-      env.TEST_URL = "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
-      echo "TEST_URL set to: ${env.TEST_URL}"
-    }
     // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
     // enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     afterAlways('functionalTest:preview') {
