@@ -49,7 +49,9 @@ withPipeline(type, product, component) {
     // enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     before('functionalTest:preview') {
       if (params.PR_NUMBER?.trim()) {
+        echo "Params number being used: ${params.PR_NUMBER}"
         env.TEST_URL = "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
+        echo "Test url being used: ${env.TEST_URL}"
       }
     }
     afterAlways('functionalTest:preview') {
