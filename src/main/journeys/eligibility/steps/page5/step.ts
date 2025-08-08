@@ -12,11 +12,20 @@ const step: StepDraft = {
       },
       validate: { required: true },
       errorMessages: {
-        required: 'Please enter a date',
-        invalid: 'Please enter a valid date now!!!',
-        day: 'Please enter a valid day',
-        month: 'Please enter a valid month',
-        year: 'Please enter a valid year',
+        required: 'Enter a date',
+        notRealDate: 'Enter a valid date of birth',
+        invalidPart: field => {
+          switch (field) {
+            case 'day':
+              return 'Enter a valid day';
+            case 'month':
+              return 'Enter a valid month';
+            case 'year':
+              return 'Enter a valid year';
+            default:
+              return 'Enter a valid value';
+          }
+        },
       },
     },
     email: {
