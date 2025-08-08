@@ -1,5 +1,15 @@
 export function initPostcodeSelection(): void {
   const addressSelect = document.getElementById('selectedAddress') as HTMLSelectElement | null;
+
+  // ✅ Step 1: Focus the dropdown if we just came from a postcode lookup
+  const url = new URL(window.location.href);
+  const isLookup = url.searchParams.get('lookup') === '1';
+
+  if (isLookup && addressSelect) {
+    addressSelect.focus();
+  }
+
+  // ✅ Step 2: Continue with your normal change event for populating fields
   if (!addressSelect) {
     return;
   }
