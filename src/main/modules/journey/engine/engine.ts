@@ -289,14 +289,22 @@ export class WizardEngine {
               'month' in value &&
               'year' in value
             ) {
+              const { day, month, year } = value as Record<string, string>;
+              const dTrim = day?.trim() ?? '';
+              const mTrim = month?.trim() ?? '';
+              const yTrim = year?.trim() ?? '';
+
+              // If all parts empty, treat value as empty
+              if (!dTrim && !mTrim && !yTrim) {
+                return '';
+              }
+
               const dt = DateTime.fromObject({
-                day: Number((value as Record<string, string>).day),
-                month: Number((value as Record<string, string>).month),
-                year: Number((value as Record<string, string>).year),
+                day: Number(dTrim),
+                month: Number(mTrim),
+                year: Number(yTrim),
               });
-              return dt.isValid
-                ? dt.toFormat('d MMMM yyyy')
-                : `${(value as Record<string, string>).day || ''}/${(value as Record<string, string>).month || ''}/${(value as Record<string, string>).year || ''}`;
+              return dt.isValid ? dt.toFormat('d MMMM yyyy') : `${dTrim}/${mTrim}/${yTrim}`;
             }
             if (
               typedFieldConfig.type === 'checkboxes' ||
@@ -858,8 +866,38 @@ export class WizardEngine {
 
         // Check if the requested step is accessible based on journey progress
         if (!this.isStepAccessible(step.id, data)) {
-          // Handle redirection logic if the step is not accessible
-          // ... your logic here
+          // Find the first incomplete step
+          const stepIds = Object.keys(this.journey.steps);
+          let firstIncompleteStep = stepIds[0];
+
+          for (const stepId of stepIds) {
+            const stepConfig = this.journey.steps[stepId] as StepConfig;
+            // Skip steps without input fields
+            if (!this.hasInputFields(stepConfig)) {
+              continue;
+            }
+            // If this step is not complete, it's the first incomplete step
+            if (!this.isStepComplete(stepId, data)) {
+              firstIncompleteStep = stepId;
+              break;
+            }
+          }
+
+          // Redirect to the first incomplete step
+          const validatedFirstIncompleteStep = this.validateStepIdForRedirect(firstIncompleteStep);
+          if (validatedFirstIncompleteStep) {
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstIncompleteStep)}`);
+          }
+          // If validation fails, redirect to the first step in the journey
+          const firstStepId = Object.keys(this.journey.steps)[0];
+          const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
+          if (validatedFirstStepId) {
+            this.logger.warn(`Invalid first incomplete step ID for redirect: ${firstIncompleteStep}`);
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}`);
+          }
+          // If even the first step is invalid, this is a critical error
+          this.logger.error('Critical error: No valid step IDs found in journey configuration');
+          return res.status(500).send('Internal server error');
         }
 
         let context = this.buildJourneyContext(step, caseId, data, lang); // Pass lang as argument
