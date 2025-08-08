@@ -47,11 +47,10 @@ withPipeline(type, product, component) {
   onPR() {
     // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
     // enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
-    before('functionalTest:preview') {
-      env.TEST_URL = (params.PR_NUMBER?.trim())
-        ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
-        : env.TEST_URL
-    }
+    env.TEST_URL = (params.PR_NUMBER?.trim())
+      ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
+      : env.TEST_URL
+    echo "test url is: ${env.TEST_URL}"
     afterAlways('functionalTest:preview') {
       try {
         publishHTML([
