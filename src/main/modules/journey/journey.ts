@@ -26,7 +26,7 @@ export class Journey {
         const journeyConfig: JourneyConfig = journeyModule.default ?? journeyModule;
         this.logger.info(`Loaded journey from ${file}: ${journeyConfig.meta.name}`);
 
-        const engine = new WizardEngine(journeyConfig, slug, file);
+        const engine = new WizardEngine(journeyConfig, slug, app, file);
         app.use(engine.basePath, engine.router());
 
         if (process.env.NODE_ENV !== 'test') {

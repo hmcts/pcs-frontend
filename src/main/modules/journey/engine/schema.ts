@@ -184,6 +184,12 @@ export const FieldSchema = z.object({
   text: z.string().optional(), // button text
 
   flag: z.string().optional(),
+
+  // Adding namePrefix for date fields or other types that require it
+  namePrefix: z.string().optional(),
+
+  // Adding value for fields like text, number, textarea, etc.
+  value: z.union([z.string(), z.number(), z.array(z.string())]).optional(), // value is now allowed for fields that support it
 });
 
 // Step configuration schema
