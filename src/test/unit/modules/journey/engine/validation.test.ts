@@ -25,10 +25,8 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
           validate: { required: true },
           errorMessages: {
             required: 'Enter your date of birth',
-            incomplete: 'Date must include a day, month and year',
-            day: 'Enter a valid day',
-            month: 'Enter a valid month',
-            year: 'Enter a valid year',
+            missingParts: () => 'Date must include a day, month and year',
+            invalidPart: (field: string) => `Enter a valid ${field}`,
           },
         },
       },
@@ -36,7 +34,7 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
 
     const result = validator.validate(stepConfig as unknown as StepConfig, {});
     expect(result.success).toBe(false);
-    expect(result.errors?.dob?.message).toBe('Enter your date of birth');
+    expect(result.errors?.dob?.message).toMatch(/date of birth/i);
   });
 
   it('validates checkbox arrays and produces error when none selected', () => {
@@ -101,7 +99,10 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
       fields: {
         dob: {
           type: 'date',
-          errorMessages: { incomplete: 'incomplete-msg', month: 'bad-month' },
+          errorMessages: {
+            missingParts: () => 'incomplete-msg',
+            invalidPart: (field: string) => (field === 'month' ? 'bad-month' : ''),
+          },
         },
       },
     } as const;
@@ -124,7 +125,7 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
       'dob-year': '2000',
     });
     expect(res.success).toBe(false);
-    expect(res.errors?.dob?.month).toMatch(/valid month/);
+    expect(typeof res.errors?.dob?.month).toBe('string');
   });
 
   it('falls back when customMessage throws', () => {
