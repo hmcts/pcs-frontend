@@ -289,7 +289,10 @@ const stepsById: Record<string, StepDraft> = {
       betweenDate: {
         type: 'date',
         fieldset: { legend: { text: 'Within 2024 (1 Jan - 31 Dec)' } },
-        validate: { required: true, mustBeBetween: { start: DateTime.fromISO('2024-01-01'), end: DateTime.fromISO('2024-12-31') } },
+        validate: {
+          required: true,
+          mustBeBetween: { start: DateTime.fromISO('2024-01-01'), end: DateTime.fromISO('2024-12-31') },
+        },
         errorMessages: {
           mustBeBetween: (s: DateTime, e: DateTime) =>
             `Date must be between ${s.toFormat('d MMM yyyy')} and ${e.toFormat('d MMM yyyy')}`,

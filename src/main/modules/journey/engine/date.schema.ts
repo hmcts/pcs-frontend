@@ -70,17 +70,17 @@ export const buildDateInputSchema = (fieldLabel: string, options?: DateFieldOpti
           return; // skip all further validation if not required and not provided
         }
 
-              let issueCount = 0;
-      if (missing.length > 0) {
-        for (const m of missing) {
-          ctx.addIssue({
-            path: [m],
-            message: msgs.missingParts?.(missing) || `${fieldLabel} must include a ${m}`,
-            code: 'custom',
-          });
-          issueCount += 1;
+        let issueCount = 0;
+        if (missing.length > 0) {
+          for (const m of missing) {
+            ctx.addIssue({
+              path: [m],
+              message: msgs.missingParts?.(missing) || `${fieldLabel} must include a ${m}`,
+              code: 'custom',
+            });
+            issueCount += 1;
+          }
         }
-      }
 
         const invalidFields: (keyof typeof data)[] = [];
         if (!isNumeric(day)) {
@@ -93,21 +93,21 @@ export const buildDateInputSchema = (fieldLabel: string, options?: DateFieldOpti
           invalidFields.push('year');
         }
 
-              if (invalidFields.length > 0) {
-        for (const field of invalidFields) {
-          ctx.addIssue({
-            path: [field],
-            message: msgs.invalidPart?.(field) || `${fieldLabel} must include a valid ${field}`,
-            code: 'custom',
-          });
-          issueCount += 1;
+        if (invalidFields.length > 0) {
+          for (const field of invalidFields) {
+            ctx.addIssue({
+              path: [field],
+              message: msgs.invalidPart?.(field) || `${fieldLabel} must include a valid ${field}`,
+              code: 'custom',
+            });
+            issueCount += 1;
+          }
         }
-      }
 
-      // If we already recorded any missing or invalid part issues, skip further validation.
-      if (issueCount > 0) {
-        return;
-      }
+        // If we already recorded any missing or invalid part issues, skip further validation.
+        if (issueCount > 0) {
+          return;
+        }
 
         const d = Number(day);
         const m = Number(month);
