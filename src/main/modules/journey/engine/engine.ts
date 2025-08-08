@@ -5,6 +5,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
+import { loadTranslations } from '../../../app/utils/loadTranslations';
 import { oidcMiddleware } from '../../../middleware/oidc';
 import { TTLCache } from '../../../utils/ttlCache';
 
@@ -18,6 +19,14 @@ interface RequestWithStep extends Request {
   step?: StepConfig;
 }
 
+interface TranslatableOption {
+  value?: string;
+  text?: string;
+  hint?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
 // Simplified journey context
 interface JourneyContext {
   caseId: string;
@@ -28,6 +37,8 @@ interface JourneyContext {
   errorSummary?: { titleText: string; errorList: { text: string; href: string }[] } | null;
   previousStepUrl?: string | null;
   summaryRows?: SummaryRow[];
+  language?: string;
+  fields?: Record<string, unknown>;
 }
 
 interface SummaryRow {
@@ -740,7 +751,8 @@ export class WizardEngine {
     // Add route to start a new journey (creates caseId in the session and redirects to first step)
     router.get('/', (req, res) => {
       getOrCreateCaseId(req);
-      res.redirect(`${this.basePath}/${Object.keys(this.journey.steps)[0]}`);
+      const lang = req.body?.lang || req.query?.lang || 'en';
+      res.redirect(`${this.basePath}/${Object.keys(this.journey.steps)[0]}?lang=${lang}`);
     });
 
     router.param('step', (req: Request, res: Response, next: NextFunction, stepId: string) => {
@@ -779,7 +791,8 @@ export class WizardEngine {
         if (originallyHadFields && nowHasNoFields) {
           const nextId = this.resolveNext(step, data);
           if (nextId && nextId !== step.id) {
-            return res.redirect(`${this.basePath}/${nextId}`);
+            const lang = req.body?.lang || req.query?.lang || 'en';
+            return res.redirect(`${this.basePath}/${nextId}?lang=${lang}`);
           }
         }
 
@@ -803,17 +816,142 @@ export class WizardEngine {
           }
 
           // Redirect to the first incomplete step
-          return res.redirect(`${this.basePath}/${firstIncompleteStep}`);
+          const lang = req.body?.lang || req.query?.lang || 'en';
+          return res.redirect(`${this.basePath}/${firstIncompleteStep}?lang=${lang}`);
+        }
+
+        // Load language and translations
+        const language = (req.query.lang || 'en') as string;
+        // eslint-disable-next-line no-console
+        console.log('step============================================================================ => ', step);
+        const translations = loadTranslations(language, ['common', `journeys/${step.id}`]);
+        // eslint-disable-next-line no-console
+        console.log('trasnlations =================> ', translations);
+        if (translations?.title) {
+          step.title = translations.title;
+        }
+        if (translations?.description) {
+          step.description = translations.description;
+        }
+
+        if (translations?.fields && step.fields) {
+          for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+            const translatedField = translations.fields[fieldName];
+
+            // Apply .text for simple fields (like buttons)
+            if (translatedField?.text) {
+              fieldConfig.text = translatedField.text;
+            }
+
+            // Apply .label
+            if (translatedField?.label) {
+              fieldConfig.label = translatedField.label;
+            }
+
+            // Apply .hint
+            if (translatedField?.hint) {
+              fieldConfig.hint = translatedField.hint;
+            }
+
+            // Apply .errorMessage
+            if (translatedField?.errorMessage) {
+              fieldConfig.errorMessage = { text: translatedField.errorMessage };
+            }
+
+            // Apply .fieldset.legend.text (radios/checkboxes/date)
+            if (
+              translatedField?.legend &&
+              fieldConfig.fieldset?.legend &&
+              typeof fieldConfig.fieldset.legend === 'object'
+            ) {
+              fieldConfig.fieldset.legend.text = translatedField.legend;
+            }
+
+            if (Array.isArray(translatedField?.options) && Array.isArray(fieldConfig.options)) {
+              const translatedOptionsMap = new Map<string, TranslatableOption>();
+
+              for (const opt of translatedField.options) {
+                if (typeof opt === 'string') {
+                  translatedOptionsMap.set(opt, { text: opt });
+                } else if (typeof opt === 'object' && opt?.value) {
+                  translatedOptionsMap.set(opt.value, opt);
+                }
+              }
+
+              fieldConfig.options = fieldConfig.options.map(opt => {
+                const value = typeof opt === 'string' ? opt : opt.value;
+                const translatedOption = translatedOptionsMap.get(value);
+
+                if (typeof opt === 'string') {
+                  return {
+                    value,
+                    text: translatedOption?.text ?? value,
+                    hint: translatedOption?.hint,
+                  };
+                }
+
+                return {
+                  ...opt,
+                  text: translatedOption?.text ?? opt.text,
+                  hint: translatedOption?.hint ?? opt.hint,
+                };
+              });
+            }
+          }
         }
 
         let context = this.buildJourneyContext(step, caseId, data);
 
         // Re-calculate previousStepUrl to skip hidden steps
         const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
+
+        const lang = req.body?.lang || req.query?.lang || 'en';
+        const previousStepUrl = prevVisible ? `${this.basePath}/${prevVisible}?lang=${lang}` : null;
+
         context = {
           ...context,
-          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
+          previousStepUrl,
         };
+
+        // If dynamic step, delegate to generateContent
+        if (typeof step.generateContent === 'function') {
+          const contentFromStep = step.generateContent({ language, translations });
+          context = {
+            ...context,
+            ...contentFromStep,
+          };
+        } else {
+          // Inject common translations for static steps
+          const { title, description, fields, ...templateContent } = translations;
+
+          // Inject fields.text for buttons, radios, etc.
+          if (translations.fields && step.fields) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const fieldTexts: Record<string, any> = {};
+            for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+              const translatedField = translations.fields[fieldName];
+              if (translatedField?.text) {
+                fieldConfig.text = translatedField.text;
+              }
+
+              // ✅ Add this to make it available to Nunjucks
+              fieldTexts[fieldName] = {
+                text: fieldConfig.text ?? translatedField?.text ?? '',
+              };
+            }
+
+            context = {
+              ...context,
+              fields: fieldTexts,
+            };
+          }
+
+          context = {
+            ...context,
+            ...templateContent,
+            language,
+          };
+        }
 
         const templatePath = await this.resolveTemplatePath(step.id);
 
@@ -906,7 +1044,8 @@ export class WizardEngine {
           });
         }
 
-        res.redirect(`${this.basePath}/${nextId}`);
+        const lang = req.body?.lang || req.query?.lang || 'en';
+        res.redirect(`${this.basePath}/${nextId}?lang=${lang}`);
       } catch (err) {
         next(err);
       }

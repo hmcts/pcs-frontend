@@ -342,7 +342,11 @@ export const JourneySchema = z
   );
 
 // Parsed/validated type (all defaults applied)
-export type StepConfig = z.infer<typeof StepSchema> & { id: string };
+export type StepConfig = z.infer<typeof StepSchema> & {
+  id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  generateContent?: (opts: { language: string; translations: Record<string, any> }) => Record<string, any>;
+};
 
 // Authoring/input type (fields optional before defaults)
 export type StepDraft = z.input<typeof StepSchema> & { id: string };

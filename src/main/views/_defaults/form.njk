@@ -1,5 +1,4 @@
-{% extends "template.njk" %}
-
+{% extends "stepsTemplate.njk" %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
@@ -14,7 +13,7 @@
 
 {% if previousStepUrl %}
   {{ govukBackLink({
-    text: "Back",
+    text: buttons.back or "Back",
     href: previousStepUrl
   }) }}
 {% endif %}
@@ -30,35 +29,103 @@
       <span class="govuk-caption-l">{{ step.description }}</span>
     {% endif %}
 
-
     {% if errorSummary %}
       {{ govukErrorSummary(errorSummary) }}
     {% endif %}
 
     <form method="post">
+      {% if query.lang %}
+        <input type="hidden" name="lang" value="{{ query.lang }}">
+      {% endif %}
       {% for fieldName, fieldConfig in step.fields %}
+
+        {% if fieldConfig.label is string %}
+          {% set label = { text: fieldConfig.label } %}
+        {% else %}
+          {% set label = fieldConfig.label %}
+        {% endif %}
+
+        {% if fieldConfig.hint is string %}
+          {% set hint = { text: fieldConfig.hint } %}
+        {% else %}
+          {% set hint = fieldConfig.hint %}
+        {% endif %}
+
         {% if fieldConfig.type in ['text', 'email', 'tel', 'password', 'url', 'number'] %}
-          {{ govukInput(fieldConfig) }}
+          {{ govukInput({
+            name: fieldConfig.name,
+            id: fieldConfig.id,
+            type: fieldConfig.type,
+            value: fieldConfig.value,
+            label: label,
+            hint: hint,
+            errorMessage: fieldConfig.errorMessage,
+            classes: fieldConfig.classes,
+            attributes: fieldConfig.attributes
+          }) }}
 
         {% elif fieldConfig.type == 'textarea' %}
-          {{ govukTextarea(fieldConfig) }}
+          {{ govukTextarea({
+            name: fieldConfig.name,
+            id: fieldConfig.id,
+            value: fieldConfig.value,
+            label: label,
+            hint: hint,
+            errorMessage: fieldConfig.errorMessage,
+            classes: fieldConfig.classes,
+            attributes: fieldConfig.attributes
+          }) }}
 
         {% elif fieldConfig.type == 'radios' %}
-          {{ govukRadios(fieldConfig) }}
+          {{ govukRadios({
+            name: fieldConfig.name,
+            fieldset: fieldConfig.fieldset,
+            hint: hint,
+            items: fieldConfig.options,
+            errorMessage: fieldConfig.errorMessage,
+            classes: fieldConfig.classes,
+            attributes: fieldConfig.attributes
+          }) }}
 
         {% elif fieldConfig.type == 'checkboxes' %}
-          {{ govukCheckboxes(fieldConfig) }}
+          {{ govukCheckboxes({
+            name: fieldConfig.name,
+            fieldset: fieldConfig.fieldset,
+            hint: hint,
+            items: fieldConfig.options,
+            errorMessage: fieldConfig.errorMessage,
+            classes: fieldConfig.classes,
+            attributes: fieldConfig.attributes
+          }) }}
 
         {% elif fieldConfig.type == 'select' %}
-          {{ govukSelect(fieldConfig) }}
+          {{ govukSelect({
+            name: fieldConfig.name,
+            id: fieldConfig.id,
+            value: fieldConfig.value,
+            label: label,
+            hint: hint,
+            items: fieldConfig.options,
+            errorMessage: fieldConfig.errorMessage,
+            classes: fieldConfig.classes,
+            attributes: fieldConfig.attributes
+          }) }}
 
         {% elif fieldConfig.type == 'date' %}
-          {{ govukDateInput(fieldConfig) }}
+          {{ govukDateInput({
+            name: fieldConfig.name,
+            fieldset: fieldConfig.fieldset,
+            hint: hint,
+            items: fieldConfig.items,
+            errorMessage: fieldConfig.errorMessage,
+            classes: fieldConfig.classes,
+            attributes: fieldConfig.attributes
+          }) }}
 
         {% elif fieldConfig.type == 'button' %}
           <div class="govuk-button-group">
             {{ govukButton({
-              text: fieldConfig.text or 'Continue',
+              text: fieldConfig.text or (buttons and buttons.continue) or 'Continue',
               href: fieldConfig.href,
               classes: fieldConfig.classes,
               attributes: fieldConfig.attributes or { type: 'submit' }
@@ -67,8 +134,8 @@
         {% endif %}
 
       {% endfor %}
-
     </form>
+
   </div>
 </div>
 

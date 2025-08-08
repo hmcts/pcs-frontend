@@ -1,0 +1,18 @@
+{
+  "title": "Who is making this claim?",
+  "fields": {
+    "claimantType": {
+      "legend": "Who is making this claim?",
+      "options": [
+        { "value": "individual", "text": "An individual" },
+        { "value": "organisation", "text": "An organisation" }
+      ]
+    },
+    "continueButton": {
+      "text": "Continue"
+    }
+  },
+  "errors": {
+    "claimantTypeError": "Select who is making this claim"
+  }
+}

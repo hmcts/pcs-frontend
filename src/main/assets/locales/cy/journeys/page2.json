@@ -1,0 +1,15 @@
+{
+  "fields": {
+    "age": {
+      "legend": "cyAre you 18 or over?",
+      "options": [
+        { "value": "yes", "text": "cyYes" },
+        { "value": "no", "text": "cyNo" }
+      ],
+      "customMessage": "cySelect yes or no"
+    },
+    "continueButton": {
+      "text": "cyContinue"
+    }
+  }
+}
