@@ -33,7 +33,9 @@ static Map < String, Object > secret(String secretName, String envVariable) {
 def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-    secret('idam-citizen-user-password', 'IDAM_CITIZEN_USER_PASSWORD')
+    secret('idam-system-user-name', 'IDAM_SYSTEM_USERNAME'),
+    secret('idam-system-user-password', 'IDAM_SYSTEM_USER_PASSWORD'),
+    secret('pcs-frontend-idam-user-temp-password', 'PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD')
   ]
 ]
 
@@ -61,8 +63,6 @@ withPipeline(type, product, component) {
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       }
-    }
-    afterAlways('functionalTest:preview') {
       stage('Validate Test Target') {
         if (params.PR_NUMBER?.trim()) {
           error("Tests passed but were run against PR ${params.PR_NUMBER}. " +
