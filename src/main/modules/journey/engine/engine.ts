@@ -141,6 +141,45 @@ export class WizardEngine {
     return segment.replace(/[^a-zA-Z0-9_-]/g, '');
   }
 
+  /**
+   * Sanitizes a full template path by filtering every segment through sanitizePathSegment.
+   * This prevents path traversal or injection when the template name is dynamic.
+   */
+  private sanitizeTemplatePath(template: string): string {
+    return template
+      .split('/')
+      .map(seg => this.sanitizePathSegment(seg))
+      .filter(Boolean)
+      .join('/');
+  }
+
+  /**
+   * Validates a step ID for use in redirect URLs - internal data used in redirects should be sanitized to prevent XSS attacks
+   * @param stepId - The step ID to validate
+   * @returns The validated step ID or null if invalid
+   */
+  private validateStepIdForRedirect(stepId: string): string | null {
+    if (!stepId || typeof stepId !== 'string') {
+      return null;
+    }
+
+    // Check if the step exists in the journey configuration
+    if (!this.journey.steps[stepId]) {
+      this.logger.warn(`Invalid step ID for redirect: ${stepId}`);
+      return null;
+    }
+
+    const sanitizedStepId = this.sanitizePathSegment(stepId);
+
+    // If sanitization changed the step ID, it contained unsafe characters
+    if (sanitizedStepId !== stepId) {
+      this.logger.warn(`Step ID contained unsafe characters: ${stepId}`);
+      return null;
+    }
+
+    return sanitizedStepId;
+  }
+
   private async resolveTemplatePath(stepId: string): Promise<string> {
     const sanitizedStepId = this.sanitizePathSegment(stepId);
     const cacheKey = `${this.slug}:${sanitizedStepId}`;
@@ -791,7 +830,14 @@ export class WizardEngine {
     // Add route to start a new journey (creates caseId in the session and redirects to first step)
     router.get('/', (req, res) => {
       getOrCreateCaseId(req);
-      res.redirect(`${this.basePath}/${Object.keys(this.journey.steps)[0]}`);
+      const firstStepId = Object.keys(this.journey.steps)[0];
+      const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
+      if (validatedFirstStepId) {
+        res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}`);
+      } else {
+        this.logger.error('Critical error: No valid step IDs found in journey configuration');
+        res.status(500).send('Internal server error');
+      }
     });
 
     router.param('step', (req: Request, res: Response, next: NextFunction, stepId: string) => {
@@ -829,7 +875,12 @@ export class WizardEngine {
         if (originallyHadFields && nowHasNoFields) {
           const nextId = this.resolveNext(step, data);
           if (nextId && nextId !== step.id) {
-            return res.redirect(`${this.basePath}/${nextId}`);
+            const validatedNextId = this.validateStepIdForRedirect(nextId);
+            if (validatedNextId) {
+              return res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}`);
+            }
+            // If validation fails, stay on current step
+            this.logger.warn(`Invalid next step ID for redirect: ${nextId}`);
           }
         }
 
@@ -853,7 +904,20 @@ export class WizardEngine {
           }
 
           // Redirect to the first incomplete step
-          return res.redirect(`${this.basePath}/${firstIncompleteStep}`);
+          const validatedFirstIncompleteStep = this.validateStepIdForRedirect(firstIncompleteStep);
+          if (validatedFirstIncompleteStep) {
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstIncompleteStep)}`);
+          }
+          // If validation fails, redirect to the first step in the journey
+          const firstStepId = Object.keys(this.journey.steps)[0];
+          const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
+          if (validatedFirstStepId) {
+            this.logger.warn(`Invalid first incomplete step ID for redirect: ${firstIncompleteStep}`);
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}`);
+          }
+          // If even the first step is invalid, this is a critical error
+          this.logger.error('Critical error: No valid step IDs found in journey configuration');
+          return res.status(500).send('Internal server error');
         }
 
         let context = this.buildJourneyContext(step, caseId, data);
@@ -866,6 +930,7 @@ export class WizardEngine {
         };
 
         const templatePath = await this.resolveTemplatePath(step.id);
+        const safeTemplate = `${this.sanitizeTemplatePath(templatePath)}.njk`;
 
         // If we are rendering the confirmation (or other terminal) step, clear the session so the user can start a new journey.
         if (step.type === 'confirmation') {
@@ -880,7 +945,8 @@ export class WizardEngine {
           }
         }
 
-        res.render(templatePath, {
+        // explicitly set the template type to njk
+        res.render(safeTemplate, {
           ...context,
           data: context.data,
           errors: null,
@@ -931,7 +997,8 @@ export class WizardEngine {
           previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
         };
 
-        return res.status(400).render(await this.resolveTemplatePath(step.id), {
+        const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+        return res.status(400).render(postTemplatePath, {
           ...context,
           errors: validationResult.errors,
         });
@@ -956,7 +1023,13 @@ export class WizardEngine {
           });
         }
 
-        res.redirect(`${this.basePath}/${nextId}`);
+        const validatedNextId = this.validateStepIdForRedirect(nextId);
+        if (validatedNextId) {
+          res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}`);
+        } else {
+          this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
+          res.status(500).send('Internal server error');
+        }
       } catch (err) {
         next(err);
       }
