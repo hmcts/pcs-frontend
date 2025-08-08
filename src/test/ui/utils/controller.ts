@@ -1,5 +1,6 @@
 import { Page, test } from '@playwright/test';
 
+import { actionData } from './interfaces/action.interface';
 import { ValidationData } from './interfaces/validation.interface';
 import { ActionRegistry } from './registry/action.registry';
 import { ValidationRegistry } from './registry/validation.registry';
@@ -20,16 +21,15 @@ class Controller {
   constructor(page: Page) {
     this.page = page;
   }
-  async performAction(
-    action: string,
-    fieldName: string,
-    value?: string | number | boolean | string[] | object
-  ): Promise<void> {
+
+  async performAction(action: string, fieldName?: actionData, value?: actionData): Promise<unknown> {
     const actionInstance = ActionRegistry.getAction(action);
-    await test.step(`Perform action: [${action}] on "${fieldName}"${value !== undefined ? ` with value "${value}"` : ''}`, async () => {
-      await actionInstance.execute(this.page, fieldName, value);
+    return test.step(`Perform action: [${action}] on "${fieldName}"${value !== undefined ? ` with value "${value}"` : ''}`, async () => {
+      const result = await actionInstance.execute(this.page, fieldName, value);
+      return result !== undefined ? result : null;
     });
   }
+
   async performValidation(validationType: string, fieldName?: string, data?: ValidationData): Promise<void> {
     const validationInstance = ValidationRegistry.getValidation(validationType);
     await test.step(`Perform validation on [${validationType}]`, async () => {
@@ -73,15 +73,11 @@ export function initializeExecutor(page: Page): void {
   testExecutor = new Controller(page);
 }
 
-export async function performAction(
-  action: string,
-  fieldName: string,
-  value?: string | number | boolean | string[] | object
-): Promise<void> {
+export async function performAction(action: string, fieldName?: actionData, value?: actionData): Promise<unknown> {
   if (!testExecutor) {
     throw new Error('Test executor not initialized. Call initializeExecutor(page) first.');
   }
-  await testExecutor.performAction(action, fieldName, value);
+  return testExecutor.performAction(action, fieldName, value);
 }
 
 export async function performValidation(
