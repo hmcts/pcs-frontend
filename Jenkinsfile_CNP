@@ -45,7 +45,9 @@ withPipeline(type, product, component) {
   env.NODE_CONFIG_ENV = 'test'
 
   onPR() {
-    handleEnvironmentSetting()
+    if (params.PR_NUMBER?.trim()) {
+      "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
+    }
     // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
     // enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     afterAlways('functionalTest:preview') {
@@ -96,10 +98,4 @@ def validateInputs() {
   if (params.PR_NUMBER && !params.PR_NUMBER.trim().matches("^\\d+\$")) {
     error("Validation Failed: PR number must contain only numerical values")
   }
-}
-
-def handleEnvironmentSetting() {
-  env.TEST_URL = (params.PR_NUMBER?.trim())
-    ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
-    : "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 }
