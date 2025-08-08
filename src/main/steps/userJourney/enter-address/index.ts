@@ -52,7 +52,6 @@ export const step: StepDefinition = {
       const addressResults = req.session.postcodeLookupResult || null;
       const error = req.session.lookupError || undefined;
 
-      // ✅ Clear transient session values
       delete req.session.lookupPostcode;
       delete req.session.lookupError;
 
@@ -77,7 +76,10 @@ export const step: StepDefinition = {
       if (action === 'find-address') {
         if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
           req.session.lookupPostcode = lookupPostcode;
-          req.session.lookupError = content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode';
+          req.session.lookupError = {
+            field: 'lookupPostcode',
+            text: content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode',
+          };
           return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
         }
 
@@ -86,7 +88,10 @@ export const step: StepDefinition = {
 
           if (addressResults.length === 0) {
             req.session.lookupPostcode = lookupPostcode;
-            req.session.lookupError = content.errors?.noAddressesFound || 'No addresses found for that postcode';
+            req.session.lookupError = {
+              field: 'lookupPostcode',
+              text: content.errors?.noAddressesFound || 'No addresses found for that postcode',
+            };
             return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
           }
 
@@ -95,8 +100,11 @@ export const step: StepDefinition = {
           return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
         } catch {
           req.session.lookupPostcode = lookupPostcode;
-          req.session.lookupError =
-            content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.';
+
+          req.session.lookupError = {
+            field: 'lookupPostcode',
+            text: content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
+          };
           return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
         }
       }

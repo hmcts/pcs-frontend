@@ -2,9 +2,13 @@ import { RequestHandler } from 'express';
 
 import { GetController } from '../app/controller/GetController';
 
+export interface ErrorField {
+  field: string;
+  text: string;
+}
 export interface StepFormData {
   title?: string;
-  error?: string;
+  error?: ErrorField | string | undefined;
   answer?: string;
   choices?: string[] | string;
   serviceName?: string;
