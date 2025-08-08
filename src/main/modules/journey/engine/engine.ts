@@ -287,14 +287,22 @@ export class WizardEngine {
               'month' in value &&
               'year' in value
             ) {
+              const { day, month, year } = value as Record<string, string>;
+              const dTrim = day?.trim() ?? '';
+              const mTrim = month?.trim() ?? '';
+              const yTrim = year?.trim() ?? '';
+
+              // If all parts empty, treat value as empty
+              if (!dTrim && !mTrim && !yTrim) {
+                return '';
+              }
+
               const dt = DateTime.fromObject({
-                day: Number((value as Record<string, string>).day),
-                month: Number((value as Record<string, string>).month),
-                year: Number((value as Record<string, string>).year),
+                day: Number(dTrim),
+                month: Number(mTrim),
+                year: Number(yTrim),
               });
-              return dt.isValid
-                ? dt.toFormat('d MMMM yyyy')
-                : `${(value as Record<string, string>).day || ''}/${(value as Record<string, string>).month || ''}/${(value as Record<string, string>).year || ''}`;
+              return dt.isValid ? dt.toFormat('d MMMM yyyy') : `${dTrim}/${mTrim}/${yTrim}`;
             }
             if (
               typedFieldConfig.type === 'checkboxes' ||

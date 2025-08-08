@@ -174,7 +174,7 @@ const stepsById: Record<string, StepDraft> = {
         fieldset: {
           legend: { text: 'Date of birth', isPageHeading: true },
         },
-        validate: { required: true },
+        validate: { required: true, mustBePast: true },
         errorMessages: {
           required: 'Enter a date',
           notRealDate: 'Enter a valid date',
@@ -198,7 +198,7 @@ const stepsById: Record<string, StepDraft> = {
       dob: {
         type: 'date',
         fieldset: {
-          legend: { text: 'Date of birth', isPageHeading: true },
+          legend: { text: 'Date of birth (optional)', isPageHeading: true },
         },
         validate: { required: false },
         errorMessages: {

@@ -32,14 +32,14 @@ export type DateFieldOptions = {
 export const buildDateInputSchema = (fieldLabel: string, options?: DateFieldOptions): z.ZodTypeAny => {
   return z
     .object({
-      day: z.string(),
-      month: z.string(),
-      year: z.string(),
+      day: z.string().optional().default(''),
+      month: z.string().optional().default(''),
+      year: z.string().optional().default(''),
     })
     .check(
       superRefine((data, ctx) => {
         const { day, month, year } = data;
-        const isEmpty = (s: string) => s.trim() === '';
+        const isEmpty = (s?: string) => !s || s.trim() === '';
         const isNumeric = (s: string) => /^\d+$/.test(s);
 
         const missing: string[] = [];
@@ -90,6 +90,20 @@ export const buildDateInputSchema = (fieldLabel: string, options?: DateFieldOpti
           invalidFields.push('month');
         }
         if (!isNumeric(year)) {
+          invalidFields.push('year');
+        }
+
+        // Range validation if numeric
+        const dNum = Number(day);
+        const mNum = Number(month);
+        const yNum = Number(year);
+        if (isNumeric(day) && (dNum < 1 || dNum > 31)) {
+          invalidFields.push('day');
+        }
+        if (isNumeric(month) && (mNum < 1 || mNum > 12)) {
+          invalidFields.push('month');
+        }
+        if (isNumeric(year) && (yNum < 1000 || yNum > 9999)) {
           invalidFields.push('year');
         }
 
