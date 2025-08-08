@@ -998,10 +998,7 @@ export class WizardEngine {
         };
 
         const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
-        return res.status(400).render(postTemplatePath, {
-          ...context,
-          errors: validationResult.errors,
-        });
+        return res.status(400).render(postTemplatePath, context);
       }
 
       try {
