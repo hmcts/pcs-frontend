@@ -48,6 +48,16 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 withNightlyPipeline(type, product, component) {
   validateInputs()
   enableSlackNotifications('#pcs-tech')
+  enableFortifyScan()
+  afterSuccess('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true,
+      artifacts: '**/Fortify Scan/**/*'
+  }
+ afterAlways('FortifyScan') {
+   runE2ETestsForBrowser(yarnBuilder, 'Chrome')
+   runE2ETestsForBrowser(yarnBuilder, 'Firefox')
+   runE2ETestsForBrowser(yarnBuilder, 'Safari')
+ }
   loadVaultSecrets(secrets)
   handleEnvironmentSetting()
   afterAlways('DependencyCheckNightly') {
