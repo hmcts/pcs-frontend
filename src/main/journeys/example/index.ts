@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import { JourneyDraft, StepDraft } from '../../modules/journey/engine/schema';
 
 // Helper to simplify next linking
@@ -175,10 +177,8 @@ const stepsById: Record<string, StepDraft> = {
         validate: { required: true },
         errorMessages: {
           required: 'Enter a date',
-          invalid: 'Enter a valid date',
-          day: 'Enter a valid day',
-          month: 'Enter a valid month',
-          year: 'Enter a valid year',
+          notRealDate: 'Enter a valid date',
+          invalidPart: field => `Enter a valid ${field}`,
         },
       },
       continueButton: {
@@ -191,6 +191,7 @@ const stepsById: Record<string, StepDraft> = {
   },
   date_optional: {
     id: 'date_optional',
+
     title: 'Enter a date (optional)',
     type: 'form',
     fields: {
@@ -202,10 +203,8 @@ const stepsById: Record<string, StepDraft> = {
         validate: { required: false },
         errorMessages: {
           required: 'Enter a date',
-          invalid: 'Enter a valid date',
-          day: 'Enter a valid day',
-          month: 'Enter a valid month',
-          year: 'Enter a valid year',
+          notRealDate: 'Enter a valid date',
+          invalidPart: field => `Enter a valid ${field}`,
         },
       },
       continueButton: {
@@ -213,6 +212,95 @@ const stepsById: Record<string, StepDraft> = {
         attributes: {
           type: 'submit',
         },
+      },
+    },
+  },
+  date_constraints: {
+    id: 'date_constraints',
+    title: 'Dates with different constraints',
+    type: 'form',
+    fields: {
+      pastDate: {
+        type: 'date',
+        fieldset: { legend: { text: 'Date in the past' } },
+        validate: { required: true, mustBePast: true },
+        errorMessages: {
+          mustBePast: 'Date must be in the past',
+          required: 'Enter a date',
+          notRealDate: 'Enter a valid date',
+          invalidPart: field => `Enter a valid ${field}`,
+        },
+      },
+      futureDate: {
+        type: 'date',
+        fieldset: { legend: { text: 'Date in the future' } },
+        validate: { required: true, mustBeFuture: true },
+        errorMessages: {
+          mustBeFuture: 'Date must be in the future',
+          required: 'Enter a date',
+          notRealDate: 'Enter a valid date',
+          invalidPart: field => `Enter a valid ${field}`,
+        },
+      },
+      todayOrPastDate: {
+        type: 'date',
+        fieldset: { legend: { text: 'Today or earlier (today or past)' } },
+        validate: { required: true, mustBeTodayOrPast: true },
+        errorMessages: {
+          mustBeTodayOrPast: 'Date must be today or in the past',
+          required: 'Enter a date',
+          notRealDate: 'Enter a valid date',
+          invalidPart: field => `Enter a valid ${field}`,
+        },
+      },
+      todayOrFutureDate: {
+        type: 'date',
+        fieldset: { legend: { text: 'Today or later (today or future)' } },
+        validate: { required: true, mustBeTodayOrFuture: true },
+        errorMessages: {
+          mustBeTodayOrFuture: 'Date must be today or in the future',
+          required: 'Enter a date',
+          notRealDate: 'Enter a valid date',
+          invalidPart: field => `Enter a valid ${field}`,
+        },
+      },
+      afterDate: {
+        type: 'date',
+        fieldset: { legend: { text: 'After 1 Jan 2025' } },
+        validate: { required: true, mustBeAfter: { date: DateTime.fromISO('2025-01-01') } },
+        errorMessages: {
+          mustBeAfter: (d: DateTime) => `Date must be after ${d.toFormat('d MMMM yyyy')}`,
+          required: 'Enter a date',
+          notRealDate: 'Enter a valid date',
+          invalidPart: field => `Enter a valid ${field}`,
+        },
+      },
+      beforeDate: {
+        type: 'date',
+        fieldset: { legend: { text: 'Before 31 Dec 2023' } },
+        validate: { required: true, mustBeBefore: { date: DateTime.fromISO('2023-12-31') } },
+        errorMessages: {
+          mustBeBefore: (d: DateTime) => `Date must be before ${d.toFormat('d MMMM yyyy')}`,
+          required: 'Enter a date',
+          notRealDate: 'Enter a valid date',
+          invalidPart: field => `Enter a valid ${field}`,
+        },
+      },
+      betweenDate: {
+        type: 'date',
+        fieldset: { legend: { text: 'Within 2024 (1 Jan - 31 Dec)' } },
+        validate: { required: true, mustBeBetween: { start: DateTime.fromISO('2024-01-01'), end: DateTime.fromISO('2024-12-31') } },
+        errorMessages: {
+          mustBeBetween: (s: DateTime, e: DateTime) =>
+            `Date must be between ${s.toFormat('d MMM yyyy')} and ${e.toFormat('d MMM yyyy')}`,
+          required: 'Enter a date',
+          notRealDate: 'Enter a valid date',
+          invalidPart: field => `Enter a valid ${field}`,
+        },
+      },
+      continueButton: {
+        type: 'button',
+        attributes: { type: 'submit' },
       },
     },
   },
@@ -383,6 +471,7 @@ const orderedIds = [
   'select',
   'date',
   'date_optional',
+  'date_constraints',
   'number',
   'email',
   'tel',

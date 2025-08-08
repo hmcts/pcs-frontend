@@ -36,7 +36,7 @@
 
 
 
-    <form method="post">
+    <form method="post" novalidate>
       {% for fieldName, fieldConfig in step.fields %}
         {% if fieldConfig.type in ['text', 'email', 'tel', 'password', 'url', 'number'] %}
           {{ govukInput(fieldConfig) }}
