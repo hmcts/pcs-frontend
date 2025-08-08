@@ -45,22 +45,35 @@ def component = "frontend"
 
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
+static Map < String, Object > secret(String secretName, String envVariable) {
+  [
+    $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    envVariable: envVariable
+  ]
+}
+
+def secrets = [
+  'pcs-${env}': [
+    secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
+    secret('idam-system-user-name', 'IDAM_SYSTEM_USERNAME'),
+    secret('idam-system-user-password', 'IDAM_SYSTEM_USER_PASSWORD'),
+    secret('pcs-frontend-idam-user-temp-password', 'PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD')
+  ]
+]
+
 withNightlyPipeline(type, product, component) {
   validateInputs()
   enableSlackNotifications('#pcs-tech')
+  loadVaultSecrets(secrets)
   enableFortifyScan()
   afterSuccess('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true,
       artifacts: '**/Fortify Scan/**/*'
   }
- afterAlways('FortifyScan') {
-   runE2ETestsForBrowser(yarnBuilder, 'Chrome')
-   runE2ETestsForBrowser(yarnBuilder, 'Firefox')
-   runE2ETestsForBrowser(yarnBuilder, 'Safari')
- }
-  loadVaultSecrets(secrets)
-  handleEnvironmentSetting()
-  afterAlways('DependencyCheckNightly') {
+  afterAlways('fortify-scan') {
+    handleEnvironmentSetting()
     runE2ETests(yarnBuilder)
     publishE2EReport()
     if (params.ACCESSIBILITY_TESTS) {
