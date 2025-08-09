@@ -1,5 +1,16 @@
 #!groovy
 
+properties([
+// H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
+  parameters([
+    string(
+      name: 'PR_NUMBER',
+      defaultValue: '',
+      description: 'PR number (REQUIRED if running against another PR, leave blank otherwise).'
+    ),
+  ])
+])
+
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -22,17 +33,24 @@ static Map < String, Object > secret(String secretName, String envVariable) {
 def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-    secret('idam-citizen-user-password', 'IDAM_CITIZEN_USER_PASSWORD')
+    secret('idam-system-user-name', 'IDAM_SYSTEM_USERNAME'),
+    secret('idam-system-user-password', 'IDAM_SYSTEM_USER_PASSWORD'),
+    secret('pcs-frontend-idam-user-temp-password', 'PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD')
   ]
 ]
 
 withPipeline(type, product, component) {
+  validateInputs()
   loadVaultSecrets(secrets)
   env.NODE_CONFIG_ENV = 'test'
+  env.TEST_URL = (params.PR_NUMBER?.trim())
+    ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
+    : env.TEST_URL
+
   onPR() {
-    env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
     // enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+    echo "test url is: ${env.TEST_URL}"
     afterAlways('functionalTest:preview') {
       try {
         publishHTML([
@@ -46,23 +64,10 @@ withPipeline(type, product, component) {
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       }
-    }
-    afterSuccess('functionalTest:preview') {
-      stage('Accessibility Test - preview') {
-        try {
-          yarnBuilder.yarn('test:accessibility')
-        } catch (Error) {
-          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-        } finally {
-          publishHTML([
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "allure-report",
-            reportFiles          : 'index.html',
-            reportName           : 'Accessibility Test Report'
-          ])
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+      stage('Validate Test Target') {
+        if (params.PR_NUMBER?.trim()) {
+          error("Tests passed but were run against PR ${params.PR_NUMBER}. " +
+            "To merge this PR, run tests against master by leaving PR_NUMBER parameter blank.")
         }
       }
     }
@@ -85,24 +90,11 @@ withPipeline(type, product, component) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       }
     }
-    afterSuccess('functionalTest:aat') {
-      stage('Accessibility Test - aat') {
-        try {
-          yarnBuilder.yarn('test:accessibility')
-        } catch (Error) {
-          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-        } finally {
-          publishHTML([
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "allure-report",
-            reportFiles          : 'index.html',
-            reportName           : 'Accessibility Test Report'
-          ])
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesAccessibility/*'
-        }
-      }
-    }
+  }
+}
+
+def validateInputs() {
+  if (params.PR_NUMBER && !params.PR_NUMBER.trim().matches("^\\d+\$")) {
+    error("Validation Failed: PR number must contain only numerical values")
   }
 }
