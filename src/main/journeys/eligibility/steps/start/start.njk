@@ -1,4 +1,4 @@
-{% extends "stepsTemplate.njk" %}
+{% extends "journeyTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block content %}
@@ -16,7 +16,7 @@
     {% endfor %}
   </ul>
 
-  <form method="post">
+  <form method="post" novalidate>
     {% if query.lang %}
       <input type="hidden" name="lang" value="{{ query.lang }}">
     {% endif %}

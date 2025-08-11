@@ -1,17 +1,28 @@
+import { Logger } from '@hmcts/nodejs-logging';
+import { DateTime } from 'luxon';
 import isPostalCode from 'validator/lib/isPostalCode';
 import { z } from 'zod/v4';
+
+import { buildDateInputSchema } from './date.schema';
+
+const logger = Logger.getLogger('journey-engine-schema');
 
 // Common error message schema
 const ErrorMessagesSchema = z
   .object({
     required: z.string().optional(),
-    incomplete: z.string().optional(),
-    invalid: z.string().optional(),
-    future: z.string().optional(),
-    past: z.string().optional(),
-    day: z.string().optional(),
-    month: z.string().optional(),
-    year: z.string().optional(),
+    missingParts: z.custom<(missing: string[]) => string>().optional(),
+    invalidPart: z.custom<(field: string) => string>().optional(),
+    notRealDate: z.string().optional(),
+    mustBePast: z.string().optional(),
+    mustBeTodayOrPast: z.string().optional(),
+    mustBeFuture: z.string().optional(),
+    mustBeTodayOrFuture: z.string().optional(),
+    mustBeAfter: z.custom<(date: DateTime, desc?: string) => string>().optional(),
+    mustBeSameOrAfter: z.custom<(date: DateTime, desc?: string) => string>().optional(),
+    mustBeBefore: z.custom<(date: DateTime, desc?: string) => string>().optional(),
+    mustBeSameOrBefore: z.custom<(date: DateTime, desc?: string) => string>().optional(),
+    mustBeBetween: z.custom<(start: DateTime, end: DateTime, desc?: string) => string>().optional(),
   })
   .optional();
 
@@ -27,6 +38,30 @@ export const ValidationRuleSchema = z
     email: z.boolean().optional().default(false),
     postcode: z.boolean().optional().default(false),
     url: z.boolean().optional().default(false),
+    // Date-specific constraints
+    mustBePast: z.boolean().optional(),
+    mustBeTodayOrPast: z.boolean().optional(),
+    mustBeFuture: z.boolean().optional(),
+    mustBeTodayOrFuture: z.boolean().optional(),
+    mustBeAfter: z
+      .object({ date: z.custom<DateTime>(v => v instanceof DateTime), description: z.string().optional() })
+      .optional(),
+    mustBeSameOrAfter: z
+      .object({ date: z.custom<DateTime>(v => v instanceof DateTime), description: z.string().optional() })
+      .optional(),
+    mustBeBefore: z
+      .object({ date: z.custom<DateTime>(v => v instanceof DateTime), description: z.string().optional() })
+      .optional(),
+    mustBeSameOrBefore: z
+      .object({ date: z.custom<DateTime>(v => v instanceof DateTime), description: z.string().optional() })
+      .optional(),
+    mustBeBetween: z
+      .object({
+        start: z.custom<DateTime>(v => v instanceof DateTime),
+        end: z.custom<DateTime>(v => v instanceof DateTime),
+        description: z.string().optional(),
+      })
+      .optional(),
     // Allows either a static string or a function (val => typeof val === 'string' | 'function')
     customMessage: z
       .custom<string | ((code: string) => string)>(val => typeof val === 'string' || typeof val === 'function', {
@@ -208,13 +243,13 @@ export const StepSchema = z.object({
 export const JourneySchema = z
   .object({
     meta: z.object({
-      name: z.string().min(1, { error: 'Journey name is required' }),
-      description: z.string().min(1, { error: 'Journey description is required' }),
+      name: z.string().min(1, { message: 'Journey name is required' }),
+      description: z.string().min(1, { message: 'Journey description is required' }),
       version: z.string().default('1.0.0'),
     }),
     steps: z
       .record(z.string(), StepSchema)
-      .refine(steps => Object.keys(steps).length > 0, { error: 'Journey must have at least one step' })
+      .refine(steps => Object.keys(steps).length > 0, { message: 'Journey must have at least one step' })
       .refine(
         steps => {
           const stepTypes = Object.values(steps).map(step => (step as StepConfig).type);
@@ -226,7 +261,7 @@ export const JourneySchema = z
           return hasFormStep && (!hasSummary || hasConfirmation);
         },
         {
-          error:
+          message:
             'Journey must have at least one form step. If it has a summary step, it must also have a confirmation step',
         }
       )
@@ -246,7 +281,7 @@ export const JourneySchema = z
             );
           });
         },
-        { error: 'All step references must point to valid step IDs' }
+        { message: 'All step references must point to valid step IDs' }
       ),
     config: z
       .object({
@@ -308,7 +343,7 @@ export const JourneySchema = z
 
       return !hasCycle(Object.keys(journey.steps)[0]);
     },
-    { error: 'Journey contains circular references in step navigation' }
+    { message: 'Journey contains circular references in step navigation' }
   )
   .refine(
     journey => {
@@ -338,7 +373,7 @@ export const JourneySchema = z
 
       return visited.size === Object.keys(journey.steps).length;
     },
-    { error: 'All steps must be reachable from the start step' }
+    { message: 'All steps must be reachable from the start step' }
   );
 
 // Parsed/validated type (all defaults applied)
@@ -362,60 +397,67 @@ export type JourneyConfig = z.infer<typeof JourneySchema>;
 // Field validation schema factory
 export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodTypeAny => {
   const rules = fieldConfig.validate;
-  const errorMessages = rules?.errorMessages;
+  // Prefer field-level errorMessages, otherwise fall back to any defined inside the rules block
+  const errorMessages = fieldConfig.errorMessages ?? rules?.errorMessages;
 
-  // Helper to resolve the correct error message for a specific validation failure.
-  // If `customMessage` is a function it will be invoked with the error code so that
-  // the developer can dynamically return a string. Otherwise, fall back to any
-  // provided string (or undefined so Zod will use its default).
   const getMessage = (code: string): string | undefined => {
     if (!rules) {
       return undefined;
     }
+
+    // Specific rule-level message wins
+    const errorMessagesMap = errorMessages as Record<string, string | undefined> | undefined;
+    if (errorMessagesMap && errorMessagesMap[code]) {
+      return errorMessagesMap[code];
+    }
+
     const { customMessage } = rules;
+
+    if (typeof customMessage === 'string') {
+      return customMessage;
+    }
+
     if (typeof customMessage === 'function') {
       try {
-        // Pass the error code plus any additional context you may need
         return customMessage(code);
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('customMessage function threw', err);
-        return undefined;
+        logger.error('customMessage function threw', err);
       }
     }
-    return customMessage as string | undefined;
+
+    return undefined;
   };
 
   switch (fieldConfig.type) {
     case 'number': {
       let schema = z.coerce.number();
       if (rules?.min !== undefined) {
-        schema = schema.min(rules.min, { error: getMessage('min') });
+        schema = schema.min(rules.min, { message: getMessage('min') });
       }
       if (rules?.max !== undefined) {
-        schema = schema.max(rules.max, { error: getMessage('max') });
+        schema = schema.max(rules.max, { message: getMessage('max') });
       }
       return rules?.required === false ? schema.optional() : schema;
     }
 
     case 'email': {
-      let schema = z.email({ error: getMessage('email') });
+      let schema = z.email({ message: getMessage('email') });
       if (rules?.minLength !== undefined) {
-        schema = schema.min(rules.minLength, { error: getMessage('minLength') });
+        schema = schema.min(rules.minLength, { message: getMessage('minLength') });
       }
       if (rules?.maxLength !== undefined) {
-        schema = schema.max(rules.maxLength, { error: getMessage('maxLength') });
+        schema = schema.max(rules.maxLength, { message: getMessage('maxLength') });
       }
       return rules?.required === false ? schema.optional() : schema;
     }
 
     case 'url': {
-      let schema = z.url({ error: getMessage('url') });
+      let schema = z.url({ message: getMessage('url') });
       if (rules?.minLength !== undefined) {
-        schema = schema.min(rules.minLength, { error: getMessage('minLength') });
+        schema = schema.min(rules.minLength, { message: getMessage('minLength') });
       }
       if (rules?.maxLength !== undefined) {
-        schema = schema.max(rules.maxLength, { error: getMessage('maxLength') });
+        schema = schema.max(rules.maxLength, { message: getMessage('maxLength') });
       }
       return rules?.required === false ? schema.optional() : schema;
     }
@@ -442,9 +484,9 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         const minItems = rules?.minLength || 1;
         let schema = z
           .array(z.string())
-          .min(minItems, { error: getMessage('minLength') || 'Select at least one option' });
+          .min(minItems, { message: getMessage('minLength') || 'Select at least one option' });
         if (rules?.maxLength !== undefined) {
-          schema = schema.max(rules.maxLength, { error: getMessage('maxLength') });
+          schema = schema.max(rules.maxLength, { message: getMessage('maxLength') });
         }
         return schema;
       }
@@ -452,45 +494,58 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     }
 
     case 'date': {
-      if (rules?.required === true) {
-        const schema = z
-          .object({
-            day: z.string(),
-            month: z.string(),
-            year: z.string(),
-          })
-          .refine(
-            val => {
-              if (!val.day || !val.month || !val.year) {
-                return false;
-              }
-              const iso = `${val.year.padStart(4, '0')}-${val.month.padStart(2, '0')}-${val.day.padStart(2, '0')}`;
-              if (isNaN(Date.parse(iso))) {
-                return false;
-              }
-              const date = new Date(iso);
-              return date.getTime() <= Date.now();
-            },
-            {
-              message: errorMessages?.invalid || 'Enter a valid date',
-              path: ['date'],
+      const label =
+        typeof fieldConfig.label === 'string'
+          ? fieldConfig.label
+          : fieldConfig.label?.text || fieldConfig.name || 'Date';
+      // Adapter: merge errorMessages with a customMessage fallback (if provided)
+      let dateMessages: Record<string, unknown> = errorMessages ? { ...errorMessages } : {};
+      if (typeof rules?.customMessage === 'function') {
+        dateMessages = { ...(errorMessages ?? {}) };
+        const fn = rules.customMessage;
+        const functionCodes = [
+          'missingParts',
+          'invalidPart',
+          'mustBeAfter',
+          'mustBeSameOrAfter',
+          'mustBeBefore',
+          'mustBeSameOrBefore',
+          'mustBeBetween',
+        ];
+        const stringCodes = [
+          'required',
+          'notRealDate',
+          'mustBePast',
+          'mustBeTodayOrPast',
+          'mustBeFuture',
+          'mustBeTodayOrFuture',
+        ];
+        for (const code of [...functionCodes, ...stringCodes]) {
+          if (dateMessages[code as keyof typeof dateMessages] === undefined) {
+            if (functionCodes.includes(code)) {
+              // Provide a wrapper that ignores args and delegates to customMessage(code)
+              dateMessages[code] = () => fn(code);
+            } else {
+              dateMessages[code] = fn(code);
             }
-          )
-          .transform(val => ({
-            day: val.day,
-            month: val.month,
-            year: val.year,
-            iso: `${val.year.padStart(4, '0')}-${val.month.padStart(2, '0')}-${val.day.padStart(2, '0')}`,
-          }));
-        return schema;
+          }
+        }
       }
-      return z
-        .object({
-          day: z.string().optional(),
-          month: z.string().optional(),
-          year: z.string().optional(),
-        })
-        .optional();
+
+      return buildDateInputSchema(label, {
+        required: rules?.required,
+        mustBePast: rules?.mustBePast,
+        mustBeTodayOrPast: rules?.mustBeTodayOrPast,
+        mustBeFuture: rules?.mustBeFuture,
+        mustBeTodayOrFuture: rules?.mustBeTodayOrFuture,
+        mustBeAfter: rules?.mustBeAfter,
+        mustBeSameOrAfter: rules?.mustBeSameOrAfter,
+        mustBeBefore: rules?.mustBeBefore,
+        mustBeSameOrBefore: rules?.mustBeSameOrBefore,
+        mustBeBetween: rules?.mustBeBetween,
+        // If both errorMessages and customMessage are undefined, this stays undefined
+        messages: dateMessages,
+      });
     }
 
     case 'button': {
@@ -503,31 +558,31 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let schema: any = z.string();
       if (rules?.minLength !== undefined) {
-        schema = schema.min(rules.minLength, { error: getMessage('minLength') });
+        schema = schema.min(rules.minLength, { message: getMessage('minLength') });
       }
       if (rules?.maxLength !== undefined) {
-        schema = schema.max(rules.maxLength, { error: getMessage('maxLength') });
+        schema = schema.max(rules.maxLength, { message: getMessage('maxLength') });
       }
       if (rules?.pattern) {
-        schema = schema.regex(new RegExp(rules.pattern), { error: getMessage('pattern') });
+        schema = schema.regex(new RegExp(rules.pattern), { message: getMessage('pattern') });
       }
 
       // Enforce non-empty when required but no explicit minLength provided
       if (rules?.required === true && (rules?.minLength === undefined || rules.minLength < 1)) {
-        schema = schema.min(1, { error: getMessage('required') || 'Enter a value' });
+        schema = schema.min(1, { message: getMessage('required') || 'Enter a value' });
       }
 
       if (rules?.email) {
-        schema = z.email({ error: getMessage('email') });
+        schema = z.email({ message: getMessage('email') });
       }
 
       if (rules?.url) {
-        schema = z.url({ error: getMessage('url') });
+        schema = z.url({ message: getMessage('url') });
       }
 
       if (rules?.postcode) {
         schema = schema.refine((val: string) => isPostalCode(val, 'GB'), {
-          error: getMessage('postcode') ?? 'Enter a valid postcode',
+          message: getMessage('postcode') ?? 'Enter a valid postcode',
         });
       }
       return rules?.required === false ? schema.optional() : schema;

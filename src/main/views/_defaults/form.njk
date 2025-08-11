@@ -1,4 +1,5 @@
-{% extends "stepsTemplate.njk" %}
+{% extends "journeyTemplate.njk" %}
+
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
@@ -21,6 +22,10 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
+    {% if errorSummary %}
+      {{ govukErrorSummary(errorSummary) }}
+    {% endif %}
+
     {% if step.title %}
       <h1 class="govuk-heading-l">{{ step.title }}</h1>
     {% endif %}
@@ -33,7 +38,7 @@
       {{ govukErrorSummary(errorSummary) }}
     {% endif %}
 
-    <form method="post">
+    <form method="post" novalidate>
       {% if query.lang %}
         <input type="hidden" name="lang" value="{{ query.lang }}">
       {% endif %}

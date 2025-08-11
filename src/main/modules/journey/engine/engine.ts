@@ -4,6 +4,7 @@ import path from 'path';
 import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import express, { NextFunction, Request, Response, Router } from 'express';
+import { DateTime } from 'luxon';
 
 import { loadTranslations } from '../../../app/utils/loadTranslations';
 import { oidcMiddleware } from '../../../middleware/oidc';
@@ -151,6 +152,45 @@ export class WizardEngine {
     return segment.replace(/[^a-zA-Z0-9_-]/g, '');
   }
 
+  /**
+   * Sanitizes a full template path by filtering every segment through sanitizePathSegment.
+   * This prevents path traversal or injection when the template name is dynamic.
+   */
+  private sanitizeTemplatePath(template: string): string {
+    return template
+      .split('/')
+      .map(seg => this.sanitizePathSegment(seg))
+      .filter(Boolean)
+      .join('/');
+  }
+
+  /**
+   * Validates a step ID for use in redirect URLs - internal data used in redirects should be sanitized to prevent XSS attacks
+   * @param stepId - The step ID to validate
+   * @returns The validated step ID or null if invalid
+   */
+  private validateStepIdForRedirect(stepId: string): string | null {
+    if (!stepId || typeof stepId !== 'string') {
+      return null;
+    }
+
+    // Check if the step exists in the journey configuration
+    if (!this.journey.steps[stepId]) {
+      this.logger.warn(`Invalid step ID for redirect: ${stepId}`);
+      return null;
+    }
+
+    const sanitizedStepId = this.sanitizePathSegment(stepId);
+
+    // If sanitization changed the step ID, it contained unsafe characters
+    if (sanitizedStepId !== stepId) {
+      this.logger.warn(`Step ID contained unsafe characters: ${stepId}`);
+      return null;
+    }
+
+    return sanitizedStepId;
+  }
+
   private async resolveTemplatePath(stepId: string): Promise<string> {
     const sanitizedStepId = this.sanitizePathSegment(stepId);
     const cacheKey = `${this.slug}:${sanitizedStepId}`;
@@ -166,9 +206,8 @@ export class WizardEngine {
 
     // Use explicit template if author provided one
     if (step.template) {
-      const sanitizedTemplate = this.sanitizePathSegment(step.template);
-      WizardEngine.templatePathCache.set(cacheKey, sanitizedTemplate);
-      return sanitizedTemplate;
+      WizardEngine.templatePathCache.set(cacheKey, step.template);
+      return step.template;
     }
 
     const checkExists = async (candidate: string): Promise<boolean> => {
@@ -259,7 +298,22 @@ export class WizardEngine {
               'month' in value &&
               'year' in value
             ) {
-              return `${value.day || ''}/${value.month || ''}/${value.year || ''}`;
+              const { day, month, year } = value as Record<string, string>;
+              const dTrim = day?.trim() ?? '';
+              const mTrim = month?.trim() ?? '';
+              const yTrim = year?.trim() ?? '';
+
+              // If all parts empty, treat value as empty
+              if (!dTrim && !mTrim && !yTrim) {
+                return '';
+              }
+
+              const dt = DateTime.fromObject({
+                day: Number(dTrim),
+                month: Number(mTrim),
+                year: Number(yTrim),
+              });
+              return dt.isValid ? dt.toFormat('d MMMM yyyy') : `${dTrim}/${mTrim}/${yTrim}`;
             }
             if (
               typedFieldConfig.type === 'checkboxes' ||
@@ -499,7 +553,7 @@ export class WizardEngine {
       data,
       allData,
       errors,
-      errorSummary: processErrorsForTemplate(errors),
+      errorSummary: processErrorsForTemplate(errors, step),
       previousStepUrl,
       summaryRows,
     };
@@ -513,6 +567,56 @@ export class WizardEngine {
   }
 
   // Check if a step is accessible based on journey progress
+  private isStepComplete(stepId: string, allData: Record<string, unknown>): boolean {
+    const stepConfig = this.journey.steps[stepId] as StepConfig;
+    const stepData = allData[stepId] as Record<string, unknown>;
+
+    // If no data exists for the step, check if it has required fields
+    if (!stepData) {
+      if (!stepConfig.fields) {
+        return true; // No fields means no validation needed
+      }
+
+      const hasRequiredFields = Object.values(stepConfig.fields).some((field: FieldConfig) => {
+        // Skip button fields as they are not input fields
+        if (field.type === 'button') {
+          return false;
+        }
+        // Fields are required by default unless explicitly set to false
+        return field.validate?.required !== false;
+      });
+
+      return !hasRequiredFields; // If no required fields, step is complete even with no data
+    }
+
+    // If step has data, check that all required fields are present
+    if (stepConfig.fields) {
+      for (const [fieldName, fieldConfig] of Object.entries(stepConfig.fields)) {
+        const typedFieldConfig = fieldConfig as FieldConfig;
+        // Skip button fields as they are not input fields
+        if (typedFieldConfig.type === 'button') {
+          continue;
+        }
+        // Fields are required by default unless explicitly set to false
+        if (typedFieldConfig.validate?.required !== false) {
+          const fieldValue = stepData[fieldName];
+
+          // For date fields, check if all components are present
+          if (typedFieldConfig.type === 'date') {
+            const dateValue = fieldValue as { day?: string; month?: string; year?: string };
+            if (!dateValue || !dateValue.day || !dateValue.month || !dateValue.year) {
+              return false;
+            }
+          } else if (!fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === '')) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
   private isStepAccessible(stepId: string, allData: Record<string, unknown>): boolean {
     // Always allow access to the first step
     const firstStepId = Object.keys(this.journey.steps)[0];
@@ -570,8 +674,7 @@ export class WizardEngine {
           continue;
         }
 
-        const dependencyData = allData[dependency] as Record<string, unknown>;
-        if (!dependencyData || Object.keys(dependencyData).length === 0) {
+        if (!this.isStepComplete(dependency, allData)) {
           return false;
         }
 
@@ -617,11 +720,6 @@ export class WizardEngine {
             roles: req.session?.user?.roles ?? [],
           },
         };
-
-        // this.logger.info('ISENABLED ===>> LaunchDarkly Flag Evaluation', { context, keyToCheck });
-
-        // const flags = await ldClient.allFlagsState(context);
-        // this.logger.info('FLAGS ===>> LaunchDarkly ALLLLL Flag Evaluation', flags.allValues(), flags.toJSON());
 
         // If the flag does not exist LD will return the default (true) so UI remains visible by default.
         return await ldClient.variation(keyToCheck, context, true);
@@ -752,16 +850,23 @@ export class WizardEngine {
     router.get('/', (req, res) => {
       getOrCreateCaseId(req);
       const lang = req.body?.lang || req.query?.lang || 'en';
-      res.redirect(`${this.basePath}/${Object.keys(this.journey.steps)[0]}?lang=${lang}`);
+      // res.redirect(`${this.basePath}/${Object.keys(this.journey.steps)[0]}?lang=${lang}`);
+      const firstStepId = Object.keys(this.journey.steps)[0];
+      const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
+      if (validatedFirstStepId) {
+        res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}?lang=${lang}`);
+      } else {
+        this.logger.error('Critical error: No valid step IDs found in journey configuration');
+        res.status(500).send('Internal server error');
+      }
     });
 
     router.param('step', (req: Request, res: Response, next: NextFunction, stepId: string) => {
-      const sanitizedStepId = this.sanitizePathSegment(stepId);
-      const step = this.journey.steps[sanitizedStepId];
+      const step = this.journey.steps[stepId];
       if (!step) {
         return res.status(404).render('not-found');
       }
-      (req as RequestWithStep).step = { id: sanitizedStepId, ...step };
+      (req as RequestWithStep).step = { id: stepId, ...step };
       next();
     });
 
@@ -778,8 +883,6 @@ export class WizardEngine {
       step = await this.applyLdOverride(step, req);
       step = await this.applyLaunchDarklyFlags(step, req);
 
-      // this.logger.info('LaunchDarkly Flag Evaluation', { step });
-
       try {
         const { data } = await this.store.load(req, caseId);
 
@@ -792,7 +895,15 @@ export class WizardEngine {
           const nextId = this.resolveNext(step, data);
           if (nextId && nextId !== step.id) {
             const lang = req.body?.lang || req.query?.lang || 'en';
-            return res.redirect(`${this.basePath}/${nextId}?lang=${lang}`);
+
+            // Ensure nextId is valid before redirecting
+            const validatedNextId = this.validateStepIdForRedirect(nextId);
+            if (validatedNextId) {
+              return res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${lang}`);
+            } else {
+              // If validation fails, log the error
+              this.logger.warn(`Invalid next step ID for redirect: ${nextId}`);
+            }
           }
         }
 
@@ -808,8 +919,8 @@ export class WizardEngine {
             if (!this.hasInputFields(stepConfig)) {
               continue;
             }
-            // If this step has no data, it's the first incomplete step
-            if (!data[stepId] || Object.keys(data[stepId] as Record<string, unknown>).length === 0) {
+            // If this step is not complete, it's the first incomplete step
+            if (!this.isStepComplete(stepId, data)) {
               firstIncompleteStep = stepId;
               break;
             }
@@ -817,16 +928,17 @@ export class WizardEngine {
 
           // Redirect to the first incomplete step
           const lang = req.body?.lang || req.query?.lang || 'en';
-          return res.redirect(`${this.basePath}/${firstIncompleteStep}?lang=${lang}`);
+          const validatedFirstIncompleteStep = this.validateStepIdForRedirect(firstIncompleteStep);
+          if (validatedFirstIncompleteStep) {
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstIncompleteStep)}?lang=${lang}`);
+          }
         }
 
         // Load language and translations
         const language = (req.query.lang || 'en') as string;
-        // eslint-disable-next-line no-console
-        console.log('step============================================================================ => ', step);
         const translations = loadTranslations(language, ['common', `journeys/${step.id}`]);
-        // eslint-disable-next-line no-console
-        console.log('trasnlations =================> ', translations);
+
+        // Apply translations to step fields
         if (translations?.title) {
           step.title = translations.title;
         }
@@ -900,76 +1012,21 @@ export class WizardEngine {
           }
         }
 
-        let context = this.buildJourneyContext(step, caseId, data);
+        let context = this.buildJourneyContext(step, caseId, data, language);
 
-        // Re-calculate previousStepUrl to skip hidden steps
         const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
-
-        const lang = req.body?.lang || req.query?.lang || 'en';
-        const previousStepUrl = prevVisible ? `${this.basePath}/${prevVisible}?lang=${lang}` : null;
-
         context = {
           ...context,
-          previousStepUrl,
+          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}?lang=${language}` : null,
         };
 
-        // If dynamic step, delegate to generateContent
-        if (typeof step.generateContent === 'function') {
-          const contentFromStep = step.generateContent({ language, translations });
-          context = {
-            ...context,
-            ...contentFromStep,
-          };
-        } else {
-          // Inject common translations for static steps
-          const { title, description, fields, ...templateContent } = translations;
-
-          // Inject fields.text for buttons, radios, etc.
-          if (translations.fields && step.fields) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const fieldTexts: Record<string, any> = {};
-            for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
-              const translatedField = translations.fields[fieldName];
-              if (translatedField?.text) {
-                fieldConfig.text = translatedField.text;
-              }
-
-              // ✅ Add this to make it available to Nunjucks
-              fieldTexts[fieldName] = {
-                text: fieldConfig.text ?? translatedField?.text ?? '',
-              };
-            }
-
-            context = {
-              ...context,
-              fields: fieldTexts,
-            };
-          }
-
-          context = {
-            ...context,
-            ...templateContent,
-            language,
-          };
-        }
-
         const templatePath = await this.resolveTemplatePath(step.id);
+        const safeTemplate = `${this.sanitizeTemplatePath(templatePath)}.njk`;
 
-        // If we are rendering the confirmation (or other terminal) step, clear the session so the user can start a new journey.
-        if (step.type === 'confirmation') {
-          const session = req.session as unknown as Record<string, unknown>;
-          // Remove the per-journey caseId key so a new journey generates a fresh id next time.
-          const caseIdKey = `journey_${this.slug}_caseId`;
-          delete session[caseIdKey];
-
-          // Also remove any stored data for this case from the session store implementation (if using sessionStore).
-          if (session[caseId]) {
-            delete session[caseId as keyof typeof session];
-          }
-        }
-
-        res.render(templatePath, {
+        // Render the template with context
+        res.render(safeTemplate, {
           ...context,
+          lang: res.locals.lang,
           data: context.data,
           errors: null,
           allData: context.allData,
@@ -989,14 +1046,13 @@ export class WizardEngine {
       step = await this.applyLdOverride(step, req);
       step = await this.applyLaunchDarklyFlags(step, req);
 
-      // We don't skip steps during POST; validation will pass for visible fields
+      const lang = req.body?.lang || req.query?.lang || 'en';
+      res.locals.lang = lang;
 
-      // Validate using Zod-based validation
       const validationResult = this.validator.validate(step, req.body);
 
       if (!validationResult.success) {
         const { data } = await this.store.load(req, caseId);
-        // Reconstruct nested date fields from req.body for template
         const reconstructedData = { ...req.body };
         if (step.fields) {
           for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
@@ -1010,19 +1066,17 @@ export class WizardEngine {
             }
           }
         }
-        // Patch the current step's data with reconstructedData for this render
         const patchedAllData = { ...data, [step.id]: reconstructedData };
-        let context = this.buildJourneyContext(step, caseId, patchedAllData, validationResult.errors);
+        let context = this.buildJourneyContext(step, caseId, patchedAllData, lang, validationResult.errors);
+
         const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
         context = {
           ...context,
           previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
         };
 
-        return res.status(400).render(await this.resolveTemplatePath(step.id), {
-          ...context,
-          errors: validationResult.errors,
-        });
+        const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+        return res.status(400).render(postTemplatePath, context);
       }
 
       try {
@@ -1034,18 +1088,20 @@ export class WizardEngine {
         const nextId = this.resolveNext(step, merged);
         const nextStep = this.journey.steps[nextId];
 
-        // If transitioning to a confirmation step, generate reference number
         if (nextStep?.type === 'confirmation' && nextStep.data?.referenceNumber) {
           const referenceNumber = await this.store.generateReference(req, this.slug, caseId);
-
-          // Save the generated reference to the confirmation step data
           await this.store.save(req, caseId, version + 1, {
             [nextId]: { referenceNumber },
           });
         }
 
-        const lang = req.body?.lang || req.query?.lang || 'en';
-        res.redirect(`${this.basePath}/${nextId}?lang=${lang}`);
+        const validatedNextId = this.validateStepIdForRedirect(nextId);
+        if (validatedNextId) {
+          res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${lang}`);
+        } else {
+          this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
+          res.status(500).send('Internal server error');
+        }
       } catch (err) {
         next(err);
       }

@@ -16,7 +16,8 @@ export interface ErrorSummaryData {
  * @returns Error summary data for template rendering
  */
 export function processErrorsForTemplate(
-  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
+  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>,
+  step?: { fields?: Record<string, { type: string }> }
 ): ErrorSummaryData | null {
   if (!errors || Object.keys(errors).length === 0) {
     return null;
@@ -25,11 +26,29 @@ export function processErrorsForTemplate(
   const errorList: ProcessedError[] = [];
 
   for (const [fieldName, error] of Object.entries(errors)) {
-    const anchorId = error.anchor || fieldName;
-    errorList.push({
-      text: error.message,
-      href: `#${anchorId}`,
+    // Add part-specific error messages (day/month/year) first so each invalid component is listed
+    let hasSpecific = false;
+    (['day', 'month', 'year'] as const).forEach(part => {
+      const partMessage = (error as Record<string, string | undefined>)[part];
+      if (partMessage) {
+        hasSpecific = true;
+        errorList.push({
+          text: String(partMessage),
+          href: `#${fieldName}-${part}`,
+        });
+      }
     });
+
+    // if generic error, target the first input
+    if (!hasSpecific) {
+      // Check if this field is actually a date type by looking at the step configuration
+      const isDateField = step?.fields?.[fieldName]?.type === 'date';
+      const anchorId = error.anchor ?? (isDateField ? `${fieldName}-day` : fieldName);
+      errorList.push({
+        text: error.message,
+        href: `#${anchorId}`,
+      });
+    }
   }
 
   return {
