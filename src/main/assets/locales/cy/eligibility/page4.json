@@ -1,0 +1,30 @@
+{
+  "page4": {
+    "title": "cyEnter your personal details",
+    "fields": {
+      "title": {
+        "label": "cyTitle",
+        "items": {
+          "mr": "cyMr",
+          "ms": "cyMs",
+          "miss": "cyMiss",
+          "mrs": "cyMrs"
+        }
+      },
+      "firstName": {
+        "label": "cyFirst name"
+      },
+      "lastName": {
+        "label": "cyLast name"
+      }
+    },
+    "errors": {
+      "firstName": {
+        "required": "cyEnter a first name"
+      },
+      "lastName": {
+        "required": "cyEnter a last name"
+      }
+    }
+  }
+}

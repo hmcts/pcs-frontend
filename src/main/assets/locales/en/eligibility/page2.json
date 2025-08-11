@@ -1,0 +1,10 @@
+{
+  "page2": {
+    "ageLabel": "Are you 18 or over?",
+    "ageDescription": "Select an option to continue.",
+    "ageOptions": {
+      "yes": "Yes",
+      "no": "No"
+    }
+  }
+}

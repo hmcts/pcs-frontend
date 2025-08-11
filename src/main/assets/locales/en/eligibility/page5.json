@@ -1,0 +1,27 @@
+{
+  "page5": {
+    "title": "Enter your personal and contact details",
+    "fields": {
+      "date": {
+        "hint": "Date of birth"
+      },
+      "email": {
+        "label": "Email address"
+      }
+    },
+    "errors": {
+      "date": {
+        "required": "Enter a date",
+        "notRealDate": "Enter a valid date of birth",
+        "invalidDay": "Enter a valid day",
+        "invalidMonth": "Enter a valid month",
+        "invalidYear": "Enter a valid year",
+        "invalidValue": "Enter a valid value"
+      },
+      "email": {
+        "required": "Enter an email address",
+        "invalid": "Enter an email address in the correct format, like name@example.com"
+      }
+    }
+  }
+}

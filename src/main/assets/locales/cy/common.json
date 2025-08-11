@@ -14,17 +14,5 @@
   "change": "cyChange",
   "defaultRequired": "cyThis field is required",
   "defaultInvalid": "cyInvalid format",
-  "back": "cyBack",
-  "startPage": {
-    "title": "cyBefore you start",
-    "description": "cyWe're building a new service. Different designs are being tested and changed based on feedback from users.",
-    "eligibilityText": "cyYou'll be asked some questions to check you're eligible to use this service.",
-    "whatYouNeedTitle": "cyWhat you'll need",
-    "whatYouNeedText": "cyTo make your claim, you'll need the following information to hand:",
-    "needNoticeInfo": "cyInformation about the type of notice you've given and when it was given (if applicable)",
-    "needPropertyInfo": "cyDetails about the property you'd like to claim possession of",
-    "needDefendantInfo": "cyThe defendants' details (if known)",
-    "needGroundsInfo": "cyYour grounds for possession and details about your reasons for making a possession claim",
-    "needDocuments": "cyCopies of relevant documents"
-  }
+  "back": "cyBack"
 }

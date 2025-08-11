@@ -30,10 +30,10 @@
         html:(translations.feedback + translations.languageToggle) | safe
       }) }}
   </div>
-  {% if backUrl %}
+  {% if previousStepUrl %}
     {{ govukBackLink({
       text: translations.back or "Back",
-      href: backUrl
+      href: previousStepUrl
     }) }}
   {% endif %}
 {% endblock %}

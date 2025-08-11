@@ -2,9 +2,7 @@ import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
   id: 'page2',
-  title: 'page2.title', // Reference translation key for the title
   type: 'form',
-  description: 'page2.description', // Reference translation key for description
   fields: {
     age: {
       type: 'radios',

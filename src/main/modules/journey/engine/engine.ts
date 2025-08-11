@@ -398,8 +398,24 @@ export class WizardEngine {
     const data = (allData[step.id] as Record<string, unknown>) || {};
 
     // Load translations for the current step and the common translations
-    const namespaces = ['common', `eligibility/${step.id}`]; // `step.id` corresponds to page1, page2, etc.
-    const translations = loadTranslations(lang, namespaces);
+    const namespaces = ['common', `eligibility/${step.id}`]; // e.g. 'eligibility/page2'
+    const translations = loadTranslations(lang, namespaces) as Record<string, unknown>;
+
+    // eslint-disable-next-line no-console
+    console.log('translation => ', translations);
+
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const getPath = (obj: unknown, path: string): unknown =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      path.split('.').reduce((acc: any, part) => (acc && typeof acc === 'object' ? acc[part] : undefined), obj);
+
+    const t = (key: unknown): string => {
+      if (typeof key !== 'string') {
+        return String(key ?? '');
+      }
+      const v = getPath(translations, key);
+      return typeof v === 'string' ? v : key; // fallback to the key if missing
+    };
 
     // Build dateItems for all date fields
     const dateItems: Record<string, { name: string; classes: string; value: string }[]> = {};
@@ -409,13 +425,8 @@ export class WizardEngine {
         if (typedFieldConfig.type === 'date') {
           const fieldValue = data[fieldName] as Record<'day' | 'month' | 'year', string | undefined>;
           const fieldError = errors && errors[fieldName];
-          dateItems[fieldName] = (['day', 'month', 'year'] as ('day' | 'month' | 'year')[]).map(part => {
-            let hasError = false;
-            if (fieldError) {
-              if (typeof fieldError === 'object' && fieldError[part]) {
-                hasError = true;
-              }
-            }
+          dateItems[fieldName] = (['day', 'month', 'year'] as const).map(part => {
+            const hasError = !!(fieldError && typeof fieldError === 'object' && fieldError[part]);
             return {
               name: part,
               classes:
@@ -431,13 +442,22 @@ export class WizardEngine {
       }
     }
 
-    // Preprocess fields for template rendering
+    // ── Make a translated copy of the step (do NOT mutate cached journey) ───────
     const processedFields: Record<string, FieldConfig> = {};
+    let stepCopy: StepConfig = { ...step };
+
+    // Translate step-level title/description if they are keys
+    if (typeof stepCopy.title === 'string') {
+      stepCopy.title = t(stepCopy.title);
+    }
+    if (typeof stepCopy.description === 'string') {
+      stepCopy.description = t(stepCopy.description);
+    }
+
     if (step.fields) {
       for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
         const typedFieldConfig = fieldConfig as FieldConfig;
-
-        const processed: FieldConfig = { ...typedFieldConfig }; // Use FieldConfig for fields that support value
+        const processed: FieldConfig = { ...typedFieldConfig };
 
         // Ensure id / name
         if (!processed.id) {
@@ -450,21 +470,56 @@ export class WizardEngine {
         const fieldValue = data[fieldName] as unknown;
         const fieldError = errors && errors[fieldName];
 
-        // Standardized errorMessage for macros
+        // Translate error message if present
         if (fieldError) {
-          const msg = fieldError.message;
-          processed.errorMessage = { text: String(msg) };
+          processed.errorMessage = { text: t(fieldError.message) };
         }
 
-        // Translate labels, hints, and options (safe property access)
-        processed.label = typedFieldConfig.label
-          ? translations[typedFieldConfig.label as string] || typedFieldConfig.label
-          : undefined;
-        processed.hint = typedFieldConfig.hint
-          ? translations[typedFieldConfig.hint as string] || typedFieldConfig.hint
-          : undefined;
+        // Translate label
+        if (typedFieldConfig.label && typeof typedFieldConfig.label === 'object') {
+          const newLabel = { ...(typedFieldConfig.label as Record<string, unknown>) };
+          if (typeof newLabel.text === 'string') {
+            newLabel.text = t(newLabel.text);
+          }
+          if (typeof newLabel.html === 'string') {
+            newLabel.html = t(newLabel.html);
+          }
+          processed.label = newLabel;
+        } else if (typeof typedFieldConfig.label === 'string') {
+          processed.label = { text: t(typedFieldConfig.label) };
+        }
 
-        // Handle value property for applicable field types
+        // Translate hint
+        if (typedFieldConfig.hint && typeof typedFieldConfig.hint === 'object') {
+          const newHint = { ...(typedFieldConfig.hint as Record<string, unknown>) };
+          if (typeof newHint.text === 'string') {
+            newHint.text = t(newHint.text);
+          }
+          if (typeof newHint.html === 'string') {
+            newHint.html = t(newHint.html);
+          }
+          processed.hint = newHint;
+        } else if (typeof typedFieldConfig.hint === 'string') {
+          processed.hint = { text: t(typedFieldConfig.hint) };
+        }
+
+        // Translate fieldset.legend.{text|html}
+        if (typedFieldConfig.fieldset?.legend) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const legend = typedFieldConfig.fieldset.legend as any;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const newLegend: any = { ...legend };
+          if (typeof newLegend.text === 'string') {
+            newLegend.text = t(newLegend.text);
+          }
+          if (typeof newLegend.html === 'string') {
+            newLegend.html = t(newLegend.html);
+          }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          processed.fieldset = { ...(typedFieldConfig.fieldset as any), legend: newLegend };
+        }
+
+        // Handle values and options
         switch (typedFieldConfig.type) {
           case 'text':
           case 'email':
@@ -473,9 +528,10 @@ export class WizardEngine {
           case 'password':
           case 'number':
           case 'textarea': {
-            processed.value = typeof fieldValue === 'string' || typeof fieldValue === 'number' ? fieldValue : ''; // Default to an empty string if not of correct type
+            processed.value = typeof fieldValue === 'string' || typeof fieldValue === 'number' ? fieldValue : '';
             break;
           }
+
           case 'radios':
           case 'checkboxes':
           case 'select': {
@@ -484,34 +540,34 @@ export class WizardEngine {
               | { value: string; text?: string; html?: string; label?: string; classes?: string }
             )[];
 
-            const items = baseOptions.map(option => {
-              if (typeof option === 'string') {
-                return { value: option, text: translations[option] || option }; // Ensure each option has a 'value'
-              } else {
-                return {
-                  ...option,
-                  text: translations[option.text as string] || option.text, // Ensure 'text' is translated
-                };
-              }
-            });
+            const items = baseOptions.map(opt =>
+              typeof opt === 'string'
+                ? { value: opt, text: t(opt) }
+                : { ...opt, text: typeof opt.text === 'string' ? t(opt.text) : opt.text }
+            );
 
-            // For selects add default prompt if author didn't supply one
-            if (typedFieldConfig.type === 'select' && !(typedFieldConfig.items && typedFieldConfig.items.length)) {
-              items.unshift({ value: '', text: translations['chooseOption'] || 'Choose an option' });
+            // For selects, add default prompt only if author didn't provide one with empty value
+            if (typedFieldConfig.type === 'select') {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const hasPrompt = items.length > 0 && items[0] && (items[0] as any).value === '';
+              if (!hasPrompt) {
+                items.unshift({ value: '', text: t('chooseOption') || 'Choose an option' });
+              }
             }
 
             processed.items = items;
             break;
           }
+
           case 'date': {
             processed.items = dateItems[fieldName] ?? [];
-            processed.namePrefix = fieldName; // Add namePrefix for date fields
+            processed.namePrefix = fieldName;
             break;
           }
+
           case 'button': {
-            if (!processed.text) {
-              processed.text = translations['continue'] || 'Continue'; // Default to 'Continue' if no translation
-            }
+            // Translate provided text key or fallback to common.continue
+            processed.text = processed.text ? t(processed.text) : t('buttons.continue') || 'Continue';
             const existingAttrs = processed.attributes ?? {};
             processed.attributes = { type: 'submit', ...existingAttrs };
             break;
@@ -521,16 +577,16 @@ export class WizardEngine {
         processedFields[fieldName] = processed;
       }
 
-      step = { ...step, fields: processedFields } as StepConfig;
+      stepCopy = { ...stepCopy, fields: processedFields } as StepConfig;
     }
 
     return {
       caseId,
-      step,
+      step: stepCopy,
       data,
       allData,
       errors,
-      errorSummary: processErrorsForTemplate(errors, step),
+      errorSummary: processErrorsForTemplate(errors, stepCopy),
       previousStepUrl,
       summaryRows,
       translations,

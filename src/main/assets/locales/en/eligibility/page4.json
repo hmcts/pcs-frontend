@@ -1,0 +1,32 @@
+{
+  "page4": {
+    "title": "Enter your personal details",
+    "fields": {
+      "title": {
+        "label": "Title",
+        "items": {
+          "mr": "Mr",
+          "ms": "Ms",
+          "miss": "Miss",
+          "mrs": "Mrs"
+        }
+      },
+      "firstName": {
+        "label": "First name",
+        "title": "First name"
+      },
+      "lastName": {
+        "label": "Last name",
+        "title": "Last name"
+      }
+    },
+    "errors": {
+      "firstName": {
+        "required": "Enter a first name"
+      },
+      "lastName": {
+        "required": "Enter a last name"
+      }
+    }
+  }
+}

@@ -14,17 +14,5 @@
   "change": "Change",
   "defaultRequired": "This field is required",
   "defaultInvalid": "Invalid format",
-  "back": "Back",
-  "startPage": {
-    "title": "Before you start",
-    "description": "We're building a new service. Different designs are being tested and changed based on feedback from users.",
-    "eligibilityText": "You'll be asked some questions to check you're eligible to use this service.",
-    "whatYouNeedTitle": "What you'll need",
-    "whatYouNeedText": "To make your claim, you'll need the following information to hand:",
-    "needNoticeInfo": "Information about the type of notice you've given and when it was given (if applicable)",
-    "needPropertyInfo": "Details about the property you'd like to claim possession of",
-    "needDefendantInfo": "The defendants' details (if known)",
-    "needGroundsInfo": "Your grounds for possession and details about your reasons for making a possession claim",
-    "needDocuments": "Copies of relevant documents"
-  }
+  "back": "Back"
 }

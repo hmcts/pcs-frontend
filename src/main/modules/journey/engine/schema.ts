@@ -11,6 +11,7 @@ const logger = Logger.getLogger('journey-engine-schema');
 const ErrorMessagesSchema = z
   .object({
     required: z.string().optional(),
+    invalid: z.string().optional(),
     missingParts: z.custom<(missing: string[]) => string>().optional(),
     invalidPart: z.custom<(field: string) => string>().optional(),
     notRealDate: z.string().optional(),
