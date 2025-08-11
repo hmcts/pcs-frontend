@@ -888,10 +888,11 @@ export class WizardEngine {
     // Add route to start a new journey (creates caseId in the session and redirects to first step)
     router.get('/', (req, res) => {
       getOrCreateCaseId(req);
+      const lang = req.body?.lang || req.query?.lang || 'en';
       const firstStepId = Object.keys(this.journey.steps)[0];
       const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
       if (validatedFirstStepId) {
-        res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}`);
+        res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}?lang=${lang}`);
       } else {
         this.logger.error('Critical error: No valid step IDs found in journey configuration');
         res.status(500).send('Internal server error');
@@ -915,8 +916,7 @@ export class WizardEngine {
       step = await this.applyLdOverride(step, req);
       step = await this.applyLaunchDarklyFlags(step, req);
 
-      const lang = req.body?.lang || req.query?.lang || 'en'; // Extract the language parameter
-
+      const lang = req.body?.lang || req.query?.lang || 'en';
       try {
         const { data } = await this.store.load(req, caseId);
 
@@ -942,14 +942,14 @@ export class WizardEngine {
           // Redirect to the first incomplete step
           const validatedFirstIncompleteStep = this.validateStepIdForRedirect(firstIncompleteStep);
           if (validatedFirstIncompleteStep) {
-            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstIncompleteStep)}`);
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstIncompleteStep)}?lang=${lang}`);
           }
           // If validation fails, redirect to the first step in the journey
           const firstStepId = Object.keys(this.journey.steps)[0];
           const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
           if (validatedFirstStepId) {
             this.logger.warn(`Invalid first incomplete step ID for redirect: ${firstIncompleteStep}`);
-            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}`);
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}?lang=${lang}`);
           }
           // If even the first step is invalid, this is a critical error
           this.logger.error('Critical error: No valid step IDs found in journey configuration');
@@ -962,7 +962,7 @@ export class WizardEngine {
         const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
         context = {
           ...context,
-          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
+          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}?lang=${lang}` : null,
         };
 
         const templatePath = await this.resolveTemplatePath(step.id);
@@ -971,7 +971,7 @@ export class WizardEngine {
         // Render the template with lang included
         res.render(safeTemplate, {
           ...context,
-          lang: res.locals.lang, // Pass the language to template
+          lang: res.locals.lang,
           data: context.data,
           errors: null,
           allData: context.allData,
@@ -1020,7 +1020,7 @@ export class WizardEngine {
         const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
         return res.status(400).render(postTemplatePath, {
           ...context,
-          lang: res.locals.lang, // Pass the language to template for POST request
+          lang: res.locals.lang,
           errors: validationResult.errors,
         });
       }
@@ -1044,7 +1044,7 @@ export class WizardEngine {
 
         const validatedNextId = this.validateStepIdForRedirect(nextId);
         if (validatedNextId) {
-          res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}`);
+          res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${lang}`);
         } else {
           this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
           res.status(500).send('Internal server error');
