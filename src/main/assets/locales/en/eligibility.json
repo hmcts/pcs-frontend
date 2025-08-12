@@ -116,5 +116,11 @@
     "helpLinkText": "Find legal advice and support",
     "helpLinkHref": "#",
     "exit": "Exit"
+  },
+  "ineligible": {
+    "title": "You are not eligible to make a claim",
+    "reason": "You need to be 18 or over to make a possession claim.",
+    "changeAnswer": "If you think this is incorrect, you can go back and change your answer.",
+    "exit": "Exit application"
   }
 }

@@ -103,18 +103,24 @@
     "submit": "cySubmit"
   },
   "confirmation": {
-    "title": "Application complete",
+    "title": "cyApplication complete",
     "panel": {
-      "refLabel": "Your reference number",
-      "pending": "PCR-PENDING"
+      "refLabel": "cyYour reference number",
+      "pending": "cyPCR-PENDING"
     },
-    "sentEmail": "We have sent you a confirmation email.",
-    "whatNextTitle": "What happens next",
-    "whatNext1": "Your possession claim will be reviewed by the court.",
-    "whatNext2": "You will be contacted within 5 working days with next steps.",
-    "helpTitle": "Help and support",
-    "helpLinkText": "Find legal advice and support",
+    "sentEmail": "cyWe have sent you a confirmation email.",
+    "whatNextTitle": "cyWhat happens next",
+    "whatNext1": "cyYour possession claim will be reviewed by the court.",
+    "whatNext2": "cyYou will be contacted within 5 working days with next steps.",
+    "helpTitle": "cyHelp and support",
+    "helpLinkText": "cyFind legal advice and support",
     "helpLinkHref": "#",
-    "exit": "Exit"
+    "exit": "cyExit"
+  },
+  "ineligible": {
+    "title": "cyYou are not eligible to make a claim",
+    "reason": "cyYou need to be 18 or over to make a possession claim.",
+    "changeAnswer": "cyIf you think this is incorrect, you can go back and change your answer.",
+    "exit": "cyExit application"
   }
 }
