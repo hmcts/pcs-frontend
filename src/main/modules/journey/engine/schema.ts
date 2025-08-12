@@ -444,7 +444,8 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     }
 
     case 'email': {
-      let schema = z.email({ message: getMessage('email') });
+      const message = getMessage('email') ?? 'errors.email.invalid';
+      let schema = z.email({ message });
       if (rules?.minLength !== undefined) {
         schema = schema.min(rules.minLength, { message: getMessage('minLength') });
       }
@@ -472,14 +473,32 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         .filter(v => v !== '' && v !== null && v !== undefined) as string[];
 
       if (allowed.length === 0) {
-        // Fallback to simple string validation if no options found
-        return z.string();
+        let schema = z.string();
+        if (rules?.required === true) {
+          schema = schema.min(1, { message: getMessage('required') ?? 'errors.required' });
+        }
+        return schema;
       }
 
-      // z.enum requires tuple type; assert non-empty
-      const enumSchema = z.enum(allowed as [string, ...string[]]);
+      let schema = z.string();
 
-      return rules?.required === false ? enumSchema.optional() : enumSchema;
+      if (rules?.required === true) {
+        schema = schema.min(1, { message: getMessage('required') ?? 'errors.required' });
+      }
+
+      schema = schema.refine(
+        val => {
+          if (val === '' || val === null) {
+            return rules?.required !== true;
+          }
+          return allowed.includes(val);
+        },
+        {
+          message: getMessage('invalid') ?? 'errors.select.invalid',
+        }
+      );
+
+      return schema;
     }
 
     case 'checkboxes': {

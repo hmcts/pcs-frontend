@@ -10,18 +10,18 @@ const step: StepDraft = {
       hint: { text: 'page5.fields.date.hint' },
       validate: { required: true },
       errorMessages: {
-        required: 'page5.errors.date.required',
-        notRealDate: 'page5.errors.date.notRealDate',
+        required: 'errors.date.required',
+        notRealDate: 'errors.date.notRealDate',
         invalidPart: (field: string) => {
           switch (field) {
             case 'day':
-              return 'page5.errors.date.invalidDay';
+              return 'errors.date.invalidDay';
             case 'month':
-              return 'page5.errors.date.invalidMonth';
+              return 'errors.date.invalidMonth';
             case 'year':
-              return 'page5.errors.date.invalidYear';
+              return 'errors.date.invalidYear';
             default:
-              return 'page5.errors.date.invalidValue';
+              return 'errors.date.invalidValue';
           }
         },
       },
@@ -31,8 +31,8 @@ const step: StepDraft = {
       label: { text: 'page5.fields.email.label' },
       validate: { required: true, email: true },
       errorMessages: {
-        required: 'page5.errors.email.required',
-        invalid: 'page5.errors.email.invalid',
+        required: 'errors.email.required',
+        invalid: 'errors.email.invalid',
       },
     },
     continueButton: {

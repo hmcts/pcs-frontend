@@ -14,6 +14,10 @@ const step: StepDraft = {
         { value: 'Miss', text: 'page4.fields.title.items.miss' },
         { value: 'Mrs', text: 'page4.fields.title.items.mrs' },
       ],
+      validate: {
+        required: true,
+        customMessage: 'page4.errors.title.required',
+      },
     },
     firstName: {
       type: 'text',

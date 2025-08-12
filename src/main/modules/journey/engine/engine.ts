@@ -601,7 +601,7 @@ export class WizardEngine {
       data,
       allData,
       errors,
-      errorSummary: processErrorsForTemplate(errors, stepCopy),
+      errorSummary: processErrorsForTemplate(errors, stepCopy, t),
       previousStepUrl,
       summaryRows,
       translations,

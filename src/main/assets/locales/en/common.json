@@ -14,5 +14,24 @@
   "change": "Change",
   "defaultRequired": "This field is required",
   "defaultInvalid": "Invalid format",
-  "back": "Back"
+  "back": "Back",
+  "errors": {
+    "title": "There is a problem",
+    "required": "Enter a value",
+    "email": {
+      "required": "Enter an email address",
+      "invalid": "Enter an email address in the correct format, like name@example.com"
+    },
+    "select": {
+      "invalid": "Select a valid option"
+    },
+    "date": {
+      "required": "Enter a date",
+      "notRealDate": "Enter a valid date",
+      "invalidDay": "Enter a valid day",
+      "invalidMonth": "Enter a valid month",
+      "invalidYear": "Enter a valid year",
+      "invalidValue": "Enter a valid value"
+    }
+  }
 }

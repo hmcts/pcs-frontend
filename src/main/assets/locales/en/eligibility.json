@@ -63,6 +63,9 @@
       }
     },
     "errors": {
+      "title": {
+        "required": "Title is required"
+      },
       "firstName": {
         "required": "Enter a first name"
       },

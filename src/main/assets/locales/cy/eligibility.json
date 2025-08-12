@@ -63,6 +63,9 @@
       }
     },
     "errors": {
+      "title": {
+        "required": "cyTitle is required"
+      },
       "firstName": {
         "required": "cyEnter a first name"
       },

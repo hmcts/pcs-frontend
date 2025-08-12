@@ -14,5 +14,24 @@
   "change": "cyChange",
   "defaultRequired": "cyThis field is required",
   "defaultInvalid": "cyInvalid format",
-  "back": "cyBack"
+  "back": "cyBack",
+  "errors": {
+    "title": "cyThere is a problem",
+    "required": "cyEnter a value",
+    "email": {
+      "required": "cyEnter an email address",
+      "invalid": "cyEnter an email address in the correct format, like name@example.com"
+    },
+    "select": {
+      "invalid": "cySelect a valid option"
+    },
+    "date": {
+      "required": "cyEnter a date",
+      "notRealDate": "cyEnter a valid date",
+      "invalidDay": "cyEnter a valid day",
+      "invalidMonth": "cyEnter a valid month",
+      "invalidYear": "cyEnter a valid year",
+      "invalidValue": "cyEnter a valid value"
+    }
+  }
 }
