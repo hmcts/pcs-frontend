@@ -47,25 +47,6 @@ withPipeline(type, product, component) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       }
     }
-    afterSuccess('functionalTest:preview') {
-      stage('Accessibility Test - preview') {
-        try {
-          yarnBuilder.yarn('test:accessibility')
-        } catch (Error) {
-          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-        } finally {
-          publishHTML([
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "allure-report",
-            reportFiles          : 'index.html',
-            reportName           : 'Accessibility Test Report'
-          ])
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
-        }
-      }
-    }
   }
 
   onMaster() {
@@ -83,25 +64,6 @@ withPipeline(type, product, component) {
         ])
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      }
-    }
-    afterSuccess('functionalTest:aat') {
-      stage('Accessibility Test - aat') {
-        try {
-          yarnBuilder.yarn('test:accessibility')
-        } catch (Error) {
-          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-        } finally {
-          publishHTML([
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "allure-report",
-            reportFiles          : 'index.html',
-            reportName           : 'Accessibility Test Report'
-          ])
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesAccessibility/*'
-        }
       }
     }
   }
