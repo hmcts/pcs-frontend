@@ -8,34 +8,34 @@
   {% if allData.confirmation and allData.confirmation.referenceNumber %}
     {% set referenceNumber = allData.confirmation.referenceNumber %}
   {% else %}
-    {% set referenceNumber = translations.eligibility.confirmation.panel.pending %}
+    {% set referenceNumber = translations.confirmation.panel.pending %}
   {% endif %}
 
   {{ govukPanel({
     titleText: step.title,
     html:
-      translations.eligibility.confirmation.panel.refLabel
+      translations.confirmation.panel.refLabel
       ~ "<br><strong>"
       ~ referenceNumber
       ~ "</strong>"
   }) }}
 
-  <p class="govuk-body">{{ translations.eligibility.confirmation.sentEmail }}</p>
+  <p class="govuk-body">{{ translations.confirmation.sentEmail }}</p>
 
-  <h2 class="govuk-heading-m">{{ translations.eligibility.confirmation.whatNextTitle }}</h2>
-  <p class="govuk-body">{{ translations.eligibility.confirmation.whatNext1 }}</p>
-  <p class="govuk-body">{{ translations.eligibility.confirmation.whatNext2 }}</p>
+  <h2 class="govuk-heading-m">{{ translations.confirmation.whatNextTitle }}</h2>
+  <p class="govuk-body">{{ translations.confirmation.whatNext1 }}</p>
+  <p class="govuk-body">{{ translations.confirmation.whatNext2 }}</p>
 
-  <h2 class="govuk-heading-m">{{ translations.eligibility.confirmation.helpTitle }}</h2>
+  <h2 class="govuk-heading-m">{{ translations.confirmation.helpTitle }}</h2>
   <p class="govuk-body">
-    <a href="{{ translations.eligibility.confirmation.helpLinkHref }}" class="govuk-link">
-      {{ translations.eligibility.confirmation.helpLinkText }}
+    <a href="{{ translations.confirmation.helpLinkHref }}" class="govuk-link">
+      {{ translations.confirmation.helpLinkText }}
     </a>
   </p>
 
   <div class="govuk-button-group">
     {{ govukButton({
-      text: translations.eligibility.confirmation.exit,
+      text: translations.confirmation.exit,
       href: "/?lang=" ~ lang,
       classes: "govuk-button--secondary"
     }) }}
