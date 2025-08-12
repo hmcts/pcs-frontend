@@ -20,7 +20,7 @@ interface CustomSessionData extends SessionData {
   ccdCase?: CcdCase;
   postcodeLookupResult?: any[];
   lookupPostcode?: string;
-  lookupError?: string;
+  lookupError?: { field: string; text: string };
   destroy(callback: (err?: Error) => void): void;
 }
 

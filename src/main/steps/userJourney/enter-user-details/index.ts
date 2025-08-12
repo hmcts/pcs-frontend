@@ -14,20 +14,23 @@ const generateContent = (lang = 'en'): TranslationContent => {
   return loadTranslations(lang, ['common', 'userJourney/enterUserDetails']);
 };
 
-const getFields = (t: TranslationContent): FormFieldConfig[] => [
-  {
-    name: 'applicantForename',
-    type: 'text',
-    required: true,
-    errorMessage: t['errors.firstName'],
-  },
-  {
-    name: 'applicantSurname',
-    type: 'text',
-    required: true,
-    errorMessage: t['errors.lastName'],
-  },
-];
+const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
+  const errors = t.errors || {};
+  return [
+    {
+      name: 'applicantForename',
+      type: 'text',
+      required: true,
+      errorMessage: errors.firstName,
+    },
+    {
+      name: 'applicantSurname',
+      type: 'text',
+      required: true,
+      errorMessage: errors.lastName,
+    },
+  ];
+};
 
 export const step: StepDefinition = {
   url: '/steps/user-journey/enter-user-details',
@@ -54,9 +57,7 @@ export const step: StepDefinition = {
       const lang = req.query.lang?.toString() || 'en';
       const content = generateContent(lang);
       const fields = getFields(content);
-
       const errors = validateForm(req, fields, content);
-
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
         return res.status(400).render('steps/userJourney/enterUserDetails.njk', {
