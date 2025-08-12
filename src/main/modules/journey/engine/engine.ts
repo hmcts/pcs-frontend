@@ -237,19 +237,20 @@ export class WizardEngine {
   }
 
   // Build summary rows for summary pages
-  private buildSummaryRows(allData: Record<string, unknown>): SummaryRow[] {
+  private buildSummaryRows(
+    allData: Record<string, unknown>,
+    t: (key: unknown) => string,
+    currentLang?: string
+  ): SummaryRow[] {
     return Object.entries(this.journey.steps)
       .filter(([stepId, stepConfig]) => {
         const typedStepConfig = stepConfig as StepConfig;
-        // Skip summary and confirmation steps
         if (typedStepConfig.type === 'summary' || typedStepConfig.type === 'confirmation') {
           return false;
         }
-        // Skip steps without fields
         if (!typedStepConfig.fields || Object.keys(typedStepConfig.fields).length === 0) {
           return false;
         }
-        // Skip steps without data
         const stepData = allData[stepId] as Record<string, unknown>;
         return stepData && Object.keys(stepData).length > 0;
       })
@@ -257,23 +258,25 @@ export class WizardEngine {
         const typedStepConfig = stepConfig as StepConfig;
         const stepData = allData[stepId] as Record<string, unknown>;
 
-        // Determine label to use for the summary row. If any field within this step has
-        // a legend marked `isPageHeading: true` prefer that legend text over the step
-        // title. This allows authors to rely on the GOV.UK Design System convention of
-        // promoting a fieldset legend to the page heading instead of duplicating the
-        // text in the step title.
-        let rowLabel: string = typedStepConfig.title || stepId;
+        // Work out the row label; prefer a page-heading legend if present
+        let rowLabel: string = (typedStepConfig.title as string) || stepId;
         if (typedStepConfig.fields) {
           for (const fieldCfg of Object.values(typedStepConfig.fields)) {
-            // fieldCfg.fieldset?.legend may be a string or an object. Only objects can
-            // have the `isPageHeading` boolean flag so we narrow the type accordingly.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const legend = (fieldCfg as FieldConfig).fieldset?.legend as any;
             if (legend && typeof legend === 'object' && legend.isPageHeading) {
-              rowLabel = legend.text ?? legend.html ?? rowLabel;
+              const raw =
+                (typeof legend.text === 'string' && legend.text) ||
+                (typeof legend.html === 'string' && legend.html) ||
+                rowLabel;
+              rowLabel = typeof raw === 'string' ? t(raw) : rowLabel;
               break;
             }
           }
+        }
+        // If rowLabel is a key, translate it too
+        if (typeof rowLabel === 'string') {
+          rowLabel = t(rowLabel);
         }
 
         const fieldValues = Object.entries(typedStepConfig.fields!)
@@ -281,6 +284,7 @@ export class WizardEngine {
           .map(([fieldName, fieldConfig]) => {
             const typedFieldConfig = fieldConfig as FieldConfig;
             const value = stepData[fieldName];
+
             if (
               typedFieldConfig.type === 'date' &&
               value &&
@@ -293,12 +297,9 @@ export class WizardEngine {
               const dTrim = day?.trim() ?? '';
               const mTrim = month?.trim() ?? '';
               const yTrim = year?.trim() ?? '';
-
-              // If all parts empty, treat value as empty
               if (!dTrim && !mTrim && !yTrim) {
                 return '';
               }
-
               const dt = DateTime.fromObject({
                 day: Number(dTrim),
                 month: Number(mTrim),
@@ -306,25 +307,37 @@ export class WizardEngine {
               });
               return dt.isValid ? dt.toFormat('d MMMM yyyy') : `${dTrim}/${mTrim}/${yTrim}`;
             }
+
             if (
               typedFieldConfig.type === 'checkboxes' ||
               typedFieldConfig.type === 'radios' ||
               typedFieldConfig.type === 'select'
             ) {
-              // return the text of the options that are selected
-
               const items = typedFieldConfig.items ?? typedFieldConfig.options;
               const selected = items
                 ?.filter(option => {
                   const optionValue = typeof option === 'string' ? option : option.value;
                   return (value as string[]).includes(optionValue) && optionValue !== '' && optionValue !== null;
                 })
-                .map(option => (typeof option === 'string' ? option : option.text))
+                .map(option => {
+                  if (typeof option === 'string') {
+                    // option is a key → translate
+                    return t(option);
+                  } else {
+                    // option.text might be a key → translate
+                    return typeof option.text === 'string' ? t(option.text) : option.text;
+                  }
+                })
                 .join(', ');
               return selected ?? '';
             }
+
             return Array.isArray(value) ? value.join(', ') : String(value);
           });
+
+        const href = currentLang
+          ? `${this.basePath}/${stepId}?lang=${encodeURIComponent(currentLang)}`
+          : `${this.basePath}/${stepId}`;
 
         return {
           key: { text: rowLabel },
@@ -332,9 +345,9 @@ export class WizardEngine {
           actions: {
             items: [
               {
-                href: `${this.basePath}/${stepId}`,
-                text: 'Change',
-                visuallyHiddenText: `${rowLabel.toLowerCase()}`,
+                href,
+                text: t('change') || 'Change',
+                visuallyHiddenText: rowLabel.toLowerCase(),
               },
             ],
           },
@@ -394,11 +407,11 @@ export class WizardEngine {
     errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
   ): JourneyContext & { dateItems?: Record<string, { name: string; classes: string; value: string }[]> } {
     const previousStepUrl = this.findPreviousStep(step.id, allData);
-    const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData) : undefined;
+
     const data = (allData[step.id] as Record<string, unknown>) || {};
 
     // Load translations for the current step and the common translations
-    const namespaces = ['common', `eligibility/${step.id}`]; // e.g. 'eligibility/page2'
+    const namespaces = ['common', 'eligibility'];
     const translations = loadTranslations(lang, namespaces) as Record<string, unknown>;
 
     // eslint-disable-next-line no-console
@@ -416,6 +429,8 @@ export class WizardEngine {
       const v = getPath(translations, key);
       return typeof v === 'string' ? v : key; // fallback to the key if missing
     };
+
+    const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData, t, lang) : undefined;
 
     // Build dateItems for all date fields
     const dateItems: Record<string, { name: string; classes: string; value: string }[]> = {};
@@ -605,43 +620,61 @@ export class WizardEngine {
     const stepConfig = this.journey.steps[stepId] as StepConfig;
     const stepData = allData[stepId] as Record<string, unknown>;
 
-    // If no data exists for the step, check if it has required fields
+    // If no data exists for the step, check if it has explicitly required fields
     if (!stepData) {
       if (!stepConfig.fields) {
-        return true; // No fields means no validation needed
+        return true;
       }
 
       const hasRequiredFields = Object.values(stepConfig.fields).some((field: FieldConfig) => {
-        // Skip button fields as they are not input fields
         if (field.type === 'button') {
           return false;
         }
-        // Fields are required by default unless explicitly set to false
-        return field.validate?.required !== false;
+        return field.validate?.required === true; // only explicitly required
       });
 
-      return !hasRequiredFields; // If no required fields, step is complete even with no data
+      return !hasRequiredFields;
     }
 
-    // If step has data, check that all required fields are present
+    // If step has data, check that all explicitly required fields are present
     if (stepConfig.fields) {
       for (const [fieldName, fieldConfig] of Object.entries(stepConfig.fields)) {
-        const typedFieldConfig = fieldConfig as FieldConfig;
-        // Skip button fields as they are not input fields
-        if (typedFieldConfig.type === 'button') {
+        const f = fieldConfig as FieldConfig;
+
+        // buttons don't gate progress
+        if (f.type === 'button') {
           continue;
         }
-        // Fields are required by default unless explicitly set to false
-        if (typedFieldConfig.validate?.required !== false) {
-          const fieldValue = stepData[fieldName];
 
-          // For date fields, check if all components are present
-          if (typedFieldConfig.type === 'date') {
-            const dateValue = fieldValue as { day?: string; month?: string; year?: string };
-            if (!dateValue || !dateValue.day || !dateValue.month || !dateValue.year) {
-              return false;
+        // only enforce when required is explicitly true
+        if (f.validate?.required === true) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const v = (stepData as any)[fieldName];
+
+          const isEmpty = () => {
+            switch (f.type) {
+              case 'date': {
+                const dv = v as { day?: string; month?: string; year?: string } | undefined;
+                return !dv || !dv.day || !dv.month || !dv.year;
+              }
+              case 'checkboxes':
+                return !Array.isArray(v) || v.length === 0;
+
+              case 'radios':
+              case 'select':
+                return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
+
+              case 'number':
+                // allow 0 as valid
+                return v === undefined || v === null || v === '';
+
+              default:
+                // text/email/tel/url/password/textarea/file etc.
+                return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
             }
-          } else if (!fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === '')) {
+          };
+
+          if (isEmpty()) {
             return false;
           }
         }

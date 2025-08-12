@@ -5,30 +5,25 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block content %}
-
-  {% if previousStepUrl %}
-    {{ govukBackLink({
-      text: "Back",
-      href: previousStepUrl
-    }) }}
+  {% if step.description %}
+    <span class="govuk-caption-l">{{ step.description }}</span>
   {% endif %}
 
   <h1 class="govuk-heading-l">{{ step.title }}</h1>
 
   {% if summaryRows and summaryRows | length > 0 %}
-    {{ govukSummaryList({
-      rows: summaryRows
-    }) }}
+    {{ govukSummaryList({ rows: summaryRows }) }}
   {% else %}
-    <p class="govuk-body">No information to display yet.</p>
+    <p class="govuk-body">{{ translations.summary.empty or "No information to display yet." }}</p>
   {% endif %}
 
-  <form method="post">
+  <form method="post" novalidate>
+    <input type="hidden" name="lang" value="{{ lang }}"/>
     <div class="govuk-button-group">
       {{ govukButton({
-        text: 'Submit',
+        text: translations.summary.submit or "Submit",
         attributes: { type: 'submit' }
       }) }}
     </div>
   </form>
-{% endblock %} 
+{% endblock %}

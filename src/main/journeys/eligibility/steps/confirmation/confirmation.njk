@@ -4,30 +4,41 @@
 
 {% block content %}
 
+  {# Work out the reference number first #}
+  {% if allData.confirmation and allData.confirmation.referenceNumber %}
+    {% set referenceNumber = allData.confirmation.referenceNumber %}
+  {% else %}
+    {% set referenceNumber = translations.eligibility.confirmation.panel.pending %}
+  {% endif %}
+
   {{ govukPanel({
     titleText: step.title,
-    html: "Your reference number<br><strong>" + (allData.confirmation.referenceNumber if allData.confirmation and allData.confirmation.referenceNumber else "PCR-PENDING") + "</strong>"
+    html:
+      translations.eligibility.confirmation.panel.refLabel
+      ~ "<br><strong>"
+      ~ referenceNumber
+      ~ "</strong>"
   }) }}
 
-  <p class="govuk-body">We have sent you a confirmation email.</p>
+  <p class="govuk-body">{{ translations.eligibility.confirmation.sentEmail }}</p>
 
-  <h2 class="govuk-heading-m">What happens next</h2>
-  
-  <p class="govuk-body">Your possession claim will be reviewed by the court.</p>
-  <p class="govuk-body">You will be contacted within 5 working days with next steps.</p>
+  <h2 class="govuk-heading-m">{{ translations.eligibility.confirmation.whatNextTitle }}</h2>
+  <p class="govuk-body">{{ translations.eligibility.confirmation.whatNext1 }}</p>
+  <p class="govuk-body">{{ translations.eligibility.confirmation.whatNext2 }}</p>
 
-  <h2 class="govuk-heading-m">Help and support</h2>
-  
+  <h2 class="govuk-heading-m">{{ translations.eligibility.confirmation.helpTitle }}</h2>
   <p class="govuk-body">
-    <a href="#" class="govuk-link">Find legal advice and support</a> if you need help with your possession claim.
+    <a href="{{ translations.eligibility.confirmation.helpLinkHref }}" class="govuk-link">
+      {{ translations.eligibility.confirmation.helpLinkText }}
+    </a>
   </p>
 
   <div class="govuk-button-group">
     {{ govukButton({
-      text: "Exit",
-      href: "/",
+      text: translations.eligibility.confirmation.exit,
+      href: "/?lang=" ~ lang,
       classes: "govuk-button--secondary"
     }) }}
   </div>
 
-{% endblock %} 
+{% endblock %}
