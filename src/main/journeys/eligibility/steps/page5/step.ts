@@ -10,7 +10,7 @@ const step: StepDraft = {
       hint: {
         text: 'Date of birth',
       },
-      validate: { required: true },
+      validate: { required: true, mustBePast: true },
       errorMessages: {
         required: 'Enter a date',
         notRealDate: 'Enter a valid date of birth',
@@ -33,7 +33,7 @@ const step: StepDraft = {
       label: {
         text: 'Email address',
       },
-      validate: { required: true, email: true },
+      validate: { required: true, email: true, customMessage: 'Enter a valid email address' },
     },
     continueButton: {
       type: 'button',

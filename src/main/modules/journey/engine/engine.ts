@@ -315,7 +315,11 @@ export class WizardEngine {
               const selected = items
                 ?.filter(option => {
                   const optionValue = typeof option === 'string' ? option : option.value;
-                  return (value as string[]).includes(optionValue) && optionValue !== '' && optionValue !== null;
+                  if (typedFieldConfig.type === 'checkboxes') {
+                    return Array.isArray(value) && (value as string[]).includes(optionValue);
+                  }
+                  // radios & select store single string value
+                  return value === optionValue;
                 })
                 .map(option => (typeof option === 'string' ? option : option.text))
                 .join(', ');
@@ -402,13 +406,18 @@ export class WizardEngine {
         if (typedFieldConfig.type === 'date') {
           const fieldValue = data[fieldName] as Record<'day' | 'month' | 'year', string | undefined>;
           const fieldError = errors && errors[fieldName];
+          const hasPartSpecificErrors = !!(
+            fieldError &&
+            typeof fieldError === 'object' &&
+            (fieldError.day || fieldError.month || fieldError.year)
+          );
+
           dateItems[fieldName] = (['day', 'month', 'year'] as ('day' | 'month' | 'year')[]).map(part => {
-            let hasError = false;
-            if (fieldError) {
-              if (typeof fieldError === 'object' && fieldError[part]) {
-                hasError = true;
-              }
-            }
+            const partHasError = !!(
+              fieldError &&
+              typeof fieldError === 'object' &&
+              (hasPartSpecificErrors ? fieldError[part] : true)
+            );
             // Name stays as day/month/year – macro will apply the field prefix.
             return {
               name: part,
@@ -417,7 +426,7 @@ export class WizardEngine {
                   ? 'govuk-input--width-2'
                   : part === 'month'
                     ? 'govuk-input--width-2'
-                    : 'govuk-input--width-4') + (hasError ? ' govuk-input--error' : ''),
+                    : 'govuk-input--width-4') + (partHasError ? ' govuk-input--error' : ''),
               value: fieldValue?.[part] || '',
             };
           });
