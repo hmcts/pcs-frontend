@@ -25,8 +25,8 @@ export default function registerSteps(app: Application): void {
           langCookie: req.cookies?.lang,
           langQuery: req.query?.lang,
           headers: {
-            'accept-language': req.headers?.['accept-language'] || undefined
-          }
+            'accept-language': req.headers?.['accept-language'] || undefined,
+          },
         });
 
         const controller = typeof step.getController === 'function' ? step.getController(lang) : step.getController;
@@ -41,6 +41,6 @@ export default function registerSteps(app: Application): void {
 
   logger.info('Steps registered successfully', {
     totalSteps: stepsWithContent.length,
-    protectedSteps: protectedSteps.length
+    protectedSteps: protectedSteps.length,
   });
 }

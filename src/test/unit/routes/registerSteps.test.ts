@@ -77,14 +77,14 @@ describe('registerSteps', () => {
 
   const findRouteHandler = (method: jest.Mock, url: string) => {
     const call = method.mock.calls.find(call => call[0] === url);
-    return call ? call[call.length - 1] as Function : null;
+    return call ? (call[call.length - 1] as Function) : null;
   };
 
   const createMockRequest = (url: string, additionalProps = {}) => ({
     url,
     query: { lang: 'cy' },
     headers: {},
-    ...additionalProps
+    ...additionalProps,
   });
 
   const createMockResponse = () => ({});
@@ -169,7 +169,7 @@ describe('registerSteps', () => {
     const additionalProps = {
       language: 'en',
       cookies: { lang: 'en' },
-      headers: { 'accept-language': 'en-GB' }
+      headers: { 'accept-language': 'en-GB' },
     };
 
     const { mockReq, mockRes } = executeHandler('/steps/unprotected', additionalProps);
@@ -182,7 +182,7 @@ describe('registerSteps', () => {
     const additionalProps = {
       language: 'en',
       cookies: { lang: 'en' },
-      headers: { 'accept-language': 'en-GB' }
+      headers: { 'accept-language': 'en-GB' },
     };
 
     executeHandler('/steps/unprotected', additionalProps);
@@ -195,8 +195,8 @@ describe('registerSteps', () => {
       langCookie: 'en',
       langQuery: 'cy',
       headers: {
-        'accept-language': 'en-GB'
-      }
+        'accept-language': 'en-GB',
+      },
     });
   });
 
@@ -205,7 +205,7 @@ describe('registerSteps', () => {
 
     expect(mockLogger.info).toHaveBeenCalledWith('Steps registered successfully', {
       totalSteps: 4,
-      protectedSteps: 1
+      protectedSteps: 1,
     });
   });
 
@@ -220,9 +220,9 @@ describe('registerSteps', () => {
         {
           url: '/steps/no-controllers',
           name: 'no-controllers',
-        }
+        },
       ],
-      protectedSteps: []
+      protectedSteps: [],
     }));
 
     jest.resetModules();
