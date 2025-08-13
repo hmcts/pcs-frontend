@@ -64,8 +64,8 @@ jest.mock('../../../main/steps', () => ({
 import { Application } from 'express';
 
 import registerSteps from '../../../main/routes/registerSteps';
+import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
 import { getValidatedLanguage } from '../../../main/utils/getValidatedLanguage';
-import { oidcMiddleware, ccdCaseMiddleware } from '../../../main/middleware';
 
 describe('registerSteps', () => {
   const mockGet = jest.fn();
