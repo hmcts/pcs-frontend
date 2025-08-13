@@ -7,8 +7,10 @@ const step: StepDraft = {
   fields: {
     date: {
       type: 'date',
-      hint: { text: 'page5.fields.date.hint' },
-      validate: { required: true },
+      hint: {
+        text: 'page5.fields.date.hint',
+      },
+      validate: { required: true, mustBePast: true },
       errorMessages: {
         required: 'errors.date.required',
         notRealDate: 'errors.date.notRealDate',
@@ -28,12 +30,10 @@ const step: StepDraft = {
     },
     email: {
       type: 'email',
-      label: { text: 'page5.fields.email.label' },
-      validate: { required: true, email: true },
-      errorMessages: {
-        required: 'errors.email.required',
-        invalid: 'errors.email.invalid',
+      label: {
+        text: 'page5.fields.email.label',
       },
+      validate: { required: true, email: true, customMessage: 'errors.email.invalid' },
     },
     continueButton: {
       type: 'button',
