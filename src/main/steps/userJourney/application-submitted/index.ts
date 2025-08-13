@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 
-import { createGetController } from 'app/controller/controllerFactory';
-import { TranslationContent, loadTranslations } from 'app/utils/loadTranslations';
+import { createGetController } from '../../../app/controller/controllerFactory';
+import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
