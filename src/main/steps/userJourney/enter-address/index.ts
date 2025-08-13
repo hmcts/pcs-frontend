@@ -1,13 +1,14 @@
 import type { Request, Response } from 'express';
 
-import { createGetController } from '../../../app/controller/controllerFactory';
-import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
-import { validateForm } from '../../../app/controller/validation';
-import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { createGetController } from 'app/controller/controllerFactory';
+import { getFormData, setFormData } from 'app/controller/sessionHelper';
+import { validateForm } from 'app/controller/validation';
+import { loadTranslations, TranslationContent } from 'app/utils/loadTranslations';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
+import { getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'enter-address';
 
@@ -69,7 +70,7 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       const { action, lookupPostcode, selectedAddressIndex } = req.body;
-      const lang = req.query.lang?.toString() || 'en';
+      const lang = getValidatedLanguage(req);
       const content = generateContent(lang);
 
       // 🔹 Handle Find Address
@@ -163,7 +164,7 @@ export const step: StepDefinition = {
         const user = req.session.user;
 
         if (ccdCase?.id && user?.accessToken) {
-          const updatedCase = await ccdCaseService.updateCase(user.accessToken, {
+          req.session.ccdCase = await ccdCaseService.updateCase(user.accessToken, {
             id: ccdCase.id,
             data: {
               ...ccdCase.data,
@@ -178,7 +179,6 @@ export const step: StepDefinition = {
               },
             },
           });
-          req.session.ccdCase = updatedCase;
         }
 
         return res.redirect(`/steps/user-journey/summary?lang=${lang}`);

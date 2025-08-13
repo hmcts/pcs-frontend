@@ -1,12 +1,13 @@
 import type { Request, Response } from 'express';
 
-import { createGetController } from '../../../app/controller/controllerFactory';
-import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
-import { validateForm } from '../../../app/controller/validation';
-import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { createGetController } from 'app/controller/controllerFactory';
+import { getFormData, setFormData } from 'app/controller/sessionHelper';
+import { validateForm } from 'app/controller/validation';
+import { loadTranslations, TranslationContent } from 'app/utils/loadTranslations';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
+import { getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'enter-user-details';
 
@@ -54,7 +55,7 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
-      const lang = req.query.lang?.toString() || 'en';
+      const lang = getValidatedLanguage(req);
       const content = generateContent(lang);
       const fields = getFields(content);
       const errors = validateForm(req, fields, content);
@@ -72,7 +73,7 @@ export const step: StepDefinition = {
       const user = req.session.user;
 
       if (ccdCase?.id) {
-        const updatedCase = await ccdCaseService.updateCase(user?.accessToken, {
+        req.session.ccdCase = await ccdCaseService.updateCase(user?.accessToken, {
           id: ccdCase.id,
           data: {
             ...ccdCase.data,
@@ -80,13 +81,11 @@ export const step: StepDefinition = {
             applicantSurname: req.body.applicantSurname,
           },
         });
-        req.session.ccdCase = updatedCase;
       } else {
-        const newCase = await ccdCaseService.createCase(user?.accessToken, {
+        req.session.ccdCase = await ccdCaseService.createCase(user?.accessToken, {
           applicantForename: req.body.applicantForename,
           applicantSurname: req.body.applicantSurname,
         });
-        req.session.ccdCase = newCase;
       }
 
       res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
