@@ -14,13 +14,14 @@
   "change": "cyChange",
   "defaultRequired": "cyThis field is required",
   "defaultInvalid": "cyInvalid format",
+  "chooseOption": "cyChoose an option",
   "back": "cyBack",
   "errors": {
     "title": "cyThere is a problem",
     "required": "cyEnter a value",
     "email": {
       "required": "cyEnter an email address",
-      "invalid": "cyEnter an email address in the correct format, like name@example.com"
+      "invalid": "cyEnter a valid email address"
     },
     "select": {
       "invalid": "cySelect a valid option"

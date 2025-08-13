@@ -14,13 +14,14 @@
   "change": "Change",
   "defaultRequired": "This field is required",
   "defaultInvalid": "Invalid format",
+  "chooseOption": "Choose an option",
   "back": "Back",
   "errors": {
     "title": "There is a problem",
     "required": "Enter a value",
     "email": {
       "required": "Enter an email address",
-      "invalid": "Enter an email address in the correct format, like name@example.com"
+      "invalid": "Enter a valid email address"
     },
     "select": {
       "invalid": "Select a valid option"

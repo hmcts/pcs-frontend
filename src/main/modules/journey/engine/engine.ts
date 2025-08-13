@@ -567,24 +567,52 @@ export class WizardEngine {
           case 'select': {
             const baseOptions = (typedFieldConfig.items ?? typedFieldConfig.options ?? []) as (
               | string
-              | { value: string; text?: string; html?: string; label?: string; classes?: string }
+              | Record<string, unknown>
             )[];
 
-            const items = baseOptions.map(opt =>
-              typeof opt === 'string'
-                ? { value: opt, text: t(opt) }
-                : { ...opt, text: typeof opt.text === 'string' ? t(opt.text) : opt.text }
-            );
+            const items = baseOptions.map(option => {
+              if (typeof option === 'string') {
+                // Translate the displayed text; value stays as the raw string
+                const obj = { value: option, text: t(option) } as Record<string, unknown>;
 
-            // For selects, add default prompt only if author didn't provide one with empty value
-            if (typedFieldConfig.type === 'select') {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const hasPrompt = items.length > 0 && items[0] && (items[0] as any).value === '';
-              if (!hasPrompt) {
-                items.unshift({ value: '', text: t('chooseOption') || 'Choose an option' });
+                if (typedFieldConfig.type === 'checkboxes') {
+                  obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(option);
+                } else if (typedFieldConfig.type === 'select') {
+                  obj['selected'] = fieldValue === option;
+                } else {
+                  obj['checked'] = fieldValue === option;
+                }
+                return obj;
+              } else {
+                // Copy existing option, and translate text/html if they are string keys
+                const obj = { ...option } as Record<string, unknown>;
+                const optVal = (option as Record<string, unknown>).value as string;
+
+                if (typeof obj.text === 'string') {
+                  obj.text = t(obj.text);
+                }
+                if (typeof obj.html === 'string') {
+                  obj.html = t(obj.html);
+                }
+
+                if (typedFieldConfig.type === 'checkboxes') {
+                  obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(optVal);
+                } else if (typedFieldConfig.type === 'select') {
+                  obj['selected'] = fieldValue === optVal;
+                } else {
+                  obj['checked'] = fieldValue === optVal;
+                }
+
+                return obj;
               }
+            });
+
+            // Keep EXACT original behaviour: only add a prompt when the author didn't supply items.
+            if (typedFieldConfig.type === 'select' && !(typedFieldConfig.items && typedFieldConfig.items.length)) {
+              items.unshift({ value: '', text: t('chooseOption') || 'Choose an option' });
             }
 
+            // @ts-expect-error value is not typed
             processed.items = items;
             break;
           }
