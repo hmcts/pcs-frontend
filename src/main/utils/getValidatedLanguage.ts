@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 
 export function getValidatedLanguage(req: Request): string {
+  const allowedLanguages = ['en', 'cy']; // Define allowed languages
   const langParam = req.query?.lang;
 
   let langValue: string | undefined;
@@ -10,5 +11,5 @@ export function getValidatedLanguage(req: Request): string {
     langValue = langParam[0];
   }
 
-  return langValue === 'cy' ? 'cy' : 'en'; // Default to 'en' for any other value can only be 'cy' or 'en' per requirements
+  return langValue && allowedLanguages.includes(langValue) ? langValue : 'en';
 }
