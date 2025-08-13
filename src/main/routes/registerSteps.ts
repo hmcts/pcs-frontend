@@ -1,5 +1,5 @@
-import { Application } from 'express';
 import { Logger } from '@hmcts/nodejs-logging';
+import { Application } from 'express';
 
 import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
 import { protectedSteps, stepsWithContent } from '../steps';

@@ -62,9 +62,10 @@ jest.mock('../../../main/steps', () => ({
 }));
 
 import { Application } from 'express';
+
+import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
 import registerSteps from '../../../main/routes/registerSteps';
 import { getValidatedLanguage } from '../../../main/utils/getValidatedLanguage';
-import { oidcMiddleware, ccdCaseMiddleware } from '../../../main/middleware';
 
 describe('registerSteps', () => {
   const mockGet = jest.fn();
@@ -112,7 +113,7 @@ describe('registerSteps', () => {
     const protectedGetCall = mockGet.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedGetCall).toBeDefined();
 
-    expect(protectedGetCall!.length).toBe(4);
+    expect(protectedGetCall!).toHaveLength(4);
     expect(protectedGetCall![0]).toBe('/steps/protected');
     expect(protectedGetCall![1]).toBe(oidcMiddleware);
     expect(protectedGetCall![2]).toBe(ccdCaseMiddleware);
@@ -120,7 +121,7 @@ describe('registerSteps', () => {
 
     const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedPostCall).toBeDefined();
-    expect(protectedPostCall!.length).toBe(4);
+    expect(protectedPostCall!).toHaveLength(4);
     expect(protectedPostCall![0]).toBe('/steps/protected');
     expect(protectedPostCall![1]).toBe(oidcMiddleware);
     expect(protectedPostCall![2]).toBe(ccdCaseMiddleware);
@@ -132,13 +133,13 @@ describe('registerSteps', () => {
 
     const unprotectedGetCall = mockGet.mock.calls.find(call => call[0] === '/steps/unprotected');
     expect(unprotectedGetCall).toBeDefined();
-    expect(unprotectedGetCall!.length).toBe(2);
+    expect(unprotectedGetCall!).toHaveLength(2);
     expect(unprotectedGetCall![0]).toBe('/steps/unprotected');
     expect(unprotectedGetCall![1]).toBeInstanceOf(Function);
 
     const unprotectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/unprotected');
     expect(unprotectedPostCall).toBeDefined();
-    expect(unprotectedPostCall!.length).toBe(2);
+    expect(unprotectedPostCall!).toHaveLength(2);
     expect(unprotectedPostCall![0]).toBe('/steps/unprotected');
     expect(unprotectedPostCall![1]).toBe(mockStepsData.unprotectedStep.postController.post);
   });
@@ -159,7 +160,7 @@ describe('registerSteps', () => {
     const stepWithMiddlewareCall = mockGet.mock.calls.find(call => call[0] === '/steps/with-middleware');
 
     expect(stepWithMiddlewareCall).toBeDefined();
-    expect(stepWithMiddlewareCall!.length).toBe(3);
+    expect(stepWithMiddlewareCall!).toHaveLength(3);
     expect(stepWithMiddlewareCall![0]).toBe('/steps/with-middleware');
     expect(stepWithMiddlewareCall![1]).toBe(mockStepsData.stepWithMiddleware.middleware![0]);
     expect(stepWithMiddlewareCall![2]).toBeInstanceOf(Function);
