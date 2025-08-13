@@ -407,19 +407,15 @@ export class WizardEngine {
     step: StepConfig,
     caseId: string,
     allData: Record<string, unknown>,
-    lang: string,
+    lang: string = 'en',
     errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
   ): JourneyContext & { dateItems?: Record<string, { name: string; classes: string; value: string }[]> } {
     const previousStepUrl = this.findPreviousStep(step.id, allData);
 
     const data = (allData[step.id] as Record<string, unknown>) || {};
-
     // Load translations for the current step and the common translations
     const namespaces = ['common', 'eligibility'];
     const translations = loadTranslations(lang, namespaces) as Record<string, unknown>;
-
-    // eslint-disable-next-line no-console
-    console.log('translation => ', translations);
 
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const getPath = (obj: unknown, path: string): unknown =>
