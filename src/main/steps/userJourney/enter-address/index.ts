@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { createGetController } from '../../../app/controller/controllerFactory';
 import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
 import { validateForm } from '../../../app/controller/validation';
-import { loadTranslations, TranslationContent } from '../../../app/utils/loadTranslations';
+import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';

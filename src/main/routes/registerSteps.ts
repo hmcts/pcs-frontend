@@ -1,8 +1,7 @@
 import { Application } from 'express';
 
-import { protectedSteps, stepsWithContent } from '../steps';
-
 import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
+import { protectedSteps, stepsWithContent } from '../steps';
 import { getValidatedLanguage } from '../utils/getValidatedLanguage';
 
 export default function registerSteps(app: Application): void {
