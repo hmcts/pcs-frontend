@@ -77,8 +77,8 @@ describe('registerSteps', () => {
   } as unknown as Application;
 
   const findRouteHandler = (method: jest.Mock, url: string) => {
-    const call = method.mock.calls.find(call => call[0] === url);
-    return call ? call[call.length - 1] as Function : null;
+    const routeCall = method.mock.calls.find(c => c[0] === url);
+    return routeCall ? routeCall[routeCall.length - 1] as (...args: any[]) => any : null;
   };
 
   const createMockRequest = (url: string, additionalProps = {}) => ({
