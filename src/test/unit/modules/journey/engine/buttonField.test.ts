@@ -1,5 +1,9 @@
 const { WizardEngine } = require('../../../../../main/modules/journey/engine/engine');
 
+jest.mock('../../../../../main/app/utils/loadTranslations', () => ({
+  loadTranslations: () => ({}), // empty map => keys don't resolve => t() returns the key
+}));
+
 describe('Button Field Type', () => {
   it('should process button fields with default text and attributes', () => {
     const journeyConfig = {

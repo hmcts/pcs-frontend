@@ -26,6 +26,10 @@ jest.mock('@launchdarkly/node-server-sdk', () => ({
   init: () => ({ variation: variationMock }),
 }));
 
+jest.mock('../../../../../main/app/utils/loadTranslations', () => ({
+  loadTranslations: () => ({}),
+}));
+
 const makeReq = () =>
   ({
     app: { locals: { launchDarklyClient: { variation: variationMock } } },
