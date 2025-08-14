@@ -386,7 +386,7 @@ describe('WizardEngine - buildJourneyContext', () => {
 
     const dobItems = (ctx.step.fields?.dob as unknown as FieldConfig).items;
     expect(dobItems).toHaveLength(3);
-    expect((ctx.step.fields?.submit as unknown as FieldConfig).text).toBe('Continue');
+    expect((ctx.step.fields?.submit as unknown as FieldConfig).text).toBe('buttons.continue');
   });
 
   it('resolveTemplatePath falls back to defaults & custom templates', async () => {

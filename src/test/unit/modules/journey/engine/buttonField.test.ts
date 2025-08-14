@@ -37,7 +37,7 @@ describe('Button Field Type', () => {
 
     expect(buttonField).toBeDefined();
     expect(buttonField?.type).toBe('button');
-    expect(buttonField?.text).toBe('Continue');
+    expect(buttonField?.text).toBe('buttons.continue');
     expect(buttonField?.attributes).toEqual({ type: 'submit' });
   });
 
