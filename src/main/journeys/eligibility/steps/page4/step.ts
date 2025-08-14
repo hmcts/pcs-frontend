@@ -24,7 +24,6 @@ const step: StepDraft = {
       label: { text: 'page4.fields.firstName.label' },
       validate: {
         required: true,
-        customMessage: 'page4.errors.firstName.required',
         minLength: 5,
         maxLength: 20,
         customMessage: 'page4.errors.firstName.required',

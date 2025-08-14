@@ -650,6 +650,7 @@ export class WizardEngine {
       previousStepUrl,
       summaryRows,
       translations,
+      dateItems,
     };
   }
 
