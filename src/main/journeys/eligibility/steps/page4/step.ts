@@ -25,6 +25,9 @@ const step: StepDraft = {
       validate: {
         required: true,
         customMessage: 'page4.errors.firstName.required',
+        minLength: 5,
+        maxLength: 20,
+        customMessage: 'page4.errors.firstName.required',
       },
     },
     lastName: {
@@ -32,6 +35,8 @@ const step: StepDraft = {
       label: { text: 'page4.fields.lastName.label' },
       validate: {
         required: true,
+        minLength: 5,
+        maxLength: 20,
         customMessage: 'page4.errors.lastName.required',
       },
     },

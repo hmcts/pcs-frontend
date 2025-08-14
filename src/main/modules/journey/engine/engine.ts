@@ -409,7 +409,9 @@ export class WizardEngine {
     allData: Record<string, unknown>,
     lang: string = 'en',
     errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
-  ): JourneyContext & { dateItems?: Record<string, { name: string; classes: string; value: string }[]> } {
+  ): JourneyContext & {
+    dateItems?: Record<string, { name: string; classes: string; value: string; attributes?: Record<string, string> }[]>;
+  } {
     const previousStepUrl = this.findPreviousStep(step.id, allData);
 
     const data = (allData[step.id] as Record<string, unknown>) || {};
@@ -433,7 +435,10 @@ export class WizardEngine {
     const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData, t, lang) : undefined;
 
     // Build dateItems for all date fields
-    const dateItems: Record<string, { name: string; classes: string; value: string }[]> = {};
+    const dateItems: Record<
+      string,
+      { name: string; classes: string; value: string; attributes?: Record<string, string> }[]
+    > = {};
     if (step.fields) {
       for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
         const typedFieldConfig = fieldConfig as FieldConfig;
@@ -462,6 +467,7 @@ export class WizardEngine {
                     ? 'govuk-input--width-2'
                     : 'govuk-input--width-4') + (partHasError ? ' govuk-input--error' : ''),
               value: fieldValue?.[part] || '',
+              attributes: part === 'year' ? { maxlength: '4' } : undefined,
             };
           });
         }

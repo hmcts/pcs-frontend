@@ -33,7 +33,13 @@ const step: StepDraft = {
       label: {
         text: 'page5.fields.email.label',
       },
-      validate: { required: true, email: true, customMessage: 'errors.email.invalid' },
+      validate: {
+        required: true,
+        email: true,
+        customMessage: 'errors.email.invalid',
+        minLength: 5,
+        maxLength: 20,
+      },
     },
     continueButton: {
       type: 'button',
