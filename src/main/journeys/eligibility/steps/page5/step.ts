@@ -33,7 +33,13 @@ const step: StepDraft = {
       label: {
         text: 'Email address',
       },
-      validate: { required: true, email: true, customMessage: 'Enter a valid email address' },
+      validate: {
+        required: true,
+        email: true,
+        customMessage: 'Enter a valid email address',
+        minLength: 5,
+        maxLength: 20,
+      },
     },
     continueButton: {
       type: 'button',

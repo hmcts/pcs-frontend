@@ -393,13 +393,18 @@ export class WizardEngine {
     caseId: string,
     allData: Record<string, unknown>,
     errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
-  ): JourneyContext & { dateItems?: Record<string, { name: string; classes: string; value: string }[]> } {
+  ): JourneyContext & {
+    dateItems?: Record<string, { name: string; classes: string; value: string; attributes?: Record<string, string> }[]>;
+  } {
     const previousStepUrl = this.findPreviousStep(step.id, allData);
     const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData) : undefined;
     const data = (allData[step.id] as Record<string, unknown>) || {};
 
     // Build dateItems for all date fields
-    const dateItems: Record<string, { name: string; classes: string; value: string }[]> = {};
+    const dateItems: Record<
+      string,
+      { name: string; classes: string; value: string; attributes?: Record<string, string> }[]
+    > = {};
     if (step.fields) {
       for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
         const typedFieldConfig = fieldConfig as FieldConfig;
@@ -428,6 +433,7 @@ export class WizardEngine {
                     ? 'govuk-input--width-2'
                     : 'govuk-input--width-4') + (partHasError ? ' govuk-input--error' : ''),
               value: fieldValue?.[part] || '',
+              attributes: part === 'year' ? { maxlength: '4' } : undefined,
             };
           });
         }
@@ -554,6 +560,7 @@ export class WizardEngine {
       errorSummary: processErrorsForTemplate(errors, step),
       previousStepUrl,
       summaryRows,
+      dateItems,
     };
   }
 

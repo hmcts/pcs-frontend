@@ -543,3 +543,87 @@ describe('WizardEngine - applyLaunchDarklyFlags', () => {
     expect(prev).toBeNull();
   });
 });
+
+describe('WizardEngine - date input attributes', () => {
+  const journeyConfig = {
+    meta: {
+      name: 'Date Test Journey',
+      description: 'Journey for testing date input attributes',
+      version: '1.0.0',
+    },
+    steps: {
+      start: {
+        id: 'start',
+        title: 'Date Input Test',
+        type: 'form',
+        fields: {
+          dateOfBirth: {
+            type: 'date',
+            fieldset: {
+              legend: { text: 'Date of birth', isPageHeading: true },
+            },
+            validate: { required: true },
+          },
+        },
+        next: 'confirmation',
+      },
+      confirmation: {
+        id: 'confirmation',
+        title: 'Complete',
+        type: 'confirmation',
+      },
+    },
+    config: { store: { type: 'memory' } },
+  } as const;
+
+  const engine = new WizardEngine(journeyConfig, 'date-test');
+
+  it('adds maxlength attribute to year input in date fields', () => {
+    const step = journeyConfig.steps.start;
+    const context = engine['buildJourneyContext'](step, 'test-case', {});
+
+    // Check that the date items are built correctly
+    expect(context.dateItems).toBeDefined();
+    expect(context.dateItems?.dateOfBirth).toBeDefined();
+
+    const dateItems = context.dateItems!.dateOfBirth;
+    expect(dateItems).toHaveLength(3);
+
+    // Check day input
+    expect(dateItems[0]).toEqual({
+      name: 'day',
+      classes: 'govuk-input--width-2',
+      value: '',
+    });
+
+    // Check month input
+    expect(dateItems[1]).toEqual({
+      name: 'month',
+      classes: 'govuk-input--width-2',
+      value: '',
+    });
+
+    // Check year input has maxlength attribute
+    expect(dateItems[2]).toEqual({
+      name: 'year',
+      classes: 'govuk-input--width-4',
+      value: '',
+      attributes: { maxlength: '4' },
+    });
+  });
+
+  it('renders maxlength attribute in processed fields for date inputs', () => {
+    const step = journeyConfig.steps.start;
+    const context = engine['buildJourneyContext'](step, 'test-case', {});
+
+    // Check that the processed fields include the date items with maxlength
+    expect(context.step.fields?.dateOfBirth).toBeDefined();
+    const dateField = context.step.fields!.dateOfBirth;
+
+    // Check that the items array includes the year with maxlength attribute
+    expect(dateField.items).toBeDefined();
+    const yearItem = dateField.items!.find((item: { name: string }) => item.name === 'year');
+    expect(yearItem).toBeDefined();
+    expect(yearItem!.attributes).toEqual({ maxlength: '4' });
+  });
+});
