@@ -24,8 +24,6 @@
       <span class="govuk-caption-l">{{ step.description }}</span>
     {% endif %}
 
-
-
     <form method="post" novalidate>
       <input type="hidden" name="lang" value="{{ lang }}"/>
       {% for fieldName, fieldConfig in step.fields %}
