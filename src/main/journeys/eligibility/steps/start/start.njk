@@ -1,4 +1,4 @@
-{% extends "stepsTemplate.njk" %}
+{% extends "journeyTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block content %}
@@ -29,7 +29,7 @@
     </li>
   </ul>
   
-  <form method="post">
+  <form method="post" novalidate>
     <div class="govuk-button-group">
       {{ govukButton({
         text: "Start",

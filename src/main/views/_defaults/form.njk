@@ -1,4 +1,4 @@
-{% extends "template.njk" %}
+{% extends "journeyTemplate.njk" %}
 
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
@@ -22,6 +22,10 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
+    {% if errorSummary %}
+      {{ govukErrorSummary(errorSummary) }}
+    {% endif %}
+    
     {% if step.title %}
       <h1 class="govuk-heading-l">{{ step.title }}</h1>
     {% endif %}
@@ -31,11 +35,8 @@
     {% endif %}
 
 
-    {% if errorSummary %}
-      {{ govukErrorSummary(errorSummary) }}
-    {% endif %}
 
-    <form method="post">
+    <form method="post" novalidate>
       {% for fieldName, fieldConfig in step.fields %}
         {% if fieldConfig.type in ['text', 'email', 'tel', 'password', 'url', 'number'] %}
           {{ govukInput(fieldConfig) }}
