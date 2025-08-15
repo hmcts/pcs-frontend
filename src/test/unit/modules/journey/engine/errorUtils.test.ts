@@ -39,6 +39,22 @@ describe('errorUtils', () => {
       expect(result?.errorList[0].href).toBe('#field1');
     });
 
+    it('should use -day suffix for date fields when anchor is not provided', () => {
+      const errors = {
+        dateOfBirth: { message: 'Enter a valid date of birth' },
+      };
+
+      const step = {
+        fields: {
+          dateOfBirth: { type: 'date' },
+        },
+      };
+
+      const result = errorUtils.processErrorsForTemplate(errors, step);
+
+      expect(result?.errorList[0].href).toBe('#dateOfBirth-day');
+    });
+
     it('should use provided anchor when available', () => {
       const errors = {
         field1: { message: 'Field 1 is required', anchor: 'custom-anchor' },
