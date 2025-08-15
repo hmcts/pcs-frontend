@@ -24,6 +24,8 @@ const step: StepDraft = {
       },
       validate: {
         required: true,
+        minLength: 5,
+        maxLength: 20,
         customMessage: 'Enter a first name',
       },
     },
@@ -34,6 +36,8 @@ const step: StepDraft = {
       },
       validate: {
         required: true,
+        minLength: 5,
+        maxLength: 20,
         customMessage: 'Enter a last name',
       },
     },
