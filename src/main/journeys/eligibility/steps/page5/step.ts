@@ -37,8 +37,6 @@ const step: StepDraft = {
         required: true,
         email: true,
         customMessage: 'errors.email.invalid',
-        minLength: 5,
-        maxLength: 20,
       },
     },
     continueButton: {
