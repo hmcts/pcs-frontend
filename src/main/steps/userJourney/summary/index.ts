@@ -5,6 +5,7 @@ import { TranslationContent, loadTranslations } from '../../../app/utils/loadTra
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';
+import { getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'summary';
 
@@ -34,7 +35,8 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       try {
-        const lang = req.query.lang?.toString() || 'en';
+        const lang = getValidatedLanguage(req);
+
         if (req.session.ccdCase && req.session.user) {
           await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
         }
