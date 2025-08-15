@@ -29,6 +29,6 @@ nodejs:
     PCS_API_URL: 'http://pcs-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     S2S_URL: 'http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     OIDC_REDIRECT_URI: 'https://pcs.{{ .Values.global.environment }}.platform.hmcts.net/oauth2/callback'
-    CCD_URL: 'http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
+    CCD_URL: 'https://ccd-data-store-api-pcs-api-pr-316.preview.platform.hmcts.net'
     OIDC_ISSUER: 'https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o'
     PCQ_URL: 'https://pcq.{{ .Values.global.environment }}.platform.hmcts.net'

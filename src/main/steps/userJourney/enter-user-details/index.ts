@@ -83,8 +83,8 @@ export const step: StepDefinition = {
         });
       } else {
         req.session.ccdCase = await ccdCaseService.createCase(user?.accessToken, {
-          applicantForename: req.body.applicantForename,
-          applicantSurname: req.body.applicantSurname,
+          // applicantForename: req.body.applicantForename,
+          // applicantSurname: req.body.applicantSurname,
         });
       }
 
