@@ -26,6 +26,10 @@ jest.mock('@launchdarkly/node-server-sdk', () => ({
   init: () => ({ variation: variationMock }),
 }));
 
+jest.mock('../../../../../main/app/utils/loadTranslations', () => ({
+  loadTranslations: () => ({}),
+}));
+
 const makeReq = () =>
   ({
     app: { locals: { launchDarklyClient: { variation: variationMock } } },
@@ -48,7 +52,7 @@ describe('WizardEngine - core utilities & validator', () => {
         title: 'Start',
         type: 'form',
         fields: {
-          field1: { type: 'text' },
+          field1: { type: 'text', validate: { required: true } },
         },
         next: 'mid',
       },
@@ -313,7 +317,8 @@ describe('WizardEngine - core utilities & validator', () => {
   });
 
   it('buildSummaryRows returns formatted data', () => {
-    const rows = engine['buildSummaryRows']({ start: { field1: 'abc' }, mid: { choice: 'y' } });
+    const noopT = (k: unknown) => (typeof k === 'string' ? k : String(k));
+    const rows = engine['buildSummaryRows']({ start: { field1: 'abc' }, mid: { choice: 'y' } }, noopT, 'en');
     expect(rows).toEqual(
       expect.arrayContaining([expect.objectContaining({ key: { text: 'Start' }, value: { text: 'abc' } })])
     );
@@ -374,13 +379,18 @@ describe('WizardEngine - buildJourneyContext', () => {
   const step = engine.journey.steps.start;
 
   it('buildJourneyContext processes complex fields', () => {
-    const ctx = engine['buildJourneyContext'](step, 'case-1', {
-      start: { dob: { day: '01', month: '02', year: '2000' }, gender: 'M', country: 'UK' },
-    });
+    const ctx = engine['buildJourneyContext'](
+      step,
+      'case-1',
+      {
+        start: { dob: { day: '01', month: '02', year: '2000' }, gender: 'M', country: 'UK' },
+      },
+      'en'
+    );
 
     const dobItems = (ctx.step.fields?.dob as unknown as FieldConfig).items;
     expect(dobItems).toHaveLength(3);
-    expect((ctx.step.fields?.submit as unknown as FieldConfig).text).toBe('Continue');
+    expect((ctx.step.fields?.submit as unknown as FieldConfig).text).toBe('buttons.continue');
   });
 
   it('resolveTemplatePath falls back to defaults & custom templates', async () => {
@@ -434,10 +444,15 @@ describe('WizardEngine - buildSummaryRows', () => {
   const engine = new WizardEngine(journey, 'extra');
 
   it('buildSummaryRows formats date & checkbox values', () => {
-    const rows = engine['buildSummaryRows']({
-      start: { name: 'Alice' },
-      details: { dob: { day: '01', month: '02', year: '2000' }, pets: ['Dog', 'Cat'] },
-    });
+    const noopT = (k: unknown) => (typeof k === 'string' ? k : String(k));
+    const rows = engine['buildSummaryRows'](
+      {
+        start: { name: 'Alice' },
+        details: { dob: { day: '01', month: '02', year: '2000' }, pets: ['Dog', 'Cat'] },
+      },
+      noopT,
+      'en'
+    );
     expect(rows.length).toBeGreaterThanOrEqual(2);
     const combinedTexts = rows.map((r: unknown) => (r as { value: { text: string } }).value.text).join(' ');
     expect(combinedTexts).toContain('1 February 2000');
@@ -522,7 +537,8 @@ describe('WizardEngine - applyLaunchDarklyFlags', () => {
   });
 
   it('buildSummaryRows prefers fieldset legend when isPageHeading true', () => {
-    const rows = engine['buildSummaryRows']({ start: { name: 'Alice' } });
+    const noopT = (k: unknown) => (typeof k === 'string' ? k : String(k));
+    const rows = engine['buildSummaryRows']({ start: { name: 'Alice' } }, noopT, 'en');
     expect(rows[0].key.text).toBe('Your name');
   });
 

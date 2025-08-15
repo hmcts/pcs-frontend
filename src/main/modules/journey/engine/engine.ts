@@ -3,9 +3,10 @@ import path from 'path';
 
 import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
-import express, { NextFunction, Request, Response, Router } from 'express';
+import express, { Express, NextFunction, Request, Response, Router } from 'express';
 import { DateTime } from 'luxon';
 
+import { loadTranslations } from '../../../app/utils/loadTranslations';
 import { oidcMiddleware } from '../../../middleware/oidc';
 import { TTLCache } from '../../../utils/ttlCache';
 
@@ -29,6 +30,7 @@ interface JourneyContext {
   errorSummary?: { titleText: string; errorList: { text: string; href: string }[] } | null;
   previousStepUrl?: string | null;
   summaryRows?: SummaryRow[];
+  translations: Record<string, unknown>;
 }
 
 interface SummaryRow {
@@ -57,7 +59,7 @@ export class WizardEngine {
 
   logger = Logger.getLogger('WizardEngine');
 
-  constructor(journeyConfig: JourneyDraft, slug: string, sourcePath?: string) {
+  constructor(journeyConfig: JourneyDraft, slug: string, _app: Express, sourcePath?: string) {
     // Disable caching when running unit tests so each instantiation can supply
     // its own journey configuration – tests often reuse the same slug with
     // different configs which would otherwise be ignored due to the cache.
@@ -235,19 +237,20 @@ export class WizardEngine {
   }
 
   // Build summary rows for summary pages
-  private buildSummaryRows(allData: Record<string, unknown>): SummaryRow[] {
+  private buildSummaryRows(
+    allData: Record<string, unknown>,
+    t: (key: unknown) => string,
+    currentLang?: string
+  ): SummaryRow[] {
     return Object.entries(this.journey.steps)
       .filter(([stepId, stepConfig]) => {
         const typedStepConfig = stepConfig as StepConfig;
-        // Skip summary and confirmation steps
         if (typedStepConfig.type === 'summary' || typedStepConfig.type === 'confirmation') {
           return false;
         }
-        // Skip steps without fields
         if (!typedStepConfig.fields || Object.keys(typedStepConfig.fields).length === 0) {
           return false;
         }
-        // Skip steps without data
         const stepData = allData[stepId] as Record<string, unknown>;
         return stepData && Object.keys(stepData).length > 0;
       })
@@ -255,23 +258,25 @@ export class WizardEngine {
         const typedStepConfig = stepConfig as StepConfig;
         const stepData = allData[stepId] as Record<string, unknown>;
 
-        // Determine label to use for the summary row. If any field within this step has
-        // a legend marked `isPageHeading: true` prefer that legend text over the step
-        // title. This allows authors to rely on the GOV.UK Design System convention of
-        // promoting a fieldset legend to the page heading instead of duplicating the
-        // text in the step title.
-        let rowLabel: string = typedStepConfig.title || stepId;
+        // Work out the row label; prefer a page-heading legend if present
+        let rowLabel: string = (typedStepConfig.title as string) || stepId;
         if (typedStepConfig.fields) {
           for (const fieldCfg of Object.values(typedStepConfig.fields)) {
-            // fieldCfg.fieldset?.legend may be a string or an object. Only objects can
-            // have the `isPageHeading` boolean flag so we narrow the type accordingly.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const legend = (fieldCfg as FieldConfig).fieldset?.legend as any;
             if (legend && typeof legend === 'object' && legend.isPageHeading) {
-              rowLabel = legend.text ?? legend.html ?? rowLabel;
+              const raw =
+                (typeof legend.text === 'string' && legend.text) ||
+                (typeof legend.html === 'string' && legend.html) ||
+                rowLabel;
+              rowLabel = typeof raw === 'string' ? t(raw) : rowLabel;
               break;
             }
           }
+        }
+        // If rowLabel is a key, translate it too
+        if (typeof rowLabel === 'string') {
+          rowLabel = t(rowLabel);
         }
 
         const fieldValues = Object.entries(typedStepConfig.fields!)
@@ -279,6 +284,7 @@ export class WizardEngine {
           .map(([fieldName, fieldConfig]) => {
             const typedFieldConfig = fieldConfig as FieldConfig;
             const value = stepData[fieldName];
+
             if (
               typedFieldConfig.type === 'date' &&
               value &&
@@ -291,12 +297,9 @@ export class WizardEngine {
               const dTrim = day?.trim() ?? '';
               const mTrim = month?.trim() ?? '';
               const yTrim = year?.trim() ?? '';
-
-              // If all parts empty, treat value as empty
               if (!dTrim && !mTrim && !yTrim) {
                 return '';
               }
-
               const dt = DateTime.fromObject({
                 day: Number(dTrim),
                 month: Number(mTrim),
@@ -304,13 +307,12 @@ export class WizardEngine {
               });
               return dt.isValid ? dt.toFormat('d MMMM yyyy') : `${dTrim}/${mTrim}/${yTrim}`;
             }
+
             if (
               typedFieldConfig.type === 'checkboxes' ||
               typedFieldConfig.type === 'radios' ||
               typedFieldConfig.type === 'select'
             ) {
-              // return the text of the options that are selected
-
               const items = typedFieldConfig.items ?? typedFieldConfig.options;
               const selected = items
                 ?.filter(option => {
@@ -321,12 +323,25 @@ export class WizardEngine {
                   // radios & select store single string value
                   return value === optionValue;
                 })
-                .map(option => (typeof option === 'string' ? option : option.text))
+                .map(option => {
+                  if (typeof option === 'string') {
+                    // option is a key → translate
+                    return t(option);
+                  } else {
+                    // option.text might be a key → translate
+                    return typeof option.text === 'string' ? t(option.text) : option.text;
+                  }
+                })
                 .join(', ');
               return selected ?? '';
             }
+
             return Array.isArray(value) ? value.join(', ') : String(value);
           });
+
+        const href = currentLang
+          ? `${this.basePath}/${stepId}?lang=${encodeURIComponent(currentLang)}`
+          : `${this.basePath}/${stepId}`;
 
         return {
           key: { text: rowLabel },
@@ -334,9 +349,9 @@ export class WizardEngine {
           actions: {
             items: [
               {
-                href: `${this.basePath}/${stepId}`,
-                text: 'Change',
-                visuallyHiddenText: `${rowLabel.toLowerCase()}`,
+                href,
+                text: t('change') || 'Change',
+                visuallyHiddenText: rowLabel.toLowerCase(),
               },
             ],
           },
@@ -392,13 +407,32 @@ export class WizardEngine {
     step: StepConfig,
     caseId: string,
     allData: Record<string, unknown>,
+    lang: string = 'en',
     errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
   ): JourneyContext & {
     dateItems?: Record<string, { name: string; classes: string; value: string; attributes?: Record<string, string> }[]>;
   } {
     const previousStepUrl = this.findPreviousStep(step.id, allData);
-    const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData) : undefined;
+
     const data = (allData[step.id] as Record<string, unknown>) || {};
+    // Load translations for the current step and the common translations
+    const namespaces = ['common', 'eligibility'];
+    const translations = loadTranslations(lang, namespaces) as Record<string, unknown>;
+
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const getPath = (obj: unknown, path: string): unknown =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      path.split('.').reduce((acc: any, part) => (acc && typeof acc === 'object' ? acc[part] : undefined), obj);
+
+    const t = (key: unknown): string => {
+      if (typeof key !== 'string') {
+        return String(key ?? '');
+      }
+      const v = getPath(translations, key);
+      return typeof v === 'string' ? v : key; // fallback to the key if missing
+    };
+
+    const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData, t, lang) : undefined;
 
     // Build dateItems for all date fields
     const dateItems: Record<
@@ -440,14 +474,22 @@ export class WizardEngine {
       }
     }
 
-    // Preprocess fields for template rendering
+    // ── Make a translated copy of the step (do NOT mutate cached journey) ───────
     const processedFields: Record<string, FieldConfig> = {};
+    let stepCopy: StepConfig = { ...step };
+
+    // Translate step-level title/description if they are keys
+    if (typeof stepCopy.title === 'string') {
+      stepCopy.title = t(stepCopy.title);
+    }
+    if (typeof stepCopy.description === 'string') {
+      stepCopy.description = t(stepCopy.description);
+    }
+
     if (step.fields) {
       for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
         const typedFieldConfig = fieldConfig as FieldConfig;
-
-        // Clone to avoid mutating cached journey config
-        const processed: FieldConfig = { ...typedFieldConfig } as FieldConfig;
+        const processed: FieldConfig = { ...typedFieldConfig };
 
         // Ensure id / name
         if (!processed.id) {
@@ -460,30 +502,68 @@ export class WizardEngine {
         const fieldValue = data[fieldName] as unknown;
         const fieldError = errors && errors[fieldName];
 
-        // Standardised errorMessage for macros
+        // Translate error message if present
         if (fieldError) {
-          // GOV.UK macro expects { text }
-          const msg = fieldError.message;
-
-          processed.errorMessage = { text: String(msg) };
+          processed.errorMessage = { text: t(fieldError.message) };
         }
 
+        // Translate label
+        if (typedFieldConfig.label && typeof typedFieldConfig.label === 'object') {
+          const newLabel = { ...(typedFieldConfig.label as Record<string, unknown>) };
+          if (typeof newLabel.text === 'string') {
+            newLabel.text = t(newLabel.text);
+          }
+          if (typeof newLabel.html === 'string') {
+            newLabel.html = t(newLabel.html);
+          }
+          processed.label = newLabel;
+        } else if (typeof typedFieldConfig.label === 'string') {
+          processed.label = { text: t(typedFieldConfig.label) };
+        }
+
+        // Translate hint
+        if (typedFieldConfig.hint && typeof typedFieldConfig.hint === 'object') {
+          const newHint = { ...(typedFieldConfig.hint as Record<string, unknown>) };
+          if (typeof newHint.text === 'string') {
+            newHint.text = t(newHint.text);
+          }
+          if (typeof newHint.html === 'string') {
+            newHint.html = t(newHint.html);
+          }
+          processed.hint = newHint;
+        } else if (typeof typedFieldConfig.hint === 'string') {
+          processed.hint = { text: t(typedFieldConfig.hint) };
+        }
+
+        // Translate fieldset.legend.{text|html}
+        if (typedFieldConfig.fieldset?.legend) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const legend = typedFieldConfig.fieldset.legend as any;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const newLegend: any = { ...legend };
+          if (typeof newLegend.text === 'string') {
+            newLegend.text = t(newLegend.text);
+          }
+          if (typeof newLegend.html === 'string') {
+            newLegend.html = t(newLegend.html);
+          }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          processed.fieldset = { ...(typedFieldConfig.fieldset as any), legend: newLegend };
+        }
+
+        // Handle values and options
         switch (typedFieldConfig.type) {
           case 'text':
           case 'email':
           case 'tel':
           case 'url':
           case 'password':
-          case 'number': {
-            // @ts-expect-error value is not typed
-            processed.value = fieldValue ?? '';
-            break;
-          }
+          case 'number':
           case 'textarea': {
-            // @ts-expect-error value is not typed
-            processed.value = fieldValue ?? '';
+            processed.value = typeof fieldValue === 'string' || typeof fieldValue === 'number' ? fieldValue : '';
             break;
           }
+
           case 'radios':
           case 'checkboxes':
           case 'select': {
@@ -491,9 +571,12 @@ export class WizardEngine {
               | string
               | Record<string, unknown>
             )[];
+
             const items = baseOptions.map(option => {
               if (typeof option === 'string') {
-                const obj = { value: option, text: option } as Record<string, unknown>;
+                // Translate the displayed text; value stays as the raw string
+                const obj = { value: option, text: t(option) } as Record<string, unknown>;
+
                 if (typedFieldConfig.type === 'checkboxes') {
                   obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(option);
                 } else if (typedFieldConfig.type === 'select') {
@@ -503,8 +586,17 @@ export class WizardEngine {
                 }
                 return obj;
               } else {
+                // Copy existing option, and translate text/html if they are string keys
                 const obj = { ...option } as Record<string, unknown>;
                 const optVal = (option as Record<string, unknown>).value as string;
+
+                if (typeof obj.text === 'string') {
+                  obj.text = t(obj.text);
+                }
+                if (typeof obj.html === 'string') {
+                  obj.html = t(obj.html);
+                }
+
                 if (typedFieldConfig.type === 'checkboxes') {
                   obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(optVal);
                 } else if (typedFieldConfig.type === 'select') {
@@ -512,32 +604,30 @@ export class WizardEngine {
                 } else {
                   obj['checked'] = fieldValue === optVal;
                 }
+
                 return obj;
               }
             });
 
-            // For selects add default prompt if author didn't supply one
+            // Keep EXACT original behaviour: only add a prompt when the author didn't supply items.
             if (typedFieldConfig.type === 'select' && !(typedFieldConfig.items && typedFieldConfig.items.length)) {
-              items.unshift({ value: '', text: 'Choose an option' });
+              items.unshift({ value: '', text: t('chooseOption') || 'Choose an option' });
             }
 
             // @ts-expect-error value is not typed
             processed.items = items;
             break;
           }
+
           case 'date': {
-            // handled earlier building dateItems list, attach now, and set namePrefix so
-            // the govukDateInput macro prefixes each item name/id with the field key.
             processed.items = dateItems[fieldName] ?? [];
-            // @ts-expect-error namePrefix not in type but allowed by macro
             processed.namePrefix = fieldName;
             break;
           }
+
           case 'button': {
-            // Merge default text and attributes for button fields
-            if (!processed.text) {
-              processed.text = 'Continue';
-            }
+            // Translate provided text key or fallback to common.continue
+            processed.text = processed.text ? t(processed.text) : t('buttons.continue') || 'Continue';
             const existingAttrs = processed.attributes ?? {};
             processed.attributes = { type: 'submit', ...existingAttrs };
             break;
@@ -547,19 +637,19 @@ export class WizardEngine {
         processedFields[fieldName] = processed;
       }
 
-      // Create a new step object with processed fields to avoid mutating original
-      step = { ...step, fields: processedFields } as StepConfig;
+      stepCopy = { ...stepCopy, fields: processedFields } as StepConfig;
     }
 
     return {
       caseId,
-      step,
+      step: stepCopy,
       data,
       allData,
       errors,
-      errorSummary: processErrorsForTemplate(errors, step),
+      errorSummary: processErrorsForTemplate(errors, stepCopy, t),
       previousStepUrl,
       summaryRows,
+      translations,
       dateItems,
     };
   }
@@ -576,43 +666,61 @@ export class WizardEngine {
     const stepConfig = this.journey.steps[stepId] as StepConfig;
     const stepData = allData[stepId] as Record<string, unknown>;
 
-    // If no data exists for the step, check if it has required fields
+    // If no data exists for the step, check if it has explicitly required fields
     if (!stepData) {
       if (!stepConfig.fields) {
-        return true; // No fields means no validation needed
+        return true;
       }
 
       const hasRequiredFields = Object.values(stepConfig.fields).some((field: FieldConfig) => {
-        // Skip button fields as they are not input fields
         if (field.type === 'button') {
           return false;
         }
-        // Fields are required by default unless explicitly set to false
-        return field.validate?.required !== false;
+        return field.validate?.required === true; // only explicitly required
       });
 
-      return !hasRequiredFields; // If no required fields, step is complete even with no data
+      return !hasRequiredFields;
     }
 
-    // If step has data, check that all required fields are present
+    // If step has data, check that all explicitly required fields are present
     if (stepConfig.fields) {
       for (const [fieldName, fieldConfig] of Object.entries(stepConfig.fields)) {
-        const typedFieldConfig = fieldConfig as FieldConfig;
-        // Skip button fields as they are not input fields
-        if (typedFieldConfig.type === 'button') {
+        const f = fieldConfig as FieldConfig;
+
+        // buttons don't gate progress
+        if (f.type === 'button') {
           continue;
         }
-        // Fields are required by default unless explicitly set to false
-        if (typedFieldConfig.validate?.required !== false) {
-          const fieldValue = stepData[fieldName];
 
-          // For date fields, check if all components are present
-          if (typedFieldConfig.type === 'date') {
-            const dateValue = fieldValue as { day?: string; month?: string; year?: string };
-            if (!dateValue || !dateValue.day || !dateValue.month || !dateValue.year) {
-              return false;
+        // only enforce when required is explicitly true
+        if (f.validate?.required === true) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const v = (stepData as any)[fieldName];
+
+          const isEmpty = () => {
+            switch (f.type) {
+              case 'date': {
+                const dv = v as { day?: string; month?: string; year?: string } | undefined;
+                return !dv || !dv.day || !dv.month || !dv.year;
+              }
+              case 'checkboxes':
+                return !Array.isArray(v) || v.length === 0;
+
+              case 'radios':
+              case 'select':
+                return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
+
+              case 'number':
+                // allow 0 as valid
+                return v === undefined || v === null || v === '';
+
+              default:
+                // text/email/tel/url/password/textarea/file etc.
+                return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
             }
-          } else if (!fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === '')) {
+          };
+
+          if (isEmpty()) {
             return false;
           }
         }
@@ -828,6 +936,11 @@ export class WizardEngine {
     router.use((req, res, next) => {
       res.locals.journey = this.journey;
       res.locals.slug = this.slug;
+
+      // Extract lang from query or body, defaulting to 'en'
+      const lang = req.body?.lang || req.query?.lang || 'en'; // Retrieve language from request body or query
+      res.locals.lang = lang; // Make language available in templates
+
       next();
     });
 
@@ -854,10 +967,11 @@ export class WizardEngine {
     // Add route to start a new journey (creates caseId in the session and redirects to first step)
     router.get('/', (req, res) => {
       getOrCreateCaseId(req);
+      const lang = req.body?.lang || req.query?.lang || 'en';
       const firstStepId = Object.keys(this.journey.steps)[0];
       const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
       if (validatedFirstStepId) {
-        res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}`);
+        res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}?lang=${lang}`);
       } else {
         this.logger.error('Critical error: No valid step IDs found in journey configuration');
         res.status(500).send('Internal server error');
@@ -878,35 +992,12 @@ export class WizardEngine {
       const caseId = getOrCreateCaseId(req);
       let step = (req as RequestWithStep).step!;
 
-      // TODO: Not keen on this implementation. It's a bit of a hack to get the
-      // override to work. Also means multiple calls to LaunchDarkly, with O(n)
-      // complexity. Ideally we would only call LaunchDarkly once per step, perhaps using getAllFlags and then
-      // checking the flags for the step.
-
       step = await this.applyLdOverride(step, req);
       step = await this.applyLaunchDarklyFlags(step, req);
 
-      // this.logger.info('LaunchDarkly Flag Evaluation', { step });
-
+      const lang = req.body?.lang || req.query?.lang || 'en';
       try {
         const { data } = await this.store.load(req, caseId);
-
-        // Auto-skip only if the original step had fields but all of them are now hidden
-        const originalFields = this.journey.steps[step.id]?.fields;
-        const originallyHadFields = originalFields && Object.keys(originalFields).length > 0;
-        const nowHasNoFields = !step.fields || Object.keys(step.fields).length === 0;
-
-        if (originallyHadFields && nowHasNoFields) {
-          const nextId = this.resolveNext(step, data);
-          if (nextId && nextId !== step.id) {
-            const validatedNextId = this.validateStepIdForRedirect(nextId);
-            if (validatedNextId) {
-              return res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}`);
-            }
-            // If validation fails, stay on current step
-            this.logger.warn(`Invalid next step ID for redirect: ${nextId}`);
-          }
-        }
 
         // Check if the requested step is accessible based on journey progress
         if (!this.isStepAccessible(step.id, data)) {
@@ -930,48 +1021,36 @@ export class WizardEngine {
           // Redirect to the first incomplete step
           const validatedFirstIncompleteStep = this.validateStepIdForRedirect(firstIncompleteStep);
           if (validatedFirstIncompleteStep) {
-            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstIncompleteStep)}`);
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstIncompleteStep)}?lang=${lang}`);
           }
           // If validation fails, redirect to the first step in the journey
           const firstStepId = Object.keys(this.journey.steps)[0];
           const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
           if (validatedFirstStepId) {
             this.logger.warn(`Invalid first incomplete step ID for redirect: ${firstIncompleteStep}`);
-            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}`);
+            return res.redirect(`${this.basePath}/${encodeURIComponent(validatedFirstStepId)}?lang=${lang}`);
           }
           // If even the first step is invalid, this is a critical error
           this.logger.error('Critical error: No valid step IDs found in journey configuration');
           return res.status(500).send('Internal server error');
         }
 
-        let context = this.buildJourneyContext(step, caseId, data);
+        let context = this.buildJourneyContext(step, caseId, data, lang); // Pass lang as argument
 
         // Re-calculate previousStepUrl to skip hidden steps
         const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
         context = {
           ...context,
-          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
+          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}?lang=${lang}` : null,
         };
 
         const templatePath = await this.resolveTemplatePath(step.id);
         const safeTemplate = `${this.sanitizeTemplatePath(templatePath)}.njk`;
 
-        // If we are rendering the confirmation (or other terminal) step, clear the session so the user can start a new journey.
-        if (step.type === 'confirmation') {
-          const session = req.session as unknown as Record<string, unknown>;
-          // Remove the per-journey caseId key so a new journey generates a fresh id next time.
-          const caseIdKey = `journey_${this.slug}_caseId`;
-          delete session[caseIdKey];
-
-          // Also remove any stored data for this case from the session store implementation (if using sessionStore).
-          if (session[caseId]) {
-            delete session[caseId as keyof typeof session];
-          }
-        }
-
-        // explicitly set the template type to njk
+        // Render the template with lang included
         res.render(safeTemplate, {
           ...context,
+          lang: res.locals.lang,
           data: context.data,
           errors: null,
           allData: context.allData,
@@ -991,15 +1070,16 @@ export class WizardEngine {
       step = await this.applyLdOverride(step, req);
       step = await this.applyLaunchDarklyFlags(step, req);
 
-      // We don't skip steps during POST; validation will pass for visible fields
+      const lang = req.body?.lang || req.query?.lang || 'en'; // Extract the language parameter
+      res.locals.lang = lang; // Store language in locals for template rendering
 
-      // Validate using Zod-based validation
       const validationResult = this.validator.validate(step, req.body);
 
       if (!validationResult.success) {
         const { data } = await this.store.load(req, caseId);
-        // Reconstruct nested date fields from req.body for template
         const reconstructedData = { ...req.body };
+
+        // Handle date field reconstruction logic here if needed
         if (step.fields) {
           for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
             const typedFieldConfig = fieldConfig as FieldConfig;
@@ -1012,17 +1092,16 @@ export class WizardEngine {
             }
           }
         }
-        // Patch the current step's data with reconstructedData for this render
+
         const patchedAllData = { ...data, [step.id]: reconstructedData };
-        let context = this.buildJourneyContext(step, caseId, patchedAllData, validationResult.errors);
-        const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
-        context = {
-          ...context,
-          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}` : null,
-        };
+        const context = this.buildJourneyContext(step, caseId, patchedAllData, lang, validationResult.errors); // Pass lang as argument
 
         const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
-        return res.status(400).render(postTemplatePath, context);
+        return res.status(400).render(postTemplatePath, {
+          ...context,
+          lang: res.locals.lang,
+          errors: validationResult.errors,
+        });
       }
 
       try {
@@ -1034,11 +1113,9 @@ export class WizardEngine {
         const nextId = this.resolveNext(step, merged);
         const nextStep = this.journey.steps[nextId];
 
-        // If transitioning to a confirmation step, generate reference number
+        // Handle reference number generation for confirmation steps
         if (nextStep?.type === 'confirmation' && nextStep.data?.referenceNumber) {
           const referenceNumber = await this.store.generateReference(req, this.slug, caseId);
-
-          // Save the generated reference to the confirmation step data
           await this.store.save(req, caseId, version + 1, {
             [nextId]: { referenceNumber },
           });
@@ -1046,7 +1123,7 @@ export class WizardEngine {
 
         const validatedNextId = this.validateStepIdForRedirect(nextId);
         if (validatedNextId) {
-          res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}`);
+          res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${lang}`);
         } else {
           this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
           res.status(500).send('Internal server error');

@@ -8,22 +8,23 @@ const step: StepDraft = {
       type: 'radios',
       fieldset: {
         legend: {
-          text: 'Are you 18 or over?',
+          text: 'page2.ageLabel', // Translation key for label
           isPageHeading: true,
           classes: 'govuk-fieldset__legend--l',
         },
       },
       options: [
-        { value: 'yes', text: 'Yes' },
-        { value: 'no', text: 'No' },
+        { value: 'yes', text: 'page2.ageOptions.yes' }, // Translation key for option text
+        { value: 'no', text: 'page2.ageOptions.no' }, // Translation key for option text
       ],
       validate: {
         required: true,
-        customMessage: 'Select yes or no',
+        customMessage: 'page2.ageDescription', // Translation key for custom error message
       },
     },
     continueButton: {
       type: 'button',
+      text: 'buttons.continue', // Reference to the 'continue' translation key in common.json
       attributes: {
         type: 'submit',
       },

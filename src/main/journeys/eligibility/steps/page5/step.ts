@@ -2,28 +2,28 @@ import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
   id: 'page5',
-  title: 'Enter your personal and contact details',
   type: 'form',
+  title: 'page5.title',
   fields: {
     date: {
       type: 'date',
       hint: {
-        text: 'Date of birth',
+        text: 'page5.fields.date.hint',
       },
       validate: { required: true, mustBePast: true },
       errorMessages: {
-        required: 'Enter a date',
-        notRealDate: 'Enter a valid date of birth',
-        invalidPart: field => {
+        required: 'errors.date.required',
+        notRealDate: 'errors.date.notRealDate',
+        invalidPart: (field: string) => {
           switch (field) {
             case 'day':
-              return 'Enter a valid day';
+              return 'errors.date.invalidDay';
             case 'month':
-              return 'Enter a valid month';
+              return 'errors.date.invalidMonth';
             case 'year':
-              return 'Enter a valid year';
+              return 'errors.date.invalidYear';
             default:
-              return 'Enter a valid value';
+              return 'errors.date.invalidValue';
           }
         },
       },
@@ -31,21 +31,18 @@ const step: StepDraft = {
     email: {
       type: 'email',
       label: {
-        text: 'Email address',
+        text: 'page5.fields.email.label',
       },
       validate: {
         required: true,
         email: true,
-        customMessage: 'Enter a valid email address',
-        minLength: 5,
-        maxLength: 20,
+        customMessage: 'errors.email.invalid',
       },
     },
     continueButton: {
       type: 'button',
-      attributes: {
-        type: 'submit',
-      },
+      text: 'buttons.continue',
+      attributes: { type: 'submit' },
     },
   },
   next: 'summary',

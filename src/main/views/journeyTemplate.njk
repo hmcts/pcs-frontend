@@ -1,6 +1,7 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/header/macro.njk" import govukHeader %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block head %}
   <title>{% block pageTitle %}GOV.UK - {{ journey.meta.name }}{% endblock %}</title>
@@ -10,23 +11,32 @@
 {% block header %}
   {{ govukHeader({
     containerClasses: "govuk-width-container",
-    serviceName: serviceName or "Possession claims",
+    serviceName: translations.serviceName or "Possession claims",
     serviceUrl: "/",
     navigation: [
     {
-      text: 'logout',
+       text: translations.logout or 'logout',
       href: '/logout'
     }
   ]
   }) }}
-  <div class="govuk-width-container">
+{% endblock %}
+
+{% block beforeContent %}
+    <div class="govuk-width-container">
       {{ govukPhaseBanner({
         tag: {
-          text: "Alpha"
+          text: translations.phase | safe
         },
-        html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+        html:(translations.feedback + translations.languageToggle) | safe
       }) }}
   </div>
+  {% if previousStepUrl %}
+    {{ govukBackLink({
+      text: translations.back or "Back",
+      href: previousStepUrl
+    }) }}
+  {% endif %}
 {% endblock %}
 
 {% block bodyEnd %}

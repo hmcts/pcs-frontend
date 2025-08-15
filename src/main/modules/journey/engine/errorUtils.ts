@@ -11,72 +11,85 @@ export interface ErrorSummaryData {
 }
 
 /**
- * Processes validation errors into a format suitable for the GOV.UK Error Summary component
+ * Processes validation errors into GOV.UK Error Summary format, with i18n.
  * @param errors - Validation errors from the journey validator
- * @returns Error summary data for template rendering
+ * @param step   - Current step (for field types)
+ * @param t      - Translator: (key) => string
  */
 export function processErrorsForTemplate(
   errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>,
-  step?: { fields?: Record<string, { type: string }> }
+  step?: { fields?: Record<string, { type: string }> },
+  t?: (key: unknown) => string
 ): ErrorSummaryData | null {
   if (!errors || Object.keys(errors).length === 0) {
     return null;
   }
 
+  const tx = (s: string) => (t ? t(s) : s);
+
   const errorList: ProcessedError[] = [];
 
   for (const [fieldName, error] of Object.entries(errors)) {
-    // Add part-specific error messages (day/month/year) first so each invalid component is listed
-    let hasSpecific = false;
+    const type = step?.fields?.[fieldName]?.type;
+
+    // Date component errors (day/month/year) first
+    let pushedSpecific = false;
     (['day', 'month', 'year'] as const).forEach(part => {
       const partMessage = (error as Record<string, string | undefined>)[part];
       if (partMessage) {
-        hasSpecific = true;
+        pushedSpecific = true;
         errorList.push({
-          text: String(partMessage),
+          text: tx(String(partMessage)),
           href: `#${fieldName}-${part}`,
         });
       }
     });
 
-    // if generic error, target the first input
-    if (!hasSpecific) {
-      // Check if this field is actually a date type by looking at the step configuration
-      const isDateField = step?.fields?.[fieldName]?.type === 'date';
-      const anchorId = error.anchor ?? (isDateField ? `${fieldName}-day` : fieldName);
+    // Generic (non-part) message
+    if (!pushedSpecific) {
+      let anchorId: string;
+      if (error.anchor) {
+        anchorId = error.anchor; // validator may provide a precise target
+      } else if (type === 'date') {
+        anchorId = `${fieldName}-day`;
+      } else if (type === 'radios' || type === 'checkboxes') {
+        // group-level anchor (GOV.UK radios/checkboxes use the field id on the container)
+        anchorId = fieldName;
+      } else {
+        anchorId = fieldName;
+      }
+
       errorList.push({
-        text: error.message,
+        text: tx(error.message),
         href: `#${anchorId}`,
       });
     }
   }
 
   return {
-    titleText: 'There is a problem',
+    titleText: tx('errors.title') || 'There is a problem',
     errorList,
   };
 }
 
 /**
- * Processes field configuration to add error messages for GOV.UK components
- * @param fieldConfig - The field configuration
- * @param fieldName - The name of the field
- * @param errors - Validation errors
- * @returns Updated field configuration with error message
+ * Attach a field-level errorMessage (component-level), with i18n.
  */
 export function addErrorMessageToField(
   fieldConfig: FieldConfig,
   fieldName: string,
-  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
+  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>,
+  t?: (key: unknown) => string
 ): FieldConfig {
   const fieldError = errors && errors[fieldName];
-
-  if (fieldError) {
-    return {
-      ...fieldConfig,
-      errorMessage: { text: String(fieldError.message) },
-    };
+  if (!fieldError) {
+    return fieldConfig;
   }
 
-  return fieldConfig;
+  const tx = (s: string) => (t ? t(s) : s);
+
+  return {
+    ...fieldConfig,
+    errorMessage: { text: tx(String(fieldError.message)) },
+  };
 }

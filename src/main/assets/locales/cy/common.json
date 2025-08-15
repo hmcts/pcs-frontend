@@ -3,14 +3,36 @@
   "phase": "cyAlpha",
   "feedback": "cyThis is a new service – your <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"external noopener noreferrer\">feedback</a> will help us to improve it.",
   "languageToggle": "<a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
+  "logout": "cylogout",
   "buttons": {
     "continue": "cyContinue",
     "back": "cyBack",
     "cancel": "cyCancel",
-    "finish": "cyStart a new application"
+    "finish": "cyStart a new application",
+    "start": "cyStart"
   },
   "change": "cyChange",
   "defaultRequired": "cyThis field is required",
   "defaultInvalid": "cyInvalid format",
-  "back": "cyBack"
+  "chooseOption": "cyChoose an option",
+  "back": "cyBack",
+  "errors": {
+    "title": "cyThere is a problem",
+    "required": "cyEnter a value",
+    "email": {
+      "required": "cyEnter an email address",
+      "invalid": "cyEnter a valid email address"
+    },
+    "select": {
+      "invalid": "cySelect a valid option"
+    },
+    "date": {
+      "required": "cyEnter a date",
+      "notRealDate": "cyEnter a valid date",
+      "invalidDay": "cyEnter a valid day",
+      "invalidMonth": "cyEnter a valid month",
+      "invalidYear": "cyEnter a valid year",
+      "invalidValue": "cyEnter a valid value"
+    }
+  }
 }
