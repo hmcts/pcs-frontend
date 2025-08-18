@@ -1,6 +1,8 @@
 import config from 'config';
 
+import { CourtVenue } from '../../../../main/interfaces/courtVenue.interface';
 import {
+  getCourtVenues,
   getDashboardNotifications,
   getDashboardTaskGroups,
   getRootGreeting,
@@ -45,6 +47,30 @@ describe('pcsApiService', () => {
     const actualGreeting = await getRootGreeting();
     expect(actualGreeting).toEqual(expectedGreeting);
     expect(mockHttp.get).toHaveBeenCalledWith(testApiBase);
+  });
+
+  test('should fetch court venues by postcode', async () => {
+    const expectedCourtVenues: CourtVenue[] = [
+      {
+        epimId: 101,
+        id: 1001,
+        name: 'some name',
+      },
+    ];
+
+    mockHttp.get.mockResolvedValue({ data: expectedCourtVenues });
+
+    const postcode: string = 'PC12 3AQ';
+    const mockAccessToken = 'test-token';
+
+    const actualCourtVenues = await getCourtVenues(postcode, { accessToken: mockAccessToken });
+
+    expect(actualCourtVenues).toEqual(expectedCourtVenues);
+    expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`, {
+      headers: {
+        Authorization: `Bearer ${mockAccessToken}`,
+      },
+    });
   });
 
   test('should fetch dashboard notifications by case reference', async () => {
@@ -97,6 +123,19 @@ describe('pcsApiService', () => {
 
     await expect(getRootGreeting()).rejects.toThrow('Network error');
     expect(mockHttp.get).toHaveBeenCalledWith(testApiBase);
+  });
+
+  test('should handle error when fetching court venues', async () => {
+    const error = new Error('Invalid postcode');
+    mockHttp.get.mockRejectedValue(error);
+
+    const postcode = 'INVALID';
+    await expect(getCourtVenues(postcode, { accessToken: 'test-token' })).rejects.toThrow('Invalid postcode');
+    expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/courts?postcode=${encodeURIComponent(postcode)}`, {
+      headers: {
+        Authorization: 'Bearer test-token',
+      },
+    });
   });
 
   test('should handle error when fetching dashboard notifications', async () => {
