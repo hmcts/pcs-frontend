@@ -11,36 +11,40 @@
 {% block header %}
   {{ govukHeader({
     containerClasses: "govuk-width-container",
-    serviceName: translations.serviceName or "Possession claims",
-    serviceUrl: "/",
+    serviceName: t('serviceName', 'Possession claims'),
+    serviceUrl: '/?lang=' ~ lang,
     navigation: [
-    {
-       text: translations.logout or 'logout',
-      href: '/logout'
-    }
-  ]
+      { text: t('logout', 'Logout'), href: '/logout?lang=' ~ lang }
+    ]
   }) }}
 {% endblock %}
 
 {% block beforeContent %}
-    <div class="govuk-width-container">
-      {{ govukPhaseBanner({
-        tag: {
-          text: translations.phase | safe
-        },
-        html:(translations.feedback + translations.languageToggle) | safe
-      }) }}
+  <div class="govuk-width-container">
+
+    {# Build a safe language toggle without inline ternary #}
+    {% if lang == 'cy' %}
+      {% set languageToggle = '<a href="?lang=en" class="govuk-link language">English</a>' %}
+    {% else %}
+      {% set languageToggle = '<a href="?lang=cy" class="govuk-link language">Cymraeg</a>' %}
+    {% endif %}
+
+    {{ govukPhaseBanner({
+      tag: { text: t('phase', 'Alpha') },
+      html: (t('feedback') | safe) ~ ' ' ~ (languageToggle | safe)
+    }) }}
+
   </div>
+
   {% if previousStepUrl %}
     {{ govukBackLink({
-      text: translations.back or "Back",
+      text: t('back', 'Back'),
       href: previousStepUrl
     }) }}
   {% endif %}
 {% endblock %}
 
 {% block bodyEnd %}
-
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}
 {% endblock %}

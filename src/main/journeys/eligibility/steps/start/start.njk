@@ -3,30 +3,27 @@
 
 {% block content %}
 
-  <!-- Title: Dynamically translated -->
-  <h1 class="govuk-heading-l">{{ translations.startPage.title }}</h1>
+  <h1 class="govuk-heading-l">{{ t('startPage.title', 'Before you start') }}</h1>
 
-  <!-- Description: Dynamically translated -->
-  <p class="govuk-body">{{ translations.startPage.description }}</p>
-  <p class="govuk-body">{{ translations.startPage.eligibilityText }}</p>
+  <p class="govuk-body">{{ t('startPage.description') }}</p>
+  <p class="govuk-body">{{ t('startPage.eligibilityText') }}</p>
 
-  <!-- What you'll need section -->
-  <h2 class="govuk-heading-s">{{ translations.startPage.whatYouNeedTitle }}</h2>
-  <p class="govuk-body">{{ translations.startPage.whatYouNeedText }}</p>
+  <h2 class="govuk-heading-s">{{ t('startPage.whatYouNeedTitle') }}</h2>
+  <p class="govuk-body">{{ t('startPage.whatYouNeedText') }}</p>
 
   <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
-    <li>{{ translations.startPage.needNoticeInfo }}</li>
-    <li>{{ translations.startPage.needPropertyInfo }}</li>
-    <li>{{ translations.startPage.needDefendantInfo }}</li>
-    <li>{{ translations.startPage.needGroundsInfo }}</li>
-    <li>{{ translations.startPage.needDocuments }}</li>
+    <li>{{ t('startPage.needNoticeInfo') }}</li>
+    <li>{{ t('startPage.needPropertyInfo') }}</li>
+    <li>{{ t('startPage.needDefendantInfo') }}</li>
+    <li>{{ t('startPage.needGroundsInfo') }}</li>
+    <li>{{ t('startPage.needDocuments') }}</li>
   </ul>
 
   <form method="post" novalidate>
     <input type="hidden" name="lang" value="{{ lang }}"/>
     <div class="govuk-button-group">
       {{ govukButton({
-        text: translations.buttons.start,
+        text: t('buttons.start', 'Start'),
         attributes: { type: 'submit' }
       }) }}
     </div>

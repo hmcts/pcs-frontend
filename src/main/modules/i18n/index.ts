@@ -1,15 +1,68 @@
+import fs from 'fs';
 import path from 'path';
 
 import { Logger } from '@hmcts/nodejs-logging';
-import { Express } from 'express';
-import i18next from 'i18next';
+import type { Express, Request as ExpressRequest, NextFunction, Response } from 'express';
+import i18next, { type TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
-import { LanguageDetector, handle } from 'i18next-http-middleware';
+import { LanguageDetector, handle as i18nextHandle } from 'i18next-http-middleware';
+
+function firstExistingPath(paths: string[]): string | null {
+  for (const p of paths) {
+    if (fs.existsSync(p)) {
+      return p;
+    }
+  }
+  return null;
+}
+
+/** Request shape after i18next-http-middleware + cookie-parser */
+export type I18nRequest = ExpressRequest & {
+  t: TFunction;
+  i18n: typeof i18next;
+  language: string;
+  cookies?: Record<string, string>;
+};
+
+/** Optional session shape if you pass user info to templates */
+type SessionWithUser = {
+  user?: Record<string, unknown>;
+};
+
+const allowedLanguages = ['en', 'cy'] as const;
+type AllowedLang = (typeof allowedLanguages)[number];
 
 export class I18n {
   private readonly logger = Logger.getLogger('i18n');
 
   public enableFor(app: Express): void {
+    // Resolve locales directory (dev & prod)
+    const candidates = [
+      process.env.LOCALES_DIR || '',
+      // ts-node (src)
+      path.resolve(__dirname, '../../public/locales'),
+      path.resolve(__dirname, '../../../public/locales'),
+      // compiled (dist)
+      path.resolve(__dirname, '../../public/locales'),
+      path.resolve(__dirname, '../../../public/locales'),
+    ].filter(Boolean) as string[];
+
+    const localesDir = firstExistingPath(candidates);
+
+    this.logger.info(`[i18n] candidate locale roots:\n${candidates.map(p => ` - ${p}`).join('\n')}`);
+
+    if (!localesDir) {
+      this.logger.error('[i18n] No locales directory found. Set LOCALES_DIR or create src/main/public/locales.');
+    } else {
+      this.logger.info(`[i18n] Using locales dir: ${localesDir}`);
+      this.logger.info(
+        `[i18n] EN present? common=${fs.existsSync(path.join(localesDir, 'en/common.json'))}, eligibility=${fs.existsSync(path.join(localesDir, 'en/eligibility.json'))}`
+      );
+      this.logger.info(
+        `[i18n] CY present? common=${fs.existsSync(path.join(localesDir, 'cy/common.json'))}, eligibility=${fs.existsSync(path.join(localesDir, 'cy/eligibility.json'))}`
+      );
+    }
+
     i18next
       .use(Backend)
       .use(LanguageDetector)
@@ -17,8 +70,11 @@ export class I18n {
         {
           fallbackLng: 'en',
           preload: ['en', 'cy'],
+          ns: ['common', 'eligibility'],
+          defaultNS: 'eligibility',
+          fallbackNS: ['common'],
           backend: {
-            loadPath: path.resolve(__dirname, '../../../locales/{{lng}}/{{ns}}.json'),
+            loadPath: path.join(localesDir || '', '{{lng}}/{{ns}}.json'),
           },
           detection: {
             order: ['querystring', 'cookie', 'session'],
@@ -29,20 +85,60 @@ export class I18n {
           },
           debug: false,
           saveMissing: false,
-          interpolation: {
-            escapeValue: false,
-          },
+          interpolation: { escapeValue: false },
+          returnEmptyString: false,
         },
         err => {
           if (err) {
-            this.logger.error('i18n init error', err);
-            throw err;
+            this.logger.error('[i18n] init error', err);
+          } else {
+            this.logger.info('[i18n] initialised OK');
           }
-
-          // Register i18n middleware *after* init completes
-          app.use(handle(i18next));
-          this.logger.info('i18n module loaded');
         }
       );
+
+    // Attach i18next express middleware
+    app.use(i18nextHandle(i18next));
+
+    // Language enforcement + expose to templates/Nunjucks
+    app.use((req: I18nRequest & { session?: SessionWithUser }, res: Response, next: NextFunction) => {
+      const detected = req.language as AllowedLang | string | undefined;
+      const lang: AllowedLang = allowedLanguages.includes(detected as AllowedLang) ? (detected as AllowedLang) : 'en';
+
+      if (typeof req.i18n?.changeLanguage === 'function') {
+        req.i18n.changeLanguage(lang);
+      }
+
+      // Keeps TFunction type; returns defaultValue (or key) if missing
+      const fallbackT: TFunction = ((key: string | string[], defaultValue?: string) =>
+        Array.isArray(key) ? key[0] : (defaultValue ?? key)) as unknown as TFunction;
+      const t: TFunction = typeof req.t === 'function' ? req.t : fallbackT;
+
+      res.locals.lang = lang;
+      res.locals.t = t;
+
+      const nunjucksEnv = req.app.locals?.nunjucksEnv;
+      if (nunjucksEnv) {
+        nunjucksEnv.addGlobal('lang', lang);
+        nunjucksEnv.addGlobal('t', t);
+        if (req.session?.user) {
+          nunjucksEnv.addGlobal('user', req.session.user);
+        }
+      }
+
+      next();
+    });
+
+    // Optional diagnostics
+    app.get('/_i18n_diag', (req: I18nRequest, res: Response) => {
+      res.json({
+        localesDir: localesDir || '(none)',
+        i18nInitialised: i18next.isInitialized,
+        detected: req.language,
+        hasT: typeof req.t === 'function',
+        sample1: req.t?.('startPage.title', 'DEFAULT_TITLE'),
+        sample2: req.t?.('serviceName', 'DEFAULT_SERVICE'),
+      });
+    });
   }
 }

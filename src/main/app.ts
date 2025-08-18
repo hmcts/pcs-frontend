@@ -10,6 +10,7 @@ import favicon from 'serve-favicon';
 import { HTTPError } from './HttpError';
 import { setupDev } from './development';
 import * as modules from './modules';
+import { I18n } from './modules/i18n';
 import registerSteps from './routes/registerSteps';
 
 const env = process.env.NODE_ENV || 'development';
@@ -22,20 +23,24 @@ const logger = Logger.getLogger('app');
 
 setupDev(app, developmentMode);
 
-modules.modules.forEach(async moduleName => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const moduleInstance = new (modules as any)[moduleName](developmentMode);
-  await moduleInstance.enableFor(app);
-});
+app.use(cookieParser());
+
+new I18n().enableFor(app);
 
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
   next();
+});
+
+modules.modules.forEach(async moduleName => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const moduleInstance = new (modules as any)[moduleName](developmentMode);
+  await moduleInstance.enableFor(app);
 });
 
 registerSteps(app);
