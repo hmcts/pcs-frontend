@@ -34,13 +34,8 @@ export class I18n {
   private readonly logger = Logger.getLogger('i18n');
 
   public enableFor(app: Express): void {
-    // Resolve locales directory (dev & prod)
     const candidates = [
       process.env.LOCALES_DIR || '',
-      // ts-node (src)
-      path.resolve(__dirname, '../../public/locales'),
-      path.resolve(__dirname, '../../../public/locales'),
-      // compiled (dist)
       path.resolve(__dirname, '../../public/locales'),
       path.resolve(__dirname, '../../../public/locales'),
     ].filter(Boolean) as string[];
@@ -51,14 +46,6 @@ export class I18n {
 
     if (!localesDir) {
       this.logger.error('[i18n] No locales directory found. Set LOCALES_DIR or create src/main/public/locales.');
-    } else {
-      this.logger.info(`[i18n] Using locales dir: ${localesDir}`);
-      this.logger.info(
-        `[i18n] EN present? common=${fs.existsSync(path.join(localesDir, 'en/common.json'))}, eligibility=${fs.existsSync(path.join(localesDir, 'en/eligibility.json'))}`
-      );
-      this.logger.info(
-        `[i18n] CY present? common=${fs.existsSync(path.join(localesDir, 'cy/common.json'))}, eligibility=${fs.existsSync(path.join(localesDir, 'cy/eligibility.json'))}`
-      );
     }
 
     i18next
@@ -100,7 +87,7 @@ export class I18n {
 
     // Language enforcement + expose to templates/Nunjucks
     app.use((req: I18nRequest & { session?: SessionWithUser }, res: Response, next: NextFunction) => {
-      const detected = req.language as AllowedLang | string | undefined;
+      const detected = req.language as string | undefined;
       const lang: AllowedLang = allowedLanguages.includes(detected as AllowedLang) ? (detected as AllowedLang) : 'en';
 
       if (typeof req.i18n?.changeLanguage === 'function') {
