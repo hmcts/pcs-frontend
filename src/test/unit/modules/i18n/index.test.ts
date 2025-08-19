@@ -103,7 +103,6 @@ describe('i18n module', () => {
     const changeLanguage = jest.fn();
     const addGlobal = jest.fn();
 
-     
     const req = {
       language: 'cy',
       i18n: { changeLanguage },
