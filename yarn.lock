@@ -2337,13 +2337,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts/playwright-common@npm:1.0.33":
-  version: 1.0.33
-  resolution: "@hmcts/playwright-common@npm:1.0.33"
+"@hmcts/playwright-common@npm:1.0.34":
+  version: 1.0.34
+  resolution: "@hmcts/playwright-common@npm:1.0.34"
   dependencies:
     "@axe-core/playwright": "npm:^4.10.0"
     "@eslint/js": "npm:^9.11.1"
     "@typescript-eslint/eslint-plugin": "npm:^8.8.0"
+    axe-html-reporter: "npm:^2.2.11"
     eslint: "npm:^9.11.1"
     eslint-plugin-playwright: "npm:^2.0.0"
     get-port: "npm:^7.1.0"
@@ -2354,7 +2355,7 @@ __metadata:
     typescript-eslint: "npm:^8.8.0"
   peerDependencies:
     "@playwright/test": ^1.53.0
-  checksum: 10/bcdde79e4dfd16635614493c234ed49fc6ecd7d8c0d33d649c8b368e262d37a986fbfcaf9ea99d30b00899304986ede7626ab02626dc5b8ea6e5fd4b53953052
+  checksum: 10/aa4670e95586f0f05806b53c382e16116885d0844ae67d459542faad450ef92501a9e964f63de00cce57e560c885c3183e6de072615f1bd1434afacbc94ce8f7
   languageName: node
   linkType: hard
 
@@ -6510,6 +6511,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axe-html-reporter@npm:^2.2.11":
+  version: 2.2.11
+  resolution: "axe-html-reporter@npm:2.2.11"
+  dependencies:
+    mustache: "npm:^4.0.1"
+  peerDependencies:
+    axe-core: ">=3"
+  checksum: 10/489a904c62fe5c74db9490773a624e8573906b54a9c8264b831ee50b648f623ba292a011598d257bd6b8dc35eede21998fc25c799bd99eb9ca8ecf2d05ef92a1
+  languageName: node
+  linkType: hard
+
 "axios-debug-log@npm:^1.0.0":
   version: 1.0.0
   resolution: "axios-debug-log@npm:1.0.0"
@@ -9982,8 +9994,8 @@ __metadata:
   linkType: hard
 
 "i18next@npm:^25.3.2":
-  version: 25.3.4
-  resolution: "i18next@npm:25.3.4"
+  version: 25.3.6
+  resolution: "i18next@npm:25.3.6"
   dependencies:
     "@babel/runtime": "npm:^7.27.6"
   peerDependencies:
@@ -9991,7 +10003,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/074be888dd5f38e522f348582eecfeac2e2255096a79b0f9f2e0f4fbdbd8d1fca6e2b589fe27bb019b0708d7ba3f424e63631c44168cfa3e3723071029409e78
+  checksum: 10/158ec6eaa19c87ae9f5f5d3d5d3e772fc4e0985f6ebc84dacc12e681296622a40d64ff92647c66aece0f3917fd9ae3eed56c376a010b6647b61f8d7df7993863
   languageName: node
   linkType: hard
 
@@ -12423,6 +12435,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mustache@npm:^4.0.1":
+  version: 4.2.0
+  resolution: "mustache@npm:4.2.0"
+  bin:
+    mustache: bin/mustache
+  checksum: 10/6e668bd5803255ab0779c3983b9412b5c4f4f90e822230e0e8f414f5449ed7a137eed29430e835aa689886f663385cfe05f808eb34b16e1f3a95525889b05cd3
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^3.3.11":
   version: 3.3.11
   resolution: "nanoid@npm:3.3.11"
@@ -13109,7 +13130,7 @@ __metadata:
     "@hmcts/info-provider": "npm:^1.1.0"
     "@hmcts/nodejs-healthcheck": "npm:^1.8.0"
     "@hmcts/nodejs-logging": "npm:^4.0.4"
-    "@hmcts/playwright-common": "npm:1.0.33"
+    "@hmcts/playwright-common": "npm:1.0.34"
     "@hmcts/properties-volume": "npm:^1.2.0"
     "@launchdarkly/node-server-sdk": "npm:^9.10.0"
     "@pact-foundation/pact": "npm:^15.0.0"
@@ -16332,8 +16353,8 @@ __metadata:
   linkType: hard
 
 "webpack@npm:^5.88.2":
-  version: 5.101.2
-  resolution: "webpack@npm:5.101.2"
+  version: 5.101.3
+  resolution: "webpack@npm:5.101.3"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.8"
@@ -16365,7 +16386,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10/d042ceb6e43c6de5be9ed39ea011b3fb28eed3f526974f10d6d3c324cbbaa01994167bd0fda394216d9929168489614fb8234dfeac6a363fc28e1b4ae6142747
+  checksum: 10/c4740e9c59d1e0562d1e5654e12559e6308acd60fc639cf3089657c85e946c8910ba06cbd9d74b08daa7f28b5ff786c0482617415a7c1fa8e4637a88b20b76a6
   languageName: node
   linkType: hard
 
