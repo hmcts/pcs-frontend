@@ -1,8 +1,17 @@
+import type { TFunction } from 'i18next';
+
 const { WizardEngine } = require('../../../../../main/modules/journey/engine/engine');
 
-jest.mock('../../../../../main/app/utils/loadTranslations', () => ({
-  loadTranslations: () => ({}), // empty map => keys don't resolve => t() returns the key
-}));
+/**
+ * Typed noop translator that mimics i18next’s TFunction signature:
+ * - if defaultValue is provided, return it
+ * - otherwise return the key (string or first element when an array is passed)
+ */
+const makeNoopT = (): TFunction =>
+  ((key: string | string[], defaultValue?: string) =>
+    Array.isArray(key)
+      ? (defaultValue ?? (key[0] as string))
+      : (defaultValue ?? (key as string))) as unknown as TFunction;
 
 describe('Button Field Type', () => {
   it('should process button fields with default text and attributes', () => {
@@ -35,13 +44,15 @@ describe('Button Field Type', () => {
     const engine = new WizardEngine(journeyConfig, 'test-journey');
     const step = engine['journey'].steps.start;
 
-    // Test that the field is processed correctly
-    const context = engine['buildJourneyContext'](step, 'test-case', {});
+    // create a single noop translator function instance
+    const t = makeNoopT();
+
+    const context = engine['buildJourneyContext'](step, 'test-case', {}, t, 'en');
     const buttonField = context.step.fields?.submitButton;
 
     expect(buttonField).toBeDefined();
     expect(buttonField?.type).toBe('button');
-    expect(buttonField?.text).toBe('buttons.continue');
+    expect(buttonField?.text).toBe('Continue');
     expect(buttonField?.attributes).toEqual({ type: 'submit' });
   });
 
@@ -60,7 +71,7 @@ describe('Button Field Type', () => {
           fields: {
             customButton: {
               type: 'button',
-              text: 'Submit Form',
+              text: 'Submit Form', // custom label
               attributes: { type: 'submit', class: 'govuk-button--secondary' },
             },
           },
@@ -77,11 +88,14 @@ describe('Button Field Type', () => {
     const engine = new WizardEngine(journeyConfig, 'test-journey');
     const step = engine['journey'].steps.start;
 
-    const context = engine['buildJourneyContext'](step, 'test-case', {});
+    const t = makeNoopT();
+
+    const context = engine['buildJourneyContext'](step, 'test-case', {}, t, 'en');
     const buttonField = Object.values(context.step.fields ?? {})[0] as Record<string, unknown>;
 
     expect(buttonField).toBeDefined();
     expect(buttonField?.type).toBe('button');
+    // custom label should pass through unchanged by the noop translator
     expect(buttonField?.text).toBe('Submit Form');
     expect(buttonField?.attributes).toEqual({
       type: 'submit',
