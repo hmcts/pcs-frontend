@@ -50,11 +50,12 @@ export class I18n {
       process.env.LOCALES_DIR || '',
       path.resolve(__dirname, '../../public/locales'),
       path.resolve(__dirname, '../../../public/locales'),
-    ].filter(Boolean) as string[];
+    ].filter(Boolean);
 
     const localesDir = firstExistingPath(candidates);
 
-    this.logger.info(`[i18n] candidate locale roots:\n${candidates.map(p => ` - ${p}`).join('\n')}`);
+    const candidateRoots = candidates.map(p => ` - ${p}`).join('\n');
+    this.logger.info(`[i18n] candidate locale roots:\n${candidateRoots}`);
 
     if (!localesDir) {
       this.logger.error('[i18n] No locales directory found. Set LOCALES_DIR or create src/main/public/locales.');
