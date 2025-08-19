@@ -4,40 +4,40 @@
 
 {% block content %}
 
-  {# Work out the reference number first #}
+  {# Reference number: real one if present, otherwise i18n fallback #}
   {% if allData.confirmation and allData.confirmation.referenceNumber %}
     {% set referenceNumber = allData.confirmation.referenceNumber %}
   {% else %}
-    {% set referenceNumber = translations.confirmation.panel.pending %}
+    {% set referenceNumber = t('confirmation.panel.pending', 'PCR-PENDING') %}
   {% endif %}
 
   {{ govukPanel({
-    titleText: step.title,
+    titleText: step.title or t('confirmation.title', 'Application complete'),
     html:
-      translations.confirmation.panel.refLabel
-      ~ "<br><strong>"
+      t('confirmation.panel.refLabel', 'Your reference number')
+      ~ '<br><strong>'
       ~ referenceNumber
-      ~ "</strong>"
+      ~ '</strong>'
   }) }}
 
-  <p class="govuk-body">{{ translations.confirmation.sentEmail }}</p>
+  <p class="govuk-body">{{ t('confirmation.sentEmail', 'We have sent you a confirmation email.') }}</p>
 
-  <h2 class="govuk-heading-m">{{ translations.confirmation.whatNextTitle }}</h2>
-  <p class="govuk-body">{{ translations.confirmation.whatNext1 }}</p>
-  <p class="govuk-body">{{ translations.confirmation.whatNext2 }}</p>
+  <h2 class="govuk-heading-m">{{ t('confirmation.whatNextTitle', 'What happens next') }}</h2>
+  <p class="govuk-body">{{ t('confirmation.whatNext1', 'Your possession claim will be reviewed by the court.') }}</p>
+  <p class="govuk-body">{{ t('confirmation.whatNext2', 'You will be contacted within 5 working days with next steps.') }}</p>
 
-  <h2 class="govuk-heading-m">{{ translations.confirmation.helpTitle }}</h2>
+  <h2 class="govuk-heading-m">{{ t('confirmation.helpTitle', 'Help and support') }}</h2>
   <p class="govuk-body">
-    <a href="{{ translations.confirmation.helpLinkHref }}" class="govuk-link">
-      {{ translations.confirmation.helpLinkText }}
+    <a href="{{ t('confirmation.helpLinkHref', '#') }}" class="govuk-link">
+      {{ t('confirmation.helpLinkText', 'Find legal advice and support') }}
     </a>
   </p>
 
   <div class="govuk-button-group">
     {{ govukButton({
-      text: translations.confirmation.exit,
-      href: "/?lang=" ~ lang,
-      classes: "govuk-button--secondary"
+      text: t('confirmation.exit', 'Exit'),
+      href: '/?lang=' ~ lang,
+      classes: 'govuk-button--secondary'
     }) }}
   </div>
 

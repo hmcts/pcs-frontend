@@ -83,8 +83,8 @@ export const step: StepDefinition = {
         req.session.ccdCase = updatedCase;
       } else {
         const newCase = await ccdCaseService.createCase(user?.accessToken, {
-          applicantForename: req.body.applicantForename,
-          applicantSurname: req.body.applicantSurname,
+          // applicantForename: req.body.applicantForename,
+          // applicantSurname: req.body.applicantSurname,
         });
         req.session.ccdCase = newCase;
       }

@@ -16,7 +16,6 @@ function firstExistingPath(paths: string[]): string | null {
   return null;
 }
 
-/** Request shape after i18next-http-middleware + cookie-parser */
 export type I18nRequest = ExpressRequest & {
   t: TFunction;
   i18n: typeof i18next;
@@ -24,7 +23,6 @@ export type I18nRequest = ExpressRequest & {
   cookies?: Record<string, string>;
 };
 
-/** Optional session shape if you pass user info to templates */
 type SessionWithUser = {
   user?: Record<string, unknown>;
 };
@@ -127,18 +125,6 @@ export class I18n {
       }
 
       next();
-    });
-
-    // Optional diagnostics
-    app.get('/_i18n_diag', (req: I18nRequest, res: Response) => {
-      res.json({
-        localesDir: localesDir || '(none)',
-        i18nInitialised: i18next.isInitialized,
-        detected: req.language,
-        hasT: typeof req.t === 'function',
-        sample1: req.t?.('startPage.title', 'DEFAULT_TITLE'),
-        sample2: req.t?.('serviceName', 'DEFAULT_SERVICE'),
-      });
     });
   }
 }

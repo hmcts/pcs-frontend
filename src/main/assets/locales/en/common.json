@@ -16,6 +16,11 @@
   "defaultInvalid": "Invalid format",
   "chooseOption": "Choose an option",
   "back": "Back",
+  "date": {
+    "day": "Day",
+    "month": "Month",
+    "year": "Year"
+  },
   "errors": {
     "title": "There is a problem",
     "required": "Enter a value",
@@ -27,6 +32,9 @@
       "invalid": "Select a valid option"
     },
     "date": {
+      "day": "Day",
+      "month": "Month",
+      "year": "Year",
       "required": "Enter a date",
       "notRealDate": "Enter a valid date",
       "invalidDay": "Enter a valid day",

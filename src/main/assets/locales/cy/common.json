@@ -16,6 +16,11 @@
   "defaultInvalid": "cyInvalid format",
   "chooseOption": "cyChoose an option",
   "back": "cyBack",
+  "date": {
+    "day": "cyDay",
+    "month": "cyMonth",
+    "year": "cyYear"
+  },
   "errors": {
     "title": "cyThere is a problem",
     "required": "cyEnter a value",
@@ -27,6 +32,9 @@
       "invalid": "cySelect a valid option"
     },
     "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
       "required": "cyEnter a date",
       "notRealDate": "cyEnter a valid date",
       "invalidDay": "cyEnter a valid day",

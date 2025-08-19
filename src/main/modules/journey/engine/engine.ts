@@ -5,6 +5,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import express, { NextFunction, Request, Response, Router } from 'express';
 import type { TFunction } from 'i18next';
+import i18next from 'i18next';
 import { DateTime } from 'luxon';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
@@ -445,6 +446,7 @@ export class WizardEngine {
             );
             return {
               name: part,
+              label: t(`date.${part}`),
               classes:
                 (part === 'day'
                   ? 'govuk-input--width-2'
@@ -867,16 +869,6 @@ export class WizardEngine {
     return null;
   }
 
-  private getTranslator(req: Request) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const maybeT = (req as any).t;
-    if (typeof maybeT === 'function') {
-      return maybeT;
-    }
-    // Fallback translator to avoid runtime crash if middleware wasn't attached yet
-    return (key: string, defaultValue?: string) => defaultValue ?? key;
-  }
-
   private async applyLdOverride(step: StepConfig, req: Request): Promise<StepConfig> {
     const ld = req.app.locals.launchDarklyClient as LDClient.LDClient | undefined;
     if (!ld) {
@@ -971,14 +963,15 @@ export class WizardEngine {
     router.get('/:step', async (req, res, next) => {
       const caseId = getOrCreateCaseId(req);
       let step = (req as RequestWithStep).step!;
-      const lang = (res.locals.lang as string) || req.language || 'en';
-      const t = this.getTranslator(req);
 
-      // LaunchDarkly override + flags
-      step = await this.applyLdOverride(step, req);
-      step = await this.applyLaunchDarklyFlags(step, req);
+      const lang = (res.locals.lang as string) || 'en';
+      const t: TFunction = (res.locals.t as TFunction) || (i18next.t.bind(i18next) as TFunction);
 
       try {
+        // LaunchDarkly override + flags
+        step = await this.applyLdOverride(step, req);
+        step = await this.applyLaunchDarklyFlags(step, req);
+
         const { data } = await this.store.load(req, caseId);
 
         // Auto-skip only if the original step had fields but all are now hidden
@@ -995,38 +988,32 @@ export class WizardEngine {
                 `${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${encodeURIComponent(lang)}`
               );
             }
-            // If validation fails, stay on current step
             this.logger.warn(`Invalid next step ID for redirect: ${nextId}`);
           }
         }
 
         // Check if the requested step is accessible based on journey progress
         if (!this.isStepAccessible(step.id, data)) {
-          // Find the first incomplete step
           const stepIds = Object.keys(this.journey.steps);
           let firstIncompleteStep = stepIds[0];
 
           for (const stepId of stepIds) {
             const stepConfig = this.journey.steps[stepId] as StepConfig;
-            // Skip steps without input fields
             if (!this.hasInputFields(stepConfig)) {
               continue;
             }
-            // If this step is not complete, it's the first incomplete step
             if (!this.isStepComplete(stepId, data)) {
               firstIncompleteStep = stepId;
               break;
             }
           }
 
-          // Redirect to the first incomplete step
           const validatedFirstIncompleteStep = this.validateStepIdForRedirect(firstIncompleteStep);
           if (validatedFirstIncompleteStep) {
             return res.redirect(
               `${this.basePath}/${encodeURIComponent(validatedFirstIncompleteStep)}?lang=${encodeURIComponent(lang)}`
             );
           }
-          // If validation fails, redirect to the first step in the journey
           const firstStepId = Object.keys(this.journey.steps)[0];
           const validatedFirstStepId = this.validateStepIdForRedirect(firstStepId);
           if (validatedFirstStepId) {
@@ -1035,24 +1022,25 @@ export class WizardEngine {
               `${this.basePath}/${encodeURIComponent(validatedFirstStepId)}?lang=${encodeURIComponent(lang)}`
             );
           }
-          // If even the first step is invalid, this is a critical error
           this.logger.error('Critical error: No valid step IDs found in journey configuration');
           return res.status(500).send('Internal server error');
         }
 
         let context = this.buildJourneyContext(step, caseId, data, t, lang);
 
-        // Re-calculate previousStepUrl to skip hidden steps
         const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
         context = {
           ...context,
-          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}?lang=${encodeURIComponent(lang)}` : null,
+          previousStepUrl:
+            prevVisible && step.type !== 'confirmation'
+              ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
+              : null,
         };
 
         const templatePath = await this.resolveTemplatePath(step.id);
         const safeTemplate = `${this.sanitizeTemplatePath(templatePath)}.njk`;
 
-        // If we are rendering the confirmation (or other terminal) step, clear the session so the user can start a new journey.
+        // If rendering confirmation, clear session so a new journey generates a fresh caseId
         if (step.type === 'confirmation') {
           const session = req.session as unknown as Record<string, unknown>;
           const caseIdKey = `journey_${this.slug}_caseId`;
@@ -1062,11 +1050,8 @@ export class WizardEngine {
           }
         }
 
-        // explicitly set the template type to njk
         res.render(safeTemplate, {
           ...context,
-          lang,
-          t,
           data: context.data,
           errors: null,
           allData: context.allData,
@@ -1083,52 +1068,56 @@ export class WizardEngine {
     router.post('/:step', express.urlencoded({ extended: true }), async (req, res, next) => {
       const caseId = getOrCreateCaseId(req);
       let step = (req as RequestWithStep).step!;
-      step = await this.applyLdOverride(step, req);
-      step = await this.applyLaunchDarklyFlags(step, req);
 
       const lang = (res.locals.lang as string) || 'en';
-      const t = this.getTranslator(req);
-
-      // Validate using Zod-based validation
-      const validationResult = this.validator.validate(step, req.body);
-
-      if (!validationResult.success) {
-        const { data } = await this.store.load(req, caseId);
-        // Reconstruct nested date fields from req.body for template
-        const reconstructedData = { ...req.body };
-        if (step.fields) {
-          for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
-            const typedFieldConfig = fieldConfig as FieldConfig;
-            if (typedFieldConfig.type === 'date') {
-              reconstructedData[fieldName] = {
-                day: req.body[`${fieldName}-day`] || '',
-                month: req.body[`${fieldName}-month`] || '',
-                year: req.body[`${fieldName}-year`] || '',
-              };
-            }
-          }
-        }
-        // Patch the current step's data with reconstructedData for this render
-        const patchedAllData = { ...data, [step.id]: reconstructedData };
-
-        // 👇 pass t + lang
-        let context = this.buildJourneyContext(step, caseId, patchedAllData, t, lang, validationResult.errors);
-
-        const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
-        context = {
-          ...context,
-          previousStepUrl: prevVisible ? `${this.basePath}/${prevVisible}?lang=${encodeURIComponent(lang)}` : null,
-        };
-
-        const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
-        return res.status(400).render(postTemplatePath, {
-          ...context,
-          lang,
-          t,
-        });
-      }
+      const t: TFunction = (res.locals.t as TFunction) || (i18next.t.bind(i18next) as TFunction);
 
       try {
+        step = await this.applyLdOverride(step, req);
+        step = await this.applyLaunchDarklyFlags(step, req);
+
+        // Validate using Zod-based validation
+        const validationResult = this.validator.validate(step, req.body);
+
+        if (!validationResult.success) {
+          const { data } = await this.store.load(req, caseId);
+
+          // Reconstruct nested date fields from req.body for template
+          const reconstructedData = { ...req.body };
+          if (step.fields) {
+            for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+              const typedFieldConfig = fieldConfig as FieldConfig;
+              if (typedFieldConfig.type === 'date') {
+                reconstructedData[fieldName] = {
+                  day: req.body[`${fieldName}-day`] || '',
+                  month: req.body[`${fieldName}-month`] || '',
+                  year: req.body[`${fieldName}-year`] || '',
+                };
+              }
+            }
+          }
+
+          // Patch the current step's data with reconstructedData for this render
+          const patchedAllData = { ...data, [step.id]: reconstructedData };
+
+          // Build i18n-aware context for error render
+          let context = this.buildJourneyContext(step, caseId, patchedAllData, t, lang, validationResult.errors);
+
+          const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
+          context = {
+            ...context,
+            previousStepUrl: prevVisible
+              ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
+              : null,
+          };
+
+          const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+          return res.status(400).render(postTemplatePath, {
+            ...context,
+          });
+        }
+
+        // Save and move forward
         const { version } = await this.store.load(req, caseId);
         const { data: merged } = await this.store.save(req, caseId, version, {
           [step.id]: validationResult.data || {},
@@ -1137,11 +1126,10 @@ export class WizardEngine {
         const nextId = this.resolveNext(step, merged);
         const nextStep = this.journey.steps[nextId];
 
+        // Generate reference number if needed
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (nextStep?.type === 'confirmation' && (nextStep as any).data?.referenceNumber) {
           const referenceNumber = await this.store.generateReference(req, this.slug, caseId);
-
-          // Save the generated reference to the confirmation step data
           await this.store.save(req, caseId, version + 1, {
             [nextId]: { referenceNumber },
           });
@@ -1149,11 +1137,13 @@ export class WizardEngine {
 
         const validatedNextId = this.validateStepIdForRedirect(nextId);
         if (validatedNextId) {
-          res.redirect(`${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${encodeURIComponent(lang)}`);
-        } else {
-          this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
-          res.status(500).send('Internal server error');
+          return res.redirect(
+            `${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${encodeURIComponent(lang)}`
+          );
         }
+
+        this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
+        res.status(500).send('Internal server error');
       } catch (err) {
         next(err);
       }

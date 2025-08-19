@@ -2,13 +2,13 @@ import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
   id: 'start',
-  title: 'startPage.title', // Reference to translation key for title
+  title: 'startPage.title',
   type: 'form',
-  description: 'startPage.description', // Reference to translation key for description
+  description: 'startPage.description',
   fields: {
     startButton: {
       type: 'button',
-      text: 'startButton.text', // Reference to translation key for button text
+      text: 'startButton.text',
       attributes: {
         type: 'submit',
       },

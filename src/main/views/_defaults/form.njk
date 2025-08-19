@@ -25,7 +25,6 @@
     {% endif %}
 
     <form method="post" novalidate>
-      <input type="hidden" name="lang" value="{{ lang }}"/>
       {% for fieldName, fieldConfig in step.fields %}
         {% if fieldConfig.type in ['text', 'email', 'tel', 'password', 'url', 'number'] %}
           {{ govukInput(fieldConfig) }}
