@@ -309,6 +309,7 @@ export const JourneySchema = z
             required: z.boolean().default(true),
           })
           .optional(),
+        i18nNamespace: z.string().optional(),
       })
       .optional(),
   })

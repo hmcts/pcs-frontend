@@ -906,12 +906,45 @@ export class WizardEngine {
   router(): Router {
     const router = Router();
 
-    // Per-request language setup
-    router.use((req, res, next) => {
-      res.locals.journey = this.journey;
-      res.locals.slug = this.slug;
-      res.locals.lang = req.language;
-      res.locals.t = req.t;
+    // Per-request language & namespace setup for this journey
+    router.use(async (req, res, next) => {
+      const ns = this.journey.config?.i18nNamespace ?? this.slug;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const lang = (req as any).language || 'en';
+
+      try {
+        // Ensure the namespace is loaded before use
+        if (req.i18n) {
+          await new Promise<void>((resolve, reject) => {
+            req.i18n.loadNamespaces(ns, err => (err ? reject(err) : resolve()));
+          });
+
+          // Set default namespace (helps with bare-key lookups)
+          req.i18n.setDefaultNamespace(ns);
+        }
+
+        // Translator bound to current lang + ns
+        const fixedT = req.i18n?.getFixedT?.(lang, ns) ?? (req.t as typeof req.t); // fallback to plain req.t
+
+        // Expose to locals (used in Nunjucks and templates)
+        res.locals.lang = lang;
+        res.locals.ns = ns;
+        res.locals.t = fixedT;
+        res.locals.journey = this.journey;
+        res.locals.slug = this.slug;
+
+        // Update Nunjucks globals too
+        const env = req.app.locals?.nunjucksEnv;
+        if (env) {
+          env.addGlobal('lang', lang);
+          env.addGlobal('ns', ns);
+          env.addGlobal('t', fixedT);
+        }
+
+        this.logger.info(`[journey i18n] lang=${lang}, ns=${ns}`);
+      } catch (e) {
+        this.logger.warn(`[journey i18n] failed to set up namespace "${ns}"`, e);
+      }
 
       next();
     });

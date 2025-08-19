@@ -26,6 +26,7 @@ const journey: JourneyDraft = {
     confirmation,
   },
   config: {
+    i18nNamespace: 'eligibility',
     store: {
       type: 'session',
     },

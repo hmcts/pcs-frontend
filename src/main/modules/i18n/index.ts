@@ -30,6 +30,18 @@ type SessionWithUser = {
 const allowedLanguages = ['en', 'cy'] as const;
 type AllowedLang = (typeof allowedLanguages)[number];
 
+function discoverNamespaces(localesDir: string, lang = 'en'): string[] {
+  try {
+    const langDir = path.join(localesDir, lang);
+    return fs
+      .readdirSync(langDir)
+      .filter(f => f.endsWith('.json'))
+      .map(f => path.basename(f, '.json'));
+  } catch {
+    return ['common'];
+  }
+}
+
 export class I18n {
   private readonly logger = Logger.getLogger('i18n');
 
@@ -48,6 +60,8 @@ export class I18n {
       this.logger.error('[i18n] No locales directory found. Set LOCALES_DIR or create src/main/public/locales.');
     }
 
+    const ns = localesDir ? discoverNamespaces(localesDir, 'en') : ['common'];
+
     i18next
       .use(Backend)
       .use(LanguageDetector)
@@ -55,12 +69,10 @@ export class I18n {
         {
           fallbackLng: 'en',
           preload: ['en', 'cy'],
-          ns: ['common', 'eligibility'],
-          defaultNS: 'eligibility',
+          ns,
+          defaultNS: 'common',
           fallbackNS: ['common'],
-          backend: {
-            loadPath: path.join(localesDir || '', '{{lng}}/{{ns}}.json'),
-          },
+          backend: { loadPath: path.join(localesDir || '', '{{lng}}/{{ns}}.json') },
           detection: {
             order: ['querystring', 'cookie', 'session'],
             lookupQuerystring: 'lang',
