@@ -6,6 +6,8 @@ import type { Express, Request as ExpressRequest, NextFunction, Response } from 
 import i18next, { type TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 import { LanguageDetector, handle as i18nextHandle } from 'i18next-http-middleware';
+import { z } from 'zod';
+import { makeZodI18nMap } from 'zod-i18n-map';
 
 function firstExistingPath(paths: string[]): string | null {
   for (const p of paths) {
@@ -123,5 +125,7 @@ export class I18n {
 
       next();
     });
+
+    z.setErrorMap(makeZodI18nMap({ t: i18next.t }));
   }
 }
