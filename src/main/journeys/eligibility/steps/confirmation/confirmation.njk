@@ -12,7 +12,7 @@
   {% endif %}
 
   {{ govukPanel({
-    titleText: step.title or t('confirmation.title', 'Application complete'),
+    titleText: step.title,
     html:
       t('confirmation.panel.refLabel', 'Your reference number')
       ~ '<br><strong>'
@@ -20,23 +20,22 @@
       ~ '</strong>'
   }) }}
 
-  <p class="govuk-body">{{ t('confirmation.sentEmail', 'We have sent you a confirmation email.') }}</p>
+  <p class="govuk-body">{{ t('confirmation.sentEmail') }}</p>
 
-  <h2 class="govuk-heading-m">{{ t('confirmation.whatNextTitle', 'What happens next') }}</h2>
-  <p class="govuk-body">{{ t('confirmation.whatNext1', 'Your possession claim will be reviewed by the court.') }}</p>
-  <p class="govuk-body">{{ t('confirmation.whatNext2', 'You will be contacted within 5 working days with next steps.') }}</p>
+  <h2 class="govuk-heading-m">{{ t('confirmation.whatNextTitle') }}</h2>
+  <p class="govuk-body">{{ t('confirmation.whatNext1') }}</p>
+  <p class="govuk-body">{{ t('confirmation.whatNext2') }}</p>
 
-  <h2 class="govuk-heading-m">{{ t('confirmation.helpTitle', 'Help and support') }}</h2>
+  <h2 class="govuk-heading-m">{{ t('confirmation.helpTitle') }}</h2>
   <p class="govuk-body">
-    <a href="{{ t('confirmation.helpLinkHref', '#') }}" class="govuk-link">
-      {{ t('confirmation.helpLinkText', 'Find legal advice and support') }}
+    <a href="{{ t('confirmation.helpLinkHref') }}" class="govuk-link">
+      {{ t('confirmation.helpLinkText') }}
     </a>
   </p>
 
   <div class="govuk-button-group">
     {{ govukButton({
       text: t('confirmation.exit', 'Exit'),
-      href: '/?lang=' ~ lang,
       classes: 'govuk-button--secondary'
     }) }}
   </div>

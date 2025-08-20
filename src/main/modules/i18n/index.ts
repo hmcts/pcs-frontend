@@ -119,9 +119,6 @@ export class I18n {
       if (nunjucksEnv) {
         nunjucksEnv.addGlobal('lang', lang);
         nunjucksEnv.addGlobal('t', t);
-        if (req.session?.user) {
-          nunjucksEnv.addGlobal('user', req.session.user);
-        }
       }
 
       next();

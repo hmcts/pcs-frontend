@@ -307,7 +307,9 @@ export class WizardEngine {
                 month: Number(mTrim),
                 year: Number(yTrim),
               });
-              return dt.isValid ? dt.toFormat('d MMMM yyyy') : `${dTrim}/${mTrim}/${yTrim}`;
+              return dt.isValid
+                ? dt.setLocale(currentLang || 'en').toFormat('d MMMM yyyy')
+                : `${dTrim}/${mTrim}/${yTrim}`;
             }
 
             if (

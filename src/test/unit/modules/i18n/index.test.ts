@@ -129,7 +129,6 @@ describe('i18n module', () => {
     // nunjucks globals set
     expect(addGlobal).toHaveBeenCalledWith('lang', 'cy');
     expect(addGlobal).toHaveBeenCalledWith('t', expect.any(Function));
-    expect(addGlobal).toHaveBeenCalledWith('user', { name: 'Alice' });
 
     // next called
     expect(next).toHaveBeenCalled();
