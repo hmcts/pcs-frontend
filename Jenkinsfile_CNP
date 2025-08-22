@@ -33,10 +33,19 @@ withPipeline(type, product, component) {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
     // enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
-    enableFortifyScan()
-    afterSuccess('fortify-scan') {
-      steps.archiveArtifacts allowEmptyArchive: true,
-        artifacts: '**/Fortify Scan/**/*'
+     afterAlways('functionalTest:preview') {
+      try {
+        publishHTML([
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : "allure-report",
+          reportFiles          : 'index.html',
+          reportName           : 'PCS Frontend Functional Test Report'
+        ])
+      } catch (Error) {
+        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+      }
     }
   }
 
