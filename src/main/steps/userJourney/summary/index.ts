@@ -5,7 +5,7 @@ import { TranslationContent, loadTranslations } from '../../../app/utils/loadTra
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { getValidatedLanguage } from '../../../utils/getValidatedLanguage';
+import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'summary';
 
@@ -35,12 +35,15 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       try {
-        const lang = getValidatedLanguage(req);
+        const lang: SupportedLang = getValidatedLanguage(req);
 
         if (req.session.ccdCase && req.session.user) {
           await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
         }
-        res.redirect(`/steps/user-journey/application-submitted?lang=${lang}`);
+        const redirectPath = '/steps/user-journey/application-submitted' as const;
+        const qs = new URLSearchParams({ lang }).toString();
+
+        res.redirect(303, `${redirectPath}?${qs}`);
       } catch {
         res.status(500).send('There was an error submitting your application.');
       }
