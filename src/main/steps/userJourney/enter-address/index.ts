@@ -8,7 +8,7 @@ import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
-import { getValidatedLanguage } from '../../../utils/getValidatedLanguage';
+import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'enter-address';
 
@@ -70,8 +70,12 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       const { action, lookupPostcode, selectedAddressIndex } = req.body;
-      const lang = getValidatedLanguage(req);
+      const lang: SupportedLang = getValidatedLanguage(req);
       const content = generateContent(lang);
+
+      const enterAddressPath = '/steps/user-journey/enter-address' as const;
+      const summaryPath = '/steps/user-journey/summary' as const;
+      const qs = new URLSearchParams({ lang }).toString();
 
       // 🔹 Handle Find Address
       if (action === 'find-address') {
@@ -81,7 +85,7 @@ export const step: StepDefinition = {
             field: 'lookupPostcode',
             text: content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode',
           };
-          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
+          return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
         }
 
         try {
@@ -93,12 +97,13 @@ export const step: StepDefinition = {
               field: 'lookupPostcode',
               text: content.errors?.noAddressesFound || 'No addresses found for that postcode',
             };
-            return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
+
+            return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
           }
 
           req.session.lookupPostcode = lookupPostcode;
           req.session.postcodeLookupResult = addressResults;
-          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
+          return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
         } catch {
           req.session.lookupPostcode = lookupPostcode;
 
@@ -106,7 +111,7 @@ export const step: StepDefinition = {
             field: 'lookupPostcode',
             text: content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
           };
-          return res.redirect(`/steps/user-journey/enter-address?lang=${lang}&lookup=1`);
+          return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
         }
       }
 
@@ -128,7 +133,7 @@ export const step: StepDefinition = {
           });
         }
 
-        return res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
+        return res.redirect(303, `${enterAddressPath}?${qs}`);
       }
 
       // 🔹 Handle Final Submission
@@ -180,9 +185,9 @@ export const step: StepDefinition = {
             },
           });
         }
-
-        return res.redirect(`/steps/user-journey/summary?lang=${lang}`);
+        return res.redirect(303, `${summaryPath}?${qs}`);
       }
+      return res.redirect(303, `${enterAddressPath}?${qs}`);
     },
   },
 };
