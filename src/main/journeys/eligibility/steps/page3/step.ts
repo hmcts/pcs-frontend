@@ -2,43 +2,40 @@ import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
   id: 'page3',
-  title: 'What are your grounds for possession?',
   type: 'form',
-  description: 'Select all grounds that apply to your case',
+  title: 'page3.title',
+  description: 'page3.description',
   fields: {
     grounds: {
       type: 'checkboxes',
-      label: {
-        text: 'Select all that apply',
-      },
+      label: { text: 'page3.groundsLabel' },
       options: [
         {
           value: 'rent-arrears-8',
-          text: 'Rent arrears (ground 8)',
-          hint: "The tenant owes at least 2 months' rent",
+          text: 'page3.options.rentArrears8.text',
+          hint: 'page3.options.rentArrears8.hint',
         },
         {
           value: 'breach-contract-9',
-          text: 'Breach of contract (ground 9)',
-          hint: 'The tenant has broken terms of the tenancy agreement',
+          text: 'page3.options.breachContract9.text',
+          hint: 'page3.options.breachContract9.hint',
         },
         {
           value: 'other-10',
-          text: 'Other (ground 10)',
-          hint: 'Other statutory grounds for possession',
+          text: 'page3.options.other10.text',
+          hint: 'page3.options.other10.hint',
         },
       ],
       validate: {
         required: true,
         minLength: 1,
-        customMessage: 'Select at least one option',
+        customMessage: 'page3.errors.groundsRequired',
       },
     },
     continueButton: {
       type: 'button',
-      attributes: {
-        type: 'submit',
-      },
+      text: 'buttons.continue',
+      attributes: { type: 'submit' },
     },
   },
   next: {

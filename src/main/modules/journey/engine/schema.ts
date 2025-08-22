@@ -11,6 +11,7 @@ const logger = Logger.getLogger('journey-engine-schema');
 const ErrorMessagesSchema = z
   .object({
     required: z.string().optional(),
+    invalid: z.string().optional(),
     missingParts: z.custom<(missing: string[]) => string>().optional(),
     invalidPart: z.custom<(field: string) => string>().optional(),
     notRealDate: z.string().optional(),
@@ -215,6 +216,12 @@ export const FieldSchema = z.object({
   text: z.string().optional(), // button text
 
   flag: z.string().optional(),
+
+  // Adding namePrefix for date fields or other types that require it
+  namePrefix: z.string().optional(),
+
+  // Adding value for fields like text, number, textarea, etc.
+  value: z.union([z.string(), z.number(), z.array(z.string())]).optional(), // value is now allowed for fields that support it
 });
 
 // Step configuration schema
@@ -302,6 +309,7 @@ export const JourneySchema = z
             required: z.boolean().default(true),
           })
           .optional(),
+        i18nNamespace: z.string().optional(),
       })
       .optional(),
   })
@@ -437,7 +445,8 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     }
 
     case 'email': {
-      let schema = z.email({ message: getMessage('email') });
+      const message = getMessage('email') ?? 'errors.email.invalid';
+      let schema = z.email({ message });
       if (rules?.minLength !== undefined) {
         schema = schema.min(rules.minLength, { message: getMessage('minLength') });
       }
@@ -465,14 +474,32 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         .filter(v => v !== '' && v !== null && v !== undefined) as string[];
 
       if (allowed.length === 0) {
-        // Fallback to simple string validation if no options found
-        return z.string();
+        let schema = z.string();
+        if (rules?.required === true) {
+          schema = schema.min(1, { message: getMessage('required') ?? 'errors.required' });
+        }
+        return schema;
       }
 
-      // z.enum requires tuple type; assert non-empty
-      const enumSchema = z.enum(allowed as [string, ...string[]]);
+      let schema = z.string();
 
-      return rules?.required === false ? enumSchema.optional() : enumSchema;
+      if (rules?.required === true) {
+        schema = schema.min(1, { message: getMessage('required') ?? 'errors.required' });
+      }
+
+      schema = schema.refine(
+        val => {
+          if (val === '' || val === null) {
+            return rules?.required !== true;
+          }
+          return allowed.includes(val);
+        },
+        {
+          message: getMessage('invalid') ?? 'errors.select.invalid',
+        }
+      );
+
+      return schema;
     }
 
     case 'checkboxes': {

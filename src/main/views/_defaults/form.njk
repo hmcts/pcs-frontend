@@ -7,25 +7,15 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block content %}
-
-{% if previousStepUrl %}
-  {{ govukBackLink({
-    text: "Back",
-    href: previousStepUrl
-  }) }}
-{% endif %}
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
     {% if errorSummary %}
       {{ govukErrorSummary(errorSummary) }}
     {% endif %}
-    
     {% if step.title %}
       <h1 class="govuk-heading-l">{{ step.title }}</h1>
     {% endif %}
@@ -33,8 +23,6 @@
     {% if step.description %}
       <span class="govuk-caption-l">{{ step.description }}</span>
     {% endif %}
-
-
 
     <form method="post" novalidate>
       {% for fieldName, fieldConfig in step.fields %}

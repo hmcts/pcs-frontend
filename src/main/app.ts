@@ -22,6 +22,8 @@ const logger = Logger.getLogger('app');
 
 setupDev(app, developmentMode);
 
+app.use(cookieParser());
+
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const moduleInstance = new (modules as any)[moduleName](developmentMode);
@@ -31,7 +33,7 @@ modules.modules.forEach(async moduleName => {
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
