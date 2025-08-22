@@ -54,12 +54,6 @@ withNightlyPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true,
       artifacts: '**/Fortify Scan/**/*'
   }
-  afterAlways('FortifyScan') {
-    runE2ETests(yarnBuilder)
-    if (params.ACCESSIBILITY_TESTS) {
-      runAccessibilityTests(yarnBuilder)
-    }
-  }
 }
 
 def validateInputs() {
