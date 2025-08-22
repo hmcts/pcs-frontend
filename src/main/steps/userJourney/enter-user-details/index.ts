@@ -7,7 +7,7 @@ import { TranslationContent, loadTranslations } from '../../../app/utils/loadTra
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { getValidatedLanguage } from '../../../utils/getValidatedLanguage';
+import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'enter-user-details';
 
@@ -55,7 +55,7 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
-      const lang = getValidatedLanguage(req);
+      const lang: SupportedLang = getValidatedLanguage(req);
       const content = generateContent(lang);
       const fields = getFields(content);
       const errors = validateForm(req, fields, content);
@@ -88,7 +88,10 @@ export const step: StepDefinition = {
         });
       }
 
-      res.redirect(`/steps/user-journey/enter-address?lang=${lang}`);
+      const redirectPath = '/steps/user-journey/enter-address' as const;
+      const qs = new URLSearchParams({ lang }).toString();
+
+      res.redirect(303, `${redirectPath}?${qs}`);
     },
   },
 };

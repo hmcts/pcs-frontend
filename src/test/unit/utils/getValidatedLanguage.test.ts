@@ -24,9 +24,9 @@ describe('getValidatedLanguage', () => {
     it('should return "en" for any other string value', () => {
       expect(getValidatedLanguage(createMockRequest('fr') as Request)).toBe('en');
       expect(getValidatedLanguage(createMockRequest('de') as Request)).toBe('en');
-      expect(getValidatedLanguage(createMockRequest('CY') as Request)).toBe('en');
+      expect(getValidatedLanguage(createMockRequest('FR') as Request)).toBe('en');
       expect(getValidatedLanguage(createMockRequest('') as Request)).toBe('en');
-      expect(getValidatedLanguage(createMockRequest('cy ') as Request)).toBe('en');
+      expect(getValidatedLanguage(createMockRequest('fr ') as Request)).toBe('en');
     });
   });
 
@@ -61,6 +61,14 @@ describe('getValidatedLanguage', () => {
     it('should handle nested arrays', () => {
       const req = createMockRequest([['cy'], 'en']);
       expect(getValidatedLanguage(req as Request)).toBe('en');
+    });
+  });
+
+  describe('normalization', () => {
+    it('lowercases and trims', () => {
+      expect(getValidatedLanguage(createMockRequest('CY') as Request)).toBe('cy');
+      expect(getValidatedLanguage(createMockRequest(' cy  ') as Request)).toBe('cy');
+      expect(getValidatedLanguage(createMockRequest(' EN ') as Request)).toBe('en');
     });
   });
 
