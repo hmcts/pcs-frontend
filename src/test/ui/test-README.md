@@ -76,6 +76,7 @@ Playwright 1.30+ | TypeScript 4.9+
 | navigateToUrl      | `performAction('navigateToUrl', 'testUrl')`               |
 | createUserAndLogin | `performAction('createUserAndLogin', 'citizen')`          |
 | clickLink          | `performAction('clickLink', ...)`                         |
+
 ### Validations
 
 | Validation            | Example Usage                                                    |
@@ -92,6 +93,7 @@ Playwright 1.30+ | TypeScript 4.9+
 | dashboardNotification | `performValidation('dashboardNotification', {title: 'test'})`    |
 | dashboardTask         | `performValidation('dashboardTask', {title: 'test'})`            |
 | mainHeader            | `performValidation('mainHeader', ...)`                           |
+
 ### Basic Test
 
 ```typescript
