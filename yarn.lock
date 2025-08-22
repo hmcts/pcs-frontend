@@ -336,19 +336,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-browser@npm:4.20.0":
-  version: 4.20.0
-  resolution: "@azure/msal-browser@npm:4.20.0"
+"@azure/msal-browser@npm:4.21.0":
+  version: 4.21.0
+  resolution: "@azure/msal-browser@npm:4.21.0"
   dependencies:
-    "@azure/msal-common": "npm:15.11.0"
-  checksum: 10/3049448c1fb56d9360ee49ddd791bdcdda6d1d99163928efa291e5cbe7a70155b2901684d4028c1912c96cb6f8d35487b3acf7da71d931160d4bd23f26715431
+    "@azure/msal-common": "npm:15.12.0"
+  checksum: 10/c440bdd0a2b9d4849d8982d420005c5d24d53d74dfe8d13a0cd4122ef543a22b8482947c1368bb055cad0dbbd6489896fee556a0a18d1cd9b3497de3a267e96b
   languageName: node
   linkType: hard
 
-"@azure/msal-common@npm:15.11.0":
-  version: 15.11.0
-  resolution: "@azure/msal-common@npm:15.11.0"
-  checksum: 10/6a23d8b4155a2da7100e0ef8f8fa116a7432fa3927c8324f1d70d8f94b9cd2a481c1e07c39d4519049826012572b0254ee273350abbd88bc58d53be2620efdea
+"@azure/msal-common@npm:15.12.0":
+  version: 15.12.0
+  resolution: "@azure/msal-common@npm:15.12.0"
+  checksum: 10/0105b1ba5b751c713545000abd1cf3d9300bdd9d803d3f9795876fb1a1aebde9050d7a9378dcef15ec04080550389edea360a7a717d43788dc7650ea03879456
   languageName: node
   linkType: hard
 
@@ -4601,13 +4601,13 @@ __metadata:
   linkType: hard
 
 "@playwright/test@npm:^1.49.0":
-  version: 1.54.2
-  resolution: "@playwright/test@npm:1.54.2"
+  version: 1.55.0
+  resolution: "@playwright/test@npm:1.55.0"
   dependencies:
-    playwright: "npm:1.54.2"
+    playwright: "npm:1.55.0"
   bin:
     playwright: cli.js
-  checksum: 10/33d6c0780ef6cca12c008cae166ba06978ae975138a1654e14cd8691ad7826dbbc03e492ed42c65889c44ca893d0fd47d8ae4dc8d824020d7f767260b395dc6b
+  checksum: 10/bfaede669b0583ee6ec48bfe9ff531cac58da1b83031907d5d0fd71c33bab6766669a23359e401066d97c8e8fa76566900f71be7b290d12213ebb3530a82afbb
   languageName: node
   linkType: hard
 
@@ -7047,16 +7047,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai@npm:5.3.1":
-  version: 5.3.1
-  resolution: "chai@npm:5.3.1"
+"chai@npm:5.3.2":
+  version: 5.3.2
+  resolution: "chai@npm:5.3.2"
   dependencies:
     assertion-error: "npm:^2.0.1"
     check-error: "npm:^2.1.1"
     deep-eql: "npm:^5.0.1"
     loupe: "npm:^3.1.0"
     pathval: "npm:^2.0.0"
-  checksum: 10/0d801e3e4584dcbba6dbf415b5ea801dbf069f328560aa4d4f9b016e9a362dd58cb44775798e2130f4ad639385cad85dc486f995e672713369a44fd33702dcbf
+  checksum: 10/4750d8ff39896554103041d0fd20b67bd4afd3e3e7522325f219e37f99b2e983c6b05a25c07c2678f3fc4c8c1b6a7aa697f20646ae0a7d85f8c9cc88522a181b
   languageName: node
   linkType: hard
 
@@ -13460,12 +13460,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.54.2, playwright-core@npm:^1.36.2":
-  version: 1.54.2
-  resolution: "playwright-core@npm:1.54.2"
+"playwright-core@npm:1.55.0, playwright-core@npm:^1.36.2":
+  version: 1.55.0
+  resolution: "playwright-core@npm:1.55.0"
   bin:
     playwright-core: cli.js
-  checksum: 10/8eb8b37d7b02c2394f85567c5703464ee7c85929e1de7118946548a0277cacd41a6f247b8f7eb50c921433346f785356eff8132a9d3c6c2dcf3402c6a83e4f18
+  checksum: 10/843376a8e2c1100d3f0625b2c85a69dc4418a0b268bdc7da6cf28252f6dc50c299c734f090a67c7f36cfa9140dacf5b95e817664e69642bcbaf06eea4d216c35
   languageName: node
   linkType: hard
 
@@ -13485,18 +13485,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright@npm:1.54.2, playwright@npm:^1.36.2":
-  version: 1.54.2
-  resolution: "playwright@npm:1.54.2"
+"playwright@npm:1.55.0, playwright@npm:^1.36.2":
+  version: 1.55.0
+  resolution: "playwright@npm:1.55.0"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.54.2"
+    playwright-core: "npm:1.55.0"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 10/3f4fedc1e2290b6da6960eedf0d78b9097251848b499b0627186ca85e94178fe6be1590c4926246ff4dad5729fc80ab63fee6554fe736d29c0a1808ec483467f
+  checksum: 10/df02529693923b9b671822dac8a2ac8a8471c9142a05e14a24f8d0038a7dcf705712363991a070fc927466bbbe70e485145cf7a77882613822f56960afc4b892
   languageName: node
   linkType: hard
 
