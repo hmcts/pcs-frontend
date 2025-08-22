@@ -91,10 +91,6 @@ export async function performValidation(
 
   const [fieldName, data] = typeof inputFieldName === 'string' ? [inputFieldName, inputData] : ['', inputFieldName];
 
-  if (!data) {
-    throw new Error('Validation data must be provided');
-  }
-
   await testExecutor.performValidation(validationType, fieldName, data);
 }
 

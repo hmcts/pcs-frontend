@@ -75,6 +75,7 @@ Playwright 1.30+ | TypeScript 4.9+
 | clickRadioButton   | `performAction('clickRadioButton', 'testRadio')`          |
 | navigateToUrl      | `performAction('navigateToUrl', 'testUrl')`               |
 | createUserAndLogin | `performAction('createUserAndLogin', 'citizen')`          |
+| clickLink          | `performAction('clickLink', ...)`                         |
 
 ### Validations
 
@@ -91,6 +92,7 @@ Playwright 1.30+ | TypeScript 4.9+
 | pageTitle             | `performValidation('pageTitle', 'title')`                        |
 | dashboardNotification | `performValidation('dashboardNotification', {title: 'test'})`    |
 | dashboardTask         | `performValidation('dashboardTask', {title: 'test'})`            |
+| mainHeader            | `performValidation('mainHeader', ...)`                           |
 
 ### Basic Test
 
