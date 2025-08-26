@@ -236,6 +236,16 @@ export class WizardEngine {
     return sanitizedStepId;
   }
 
+  private formatDateViaI18n(dt: DateTime, t: TFunction): string {
+    const day = String(dt.day);
+    const monthKey = String(dt.month); // 1..12
+    const month = t(`months.${monthKey}`, monthKey); // falls back to number if missing
+    const year = String(dt.year);
+    // allow languages to change order via a translatable template
+    const tpl = t('dateFormatLong', '{{day}} {{month}} {{year}}');
+    return tpl.replace('{{day}}', day).replace('{{month}}', month).replace('{{year}}', year);
+  }
+
   // Build summary rows for summary pages (with i18n)
   private buildSummaryRows(allData: Record<string, unknown>, t: TFunction, currentLang?: string): SummaryRow[] {
     return Object.entries(this.journey.steps)
@@ -307,9 +317,7 @@ export class WizardEngine {
                 month: Number(mTrim),
                 year: Number(yTrim),
               });
-              return dt.isValid
-                ? dt.setLocale(currentLang || 'en').toFormat('d MMMM yyyy')
-                : `${dTrim}/${mTrim}/${yTrim}`;
+              return dt.isValid ? this.formatDateViaI18n(dt, t) : `${dTrim}/${mTrim}/${yTrim}`;
             }
 
             if (
@@ -356,7 +364,7 @@ export class WizardEngine {
             items: [
               {
                 href,
-                text: t('summary.change', 'Change'),
+                text: t('change', 'Change'),
                 visuallyHiddenText: `${rowLabel.toLowerCase()}`,
               },
             ],
