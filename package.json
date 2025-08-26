@@ -46,7 +46,7 @@
     "applicationinsights": "3.9.0",
     "axios": "^1.4.0",
     "body-parser": "^2.0.0",
-    "chai": "5.3.1",
+    "chai": "5.3.2",
     "config": "^3.3.9",
     "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.7",
@@ -169,10 +169,10 @@
     "semver": "^7.5.2",
     "axios": ">1.6.0",
     "@types/express-serve-static-core": "*",
-    "chai": "5.3.1",
+    "chai": "5.3.2",
     "@types/node": "22.17.2",
     "glob": "^11.0.0",
-    "@azure/msal-browser": "4.20.0",
+    "@azure/msal-browser": "4.21.0",
     "superagent": "10.2.3",
     "brace-expansion": "4.0.1",
     "form-data": "^4.0.4",
@@ -182,5 +182,5 @@
     "*.{js,ts}": "eslint --cache --fix",
     "*.{js,ts,css,md,html,json}": "prettier --write"
   },
-  "packageManager": "yarn@4.9.2"
+  "packageManager": "yarn@4.9.3"
 }

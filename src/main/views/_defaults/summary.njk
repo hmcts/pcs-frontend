@@ -18,10 +18,9 @@
   {% endif %}
 
   <form method="post" novalidate>
-    <input type="hidden" name="lang" value="{{ lang }}"/>
     <div class="govuk-button-group">
       {{ govukButton({
-        text: translations.summary.submit or "Submit",
+        text:  t('buttons.submit', 'Submit'),
         attributes: { type: 'submit' }
       }) }}
     </div>

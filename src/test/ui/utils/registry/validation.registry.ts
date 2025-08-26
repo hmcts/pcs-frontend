@@ -6,6 +6,7 @@ import { CheckedValidation } from '../validations/element-validations/checked.va
 import { CountValidation } from '../validations/element-validations/count.validation';
 import { CssValidation } from '../validations/element-validations/css.validation';
 import { EnabledValidation } from '../validations/element-validations/enabled.validation';
+import { MainHeaderValidation } from '../validations/element-validations/pageHeader.validation';
 import { PageTitleValidation } from '../validations/element-validations/pageTitle.validation';
 import { TextValidation } from '../validations/element-validations/text.validation';
 import { ValueValidation } from '../validations/element-validations/value.validation';
@@ -24,6 +25,7 @@ export class ValidationRegistry {
     ['pageTitle', new PageTitleValidation()],
     ['dashboardNotification', new DashboardNotificationValidation()],
     ['dashboardTask', new DashboardTasksValidation()],
+    ['mainHeader', new MainHeaderValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {

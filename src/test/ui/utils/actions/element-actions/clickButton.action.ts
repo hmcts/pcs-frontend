@@ -9,7 +9,9 @@ export class ClickButtonAction implements IAction {
            [aria-label="${fieldName}"],
            [name="${fieldName}"],
            label:has-text("${fieldName}") + button,
-           label:has-text("${fieldName}") ~ button`);
+           label:has-text("${fieldName}") ~ button,
+           a[role="button"]:has-text("${fieldName}"),
+           a.govuk-button:has-text("${fieldName}")`);
     await locator.click();
   }
 }

@@ -9,7 +9,8 @@
     "back": "cyBack",
     "cancel": "cyCancel",
     "finish": "cyStart a new application",
-    "start": "cyStart"
+    "start": "cyStart",
+    "submit": "cySubmit"
   },
   "change": "cyChange",
   "defaultRequired": "cyThis field is required",
@@ -42,5 +43,20 @@
       "invalidYear": "cyEnter a valid year",
       "invalidValue": "cyEnter a valid value"
     }
-  }
+  },
+  "months": {
+    "1": "cyJanuary",
+    "2": "cyFebruary",
+    "3": "cyMarch",
+    "4": "cyApril",
+    "5": "cyMay",
+    "6": "cyJune",
+    "7": "cyJuly",
+    "8": "cyAugust",
+    "9": "cySeptember",
+    "10": "cyOctober",
+    "11": "cyNovember",
+    "12": "cyDecember"
+  },
+  "dateFormatLong": "{{day}} {{month}} {{year}}"
 }
