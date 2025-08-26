@@ -7037,13 +7037,13 @@ __metadata:
   linkType: hard
 
 "chai-as-promised@npm:^8.0.0":
-  version: 8.0.1
-  resolution: "chai-as-promised@npm:8.0.1"
+  version: 8.0.2
+  resolution: "chai-as-promised@npm:8.0.2"
   dependencies:
-    check-error: "npm:^2.0.0"
+    check-error: "npm:^2.1.1"
   peerDependencies:
-    chai: ">= 2.1.2 < 6"
-  checksum: 10/1938d9f00b1ae197b47c01a9ff8455d3719bc4638103fa5ad254a32e27bc663ba8530fecfa840309e254c2a52ef171c194b7fb25615f8c5d33022d64456f07f9
+    chai: ">= 2.1.2 < 7"
+  checksum: 10/9723b6cda34ef511b48d525ff86a730323f1287728e78918833350718e8b5da58783ebf314ad01e07cca4edcf6df42b2c4bf6b9cfebc886c54ce93b587a1183f
   languageName: node
   linkType: hard
 
@@ -7091,7 +7091,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"check-error@npm:^2.0.0, check-error@npm:^2.1.1":
+"check-error@npm:^2.1.1":
   version: 2.1.1
   resolution: "check-error@npm:2.1.1"
   checksum: 10/d785ed17b1d4a4796b6e75c765a9a290098cf52ff9728ce0756e8ffd4293d2e419dd30c67200aee34202463b474306913f2fcfaf1890641026d9fc6966fea27a
@@ -14789,12 +14789,12 @@ __metadata:
   linkType: hard
 
 "sinon-chai@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "sinon-chai@npm:4.0.0"
+  version: 4.0.1
+  resolution: "sinon-chai@npm:4.0.1"
   peerDependencies:
-    chai: ^5.0.0
+    chai: ^5.0.0 || ^6.0.0
     sinon: ">=4.0.0"
-  checksum: 10/6eb3e6f9da8d71496359b89e30eefba82b2fee3602dd16b9c36e8cd5f43c23cf7dcc6ce47666d0ef16a9ba28e825e299d0d8ef317360dd4ed342cbc3838f9912
+  checksum: 10/cc417d196133353cfd08775a6b259264d06bf8b4dea135de1f601d295726010660f20cbeb601c281504935810fcb7781aef1c56596edc0eaaff57be52717bbc8
   languageName: node
   linkType: hard
 
