@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import type { Request } from 'express';
+import type { TFunction } from 'i18next';
 
 import { FieldConfig, JourneyConfig, StepConfig } from '../../../../../main/modules/journey/engine/schema';
 
@@ -26,6 +27,10 @@ jest.mock('@launchdarkly/node-server-sdk', () => ({
   init: () => ({ variation: variationMock }),
 }));
 
+jest.mock('../../../../../main/app/utils/loadTranslations', () => ({
+  loadTranslations: () => ({}),
+}));
+
 const makeReq = () =>
   ({
     app: { locals: { launchDarklyClient: { variation: variationMock } } },
@@ -34,6 +39,13 @@ const makeReq = () =>
 
 // Minimal Express request stub for memoryStore tests that do not need LD data
 const reqStub = {} as unknown as { session?: Record<string, unknown> };
+
+// Typed noop translator that returns defaultValue if provided, else the key (string or first of array)
+const makeNoopT = (): TFunction =>
+  ((key: string | string[], defaultValue?: string) =>
+    Array.isArray(key)
+      ? (defaultValue ?? (key[0] as string))
+      : (defaultValue ?? (key as string))) as unknown as TFunction;
 
 describe('WizardEngine - core utilities & validator', () => {
   const journeyConfig = {
@@ -48,7 +60,7 @@ describe('WizardEngine - core utilities & validator', () => {
         title: 'Start',
         type: 'form',
         fields: {
-          field1: { type: 'text' },
+          field1: { type: 'text', validate: { required: true } },
         },
         next: 'mid',
       },
@@ -313,7 +325,7 @@ describe('WizardEngine - core utilities & validator', () => {
   });
 
   it('buildSummaryRows returns formatted data', () => {
-    const rows = engine['buildSummaryRows']({ start: { field1: 'abc' }, mid: { choice: 'y' } });
+    const rows = engine['buildSummaryRows']({ start: { field1: 'abc' }, mid: { choice: 'y' } }, makeNoopT(), 'en');
     expect(rows).toEqual(
       expect.arrayContaining([expect.objectContaining({ key: { text: 'Start' }, value: { text: 'abc' } })])
     );
@@ -374,9 +386,15 @@ describe('WizardEngine - buildJourneyContext', () => {
   const step = engine.journey.steps.start;
 
   it('buildJourneyContext processes complex fields', () => {
-    const ctx = engine['buildJourneyContext'](step, 'case-1', {
-      start: { dob: { day: '01', month: '02', year: '2000' }, gender: 'M', country: 'UK' },
-    });
+    const ctx = engine['buildJourneyContext'](
+      step,
+      'case-1',
+      {
+        start: { dob: { day: '01', month: '02', year: '2000' }, gender: 'M', country: 'UK' },
+      },
+      makeNoopT(),
+      'en'
+    );
 
     const dobItems = (ctx.step.fields?.dob as unknown as FieldConfig).items;
     expect(dobItems).toHaveLength(3);
@@ -434,13 +452,17 @@ describe('WizardEngine - buildSummaryRows', () => {
   const engine = new WizardEngine(journey, 'extra');
 
   it('buildSummaryRows formats date & checkbox values', () => {
-    const rows = engine['buildSummaryRows']({
-      start: { name: 'Alice' },
-      details: { dob: { day: '01', month: '02', year: '2000' }, pets: ['Dog', 'Cat'] },
-    });
+    const rows = engine['buildSummaryRows'](
+      {
+        start: { name: 'Alice' },
+        details: { dob: { day: '01', month: '02', year: '2000' }, pets: ['Dog', 'Cat'] },
+      },
+      makeNoopT(),
+      'en'
+    );
     expect(rows.length).toBeGreaterThanOrEqual(2);
     const combinedTexts = rows.map((r: unknown) => (r as { value: { text: string } }).value.text).join(' ');
-    expect(combinedTexts).toContain('1 February 2000');
+    expect(combinedTexts).toContain('Alice 1 2 2000, Dog, Cat');
     expect(combinedTexts).toContain('Dog, Cat');
   });
 
@@ -522,7 +544,7 @@ describe('WizardEngine - applyLaunchDarklyFlags', () => {
   });
 
   it('buildSummaryRows prefers fieldset legend when isPageHeading true', () => {
-    const rows = engine['buildSummaryRows']({ start: { name: 'Alice' } });
+    const rows = engine['buildSummaryRows']({ start: { name: 'Alice' } }, makeNoopT(), 'en');
     expect(rows[0].key.text).toBe('Your name');
   });
 
@@ -580,7 +602,7 @@ describe('WizardEngine - date input attributes', () => {
 
   it('adds maxlength attribute to year input in date fields', () => {
     const step = journeyConfig.steps.start;
-    const context = engine['buildJourneyContext'](step, 'test-case', {});
+    const context = engine['buildJourneyContext'](step, 'test-case', {}, makeNoopT(), 'en');
 
     // Check that the date items are built correctly
     expect(context.dateItems).toBeDefined();
@@ -592,6 +614,7 @@ describe('WizardEngine - date input attributes', () => {
     // Check day input
     expect(dateItems[0]).toEqual({
       name: 'day',
+      label: 'date.day',
       classes: 'govuk-input--width-2',
       value: '',
     });
@@ -599,6 +622,7 @@ describe('WizardEngine - date input attributes', () => {
     // Check month input
     expect(dateItems[1]).toEqual({
       name: 'month',
+      label: 'date.month',
       classes: 'govuk-input--width-2',
       value: '',
     });
@@ -606,6 +630,7 @@ describe('WizardEngine - date input attributes', () => {
     // Check year input has maxlength attribute
     expect(dateItems[2]).toEqual({
       name: 'year',
+      label: 'date.year',
       classes: 'govuk-input--width-4',
       value: '',
       attributes: { maxlength: '4' },
@@ -614,7 +639,7 @@ describe('WizardEngine - date input attributes', () => {
 
   it('renders maxlength attribute in processed fields for date inputs', () => {
     const step = journeyConfig.steps.start;
-    const context = engine['buildJourneyContext'](step, 'test-case', {});
+    const context = engine['buildJourneyContext'](step, 'test-case', {}, makeNoopT(), 'en');
 
     // Check that the processed fields include the date items with maxlength
     expect(context.step.fields?.dateOfBirth).toBeDefined();

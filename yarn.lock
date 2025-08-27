@@ -13232,6 +13232,7 @@ __metadata:
     webpack-dev-middleware: "npm:^7.0.0"
     webpack-node-externals: "npm:^3.0.0"
     zod: "npm:^3.25.32"
+    zod-i18n-map: "npm:^2.27.0"
   languageName: unknown
   linkType: soft
 
@@ -16759,6 +16760,16 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 10/f77b3d8d00310def622123df93d4ee654fc6a0096182af8bd60679ddcdfb3474c56c6c7190817c84a2785648cdee9d721c0154eb45698c62176c322fb46fc700
+  languageName: node
+  linkType: hard
+
+"zod-i18n-map@npm:^2.27.0":
+  version: 2.27.0
+  resolution: "zod-i18n-map@npm:2.27.0"
+  peerDependencies:
+    i18next: ">=21.3.0"
+    zod: ">=3.17.0"
+  checksum: 10/4063bb7cfeed3bdd2084de7a5d55e8b3efb940cb8c07ac1d8d4173e4d2c24cd386b10eb6e1353ce8e6a6060a346a77fd0ad190c624fd886a4b516f044c34968d
   languageName: node
   linkType: hard
 

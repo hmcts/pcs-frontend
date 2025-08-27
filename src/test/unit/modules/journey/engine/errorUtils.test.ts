@@ -21,7 +21,7 @@ describe('errorUtils', () => {
       const result = errorUtils.processErrorsForTemplate(errors);
 
       expect(result).toEqual({
-        titleText: 'There is a problem',
+        titleText: 'errors.title',
         errorList: [
           { text: 'Field 1 is required', href: '#field1' },
           { text: 'Field 2 is invalid', href: '#field2' },
