@@ -1,26 +1,19 @@
 {% extends "journeyTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block content %}
+  <h1 class="govuk-heading-l">{{ step.title or t('ineligible.title', 'You cannot continue') }}</h1>
 
-{% if previousStepUrl %}
-  {{ govukBackLink({
-    text: "Back",
-    href: previousStepUrl
-  }) }}
-{% endif %}
+  {% if step.description %}
+    <p class="govuk-body">{{ step.description }}</p>
+  {% endif %}
 
-  <h1 class="govuk-heading-l">{{ step.title }}</h1>
-
-  <p class="govuk-body">You need to be 18 or over to make a possession claim.</p>
-  <p class="govuk-body">If you think this is incorrect, you can go back and change your answer.</p>
+  <p class="govuk-body">{{ t('ineligible.changeAnswer', 'You can go back and change your answers if you made a mistake.') }}</p>
 
   <div class="govuk-button-group">
     {{ govukButton({
-      text: "Exit application",
-      href: "/"
+      text: t('ineligible.exit', 'Exit'),
+      href: '/?lang=' ~ lang
     }) }}
   </div>
-
 {% endblock %}

@@ -2,50 +2,43 @@ import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
   id: 'page4',
-  title: 'Enter your personal details',
   type: 'form',
+  title: 'page4.title',
   fields: {
     title: {
       type: 'select',
-      label: {
-        text: 'Title',
-      },
+      label: { text: 'page4.fields.title.label' },
       items: [
-        { value: 'Mr', text: 'Mr' },
-        { value: 'Ms', text: 'Ms' },
-        { value: 'Miss', text: 'Miss' },
-        { value: 'Mrs', text: 'Mrs' },
+        { value: 'Mr', text: 'page4.fields.title.items.mr' },
+        { value: 'Ms', text: 'page4.fields.title.items.ms' },
+        { value: 'Miss', text: 'page4.fields.title.items.miss' },
+        { value: 'Mrs', text: 'page4.fields.title.items.mrs' },
       ],
+      validate: {
+        required: true,
+        customMessage: 'page4.errors.title.required',
+      },
     },
     firstName: {
       type: 'text',
-      label: {
-        text: 'First Name',
-      },
+      label: { text: 'page4.fields.firstName.label' },
       validate: {
         required: true,
-        minLength: 5,
-        maxLength: 20,
-        customMessage: 'Enter a first name',
+        customMessage: 'page4.errors.firstName.required',
       },
     },
     lastName: {
       type: 'text',
-      label: {
-        text: 'Last Name',
-      },
+      label: { text: 'page4.fields.lastName.label' },
       validate: {
         required: true,
-        minLength: 5,
-        maxLength: 20,
-        customMessage: 'Enter a last name',
+        customMessage: 'page4.errors.lastName.required',
       },
     },
     continueButton: {
       type: 'button',
-      attributes: {
-        type: 'submit',
-      },
+      text: 'buttons.continue',
+      attributes: { type: 'submit' },
     },
   },
   next: 'page5',

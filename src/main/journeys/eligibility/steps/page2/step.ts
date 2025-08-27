@@ -8,22 +8,23 @@ const step: StepDraft = {
       type: 'radios',
       fieldset: {
         legend: {
-          text: 'Are you 18 or over?',
+          text: 'page2.ageLabel',
           isPageHeading: true,
           classes: 'govuk-fieldset__legend--l',
         },
       },
       options: [
-        { value: 'yes', text: 'Yes' },
-        { value: 'no', text: 'No' },
+        { value: 'yes', text: 'page2.ageOptions.yes' },
+        { value: 'no', text: 'page2.ageOptions.no' },
       ],
       validate: {
         required: true,
-        customMessage: 'Select yes or no',
+        customMessage: 'page2.ageDescription',
       },
     },
     continueButton: {
       type: 'button',
+      text: 'buttons.continue',
       attributes: {
         type: 'submit',
       },

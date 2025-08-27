@@ -4,30 +4,41 @@
 
 {% block content %}
 
+  {# Reference number: real one if present, otherwise i18n fallback #}
+  {% if allData.confirmation and allData.confirmation.referenceNumber %}
+    {% set referenceNumber = allData.confirmation.referenceNumber %}
+  {% else %}
+    {% set referenceNumber = t('confirmation.panel.pending', 'PCR-PENDING') %}
+  {% endif %}
+
   {{ govukPanel({
     titleText: step.title,
-    html: "Your reference number<br><strong>" + (allData.confirmation.referenceNumber if allData.confirmation and allData.confirmation.referenceNumber else "PCR-PENDING") + "</strong>"
+    html:
+      t('confirmation.panel.refLabel', 'Your reference number')
+      ~ '<br><strong>'
+      ~ referenceNumber
+      ~ '</strong>'
   }) }}
 
-  <p class="govuk-body">We have sent you a confirmation email.</p>
+  <p class="govuk-body">{{ t('confirmation.sentEmail') }}</p>
 
-  <h2 class="govuk-heading-m">What happens next</h2>
-  
-  <p class="govuk-body">Your possession claim will be reviewed by the court.</p>
-  <p class="govuk-body">You will be contacted within 5 working days with next steps.</p>
+  <h2 class="govuk-heading-m">{{ t('confirmation.whatNextTitle') }}</h2>
+  <p class="govuk-body">{{ t('confirmation.whatNext1') }}</p>
+  <p class="govuk-body">{{ t('confirmation.whatNext2') }}</p>
 
-  <h2 class="govuk-heading-m">Help and support</h2>
-  
+  <h2 class="govuk-heading-m">{{ t('confirmation.helpTitle') }}</h2>
   <p class="govuk-body">
-    <a href="#" class="govuk-link">Find legal advice and support</a> if you need help with your possession claim.
+    <a href="{{ t('confirmation.helpLinkHref') }}" class="govuk-link">
+      {{ t('confirmation.helpLinkText') }}
+    </a>
   </p>
 
   <div class="govuk-button-group">
     {{ govukButton({
-      text: "Exit",
-      href: "/",
-      classes: "govuk-button--secondary"
+      href: '/?lang=' ~ lang,
+      text: t('confirmation.exit', 'Exit'),
+      classes: 'govuk-button--secondary'
     }) }}
   </div>
 
-{% endblock %} 
+{% endblock %}
