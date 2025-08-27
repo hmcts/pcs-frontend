@@ -2,13 +2,13 @@ import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
   id: 'start',
-  title: 'Before you start',
+  title: 'startPage.title',
   type: 'form',
-  description: "Information about what you'll need for your possession claim",
+  description: 'startPage.description',
   fields: {
     startButton: {
       type: 'button',
-      text: 'Start',
+      text: 'startButton.text',
       attributes: {
         type: 'submit',
       },
