@@ -446,24 +446,29 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
 
     case 'email': {
       const message = getMessage('email') ?? 'errors.email.invalid';
-      let schema = z.email({ message });
+      // Trim whitespace first, then validate email format
+      let schemaBase = z.string().trim();
       if (rules?.minLength !== undefined) {
-        schema = schema.min(rules.minLength, { message: getMessage('minLength') });
+        schemaBase = schemaBase.min(rules.minLength, { message: getMessage('minLength') });
       }
       if (rules?.maxLength !== undefined) {
-        schema = schema.max(rules.maxLength, { message: getMessage('maxLength') });
+        schemaBase = schemaBase.max(rules.maxLength, { message: getMessage('maxLength') });
       }
-      return rules?.required === false ? schema.optional() : schema;
+      const schema = schemaBase.pipe(z.email({ message }));
+      const newSchema = rules?.required === false ? schema.optional() : schema;
+      return newSchema;
     }
 
     case 'url': {
-      let schema = z.url({ message: getMessage('url') });
+      // Trim whitespace before URL validation
+      let base = z.string().trim();
       if (rules?.minLength !== undefined) {
-        schema = schema.min(rules.minLength, { message: getMessage('minLength') });
+        base = base.min(rules.minLength, { message: getMessage('minLength') });
       }
       if (rules?.maxLength !== undefined) {
-        schema = schema.max(rules.maxLength, { message: getMessage('maxLength') });
+        base = base.max(rules.maxLength, { message: getMessage('maxLength') });
       }
+      const schema = base.pipe(z.url({ message: getMessage('url') }));
       return rules?.required === false ? schema.optional() : schema;
     }
 
@@ -579,7 +584,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       // Use a relaxed type here as the schema may switch between string, email, and URL validators
       // during the following conditional transformations.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let schema: any = z.string();
+      let schema: any = z.string().trim();
       if (rules?.minLength !== undefined) {
         schema = schema.min(rules.minLength, { message: getMessage('minLength') });
       }
@@ -596,11 +601,11 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       }
 
       if (rules?.email) {
-        schema = z.email({ message: getMessage('email') });
+        schema = schema.pipe(z.email({ message: getMessage('email') }));
       }
 
       if (rules?.url) {
-        schema = z.url({ message: getMessage('url') });
+        schema = schema.pipe(z.url({ message: getMessage('url') }));
       }
 
       if (rules?.postcode) {
