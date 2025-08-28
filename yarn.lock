@@ -7047,16 +7047,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai@npm:5.3.2":
-  version: 5.3.2
-  resolution: "chai@npm:5.3.2"
+"chai@npm:5.3.3":
+  version: 5.3.3
+  resolution: "chai@npm:5.3.3"
   dependencies:
     assertion-error: "npm:^2.0.1"
     check-error: "npm:^2.1.1"
     deep-eql: "npm:^5.0.1"
     loupe: "npm:^3.1.0"
     pathval: "npm:^2.0.0"
-  checksum: 10/4750d8ff39896554103041d0fd20b67bd4afd3e3e7522325f219e37f99b2e983c6b05a25c07c2678f3fc4c8c1b6a7aa697f20646ae0a7d85f8c9cc88522a181b
+  checksum: 10/0d0ef63106083b05c7ba510697cd9991a02b8df5984a7d010ab4af10205c7a1f27d1c06bfa4679540894295ac4dcc22aa2a281e2e4cfe5133c1db379626689a2
   languageName: node
   linkType: hard
 
