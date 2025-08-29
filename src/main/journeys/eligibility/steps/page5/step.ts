@@ -35,7 +35,6 @@ const step: StepDraft = {
       },
       validate: {
         required: true,
-        email: true,
         customMessage: 'errors.email.invalid',
       },
     },
