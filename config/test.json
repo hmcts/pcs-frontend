@@ -20,7 +20,6 @@
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
     },
     "claimFormTestData": {
-      "pageRoute": "/steps/page1",
       "eligibility": "/eligibility"
     },
     "dashboard": {
