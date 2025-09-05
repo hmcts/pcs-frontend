@@ -22,7 +22,16 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
       fields: {
         dob: {
           type: 'date',
-          validate: { required: true, minLength: 0, maxLength: 100, min: 0, max: 100, email: false, postcode: false, url: false },
+          validate: {
+            required: true,
+            minLength: 0,
+            maxLength: 100,
+            min: 0,
+            max: 100,
+            email: false,
+            postcode: false,
+            url: false,
+          },
           errorMessages: {
             required: 'Enter your date of birth',
             missingParts: () => 'Date must include a day, month and year',
@@ -44,7 +53,16 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
       fields: {
         animals: {
           type: 'checkboxes',
-          validate: { required: true, minLength: 0, maxLength: 100, min: 0, max: 100, email: false, postcode: false, url: false },
+          validate: {
+            required: true,
+            minLength: 0,
+            maxLength: 100,
+            min: 0,
+            max: 100,
+            email: false,
+            postcode: false,
+            url: false,
+          },
           items: ['Dog', 'Cat'],
         },
       },
@@ -62,7 +80,16 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
       fields: {
         animals: {
           type: 'checkboxes',
-          validate: { required: true, minLength: 0, maxLength: 100, min: 0, max: 100, email: false, postcode: false, url: false },
+          validate: {
+            required: true,
+            minLength: 0,
+            maxLength: 100,
+            min: 0,
+            max: 100,
+            email: false,
+            postcode: false,
+            url: false,
+          },
           items: ['Dog', 'Cat'],
         },
       },
@@ -163,7 +190,16 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
           fieldset: {
             legend: { text: 'Date of birth', isPageHeading: true },
           },
-          validate: { required: true, minLength: 0, maxLength: 100, min: 0, max: 100, email: false, postcode: false, url: false },
+          validate: {
+            required: true,
+            minLength: 0,
+            maxLength: 100,
+            min: 0,
+            max: 100,
+            email: false,
+            postcode: false,
+            url: false,
+          },
         },
       },
     };
@@ -234,7 +270,16 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
           fieldset: {
             legend: { text: 'Date of birth', isPageHeading: true },
           },
-          validate: { required: true, minLength: 0, maxLength: 100, min: 0, max: 100, email: false, postcode: false, url: false },
+          validate: {
+            required: true,
+            minLength: 0,
+            maxLength: 100,
+            min: 0,
+            max: 100,
+            email: false,
+            postcode: false,
+            url: false,
+          },
         },
       },
     };
@@ -263,7 +308,16 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
           fieldset: {
             legend: { text: 'Date of birth', isPageHeading: true },
           },
-          validate: { required: true, minLength: 0, maxLength: 100, min: 0, max: 100, email: false, postcode: false, url: false },
+          validate: {
+            required: true,
+            minLength: 0,
+            maxLength: 100,
+            min: 0,
+            max: 100,
+            email: false,
+            postcode: false,
+            url: false,
+          },
         },
       },
     };
@@ -295,7 +349,16 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
           fieldset: {
             legend: { text: 'Date of birth', isPageHeading: true },
           },
-          validate: { required: true, minLength: 0, maxLength: 100, min: 0, max: 100, email: false, postcode: false, url: false },
+          validate: {
+            required: true,
+            minLength: 0,
+            maxLength: 100,
+            min: 0,
+            max: 100,
+            email: false,
+            postcode: false,
+            url: false,
+          },
         },
       },
     };
@@ -313,7 +376,7 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
     expect(result.errors?.['dateOfBirth-month']?.message).toBe('Enter a valid month');
     expect(result.errors?.dateOfBirth?.message).toContain('must include');
     expect(result.errors?.dateOfBirth?._fieldOnly).toBe(true); // Should not be in summary
-    
+
     // Verify part-specific error messages are stored for engine styling
     expect(result.errors?.dateOfBirth?.day).toBe('Enter a valid day');
     expect(result.errors?.dateOfBirth?.month).toBe('Enter a valid month');

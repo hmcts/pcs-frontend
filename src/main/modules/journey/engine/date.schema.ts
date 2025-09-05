@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 import { superRefine, z } from 'zod/v4';
+
 import { FieldConfig } from './schema';
 
 export type DateFieldOptions = {
@@ -39,11 +40,10 @@ export const buildDateInputSchema = (fieldConfig: FieldConfig, options?: DateFie
     })
     .check(
       superRefine((data, ctx) => {
-
         const fieldLabel =
-        typeof fieldConfig.label === 'string'
-          ? fieldConfig.label
-          : fieldConfig.label?.text || fieldConfig.name || 'Date'
+          typeof fieldConfig.label === 'string'
+            ? fieldConfig.label
+            : fieldConfig.label?.text || fieldConfig.name || 'Date';
 
         const day = data.day?.trim() ?? '';
         const month = data.month?.trim() ?? '';
@@ -78,7 +78,6 @@ export const buildDateInputSchema = (fieldConfig: FieldConfig, options?: DateFie
         if (!anyProvided && !options?.required) {
           return; // skip all further validation if not required and not provided
         }
-
 
         // Check for invalid parts (non-numeric or out of range)
         const invalidParts: string[] = [];
@@ -139,13 +138,15 @@ export const buildDateInputSchema = (fieldConfig: FieldConfig, options?: DateFie
               });
             }
           }
-          
+
           // Also add a whole field error for field-level display
           ctx.addIssue({
             path: [fieldConfig.name || ''],
-            message: msgs.missingParts?.(missing) || (missing.length > 1 
-              ? `${fieldLabel} must include ${missing.slice(0, -1).join(', ')} and ${missing[missing.length - 1]}`
-              : `${fieldLabel} must include a ${missing[0]}`),
+            message:
+              msgs.missingParts?.(missing) ||
+              (missing.length > 1
+                ? `${fieldLabel} must include ${missing.slice(0, -1).join(', ')} and ${missing[missing.length - 1]}`
+                : `${fieldLabel} must include a ${missing[0]}`),
             code: 'custom',
           });
         }

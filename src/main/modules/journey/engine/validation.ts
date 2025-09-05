@@ -5,7 +5,10 @@ import { StepConfig, createFieldValidationSchema } from './schema';
 export interface ValidationResult {
   success: boolean;
   data?: Record<string, unknown>;
-  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string; _fieldOnly?: boolean }>;
+  errors?: Record<
+    string,
+    { day?: string; month?: string; year?: string; message: string; anchor?: string; _fieldOnly?: boolean }
+  >;
 }
 
 export class JourneyValidator {
@@ -56,15 +59,15 @@ export class JourneyValidator {
 
         for (const issue of result.error.issues) {
           const anchorPart = (issue.path?.[0] as string) ?? 'day';
-          
+
           if (['day', 'month', 'year'].includes(anchorPart)) {
             // This is a part-specific error
             partErrors.push(anchorPart);
             const anchorId = `${fieldName}-${anchorPart}`;
-            
+
             // Store part-specific error message for engine to use for styling
             partErrorMessages[anchorPart as keyof typeof partErrorMessages] = issue.message || 'Enter a valid date';
-            
+
             // Also store as separate entry for summary processing
             if (!errors[anchorId]) {
               errors[anchorId] = {
@@ -90,17 +93,28 @@ export class JourneyValidator {
           // There are part-specific errors, add a generic field error for field-level display
           // but mark it as field-only so it doesn't appear in summary
           // Include part-specific error messages for engine styling
-          errors[fieldName] = {
+          const fieldError: {
+            day?: string;
+            month?: string;
+            year?: string;
+            message: string;
+            anchor?: string;
+            _fieldOnly?: boolean;
+          } = {
             message: wholeFieldError || 'Enter a valid date',
             anchor: `${fieldName}-day`,
             _fieldOnly: true,
-            ...partErrorMessages,
-          } as any;
+          };
+
+          if (partErrorMessages.day) {fieldError.day = partErrorMessages.day;}
+          if (partErrorMessages.month) {fieldError.month = partErrorMessages.month;}
+          if (partErrorMessages.year) {fieldError.year = partErrorMessages.year;}
+
+          errors[fieldName] = fieldError;
         }
 
         continue;
       }
-
 
       // Non-date fields: use first issue (with optional customMessage override)
       const firstIssue = result.error.issues[0];

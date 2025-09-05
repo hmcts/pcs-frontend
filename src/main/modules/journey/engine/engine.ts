@@ -645,8 +645,6 @@ export class WizardEngine {
       stepCopy = { ...stepCopy, fields: processedFields } as StepConfig;
     }
 
-    console.log('================================ >>>>>>> errors before processing', errors);
-
     return {
       caseId,
       step: stepCopy,
@@ -1158,8 +1156,6 @@ export class WizardEngine {
               ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
               : null,
           };
-
-          console.log('context', context);
 
           const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
           return res.status(400).render(postTemplatePath, {
