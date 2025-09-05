@@ -464,7 +464,10 @@ export class WizardEngine {
                     ? 'govuk-input--width-2'
                     : 'govuk-input--width-4') + (partHasError ? ' govuk-input--error' : ''),
               value: fieldValue?.[part] || '',
-              attributes: part === 'year' ? { maxlength: '4' } : undefined,
+              attributes: {
+                maxlength: part === 'year' ? '4' : '2',
+                inputmode: 'numeric',
+              },
             };
           });
         }

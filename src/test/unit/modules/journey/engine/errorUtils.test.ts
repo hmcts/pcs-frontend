@@ -64,6 +64,62 @@ describe('errorUtils', () => {
 
       expect(result?.errorList[0].href).toBe('#custom-anchor');
     });
+
+    it('should show part-specific errors in summary instead of whole field errors for date fields', () => {
+      const errors = {
+        'dateOfBirth-day': { message: 'Enter a valid day', anchor: 'dateOfBirth-day' },
+        'dateOfBirth-month': { message: 'Enter a valid month', anchor: 'dateOfBirth-month' },
+        dateOfBirth: { message: 'Enter a valid date', anchor: 'dateOfBirth-day', _fieldOnly: true },
+      };
+
+      const step = {
+        fields: {
+          dateOfBirth: { type: 'date' },
+        },
+      };
+
+      const result = errorUtils.processErrorsForTemplate(errors, step);
+
+      expect(result?.errorList).toHaveLength(2);
+      expect(result?.errorList[0]).toEqual({
+        text: 'Enter a valid day',
+        href: '#dateOfBirth-day',
+      });
+      expect(result?.errorList[1]).toEqual({
+        text: 'Enter a valid month',
+        href: '#dateOfBirth-month',
+      });
+    });
+
+    it('should show whole field error in summary when no part-specific errors exist', () => {
+      const errors = {
+        dateOfBirth: { message: 'Date of birth must include a day, month and year', anchor: 'dateOfBirth-day' },
+      };
+
+      const step = {
+        fields: {
+          dateOfBirth: { type: 'date' },
+        },
+      };
+
+      const result = errorUtils.processErrorsForTemplate(errors, step);
+
+      expect(result?.errorList).toHaveLength(1);
+      expect(result?.errorList[0]).toEqual({
+        text: 'Date of birth must include a day, month and year',
+        href: '#dateOfBirth-day',
+      });
+    });
+
+    it('should skip field-only errors in summary', () => {
+      const errors = {
+        dateOfBirth: { message: 'Enter a valid date', anchor: 'dateOfBirth-day', _fieldOnly: true },
+      };
+
+      const result = errorUtils.processErrorsForTemplate(errors);
+
+      expect(result).toBeNull();
+    });
   });
 
   describe('addErrorMessageToField', () => {

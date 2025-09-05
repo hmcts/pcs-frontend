@@ -78,7 +78,8 @@
     "title": "cyEnter your personal and contact details",
     "fields": {
       "date": {
-        "hint": "cyDate of birth"
+        "hint": "cyDate of birth",
+        "label": "cyDate of birth"
       },
       "email": {
         "label": "cyEmail address"
