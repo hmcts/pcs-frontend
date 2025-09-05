@@ -35,6 +35,11 @@ export class Helmet {
     if (pcqDomain) {
       formAction.push(pcqDomain);
     }
+    // this is required if user is submitting a form when they need to be logged in
+    const idamDomain: string = new URL(config.get('oidc.issuer')).origin;
+    if (idamDomain) {
+      formAction.push(idamDomain);
+    }
 
     app.use(
       helmet({
@@ -48,7 +53,7 @@ export class Helmet {
             scriptSrc,
             styleSrc: [self],
             manifestSrc: [self],
-            formAction: [self, pcqDomain],
+            formAction,
           },
         },
         referrerPolicy: { policy: 'origin' },

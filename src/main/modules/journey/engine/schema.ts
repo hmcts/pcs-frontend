@@ -522,10 +522,6 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     }
 
     case 'date': {
-      const label =
-        typeof fieldConfig.label === 'string'
-          ? fieldConfig.label
-          : fieldConfig.label?.text || fieldConfig.name || 'Date';
       // Adapter: merge errorMessages with a customMessage fallback (if provided)
       let dateMessages: Record<string, unknown> = errorMessages ? { ...errorMessages } : {};
       if (typeof rules?.customMessage === 'function') {
@@ -560,7 +556,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         }
       }
 
-      return buildDateInputSchema(label, {
+      return buildDateInputSchema(fieldConfig, {
         required: rules?.required,
         mustBePast: rules?.mustBePast,
         mustBeTodayOrPast: rules?.mustBeTodayOrPast,

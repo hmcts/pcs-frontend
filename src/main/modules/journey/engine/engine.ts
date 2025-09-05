@@ -464,7 +464,10 @@ export class WizardEngine {
                     ? 'govuk-input--width-2'
                     : 'govuk-input--width-4') + (partHasError ? ' govuk-input--error' : ''),
               value: fieldValue?.[part] || '',
-              attributes: part === 'year' ? { maxlength: '4' } : undefined,
+              attributes: {
+                maxlength: part === 'year' ? '4' : '2',
+                inputmode: 'numeric',
+              },
             };
           });
         }
@@ -641,6 +644,8 @@ export class WizardEngine {
       // Create a new step object with processed fields to avoid mutating original
       stepCopy = { ...stepCopy, fields: processedFields } as StepConfig;
     }
+
+    console.log('================================ >>>>>>> errors before processing', errors);
 
     return {
       caseId,
@@ -1153,6 +1158,8 @@ export class WizardEngine {
               ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
               : null,
           };
+
+          console.log('context', context);
 
           const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
           return res.status(400).render(postTemplatePath, {

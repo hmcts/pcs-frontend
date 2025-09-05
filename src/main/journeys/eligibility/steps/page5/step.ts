@@ -10,6 +10,9 @@ const step: StepDraft = {
       hint: {
         text: 'page5.fields.date.hint',
       },
+      label: {
+        text: 'page5.fields.date.label',
+      },
       validate: { required: true, mustBePast: true },
       errorMessages: {
         required: 'errors.date.required',
