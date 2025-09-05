@@ -106,9 +106,15 @@ export class JourneyValidator {
             _fieldOnly: true,
           };
 
-          if (partErrorMessages.day) {fieldError.day = partErrorMessages.day;}
-          if (partErrorMessages.month) {fieldError.month = partErrorMessages.month;}
-          if (partErrorMessages.year) {fieldError.year = partErrorMessages.year;}
+          if (partErrorMessages.day) {
+            fieldError.day = partErrorMessages.day;
+          }
+          if (partErrorMessages.month) {
+            fieldError.month = partErrorMessages.month;
+          }
+          if (partErrorMessages.year) {
+            fieldError.year = partErrorMessages.year;
+          }
 
           errors[fieldName] = fieldError;
         }
