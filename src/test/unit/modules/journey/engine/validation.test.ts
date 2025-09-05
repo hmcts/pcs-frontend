@@ -294,7 +294,7 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
     const result = validator.validate(step, submissionWithMissingParts);
     expect(result.success).toBe(false);
     expect(result.errors?.dateOfBirth?.message).toContain('must include');
-    expect(result.errors?.dateOfBirth?._fieldOnly).toBeUndefined(); // Should be in summary
+    expect(result.errors?.dateOfBirth?._fieldOnly).toBe(true); // Should be in summary
   });
 
   it('shows invalid date error when incorrect type but other fields blank', () => {
