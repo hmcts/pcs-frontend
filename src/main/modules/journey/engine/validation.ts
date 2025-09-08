@@ -19,7 +19,10 @@ export class JourneyValidator {
       return { success: true, data: submission };
     }
 
-    const errors: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }> =
+    const errors: Record<
+      string,
+      { day?: string; month?: string; year?: string; message: string; anchor?: string; _fieldOnly?: boolean }
+    > =
       {};
     const validatedData: Record<string, unknown> = {};
 
@@ -40,6 +43,19 @@ export class JourneyValidator {
           day: submission[`${fieldName}-day`],
           month: submission[`${fieldName}-month`],
           year: submission[`${fieldName}-year`],
+        };
+      }
+
+      // Collect composite parts for address field
+      if (fieldConfig.type === 'address') {
+        fieldValue = {
+          addressLine1: submission[`${fieldName}-addressLine1`],
+          addressLine2: submission[`${fieldName}-addressLine2`],
+          addressLine3: submission[`${fieldName}-addressLine3`],
+          town: submission[`${fieldName}-town`],
+          county: submission[`${fieldName}-county`],
+          postcode: submission[`${fieldName}-postcode`],
+          country: submission[`${fieldName}-country`],
         };
       }
 
@@ -119,6 +135,47 @@ export class JourneyValidator {
           errors[fieldName] = fieldError;
         }
 
+        continue;
+      }
+
+      if (fieldConfig.type === 'address') {
+        // Handle part-specific errors similar to date fields
+        const partErrors: string[] = [];
+        const partErrorMessages: Record<string, string> = {};
+        let wholeFieldError: string | null = null;
+
+        for (const issue of result.error.issues) {
+          const anchorPart = (issue.path?.[0] as string) ?? 'addressLine1';
+          if (
+            ['addressLine1', 'addressLine2', 'addressLine3', 'town', 'county', 'postcode', 'country'].includes(
+              anchorPart
+            )
+          ) {
+            partErrors.push(anchorPart);
+            const anchorId = `${fieldName}-${anchorPart}`;
+            partErrorMessages[anchorPart] = issue.message || 'Enter a value';
+            if (!errors[anchorId]) {
+              errors[anchorId] = {
+                message: issue.message || 'Enter a value',
+                anchor: anchorId,
+              };
+            }
+          } else {
+            wholeFieldError = issue.message || 'Enter a value';
+          }
+        }
+
+        if (wholeFieldError && partErrors.length === 0) {
+          errors[fieldName] = { message: wholeFieldError, anchor: `${fieldName}-addressLine1` };
+        } else if (partErrors.length > 0) {
+          // Provide a field-level error for display, but avoid duplicating in summary
+          const anchorPref = partErrors.includes('addressLine1') ? 'addressLine1' : partErrors[0];
+          errors[fieldName] = {
+            message: wholeFieldError || partErrorMessages[anchorPref] || 'Enter a value',
+            anchor: `${fieldName}-${anchorPref}`,
+            _fieldOnly: true,
+          };
+        }
         continue;
       }
 

@@ -176,6 +176,8 @@ export const FieldSchema = z.object({
     'password',
     'file',
     'button',
+    // Custom composite field type for postcode/address lookup
+    'address',
   ]),
 
   // Core GOV.UK macro options (all optional so existing journeys continue to work)
@@ -574,6 +576,29 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
 
     case 'button': {
       return z.any().optional();
+    }
+
+    case 'address': {
+      // Composite address field. Expect sub-inputs named using the pattern
+      // `${name}-addressLine1`, `${name}-addressLine2`, `${name}-addressLine3`, `${name}-town`, `${name}-county`, `${name}-postcode`, `${name}-country`.
+      // We only enforce minimal validation here (line1, town, postcode). Postcode uses GB validation.
+      const requiredMsg = getMessage('required') || 'Enter a value';
+      const postcodeMsg = getMessage('postcode') || 'Enter a valid postcode';
+
+      const base = z.object({
+        addressLine1: z.string().trim().min(1, { message: getMessage('addressLine1') || requiredMsg }),
+        addressLine2: z.string().trim().optional().default(''),
+        addressLine3: z.string().trim().optional().default(''),
+        town: z.string().trim().min(1, { message: getMessage('town') || requiredMsg }),
+        county: z.string().trim().optional().default(''),
+        postcode: z
+          .string()
+          .trim()
+          .refine(val => isPostalCode(val, 'GB'), { message: postcodeMsg }),
+        country: z.string().trim().optional().default(''),
+      });
+      // For non-required address fields allow empty object
+      return rules?.required === false ? base.partial() : base;
     }
 
     default: {

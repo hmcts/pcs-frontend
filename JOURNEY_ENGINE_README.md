@@ -152,3 +152,26 @@ The engine uses a smart template resolution system:
 4. Falls back to step ID as template path
 
 Place templates in `views/journey-slug/` or use the defaults in `views/_defaults/`.
+
+## Address Lookup (OS Places)
+
+The engine includes a composite `address` field type that adds UK postcode lookup via the OS Places API and a manual entry form.
+
+Example usage in a step:
+
+```
+fields: {
+  homeAddress: {
+    type: 'address',
+    label: { text: 'Address lookup' },
+    validate: { required: true }
+  },
+  continueButton: { type: 'button', attributes: { type: 'submit' } }
+}
+```
+
+Config required:
+- `osPostcodeLookup.url` (e.g. `https://api.os.uk/search/places/v1`)
+- `secrets.pcs.pcs-os-client-lookup-key` – OS Places API key
+
+The lookup is performed client-side against `/api/postcode-lookup` and returns a list of addresses to populate the form.

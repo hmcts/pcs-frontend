@@ -625,6 +625,22 @@ export class WizardEngine {
             break;
           }
 
+          case 'address': {
+            // Pass through any stored value so template can prefill inputs
+            // @ts-expect-error address composite value
+            processed.value = fieldValue ?? {
+              addressLine1: '',
+              addressLine2: '',
+              addressLine3: '',
+              town: '',
+              county: '',
+              postcode: '',
+              country: '',
+            };
+            processed.namePrefix = fieldName;
+            break;
+          }
+
           case 'button': {
             // Translate button label or default
             if (!processed.text) {
@@ -1125,23 +1141,33 @@ export class WizardEngine {
         // Validate using Zod-based validation
         const validationResult = this.validator.validate(step, req.body);
 
-        if (!validationResult.success) {
-          const { data } = await this.store.load(req, caseId);
+      if (!validationResult.success) {
+        const { data } = await this.store.load(req, caseId);
 
-          // Reconstruct nested date fields from req.body for template
-          const reconstructedData = { ...req.body };
-          if (step.fields) {
-            for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
-              const typedFieldConfig = fieldConfig as FieldConfig;
-              if (typedFieldConfig.type === 'date') {
-                reconstructedData[fieldName] = {
-                  day: req.body[`${fieldName}-day`] || '',
-                  month: req.body[`${fieldName}-month`] || '',
-                  year: req.body[`${fieldName}-year`] || '',
-                };
-              }
+        // Reconstruct nested date fields from req.body for template
+        const reconstructedData = { ...req.body };
+        if (step.fields) {
+          for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+            const typedFieldConfig = fieldConfig as FieldConfig;
+            if (typedFieldConfig.type === 'date') {
+              reconstructedData[fieldName] = {
+                day: req.body[`${fieldName}-day`] || '',
+                month: req.body[`${fieldName}-month`] || '',
+                year: req.body[`${fieldName}-year`] || '',
+              };
+            } else if (typedFieldConfig.type === 'address') {
+              reconstructedData[fieldName] = {
+                addressLine1: req.body[`${fieldName}-addressLine1`] || '',
+                addressLine2: req.body[`${fieldName}-addressLine2`] || '',
+                addressLine3: req.body[`${fieldName}-addressLine3`] || '',
+                town: req.body[`${fieldName}-town`] || '',
+                county: req.body[`${fieldName}-county`] || '',
+                postcode: req.body[`${fieldName}-postcode`] || '',
+                country: req.body[`${fieldName}-country`] || '',
+              };
             }
           }
+        }
 
           // Patch the current step's data with reconstructedData for this render
           const patchedAllData = { ...data, [step.id]: reconstructedData };

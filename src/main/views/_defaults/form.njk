@@ -44,6 +44,9 @@
         {% elif fieldConfig.type == 'date' %}
           {{ govukDateInput(fieldConfig) }}
 
+        {% elif fieldConfig.type == 'address' %}
+          {% include "components/addressLookup.njk" %}
+
         {% elif fieldConfig.type == 'button' %}
           <div class="govuk-button-group">
             {{ govukButton({
