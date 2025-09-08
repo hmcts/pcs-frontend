@@ -293,7 +293,7 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
 
     const result = validator.validate(step, submissionWithMissingParts);
     expect(result.success).toBe(false);
-    expect(result.errors?.dateOfBirth?.message).toContain('must include');
+    expect(result.errors?.dateOfBirth?.message).toBe('dateOfBirth must include month and year');
     expect(result.errors?.dateOfBirth?._fieldOnly).toBe(true); // Should be in summary
   });
 
@@ -334,7 +334,7 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
     expect(result.errors?.['dateOfBirth-day']?.message).toBe('Enter a valid day');
     expect(result.errors?.['dateOfBirth-month']?.message).toBe('Enter a valid month');
     expect(result.errors?.['dateOfBirth-year']?.message).toBe('Enter a valid year');
-    expect(result.errors?.dateOfBirth?.message).toContain('must include');
+    expect(result.errors?.dateOfBirth?.message).toBe('dateOfBirth must be a real date');
     expect(result.errors?.dateOfBirth?._fieldOnly).toBe(true); // Should not be in summary
   });
 
@@ -374,7 +374,7 @@ describe('JourneyValidator – date fields and checkbox arrays', () => {
     expect(result.success).toBe(false);
     expect(result.errors?.['dateOfBirth-day']?.message).toBe('Enter a valid day');
     expect(result.errors?.['dateOfBirth-month']?.message).toBe('Enter a valid month');
-    expect(result.errors?.dateOfBirth?.message).toContain('must include');
+    expect(result.errors?.dateOfBirth?.message).toBe('dateOfBirth must be a real date');
     expect(result.errors?.dateOfBirth?._fieldOnly).toBe(true); // Should not be in summary
 
     // Verify part-specific error messages are stored for engine styling

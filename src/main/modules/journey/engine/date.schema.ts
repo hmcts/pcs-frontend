@@ -139,6 +139,16 @@ export const buildDateInputSchema = (fieldConfig: FieldConfig, options?: DateFie
             }
           }
 
+          // break early and show invalid date message for whole field
+          if (invalidParts.length > 0) {
+            ctx.addIssue({
+              path: [fieldConfig.name || ''],
+              message: msgs.notRealDate || `${fieldLabel} must be a real date`,
+              code: 'custom',
+            });
+            return;
+          }
+
           // Also add a whole field error for field-level display
           ctx.addIssue({
             path: [fieldConfig.name || ''],
