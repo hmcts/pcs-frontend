@@ -78,7 +78,8 @@
     "title": "Enter your personal and contact details",
     "fields": {
       "date": {
-        "hint": "Date of birth"
+        "hint": "Date of birth",
+        "label": "Date of birth"
       },
       "email": {
         "label": "Email address"
