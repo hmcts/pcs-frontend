@@ -5,7 +5,10 @@ import { StepConfig, createFieldValidationSchema } from './schema';
 export interface ValidationResult {
   success: boolean;
   data?: Record<string, unknown>;
-  errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>;
+  errors?: Record<
+    string,
+    { day?: string; month?: string; year?: string; message: string; anchor?: string; _fieldOnly?: boolean }
+  >;
 }
 
 export class JourneyValidator {
@@ -23,6 +26,8 @@ export class JourneyValidator {
     // Iterate over every configured field on the step
     for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
       let fieldValue = submission[fieldName];
+
+      fieldConfig.name = fieldName;
 
       // Normalise checkbox values – Express sends a single string when only one checkbox selected
       if (fieldConfig.type === 'checkboxes' && fieldValue) {
@@ -46,21 +51,74 @@ export class JourneyValidator {
         continue;
       }
 
-      // Build user-friendly error output for date components
       if (fieldConfig.type === 'date') {
-        const perPart: Record<string, string | undefined> = {};
+        // Separate part-specific errors from whole field errors
+        const partErrors: string[] = [];
+        let wholeFieldError: string | null = null;
+        const partErrorMessages: { day?: string; month?: string; year?: string } = {};
+
         for (const issue of result.error.issues) {
-          const pathPart = (issue.path?.[0] ?? '') as string;
-          if (['day', 'month', 'year'].includes(pathPart)) {
-            perPart[pathPart] = issue.message;
+          const anchorPart = (issue.path?.[0] as string) ?? 'day';
+
+          if (['day', 'month', 'year'].includes(anchorPart)) {
+            // This is a part-specific error
+            partErrors.push(anchorPart);
+            const anchorId = `${fieldName}-${anchorPart}`;
+
+            // Store part-specific error message for engine to use for styling
+            partErrorMessages[anchorPart as keyof typeof partErrorMessages] = issue.message || 'Enter a valid date';
+
+            // Also store as separate entry for summary processing
+            if (!errors[anchorId]) {
+              errors[anchorId] = {
+                message: issue.message || 'Enter a valid date',
+                anchor: anchorId,
+              };
+            }
+          } else {
+            // This is a whole field error (e.g., missing parts, invalid date)
+            wholeFieldError = issue.message || 'Enter a valid date';
           }
         }
-        const firstIssue = result.error.issues[0];
-        errors[fieldName] = {
-          ...perPart,
-          message: firstIssue?.message || 'Enter a valid date',
-          anchor: `${fieldName}-${(firstIssue?.path?.[0] as string) ?? 'day'}`,
-        };
+
+        // If there are part-specific errors, don't add whole field error to summary
+        // But still add it for field-level display
+        if (wholeFieldError && partErrors.length === 0) {
+          // Only whole field error, add to summary
+          errors[fieldName] = {
+            message: wholeFieldError,
+            anchor: `${fieldName}-day`,
+          };
+        } else if (partErrors.length > 0) {
+          // There are part-specific errors, add a generic field error for field-level display
+          // but mark it as field-only so it doesn't appear in summary
+          // Include part-specific error messages for engine styling
+          const fieldError: {
+            day?: string;
+            month?: string;
+            year?: string;
+            message: string;
+            anchor?: string;
+            _fieldOnly?: boolean;
+          } = {
+            message: wholeFieldError || 'Enter a valid date',
+            anchor: `${fieldName}-day`,
+            _fieldOnly: true,
+          };
+
+          if (partErrorMessages.day) {
+            fieldError.day = partErrorMessages.day;
+          }
+          if (partErrorMessages.month) {
+            fieldError.month = partErrorMessages.month;
+          }
+          if (partErrorMessages.year) {
+            fieldError.year = partErrorMessages.year;
+          }
+
+          errors[fieldName] = fieldError;
+        }
+
         continue;
       }
 

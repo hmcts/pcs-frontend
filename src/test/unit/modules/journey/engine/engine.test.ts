@@ -617,6 +617,10 @@ describe('WizardEngine - date input attributes', () => {
       label: 'date.day',
       classes: 'govuk-input--width-2',
       value: '',
+      attributes: {
+        maxlength: '2',
+        inputmode: 'numeric',
+      },
     });
 
     // Check month input
@@ -625,6 +629,10 @@ describe('WizardEngine - date input attributes', () => {
       label: 'date.month',
       classes: 'govuk-input--width-2',
       value: '',
+      attributes: {
+        maxlength: '2',
+        inputmode: 'numeric',
+      },
     });
 
     // Check year input has maxlength attribute
@@ -633,7 +641,10 @@ describe('WizardEngine - date input attributes', () => {
       label: 'date.year',
       classes: 'govuk-input--width-4',
       value: '',
-      attributes: { maxlength: '4' },
+      attributes: {
+        maxlength: '4',
+        inputmode: 'numeric',
+      },
     });
   });
 
@@ -649,6 +660,9 @@ describe('WizardEngine - date input attributes', () => {
     expect(dateField.items).toBeDefined();
     const yearItem = dateField.items!.find((item: { name: string }) => item.name === 'year');
     expect(yearItem).toBeDefined();
-    expect(yearItem!.attributes).toEqual({ maxlength: '4' });
+    expect(yearItem!.attributes).toEqual({
+      maxlength: '4',
+      inputmode: 'numeric',
+    });
   });
 });
