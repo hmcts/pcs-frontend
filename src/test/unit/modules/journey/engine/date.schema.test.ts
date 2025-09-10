@@ -6,12 +6,18 @@ import { buildDateInputSchema } from '../../../../../main/modules/journey/engine
 
 describe('buildDateInputSchema – unit', () => {
   it('flags missing parts when required', () => {
-    const schema = buildDateInputSchema('Date of birth', {
-      required: true,
-      messages: {
-        missingParts: (missing: string[]) => `Need ${missing.join(',')}`,
-      },
-    });
+    const schema = buildDateInputSchema(
+      {
+        type: 'date',
+        label: { text: 'Date of birth' },
+      } as any,
+      {
+        required: true,
+        messages: {
+          missingParts: (missing: string[]) => `Need ${missing.join(',')}`,
+        },
+      }
+    );
     const res = schema.safeParse({ day: '', month: '', year: '' });
     expect(res.success).toBe(false);
     if (!res.success) {
@@ -20,7 +26,10 @@ describe('buildDateInputSchema – unit', () => {
   });
 
   it('validates numeric parts', () => {
-    const schema = buildDateInputSchema('DOB');
+    const schema = buildDateInputSchema({
+      type: 'date',
+      label: { text: 'DOB' },
+    } as any);
     const res = schema.safeParse({ day: 'aa', month: 'bb', year: 'cccc' });
     expect(res.success).toBe(false);
     if (!res.success) {
@@ -30,13 +39,22 @@ describe('buildDateInputSchema – unit', () => {
   });
 
   it('accepts a real date', () => {
-    const schema = buildDateInputSchema('DOB');
+    const schema = buildDateInputSchema({
+      type: 'date',
+      label: { text: 'DOB' },
+    } as any);
     const res = schema.safeParse({ day: '15', month: '06', year: '2000' });
     expect(res.success).toBe(true);
   });
 
   it('enforces mustBePast', () => {
-    const schema = buildDateInputSchema('DOB', { mustBePast: true });
+    const schema = buildDateInputSchema(
+      {
+        type: 'date',
+        label: { text: 'DOB' },
+      } as any,
+      { mustBePast: true }
+    );
     const future = DateTime.now().plus({ days: 1 });
     const res = schema.safeParse({
       day: future.toFormat('dd'),
@@ -52,7 +70,13 @@ describe('buildDateInputSchema – unit', () => {
   it('enforces mustBeBetween range', () => {
     const start = DateTime.fromISO('2024-01-01');
     const end = DateTime.fromISO('2024-12-31');
-    const schema = buildDateInputSchema('Period', { mustBeBetween: { start, end } });
+    const schema = buildDateInputSchema(
+      {
+        type: 'date',
+        label: { text: 'Period' },
+      } as any,
+      { mustBeBetween: { start, end } }
+    );
     const outside = DateTime.fromISO('2023-12-31');
     const res = schema.safeParse({
       day: outside.toFormat('dd'),
