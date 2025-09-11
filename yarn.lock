@@ -326,12 +326,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-browser@npm:4.22.0":
-  version: 4.22.0
-  resolution: "@azure/msal-browser@npm:4.22.0"
+"@azure/msal-browser@npm:4.22.1":
+  version: 4.22.1
+  resolution: "@azure/msal-browser@npm:4.22.1"
   dependencies:
     "@azure/msal-common": "npm:15.12.0"
-  checksum: 10/7658aadd90c0c44ea5764715afd9652d314f5cc7891815d4ef052562409cd8133a25316704e16bf53ee8d31de35dde31a68098281557c85c8d882f9b27a61ea4
+  checksum: 10/3f76f8024648540b8ba07c14f5a2a8a0408014eafaa26c829129544753bfcbfd7bfe22c55535ae3ffe9225ef9dd6fb43fb27ac300e20bc8998a2c46fc278db78
   languageName: node
   linkType: hard
 
