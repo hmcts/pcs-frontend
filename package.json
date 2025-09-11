@@ -172,7 +172,7 @@
     "chai": "5.3.3",
     "@types/node": "22.18.1",
     "glob": "^11.0.0",
-    "@azure/msal-browser": "4.22.0",
+    "@azure/msal-browser": "4.22.1",
     "superagent": "10.2.3",
     "brace-expansion": "4.0.1",
     "form-data": "^4.0.4",
