@@ -411,6 +411,45 @@ const stepsById: Record<string, StepDraft> = {
       },
     },
   },
+  address: {
+    id: 'address',
+    title: 'Enter your address',
+    type: 'form',
+    fields: {
+      businessAddress: {
+        type: 'address',
+        label: {
+          text: 'Address lookup',
+        },
+        validate: { required: true },
+      },
+      deliveryAddress: {
+        type: 'address',
+        label: {
+          text: 'Delivery address',
+        },
+      },
+      billingAddress: {
+        type: 'address',
+        label: {
+          text: 'Billing address',
+        },
+      },
+      test: {
+        type: 'text',
+        label: {
+          text: 'Test',
+        },
+        validate: { required: true },
+      },
+      continueButton: {
+        type: 'button',
+        attributes: {
+          type: 'submit',
+        },
+      },
+    },
+  },
   postcode: {
     id: 'postcode',
     title: 'Enter a postcode',
@@ -481,6 +520,7 @@ const orderedIds = [
   'url',
   'postcode',
   'password',
+  'address',
   // 'file',
   'summary',
   'confirmation',
