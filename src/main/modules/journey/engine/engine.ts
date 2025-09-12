@@ -32,7 +32,7 @@ interface JourneyContext {
   previousStepUrl?: string | null;
   summaryRows?: SummaryRow[];
   // When using summary cards grouped by step
-  summaryCards?: Array<{ card: { title: { text: string } }; rows: SummaryRow[] }>;
+  summaryCards?: { card: { title: { text: string } }; rows: SummaryRow[] }[];
 }
 
 interface SummaryRow {
@@ -281,12 +281,26 @@ export class WizardEngine {
 
         // Determine field label (translated)
         let fieldLabel: string = fieldName;
-        if (typeof typedFieldConfig.label === 'string') {
+
+        // Check if fieldset legend should be used (when isPageHeading is true)
+        if (
+          typedFieldConfig.fieldset?.legend &&
+          typeof typedFieldConfig.fieldset.legend === 'object' &&
+          typedFieldConfig.fieldset.legend.isPageHeading &&
+          typedFieldConfig.fieldset.legend.text
+        ) {
+          fieldLabel = t(typedFieldConfig.fieldset.legend.text, typedFieldConfig.fieldset.legend.text);
+        } else if (typeof typedFieldConfig.label === 'string') {
           fieldLabel = t(typedFieldConfig.label, typedFieldConfig.label);
         } else if (typedFieldConfig.label && typeof typedFieldConfig.label === 'object') {
           const lbl = typedFieldConfig.label as Record<string, unknown>;
           const text = (lbl.text as string) || (lbl['html'] as string) || fieldName;
           fieldLabel = t(text, text);
+        } else {
+          // Fall back to step title if no field label is provided
+          if (typeof typedStepConfig.title === 'string') {
+            fieldLabel = t(typedStepConfig.title, typedStepConfig.title);
+          }
         }
 
         // Format value based on type
@@ -315,7 +329,7 @@ export class WizardEngine {
           typedFieldConfig.type === 'radios' ||
           typedFieldConfig.type === 'select'
         ) {
-          const items = typedFieldConfig.items ?? typedFieldConfig.options;
+          const items = typedFieldConfig.items;
           const selected = items
             ?.filter(option => {
               const optionValue = typeof option === 'string' ? option : (option.value as string);
@@ -328,7 +342,9 @@ export class WizardEngine {
               if (typeof option === 'string') {
                 return t(option, option);
               } else {
-                return typeof option.text === 'string' ? t(option.text, option.text) : ((option.text as unknown) as string);
+                return typeof option.text === 'string'
+                  ? t(option.text, option.text)
+                  : (option.text as unknown as string);
               }
             })
             .join(', ');
@@ -355,9 +371,7 @@ export class WizardEngine {
           key: { text: fieldLabel },
           value: valueHtml ? { html: valueHtml, text: '' } : { text: valueText || '' },
           actions: {
-            items: [
-              { href: changeHref, text: t('change', 'Change'), visuallyHiddenText: fieldLabel.toLowerCase() },
-            ],
+            items: [{ href: changeHref, text: t('change', 'Change'), visuallyHiddenText: fieldLabel.toLowerCase() }],
           },
         };
         rows.push(row);
@@ -372,8 +386,8 @@ export class WizardEngine {
     allData: Record<string, unknown>,
     t: TFunction,
     currentLang?: string
-  ): Array<{ card: { title: { text: string } }; rows: SummaryRow[] }> {
-    const cards: Array<{ card: { title: { text: string } }; rows: SummaryRow[] }> = [];
+  ): { card: { title: { text: string } }; rows: SummaryRow[] }[] {
+    const cards: { card: { title: { text: string } }; rows: SummaryRow[] }[] = [];
 
     for (const [stepId, stepConfig] of Object.entries(this.journey.steps)) {
       const typedStepConfig = stepConfig as StepConfig;
@@ -405,9 +419,13 @@ export class WizardEngine {
       const rows: SummaryRow[] = [];
       for (const [fieldName, fieldConfig] of Object.entries(typedStepConfig.fields)) {
         const typedFieldConfig = fieldConfig as FieldConfig;
-        if (typedFieldConfig.type === 'button') continue;
+        if (typedFieldConfig.type === 'button') {
+          continue;
+        }
         const rawValue = stepData[fieldName];
-        if (rawValue === undefined || rawValue === null || rawValue === '') continue;
+        if (rawValue === undefined || rawValue === null || rawValue === '') {
+          continue;
+        }
 
         // Build field label
         let fieldLabel: string = fieldName;
@@ -444,7 +462,7 @@ export class WizardEngine {
           typedFieldConfig.type === 'radios' ||
           typedFieldConfig.type === 'select'
         ) {
-          const items = typedFieldConfig.items ?? typedFieldConfig.options;
+          const items = typedFieldConfig.items;
           const selected = items
             ?.filter(option => {
               const optionValue = typeof option === 'string' ? option : (option.value as string);
@@ -457,7 +475,9 @@ export class WizardEngine {
               if (typeof option === 'string') {
                 return t(option, option);
               } else {
-                return typeof option.text === 'string' ? t(option.text, option.text) : ((option.text as unknown) as string);
+                return typeof option.text === 'string'
+                  ? t(option.text, option.text)
+                  : (option.text as unknown as string);
               }
             })
             .join(', ');
@@ -693,10 +713,7 @@ export class WizardEngine {
           case 'radios':
           case 'checkboxes':
           case 'select': {
-            const baseOptions = (typedFieldConfig.items ?? typedFieldConfig.options ?? []) as (
-              | string
-              | Record<string, unknown>
-            )[];
+            const baseOptions = (typedFieldConfig.items ?? []) as (string | Record<string, unknown>)[];
 
             const items = baseOptions.map(option => {
               if (typeof option === 'string') {
@@ -1265,33 +1282,33 @@ export class WizardEngine {
         // Validate using Zod-based validation
         const validationResult = this.validator.validate(step, req.body);
 
-      if (!validationResult.success) {
-        const { data } = await this.store.load(req, caseId);
+        if (!validationResult.success) {
+          const { data } = await this.store.load(req, caseId);
 
-        // Reconstruct nested date fields from req.body for template
-        const reconstructedData = { ...req.body };
-        if (step.fields) {
-          for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
-            const typedFieldConfig = fieldConfig as FieldConfig;
-            if (typedFieldConfig.type === 'date') {
-              reconstructedData[fieldName] = {
-                day: req.body[`${fieldName}-day`] || '',
-                month: req.body[`${fieldName}-month`] || '',
-                year: req.body[`${fieldName}-year`] || '',
-              };
-            } else if (typedFieldConfig.type === 'address') {
-              reconstructedData[fieldName] = {
-                addressLine1: req.body[`${fieldName}-addressLine1`] || '',
-                addressLine2: req.body[`${fieldName}-addressLine2`] || '',
-                addressLine3: req.body[`${fieldName}-addressLine3`] || '',
-                town: req.body[`${fieldName}-town`] || '',
-                county: req.body[`${fieldName}-county`] || '',
-                postcode: req.body[`${fieldName}-postcode`] || '',
-                country: req.body[`${fieldName}-country`] || '',
-              };
+          // Reconstruct nested date fields from req.body for template
+          const reconstructedData = { ...req.body };
+          if (step.fields) {
+            for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+              const typedFieldConfig = fieldConfig as FieldConfig;
+              if (typedFieldConfig.type === 'date') {
+                reconstructedData[fieldName] = {
+                  day: req.body[`${fieldName}-day`] || '',
+                  month: req.body[`${fieldName}-month`] || '',
+                  year: req.body[`${fieldName}-year`] || '',
+                };
+              } else if (typedFieldConfig.type === 'address') {
+                reconstructedData[fieldName] = {
+                  addressLine1: req.body[`${fieldName}-addressLine1`] || '',
+                  addressLine2: req.body[`${fieldName}-addressLine2`] || '',
+                  addressLine3: req.body[`${fieldName}-addressLine3`] || '',
+                  town: req.body[`${fieldName}-town`] || '',
+                  county: req.body[`${fieldName}-county`] || '',
+                  postcode: req.body[`${fieldName}-postcode`] || '',
+                  country: req.body[`${fieldName}-country`] || '',
+                };
+              }
             }
           }
-        }
 
           // Patch the current step's data with reconstructedData for this render
           const patchedAllData = { ...data, [step.id]: reconstructedData };

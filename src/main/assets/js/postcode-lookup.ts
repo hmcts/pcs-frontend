@@ -8,7 +8,9 @@
  */
 export function initPostcodeLookup(): void {
   const containers = Array.from(document.querySelectorAll<HTMLElement>('[data-address-component]'));
-  if (!containers.length) return;
+  if (!containers.length) {
+    return;
+  }
 
   containers.forEach(container => {
     const prefix = container.dataset.namePrefix || 'address';
@@ -36,7 +38,7 @@ export function initPostcodeLookup(): void {
       }
     };
 
-    const populateOptions = (addresses: Array<Record<string, string>>) => {
+    const populateOptions = (addresses: Record<string, string>[]) => {
       clearOptions();
       const defaultOpt = document.createElement('option');
       defaultOpt.value = '';
@@ -56,7 +58,9 @@ export function initPostcodeLookup(): void {
         opt.dataset.postcode = addr.postcode || '';
         select.appendChild(opt);
       }
-      if (selectContainer) selectContainer.hidden = false;
+      if (selectContainer) {
+        selectContainer.hidden = false;
+      }
       select.hidden = false;
       select.focus();
     };
@@ -75,16 +79,18 @@ export function initPostcodeLookup(): void {
         if (!resp.ok) {
           throw new Error('Lookup failed');
         }
-        const json = (await resp.json()) as { addresses?: Array<Record<string, string>> };
+        const json = (await resp.json()) as { addresses?: Record<string, string>[] };
         const addresses = json.addresses || [];
         populateOptions(addresses);
-      } catch (e) {
+      } catch {
         clearOptions();
         const opt = document.createElement('option');
         opt.value = '';
         opt.textContent = 'No addresses found';
         select.appendChild(opt);
-        if (selectContainer) selectContainer.hidden = false;
+        if (selectContainer) {
+          selectContainer.hidden = false;
+        }
         select.hidden = false;
       } finally {
         findBtn.disabled = false;
@@ -100,12 +106,24 @@ export function initPostcodeLookup(): void {
       if (detailsEl && !detailsEl.open) {
         detailsEl.open = true;
       }
-      if (addressLine1) addressLine1.value = selected.dataset.line1 || '';
-      if (addressLine2) addressLine2.value = selected.dataset.line2 || '';
-      if (addressLine3) addressLine3.value = selected.dataset.line3 || '';
-      if (town) town.value = selected.dataset.town || '';
-      if (county) county.value = selected.dataset.county || '';
-      if (postcode) postcode.value = selected.dataset.postcode || '';
+      if (addressLine1) {
+        addressLine1.value = selected.dataset.line1 || '';
+      }
+      if (addressLine2) {
+        addressLine2.value = selected.dataset.line2 || '';
+      }
+      if (addressLine3) {
+        addressLine3.value = selected.dataset.line3 || '';
+      }
+      if (town) {
+        town.value = selected.dataset.town || '';
+      }
+      if (county) {
+        county.value = selected.dataset.county || '';
+      }
+      if (postcode) {
+        postcode.value = selected.dataset.postcode || '';
+      }
       // Focus first field for accessibility
       addressLine1?.focus();
     });

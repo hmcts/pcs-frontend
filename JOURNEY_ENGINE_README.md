@@ -171,6 +171,7 @@ fields: {
 ```
 
 Config required:
+
 - `osPostcodeLookup.url` (e.g. `https://api.os.uk/search/places/v1`)
 - `secrets.pcs.pcs-os-client-lookup-key` – OS Places API key
 

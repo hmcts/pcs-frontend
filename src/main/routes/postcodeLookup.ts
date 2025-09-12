@@ -14,9 +14,8 @@ export default function postcodeLookupRoutes(app: Application): void {
     try {
       const addresses = await getAddressesByPostcode(postcode);
       return res.json({ addresses });
-    } catch (e) {
+    } catch {
       return res.status(502).json({ error: 'Failed to lookup postcode' });
     }
   });
 }
-

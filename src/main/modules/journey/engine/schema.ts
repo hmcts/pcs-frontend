@@ -1,7 +1,7 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { DateTime } from 'luxon';
 import isPostalCode from 'validator/lib/isPostalCode';
-import { z } from 'zod/v4';
+import { superRefine, z } from 'zod/v4';
 
 import { buildDateInputSchema } from './date.schema';
 
@@ -160,71 +160,81 @@ export const FieldOptionSchema = z.union([
 ]);
 
 // Field configuration schema
-export const FieldSchema = z.object({
-  // Supported form component types
-  type: z.enum([
-    'text',
-    'textarea',
-    'radios',
-    'checkboxes',
-    'select',
-    'date',
-    'number',
-    'email',
-    'tel',
-    'url',
-    'password',
-    'file',
-    'button',
-    // Custom composite field type for postcode/address lookup
-    'address',
-  ]),
+export const FieldSchema = z
+  .object({
+    // Supported form component types
+    type: z.enum([
+      'text',
+      'textarea',
+      'radios',
+      'checkboxes',
+      'select',
+      'date',
+      'number',
+      'email',
+      'tel',
+      'url',
+      'password',
+      'file',
+      'button',
+      // Custom composite field type for postcode/address lookup
+      'address',
+    ]),
 
-  // Core GOV.UK macro options (all optional so existing journeys continue to work)
-  id: z.string().optional(),
-  name: z.string().optional(),
-  label: LabelSchema.optional(),
-  hint: HintSchema.optional(),
-  errorMessage: GovukErrorMessageSchema.optional(),
+    // Core GOV.UK macro options (all optional so existing journeys continue to work)
+    id: z.string().optional(),
+    name: z.string().optional(),
+    label: LabelSchema.optional(),
+    hint: HintSchema.optional(),
+    errorMessage: GovukErrorMessageSchema.optional(),
 
-  // Original specialised errorMessages remain supported for rule-level messages
-  errorMessages: ErrorMessagesSchema,
+    // Original specialised errorMessages remain supported for rule-level messages
+    errorMessages: ErrorMessagesSchema,
 
-  fieldset: FieldsetSchema.optional(),
-  formGroup: FormGroupSchema.optional(),
+    fieldset: FieldsetSchema.optional(),
+    formGroup: FormGroupSchema.optional(),
 
-  prefix: AffixSchema.optional(),
-  suffix: AffixSchema.optional(),
+    prefix: AffixSchema.optional(),
+    suffix: AffixSchema.optional(),
 
-  // Choices / select style components
-  items: z.array(FieldOptionSchema).optional(), // direct GOV.UK naming
-  options: z.array(FieldOptionSchema).optional(), // legacy naming our engine uses
+    // Choices / select style components
+    items: z.array(FieldOptionSchema).optional(), // direct GOV.UK naming
 
-  // Validation rules remain unchanged
-  validate: ValidationRuleSchema,
+    // Validation rules remain unchanged
+    validate: ValidationRuleSchema,
 
-  // Presentation helpers
-  classes: z.string().optional(),
-  attributes: z.record(z.string(), z.unknown()).optional(),
+    // Presentation helpers
+    classes: z.string().optional(),
+    attributes: z.record(z.string(), z.unknown()).optional(),
 
-  autocomplete: z.string().optional(),
-  disabled: z.boolean().optional(),
-  readonly: z.boolean().optional(),
-  spellcheck: z.boolean().optional(),
-  enterKeyHint: z.string().optional(),
+    autocomplete: z.string().optional(),
+    disabled: z.boolean().optional(),
+    readonly: z.boolean().optional(),
+    spellcheck: z.boolean().optional(),
+    enterKeyHint: z.string().optional(),
 
-  rows: z.number().optional(), // textarea
-  width: z.string().optional(), // input width modifier classes
-  text: z.string().optional(), // button text
+    rows: z.number().optional(), // textarea
+    width: z.string().optional(), // input width modifier classes
+    text: z.string().optional(), // button text
 
-  flag: z.string().optional(),
+    flag: z.string().optional(),
 
-  // Adding namePrefix for date fields or other types that require it
-  namePrefix: z.string().optional(),
+    // Adding namePrefix for date fields or other types that require it
+    namePrefix: z.string().optional(),
 
-  // Adding value for fields like text, number, textarea, etc.
-  value: z.union([z.string(), z.number(), z.array(z.string())]).optional(), // value is now allowed for fields that support it
-});
+    // Adding value for fields like text, number, textarea, etc.
+    value: z.union([z.string(), z.number(), z.array(z.string())]).optional(), // value is now allowed for fields that support it
+  })
+  // Allow unknown GOV.UK macro options to pass through to templates
+  .loose()
+  // Explicitly reject legacy `options` key to avoid confusion now that we are alpha
+  .check(
+    superRefine((data, ctx) => {
+      if (data && typeof data === 'object' && 'options' in (data as Record<string, unknown>)) {
+        ctx.addIssue({ code: 'custom', path: ['options'], message: 'Use items instead of options' });
+      }
+    })
+  );
 
 // Step configuration schema
 export const StepSchema = z.object({
@@ -390,13 +400,229 @@ export const JourneySchema = z
 export type StepConfig = z.infer<typeof StepSchema> & { id: string };
 
 // Authoring/input type (fields optional before defaults)
-export type StepDraft = z.input<typeof StepSchema> & { id: string };
+// ────────────────────────────────────────────────────────────────────────────────
+// Strongly-typed authoring helpers (dev DX / autocomplete)
+// These types do not change runtime validation; they narrow the authoring surface
+// so that when a dev sets `type`, TS can suggest relevant properties.
+
+// Reuse input types of the internal Zod schemas for GOV.UK macro options
+export type Label = z.input<typeof LabelSchema>;
+export type Hint = z.input<typeof HintSchema>;
+export type GovukErrorMessage = z.input<typeof GovukErrorMessageSchema>;
+export type FormGroup = z.input<typeof FormGroupSchema>;
+export type Fieldset = z.input<typeof FieldsetSchema>;
+export type Affix = z.input<typeof AffixSchema>;
+
+// Align with the field options we already validate
+export type FieldOption = z.input<typeof FieldOptionSchema>;
+
+// Error messages type aligned with ErrorMessagesSchema
+export type ErrorMessages = z.input<typeof ErrorMessagesSchema>;
+
+export type ConditionFn = (stepData: Record<string, unknown>, allData: Record<string, unknown>) => boolean;
+
+export type NextConfig =
+  | string
+  | {
+      when: unknown | ConditionFn;
+      goto: string;
+      else?: string;
+    };
+
+// Shared field properties
+type MacroCommon = {
+  id?: string;
+  name?: string;
+  classes?: string;
+  attributes?: Record<string, unknown>;
+  formGroup?: FormGroup;
+};
+
+type WithLabel = { label?: Label };
+type WithHint = { hint?: Hint };
+type WithErrorMessage = { errorMessage?: GovukErrorMessage };
+type WithFieldset = { fieldset?: Fieldset };
+type WithValidation = { validate?: ValidationRule; errorMessages?: ErrorMessages; flag?: string };
+
+type WithValue = { value?: string | number | string[] };
+type WithAffixes = { prefix?: Affix; suffix?: Affix };
+type WithAccessibility = { autocomplete?: string; spellcheck?: boolean; disabled?: boolean; readonly?: boolean };
+type WithWidth = { width?: string };
+
+export type TextFieldDraft = MacroCommon &
+  WithLabel &
+  WithHint &
+  WithErrorMessage &
+  WithAffixes &
+  WithAccessibility &
+  WithWidth &
+  WithValue &
+  WithValidation & {
+    type: 'text' | 'email' | 'tel' | 'url' | 'password';
+    enterKeyHint?: string;
+  };
+
+export type TextareaFieldDraft = MacroCommon &
+  WithLabel &
+  WithHint &
+  WithErrorMessage &
+  WithAccessibility &
+  WithValue &
+  WithValidation & {
+    type: 'textarea';
+    rows?: number;
+  };
+
+export type NumberFieldDraft = MacroCommon &
+  WithLabel &
+  WithHint &
+  WithErrorMessage &
+  WithAffixes &
+  WithAccessibility &
+  WithWidth &
+  WithValue &
+  WithValidation & {
+    type: 'number';
+  };
+
+export type RadiosFieldDraft = MacroCommon &
+  WithHint &
+  WithErrorMessage &
+  WithFieldset &
+  WithValidation & {
+    type: 'radios';
+    items?: FieldOption[];
+  };
+
+export type CheckboxesFieldDraft = MacroCommon &
+  WithHint &
+  WithErrorMessage &
+  WithFieldset &
+  WithValidation & {
+    type: 'checkboxes';
+    items?: FieldOption[];
+  };
+
+export type SelectFieldDraft = MacroCommon &
+  WithLabel &
+  WithHint &
+  WithErrorMessage &
+  WithValue &
+  WithValidation & {
+    type: 'select';
+    items?: FieldOption[];
+  };
+
+export type DateFieldDraft = MacroCommon &
+  WithHint &
+  WithErrorMessage &
+  WithFieldset &
+  WithValidation & {
+    type: 'date';
+    // For composite input name prefixing
+    namePrefix?: string;
+  };
+
+export type ButtonFieldDraft = {
+  type: 'button';
+  text?: string;
+  html?: string;
+  href?: string;
+  classes?: string;
+  attributes?: Record<string, unknown>;
+  preventDoubleClick?: boolean;
+  isStartButton?: boolean;
+  flag?: string;
+};
+
+export type FileFieldDraft = MacroCommon &
+  WithLabel &
+  WithHint &
+  WithErrorMessage &
+  WithAccessibility &
+  WithValidation & {
+    type: 'file';
+  };
+
+export type AddressFieldDraft = MacroCommon &
+  WithLabel &
+  WithHint &
+  WithValidation & {
+    type: 'address';
+  };
+
+export type FieldDraft =
+  | TextFieldDraft
+  | TextareaFieldDraft
+  | NumberFieldDraft
+  | RadiosFieldDraft
+  | CheckboxesFieldDraft
+  | SelectFieldDraft
+  | DateFieldDraft
+  | ButtonFieldDraft
+  | FileFieldDraft
+  | AddressFieldDraft;
+
+// Step authoring types
+type BaseStep = {
+  id: string;
+  title?: string;
+  description?: string;
+  next?: NextConfig;
+  template?: string;
+  data?: Record<string, unknown>;
+  flag?: string;
+};
+
+export type FormStepDraft = BaseStep & {
+  type: 'form';
+  fields: Record<string, FieldDraft>;
+};
+
+export type SummaryStepDraft = BaseStep & {
+  type: 'summary';
+  fields?: never;
+};
+
+export type ConfirmationStepDraft = BaseStep & {
+  type: 'confirmation';
+  fields?: never;
+};
+
+export type IneligibleStepDraft = BaseStep & {
+  type: 'ineligible';
+  fields?: never;
+};
+
+export type ErrorStepDraft = BaseStep & {
+  type: 'error';
+  fields?: never;
+};
+
+export type CompleteStepDraft = BaseStep & {
+  type: 'complete';
+  fields?: never;
+};
+
+export type SuccessStepDraft = BaseStep & {
+  type: 'success';
+  fields?: never;
+};
+
+export type StepDraft =
+  | FormStepDraft
+  | SummaryStepDraft
+  | ConfirmationStepDraft
+  | IneligibleStepDraft
+  | ErrorStepDraft
+  | CompleteStepDraft
+  | SuccessStepDraft;
 
 export type JourneyDraft = z.input<typeof JourneySchema>;
 
 // Type inference
-export type ValidationRule = z.infer<typeof ValidationRuleSchema>;
-export type FieldOption = z.infer<typeof FieldOptionSchema>;
+// Authoring-time rules should use input type so defaults are optional in TS
+export type ValidationRule = z.input<typeof ValidationRuleSchema>;
 export type FieldConfig = z.infer<typeof FieldSchema>;
 export type JourneyConfig = z.infer<typeof JourneySchema>;
 
@@ -475,7 +701,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     }
 
     case 'select': {
-      const opts = (fieldConfig.items ?? fieldConfig.options ?? []) as (string | { value?: string })[];
+      const opts = (fieldConfig.items ?? []) as (string | { value?: string })[];
       const allowed = opts
         .map(o => (typeof o === 'string' ? o : (o.value ?? '')))
         .filter(v => v !== '' && v !== null && v !== undefined) as string[];
@@ -509,18 +735,58 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       return schema;
     }
 
+    case 'radios': {
+      const opts = (fieldConfig.items ?? []) as (string | { value?: string })[];
+      const allowed = opts
+        .map(o => (typeof o === 'string' ? o : (o.value ?? '')))
+        .filter(v => v !== '' && v !== null && v !== undefined) as string[];
+
+      let schema = z.string();
+      if (rules?.required === true) {
+        schema = schema.min(1, { message: getMessage('required') ?? 'errors.required' });
+      }
+
+      if (allowed.length > 0) {
+        schema = schema.refine(
+          val => {
+            if (val === '' || val === null) {
+              return rules?.required !== true;
+            }
+            return allowed.includes(val);
+          },
+          {
+            message: getMessage('invalid') ?? 'errors.radios.invalid',
+          }
+        );
+      }
+
+      return schema;
+    }
+
     case 'checkboxes': {
+      const opts = (fieldConfig.items ?? []) as (string | { value?: string })[];
+      const allowed = opts
+        .map(o => (typeof o === 'string' ? o : (o.value ?? '')))
+        .filter(v => v !== '' && v !== null && v !== undefined) as string[];
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let schema: any = z.array(z.string());
+
       if (rules?.required === true || rules?.minLength !== undefined) {
         const minItems = rules?.minLength || 1;
-        let schema = z
-          .array(z.string())
-          .min(minItems, { message: getMessage('minLength') || 'Select at least one option' });
-        if (rules?.maxLength !== undefined) {
-          schema = schema.max(rules.maxLength, { message: getMessage('maxLength') });
-        }
-        return schema;
+        schema = schema.min(minItems, { message: getMessage('minLength') || 'Select at least one option' });
       }
-      return z.array(z.string()).optional().default([]);
+      if (rules?.maxLength !== undefined) {
+        schema = schema.max(rules.maxLength, { message: getMessage('maxLength') });
+      }
+
+      if (allowed.length > 0) {
+        schema = schema.refine((arr: string[]) => arr.every((v: string) => allowed.includes(v)), {
+          message: getMessage('invalid') ?? 'errors.checkboxes.invalid',
+        });
+      }
+
+      return rules?.required === false ? schema.optional().default([]) : schema;
     }
 
     case 'date': {
@@ -586,10 +852,16 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       const postcodeMsg = getMessage('postcode') || 'Enter a valid postcode';
 
       const base = z.object({
-        addressLine1: z.string().trim().min(1, { message: getMessage('addressLine1') || requiredMsg }),
+        addressLine1: z
+          .string()
+          .trim()
+          .min(1, { message: getMessage('addressLine1') || requiredMsg }),
         addressLine2: z.string().trim().optional().default(''),
         addressLine3: z.string().trim().optional().default(''),
-        town: z.string().trim().min(1, { message: getMessage('town') || requiredMsg }),
+        town: z
+          .string()
+          .trim()
+          .min(1, { message: getMessage('town') || requiredMsg }),
         county: z.string().trim().optional().default(''),
         postcode: z
           .string()
@@ -597,8 +869,35 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
           .refine(val => isPostalCode(val, 'GB'), { message: postcodeMsg }),
         country: z.string().trim().optional().default(''),
       });
-      // For non-required address fields allow empty object
-      return rules?.required === false ? base.partial() : base;
+      // For non-required address fields, allow empty values across all parts.
+      // If some parts are provided, enforce the minimal constraints (line1, town, postcode).
+      const isRequired = rules?.required === true;
+      if (!isRequired) {
+        const partial = base.partial();
+        const cleanEmptyToMissing = z.preprocess(val => {
+          if (val && typeof val === 'object') {
+            const obj = { ...(val as Record<string, unknown>) };
+            for (const key of [
+              'addressLine1',
+              'addressLine2',
+              'addressLine3',
+              'town',
+              'county',
+              'postcode',
+              'country',
+            ]) {
+              const v = obj[key];
+              if (typeof v === 'string' && v.trim() === '') {
+                delete obj[key];
+              }
+            }
+            return obj;
+          }
+          return val;
+        }, partial);
+        return cleanEmptyToMissing;
+      }
+      return base;
     }
 
     default: {

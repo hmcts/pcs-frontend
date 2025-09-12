@@ -8,7 +8,7 @@
   fieldConfig.namePrefix is the base field name; inputs are named using `${namePrefix}-<part>`
   fieldConfig.value contains any existing values for prefilling.
 
-  This component assumes a single address widget per page and uses fixed ids to hook JS:
+  This component uses fixed ids to hook JS:
     - lookupPostcode, findAddressBtn, selectedAddress
     - addressLine1/2/3, town, county, postcode, country
  #}
@@ -110,7 +110,7 @@
 {{ govukDetails({
   summaryText: t('address.manualEntryToggle', 'Enter an address manually'),
   html: manualAddressHtml,
-  open: (val.addressLine1 and val.town and val.postcode)
+  open: ((val.addressLine1 and val.town and val.postcode) or (errs[namePrefix ~ '-addressLine1'] or errs[namePrefix ~ '-town'] or errs[namePrefix ~ '-postcode']))
 }) }}
 
 </div>

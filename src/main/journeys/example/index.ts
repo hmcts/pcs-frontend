@@ -428,14 +428,12 @@ const stepsById: Record<string, StepDraft> = {
         label: {
           text: 'Delivery address',
         },
-        validate: { required: true },
       },
       billingAddress: {
         type: 'address',
         label: {
           text: 'Billing address',
         },
-        validate: { required: true },
       },
       test: {
         type: 'text',
@@ -450,7 +448,6 @@ const stepsById: Record<string, StepDraft> = {
           type: 'submit',
         },
       },
-      
     },
   },
   postcode: {
@@ -509,20 +506,20 @@ const stepsById: Record<string, StepDraft> = {
 };
 
 const orderedIds = [
-  'text',
-  'textarea',
-  'radios',
-  'checkboxes',
-  'select',
-  'date',
-  'date_optional',
-  'date_constraints',
-  'number',
-  'email',
-  'tel',
-  'url',
-  'postcode',
-  'password',
+  // 'text',
+  // 'textarea',
+  // 'radios',
+  // 'checkboxes',
+  // 'select',
+  // 'date',
+  // 'date_optional',
+  // 'date_constraints',
+  // 'number',
+  // 'email',
+  // 'tel',
+  // 'url',
+  // 'postcode',
+  // 'password',
   'address',
   // 'file',
   'summary',

@@ -49,11 +49,15 @@
 
         {% elif fieldConfig.type == 'button' %}
           <div class="govuk-button-group">
+            {% set btnAttrs = fieldConfig.attributes or { type: 'submit' } %}
             {{ govukButton({
               text: fieldConfig.text or 'Continue',
+              html: fieldConfig.html,
               href: fieldConfig.href,
               classes: fieldConfig.classes,
-              attributes: fieldConfig.attributes or { type: 'submit' }
+              attributes: btnAttrs,
+              isStartButton: fieldConfig.isStartButton,
+              preventDoubleClick: fieldConfig.preventDoubleClick
             }) }}
           </div>
         {% endif %}

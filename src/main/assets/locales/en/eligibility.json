@@ -22,7 +22,6 @@
   "page3": {
     "title": "What are your grounds for possession?",
     "description": "Select all grounds that apply to your case",
-    "groundsLabel": "Select all that apply",
     "options": {
       "rentArrears8": {
         "text": "Rent arrears (ground 8)",

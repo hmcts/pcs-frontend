@@ -22,8 +22,7 @@ export class JourneyValidator {
     const errors: Record<
       string,
       { day?: string; month?: string; year?: string; message: string; anchor?: string; _fieldOnly?: boolean }
-    > =
-      {};
+    > = {};
     const validatedData: Record<string, unknown> = {};
 
     // Iterate over every configured field on the step
