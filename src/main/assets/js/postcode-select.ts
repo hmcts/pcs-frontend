@@ -2,8 +2,19 @@ export function initPostcodeSelection(): void {
   const addressSelect = document.getElementById('selectedAddress') as HTMLSelectElement | null;
 
   // ✅ Step 1: Focus the dropdown if we just came from a postcode lookup
-  const url = new URL(window.location.href);
-  const isLookup = url.searchParams.get('lookup') === '1';
+  // Be robust to environments that cannot safely stub window.location
+  let href = '';
+  // Prefer explicit test hook when present
+  if ((window as any).__testHref) {
+    href = (window as any).__testHref as string;
+  } else {
+    try {
+      href = (window as any)?.location?.href || '';
+    } catch {
+      href = '';
+    }
+  }
+  const isLookup = /(^|[?&])lookup=1(&|$)/.test(href);
 
   if (isLookup && addressSelect) {
     addressSelect.focus();
