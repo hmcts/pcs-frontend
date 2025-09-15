@@ -461,7 +461,7 @@ describe('initPostcodeLookup', () => {
   describe('multiple container scenarios (event delegation)', () => {
     beforeEach(() => {
       // Reset the global flag
-      (global as any).postcodeLookupDelegatedBound = false;
+      (global as { postcodeLookupDelegatedBound?: boolean }).postcodeLookupDelegatedBound = false;
     });
 
     it('uses event delegation for multiple containers', async () => {
@@ -632,9 +632,9 @@ describe('initPostcodeSelection', () => {
 
   it('focuses address select when lookup=1 in URL', () => {
     // Provide a safe test-only href without touching window.location
-    const originalHref = (window as any).__testHref;
-    (window as any).__testHref = 'http://localhost:3000/test?lookup=1';
-    
+    const originalHref = (window as { __testHref?: string }).__testHref;
+    (window as { __testHref?: string }).__testHref = 'http://localhost:3000/test?lookup=1';
+
     document.body.innerHTML = `
       <select id="selectedAddress">
         <option value="">Select address</option>
@@ -647,16 +647,16 @@ describe('initPostcodeSelection', () => {
     initPostcodeSelection();
 
     expect(focusSpy).toHaveBeenCalled();
-    
+
     // Restore test href
-    (window as any).__testHref = originalHref;
+    (window as { __testHref?: string }).__testHref = originalHref;
   });
 
   it('does not focus when lookup parameter is not 1', () => {
     // Provide a safe test-only href without touching window.location
-    const originalHref = (window as any).__testHref;
-    (window as any).__testHref = 'http://localhost:3000/test?lookup=0';
-    
+    const originalHref = (window as { __testHref?: string }).__testHref;
+    (window as { __testHref?: string }).__testHref = 'http://localhost:3000/test?lookup=0';
+
     document.body.innerHTML = `
       <select id="selectedAddress">
         <option value="">Select address</option>
@@ -669,16 +669,16 @@ describe('initPostcodeSelection', () => {
     initPostcodeSelection();
 
     expect(focusSpy).not.toHaveBeenCalled();
-    
+
     // Restore test href
-    (window as any).__testHref = originalHref;
+    (window as { __testHref?: string }).__testHref = originalHref;
   });
 
   it('does not focus when no lookup parameter', () => {
     // Provide a safe test-only href without touching window.location
-    const originalHref = (window as any).__testHref;
-    (window as any).__testHref = 'http://localhost:3000/test';
-    
+    const originalHref = (window as { __testHref?: string }).__testHref;
+    (window as { __testHref?: string }).__testHref = 'http://localhost:3000/test';
+
     document.body.innerHTML = `
       <select id="selectedAddress">
         <option value="">Select address</option>
@@ -691,9 +691,9 @@ describe('initPostcodeSelection', () => {
     initPostcodeSelection();
 
     expect(focusSpy).not.toHaveBeenCalled();
-    
+
     // Restore test href
-    (window as any).__testHref = originalHref;
+    (window as { __testHref?: string }).__testHref = originalHref;
   });
 
   it('handles address selection change with all fields present', () => {

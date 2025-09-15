@@ -5,11 +5,11 @@ export function initPostcodeSelection(): void {
   // Be robust to environments that cannot safely stub window.location
   let href = '';
   // Prefer explicit test hook when present
-  if ((window as any).__testHref) {
-    href = (window as any).__testHref as string;
+  if ((window as { __testHref?: string }).__testHref) {
+    href = (window as { __testHref?: string }).__testHref as string;
   } else {
     try {
-      href = (window as any)?.location?.href || '';
+      href = (window as { location?: { href?: string } })?.location?.href || '';
     } catch {
       href = '';
     }
