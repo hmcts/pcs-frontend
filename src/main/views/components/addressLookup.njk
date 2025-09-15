@@ -16,6 +16,8 @@
 {% set namePrefix = fieldConfig.namePrefix or 'address' %}
 {% set val = fieldConfig.value or {} %}
 {% set errs = errors or {} %}
+{% set lookupStore = addressLookup or {} %}
+{% set lookupForField = lookupStore[namePrefix] %}
 
 <div class="pcs-address-component" data-address-component data-name-prefix="{{ namePrefix }}">
 
@@ -29,21 +31,46 @@
 
   <div class="govuk-form-group">
     <label class="govuk-label" for="{{ namePrefix }}-lookupPostcode">{{ t('address.lookupPostcode', 'Enter a UK postcode') }}</label>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <input class="govuk-input govuk-!-width-one-half" id="{{ namePrefix }}-lookupPostcode" name="{{ namePrefix }}-lookupPostcode" value="">
-      <button class="govuk-button" id="{{ namePrefix }}-findAddressBtn" type="button">
-        {{ t('address.findAddress', 'Find address') }}
-      </button>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <input class="govuk-input govuk-!-width-one-half" id="{{ namePrefix }}-lookupPostcode" name="{{ namePrefix }}-lookupPostcode" value="{{ lookupForField and lookupForField.postcode or '' }}">
+        <button class="govuk-button" id="{{ namePrefix }}-findAddressBtn" type="submit" name="_addressLookup" value="{{ namePrefix }}">
+          {{ t('address.findAddress', 'Find address') }}
+        </button>
+      </div>
     </div>
   </div>
-  </div>
 
-  <div class="govuk-form-group" id="{{ namePrefix }}-addressSelectContainer" hidden>
+  {% set hasResults = lookupForField and lookupForField.addresses and lookupForField.addresses.length > 0 %}
+  <div class="govuk-form-group" id="{{ namePrefix }}-addressSelectContainer"{% if not hasResults %} hidden{% endif %}>
     <label class="govuk-label" for="{{ namePrefix }}-selectedAddress">{{ t('address.selectAddress', 'Select your address') }}</label>
-    <select class="govuk-select govuk-!-width-three-quarters" id="{{ namePrefix }}-selectedAddress">
-    <option value="">{{ t('address.addressesFound', 'Addresses will appear here') }}</option>
+    <select class="govuk-select govuk-!-width-three-quarters" id="{{ namePrefix }}-selectedAddress" name="{{ namePrefix }}-selectedAddress">
+      {% if hasResults %}
+        {% set count = lookupForField.addresses.length %}
+        <option value="">{{ count }} {% if count == 1 %}{{ t('address.addressFoundSingle', 'address found') }}{% else %}{{ t('address.addressFoundPlural', 'addresses found') }}{% endif %}</option>
+        {% for address in lookupForField.addresses %}
+          <option
+            value="{{ loop.index0 }}"
+            data-line1="{{ address.addressLine1 }}"
+            data-line2="{{ address.addressLine2 }}"
+            data-line3="{{ address.addressLine3 }}"
+            data-town="{{ address.town }}"
+            data-county="{{ address.county }}"
+            data-postcode="{{ address.postcode }}"
+            data-country="{{ address.country }}"
+          >{{ address.fullAddress }}</option>
+        {% endfor %}
+      {% else %}
+        <option value="">{{ t('address.addressesFound', 'Addresses will appear here') }}</option>
+      {% endif %}
     </select>
+    <noscript>
+    <div class="govuk-!-margin-top-2">
+      <button class="govuk-button govuk-button--secondary" type="submit" name="_selectAddress" value="{{ namePrefix }}">
+          {{ t('buttons.useAddress', 'Use this address') }}
+        </button>
+      </div>
+    </noscript>
   </div>
 
 {% set manualAddressHtml %}
@@ -105,6 +132,7 @@
     value: val.country,
     classes: 'govuk-!-width-three-quarters'
   }) }}
+
 {% endset %}
 
 {{ govukDetails({

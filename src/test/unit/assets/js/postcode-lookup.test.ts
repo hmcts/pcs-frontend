@@ -7,11 +7,20 @@ import { initPostcodeSelection } from '../../../../main/assets/js/postcode-selec
 
 const flushPromises = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
+// Helper to set the global fetch without using `any`
+const setFetch = (value: unknown) => {
+  Object.defineProperty(globalThis, 'fetch', {
+    value,
+    writable: true,
+    configurable: true,
+  });
+};
+
 describe('initPostcodeLookup', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     jest.restoreAllMocks();
-    (global as any).fetch = undefined;
+    setFetch(undefined);
   });
 
   const buildComponent = (prefix = 'address') => `
@@ -61,10 +70,12 @@ describe('initPostcodeLookup', () => {
       },
     ];
 
-    (global as any).fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ addresses }),
-    });
+    setFetch(
+      jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ addresses }),
+      })
+    );
 
     initPostcodeLookup();
 
@@ -88,7 +99,7 @@ describe('initPostcodeLookup', () => {
     });
 
     // First option is the summary ("n addresses found") + 2 address options
-    expect(select.options.length).toBe(3);
+    expect(select.options).toHaveLength(3);
     expect(select.options[0].textContent).toBe('2 addresses found');
     expect(select.options[1].textContent).toBe('10 Downing Street, London, SW1A 2AA');
     expect(select.options[1].dataset.line1).toBe('10 Downing Street');
@@ -101,10 +112,12 @@ describe('initPostcodeLookup', () => {
   it('shows fallback when lookup fails', async () => {
     document.body.innerHTML = buildComponent();
 
-    (global as any).fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      json: async () => ({ error: 'fail' }),
-    });
+    setFetch(
+      jest.fn().mockResolvedValue({
+        ok: false,
+        json: async () => ({ error: 'fail' }),
+      })
+    );
 
     initPostcodeLookup();
 
@@ -118,7 +131,7 @@ describe('initPostcodeLookup', () => {
 
     await flushPromises();
 
-    expect(select.options.length).toBe(1);
+    expect(select.options).toHaveLength(1);
     expect(select.options[0].textContent).toBe('No addresses found');
     expect(select.hidden).toBe(false);
     expect(selectContainer.hidden).toBe(false);
@@ -127,7 +140,7 @@ describe('initPostcodeLookup', () => {
 
   it('does not call fetch for empty postcode', async () => {
     document.body.innerHTML = buildComponent();
-    (global as any).fetch = jest.fn();
+    setFetch(jest.fn());
 
     initPostcodeLookup();
 
@@ -142,7 +155,7 @@ describe('initPostcodeLookup', () => {
 
     expect(global.fetch).not.toHaveBeenCalled();
     // Ensure the initial option remains unchanged
-    expect(select.options.length).toBe(1);
+    expect(select.options).toHaveLength(1);
     expect(button.disabled).toBe(false);
   });
 
@@ -157,7 +170,9 @@ describe('initPostcodeLookup', () => {
     const line1FocusSpy = jest.spyOn(line1, 'focus');
 
     // Replace options with a selected entry
-    while (select.options.length) select.remove(0);
+    while (select.options.length) {
+      select.remove(0);
+    }
     const opt = document.createElement('option');
     opt.value = '0';
     opt.textContent = '1 Main St';
@@ -186,10 +201,12 @@ describe('initPostcodeLookup', () => {
   it('supports custom namePrefix per component container', async () => {
     document.body.innerHTML = buildComponent('homeAddress');
 
-    (global as any).fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ addresses: [] }),
-    });
+    setFetch(
+      jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ addresses: [] }),
+      })
+    );
 
     initPostcodeLookup();
 

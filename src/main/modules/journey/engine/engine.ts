@@ -9,6 +9,7 @@ import i18next from 'i18next';
 import { DateTime } from 'luxon';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
+import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
 import { TTLCache } from '../../../utils/ttlCache';
 
 import { processErrorsForTemplate } from './errorUtils';
@@ -1253,8 +1254,13 @@ export class WizardEngine {
           }
         }
 
+        // Inject any server-side postcode lookup results for this step (no-JS fallback)
+        const __sessAny = req.session as unknown as Record<string, unknown>;
+        const addressLookup =
+          (__sessAny._addressLookup && (__sessAny._addressLookup as Record<string, unknown>)[step.id]) || {};
         res.render(safeTemplate, {
           ...context,
+          addressLookup,
           data: context.data,
           errors: null,
           allData: context.allData,
@@ -1278,6 +1284,117 @@ export class WizardEngine {
       try {
         step = await this.applyLdOverride(step, req);
         step = await this.applyLaunchDarklyFlags(step, req);
+
+        // ── Server-side postcode lookup (no-JS fallback) ──
+        const __sessAny = req.session as unknown as Record<string, unknown>;
+        const addressLookupStore = (__sessAny._addressLookup as Record<string, Record<string, unknown>>) || {};
+        const lookupPrefix = (req.body._addressLookup as string) || '';
+        const selectPrefix = (req.body._selectAddress as string) || '';
+
+        // Handle "Find address" action
+        if (lookupPrefix) {
+          const postcode = String(req.body[`${lookupPrefix}-lookupPostcode`] || '').trim();
+          // Persist results per step/prefix
+          if (!__sessAny._addressLookup) {
+            __sessAny._addressLookup = {};
+          }
+          addressLookupStore[step.id] = addressLookupStore[step.id] || {};
+
+          let addresses: unknown[] = [];
+          if (postcode) {
+            try {
+              addresses = await getAddressesByPostcode(postcode);
+            } catch {
+              addresses = [];
+            }
+          }
+
+          addressLookupStore[step.id][lookupPrefix] = { postcode, addresses };
+
+          const { data } = await this.store.load(req, caseId);
+          let context = this.buildJourneyContext(step, caseId, data, t, lang);
+          const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
+          context = {
+            ...context,
+            previousStepUrl: prevVisible
+              ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
+              : null,
+          };
+          const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+          return res.status(200).render(postTemplatePath, {
+            ...context,
+            addressLookup: addressLookupStore[step.id] || {},
+          });
+        }
+
+        // Handle "Use this address" action to populate inputs server-side
+        if (selectPrefix) {
+          const selectedIndexRaw = String(req.body[`${selectPrefix}-selectedAddress`] || '').trim();
+          const index = selectedIndexRaw ? parseInt(selectedIndexRaw, 10) : NaN;
+          const storeForStep = addressLookupStore[step.id] || {};
+          const record = storeForStep[selectPrefix] as unknown as {
+            postcode?: string;
+            addresses?: Record<string, string>[];
+          };
+          const sel = Array.isArray(record?.addresses) && Number.isFinite(index) ? record.addresses[index] : null;
+
+          const { data } = await this.store.load(req, caseId);
+          const stepData = (data[step.id] as Record<string, unknown>) || {};
+          const reconstructedData: Record<string, unknown> = { ...stepData };
+
+          // Process all form fields, not just the selected address
+          for (const [fieldName, fieldConfig] of Object.entries(step.fields || {})) {
+            if (fieldName === selectPrefix && sel) {
+              // Use the selected address data for the clicked component
+              reconstructedData[fieldName] = {
+                addressLine1: sel.addressLine1 || '',
+                addressLine2: sel.addressLine2 || '',
+                addressLine3: sel.addressLine3 || '',
+                town: sel.town || '',
+                county: sel.county || '',
+                postcode: sel.postcode || '',
+                country: sel.country || '',
+              };
+            } else if (fieldConfig.type === 'address') {
+              // Process other address fields from form data
+              reconstructedData[fieldName] = {
+                addressLine1: req.body[`${fieldName}-addressLine1`] || '',
+                addressLine2: req.body[`${fieldName}-addressLine2`] || '',
+                addressLine3: req.body[`${fieldName}-addressLine3`] || '',
+                town: req.body[`${fieldName}-town`] || '',
+                county: req.body[`${fieldName}-county`] || '',
+                postcode: req.body[`${fieldName}-postcode`] || '',
+                country: req.body[`${fieldName}-country`] || '',
+              };
+            } else if (fieldConfig.type === 'date') {
+              // Process date fields
+              reconstructedData[fieldName] = {
+                day: req.body[`${fieldName}-day`] || '',
+                month: req.body[`${fieldName}-month`] || '',
+                year: req.body[`${fieldName}-year`] || '',
+              };
+            } else {
+              // Process other field types
+              reconstructedData[fieldName] = req.body[fieldName] || '';
+            }
+          }
+
+          const patchedAllData = { ...data, [step.id]: reconstructedData };
+          let context = this.buildJourneyContext(step, caseId, patchedAllData, t, lang);
+          const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
+          context = {
+            ...context,
+            previousStepUrl: prevVisible
+              ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
+              : null,
+          };
+
+          const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+          return res.status(200).render(postTemplatePath, {
+            ...context,
+            addressLookup: addressLookupStore[step.id] || {},
+          });
+        }
 
         // Validate using Zod-based validation
         const validationResult = this.validator.validate(step, req.body);
@@ -1335,6 +1452,11 @@ export class WizardEngine {
         const { data: merged } = await this.store.save(req, caseId, version, {
           [step.id]: validationResult.data || {},
         });
+
+        // Clear any stored lookup state for this step after a successful save
+        if (addressLookupStore[step.id]) {
+          delete addressLookupStore[step.id];
+        }
 
         const nextId = this.resolveNext(step, merged);
         const nextStep = this.journey.steps[nextId];

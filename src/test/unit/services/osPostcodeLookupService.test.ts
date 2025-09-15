@@ -73,7 +73,6 @@ describe('getAddressesByPostcode', () => {
         addressLine3: '',
         town: 'Testville',
         postcode: 'TE57 1NG',
-        country: 'England',
       },
     ]);
 
@@ -115,7 +114,6 @@ describe('getAddressesByPostcode', () => {
         addressLine3: '',
         town: 'Elsewhere',
         postcode: 'EL57 2RE',
-        country: 'England',
       },
     ]);
   });
