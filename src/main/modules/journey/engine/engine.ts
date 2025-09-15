@@ -1291,6 +1291,12 @@ export class WizardEngine {
         const lookupPrefix = (req.body._addressLookup as string) || '';
         const selectPrefix = (req.body._selectAddress as string) || '';
 
+        // Prevent prototype pollution via step.id
+        const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
+        if (dangerousKeys.includes(step.id)) {
+          return res.status(400).json({ error: `Invalid step id: ${step.id}` });
+        }
+
         // Handle "Find address" action
         if (lookupPrefix) {
           const postcode = String(req.body[`${lookupPrefix}-lookupPostcode`] || '').trim();
