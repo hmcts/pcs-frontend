@@ -29,7 +29,7 @@ export function initPostcodeLookup(): void {
       county: byId('county') as HTMLInputElement | null,
       postcodeOut: byId('postcode') as HTMLInputElement | null,
       country: byId('country') as HTMLInputElement | null,
-      details: container.querySelector('.govuk-details, details') as HTMLDetailsElement | null,
+      details: container.querySelector('.govuk-details, details'),
     };
   };
 
@@ -75,11 +75,11 @@ export function initPostcodeLookup(): void {
     const { addressLine1, addressLine2, addressLine3, town, county, postcodeOut, country, details } =
       getParts(container);
     const selected = select.options[select.selectedIndex];
-    if (!selected || !selected.value) {
+    if (!selected?.value) {
       return;
     }
-    if (details && !details.open) {
-      details.open = true;
+    if (details && !(details as HTMLDetailsElement).open) {
+      (details as HTMLDetailsElement).open = true;
     }
     if (addressLine1) {
       addressLine1.value = selected.dataset.line1 || '';
@@ -117,11 +117,11 @@ export function initPostcodeLookup(): void {
       if (!target) {
         return;
       }
-      const btn = target.closest('button[id$="-findAddressBtn"]') as HTMLButtonElement | null;
+      const btn = target.closest('button[id$="-findAddressBtn"]') as HTMLButtonElement;
       if (!btn) {
         return;
       }
-      const container = btn.closest('[data-address-component]') as HTMLElement | null;
+      const container = btn.closest('[data-address-component]') as HTMLElement;
       if (!container) {
         return;
       }
@@ -166,11 +166,11 @@ export function initPostcodeLookup(): void {
       if (!target) {
         return;
       }
-      const select = target.closest('select[id$="-selectedAddress"]') as HTMLSelectElement | null;
+      const select = target.closest('select[id$="-selectedAddress"]') as HTMLSelectElement;
       if (!select) {
         return;
       }
-      const container = select.closest('[data-address-component]') as HTMLElement | null;
+      const container = select.closest('[data-address-component]') as HTMLElement;
       if (!container) {
         return;
       }
