@@ -71,38 +71,72 @@ export function initPostcodeLookup(): void {
     select.focus();
   };
 
-  const handleSelectionChange = (container: HTMLElement, select: HTMLSelectElement) => {
+  const populateAddressFields = (container: HTMLElement, selected: HTMLOptionElement) => {
     const { addressLine1, addressLine2, addressLine3, town, county, postcodeOut, country, details } =
       getParts(container);
+
+    if (details && !(details as HTMLDetailsElement).open) {
+      (details as HTMLDetailsElement).open = true;
+    }
+
+    const fieldMappings = [
+      { field: addressLine1, value: selected.dataset.line1 },
+      { field: addressLine2, value: selected.dataset.line2 },
+      { field: addressLine3, value: selected.dataset.line3 },
+      { field: town, value: selected.dataset.town },
+      { field: county, value: selected.dataset.county },
+      { field: postcodeOut, value: selected.dataset.postcode },
+      { field: country, value: selected.dataset.country },
+    ];
+
+    fieldMappings.forEach(({ field, value }) => {
+      if (field) {
+        field.value = value || '';
+      }
+    });
+
+    addressLine1?.focus();
+  };
+
+  const handleSelectionChange = (container: HTMLElement, select: HTMLSelectElement) => {
     const selected = select.options[select.selectedIndex];
     if (!selected?.value) {
       return;
     }
-    if (details && !(details as HTMLDetailsElement).open) {
-      (details as HTMLDetailsElement).open = true;
+    populateAddressFields(container, selected);
+  };
+
+  const performPostcodeLookup = async (
+    postcode: string,
+    select: HTMLSelectElement,
+    selectContainer: HTMLDivElement | null,
+    button: HTMLButtonElement
+  ) => {
+    button.disabled = true;
+    try {
+      const resp = await fetch(`/api/postcode-lookup?postcode=${encodeURIComponent(postcode)}`, {
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+      if (!resp.ok) {
+        throw new Error('Lookup failed');
+      }
+      const json = (await resp.json()) as { addresses?: Record<string, string>[] };
+      const addresses = json.addresses || [];
+      populateOptions(select, selectContainer, addresses);
+    } catch {
+      clearOptions(select);
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'No addresses found';
+      select.appendChild(opt);
+      if (selectContainer) {
+        selectContainer.hidden = false;
+      }
+      select.hidden = false;
+    } finally {
+      button.disabled = false;
     }
-    if (addressLine1) {
-      addressLine1.value = selected.dataset.line1 || '';
-    }
-    if (addressLine2) {
-      addressLine2.value = selected.dataset.line2 || '';
-    }
-    if (addressLine3) {
-      addressLine3.value = selected.dataset.line3 || '';
-    }
-    if (town) {
-      town.value = selected.dataset.town || '';
-    }
-    if (county) {
-      county.value = selected.dataset.county || '';
-    }
-    if (postcodeOut) {
-      postcodeOut.value = selected.dataset.postcode || '';
-    }
-    if (country) {
-      country.value = selected.dataset.country || '';
-    }
-    addressLine1?.focus();
   };
 
   // If more than one component, use event delegation to avoid multiple handlers
@@ -134,31 +168,7 @@ export function initPostcodeLookup(): void {
       if (!value) {
         return;
       }
-      btn.disabled = true;
-      try {
-        const resp = await fetch(`/api/postcode-lookup?postcode=${encodeURIComponent(value)}`, {
-          headers: { Accept: 'application/json' },
-          credentials: 'same-origin',
-        });
-        if (!resp.ok) {
-          throw new Error('Lookup failed');
-        }
-        const json = (await resp.json()) as { addresses?: Record<string, string>[] };
-        const addresses = json.addresses || [];
-        populateOptions(select, selectContainer, addresses);
-      } catch {
-        clearOptions(select);
-        const opt = document.createElement('option');
-        opt.value = '';
-        opt.textContent = 'No addresses found';
-        select.appendChild(opt);
-        if (selectContainer) {
-          selectContainer.hidden = false;
-        }
-        select.hidden = false;
-      } finally {
-        btn.disabled = false;
-      }
+      await performPostcodeLookup(value, select, selectContainer, btn);
     });
 
     document.addEventListener('change', evt => {
@@ -198,31 +208,7 @@ export function initPostcodeLookup(): void {
       if (!value) {
         return;
       }
-      findBtn.disabled = true;
-      try {
-        const resp = await fetch(`/api/postcode-lookup?postcode=${encodeURIComponent(value)}`, {
-          headers: { Accept: 'application/json' },
-          credentials: 'same-origin',
-        });
-        if (!resp.ok) {
-          throw new Error('Lookup failed');
-        }
-        const json = (await resp.json()) as { addresses?: Record<string, string>[] };
-        const addresses = json.addresses || [];
-        populateOptions(select, selectContainer, addresses);
-      } catch {
-        clearOptions(select);
-        const opt = document.createElement('option');
-        opt.value = '';
-        opt.textContent = 'No addresses found';
-        select.appendChild(opt);
-        if (selectContainer) {
-          selectContainer.hidden = false;
-        }
-        select.hidden = false;
-      } finally {
-        findBtn.disabled = false;
-      }
+      await performPostcodeLookup(value, select, selectContainer, findBtn);
     });
   });
 }
