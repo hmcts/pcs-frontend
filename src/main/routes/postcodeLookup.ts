@@ -7,8 +7,12 @@ export default function postcodeLookupRoutes(app: Application): void {
   // Auth-protected API endpoint to fetch addresses for a postcode
   app.get('/api/postcode-lookup', oidcMiddleware, async (req: Request, res: Response) => {
     const raw = req.query.postcode;
-    const postcode =
-      typeof raw === 'string' ? raw.trim() : Array.isArray(raw) && typeof raw[0] === 'string' ? raw[0].trim() : '';
+    let postcode = '';
+    if (typeof raw === 'string') {
+      postcode = raw.trim();
+    } else if (Array.isArray(raw) && typeof raw[0] === 'string') {
+      postcode = raw[0].trim();
+    }
     if (!postcode) {
       return res.status(400).json({ error: 'Missing postcode' });
     }
