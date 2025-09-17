@@ -28,7 +28,7 @@ export interface OSResponse {
       POST_TOWN: string;
       LOCAL_CUSTODIAN_CODE_DESCRIPTION?: string;
       POSTCODE: string;
-      COUNTRY_CODE_DESCRIPTION?: string;
+      COUNTRY_CODE?: string;
     };
   }[];
 }

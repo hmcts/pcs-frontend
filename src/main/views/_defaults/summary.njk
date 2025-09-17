@@ -11,7 +11,11 @@
 
   <h1 class="govuk-heading-l">{{ step.title }}</h1>
 
-  {% if summaryRows and summaryRows | length > 0 %}
+  {% if summaryCards and summaryCards | length > 0 %}
+    {% for card in summaryCards %}
+      {{ govukSummaryList(card) }}
+    {% endfor %}
+  {% elif summaryRows and summaryRows | length > 0 %}
     {{ govukSummaryList({ rows: summaryRows }) }}
   {% else %}
     <p class="govuk-body">{{ translations.summary.empty or "No information to display yet." }}</p>

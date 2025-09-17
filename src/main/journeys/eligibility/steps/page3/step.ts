@@ -8,8 +8,7 @@ const step: StepDraft = {
   fields: {
     grounds: {
       type: 'checkboxes',
-      label: { text: 'page3.groundsLabel' },
-      options: [
+      items: [
         {
           value: 'rent-arrears-8',
           text: 'page3.options.rentArrears8.text',
