@@ -13,7 +13,7 @@ export const getAccessToken = async (): Promise<void> => {
     grantType: 'client_credentials',
     clientId: 'pcs-frontend',
     clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,
-    scope: 'profile roles'
+    scope: 'profile roles',
   });
 };
 export default globalSetupConfig;

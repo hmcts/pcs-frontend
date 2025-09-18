@@ -10,5 +10,5 @@ export const accessTokenApiData = {
     scope: 'profile openid roles',
     grant_type: 'password',
   },
-  accessTokenApiEndPoint: '/o/token'
+  accessTokenApiEndPoint: '/o/token',
 };

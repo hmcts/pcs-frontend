@@ -18,17 +18,19 @@ export class FormLabelValueValidation implements IValidation {
 
   private async findFieldValueLocator(page: Page, fieldName: string): Promise<Locator> {
     const locators = [
-      page.locator(`.case-viewer-label:has-text("${fieldName}")`)
+      page
+        .locator(`.case-viewer-label:has-text("${fieldName}")`)
         .locator('xpath=../following-sibling::td[1]')
         .locator('.text-16 span'),
 
-      page.locator(`th#complex-panel-simple-field-label > span.text-16:has-text("${fieldName}")`)
+      page
+        .locator(`th#complex-panel-simple-field-label > span.text-16:has-text("${fieldName}")`)
         .locator('xpath=../..')
-        .locator('td span.text-16:not(:has(ccd-field-read-label))')
+        .locator('td span.text-16:not(:has(ccd-field-read-label))'),
     ];
 
     for (const locator of locators) {
-      if (await locator.count() === 1) {
+      if ((await locator.count()) === 1) {
         await expect(locator).toBeVisible();
         return locator;
       }

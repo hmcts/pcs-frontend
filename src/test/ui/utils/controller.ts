@@ -18,7 +18,11 @@ function getExecutor(): { page: Page } {
   return testExecutor;
 }
 
-export async function performAction(action: string, fieldName?: actionData | actionRecord, value?: actionData | actionRecord): Promise<void> {
+export async function performAction(
+  action: string,
+  fieldName?: actionData | actionRecord,
+  value?: actionData | actionRecord
+): Promise<void> {
   const executor = getExecutor();
   const actionInstance = ActionRegistry.getAction(action);
   await test.step(`Perform action: ${action} on "${fieldName}"${value !== undefined ? ` with value "${value}"` : ''}`, async () => {
@@ -26,11 +30,13 @@ export async function performAction(action: string, fieldName?: actionData | act
   });
 }
 
-export async function performValidation(validation: string, inputFieldName: validationData | validationRecord, inputData?: validationData | validationRecord): Promise<void> {
+export async function performValidation(
+  validation: string,
+  inputFieldName: validationData | validationRecord,
+  inputData?: validationData | validationRecord
+): Promise<void> {
   const executor = getExecutor();
-  const [fieldName, data] = typeof inputFieldName === 'string'
-    ? [inputFieldName, inputData]
-    : ['', inputFieldName];
+  const [fieldName, data] = typeof inputFieldName === 'string' ? [inputFieldName, inputData] : ['', inputFieldName];
   const validationInstance = ValidationRegistry.getValidation(validation);
   await test.step(`Perform validation on ${validation}`, async () => {
     await validationInstance.validate(executor.page, validation, fieldName, data);

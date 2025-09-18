@@ -46,72 +46,74 @@ module.exports = defineConfig({
         headless: !!process.env.CI,
       },
     },
-    ...(process.env.CI ? [
-      {
-        name: 'firefox',
-        use: {
-          ...devices['Desktop Firefox'],
-          channel: 'firefox',
-          screenshot: 'only-on-failure' as const,
-          video: 'retain-on-failure' as const,
-          trace: 'on-first-retry' as const,
-          javaScriptEnabled: true,
-          viewport: DEFAULT_VIEWPORT,
-          headless: !!process.env.CI,
-        },
-      },
-      {
-        name: 'webkit',
-        use: {
-          ...devices['Desktop Safari'],
-          channel: 'webkit',
-          screenshot: 'only-on-failure' as const,
-          video: 'retain-on-failure' as const,
-          trace: 'on-first-retry' as const,
-          javaScriptEnabled: true,
-          viewport: DEFAULT_VIEWPORT,
-          headless: !!process.env.CI,
-        },
-      },
-      {
-        name: 'MobileChrome',
-        use: {
-          ...devices['Pixel 5'],
-          channel: 'MobileChrome',
-          screenshot: 'only-on-failure' as const,
-          video: 'retain-on-failure' as const,
-          trace: 'on-first-retry' as const,
-          javaScriptEnabled: true,
-          viewport: DEFAULT_VIEWPORT,
-          headless: !!process.env.CI,
-        },
-      },
-      {
-        name: 'MobileSafari',
-        use: {
-          ...devices['iPhone 12'],
-          channel: 'MobileSafari',
-          screenshot: 'only-on-failure' as const,
-          video: 'retain-on-failure' as const,
-          trace: 'on-first-retry' as const,
-          javaScriptEnabled: true,
-          viewport: DEFAULT_VIEWPORT,
-          headless: !!process.env.CI,
-        },
-      },
-      {
-        name: 'MicrosoftEdge',
-        use: {
-          ...devices['Desktop Edge'],
-          channel: 'MicrosoftEdge',
-          screenshot: 'only-on-failure' as const,
-          video: 'retain-on-failure' as const,
-          trace: 'on-first-retry' as const,
-          javaScriptEnabled: true,
-          viewport: DEFAULT_VIEWPORT,
-          headless: !!process.env.CI,
-        },
-      },
-    ] : [])
-  ]
+    ...(process.env.CI
+      ? [
+          {
+            name: 'firefox',
+            use: {
+              ...devices['Desktop Firefox'],
+              channel: 'firefox',
+              screenshot: 'only-on-failure' as const,
+              video: 'retain-on-failure' as const,
+              trace: 'on-first-retry' as const,
+              javaScriptEnabled: true,
+              viewport: DEFAULT_VIEWPORT,
+              headless: !!process.env.CI,
+            },
+          },
+          {
+            name: 'webkit',
+            use: {
+              ...devices['Desktop Safari'],
+              channel: 'webkit',
+              screenshot: 'only-on-failure' as const,
+              video: 'retain-on-failure' as const,
+              trace: 'on-first-retry' as const,
+              javaScriptEnabled: true,
+              viewport: DEFAULT_VIEWPORT,
+              headless: !!process.env.CI,
+            },
+          },
+          {
+            name: 'MobileChrome',
+            use: {
+              ...devices['Pixel 5'],
+              channel: 'MobileChrome',
+              screenshot: 'only-on-failure' as const,
+              video: 'retain-on-failure' as const,
+              trace: 'on-first-retry' as const,
+              javaScriptEnabled: true,
+              viewport: DEFAULT_VIEWPORT,
+              headless: !!process.env.CI,
+            },
+          },
+          {
+            name: 'MobileSafari',
+            use: {
+              ...devices['iPhone 12'],
+              channel: 'MobileSafari',
+              screenshot: 'only-on-failure' as const,
+              video: 'retain-on-failure' as const,
+              trace: 'on-first-retry' as const,
+              javaScriptEnabled: true,
+              viewport: DEFAULT_VIEWPORT,
+              headless: !!process.env.CI,
+            },
+          },
+          {
+            name: 'MicrosoftEdge',
+            use: {
+              ...devices['Desktop Edge'],
+              channel: 'MicrosoftEdge',
+              screenshot: 'only-on-failure' as const,
+              video: 'retain-on-failure' as const,
+              trace: 'on-first-retry' as const,
+              javaScriptEnabled: true,
+              viewport: DEFAULT_VIEWPORT,
+              headless: !!process.env.CI,
+            },
+          },
+        ]
+      : []),
+  ],
 });
