@@ -5291,12 +5291,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.18.1":
-  version: 22.18.1
-  resolution: "@types/node@npm:22.18.1"
+"@types/node@npm:22.18.5":
+  version: 22.18.5
+  resolution: "@types/node@npm:22.18.5"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/da67f3c3fa4107fbca704e7a71fee36c27f3b6f44af1c466cd5c71eab76a9ffcd6a16f3b97d1e757b9763f1fa1085eebb60cb648c272e36794aca7305b2a15d9
+  checksum: 10/5a721e6e25e4997ecde0333a72463cf625f6a7f7e17b84fd107d4646efd0735a7f4cf37908e2c20a0072eda9e9ddfe1ccacf75cdef7c0ada8f5650d1331a1af4
   languageName: node
   linkType: hard
 
@@ -13181,7 +13181,7 @@ __metadata:
     "@types/jest": "npm:^29.5.14"
     "@types/lodash": "npm:^4.14.197"
     "@types/luxon": "npm:^3"
-    "@types/node": "npm:22.18.1"
+    "@types/node": "npm:22.18.5"
     "@types/nunjucks": "npm:^3.2.3"
     "@types/require-directory": "npm:^2.1.2"
     "@types/serve-favicon": "npm:^2.5.4"
@@ -15755,8 +15755,8 @@ __metadata:
   linkType: hard
 
 "ts-jest@npm:^29.2.6":
-  version: 29.4.1
-  resolution: "ts-jest@npm:29.4.1"
+  version: 29.4.2
+  resolution: "ts-jest@npm:29.4.2"
   dependencies:
     bs-logger: "npm:^0.2.6"
     fast-json-stable-stringify: "npm:^2.1.0"
@@ -15790,7 +15790,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: 10/6aed48232c01a70c7d24c8e1e1fa4c10fcc7d4845913cc4b4c3def10d2d5ba32e98e495b427d3aca5682c13ac0754e6145af81d977ffcc71a26c54a2ca634d65
+  checksum: 10/09494224db6933f666a5f6a0dc5694181515d65f1abe8d602b5edfe45c475c20c4c5e59ca4755030439400efb9cf0d727e5bb8700b5234a2103fe09cf7d5bdf1
   languageName: node
   linkType: hard
 
