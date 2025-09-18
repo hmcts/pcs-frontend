@@ -24,7 +24,7 @@ export class LoginAction implements IAction {
 
   private async createUserAndLogin(userType: string, roles: string[]): Promise<void> {
     const token = process.env.CREATE_USER_BEARER_TOKEN as string;
-    const password = process.env.IDAM_PCS_USER_PASSWORD as string;
+    const password = process.env.PCS_IDAM_TEST_USER_PASSWORD as string;
     const uniqueId = uuidv4();
     const email = process.env.IDAM_PCS_USER_EMAIL = `TEST_PCS_USER.${userType}.${uniqueId}@test.test`;
     const forename = 'fn_' + uniqueId.split('-')[0];
