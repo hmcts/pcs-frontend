@@ -51,7 +51,7 @@
         "__name": "IDAM_SYSTEM_PASSWORD"
       },
       "pcs-idam-test-user-password": {
-        "__name": "PCS_IDAM_TEST_USER_PASSWORD"
+        "__name": "IDAM_PCS_USER_PASSWORD"
       },
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
     }

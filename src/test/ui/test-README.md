@@ -67,33 +67,26 @@ Playwright 1.30+ | TypeScript 4.9+
 
 ### Actions
 
-| Action             | Example Usage                                             |
-| ------------------ | --------------------------------------------------------- |
-| inputText          | `performAction('inputText', 'Email', 'test@example.com')` |
-| check              | `performAction('check', 'RememberMe')`                    |
-| clickButton        | `performAction('clickButton', 'Submit')`                  |
-| clickRadioButton   | `performAction('clickRadioButton', 'testRadio')`          |
-| navigateToUrl      | `performAction('navigateToUrl', 'testUrl')`               |
-| createUserAndLogin | `performAction('createUserAndLogin', 'citizen')`          |
-| clickLink          | `performAction('clickLink', 'English')`                   |
-
+| Action             | Example Usage                                                 |
+|--------------------|---------------------------------------------------------------|
+| inputText          | `performAction('inputText', 'Email', 'test@example.com')`     |
+| check              | `performAction('check', 'RememberMe')`                        |
+| clickButton        | `performAction('clickButton', 'Submit')`                      |
+| clickRadioButton   | `performAction('clickRadioButton', 'testRadio')`              |
+| navigateToUrl      | `performAction('navigateToUrl', 'testUrl')`                   |
+| createUserAndLogin | `performAction('createUserAndLogin', 'citizen', ['citizen'])` |
 ### Validations
 
-| Validation            | Example Usage                                                    |
-| --------------------- | ---------------------------------------------------------------- |
-| text                  | `performValidation('text', 'testElement')`                       |
-| value                 | `performValidation('value', 'testElement')`                      |
-| visibility            | `performValidation('visibility', 'testElement')`                 |
-| enabled               | `performValidation('enabled', 'testElement')`                    |
-| checked               | `performValidation('checked', 'testElement')`                    |
-| count                 | `performValidation('count', 'testElement')`                      |
-| css                   | `performValidation('css', 'testElement')`                        |
-| attribute             | `performValidation('attribute', 'testElement', 'attributeName')` |
-| pageTitle             | `performValidation('pageTitle', 'title')`                        |
-| dashboardNotification | `performValidation('dashboardNotification', {title: 'test'})`    |
-| dashboardTask         | `performValidation('dashboardTask', {title: 'test'})`            |
-| mainHeader            | `performValidation('mainHeader', eligibility.mainHeaderEnglish)` |
-
+| Validation          | Example Usage                                                                                                                        |
+|---------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| text                | `performValidation('text', 'testElement')`                                                                                           |
+| visibility          | `performValidation('visibility', 'testElement')`                                                                                     |
+| mainHeader          | `performValidation('mainHeader', eligibility.mainHeaderEnglish)`                                                                     |
+| bannerAlert         | `performValidation('bannerAlert', {message: "Case has been created."})`                                                              |
+| formLabelValue      | `performValidation('formLabelValue',  "Applicant's forename", {value:'TestUser'})`                                                   |
+| optionList          | `performValidation('optionList', 'sectionName', {optionsData})`                                                                      |
+| errorMessage        | `performValidation('errorMessage', {header: claimantType.errorMessage.header,errorHasLink: claimantType.errorMessage.errorMessage})` |
+| radioButtonChecked  | `performValidation('radioButtonChecked')`                                                                                            |
 ### Basic Test
 
 ```typescript

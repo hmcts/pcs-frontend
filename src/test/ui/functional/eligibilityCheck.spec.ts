@@ -15,14 +15,14 @@ test.beforeEach(async ({ page }, testInfo) => {
   });
   initializeExecutor(page);
   await performAction('navigateToUrl', claim_url);
-  await performAction('createUserAndLogin', ['citizen']);
+  await performAction('createUserAndLogin', 'citizen', ['citizen']);
 });
 
 test.describe('Possession claims @PR @nightly', async () => {
   test('Verify language toggle and bilingual content support (English/Welsh)', async () => {
-    await performAction('clickLink', 'Cymraeg');
+    await performAction('clickButton', 'Cymraeg');
     await performValidation('mainHeader', eligibility.mainHeaderWelsh);
-    await performAction('clickLink', 'English');
+    await performAction('clickButton', 'English');
     await performValidation('mainHeader', eligibility.mainHeaderEnglish);
   });
 });

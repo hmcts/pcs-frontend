@@ -1,39 +1,29 @@
 import { IValidation } from '../interfaces/validation.interface';
-import { DashboardNotificationValidation } from '../validations/custom-validations/dashboardNotification.validation';
-import { DashboardTasksValidation } from '../validations/custom-validations/dashboardTasks.validation';
-import { AttributeValidation } from '../validations/element-validations/attribute.validation';
-import { CheckedValidation } from '../validations/element-validations/checked.validation';
-import { CountValidation } from '../validations/element-validations/count.validation';
-import { CssValidation } from '../validations/element-validations/css.validation';
-import { EnabledValidation } from '../validations/element-validations/enabled.validation';
+import { BannerAlertValidation } from '../validations/element-validations/bannerAlert.validation';
+import { ErrorMessageValidation } from '../validations/element-validations/error-message.validation';
+import { FormLabelValueValidation } from '../validations/element-validations/formLabelValue.validation';
+import { OptionListValidation } from '../validations/element-validations/optionList.validation';
 import { MainHeaderValidation } from '../validations/element-validations/pageHeader.validation';
-import { PageTitleValidation } from '../validations/element-validations/pageTitle.validation';
+import { RadioButtonValidation } from '../validations/element-validations/radioButton.validation';
 import { TextValidation } from '../validations/element-validations/text.validation';
-import { ValueValidation } from '../validations/element-validations/value.validation';
 import { VisibilityValidation } from '../validations/element-validations/visibility.validation';
 
 export class ValidationRegistry {
   private static validations: Map<string, IValidation> = new Map([
     ['text', new TextValidation()],
-    ['value', new ValueValidation()],
     ['visibility', new VisibilityValidation()],
-    ['enabled', new EnabledValidation()],
-    ['checked', new CheckedValidation()],
-    ['count', new CountValidation()],
-    ['attribute', new AttributeValidation()],
-    ['css', new CssValidation()],
-    ['pageTitle', new PageTitleValidation()],
-    ['dashboardNotification', new DashboardNotificationValidation()],
-    ['dashboardTask', new DashboardTasksValidation()],
+    ['bannerAlert', new BannerAlertValidation()],
+    ['formLabelValue', new FormLabelValueValidation()],
+    ['optionList', new OptionListValidation()],
     ['mainHeader', new MainHeaderValidation()],
+    ['errorMessage', new ErrorMessageValidation()],
+    ['radioButtonChecked', new RadioButtonValidation()]
   ]);
 
   static getValidation(validationType: string): IValidation {
     const validation = this.validations.get(validationType);
     if (!validation) {
-      throw new Error(
-        `Validation '${validationType}' is not registered. Available validations: ${Array.from(this.validations.keys()).join(', ')}`
-      );
+      throw new Error(`Validation '${validationType}' is not registered. Available validations: ${Array.from(this.validations.keys()).join(', ')}`);
     }
     return validation;
   }

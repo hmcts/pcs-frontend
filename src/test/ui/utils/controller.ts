@@ -1,138 +1,58 @@
 import { Page, test } from '@playwright/test';
 
-import { actionData } from './interfaces/action.interface';
-import { ValidationData } from './interfaces/validation.interface';
+import { actionData, actionRecord, actionTuple } from './interfaces/action.interface';
+import { validationData, validationRecord, validationTuple } from './interfaces/validation.interface';
 import { ActionRegistry } from './registry/action.registry';
 import { ValidationRegistry } from './registry/validation.registry';
-type ActionStep = {
-  action: string;
-  fieldName: string;
-  value?: string | number | boolean | string[] | object;
-};
-type ValidationStep = {
-  validationType: string;
-  fieldName: string;
-  data: ValidationData;
-};
-type ActionTuple = [string, string] | [string, string, string | number | boolean | string[] | object];
-type ValidationTuple = [string, string, ValidationData];
-class Controller {
-  private page: Page;
-  constructor(page: Page) {
-    this.page = page;
-  }
 
-  async performAction(action: string, fieldName?: actionData, value?: actionData): Promise<unknown> {
-    const actionInstance = ActionRegistry.getAction(action);
-    return test.step(`Perform action: [${action}] on "${fieldName}"${value !== undefined ? ` with value "${value}"` : ''}`, async () => {
-      const result = await actionInstance.execute(this.page, fieldName, value);
-      return result !== undefined ? result : null;
-    });
-  }
-
-  async performValidation(validationType: string, fieldName?: string, data?: ValidationData): Promise<void> {
-    const validationInstance = ValidationRegistry.getValidation(validationType);
-    await test.step(`Perform validation on [${validationType}]`, async () => {
-      await validationInstance.validate(this.page, fieldName, data);
-    });
-  }
-  async performActionGroupWithObjects(groupName: string, ...actions: ActionStep[]): Promise<void> {
-    for (const step of actions) {
-      await this.performAction(step.action, step.fieldName, step.value);
-    }
-  }
-  async performActionGroupWithTuples(groupName: string, ...actions: ActionTuple[]): Promise<void> {
-    for (const tuple of actions) {
-      const [action, fieldName, value] = tuple;
-      await this.performAction(action, fieldName, value);
-    }
-  }
-  async performValidationGroupWithObjects(groupName: string, validations: ValidationStep[]): Promise<void> {
-    for (const step of validations) {
-      await this.performValidation(step.validationType, step.fieldName, step.data);
-    }
-  }
-
-  async performValidationGroupWithTuples(groupName: string, ...validations: ValidationTuple[]): Promise<void> {
-    for (const tuple of validations) {
-      const [validationType, fieldName, data] = tuple;
-      await this.performValidation(validationType, fieldName, data);
-    }
-  }
-  getAvailableActions(): string[] {
-    return ActionRegistry.getAvailableActions();
-  }
-  getAvailableValidations(): string[] {
-    return ValidationRegistry.getAvailableValidations();
-  }
-}
-
-let testExecutor: Controller;
+let testExecutor: { page: Page };
 
 export function initializeExecutor(page: Page): void {
-  testExecutor = new Controller(page);
+  testExecutor = { page };
 }
 
-export async function performAction(action: string, fieldName?: actionData, value?: actionData): Promise<unknown> {
+function getExecutor(): { page: Page } {
   if (!testExecutor) {
     throw new Error('Test executor not initialized. Call initializeExecutor(page) first.');
   }
-  return testExecutor.performAction(action, fieldName, value);
+  return testExecutor;
 }
 
-export async function performValidation(
-  validationType: string,
-  inputFieldName: string | ValidationData,
-  inputData?: ValidationData
-): Promise<void> {
-  if (!testExecutor) {
-    throw new Error('Test executor not initialized. Call initializeExecutor(page) first.');
-  }
-
-  const [fieldName, data] = typeof inputFieldName === 'string' ? [inputFieldName, inputData] : ['', inputFieldName];
-  await testExecutor.performValidation(validationType, fieldName, data);
-}
-
-export async function performActionGroup(
-  groupName: string,
-  ...actions: { action: string; fieldName: string; value?: string | number | boolean | string[] | object }[]
-): Promise<void> {
-  if (!testExecutor) {
-    throw new Error('Test executor not initialized. Call initializeExecutor(page) first.');
-  }
-  await test.step(`Performing the action group: [${groupName}]}`, async () => {
-    await testExecutor.performActionGroupWithObjects(groupName, ...actions);
+export async function performAction(action: string, fieldName?: actionData | actionRecord, value?: actionData | actionRecord): Promise<void> {
+  const executor = getExecutor();
+  const actionInstance = ActionRegistry.getAction(action);
+  await test.step(`Perform action: ${action} on "${fieldName}"${value !== undefined ? ` with value "${value}"` : ''}`, async () => {
+    await actionInstance.execute(executor.page, action, fieldName, value);
   });
 }
 
-export async function performActions(
-  groupName: string,
-  ...actions: ([string, string] | [string, string, string | number | boolean | string[] | object])[]
-): Promise<void> {
-  if (!testExecutor) {
-    throw new Error('Test executor not initialized. Call initializeExecutor(page) first.');
-  }
-  await test.step(`Performing the action group: [${groupName}]`, async () => {
-    await testExecutor.performActionGroupWithTuples(groupName, ...actions);
+export async function performValidation(validation: string, inputFieldName: validationData | validationRecord, inputData?: validationData | validationRecord): Promise<void> {
+  const executor = getExecutor();
+  const [fieldName, data] = typeof inputFieldName === 'string'
+    ? [inputFieldName, inputData]
+    : ['', inputFieldName];
+  const validationInstance = ValidationRegistry.getValidation(validation);
+  await test.step(`Perform validation on ${validation}`, async () => {
+    await validationInstance.validate(executor.page, validation, fieldName, data);
   });
 }
 
-export async function performValidationGroup(
-  groupName: string,
-  validations: { validationType: string; fieldName: string; data: ValidationData }[]
-): Promise<void> {
-  if (!testExecutor) {
-    throw new Error('Test executor not initialized. Call initializeExecutor(page) first.');
-  }
-  await testExecutor.performValidationGroupWithObjects(groupName, validations);
+export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {
+  getExecutor();
+  await test.step(`Performing action group: ${groupName}`, async () => {
+    for (const action of actions) {
+      const [actionName, fieldName, value] = action;
+      await performAction(actionName, fieldName, value);
+    }
+  });
 }
 
-export async function performValidations(
-  groupName: string,
-  ...validations: [string, string, ValidationData][]
-): Promise<void> {
-  if (!testExecutor) {
-    throw new Error('Test executor not initialized. Call initializeExecutor(page) first.');
-  }
-  await testExecutor.performValidationGroupWithTuples(groupName, ...validations);
+export async function performValidations(groupName: string, ...validations: validationTuple[]): Promise<void> {
+  getExecutor();
+  await test.step(`Performing validation group: ${groupName}`, async () => {
+    for (const validation of validations) {
+      const [validationType, fieldName, data] = validation;
+      await performValidation(validationType, fieldName, data);
+    }
+  });
 }
