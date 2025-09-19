@@ -22,7 +22,7 @@ static Map < String, Object > secret(String secretName, String envVariable) {
 def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-    secret('idam-citizen-user-password', 'IDAM_PCS_USER_PASSWORD')
+    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')
   ]
 ]
 
