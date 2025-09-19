@@ -47,12 +47,8 @@
     "playwrightDebug": "PWDEBUG",
     "secrets": {
       "pcs-frontend-idam-system-username": "IDAM_SYSTEM_USERNAME",
-      "pcs-frontend-idam-system-password": {
-        "__name": "IDAM_SYSTEM_PASSWORD"
-      },
-      "pcs-idam-test-user-password": {
-        "__name": "IDAM_PCS_USER_PASSWORD"
-      },
+      "pcs-frontend-idam-system-password": "IDAM_SYSTEM_PASSWORD",
+      "idam-pcs-user-password": "IDAM_PCS_USER_PASSWORD",
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
     }
   }

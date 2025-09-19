@@ -20,9 +20,9 @@ test.beforeEach(async ({ page }, testInfo) => {
 
 test.describe('Possession claims @PR @nightly', async () => {
   test('Verify language toggle and bilingual content support (English/Welsh)', async () => {
-    await performAction('clickButton', 'Cymraeg');
+    await performAction('clickLink', 'Cymraeg');
     await performValidation('mainHeader', eligibility.mainHeaderWelsh);
-    await performAction('clickButton', 'English');
+    await performAction('clickLink', 'English');
     await performValidation('mainHeader', eligibility.mainHeaderEnglish);
   });
 });
