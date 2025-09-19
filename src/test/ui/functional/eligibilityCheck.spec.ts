@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   });
   initializeExecutor(page);
   await performAction('navigateToUrl', claim_url);
-  await performAction('createUserAndLogin', ['citizen']);
+  await performAction('createUserAndLogin', 'citizen', ['citizen']);
 });
 
 test.describe('Possession claims @PR @nightly', async () => {
