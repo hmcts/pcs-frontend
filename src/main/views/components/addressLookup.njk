@@ -23,17 +23,19 @@
 
   {% if fieldConfig.label %}
     {% if fieldConfig.label.text %}
-      <h2 class="govuk-heading-m">{{ fieldConfig.label.text }}</h2>
+      <h3 class="govuk-heading-s">{{ fieldConfig.label.text }}</h3>
     {% else %}
-      <h2 class="govuk-heading-m">{{ fieldConfig.label }}</h2>
+      <h3 class="govuk-heading-s">{{ fieldConfig.label }}</h3>
     {% endif %}
   {% endif %}
 
-  <div class="govuk-form-group">
+  <div class="govuk-form-group govuk-!-margin-bottom-0">
     <label class="govuk-label" for="{{ namePrefix }}-lookupPostcode">{{ t('address.lookupPostcode', 'Enter a UK postcode') }}</label>
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        <input class="govuk-input govuk-!-width-one-half" id="{{ namePrefix }}-lookupPostcode" name="{{ namePrefix }}-lookupPostcode" value="{{ lookupForField and lookupForField.postcode or '' }}">
+      <div class="govuk-grid-column-one-half">
+        <input class="govuk-input govuk-input--width-10" id="{{ namePrefix }}-lookupPostcode" name="{{ namePrefix }}-lookupPostcode" value="{{ lookupForField and lookupForField.postcode or '' }}">
+      </div>
+      <div class="govuk-grid-column-one-half">
         <button class="govuk-button" id="{{ namePrefix }}-findAddressBtn" type="submit" name="_addressLookup" value="{{ namePrefix }}">
           {{ t('address.findAddress', 'Find address') }}
         </button>
@@ -74,6 +76,11 @@
   </div>
 
 {% set manualAddressHtml %}
+
+{% if fieldConfig.lookupText %}
+  <p class="govuk-heading-m">{{ fieldConfig.lookupText }}</p>
+{% endif %}
+
   {{ govukInput({
     id: namePrefix + '-addressLine1',
     name: namePrefix + '-addressLine1',

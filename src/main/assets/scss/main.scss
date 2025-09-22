@@ -7,3 +7,38 @@
   align-items: center;
   justify-content: space-between;
 }
+
+.claim-journey-secondary-heading {
+  color: $govuk-secondary-text-colour;
+  font-weight: 300;
+}
+
+.correspondence-address-form {
+  .pcs-address-component {
+    .govuk-details__text {
+      border-left: none;
+      padding-left: 0;
+      padding-bottom: 0;
+      position: relative;
+
+      &::before {
+        content: ''; /* Required for pseudo-elements */
+        display: block; /* Make it a block element */
+        position: absolute; /* Position it relative to the parent */
+        top: 0; /* Align to the top of the parent */
+        left: -40px; /* Position over the border */
+        width: 5px;
+        height: 15px;
+        background-color: govuk-colour('white');
+      }
+    }
+
+    .govuk-details {
+      margin-bottom: 5px;
+    }
+  }
+
+  #correspondenceAddress-addressSelectContainer {
+    margin-bottom: 30px;
+  }
+}

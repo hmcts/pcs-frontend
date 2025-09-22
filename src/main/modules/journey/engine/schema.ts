@@ -549,6 +549,7 @@ export type AddressFieldDraft = MacroCommon &
   WithHint &
   WithValidation & {
     type: 'address';
+    lookupText?: string;
   };
 
 export type FieldDraft =

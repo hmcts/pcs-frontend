@@ -436,6 +436,10 @@ export class WizardEngine {
           const lbl = typedFieldConfig.label as Record<string, unknown>;
           const text = (lbl.text as string) || (lbl['html'] as string) || fieldName;
           fieldLabel = t(text, text);
+        } else if (typedFieldConfig.fieldset && typedFieldConfig.fieldset.legend) {
+          const legend = typedFieldConfig.fieldset.legend as Record<string, unknown>;
+          const text = (legend.text as string) || (legend['html'] as string) || fieldName;
+          fieldLabel = t(text, text);
         }
 
         // Value formatting (copied from buildSummaryRows)

@@ -41,7 +41,7 @@ const step: StepDraft = {
       attributes: { type: 'submit' },
     },
   },
-  next: 'summary',
+  next: 'correspondenceAddress',
 };
 
 export default step;
