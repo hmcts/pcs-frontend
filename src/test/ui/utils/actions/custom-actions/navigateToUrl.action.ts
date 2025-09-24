@@ -1,15 +1,11 @@
-import { Page } from '@playwright/test';
+import { Page, test } from '@playwright/test';
 
 import { IAction } from '../../interfaces/action.interface';
 
-export class NavigateToUrlAction implements IAction {
-  async execute(page: Page, url: string): Promise<void> {
-    if (!url) {
-      throw new Error('URL is required for navigation');
-    }
-    const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
-    await page.goto(formattedUrl);
-
-    await page.waitForLoadState('networkidle');
+export class NavigateToUrl implements IAction {
+  async execute(page: Page, action: string, url: string): Promise<void> {
+    await test.step(`Navigate to Manage Case URL: ${url}`, async () => {
+      await page.goto(url);
+    });
   }
 }
