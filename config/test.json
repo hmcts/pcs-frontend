@@ -21,9 +21,6 @@
     },
     "claimFormTestData": {
       "eligibility": "/eligibility"
-    },
-    "dashboard": {
-      "pageRoute": "/dashboard/1"
     }
   }
 }

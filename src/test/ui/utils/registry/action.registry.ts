@@ -1,9 +1,9 @@
-import { CreateUserAndLoginAction } from '../actions/custom-actions/createUserAndLogin.action';
-import { NavigateToUrlAction } from '../actions/custom-actions/navigateToUrl.action';
+import { LoginAction } from '../actions/custom-actions/login.action';
+import { NavigateToUrl } from '../actions/custom-actions/navigateToUrl.action';
 import { CheckAction } from '../actions/element-actions/check.action';
 import { ClickButtonAction } from '../actions/element-actions/clickButton.action';
 import { ClickLinkAction } from '../actions/element-actions/clickLink.action';
-import { clickRadioButton } from '../actions/element-actions/clickRadioButton.action';
+import { ClickRadioButton } from '../actions/element-actions/clickRadioButton.action';
 import { InputTextAction } from '../actions/element-actions/inputText.action';
 import { IAction } from '../interfaces/action.interface';
 
@@ -13,9 +13,9 @@ export class ActionRegistry {
     ['clickLink', new ClickLinkAction()],
     ['inputText', new InputTextAction()],
     ['check', new CheckAction()],
-    ['clickRadioButton', new clickRadioButton()],
-    ['createUserAndLogin', new CreateUserAndLoginAction()],
-    ['navigateToUrl', new NavigateToUrlAction()],
+    ['clickRadioButton', new ClickRadioButton()],
+    ['createUserAndLogin', new LoginAction()],
+    ['navigateToUrl', new NavigateToUrl()],
   ]);
 
   static getAction(actionName: string): IAction {
