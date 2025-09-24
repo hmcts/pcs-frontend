@@ -22,11 +22,11 @@
       position: relative;
 
       &::before {
-        content: ''; /* Required for pseudo-elements */
-        display: block; /* Make it a block element */
-        position: absolute; /* Position it relative to the parent */
-        top: 0; /* Align to the top of the parent */
-        left: -40px; /* Position over the border */
+        content: '';
+        display: block;
+        position: absolute;
+        top: -5px;
+        left: -40px;
         width: 5px;
         height: 15px;
         background-color: govuk-colour('white');

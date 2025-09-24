@@ -35,7 +35,6 @@ describe('initPostcodeLookup', () => {
       <details></details>
       <input id="${prefix}-addressLine1" />
       <input id="${prefix}-addressLine2" />
-      <input id="${prefix}-addressLine3" />
       <input id="${prefix}-town" />
       <input id="${prefix}-county" />
       <input id="${prefix}-postcode" />
@@ -54,7 +53,6 @@ describe('initPostcodeLookup', () => {
         fullAddress: '10 Downing Street, London, SW1A 2AA',
         addressLine1: '10 Downing Street',
         addressLine2: '',
-        addressLine3: '',
         town: 'London',
         county: 'Greater London',
         postcode: 'SW1A 2AA',
@@ -63,7 +61,6 @@ describe('initPostcodeLookup', () => {
         fullAddress: '11 Downing Street, London, SW1A 2AB',
         addressLine1: '11 Downing Street',
         addressLine2: '',
-        addressLine3: '',
         town: 'London',
         county: 'Greater London',
         postcode: 'SW1A 2AB',
@@ -190,7 +187,6 @@ describe('initPostcodeLookup', () => {
 
     expect(line1.value).toBe('1 Main St');
     expect((document.getElementById('address-addressLine2') as HTMLInputElement).value).toBe('Area');
-    expect((document.getElementById('address-addressLine3') as HTMLInputElement).value).toBe('Locality');
     expect((document.getElementById('address-town') as HTMLInputElement).value).toBe('Townsville');
     expect((document.getElementById('address-county') as HTMLInputElement).value).toBe('Countyshire');
     expect((document.getElementById('address-postcode') as HTMLInputElement).value).toBe('AB1 2CD');
@@ -232,7 +228,6 @@ describe('initPostcodeLookup', () => {
         fullAddress: '10 Downing Street, London, SW1A 2AA',
         addressLine1: '10 Downing Street',
         addressLine2: '',
-        addressLine3: '',
         town: 'London',
         county: 'Greater London',
         postcode: 'SW1A 2AA',
@@ -270,7 +265,6 @@ describe('initPostcodeLookup', () => {
         <details></details>
         <input id="address-addressLine1" />
         <input id="address-addressLine2" />
-        <input id="address-addressLine3" />
         <input id="address-town" />
         <input id="address-county" />
         <input id="address-postcode" />
@@ -335,47 +329,6 @@ describe('initPostcodeLookup', () => {
     }).not.toThrow();
   });
 
-  it('handles country field in address selection', () => {
-    document.body.innerHTML = `
-      <div data-address-component>
-        <input id="address-lookupPostcode" />
-        <button id="address-findAddressBtn" type="button">Find</button>
-        <select id="address-selectedAddress">
-          <option value="">Initial</option>
-        </select>
-        <details></details>
-        <input id="address-addressLine1" />
-        <input id="address-addressLine2" />
-        <input id="address-addressLine3" />
-        <input id="address-town" />
-        <input id="address-county" />
-        <input id="address-postcode" />
-        <input id="address-country" />
-      </div>
-    `;
-
-    initPostcodeLookup();
-    initPostcodeSelection();
-
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-    const country = document.getElementById('address-country') as HTMLInputElement;
-
-    // Replace options with a selected entry
-    while (select.options.length) {
-      select.remove(0);
-    }
-    const opt = document.createElement('option');
-    opt.value = '0';
-    opt.textContent = '1 Main St';
-    opt.dataset.line1 = '1 Main St';
-    opt.dataset.country = 'United Kingdom';
-    select.appendChild(opt);
-
-    select.selectedIndex = 0;
-    select.dispatchEvent(new Event('change'));
-
-    expect(country.value).toBe('United Kingdom');
-  });
 
   it('handles details element with different selectors', () => {
     document.body.innerHTML = `
@@ -703,7 +656,6 @@ describe('initPostcodeSelection', () => {
       </select>
       <input id="addressLine1" />
       <input id="addressLine2" />
-      <input id="addressLine3" />
       <input id="town" />
       <input id="county" />
       <input id="postcode" />
@@ -715,7 +667,6 @@ describe('initPostcodeSelection', () => {
     const select = document.getElementById('selectedAddress') as HTMLSelectElement;
     const addressLine1 = document.getElementById('addressLine1') as HTMLInputElement;
     const addressLine2 = document.getElementById('addressLine2') as HTMLInputElement;
-    const addressLine3 = document.getElementById('addressLine3') as HTMLInputElement;
     const town = document.getElementById('town') as HTMLInputElement;
     const county = document.getElementById('county') as HTMLInputElement;
     const postcode = document.getElementById('postcode') as HTMLInputElement;
@@ -742,7 +693,6 @@ describe('initPostcodeSelection', () => {
 
     expect(addressLine1.value).toBe('1 Main St');
     expect(addressLine2.value).toBe('Area');
-    expect(addressLine3.value).toBe('Locality');
     expect(town.value).toBe('Townsville');
     expect(county.value).toBe('Countyshire');
     expect(postcode.value).toBe('AB1 2CD');

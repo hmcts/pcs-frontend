@@ -352,15 +352,7 @@ export class WizardEngine {
           valueText = selected ?? '';
         } else if (typedFieldConfig.type === 'address' && value && typeof value === 'object') {
           const addr = value as Record<string, string | undefined>;
-          const parts = [
-            addr.addressLine1,
-            addr.addressLine2,
-            addr.addressLine3,
-            addr.town,
-            addr.county,
-            addr.postcode,
-            addr.country,
-          ]
+          const parts = [addr.addressLine1, addr.addressLine2, addr.town, addr.county, addr.postcode]
             .map(v => (typeof v === 'string' ? v.trim() : ''))
             .filter(v => v.length > 0);
           valueHtml = parts.join('<br>');
@@ -489,15 +481,7 @@ export class WizardEngine {
           valueText = selected ?? '';
         } else if (typedFieldConfig.type === 'address' && value && typeof value === 'object') {
           const addr = value as Record<string, string | undefined>;
-          const parts = [
-            addr.addressLine1,
-            addr.addressLine2,
-            addr.addressLine3,
-            addr.town,
-            addr.county,
-            addr.postcode,
-            addr.country,
-          ]
+          const parts = [addr.addressLine1, addr.addressLine2, addr.town, addr.county, addr.postcode]
             .map(v => (typeof v === 'string' ? v.trim() : ''))
             .filter(v => v.length > 0);
           valueHtml = parts.join('<br>');
@@ -776,11 +760,9 @@ export class WizardEngine {
             processed.value = fieldValue ?? {
               addressLine1: '',
               addressLine2: '',
-              addressLine3: '',
               town: '',
               county: '',
               postcode: '',
-              country: '',
             };
             processed.namePrefix = fieldName;
             break;
@@ -1359,22 +1341,18 @@ export class WizardEngine {
               reconstructedData[fieldName] = {
                 addressLine1: sel.addressLine1 || '',
                 addressLine2: sel.addressLine2 || '',
-                addressLine3: sel.addressLine3 || '',
                 town: sel.town || '',
                 county: sel.county || '',
                 postcode: sel.postcode || '',
-                country: sel.country || '',
               };
             } else if (fieldConfig.type === 'address') {
               // Process other address fields from form data
               reconstructedData[fieldName] = {
                 addressLine1: req.body[`${fieldName}-addressLine1`] || '',
                 addressLine2: req.body[`${fieldName}-addressLine2`] || '',
-                addressLine3: req.body[`${fieldName}-addressLine3`] || '',
                 town: req.body[`${fieldName}-town`] || '',
                 county: req.body[`${fieldName}-county`] || '',
                 postcode: req.body[`${fieldName}-postcode`] || '',
-                country: req.body[`${fieldName}-country`] || '',
               };
             } else if (fieldConfig.type === 'date') {
               // Process date fields
@@ -1407,11 +1385,10 @@ export class WizardEngine {
         }
 
         // Validate using Zod-based validation
-        const validationResult = this.validator.validate(step, req.body);
+        const { data } = await this.store.load(req, caseId);
+        const validationResult = this.validator.validate(step, req.body, data);
 
         if (!validationResult.success) {
-          const { data } = await this.store.load(req, caseId);
-
           // Reconstruct nested date fields from req.body for template
           const reconstructedData = { ...req.body };
           if (step.fields) {
@@ -1427,11 +1404,9 @@ export class WizardEngine {
                 reconstructedData[fieldName] = {
                   addressLine1: req.body[`${fieldName}-addressLine1`] || '',
                   addressLine2: req.body[`${fieldName}-addressLine2`] || '',
-                  addressLine3: req.body[`${fieldName}-addressLine3`] || '',
                   town: req.body[`${fieldName}-town`] || '',
                   county: req.body[`${fieldName}-county`] || '',
                   postcode: req.body[`${fieldName}-postcode`] || '',
-                  country: req.body[`${fieldName}-country`] || '',
                 };
               }
             }

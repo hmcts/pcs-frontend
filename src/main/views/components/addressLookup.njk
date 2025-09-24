@@ -10,7 +10,7 @@
 
   This component uses fixed ids to hook JS:
     - lookupPostcode, findAddressBtn, selectedAddress
-    - addressLine1/2/3, town, county, postcode, country
+    - addressLine1/2/3, town, county, postcode
  #}
 
 {% set namePrefix = fieldConfig.namePrefix or 'address' %}
@@ -55,11 +55,9 @@
             value="{{ loop.index0 }}"
             data-line1="{{ address.addressLine1 }}"
             data-line2="{{ address.addressLine2 }}"
-            data-line3="{{ address.addressLine3 }}"
             data-town="{{ address.town }}"
             data-county="{{ address.county }}"
             data-postcode="{{ address.postcode }}"
-            data-country="{{ address.country }}"
           >{{ address.fullAddress }}</option>
         {% endfor %}
       {% else %}
@@ -84,7 +82,7 @@
   {{ govukInput({
     id: namePrefix + '-addressLine1',
     name: namePrefix + '-addressLine1',
-    label: { text: t('address.addressLine1', 'Address Line 1') },
+    label: { text: t('address.addressLine1', 'Address line 1') },
     value: val.addressLine1,
     classes: 'govuk-!-width-three-quarters',
     errorMessage: errs[namePrefix ~ '-addressLine1'] and { text: errs[namePrefix ~ '-addressLine1'].message }
@@ -93,18 +91,11 @@
   {{ govukInput({
     id: namePrefix + '-addressLine2',
     name: namePrefix + '-addressLine2',
-    label: { text: t('address.addressLine2', 'Address Line 2 (optional)') },
+    label: { text: t('address.addressLine2', 'Address line 2 (optional)') },
     value: val.addressLine2,
     classes: 'govuk-!-width-three-quarters'
   }) }}
 
-  {{ govukInput({
-    id: namePrefix + '-addressLine3',
-    name: namePrefix + '-addressLine3',
-    label: { text: t('address.addressLine3', 'Address Line 3 (optional)') },
-    value: val.addressLine3,
-    classes: 'govuk-!-width-three-quarters'
-  }) }}
 
   {{ govukInput({
     id: namePrefix + '-town',
@@ -132,13 +123,6 @@
     errorMessage: errs[namePrefix ~ '-postcode'] and { text: errs[namePrefix ~ '-postcode'].message }
   }) }}
 
-  {{ govukInput({
-    id: namePrefix + '-country',
-    name: namePrefix + '-country',
-    label: { text: t('address.country', 'Country (optional)') },
-    value: val.country,
-    classes: 'govuk-!-width-three-quarters'
-  }) }}
 
 {% endset %}
 

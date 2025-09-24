@@ -14,7 +14,7 @@ export interface ValidationResult {
 export class JourneyValidator {
   private readonly logger: Logger = Logger.getLogger('JourneyValidator');
 
-  validate(step: StepConfig, submission: Record<string, unknown>): ValidationResult {
+  validate(step: StepConfig, submission: Record<string, unknown>, allData?: Record<string, unknown>): ValidationResult {
     if (!step.fields) {
       return { success: true, data: submission };
     }
@@ -24,6 +24,9 @@ export class JourneyValidator {
       { day?: string; month?: string; year?: string; message: string; anchor?: string; _fieldOnly?: boolean }
     > = {};
     const validatedData: Record<string, unknown> = {};
+
+    // Create stepData from submission for conditional validation
+    const stepData: Record<string, unknown> = { ...submission };
 
     // Iterate over every configured field on the step
     for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
@@ -50,15 +53,13 @@ export class JourneyValidator {
         fieldValue = {
           addressLine1: submission[`${fieldName}-addressLine1`],
           addressLine2: submission[`${fieldName}-addressLine2`],
-          addressLine3: submission[`${fieldName}-addressLine3`],
           town: submission[`${fieldName}-town`],
           county: submission[`${fieldName}-county`],
           postcode: submission[`${fieldName}-postcode`],
-          country: submission[`${fieldName}-country`],
         };
       }
 
-      const fieldSchema = createFieldValidationSchema(fieldConfig);
+      const fieldSchema = createFieldValidationSchema(fieldConfig, stepData, allData);
       const result = fieldSchema.safeParse(fieldValue);
 
       if (result.success) {
@@ -145,11 +146,7 @@ export class JourneyValidator {
 
         for (const issue of result.error.issues) {
           const anchorPart = (issue.path?.[0] as string) ?? 'addressLine1';
-          if (
-            ['addressLine1', 'addressLine2', 'addressLine3', 'town', 'county', 'postcode', 'country'].includes(
-              anchorPart
-            )
-          ) {
+          if (['addressLine1', 'addressLine2', 'town', 'county', 'postcode'].includes(anchorPart)) {
             partErrors.push(anchorPart);
             const anchorId = `${fieldName}-${anchorPart}`;
             partErrorMessages[anchorPart] = issue.message || 'Enter a value';

@@ -4,7 +4,7 @@
  * - #lookupPostcode: input for entering postcode
  * - #findAddressBtn: button (type=button) to trigger lookup
  * - #selectedAddress: select populated with results
- * - #addressLine1, #addressLine2, #addressLine3, #town, #county, #postcode: inputs to populate
+ * - #addressLine1, #addressLine2, #town, #county, #postcode: inputs to populate
  */
 let postcodeLookupDelegatedBound = false;
 
@@ -24,11 +24,9 @@ export function initPostcodeLookup(): void {
       selectContainer: byId('addressSelectContainer') as HTMLDivElement | null,
       addressLine1: byId('addressLine1') as HTMLInputElement | null,
       addressLine2: byId('addressLine2') as HTMLInputElement | null,
-      addressLine3: byId('addressLine3') as HTMLInputElement | null,
       town: byId('town') as HTMLInputElement | null,
       county: byId('county') as HTMLInputElement | null,
       postcodeOut: byId('postcode') as HTMLInputElement | null,
-      country: byId('country') as HTMLInputElement | null,
       details: container.querySelector('.govuk-details, details'),
     };
   };
@@ -57,11 +55,9 @@ export function initPostcodeLookup(): void {
       opt.textContent = addr.fullAddress || '';
       opt.dataset.line1 = addr.addressLine1 || '';
       opt.dataset.line2 = addr.addressLine2 || '';
-      opt.dataset.line3 = addr.addressLine3 || '';
       opt.dataset.town = addr.town || '';
       opt.dataset.county = addr.county || '';
       opt.dataset.postcode = addr.postcode || '';
-      opt.dataset.country = addr.country || '';
       select.appendChild(opt);
     }
     if (selectContainer) {
@@ -72,8 +68,7 @@ export function initPostcodeLookup(): void {
   };
 
   const populateAddressFields = (container: HTMLElement, selected: HTMLOptionElement) => {
-    const { addressLine1, addressLine2, addressLine3, town, county, postcodeOut, country, details } =
-      getParts(container);
+    const { addressLine1, addressLine2, town, county, postcodeOut, details } = getParts(container);
 
     if (details && !(details as HTMLDetailsElement).open) {
       (details as HTMLDetailsElement).open = true;
@@ -82,11 +77,9 @@ export function initPostcodeLookup(): void {
     const fieldMappings = [
       { field: addressLine1, value: selected.dataset.line1 },
       { field: addressLine2, value: selected.dataset.line2 },
-      { field: addressLine3, value: selected.dataset.line3 },
       { field: town, value: selected.dataset.town },
       { field: county, value: selected.dataset.county },
       { field: postcodeOut, value: selected.dataset.postcode },
-      { field: country, value: selected.dataset.country },
     ];
 
     fieldMappings.forEach(({ field, value }) => {

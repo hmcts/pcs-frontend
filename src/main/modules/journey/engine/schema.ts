@@ -30,7 +30,15 @@ const ErrorMessagesSchema = z
 // Field validation rules
 export const ValidationRuleSchema = z
   .object({
-    required: z.boolean().optional().default(false),
+    required: z
+      .union([
+        z.boolean(),
+        z.custom<(data: Record<string, unknown>, allData: Record<string, unknown>) => boolean>(
+          val => typeof val === 'function'
+        ),
+      ])
+      .optional()
+      .default(false),
     minLength: z.number().min(0).optional().default(0),
     maxLength: z.number().min(1).optional().default(100),
     min: z.number().optional().default(0),
@@ -628,7 +636,11 @@ export type FieldConfig = z.infer<typeof FieldSchema>;
 export type JourneyConfig = z.infer<typeof JourneySchema>;
 
 // Field validation schema factory
-export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodTypeAny => {
+export const createFieldValidationSchema = (
+  fieldConfig: FieldConfig,
+  stepData?: Record<string, unknown>,
+  allData?: Record<string, unknown>
+): z.ZodTypeAny => {
   const rules = fieldConfig.validate;
   // Prefer field-level errorMessages, otherwise fall back to any defined inside the rules block
   const errorMessages = fieldConfig.errorMessages ?? rules?.errorMessages;
@@ -661,6 +673,27 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
     return undefined;
   };
 
+  const isRequired = (): boolean => {
+    if (!rules?.required) {
+      return false;
+    }
+
+    if (typeof rules.required === 'boolean') {
+      return rules.required;
+    }
+
+    if (typeof rules.required === 'function' && stepData && allData) {
+      try {
+        return rules.required(stepData, allData);
+      } catch (err) {
+        logger.error('required function threw', err);
+        return false;
+      }
+    }
+
+    return false;
+  };
+
   switch (fieldConfig.type) {
     case 'number': {
       let schema = z.coerce.number();
@@ -670,7 +703,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       if (rules?.max !== undefined) {
         schema = schema.max(rules.max, { message: getMessage('max') });
       }
-      return rules?.required === false ? schema.optional() : schema;
+      return !isRequired() ? schema.optional() : schema;
     }
 
     case 'email': {
@@ -684,7 +717,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         schemaBase = schemaBase.max(rules.maxLength, { message: getMessage('maxLength') });
       }
       const schema = schemaBase.pipe(z.email({ message }));
-      const newSchema = rules?.required === false ? schema.optional() : schema;
+      const newSchema = !isRequired() ? schema.optional() : schema;
       return newSchema;
     }
 
@@ -698,7 +731,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         base = base.max(rules.maxLength, { message: getMessage('maxLength') });
       }
       const schema = base.pipe(z.url({ message: getMessage('url') }));
-      return rules?.required === false ? schema.optional() : schema;
+      return !isRequired() ? schema.optional() : schema;
     }
 
     case 'select': {
@@ -709,7 +742,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
 
       if (allowed.length === 0) {
         let schema = z.string();
-        if (rules?.required === true) {
+        if (isRequired()) {
           schema = schema.min(1, { message: getMessage('required') ?? 'errors.required' });
         }
         return schema;
@@ -717,14 +750,14 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
 
       let schema = z.string();
 
-      if (rules?.required === true) {
+      if (isRequired()) {
         schema = schema.min(1, { message: getMessage('required') ?? 'errors.required' });
       }
 
       schema = schema.refine(
         val => {
           if (val === '' || val === null) {
-            return rules?.required !== true;
+            return !isRequired();
           }
           return allowed.includes(val);
         },
@@ -743,7 +776,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         .filter(v => v !== '' && v !== null && v !== undefined) as string[];
 
       let schema = z.string();
-      if (rules?.required === true) {
+      if (isRequired()) {
         schema = schema.min(1, { message: getMessage('required') ?? 'errors.required' });
       }
 
@@ -751,7 +784,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         schema = schema.refine(
           val => {
             if (val === '' || val === null) {
-              return rules?.required !== true;
+              return !isRequired();
             }
             return allowed.includes(val);
           },
@@ -773,7 +806,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let schema: any = z.array(z.string());
 
-      if (rules?.required === true || rules?.minLength !== undefined) {
+      if (isRequired() || rules?.minLength !== undefined) {
         const minItems = rules?.minLength || 1;
         schema = schema.min(minItems, { message: getMessage('minLength') || 'Select at least one option' });
       }
@@ -787,7 +820,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
         });
       }
 
-      return rules?.required === false ? schema.optional().default([]) : schema;
+      return !isRequired() ? schema.optional().default([]) : schema;
     }
 
     case 'date': {
@@ -826,7 +859,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       }
 
       return buildDateInputSchema(fieldConfig, {
-        required: rules?.required,
+        required: isRequired(),
         mustBePast: rules?.mustBePast,
         mustBeTodayOrPast: rules?.mustBeTodayOrPast,
         mustBeFuture: rules?.mustBeFuture,
@@ -847,7 +880,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
 
     case 'address': {
       // Composite address field. Expect sub-inputs named using the pattern
-      // `${name}-addressLine1`, `${name}-addressLine2`, `${name}-addressLine3`, `${name}-town`, `${name}-county`, `${name}-postcode`, `${name}-country`.
+      // `${name}-addressLine1`, `${name}-addressLine2`, `${name}-town`, `${name}-county`, `${name}-postcode`.
       // We only enforce minimal validation here (line1, town, postcode). Postcode uses GB validation.
       const requiredMsg = getMessage('required') || 'Enter a value';
       const postcodeMsg = getMessage('postcode') || 'Enter a valid postcode';
@@ -858,7 +891,6 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
           .trim()
           .min(1, { message: getMessage('addressLine1') || requiredMsg }),
         addressLine2: z.string().trim().optional().default(''),
-        addressLine3: z.string().trim().optional().default(''),
         town: z
           .string()
           .trim()
@@ -868,25 +900,16 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
           .string()
           .trim()
           .refine(val => isPostalCode(val, 'GB'), { message: postcodeMsg }),
-        country: z.string().trim().optional().default(''),
       });
       // For non-required address fields, allow empty values across all parts.
       // If some parts are provided, enforce the minimal constraints (line1, town, postcode).
-      const isRequired = rules?.required === true;
-      if (!isRequired) {
+      const addressRequired = isRequired();
+      if (!addressRequired) {
         const partial = base.partial();
         const cleanEmptyToMissing = z.preprocess(val => {
           if (val && typeof val === 'object') {
             const obj = { ...(val as Record<string, unknown>) };
-            for (const key of [
-              'addressLine1',
-              'addressLine2',
-              'addressLine3',
-              'town',
-              'county',
-              'postcode',
-              'country',
-            ]) {
+            for (const key of ['addressLine1', 'addressLine2', 'town', 'county', 'postcode']) {
               const v = obj[key];
               if (typeof v === 'string' && v.trim() === '') {
                 delete obj[key];
@@ -917,7 +940,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
       }
 
       // Enforce non-empty when required but no explicit minLength provided
-      if (rules?.required === true && (rules?.minLength === undefined || rules.minLength < 1)) {
+      if (isRequired() && (rules?.minLength === undefined || rules.minLength < 1)) {
         schema = schema.min(1, { message: getMessage('required') || 'Enter a value' });
       }
 
@@ -934,7 +957,7 @@ export const createFieldValidationSchema = (fieldConfig: FieldConfig): z.ZodType
           message: getMessage('postcode') ?? 'Enter a valid postcode',
         });
       }
-      return rules?.required === false ? schema.optional() : schema;
+      return !isRequired() ? schema.optional() : schema;
     }
   }
 };

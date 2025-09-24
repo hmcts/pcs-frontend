@@ -9,7 +9,6 @@ const step: StepDraft = {
   fields: {
     isCorrespondenceAddress: {
       type: 'radios',
-      classes: 'govuk-radios--inline',
       fieldset: {
         legend: {
           text: 'Is this your correspondence address?',
@@ -43,7 +42,10 @@ const step: StepDraft = {
         text: 'This is the address we will send the claim documents to.',
       },
       validate: {
-        required: true,
+        required: (stepData: Record<string, unknown>) => {
+          // Only require correspondence address if user selected "No" for isCorrespondenceAddress
+          return stepData.isCorrespondenceAddress === 'no';
+        },
       },
     },
     continueButton: {
