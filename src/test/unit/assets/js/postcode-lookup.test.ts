@@ -329,7 +329,6 @@ describe('initPostcodeLookup', () => {
     }).not.toThrow();
   });
 
-
   it('handles details element with different selectors', () => {
     document.body.innerHTML = `
       <div data-address-component>
