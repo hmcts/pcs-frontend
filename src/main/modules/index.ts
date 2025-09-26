@@ -18,8 +18,8 @@ export const modules = [
   'Nunjucks',
   'Helmet',
   'Session',
-  // 'S2S',
-  // 'OIDCModule',
+  'S2S',
+  'OIDCModule',
   'Journey',
   'LaunchDarkly',
 ];
