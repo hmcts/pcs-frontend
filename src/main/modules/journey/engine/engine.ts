@@ -827,6 +827,10 @@ export class WizardEngine {
         if (field.type === 'button') {
           return false;
         }
+        // For function-based required fields, we can't evaluate without data, so assume they might be required
+        if (typeof field.validate?.required === 'function') {
+          return true; // Assume function-based fields might be required
+        }
         // Fields are required by default unless explicitly set to false
         return field.validate?.required !== false;
       });
@@ -842,8 +846,23 @@ export class WizardEngine {
         if (typedFieldConfig.type === 'button') {
           continue;
         }
-        // Fields are required by default unless explicitly set to false
-        if (typedFieldConfig.validate?.required !== false) {
+        // Check if field is required (handle both boolean and function cases)
+        let isRequired = false;
+        if (typeof typedFieldConfig.validate?.required === 'boolean') {
+          isRequired = typedFieldConfig.validate.required;
+        } else if (typeof typedFieldConfig.validate?.required === 'function') {
+          try {
+            isRequired = typedFieldConfig.validate.required(stepData, allData);
+          } catch (err) {
+            this.logger.error('Error evaluating required function in isStepComplete', err);
+            isRequired = false;
+          }
+        } else {
+          // Default to required if not explicitly set to false
+          isRequired = typedFieldConfig.validate?.required !== false;
+        }
+
+        if (isRequired) {
           const fieldValue = stepData[fieldName];
 
           // For date fields, check if all components are present
@@ -928,6 +947,44 @@ export class WizardEngine {
     }
 
     return true;
+  }
+
+  /**
+   * Clean up data for conditionally required fields that are no longer required.
+   * This method removes data for fields where the required function evaluates to false.
+   * Static optional fields (required: false) are not cleaned up to preserve user data.
+   */
+  private async cleanupConditionalData(
+    step: StepConfig,
+    stepData: Record<string, unknown>,
+    allData: Record<string, unknown>
+  ): Promise<Record<string, unknown>> {
+    const cleanedData = { ...stepData };
+
+    if (!step.fields) {
+      return cleanedData;
+    }
+
+    for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+      // Only clean up if this is a conditionally required field (function) that returns false
+      // Static optional fields (required: false) should keep their data
+      if (typeof fieldConfig.validate?.required === 'function') {
+        try {
+          const isRequired = fieldConfig.validate.required(cleanedData, allData);
+
+          // Only clean up if the conditional function says the field is not required
+          if (!isRequired) {
+            delete cleanedData[fieldName];
+          }
+        } catch (err) {
+          this.logger.error('Error evaluating required function in cleanupConditionalData', err);
+          // On error, don't clean up the data
+        }
+      }
+      // For static required: false, we don't clean up - let the user's data persist
+    }
+
+    return cleanedData;
   }
 
   /**
@@ -1162,7 +1219,10 @@ export class WizardEngine {
         step = await this.applyLdOverride(step, req);
         step = await this.applyLaunchDarklyFlags(step, req);
 
-        const { data } = await this.store.load(req, caseId);
+        const { data: rawData } = await this.store.load(req, caseId);
+
+        // Use the raw data as-is for rendering (cleanup happens at form submission time)
+        const data = rawData;
 
         // Auto-skip only if the original step had fields but all are now hidden
         const originalFields = this.journey.steps[step.id]?.fields;
@@ -1346,13 +1406,14 @@ export class WizardEngine {
                 postcode: sel.postcode || '',
               };
             } else if (fieldConfig.type === 'address') {
-              // Process other address fields from form data
+              // Process other address fields from form data (nested structure)
+              const addressData = (req.body[fieldName] as Record<string, unknown>) || {};
               reconstructedData[fieldName] = {
-                addressLine1: req.body[`${fieldName}-addressLine1`] || '',
-                addressLine2: req.body[`${fieldName}-addressLine2`] || '',
-                town: req.body[`${fieldName}-town`] || '',
-                county: req.body[`${fieldName}-county`] || '',
-                postcode: req.body[`${fieldName}-postcode`] || '',
+                addressLine1: addressData.addressLine1 || '',
+                addressLine2: addressData.addressLine2 || '',
+                town: addressData.town || '',
+                county: addressData.county || '',
+                postcode: addressData.postcode || '',
               };
             } else if (fieldConfig.type === 'date') {
               // Process date fields
@@ -1401,12 +1462,14 @@ export class WizardEngine {
                   year: req.body[`${fieldName}-year`] || '',
                 };
               } else if (typedFieldConfig.type === 'address') {
+                // Process address fields from form data (nested structure)
+                const addressData = (req.body[fieldName] as Record<string, unknown>) || {};
                 reconstructedData[fieldName] = {
-                  addressLine1: req.body[`${fieldName}-addressLine1`] || '',
-                  addressLine2: req.body[`${fieldName}-addressLine2`] || '',
-                  town: req.body[`${fieldName}-town`] || '',
-                  county: req.body[`${fieldName}-county`] || '',
-                  postcode: req.body[`${fieldName}-postcode`] || '',
+                  addressLine1: addressData.addressLine1 || '',
+                  addressLine2: addressData.addressLine2 || '',
+                  town: addressData.town || '',
+                  county: addressData.county || '',
+                  postcode: addressData.postcode || '',
                 };
               }
             }
@@ -1433,10 +1496,77 @@ export class WizardEngine {
         }
 
         // Save and move forward
-        const { version } = await this.store.load(req, caseId);
-        const { data: merged } = await this.store.save(req, caseId, version, {
-          [step.id]: validationResult.data || {},
-        });
+        const { version, data: currentData } = await this.store.load(req, caseId);
+
+        // Apply automatic data cleanup for conditionally required fields
+        const cleanedCurrentStepData = await this.cleanupConditionalData(
+          step,
+          validationResult.data || {},
+          currentData
+        );
+
+        // Also clean up all other steps that might have conditional fields affected by this change
+        const allCleanedData = { ...currentData, [step.id]: cleanedCurrentStepData };
+        let hasGlobalChanges = false;
+
+        for (const [stepId, stepConfig] of Object.entries(this.journey.steps)) {
+          const typedStepConfig = stepConfig as StepConfig;
+          if (typedStepConfig.type === 'summary' || typedStepConfig.type === 'confirmation') {
+            continue;
+          }
+          if (!typedStepConfig.fields || Object.keys(typedStepConfig.fields).length === 0) {
+            continue;
+          }
+
+          // For the current step being submitted, use the cleaned data; for other steps, use original data
+          const stepData =
+            stepId === step.id
+              ? (allCleanedData[stepId] as Record<string, unknown>)
+              : (currentData[stepId] as Record<string, unknown>);
+          if (!stepData || Object.keys(stepData).length === 0) {
+            continue;
+          }
+
+          // Always use allCleanedData so the required function sees the updated values
+          const cleanedStepData = await this.cleanupConditionalData(typedStepConfig, stepData, allCleanedData);
+
+          // Check if cleanup removed any data (compare with original data, not the potentially already cleaned data)
+          const originalStepData = currentData[stepId] as Record<string, unknown>;
+          if (!originalStepData || Object.keys(cleanedStepData).length !== Object.keys(originalStepData).length) {
+            // Explicitly set removed fields to undefined to ensure they're removed from the store
+            const finalStepData = { ...cleanedStepData };
+            if (originalStepData) {
+              for (const key of Object.keys(originalStepData)) {
+                if (!(key in cleanedStepData)) {
+                  finalStepData[key] = undefined;
+                }
+              }
+            }
+            allCleanedData[stepId] = finalStepData;
+            hasGlobalChanges = true;
+          }
+        }
+
+        // Save the cleaned data
+        let merged: Record<string, unknown>;
+        if (hasGlobalChanges) {
+          // Save each step individually to ensure proper replacement (not merge)
+          let currentVersion = version;
+          for (const [stepId, stepData] of Object.entries(allCleanedData)) {
+            await this.store.save(req, caseId, currentVersion, { [stepId]: stepData });
+            currentVersion++;
+          }
+
+          // Reload the final data
+          const { data: finalData } = await this.store.load(req, caseId);
+          merged = finalData;
+        } else {
+          // No global changes, just save the current step
+          const { data: finalData } = await this.store.save(req, caseId, version, {
+            [step.id]: cleanedCurrentStepData,
+          });
+          merged = finalData;
+        }
 
         // Clear any stored lookup state for this step after a successful save
         if (addressLookupStore[step.id]) {

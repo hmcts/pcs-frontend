@@ -880,26 +880,24 @@ export const createFieldValidationSchema = (
 
     case 'address': {
       // Composite address field. Expect sub-inputs named using the pattern
-      // `${name}-addressLine1`, `${name}-addressLine2`, `${name}-town`, `${name}-county`, `${name}-postcode`.
+      // `${name}[addressLine1]`, `${name}[addressLine2]`, `${name}[town]`, `${name}[county]`, `${name}[postcode]`.
       // We only enforce minimal validation here (line1, town, postcode). Postcode uses GB validation.
-      const requiredMsg = getMessage('required') || 'Enter a value';
-      const postcodeMsg = getMessage('postcode') || 'Enter a valid postcode';
 
       const base = z.object({
         addressLine1: z
           .string()
           .trim()
-          .min(1, { message: getMessage('addressLine1') || requiredMsg }),
+          .min(1, { message: getMessage('addressLine1') || 'errors.address.addressLine1' }),
         addressLine2: z.string().trim().optional().default(''),
         town: z
           .string()
           .trim()
-          .min(1, { message: getMessage('town') || requiredMsg }),
+          .min(1, { message: getMessage('town') || 'errors.address.town' }),
         county: z.string().trim().optional().default(''),
         postcode: z
           .string()
           .trim()
-          .refine(val => isPostalCode(val, 'GB'), { message: postcodeMsg }),
+          .refine(val => isPostalCode(val, 'GB'), { message: getMessage('postcode') || 'errors.address.postcode' }),
       });
       // For non-required address fields, allow empty values across all parts.
       // If some parts are provided, enforce the minimal constraints (line1, town, postcode).
@@ -954,7 +952,7 @@ export const createFieldValidationSchema = (
 
       if (rules?.postcode) {
         schema = schema.refine((val: string) => isPostalCode(val, 'GB'), {
-          message: getMessage('postcode') ?? 'Enter a valid postcode',
+          message: getMessage('postcode') ?? 'Enter a valid Postcode',
         });
       }
       return !isRequired() ? schema.optional() : schema;

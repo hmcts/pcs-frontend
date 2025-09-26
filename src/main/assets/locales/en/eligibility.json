@@ -125,5 +125,12 @@
     "reason": "You need to be 18 or over to make a possession claim.",
     "changeAnswer": "If you think this is incorrect, you can go back and change your answer.",
     "exit": "Exit application"
+  },
+  "errors": {
+    "address": {
+      "addressLine1": "Enter Address line 1",
+      "town": "Enter Town or city",
+      "postcode": "Enter a valid Postcode"
+    }
   }
 }

@@ -30,6 +30,7 @@ const step: StepDraft = {
       ],
       validate: {
         required: true,
+        customMessage: 'Select yes or no',
       },
     },
     correspondenceAddress: {

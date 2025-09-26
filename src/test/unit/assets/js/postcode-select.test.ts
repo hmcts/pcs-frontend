@@ -17,11 +17,11 @@ describe('initPostcodeSelection', () => {
           data-postcode="TE5 7ST"
         >123 Test St</option>
       </select>
-      <input id="addressLine1" />
-      <input id="addressLine2" />
-      <input id="town" />
-      <input id="county" />
-      <input id="postcode" />
+      <input id="addressLine1" name="address[addressLine1]" />
+      <input id="addressLine2" name="address[addressLine2]" />
+      <input id="town" name="address[town]" />
+      <input id="county" name="address[county]" />
+      <input id="postcode" name="address[postcode]" />
       <details class="govuk-details"></details>
     `;
   });

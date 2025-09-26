@@ -25,19 +25,19 @@ describe('initPostcodeLookup', () => {
 
   const buildComponent = (prefix = 'address') => `
     <div data-address-component data-name-prefix="${prefix}">
-      <input id="${prefix}-lookupPostcode" />
+      <input id="${prefix}-lookupPostcode" name="${prefix}[lookupPostcode]" />
       <button id="${prefix}-findAddressBtn" type="button">Find</button>
       <div id="${prefix}-addressSelectContainer" hidden>
-        <select id="${prefix}-selectedAddress">
+        <select id="${prefix}-selectedAddress" name="${prefix}[selectedAddress]">
           <option value="">Initial</option>
         </select>
       </div>
       <details></details>
-      <input id="${prefix}-addressLine1" />
-      <input id="${prefix}-addressLine2" />
-      <input id="${prefix}-town" />
-      <input id="${prefix}-county" />
-      <input id="${prefix}-postcode" />
+      <input id="${prefix}-addressLine1" name="${prefix}[addressLine1]" />
+      <input id="${prefix}-addressLine2" name="${prefix}[addressLine2]" />
+      <input id="${prefix}-town" name="${prefix}[town]" />
+      <input id="${prefix}-county" name="${prefix}[county]" />
+      <input id="${prefix}-postcode" name="${prefix}[postcode]" />
     </div>
   `;
 
@@ -263,11 +263,11 @@ describe('initPostcodeLookup', () => {
           <option value="">Initial</option>
         </select>
         <details></details>
-        <input id="address-addressLine1" />
-        <input id="address-addressLine2" />
-        <input id="address-town" />
-        <input id="address-county" />
-        <input id="address-postcode" />
+        <input id="address-addressLine1" name="address[addressLine1]" />
+        <input id="address-addressLine2" name="address[addressLine2]" />
+        <input id="address-town" name="address[town]" />
+        <input id="address-county" name="address[county]" />
+        <input id="address-postcode" name="address[postcode]" />
       </div>
     `;
 
@@ -653,11 +653,11 @@ describe('initPostcodeSelection', () => {
       <select id="selectedAddress">
         <option value="">Select address</option>
       </select>
-      <input id="addressLine1" />
-      <input id="addressLine2" />
-      <input id="town" />
-      <input id="county" />
-      <input id="postcode" />
+      <input id="addressLine1" name="address[addressLine1]" />
+      <input id="addressLine2" name="address[addressLine2]" />
+      <input id="town" name="address[town]" />
+      <input id="county" name="address[county]" />
+      <input id="postcode" name="address[postcode]" />
       <div class="govuk-details"></div>
     `;
 

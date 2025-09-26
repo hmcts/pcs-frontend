@@ -50,12 +50,14 @@ export class JourneyValidator {
 
       // Collect composite parts for address field
       if (fieldConfig.type === 'address') {
+        // Handle nested address structure: fieldName[addressLine1], fieldName[town], etc.
+        const addressData = (submission[fieldName] as Record<string, unknown>) || {};
         fieldValue = {
-          addressLine1: submission[`${fieldName}-addressLine1`],
-          addressLine2: submission[`${fieldName}-addressLine2`],
-          town: submission[`${fieldName}-town`],
-          county: submission[`${fieldName}-county`],
-          postcode: submission[`${fieldName}-postcode`],
+          addressLine1: addressData.addressLine1,
+          addressLine2: addressData.addressLine2,
+          town: addressData.town,
+          county: addressData.county,
+          postcode: addressData.postcode,
         };
       }
 

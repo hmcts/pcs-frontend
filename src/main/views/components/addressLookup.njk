@@ -30,14 +30,14 @@
   {% endif %}
 
   <div class="govuk-form-group govuk-!-margin-bottom-0">
-    <label class="govuk-label" for="{{ namePrefix }}-lookupPostcode">{{ t('address.lookupPostcode', 'Enter a UK postcode') }}</label>
+    <label class="govuk-label" for="{{ namePrefix }}-lookupPostcode">{{ t('labels.lookupPostcode', 'Enter a UK postcode') }}</label>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-half">
-        <input class="govuk-input govuk-input--width-10" id="{{ namePrefix }}-lookupPostcode" name="{{ namePrefix }}-lookupPostcode" value="{{ lookupForField and lookupForField.postcode or '' }}">
+        <input class="govuk-input govuk-input--width-10" id="{{ namePrefix }}-lookupPostcode" name="{{ namePrefix }}[lookupPostcode]" value="{{ lookupForField and lookupForField.postcode or '' }}">
       </div>
       <div class="govuk-grid-column-one-half">
         <button class="govuk-button" id="{{ namePrefix }}-findAddressBtn" type="submit" name="_addressLookup" value="{{ namePrefix }}">
-          {{ t('address.findAddress', 'Find address') }}
+          {{ t('buttons.findAddress', 'Find address') }}
         </button>
       </div>
     </div>
@@ -45,11 +45,11 @@
 
   {% set hasResults = lookupForField and lookupForField.addresses and lookupForField.addresses.length > 0 %}
   <div class="govuk-form-group" id="{{ namePrefix }}-addressSelectContainer"{% if not hasResults %} hidden{% endif %}>
-    <label class="govuk-label" for="{{ namePrefix }}-selectedAddress">{{ t('address.selectAddress', 'Select your address') }}</label>
-    <select class="govuk-select govuk-!-width-three-quarters" id="{{ namePrefix }}-selectedAddress" name="{{ namePrefix }}-selectedAddress">
+    <label class="govuk-label" for="{{ namePrefix }}-selectedAddress">{{ t('labels.selectAddress', 'Select your address') }}</label>
+    <select class="govuk-select govuk-!-width-three-quarters" id="{{ namePrefix }}-selectedAddress" name="{{ namePrefix }}[selectedAddress]">
       {% if hasResults %}
         {% set count = lookupForField.addresses.length %}
-        <option value="">{{ count }} {% if count == 1 %}{{ t('address.addressFoundSingle', 'address found') }}{% else %}{{ t('address.addressFoundPlural', 'addresses found') }}{% endif %}</option>
+        <option value="">{{ count }} {% if count == 1 %}{{ t('addressFoundSingle', 'address found') }}{% else %}{{ t('addressFoundPlural', 'addresses found') }}{% endif %}</option>
         {% for address in lookupForField.addresses %}
           <option
             value="{{ loop.index0 }}"
@@ -61,7 +61,7 @@
           >{{ address.fullAddress }}</option>
         {% endfor %}
       {% else %}
-        <option value="">{{ t('address.addressesFound', 'Addresses will appear here') }}</option>
+        <option value="">{{ t('addressesFound', 'Addresses will appear here') }}</option>
       {% endif %}
     </select>
     <noscript>
@@ -81,17 +81,17 @@
 
   {{ govukInput({
     id: namePrefix + '-addressLine1',
-    name: namePrefix + '-addressLine1',
-    label: { text: t('address.addressLine1', 'Address line 1') },
+    name: namePrefix + '[addressLine1]',
+    label: { text: t('labels.addressLine1', 'Address line 1') },
     value: val.addressLine1,
     classes: 'govuk-!-width-three-quarters',
-    errorMessage: errs[namePrefix ~ '-addressLine1'] and { text: errs[namePrefix ~ '-addressLine1'].message }
+    errorMessage: errs[namePrefix ~ '-addressLine1'] and { text: t(errs[namePrefix ~ '-addressLine1'].message) }
   }) }}
 
   {{ govukInput({
     id: namePrefix + '-addressLine2',
-    name: namePrefix + '-addressLine2',
-    label: { text: t('address.addressLine2', 'Address line 2 (optional)') },
+    name: namePrefix + '[addressLine2]',
+    label: { text: t('labels.addressLine2', 'Address line 2 (optional)') },
     value: val.addressLine2,
     classes: 'govuk-!-width-three-quarters'
   }) }}
@@ -99,35 +99,35 @@
 
   {{ govukInput({
     id: namePrefix + '-town',
-    name: namePrefix + '-town',
-    label: { text: t('address.town', 'Town or city') },
+    name: namePrefix + '[town]',
+    label: { text: t('labels.town', 'Town or city') },
     value: val.town,
     classes: 'govuk-!-width-three-quarters',
-    errorMessage: errs[namePrefix ~ '-town'] and { text: errs[namePrefix ~ '-town'].message }
+    errorMessage: errs[namePrefix ~ '-town'] and { text: t(errs[namePrefix ~ '-town'].message) }
   }) }}
 
   {{ govukInput({
     id: namePrefix + '-county',
-    name: namePrefix + '-county',
-    label: { text: t('address.county', 'County (optional)') },
+    name: namePrefix + '[county]',
+    label: { text: t('labels.county', 'County (optional)') },
     value: val.county,
     classes: 'govuk-!-width-three-quarters'
   }) }}
 
   {{ govukInput({
     id: namePrefix + '-postcode',
-    name: namePrefix + '-postcode',
-    label: { text: t('address.postcode', 'Postcode') },
+    name: namePrefix + '[postcode]',
+    label: { text: t('labels.postcode', 'Postcode') },
     value: val.postcode,
     classes: 'govuk-!-width-one-quarter',
-    errorMessage: errs[namePrefix ~ '-postcode'] and { text: errs[namePrefix ~ '-postcode'].message }
+    errorMessage: errs[namePrefix ~ '-postcode'] and { text: t(errs[namePrefix ~ '-postcode'].message) }
   }) }}
 
 
 {% endset %}
 
 {{ govukDetails({
-  summaryText: t('address.manualEntryToggle', 'Enter an address manually'),
+  summaryText: t('labels.manualEntryToggle', 'Enter an address manually'),
   html: manualAddressHtml,
   open: ((val.addressLine1 and val.town and val.postcode) or (errs[namePrefix ~ '-addressLine1'] or errs[namePrefix ~ '-town'] or errs[namePrefix ~ '-postcode']))
 }) }}
