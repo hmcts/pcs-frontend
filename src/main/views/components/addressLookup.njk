@@ -1,0 +1,135 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{#
+  fieldConfig is the address field definition from the engine.
+  fieldConfig.namePrefix is the base field name; inputs are named using `${namePrefix}-<part>`
+  fieldConfig.value contains any existing values for prefilling.
+
+  This component uses fixed ids to hook JS:
+    - lookupPostcode, findAddressBtn, selectedAddress
+    - addressLine1/2/3, town, county, postcode
+ #}
+
+{% set namePrefix = fieldConfig.namePrefix or 'address' %}
+{% set val = fieldConfig.value or {} %}
+{% set errs = errors or {} %}
+{% set lookupStore = addressLookup or {} %}
+{% set lookupForField = lookupStore[namePrefix] %}
+
+<div class="pcs-address-component" data-address-component data-name-prefix="{{ namePrefix }}">
+
+  {% if fieldConfig.label %}
+    {% if fieldConfig.label.text %}
+      <h3 class="govuk-heading-s">{{ fieldConfig.label.text }}</h3>
+    {% else %}
+      <h3 class="govuk-heading-s">{{ fieldConfig.label }}</h3>
+    {% endif %}
+  {% endif %}
+
+  <div class="govuk-form-group govuk-!-margin-bottom-0">
+    <label class="govuk-label" for="{{ namePrefix }}-lookupPostcode">{{ t('labels.lookupPostcode', 'Enter a UK postcode') }}</label>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-half">
+        <input class="govuk-input govuk-input--width-10" id="{{ namePrefix }}-lookupPostcode" name="{{ namePrefix }}[lookupPostcode]" value="{{ lookupForField and lookupForField.postcode or '' }}">
+      </div>
+      <div class="govuk-grid-column-one-half">
+        <button class="govuk-button" id="{{ namePrefix }}-findAddressBtn" type="submit" name="_addressLookup" value="{{ namePrefix }}">
+          {{ t('buttons.findAddress', 'Find address') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {% set hasResults = lookupForField and lookupForField.addresses and lookupForField.addresses.length > 0 %}
+  <div class="govuk-form-group" id="{{ namePrefix }}-addressSelectContainer"{% if not hasResults %} hidden{% endif %}>
+    <label class="govuk-label" for="{{ namePrefix }}-selectedAddress">{{ t('labels.selectAddress', 'Select your address') }}</label>
+    <select class="govuk-select govuk-!-width-three-quarters" id="{{ namePrefix }}-selectedAddress" name="{{ namePrefix }}[selectedAddress]">
+      {% if hasResults %}
+        {% set count = lookupForField.addresses.length %}
+        <option value="">{{ count }} {% if count == 1 %}{{ t('addressFoundSingle', 'address found') }}{% else %}{{ t('addressFoundPlural', 'addresses found') }}{% endif %}</option>
+        {% for address in lookupForField.addresses %}
+          <option
+            value="{{ loop.index0 }}"
+            data-line1="{{ address.addressLine1 }}"
+            data-line2="{{ address.addressLine2 }}"
+            data-town="{{ address.town }}"
+            data-county="{{ address.county }}"
+            data-postcode="{{ address.postcode }}"
+          >{{ address.fullAddress }}</option>
+        {% endfor %}
+      {% else %}
+        <option value="">{{ t('addressesFound', 'Addresses will appear here') }}</option>
+      {% endif %}
+    </select>
+    <noscript>
+    <div class="govuk-!-margin-top-2">
+      <button class="govuk-button govuk-button--secondary" type="submit" name="_selectAddress" value="{{ namePrefix }}">
+          {{ t('buttons.useAddress', 'Use this address') }}
+        </button>
+      </div>
+    </noscript>
+  </div>
+
+{% set manualAddressHtml %}
+
+{% if fieldConfig.lookupText %}
+  <p class="govuk-heading-m">{{ fieldConfig.lookupText }}</p>
+{% endif %}
+
+  {{ govukInput({
+    id: namePrefix + '-addressLine1',
+    name: namePrefix + '[addressLine1]',
+    label: { text: t('labels.addressLine1', 'Address line 1') },
+    value: val.addressLine1,
+    classes: 'govuk-!-width-three-quarters',
+    errorMessage: errs[namePrefix ~ '-addressLine1'] and { text: t(errs[namePrefix ~ '-addressLine1'].message) }
+  }) }}
+
+  {{ govukInput({
+    id: namePrefix + '-addressLine2',
+    name: namePrefix + '[addressLine2]',
+    label: { text: t('labels.addressLine2', 'Address line 2 (optional)') },
+    value: val.addressLine2,
+    classes: 'govuk-!-width-three-quarters'
+  }) }}
+
+
+  {{ govukInput({
+    id: namePrefix + '-town',
+    name: namePrefix + '[town]',
+    label: { text: t('labels.town', 'Town or city') },
+    value: val.town,
+    classes: 'govuk-!-width-three-quarters',
+    errorMessage: errs[namePrefix ~ '-town'] and { text: t(errs[namePrefix ~ '-town'].message) }
+  }) }}
+
+  {{ govukInput({
+    id: namePrefix + '-county',
+    name: namePrefix + '[county]',
+    label: { text: t('labels.county', 'County (optional)') },
+    value: val.county,
+    classes: 'govuk-!-width-three-quarters'
+  }) }}
+
+  {{ govukInput({
+    id: namePrefix + '-postcode',
+    name: namePrefix + '[postcode]',
+    label: { text: t('labels.postcode', 'Postcode') },
+    value: val.postcode,
+    classes: 'govuk-!-width-one-quarter',
+    errorMessage: errs[namePrefix ~ '-postcode'] and { text: t(errs[namePrefix ~ '-postcode'].message) }
+  }) }}
+
+
+{% endset %}
+
+{{ govukDetails({
+  summaryText: t('labels.manualEntryToggle', 'Enter an address manually'),
+  html: manualAddressHtml,
+  open: ((val.addressLine1 and val.town and val.postcode) or (errs[namePrefix ~ '-addressLine1'] or errs[namePrefix ~ '-town'] or errs[namePrefix ~ '-postcode']))
+}) }}
+
+</div>

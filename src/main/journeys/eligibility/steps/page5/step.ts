@@ -7,12 +7,8 @@ const step: StepDraft = {
   fields: {
     date: {
       type: 'date',
-      hint: {
-        text: 'page5.fields.date.hint',
-      },
-      label: {
-        text: 'page5.fields.date.label',
-      },
+      hint: { text: 'page5.fields.date.hint' },
+      fieldset: { legend: { text: 'page5.fields.date.label' } },
       validate: { required: true, mustBePast: true },
       errorMessages: {
         required: 'errors.date.required',
@@ -33,9 +29,7 @@ const step: StepDraft = {
     },
     email: {
       type: 'email',
-      label: {
-        text: 'page5.fields.email.label',
-      },
+      label: { text: 'page5.fields.email.label' },
       validate: {
         required: true,
         customMessage: 'errors.email.invalid',
@@ -47,7 +41,7 @@ const step: StepDraft = {
       attributes: { type: 'submit' },
     },
   },
-  next: 'summary',
+  next: 'correspondenceAddress',
 };
 
 export default step;

@@ -14,14 +14,19 @@ export interface ValidationResult {
 export class JourneyValidator {
   private readonly logger: Logger = Logger.getLogger('JourneyValidator');
 
-  validate(step: StepConfig, submission: Record<string, unknown>): ValidationResult {
+  validate(step: StepConfig, submission: Record<string, unknown>, allData?: Record<string, unknown>): ValidationResult {
     if (!step.fields) {
       return { success: true, data: submission };
     }
 
-    const errors: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }> =
-      {};
+    const errors: Record<
+      string,
+      { day?: string; month?: string; year?: string; message: string; anchor?: string; _fieldOnly?: boolean }
+    > = {};
     const validatedData: Record<string, unknown> = {};
+
+    // Create stepData from submission for conditional validation
+    const stepData: Record<string, unknown> = { ...submission };
 
     // Iterate over every configured field on the step
     for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
@@ -43,7 +48,20 @@ export class JourneyValidator {
         };
       }
 
-      const fieldSchema = createFieldValidationSchema(fieldConfig);
+      // Collect composite parts for address field
+      if (fieldConfig.type === 'address') {
+        // Handle nested address structure: fieldName[addressLine1], fieldName[town], etc.
+        const addressData = (submission[fieldName] as Record<string, unknown>) || {};
+        fieldValue = {
+          addressLine1: addressData.addressLine1,
+          addressLine2: addressData.addressLine2,
+          town: addressData.town,
+          county: addressData.county,
+          postcode: addressData.postcode,
+        };
+      }
+
+      const fieldSchema = createFieldValidationSchema(fieldConfig, stepData, allData);
       const result = fieldSchema.safeParse(fieldValue);
 
       if (result.success) {
@@ -119,6 +137,43 @@ export class JourneyValidator {
           errors[fieldName] = fieldError;
         }
 
+        continue;
+      }
+
+      if (fieldConfig.type === 'address') {
+        // Handle part-specific errors similar to date fields
+        const partErrors: string[] = [];
+        const partErrorMessages: Record<string, string> = {};
+        let wholeFieldError: string | null = null;
+
+        for (const issue of result.error.issues) {
+          const anchorPart = (issue.path?.[0] as string) ?? 'addressLine1';
+          if (['addressLine1', 'addressLine2', 'town', 'county', 'postcode'].includes(anchorPart)) {
+            partErrors.push(anchorPart);
+            const anchorId = `${fieldName}-${anchorPart}`;
+            partErrorMessages[anchorPart] = issue.message || 'Enter a value';
+            if (!errors[anchorId]) {
+              errors[anchorId] = {
+                message: issue.message || 'Enter a value',
+                anchor: anchorId,
+              };
+            }
+          } else {
+            wholeFieldError = issue.message || 'Enter a value';
+          }
+        }
+
+        if (wholeFieldError && partErrors.length === 0) {
+          errors[fieldName] = { message: wholeFieldError, anchor: `${fieldName}-addressLine1` };
+        } else if (partErrors.length > 0) {
+          // Provide a field-level error for display, but avoid duplicating in summary
+          const anchorPref = partErrors.includes('addressLine1') ? 'addressLine1' : partErrors[0];
+          errors[fieldName] = {
+            message: wholeFieldError || partErrorMessages[anchorPref] || 'Enter a value',
+            anchor: `${fieldName}-${anchorPref}`,
+            _fieldOnly: true,
+          };
+        }
         continue;
       }
 

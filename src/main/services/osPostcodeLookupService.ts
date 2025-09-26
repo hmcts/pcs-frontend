@@ -13,6 +13,13 @@ function getToken(): string {
   return config.get<string>('secrets.pcs.pcs-os-client-lookup-key');
 }
 
+const countryCodes = new Map([
+  ['E', 'ENGLAND'],
+  ['S', 'SCOTLAND'],
+  ['W', 'WALES'],
+  ['N', 'NORTHERN IRELAND'],
+]);
+
 export const getAddressesByPostcode = async (postcode: string): Promise<Address[]> => {
   const url = `${getBaseUrl()}/postcode?postcode=${encodeURIComponent(postcode)}&key=${getToken()}`;
   logger.info(`[osPostcodeLookupService] Calling getAddressesByPostcode with URL: ${url}`);
@@ -41,7 +48,7 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
           DOUBLE_DEPENDENT_LOCALITY = '',
           POST_TOWN,
           POSTCODE,
-          COUNTRY_CODE_DESCRIPTION = '',
+          COUNTRY_CODE = '',
         } = DPA;
 
         const addresses = [];
@@ -68,15 +75,19 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
         }
         const [addressLine1 = '', addressLine2 = '', addressLine3 = ''] = addresses.slice(0, 3);
 
-        return {
+        const addr = {
           fullAddress: ADDRESS,
           addressLine1,
           addressLine2,
           addressLine3,
           town: POST_TOWN,
           postcode: POSTCODE,
-          country: COUNTRY_CODE_DESCRIPTION,
+          country: countryCodes.get(COUNTRY_CODE),
         };
+
+        logger.info(`[osPostcodeLookupService] Address: ${JSON.stringify(addr, null, 2)}`);
+
+        return addr;
       })
       .filter((addr): addr is Address => addr !== null);
   } catch {

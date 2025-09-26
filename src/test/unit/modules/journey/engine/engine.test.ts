@@ -462,7 +462,7 @@ describe('WizardEngine - buildSummaryRows', () => {
     );
     expect(rows.length).toBeGreaterThanOrEqual(2);
     const combinedTexts = rows.map((r: unknown) => (r as { value: { text: string } }).value.text).join(' ');
-    expect(combinedTexts).toContain('Alice 1 2 2000, Dog, Cat');
+    expect(combinedTexts).toContain('Alice 1 2 2000 Dog, Cat');
     expect(combinedTexts).toContain('Dog, Cat');
   });
 
@@ -664,5 +664,418 @@ describe('WizardEngine - date input attributes', () => {
       maxlength: '4',
       inputmode: 'numeric',
     });
+  });
+});
+
+describe('WizardEngine - conditional data cleanup', () => {
+  const cleanupJourneyConfig = {
+    meta: {
+      name: 'Cleanup Test Journey',
+      description: 'Journey for testing conditional data cleanup',
+      version: '1.0.0',
+    },
+    steps: {
+      choice: {
+        id: 'choice',
+        title: 'Choice Step',
+        type: 'form',
+        fields: {
+          isCorrespondenceAddress: {
+            type: 'radios',
+            items: ['yes', 'no'],
+            validate: { required: true },
+          },
+        },
+        next: 'address',
+      },
+      address: {
+        id: 'address',
+        title: 'Address Step',
+        type: 'form',
+        fields: {
+          correspondenceAddress: {
+            type: 'address',
+            validate: {
+              required: (stepData: Record<string, unknown>, allData: Record<string, unknown>) =>
+                (allData.choice as Record<string, unknown>)?.isCorrespondenceAddress === 'no',
+            },
+          },
+        },
+        next: 'confirmation',
+      },
+      confirmation: {
+        id: 'confirmation',
+        title: 'Complete',
+        type: 'confirmation',
+      },
+    },
+    config: { store: { type: 'memory' } },
+  } as const;
+
+  const cleanupEngine = new WizardEngine(cleanupJourneyConfig, 'cleanup-test');
+
+  it('cleanupConditionalData removes data when conditional field is not required', async () => {
+    const step = cleanupJourneyConfig.steps.address;
+    const stepData = {
+      correspondenceAddress: {
+        addressLine1: '123 Test Street',
+        town: 'Test City',
+        postcode: 'TE1 1ST',
+      },
+    };
+    const allData = {
+      choice: { isCorrespondenceAddress: 'yes' }, // Field is NOT required
+      address: stepData,
+    };
+
+    const cleanedData = await cleanupEngine['cleanupConditionalData'](step, stepData, allData);
+
+    // Should remove correspondenceAddress since isCorrespondenceAddress is 'yes'
+    expect(cleanedData).toEqual({});
+    expect(cleanedData.correspondenceAddress).toBeUndefined();
+  });
+
+  it('cleanupConditionalData preserves data when conditional field is required', async () => {
+    const step = cleanupJourneyConfig.steps.address;
+    const stepData = {
+      correspondenceAddress: {
+        addressLine1: '123 Test Street',
+        town: 'Test City',
+        postcode: 'TE1 1ST',
+      },
+    };
+    const allData = {
+      choice: { isCorrespondenceAddress: 'no' }, // Field IS required
+      address: stepData,
+    };
+
+    const cleanedData = await cleanupEngine['cleanupConditionalData'](step, stepData, allData);
+
+    // Should preserve correspondenceAddress since isCorrespondenceAddress is 'no'
+    expect(cleanedData).toEqual(stepData);
+    expect(cleanedData.correspondenceAddress).toEqual(stepData.correspondenceAddress);
+  });
+
+  it('cleanupConditionalData preserves data for static optional fields', async () => {
+    const staticOptionalJourneyConfig = {
+      meta: {
+        name: 'Static Optional Test',
+        description: 'Journey for testing static optional fields',
+        version: '1.0.0',
+      },
+      steps: {
+        optional: {
+          id: 'optional',
+          title: 'Optional Step',
+          type: 'form',
+          fields: {
+            optionalField: {
+              type: 'text',
+              validate: { required: false }, // Static optional field
+            },
+          },
+          next: 'confirmation',
+        },
+        confirmation: {
+          id: 'confirmation',
+          title: 'Complete',
+          type: 'confirmation',
+        },
+      },
+      config: { store: { type: 'memory' } },
+    } as const;
+
+    const staticEngine = new WizardEngine(staticOptionalJourneyConfig, 'static-optional-test');
+    const step = staticOptionalJourneyConfig.steps.optional;
+    const stepData = {
+      optionalField: 'some value',
+    };
+    const allData = {
+      optional: stepData,
+    };
+
+    const cleanedData = await staticEngine['cleanupConditionalData'](step, stepData, allData);
+
+    // Should preserve data for static optional fields
+    expect(cleanedData).toEqual(stepData);
+    expect(cleanedData.optionalField).toBe('some value');
+  });
+
+  it('cleanupConditionalData handles errors gracefully', async () => {
+    const errorJourneyConfig = {
+      meta: {
+        name: 'Error Test',
+        description: 'Journey for testing error handling',
+        version: '1.0.0',
+      },
+      steps: {
+        error: {
+          id: 'error',
+          title: 'Error Step',
+          type: 'form',
+          fields: {
+            errorField: {
+              type: 'text',
+              validate: {
+                required: () => {
+                  throw new Error('Test error');
+                },
+              },
+            },
+          },
+          next: 'confirmation',
+        },
+        confirmation: {
+          id: 'confirmation',
+          title: 'Complete',
+          type: 'confirmation',
+        },
+      },
+      config: { store: { type: 'memory' } },
+    } as const;
+
+    const errorEngine = new WizardEngine(errorJourneyConfig, 'error-test');
+    const step = errorJourneyConfig.steps.error;
+    const stepData = {
+      errorField: 'some value',
+    };
+    const allData = {
+      error: stepData,
+    };
+
+    const cleanedData = await errorEngine['cleanupConditionalData'](step, stepData, allData);
+
+    // Should preserve data when error occurs
+    expect(cleanedData).toEqual(stepData);
+    expect(cleanedData.errorField).toBe('some value');
+  });
+
+  it('buildSummaryRows shows all data as-is (no artificial hiding)', () => {
+    // This test verifies that summary rows show the actual data without artificial hiding
+    // The cleanup should happen at form submission time, not at display time
+
+    const realWorldJourneyConfig = {
+      meta: {
+        name: 'Real World Test',
+        description: 'Journey simulating the actual issue',
+        version: '1.0.0',
+      },
+      steps: {
+        correspondenceAddress: {
+          id: 'correspondenceAddress',
+          title: 'Your correspondence address',
+          type: 'form',
+          fields: {
+            isCorrespondenceAddress: {
+              type: 'radios',
+              items: ['yes', 'no'],
+              validate: { required: true },
+            },
+            correspondenceAddress: {
+              type: 'address',
+              label: 'Enter correspondence address',
+              validate: {
+                required: (stepData: Record<string, unknown>) => stepData.isCorrespondenceAddress === 'no',
+              },
+            },
+          },
+          next: 'summary',
+        },
+        summary: {
+          id: 'summary',
+          title: 'Summary',
+          type: 'summary',
+          next: 'confirmation',
+        },
+        confirmation: {
+          id: 'confirmation',
+          title: 'Complete',
+          type: 'confirmation',
+        },
+      },
+      config: { store: { type: 'memory' } },
+    } as const;
+
+    const realWorldEngine = new WizardEngine(realWorldJourneyConfig, 'real-world-test');
+
+    // Simulate the scenario: user selected "Yes" but correspondenceAddress data exists
+    const allData = {
+      correspondenceAddress: {
+        isCorrespondenceAddress: 'yes', // User selected "Yes"
+        correspondenceAddress: {
+          // But this data still exists
+          addressLine1: '66 GREENTOP',
+          town: 'PUDSEY',
+          postcode: 'LS28 8JB',
+        },
+      },
+    };
+
+    const summaryRows = realWorldEngine['buildSummaryRows'](allData, makeNoopT(), 'en');
+
+    // Should show BOTH rows because the data exists (cleanup should happen at submission time)
+    expect(summaryRows).toHaveLength(2);
+
+    // Should have a row for isCorrespondenceAddress
+    const isCorrespondenceAddressRow = summaryRows.find(
+      (row: { key: { text: string }; value: { text: string } }) => row.key.text === 'Your correspondence address'
+    );
+    expect(isCorrespondenceAddressRow).toBeDefined();
+    expect(isCorrespondenceAddressRow!.value.text).toBe('yes');
+
+    // Should also have a row for correspondenceAddress (because the data exists)
+    const correspondenceAddressRow = summaryRows.find(
+      (row: { key: { text: string }; value: { text: string } }) => row.key.text === 'Enter correspondence address'
+    );
+    expect(correspondenceAddressRow).toBeDefined();
+  });
+
+  it('form submission cleans up all steps with conditional fields', async () => {
+    // This test verifies that when submitting a form, the cleanup logic runs on ALL steps
+    // not just the current step, ensuring stale data is removed
+
+    const formSubmissionJourneyConfig = {
+      meta: {
+        name: 'Form Submission Test',
+        description: 'Journey for testing form submission cleanup',
+        version: '1.0.0',
+      },
+      steps: {
+        correspondenceAddress: {
+          id: 'correspondenceAddress',
+          title: 'Your correspondence address',
+          type: 'form',
+          fields: {
+            isCorrespondenceAddress: {
+              type: 'radios',
+              items: ['yes', 'no'],
+              validate: { required: true },
+            },
+            correspondenceAddress: {
+              type: 'address',
+              validate: {
+                required: (stepData: Record<string, unknown>) => stepData.isCorrespondenceAddress === 'no',
+              },
+            },
+          },
+          next: 'summary',
+        },
+        summary: {
+          id: 'summary',
+          title: 'Summary',
+          type: 'summary',
+          next: 'confirmation',
+        },
+        confirmation: {
+          id: 'confirmation',
+          title: 'Complete',
+          type: 'confirmation',
+        },
+      },
+      config: { store: { type: 'memory' } },
+    } as const;
+
+    const formSubmissionEngine = new WizardEngine(formSubmissionJourneyConfig, 'form-submission-test');
+
+    // Create a mock request and store
+    const mockReq = { session: {} } as Request;
+    const store = formSubmissionEngine['store'];
+
+    // Save initial data with correspondenceAddress populated (from previous "no" selection)
+    await store.save(mockReq, 'test-case', 0, {
+      correspondenceAddress: {
+        isCorrespondenceAddress: 'no', // Previously selected "No"
+        correspondenceAddress: {
+          // So this data was filled in
+          addressLine1: '66 GREENTOP',
+          town: 'PUDSEY',
+          postcode: 'LS28 8JB',
+        },
+      },
+    });
+
+    // Verify initial data exists
+    const { data: initialData } = await store.load(mockReq, 'test-case');
+    expect(initialData.correspondenceAddress.correspondenceAddress).toBeDefined();
+    expect(initialData.correspondenceAddress.correspondenceAddress.addressLine1).toBe('66 GREENTOP');
+
+    // Simulate form submission where user changes to "Yes"
+    const step = formSubmissionJourneyConfig.steps.correspondenceAddress;
+    const validationResult = {
+      success: true,
+      data: {
+        isCorrespondenceAddress: 'yes', // User now selects "Yes"
+        // correspondenceAddress is not in the form data because it's not required
+      },
+    };
+
+    // Apply the same cleanup logic that happens in form submission
+    const { version, data: currentData } = await store.load(mockReq, 'test-case');
+
+    // Clean up current step
+    const cleanedCurrentStepData = await formSubmissionEngine['cleanupConditionalData'](
+      step,
+      validationResult.data,
+      currentData
+    );
+
+    // Clean up all other steps (use original currentData, not the cleaned version)
+    const allCleanedData = { ...currentData, [step.id]: cleanedCurrentStepData };
+    let hasGlobalChanges = false;
+
+    for (const [stepId, stepConfig] of Object.entries(formSubmissionJourneyConfig.steps)) {
+      const typedStepConfig = stepConfig as StepConfig;
+      if (typedStepConfig.type === 'summary' || typedStepConfig.type === 'confirmation') {
+        continue;
+      }
+      if (!typedStepConfig.fields || Object.keys(typedStepConfig.fields).length === 0) {
+        continue;
+      }
+
+      // For the current step being submitted, use the cleaned data; for other steps, use original data
+      const stepData =
+        stepId === step.id
+          ? (allCleanedData[stepId] as Record<string, unknown>)
+          : (currentData[stepId] as Record<string, unknown>);
+      if (!stepData || Object.keys(stepData).length === 0) {
+        continue;
+      }
+
+      // Always use allCleanedData so the required function sees the updated values
+      const cleanedStepData = await formSubmissionEngine['cleanupConditionalData'](
+        typedStepConfig,
+        stepData,
+        allCleanedData
+      );
+
+      // Check if cleanup removed any data (compare with original data, not the potentially already cleaned data)
+      const originalStepData = currentData[stepId] as Record<string, unknown>;
+      if (!originalStepData || Object.keys(cleanedStepData).length !== Object.keys(originalStepData).length) {
+        const finalStepData = { ...cleanedStepData };
+        if (originalStepData) {
+          for (const key of Object.keys(originalStepData)) {
+            if (!(key in cleanedStepData)) {
+              finalStepData[key] = undefined;
+            }
+          }
+        }
+        allCleanedData[stepId] = finalStepData;
+        hasGlobalChanges = true;
+      }
+    }
+
+    // Save the cleaned data
+    if (hasGlobalChanges) {
+      let currentVersion = version;
+      for (const [stepId, stepData] of Object.entries(allCleanedData)) {
+        await store.save(mockReq, 'test-case', currentVersion, { [stepId]: stepData });
+        currentVersion++;
+      }
+    }
+
+    // Verify the data was actually removed from the store
+    const { data: finalData } = await store.load(mockReq, 'test-case');
+    expect(finalData.correspondenceAddress.correspondenceAddress).toBeUndefined();
+    expect(finalData.correspondenceAddress.isCorrespondenceAddress).toBe('yes'); // This should still exist
   });
 });

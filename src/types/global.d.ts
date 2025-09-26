@@ -11,6 +11,15 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   refreshToken: string;
 }
 
+export interface AddressLookupSessionData {
+  [stepId: string]: {
+    [fieldNamePrefix: string]: {
+      postcode?: string;
+      addresses?: any[];
+    };
+  };
+}
+
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
@@ -21,6 +30,7 @@ interface CustomSessionData extends SessionData {
   postcodeLookupResult?: any[];
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
+  _addressLookup?: AddressLookupSessionData;
   destroy(callback: (err?: Error) => void): void;
 }
 

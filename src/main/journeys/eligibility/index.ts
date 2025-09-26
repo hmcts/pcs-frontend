@@ -1,6 +1,7 @@
 import { JourneyDraft } from '../../modules/journey/engine/schema';
 
 import confirmation from './steps/confirmation/step';
+import correspondenceAddress from './steps/correspondenceAddress/step';
 import ineligible from './steps/ineligible/step';
 import page2 from './steps/page2/step';
 import page3 from './steps/page3/step';
@@ -22,6 +23,7 @@ const journey: JourneyDraft = {
     page3,
     page4,
     page5,
+    correspondenceAddress,
     summary,
     confirmation,
   },
