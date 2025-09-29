@@ -1,6 +1,6 @@
 import { JourneyDraft } from '../../modules/journey/engine/schema';
 
-// import page2 from './steps/page2/step';
+import page2 from './steps/page2/step';
 import start from './steps/start/step';
 
 const journey: JourneyDraft = {
@@ -11,7 +11,7 @@ const journey: JourneyDraft = {
   },
   steps: {
     start,
-    // page2,
+    page2,
   },
   config: {
     i18nNamespace: 'uploadDocPoc',

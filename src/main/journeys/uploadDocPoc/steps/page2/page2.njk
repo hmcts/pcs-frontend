@@ -1,0 +1,40 @@
+{% extends "journeyTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+
+  <h1 class="govuk-heading-l">{{ t('page2.title') }}</h1>
+
+  <div class="govuk-inset-text">
+    <p class="govuk-body">{{ t('page2.caseReferenceHint') }}</p>
+    <p class="govuk-body govuk-!-font-weight-bold">TEST-CASE-12345</p>
+  </div>
+
+  <h2 class="govuk-heading-m">
+    {{ t('page2.fileUploadLabel') }}
+  </h2>
+  <p class="govuk-body">
+    {{ t('page2.fileUploadHint') }}
+  </p>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+
+      <div class="govuk-form-group">
+         <label class="govuk-label govuk-label--s" for="upload">
+        {{ t('page2.fileUploadLabel2') }}
+      </label>
+      <div id="upload-hint" class="govuk-hint">
+        {{ t('page2.fileUploadHint2') }}
+      </div>
+      <input class="govuk-file-upload" id="upload" name="upload" type="file" aria-describedby="upload-hint">
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('page2.uploadButton'),
+        attributes: { type: 'submit' }
+      }) }}
+    </div>
+  </form>
+
+{% endblock %}
