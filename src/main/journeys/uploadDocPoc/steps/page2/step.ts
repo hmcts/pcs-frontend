@@ -1,3 +1,4 @@
+import { DEFAULT_CASE_REFERENCE } from '../../../../config/constants';
 import { StepDraft } from '../../../../modules/journey/engine/schema';
 
 const step: StepDraft = {
@@ -11,7 +12,7 @@ const step: StepDraft = {
         text: 'Case Reference',
         classes: 'govuk-label--m',
       },
-      value: 'TEST-CASE-12345', // hardcoded case ref
+      value: DEFAULT_CASE_REFERENCE,
       attributes: {
         readonly: true,
       },

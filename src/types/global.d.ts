@@ -4,6 +4,7 @@ import { type Redis } from 'ioredis';
 import { type Environment } from 'nunjucks';
 import { type CcdCase } from '../main/interfaces/ccdCase.interface';
 import { S2S } from '../main/modules/s2s';
+import { type DocumentManagementFile } from '../main/app/document/CaseDocumentManagementClient';
 
 export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
@@ -21,6 +22,7 @@ interface CustomSessionData extends SessionData {
   postcodeLookupResult?: any[];
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
+  supportingCaseDocuments?: DocumentManagementFile[];
   destroy(callback: (err?: Error) => void): void;
 }
 

@@ -34,6 +34,9 @@
   "ccd": {
     "url": "CCD_URL"
   },
+  "caseType": "CASE_TYPE_ID",
+  "jurisdiction": "JURISDICTION_ID",
+  "uploadTimeout": "UPLOAD_TIMEOUT",
   "oidc": {
     "issuer": "OIDC_ISSUER",
     "clientId": "OIDC_CLIENT_ID",
@@ -54,6 +57,11 @@
         "__name": "PCS_IDAM_TEST_USER_PASSWORD"
       },
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
+    }
+  },
+  "services": {
+    "cdam": {
+      "url": "CASE_DOCUMENT_API_URL"
     }
   }
 }

@@ -1,13 +1,16 @@
 {% extends "journeyTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
+{# Import the case reference constant #}
+{% set DEFAULT_CASE_REFERENCE = '1759241919150004' %}
+
 {% block content %}
 
   <h1 class="govuk-heading-l">{{ t('page2.title') }}</h1>
 
   <div class="govuk-inset-text">
     <p class="govuk-body">{{ t('page2.caseReferenceHint') }}</p>
-    <p class="govuk-body govuk-!-font-weight-bold">TEST-CASE-12345</p>
+    <p class="govuk-body govuk-!-font-weight-bold">{{ data.caseReference or DEFAULT_CASE_REFERENCE }}</p>
   </div>
 
   <h2 class="govuk-heading-m">
@@ -17,7 +20,8 @@
     {{ t('page2.fileUploadHint') }}
   </p>
 
-  <form method="post" enctype="multipart/form-data" novalidate>
+  <form method="post" action="/uploadDocPoc/page2/upload" enctype="multipart/form-data" novalidate>
+    <input type="hidden" name="caseReference" value="{{ data.caseReference or DEFAULT_CASE_REFERENCE }}">
 
       <div class="govuk-form-group">
          <label class="govuk-label govuk-label--s" for="upload">
@@ -36,5 +40,62 @@
       }) }}
     </div>
   </form>
+
+  <!-- eeror success log results -->
+  <div id="upload-results" style="display: none;">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">Document uploaded successfully</h1>
+      <div class="govuk-panel__body">
+        <strong id="document-name"></strong><br>
+        Document ID: <strong id="document-id"></strong>
+      </div>
+    </div>
+  </div>
+
+  <div id="upload-error" style="display: none;">
+    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
+      <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          <li><span id="error-message"></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelector('form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const uploadResults = document.getElementById('upload-results');
+      const uploadError = document.getElementById('upload-error');
+      
+      // Hide previous results
+      uploadResults.style.display = 'none';
+      uploadError.style.display = 'none';
+      
+      try {
+        const response = await fetch('/uploadDocPoc/page2/upload', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          document.getElementById('document-name').textContent = result.document.originalDocumentName;
+          document.getElementById('document-id').textContent = result.documentId;
+          uploadResults.style.display = 'block';
+        } else {
+          document.getElementById('error-message').textContent = result.message || 'Upload failed';
+          uploadError.style.display = 'block';
+        }
+      } catch (error) {
+        document.getElementById('error-message').textContent = 'Upload failed: ' + error.message;
+        uploadError.style.display = 'block';
+      }
+    });
+  </script>
 
 {% endblock %}

@@ -4,6 +4,7 @@ import path from 'path';
 import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import express, { NextFunction, Request, Response, Router } from 'express';
+import fileUpload from 'express-fileupload';
 import type { TFunction } from 'i18next';
 import i18next from 'i18next';
 import { DateTime } from 'luxon';
@@ -1111,89 +1112,100 @@ export class WizardEngine {
     });
 
     // ─── POST ───
-    router.post('/:step', express.urlencoded({ extended: true }), async (req, res, next) => {
-      const caseId = getOrCreateCaseId(req);
-      let step = (req as RequestWithStep).step!;
+    router.post(
+      '/:step',
+      fileUpload({
+        limits: { fileSize: 1024 * 1024 * 101 },
+        abortOnLimit: true,
+        createParentPath: true,
+        useTempFiles: true,
+        tempFileDir: '/tmp/',
+      }),
+      express.urlencoded({ extended: true }),
+      async (req, res, next) => {
+        const caseId = getOrCreateCaseId(req);
+        let step = (req as RequestWithStep).step!;
 
-      const lang = (res.locals.lang as string) || 'en';
-      const t: TFunction = (res.locals.t as TFunction) || (i18next.t.bind(i18next) as TFunction);
+        const lang = (res.locals.lang as string) || 'en';
+        const t: TFunction = (res.locals.t as TFunction) || (i18next.t.bind(i18next) as TFunction);
 
-      try {
-        step = await this.applyLdOverride(step, req);
-        step = await this.applyLaunchDarklyFlags(step, req);
+        try {
+          step = await this.applyLdOverride(step, req);
+          step = await this.applyLaunchDarklyFlags(step, req);
 
-        // Validate using Zod-based validation
-        const validationResult = this.validator.validate(step, req.body);
+          // Validate using Zod-based validation
+          const validationResult = this.validator.validate(step, req.body);
 
-        if (!validationResult.success) {
-          const { data } = await this.store.load(req, caseId);
+          if (!validationResult.success) {
+            const { data } = await this.store.load(req, caseId);
 
-          // Reconstruct nested date fields from req.body for template
-          const reconstructedData = { ...req.body };
-          if (step.fields) {
-            for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
-              const typedFieldConfig = fieldConfig as FieldConfig;
-              if (typedFieldConfig.type === 'date') {
-                reconstructedData[fieldName] = {
-                  day: req.body[`${fieldName}-day`] || '',
-                  month: req.body[`${fieldName}-month`] || '',
-                  year: req.body[`${fieldName}-year`] || '',
-                };
+            // Reconstruct nested date fields from req.body for template
+            const reconstructedData = { ...req.body };
+            if (step.fields) {
+              for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+                const typedFieldConfig = fieldConfig as FieldConfig;
+                if (typedFieldConfig.type === 'date') {
+                  reconstructedData[fieldName] = {
+                    day: req.body[`${fieldName}-day`] || '',
+                    month: req.body[`${fieldName}-month`] || '',
+                    year: req.body[`${fieldName}-year`] || '',
+                  };
+                }
               }
             }
+
+            // Patch the current step's data with reconstructedData for this render
+            const patchedAllData = { ...data, [step.id]: reconstructedData };
+
+            // Build i18n-aware context for error render
+            let context = this.buildJourneyContext(step, caseId, patchedAllData, t, lang, validationResult.errors);
+
+            const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
+            context = {
+              ...context,
+              previousStepUrl: prevVisible
+                ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
+                : null,
+            };
+
+            const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+            return res.status(400).render(postTemplatePath, {
+              ...context,
+            });
           }
 
-          // Patch the current step's data with reconstructedData for this render
-          const patchedAllData = { ...data, [step.id]: reconstructedData };
-
-          // Build i18n-aware context for error render
-          let context = this.buildJourneyContext(step, caseId, patchedAllData, t, lang, validationResult.errors);
-
-          const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
-          context = {
-            ...context,
-            previousStepUrl: prevVisible
-              ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
-              : null,
-          };
-
-          const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
-          return res.status(400).render(postTemplatePath, {
-            ...context,
+          // Save and move forward
+          const { version } = await this.store.load(req, caseId);
+          const { data: merged } = await this.store.save(req, caseId, version, {
+            [step.id]: validationResult.data || {},
           });
+
+          const nextId = this.resolveNext(step, merged);
+          const nextStep = this.journey.steps[nextId];
+
+          // Generate reference number if needed
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if (nextStep?.type === 'confirmation' && (nextStep as any).data?.referenceNumber) {
+            const referenceNumber = await this.store.generateReference(req, this.slug, caseId);
+            await this.store.save(req, caseId, version + 1, {
+              [nextId]: { referenceNumber },
+            });
+          }
+
+          const validatedNextId = this.validateStepIdForRedirect(nextId);
+          if (validatedNextId) {
+            return res.redirect(
+              `${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${encodeURIComponent(lang)}`
+            );
+          }
+
+          this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
+          res.status(500).send('Internal server error');
+        } catch (err) {
+          next(err);
         }
-
-        // Save and move forward
-        const { version } = await this.store.load(req, caseId);
-        const { data: merged } = await this.store.save(req, caseId, version, {
-          [step.id]: validationResult.data || {},
-        });
-
-        const nextId = this.resolveNext(step, merged);
-        const nextStep = this.journey.steps[nextId];
-
-        // Generate reference number if needed
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (nextStep?.type === 'confirmation' && (nextStep as any).data?.referenceNumber) {
-          const referenceNumber = await this.store.generateReference(req, this.slug, caseId);
-          await this.store.save(req, caseId, version + 1, {
-            [nextId]: { referenceNumber },
-          });
-        }
-
-        const validatedNextId = this.validateStepIdForRedirect(nextId);
-        if (validatedNextId) {
-          return res.redirect(
-            `${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${encodeURIComponent(lang)}`
-          );
-        }
-
-        this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
-        res.status(500).send('Internal server error');
-      } catch (err) {
-        next(err);
       }
-    });
+    );
 
     return router;
   }
