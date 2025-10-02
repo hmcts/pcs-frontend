@@ -4,6 +4,7 @@ import path from 'path';
 import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import express, { NextFunction, Request, Response, Router } from 'express';
+import fileUpload from 'express-fileupload';
 import type { TFunction } from 'i18next';
 import i18next from 'i18next';
 import { DateTime } from 'luxon';
@@ -1320,6 +1321,16 @@ export class WizardEngine {
     });
 
     // ─── POST ───
+
+    router.post(
+      '/:step',
+      fileUpload({
+        limits: { fileSize: 1024 * 1024 * 101 },
+        abortOnLimit: true,
+        createParentPath: true,
+        useTempFiles: true,
+        tempFileDir: '/tmp/',
+      }),
     router.post('/:step', express.urlencoded({ extended: true }), async (req, res, next) => {
       const caseId = getOrCreateCaseId(req);
       let step = (req as RequestWithStep).step!;
@@ -1473,27 +1484,36 @@ export class WizardEngine {
                 };
               }
             }
+
+            // Patch the current step's data with reconstructedData for this render
+            const patchedAllData = { ...data, [step.id]: reconstructedData };
+
+            // Build i18n-aware context for error render
+            let context = this.buildJourneyContext(step, caseId, patchedAllData, t, lang, validationResult.errors);
+
+            const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
+            context = {
+              ...context,
+              previousStepUrl: prevVisible
+                ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
+                : null,
+            };
+
+            const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+            return res.status(400).render(postTemplatePath, {
+              ...context,
+            });
           }
 
-          // Patch the current step's data with reconstructedData for this render
-          const patchedAllData = { ...data, [step.id]: reconstructedData };
-
-          // Build i18n-aware context for error render
-          let context = this.buildJourneyContext(step, caseId, patchedAllData, t, lang, validationResult.errors);
-
-          const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
-          context = {
-            ...context,
-            previousStepUrl: prevVisible
-              ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
-              : null,
-          };
-
-          const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
-          return res.status(400).render(postTemplatePath, {
-            ...context,
+          // Save and move forward
+          const { version } = await this.store.load(req, caseId);
+          const { data: merged } = await this.store.save(req, caseId, version, {
+            [step.id]: validationResult.data || {},
           });
-        }
+
+
+          const nextId = this.resolveNext(step, merged);
+          const nextStep = this.journey.steps[nextId];
 
         // Save and move forward
         const { version, data: currentData } = await this.store.load(req, caseId);
@@ -1573,31 +1593,30 @@ export class WizardEngine {
           delete addressLookupStore[step.id];
         }
 
-        const nextId = this.resolveNext(step, merged);
-        const nextStep = this.journey.steps[nextId];
 
-        // Generate reference number if needed
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (nextStep?.type === 'confirmation' && (nextStep as any).data?.referenceNumber) {
-          const referenceNumber = await this.store.generateReference(req, this.slug, caseId);
-          await this.store.save(req, caseId, version + 1, {
-            [nextId]: { referenceNumber },
-          });
+          // Generate reference number if needed
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if (nextStep?.type === 'confirmation' && (nextStep as any).data?.referenceNumber) {
+            const referenceNumber = await this.store.generateReference(req, this.slug, caseId);
+            await this.store.save(req, caseId, version + 1, {
+              [nextId]: { referenceNumber },
+            });
+          }
+
+          const validatedNextId = this.validateStepIdForRedirect(nextId);
+          if (validatedNextId) {
+            return res.redirect(
+              `${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${encodeURIComponent(lang)}`
+            );
+          }
+
+          this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
+          res.status(500).send('Internal server error');
+        } catch (err) {
+          next(err);
         }
-
-        const validatedNextId = this.validateStepIdForRedirect(nextId);
-        if (validatedNextId) {
-          return res.redirect(
-            `${this.basePath}/${encodeURIComponent(validatedNextId)}?lang=${encodeURIComponent(lang)}`
-          );
-        }
-
-        this.logger.error(`Invalid next step ID for redirect: ${nextId}`);
-        res.status(500).send('Internal server error');
-      } catch (err) {
-        next(err);
       }
-    });
+    );
 
     return router;
   }

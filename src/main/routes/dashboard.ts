@@ -79,6 +79,10 @@ export default function (app: Application): void {
         getDashboardTaskGroups(caseReference).then(mapTaskGroups(app, caseReference)),
       ]);
 
+      // Log the data being sent to the frontend
+      logger.info(`[Dashboard] Notifications data: ${JSON.stringify(notifications, null, 2)}`);
+      logger.info(`[Dashboard] Task groups data: ${JSON.stringify(taskGroups, null, 2)}`);
+
       res.render('dashboard', {
         notifications,
         taskGroups,
