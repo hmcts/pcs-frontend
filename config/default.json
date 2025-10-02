@@ -18,14 +18,22 @@
     "url": "http://pcs-api-aat.service.core-compute-aat.internal"
   },
   "s2s": {
-    "microservice": "pcs_frontend",
+    "microservice": "pcs_api",
     "url": "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
     "ttl": 3600,
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-316.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-316"
+    "url": "https://ccd-data-store-api-pcs-api-pr-672.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-672"
+  },
+  "caseType": "PCS-672",
+  "jurisdiction": "PCS",
+  "uploadTimeout": 30000,
+  "services": {
+    "cdam": {
+      "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+    }
   },
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
