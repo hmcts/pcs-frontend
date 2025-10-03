@@ -22,6 +22,7 @@
     "test:coverage": "jest --coverage",
     "test:routes": "jest -c jest.routes.config.ts",
     "test:a11y": "echo 'Accessibility tests implemented later in the pipeline'",
+    "test:can-i-deploy:consumer": "export VERSION=$(git rev-parse --short HEAD) pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version ${VERSION} --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:accessibility": "yarn playwright install && yarn playwright test --project chromium --grep @accessibility; EXIT_CODE=$?; allure generate --clean; exit $EXIT_CODE",
     "test:smoke": "NODE_TLS_REJECT_UNAUTHORIZED=0 jest -c jest.smoke.config.ts",
     "test:functional": "yarn playwright install && yarn playwright test --project chromium --grep @PR; EXIT_CODE=$?; allure generate --clean; exit $EXIT_CODE",
