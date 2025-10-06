@@ -17,3 +17,6 @@ redis:
     registry: hmctspublic.azurecr.io
     repository: imported/bitnami/redis
   enabled: true
+global:
+  security:
+    allowInsecureImages: true
