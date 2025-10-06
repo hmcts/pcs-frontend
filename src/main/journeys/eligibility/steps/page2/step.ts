@@ -13,7 +13,7 @@ const step: StepDraft = {
           classes: 'govuk-fieldset__legend--l',
         },
       },
-      options: [
+      items: [
         { value: 'yes', text: 'page2.ageOptions.yes' },
         { value: 'no', text: 'page2.ageOptions.no' },
       ],

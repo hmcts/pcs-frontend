@@ -9,6 +9,7 @@ import i18next from 'i18next';
 import { DateTime } from 'luxon';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
+import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
 import { TTLCache } from '../../../utils/ttlCache';
 
 import { processErrorsForTemplate } from './errorUtils';
@@ -31,6 +32,8 @@ interface JourneyContext {
   errorSummary?: { titleText: string; errorList: { text: string; href: string }[] } | null;
   previousStepUrl?: string | null;
   summaryRows?: SummaryRow[];
+  // When using summary cards grouped by step
+  summaryCards?: { card: { title: { text: string } }; rows: SummaryRow[] }[];
 }
 
 interface SummaryRow {
@@ -246,131 +249,259 @@ export class WizardEngine {
     return tpl.replace('{{day}}', day).replace('{{month}}', month).replace('{{year}}', year);
   }
 
-  // Build summary rows for summary pages (with i18n)
+  // Build summary rows for summary pages (with i18n). One row per field.
   private buildSummaryRows(allData: Record<string, unknown>, t: TFunction, currentLang?: string): SummaryRow[] {
-    return Object.entries(this.journey.steps)
-      .filter(([stepId, stepConfig]) => {
-        const typedStepConfig = stepConfig as StepConfig;
-        // Skip summary and confirmation steps
-        if (typedStepConfig.type === 'summary' || typedStepConfig.type === 'confirmation') {
-          return false;
-        }
-        // Skip steps without fields
-        if (!typedStepConfig.fields || Object.keys(typedStepConfig.fields).length === 0) {
-          return false;
-        }
-        // Skip steps without data
-        const stepData = allData[stepId] as Record<string, unknown>;
-        return stepData && Object.keys(stepData).length > 0;
-      })
-      .map(([stepId, stepConfig]) => {
-        const typedStepConfig = stepConfig as StepConfig;
-        const stepData = allData[stepId] as Record<string, unknown>;
+    const rows: SummaryRow[] = [];
 
-        // Determine label to use for the summary row. Prefer page-heading legend
-        let rowLabel: string =
-          typeof typedStepConfig.title === 'string'
-            ? t(typedStepConfig.title, typedStepConfig.title)
-            : (typedStepConfig.title as unknown as string) || stepId;
+    for (const [stepId, stepConfig] of Object.entries(this.journey.steps)) {
+      const typedStepConfig = stepConfig as StepConfig;
+      if (typedStepConfig.type === 'summary' || typedStepConfig.type === 'confirmation') {
+        continue;
+      }
+      if (!typedStepConfig.fields || Object.keys(typedStepConfig.fields).length === 0) {
+        continue;
+      }
+      const stepData = allData[stepId] as Record<string, unknown>;
+      if (!stepData || Object.keys(stepData).length === 0) {
+        continue;
+      }
 
-        if (typedStepConfig.fields) {
-          for (const fieldCfg of Object.values(typedStepConfig.fields)) {
-            // fieldCfg.fieldset?.legend may be a string or an object.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const legend = (fieldCfg as FieldConfig).fieldset?.legend as any;
-            if (legend && typeof legend === 'object' && legend.isPageHeading) {
-              const source =
-                (typeof legend.text === 'string' && legend.text) ||
-                (typeof legend.html === 'string' && legend.html) ||
-                rowLabel;
-              rowLabel = typeof source === 'string' ? t(source, source) : rowLabel;
-              break;
-            }
+      const changeHref = currentLang
+        ? `${this.basePath}/${encodeURIComponent(stepId)}?lang=${encodeURIComponent(currentLang)}`
+        : `${this.basePath}/${encodeURIComponent(stepId)}`;
+
+      for (const [fieldName, fieldConfig] of Object.entries(typedStepConfig.fields)) {
+        const typedFieldConfig = fieldConfig as FieldConfig;
+        if (typedFieldConfig.type === 'button') {
+          continue;
+        }
+        const rawValue = stepData[fieldName];
+        if (rawValue === undefined || rawValue === null || rawValue === '') {
+          continue;
+        }
+
+        // Determine field label (translated)
+        let fieldLabel: string = fieldName;
+
+        // Check if fieldset legend should be used (when isPageHeading is true)
+        if (
+          typedFieldConfig.fieldset?.legend &&
+          typeof typedFieldConfig.fieldset.legend === 'object' &&
+          typedFieldConfig.fieldset.legend.isPageHeading &&
+          typedFieldConfig.fieldset.legend.text
+        ) {
+          fieldLabel = t(typedFieldConfig.fieldset.legend.text, typedFieldConfig.fieldset.legend.text);
+        } else if (typeof typedFieldConfig.label === 'string') {
+          fieldLabel = t(typedFieldConfig.label, typedFieldConfig.label);
+        } else if (typedFieldConfig.label && typeof typedFieldConfig.label === 'object') {
+          const lbl = typedFieldConfig.label as Record<string, unknown>;
+          const text = (lbl.text as string) || (lbl['html'] as string) || fieldName;
+          fieldLabel = t(text, text);
+        } else {
+          // Fall back to step title if no field label is provided
+          if (typeof typedStepConfig.title === 'string') {
+            fieldLabel = t(typedStepConfig.title, typedStepConfig.title);
           }
         }
 
-        const fieldValues = Object.entries(typedStepConfig.fields!)
-          .filter(([fieldName]) => (stepData as Record<string, unknown>)[fieldName])
-          .map(([fieldName, fieldConfig]) => {
-            const typedFieldConfig = fieldConfig as FieldConfig;
-            const value = (stepData as Record<string, unknown>)[fieldName];
+        // Format value based on type
+        let valueText = '' as string | null;
+        let valueHtml = '' as string | null;
+        const value = rawValue as unknown;
 
-            if (
-              typedFieldConfig.type === 'date' &&
-              value &&
-              typeof value === 'object' &&
-              'day' in value &&
-              'month' in value &&
-              'year' in value
-            ) {
-              const { day, month, year } = value as Record<string, string>;
-              const dTrim = day?.trim() ?? '';
-              const mTrim = month?.trim() ?? '';
-              const yTrim = year?.trim() ?? '';
-
-              if (!dTrim && !mTrim && !yTrim) {
-                return '';
+        if (
+          typedFieldConfig.type === 'date' &&
+          value &&
+          typeof value === 'object' &&
+          'day' in (value as Record<string, unknown>) &&
+          'month' in (value as Record<string, unknown>) &&
+          'year' in (value as Record<string, unknown>)
+        ) {
+          const v = value as Record<string, string>;
+          const dTrim = v.day?.trim() ?? '';
+          const mTrim = v.month?.trim() ?? '';
+          const yTrim = v.year?.trim() ?? '';
+          if (dTrim || mTrim || yTrim) {
+            const dt = DateTime.fromObject({ day: Number(dTrim), month: Number(mTrim), year: Number(yTrim) });
+            valueText = dt.isValid ? this.formatDateViaI18n(dt, t) : `${dTrim}/${mTrim}/${yTrim}`;
+          }
+        } else if (
+          typedFieldConfig.type === 'checkboxes' ||
+          typedFieldConfig.type === 'radios' ||
+          typedFieldConfig.type === 'select'
+        ) {
+          const items = typedFieldConfig.items;
+          const selected = items
+            ?.filter(option => {
+              const optionValue = typeof option === 'string' ? option : (option.value as string);
+              if (typedFieldConfig.type === 'checkboxes') {
+                return Array.isArray(value) && (value as string[]).includes(optionValue);
               }
+              return value === optionValue;
+            })
+            .map(option => {
+              if (typeof option === 'string') {
+                return t(option, option);
+              } else {
+                return typeof option.text === 'string'
+                  ? t(option.text, option.text)
+                  : (option.text as unknown as string);
+              }
+            })
+            .join(', ');
+          valueText = selected ?? '';
+        } else if (typedFieldConfig.type === 'address' && value && typeof value === 'object') {
+          const addr = value as Record<string, string | undefined>;
+          const parts = [addr.addressLine1, addr.addressLine2, addr.town, addr.county, addr.postcode]
+            .map(v => (typeof v === 'string' ? v.trim() : ''))
+            .filter(v => v.length > 0);
+          valueHtml = parts.join('<br>');
+        } else {
+          valueText = Array.isArray(value) ? (value as string[]).join(', ') : String(value);
+        }
 
-              const dt = DateTime.fromObject({
-                day: Number(dTrim),
-                month: Number(mTrim),
-                year: Number(yTrim),
-              });
-              return dt.isValid ? this.formatDateViaI18n(dt, t) : `${dTrim}/${mTrim}/${yTrim}`;
-            }
-
-            if (
-              typedFieldConfig.type === 'checkboxes' ||
-              typedFieldConfig.type === 'radios' ||
-              typedFieldConfig.type === 'select'
-            ) {
-              const items = typedFieldConfig.items ?? typedFieldConfig.options;
-              const selected = items
-                ?.filter(option => {
-                  const optionValue = typeof option === 'string' ? option : option.value;
-                  if (typedFieldConfig.type === 'checkboxes') {
-                    return Array.isArray(value) && (value as string[]).includes(optionValue);
-                  }
-                  // radios & select store single string value
-                  return value === optionValue;
-                })
-                .map(option => {
-                  if (typeof option === 'string') {
-                    // option is a key → translate text
-                    return t(option, option);
-                  } else {
-                    // option.text might be a key → translate
-                    return typeof option.text === 'string'
-                      ? t(option.text, option.text)
-                      : (option.text as unknown as string);
-                  }
-                })
-                .join(', ');
-              return selected ?? '';
-            }
-
-            return Array.isArray(value) ? value.join(', ') : String(value);
-          });
-
-        const href = currentLang
-          ? `${this.basePath}/${stepId}?lang=${encodeURIComponent(currentLang)}`
-          : `${this.basePath}/${stepId}`;
-
-        return {
-          key: { text: rowLabel },
-          value: { text: fieldValues.join(', ') },
+        const row: SummaryRow = {
+          key: { text: fieldLabel },
+          value: valueHtml ? { html: valueHtml, text: '' } : { text: valueText || '' },
           actions: {
-            items: [
-              {
-                href,
-                text: t('change', 'Change'),
-                visuallyHiddenText: `${rowLabel.toLowerCase()}`,
-              },
-            ],
+            items: [{ href: changeHref, text: t('change', 'Change'), visuallyHiddenText: fieldLabel.toLowerCase() }],
           },
         };
-      });
+        rows.push(row);
+      }
+    }
+
+    return rows;
+  }
+
+  // Build summary cards grouped per step, using the step title as the card title
+  private buildSummaryCards(
+    allData: Record<string, unknown>,
+    t: TFunction,
+    currentLang?: string
+  ): { card: { title: { text: string } }; rows: SummaryRow[] }[] {
+    const cards: { card: { title: { text: string } }; rows: SummaryRow[] }[] = [];
+
+    for (const [stepId, stepConfig] of Object.entries(this.journey.steps)) {
+      const typedStepConfig = stepConfig as StepConfig;
+      if (typedStepConfig.type === 'summary' || typedStepConfig.type === 'confirmation') {
+        continue;
+      }
+      if (!typedStepConfig.fields || Object.keys(typedStepConfig.fields).length === 0) {
+        continue;
+      }
+      const stepData = allData[stepId] as Record<string, unknown>;
+      if (!stepData || Object.keys(stepData).length === 0) {
+        continue;
+      }
+
+      // Card title from step.title (translated)
+      let cardTitle = stepId;
+      if (typeof typedStepConfig.title === 'string') {
+        cardTitle = t(typedStepConfig.title, typedStepConfig.title);
+      } else if (typedStepConfig.title) {
+        // Fallback for non-string titles
+        cardTitle = String(typedStepConfig.title);
+      }
+
+      // Reuse row building by calling the existing method but filter by this step only
+      const changeHref = currentLang
+        ? `${this.basePath}/${encodeURIComponent(stepId)}?lang=${encodeURIComponent(currentLang)}`
+        : `${this.basePath}/${encodeURIComponent(stepId)}`;
+
+      const rows: SummaryRow[] = [];
+      for (const [fieldName, fieldConfig] of Object.entries(typedStepConfig.fields)) {
+        const typedFieldConfig = fieldConfig as FieldConfig;
+        if (typedFieldConfig.type === 'button') {
+          continue;
+        }
+        const rawValue = stepData[fieldName];
+        if (rawValue === undefined || rawValue === null || rawValue === '') {
+          continue;
+        }
+
+        // Build field label
+        let fieldLabel: string = fieldName;
+        if (typeof typedFieldConfig.label === 'string') {
+          fieldLabel = t(typedFieldConfig.label, typedFieldConfig.label);
+        } else if (typedFieldConfig.label && typeof typedFieldConfig.label === 'object') {
+          const lbl = typedFieldConfig.label as Record<string, unknown>;
+          const text = (lbl.text as string) || (lbl['html'] as string) || fieldName;
+          fieldLabel = t(text, text);
+        } else if (typedFieldConfig.fieldset && typedFieldConfig.fieldset.legend) {
+          const legend = typedFieldConfig.fieldset.legend as Record<string, unknown>;
+          const text = (legend.text as string) || (legend['html'] as string) || fieldName;
+          fieldLabel = t(text, text);
+        }
+
+        // Value formatting (copied from buildSummaryRows)
+        let valueText: string | null = '';
+        let valueHtml: string | null = null;
+        const value = rawValue as unknown;
+        if (
+          typedFieldConfig.type === 'date' &&
+          value &&
+          typeof value === 'object' &&
+          'day' in (value as Record<string, unknown>) &&
+          'month' in (value as Record<string, unknown>) &&
+          'year' in (value as Record<string, unknown>)
+        ) {
+          const v = value as Record<string, string>;
+          const dTrim = v.day?.trim() ?? '';
+          const mTrim = v.month?.trim() ?? '';
+          const yTrim = v.year?.trim() ?? '';
+          if (dTrim || mTrim || yTrim) {
+            const dt = DateTime.fromObject({ day: Number(dTrim), month: Number(mTrim), year: Number(yTrim) });
+            valueText = dt.isValid ? this.formatDateViaI18n(dt, t) : `${dTrim}/${mTrim}/${yTrim}`;
+          }
+        } else if (
+          typedFieldConfig.type === 'checkboxes' ||
+          typedFieldConfig.type === 'radios' ||
+          typedFieldConfig.type === 'select'
+        ) {
+          const items = typedFieldConfig.items;
+          const selected = items
+            ?.filter(option => {
+              const optionValue = typeof option === 'string' ? option : (option.value as string);
+              if (typedFieldConfig.type === 'checkboxes') {
+                return Array.isArray(value) && (value as string[]).includes(optionValue);
+              }
+              return value === optionValue;
+            })
+            .map(option => {
+              if (typeof option === 'string') {
+                return t(option, option);
+              } else {
+                return typeof option.text === 'string'
+                  ? t(option.text, option.text)
+                  : (option.text as unknown as string);
+              }
+            })
+            .join(', ');
+          valueText = selected ?? '';
+        } else if (typedFieldConfig.type === 'address' && value && typeof value === 'object') {
+          const addr = value as Record<string, string | undefined>;
+          const parts = [addr.addressLine1, addr.addressLine2, addr.town, addr.county, addr.postcode]
+            .map(v => (typeof v === 'string' ? v.trim() : ''))
+            .filter(v => v.length > 0);
+          valueHtml = parts.join('<br>');
+        } else {
+          valueText = Array.isArray(value) ? (value as string[]).join(', ') : String(value);
+        }
+
+        rows.push({
+          key: { text: fieldLabel },
+          value: valueHtml ? { html: valueHtml, text: '' } : { text: valueText || '' },
+          actions: { items: [{ href: changeHref, text: t('change', 'Change'), visuallyHiddenText: fieldLabel }] },
+        });
+      }
+
+      if (rows.length > 0) {
+        cards.push({ card: { title: { text: cardTitle } }, rows });
+      }
+    }
+
+    return cards;
   }
 
   // Find the previous step for back navigation by analyzing journey flow
@@ -429,6 +560,7 @@ export class WizardEngine {
   } {
     const previousStepUrl = this.findPreviousStep(step.id, allData);
     const summaryRows = step.type === 'summary' ? this.buildSummaryRows(allData, t, lang) : undefined;
+    const summaryCards = step.type === 'summary' ? this.buildSummaryCards(allData, t, lang) : undefined;
     const data = (allData[step.id] as Record<string, unknown>) || {};
 
     // Build dateItems for all date fields
@@ -570,10 +702,7 @@ export class WizardEngine {
           case 'radios':
           case 'checkboxes':
           case 'select': {
-            const baseOptions = (typedFieldConfig.items ?? typedFieldConfig.options ?? []) as (
-              | string
-              | Record<string, unknown>
-            )[];
+            const baseOptions = (typedFieldConfig.items ?? []) as (string | Record<string, unknown>)[];
 
             const items = baseOptions.map(option => {
               if (typeof option === 'string') {
@@ -625,6 +754,20 @@ export class WizardEngine {
             break;
           }
 
+          case 'address': {
+            // Pass through any stored value so template can prefill inputs
+            // @ts-expect-error address composite value
+            processed.value = fieldValue ?? {
+              addressLine1: '',
+              addressLine2: '',
+              town: '',
+              county: '',
+              postcode: '',
+            };
+            processed.namePrefix = fieldName;
+            break;
+          }
+
           case 'button': {
             // Translate button label or default
             if (!processed.text) {
@@ -656,6 +799,7 @@ export class WizardEngine {
       ),
       previousStepUrl,
       summaryRows,
+      summaryCards,
       dateItems,
     };
   }
@@ -683,6 +827,10 @@ export class WizardEngine {
         if (field.type === 'button') {
           return false;
         }
+        // For function-based required fields, we can't evaluate without data, so assume they might be required
+        if (typeof field.validate?.required === 'function') {
+          return true; // Assume function-based fields might be required
+        }
         // Fields are required by default unless explicitly set to false
         return field.validate?.required !== false;
       });
@@ -698,8 +846,23 @@ export class WizardEngine {
         if (typedFieldConfig.type === 'button') {
           continue;
         }
-        // Fields are required by default unless explicitly set to false
-        if (typedFieldConfig.validate?.required !== false) {
+        // Check if field is required (handle both boolean and function cases)
+        let isRequired = false;
+        if (typeof typedFieldConfig.validate?.required === 'boolean') {
+          isRequired = typedFieldConfig.validate.required;
+        } else if (typeof typedFieldConfig.validate?.required === 'function') {
+          try {
+            isRequired = typedFieldConfig.validate.required(stepData, allData);
+          } catch (err) {
+            this.logger.error('Error evaluating required function in isStepComplete', err);
+            isRequired = false;
+          }
+        } else {
+          // Default to required if not explicitly set to false
+          isRequired = typedFieldConfig.validate?.required !== false;
+        }
+
+        if (isRequired) {
           const fieldValue = stepData[fieldName];
 
           // For date fields, check if all components are present
@@ -784,6 +947,44 @@ export class WizardEngine {
     }
 
     return true;
+  }
+
+  /**
+   * Clean up data for conditionally required fields that are no longer required.
+   * This method removes data for fields where the required function evaluates to false.
+   * Static optional fields (required: false) are not cleaned up to preserve user data.
+   */
+  private async cleanupConditionalData(
+    step: StepConfig,
+    stepData: Record<string, unknown>,
+    allData: Record<string, unknown>
+  ): Promise<Record<string, unknown>> {
+    const cleanedData = { ...stepData };
+
+    if (!step.fields) {
+      return cleanedData;
+    }
+
+    for (const [fieldName, fieldConfig] of Object.entries(step.fields)) {
+      // Only clean up if this is a conditionally required field (function) that returns false
+      // Static optional fields (required: false) should keep their data
+      if (typeof fieldConfig.validate?.required === 'function') {
+        try {
+          const isRequired = fieldConfig.validate.required(cleanedData, allData);
+
+          // Only clean up if the conditional function says the field is not required
+          if (!isRequired) {
+            delete cleanedData[fieldName];
+          }
+        } catch (err) {
+          this.logger.error('Error evaluating required function in cleanupConditionalData', err);
+          // On error, don't clean up the data
+        }
+      }
+      // For static required: false, we don't clean up - let the user's data persist
+    }
+
+    return cleanedData;
   }
 
   /**
@@ -1018,7 +1219,10 @@ export class WizardEngine {
         step = await this.applyLdOverride(step, req);
         step = await this.applyLaunchDarklyFlags(step, req);
 
-        const { data } = await this.store.load(req, caseId);
+        const { data: rawData } = await this.store.load(req, caseId);
+
+        // Use the raw data as-is for rendering (cleanup happens at form submission time)
+        const data = rawData;
 
         // Auto-skip only if the original step had fields but all are now hidden
         const originalFields = this.journey.steps[step.id]?.fields;
@@ -1096,8 +1300,13 @@ export class WizardEngine {
           }
         }
 
+        // Inject any server-side postcode lookup results for this step (no-JS fallback)
+        const __sessAny = req.session as unknown as Record<string, unknown>;
+        const addressLookup =
+          (__sessAny._addressLookup && (__sessAny._addressLookup as Record<string, unknown>)[step.id]) || {};
         res.render(safeTemplate, {
           ...context,
+          addressLookup,
           data: context.data,
           errors: null,
           allData: context.allData,
@@ -1122,12 +1331,125 @@ export class WizardEngine {
         step = await this.applyLdOverride(step, req);
         step = await this.applyLaunchDarklyFlags(step, req);
 
+        // ── Server-side postcode lookup (no-JS fallback) ──
+        const __sessAny = req.session as unknown as Record<string, unknown>;
+        const addressLookupStore = (__sessAny._addressLookup as Record<string, Record<string, unknown>>) || {};
+        const lookupPrefix = (req.body._addressLookup as string) || '';
+        const selectPrefix = (req.body._selectAddress as string) || '';
+
+        // Prevent prototype pollution via step.id
+        const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
+        if (dangerousKeys.includes(step.id)) {
+          return res.status(400).json({ error: `Invalid step id: ${step.id}` });
+        }
+
+        // Handle "Find address" action
+        if (lookupPrefix) {
+          const postcode = String(req.body[`${lookupPrefix}-lookupPostcode`] || '').trim();
+          // Persist results per step/prefix
+          if (!__sessAny._addressLookup) {
+            __sessAny._addressLookup = {};
+          }
+          addressLookupStore[step.id] = addressLookupStore[step.id] || {};
+
+          let addresses: unknown[] = [];
+          if (postcode) {
+            try {
+              addresses = await getAddressesByPostcode(postcode);
+            } catch {
+              addresses = [];
+            }
+          }
+
+          addressLookupStore[step.id][lookupPrefix] = { postcode, addresses };
+
+          const { data } = await this.store.load(req, caseId);
+          let context = this.buildJourneyContext(step, caseId, data, t, lang);
+          const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
+          context = {
+            ...context,
+            previousStepUrl: prevVisible
+              ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
+              : null,
+          };
+          const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+          return res.status(200).render(postTemplatePath, {
+            ...context,
+            addressLookup: addressLookupStore[step.id] || {},
+          });
+        }
+
+        // Handle "Use this address" action to populate inputs server-side
+        if (selectPrefix) {
+          const selectedIndexRaw = String(req.body[`${selectPrefix}-selectedAddress`] || '').trim();
+          const index = selectedIndexRaw ? parseInt(selectedIndexRaw, 10) : NaN;
+          const storeForStep = addressLookupStore[step.id] || {};
+          const record = storeForStep[selectPrefix] as unknown as {
+            postcode?: string;
+            addresses?: Record<string, string>[];
+          };
+          const sel = Array.isArray(record?.addresses) && Number.isFinite(index) ? record.addresses[index] : null;
+
+          const { data } = await this.store.load(req, caseId);
+          const stepData = (data[step.id] as Record<string, unknown>) || {};
+          const reconstructedData: Record<string, unknown> = { ...stepData };
+
+          // Process all form fields, not just the selected address
+          for (const [fieldName, fieldConfig] of Object.entries(step.fields || {})) {
+            if (fieldName === selectPrefix && sel) {
+              // Use the selected address data for the clicked component
+              reconstructedData[fieldName] = {
+                addressLine1: sel.addressLine1 || '',
+                addressLine2: sel.addressLine2 || '',
+                town: sel.town || '',
+                county: sel.county || '',
+                postcode: sel.postcode || '',
+              };
+            } else if (fieldConfig.type === 'address') {
+              // Process other address fields from form data (nested structure)
+              const addressData = (req.body[fieldName] as Record<string, unknown>) || {};
+              reconstructedData[fieldName] = {
+                addressLine1: addressData.addressLine1 || '',
+                addressLine2: addressData.addressLine2 || '',
+                town: addressData.town || '',
+                county: addressData.county || '',
+                postcode: addressData.postcode || '',
+              };
+            } else if (fieldConfig.type === 'date') {
+              // Process date fields
+              reconstructedData[fieldName] = {
+                day: req.body[`${fieldName}-day`] || '',
+                month: req.body[`${fieldName}-month`] || '',
+                year: req.body[`${fieldName}-year`] || '',
+              };
+            } else {
+              // Process other field types
+              reconstructedData[fieldName] = req.body[fieldName] || '';
+            }
+          }
+
+          const patchedAllData = { ...data, [step.id]: reconstructedData };
+          let context = this.buildJourneyContext(step, caseId, patchedAllData, t, lang);
+          const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
+          context = {
+            ...context,
+            previousStepUrl: prevVisible
+              ? `${this.basePath}/${encodeURIComponent(prevVisible)}?lang=${encodeURIComponent(lang)}`
+              : null,
+          };
+
+          const postTemplatePath = this.sanitizeTemplatePath(await this.resolveTemplatePath(step.id)) + '.njk';
+          return res.status(200).render(postTemplatePath, {
+            ...context,
+            addressLookup: addressLookupStore[step.id] || {},
+          });
+        }
+
         // Validate using Zod-based validation
-        const validationResult = this.validator.validate(step, req.body);
+        const { data } = await this.store.load(req, caseId);
+        const validationResult = this.validator.validate(step, req.body, data);
 
         if (!validationResult.success) {
-          const { data } = await this.store.load(req, caseId);
-
           // Reconstruct nested date fields from req.body for template
           const reconstructedData = { ...req.body };
           if (step.fields) {
@@ -1138,6 +1460,16 @@ export class WizardEngine {
                   day: req.body[`${fieldName}-day`] || '',
                   month: req.body[`${fieldName}-month`] || '',
                   year: req.body[`${fieldName}-year`] || '',
+                };
+              } else if (typedFieldConfig.type === 'address') {
+                // Process address fields from form data (nested structure)
+                const addressData = (req.body[fieldName] as Record<string, unknown>) || {};
+                reconstructedData[fieldName] = {
+                  addressLine1: addressData.addressLine1 || '',
+                  addressLine2: addressData.addressLine2 || '',
+                  town: addressData.town || '',
+                  county: addressData.county || '',
+                  postcode: addressData.postcode || '',
                 };
               }
             }
@@ -1164,10 +1496,82 @@ export class WizardEngine {
         }
 
         // Save and move forward
-        const { version } = await this.store.load(req, caseId);
-        const { data: merged } = await this.store.save(req, caseId, version, {
-          [step.id]: validationResult.data || {},
-        });
+        const { version, data: currentData } = await this.store.load(req, caseId);
+
+        // Apply automatic data cleanup for conditionally required fields
+        const cleanedCurrentStepData = await this.cleanupConditionalData(
+          step,
+          validationResult.data || {},
+          currentData
+        );
+
+        // Also clean up all other steps that might have conditional fields affected by this change
+        const allCleanedData = { ...currentData, [step.id]: cleanedCurrentStepData };
+        let hasGlobalChanges = false;
+
+        for (const [stepId, stepConfig] of Object.entries(this.journey.steps)) {
+          const typedStepConfig = stepConfig as StepConfig;
+          if (typedStepConfig.type === 'summary' || typedStepConfig.type === 'confirmation') {
+            continue;
+          }
+          if (!typedStepConfig.fields || Object.keys(typedStepConfig.fields).length === 0) {
+            continue;
+          }
+
+          // For the current step being submitted, use the cleaned data; for other steps, use original data
+          const stepData =
+            stepId === step.id
+              ? (allCleanedData[stepId] as Record<string, unknown>)
+              : (currentData[stepId] as Record<string, unknown>);
+          if (!stepData || Object.keys(stepData).length === 0) {
+            continue;
+          }
+
+          // Always use allCleanedData so the required function sees the updated values
+          const cleanedStepData = await this.cleanupConditionalData(typedStepConfig, stepData, allCleanedData);
+
+          // Check if cleanup removed any data (compare with original data, not the potentially already cleaned data)
+          const originalStepData = currentData[stepId] as Record<string, unknown>;
+          if (!originalStepData || Object.keys(cleanedStepData).length !== Object.keys(originalStepData).length) {
+            // Explicitly set removed fields to undefined to ensure they're removed from the store
+            const finalStepData = { ...cleanedStepData };
+            if (originalStepData) {
+              for (const key of Object.keys(originalStepData)) {
+                if (!(key in cleanedStepData)) {
+                  finalStepData[key] = undefined;
+                }
+              }
+            }
+            allCleanedData[stepId] = finalStepData;
+            hasGlobalChanges = true;
+          }
+        }
+
+        // Save the cleaned data
+        let merged: Record<string, unknown>;
+        if (hasGlobalChanges) {
+          // Save each step individually to ensure proper replacement (not merge)
+          let currentVersion = version;
+          for (const [stepId, stepData] of Object.entries(allCleanedData)) {
+            await this.store.save(req, caseId, currentVersion, { [stepId]: stepData });
+            currentVersion++;
+          }
+
+          // Reload the final data
+          const { data: finalData } = await this.store.load(req, caseId);
+          merged = finalData;
+        } else {
+          // No global changes, just save the current step
+          const { data: finalData } = await this.store.save(req, caseId, version, {
+            [step.id]: cleanedCurrentStepData,
+          });
+          merged = finalData;
+        }
+
+        // Clear any stored lookup state for this step after a successful save
+        if (addressLookupStore[step.id]) {
+          delete addressLookupStore[step.id];
+        }
 
         const nextId = this.resolveNext(step, merged);
         const nextStep = this.journey.steps[nextId];
