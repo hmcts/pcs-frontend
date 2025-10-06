@@ -43,7 +43,8 @@ FROM dependencies AS development
 WORKDIR /app
 # Install bash for development
 USER root
-RUN apk add --no-cache bash
+RUN apk add --no-cache \
+    bash=~5
 USER hmcts
 
 # Copy all source files
@@ -78,7 +79,8 @@ RUN yarn workspaces focus --production --all
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/src/main/public ./dist/main/public
 COPY --from=build /app/src/main/views ./dist/main/views
-COPY --from=build /app/src/main/assets/fixtures ./dist/main/assets/fixtures
+COPY --from=build /app/src/main/journeys ./dist/main/journeys
+RUN find ./dist/main/journeys -type f \( ! -name "*.js" ! -name "*.njk" \) -delete
 COPY --from=build /app/config ./config
 
 RUN chmod +x /app/dist/main/server.js

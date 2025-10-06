@@ -1,10 +1,15 @@
 import { RequestHandler } from 'express';
 
 import { GetController } from '../app/controller/GetController';
+import { type SupportedLang } from '../utils/getValidatedLanguage';
 
+export interface ErrorField {
+  field: string;
+  text: string;
+}
 export interface StepFormData {
   title?: string;
-  error?: string;
+  error?: ErrorField | string | undefined;
   answer?: string;
   choices?: string[] | string;
   serviceName?: string;
@@ -21,7 +26,8 @@ export interface StepDefinition {
   name: string;
   view: string;
   stepDir: string;
-  generateContent: () => StepFormData;
-  getController: GetController;
+  generateContent: (lang?: SupportedLang) => StepFormData;
+  getController: GetController | ((lang?: SupportedLang) => GetController);
   postController?: { post: RequestHandler };
+  middleware?: RequestHandler[];
 }

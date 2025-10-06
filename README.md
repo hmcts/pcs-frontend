@@ -41,8 +41,10 @@ yarn build
 
 Run:
 
+Get the secret value from the azure keyvault
+
 ```bash
-yarn start:dev
+PCS_FRONTEND_IDAM_SECRET=XXX S2S_SECRET=XXX OS_CLIENT_LOOKUP_SECRET=XXX yarn start:dev
 ```
 
 #### Production
@@ -215,3 +217,12 @@ in [info.ts](src/main/routes/info.ts) file and currently displays info from:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+### The following environment variables are needed to run the tests:
+
+- NODE_CONFIG_ENV
+- TEST_URL
+- PCS_FRONTEND_IDAM_SECRET
+- IDAM_SYSTEM_PASSWORD
+- IDAM_SYSTEM_USERNAME
+- IDAM_PCS_USER_PASSWORD

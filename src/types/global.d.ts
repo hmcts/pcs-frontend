@@ -2,12 +2,22 @@ import { type Session, type SessionData } from 'express-session';
 import { type TokenEndpointResponse, type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
 import { type Environment } from 'nunjucks';
+import { type CcdCase } from '../main/interfaces/ccdCase.interface';
 import { S2S } from '../main/modules/s2s';
 
-interface UserInfoResponseWithToken extends UserInfoResponse {
+export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
   idToken: string;
   refreshToken: string;
+}
+
+export interface AddressLookupSessionData {
+  [stepId: string]: {
+    [fieldNamePrefix: string]: {
+      postcode?: string;
+      addresses?: any[];
+    };
+  };
 }
 
 interface CustomSessionData extends SessionData {
@@ -16,6 +26,11 @@ interface CustomSessionData extends SessionData {
   user?: UserInfoResponseWithToken;
   returnTo?: string;
   formData?: Record<string, any>;
+  ccdCase?: CcdCase;
+  postcodeLookupResult?: any[];
+  lookupPostcode?: string;
+  lookupError?: { field: string; text: string };
+  _addressLookup?: AddressLookupSessionData;
   destroy(callback: (err?: Error) => void): void;
 }
 

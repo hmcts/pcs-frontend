@@ -27,14 +27,14 @@ describe('AppInsights test', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    appInsights = new AppInsights();
+    appInsights = new AppInsights(false);
   });
 
   it('should enable Application Insights when connection string is provided', () => {
     jest.spyOn(config, 'get').mockReturnValue('fake-connection-string');
     const appInsightsModule = require('applicationinsights');
 
-    appInsights.enable();
+    appInsights.enableFor();
 
     expect(appInsightsModule.setup).toHaveBeenCalledWith('fake-connection-string');
     expect(appInsightsModule.setSendLiveMetrics).toHaveBeenCalledWith(true);
@@ -47,7 +47,7 @@ describe('AppInsights test', () => {
   it('should not enable Application Insights when connection string is not provided', () => {
     jest.spyOn(config, 'get').mockReturnValue(null);
 
-    appInsights.enable();
+    appInsights.enableFor();
 
     const appInsightsModule = require('applicationinsights');
     expect(appInsightsModule.setup).not.toHaveBeenCalled();

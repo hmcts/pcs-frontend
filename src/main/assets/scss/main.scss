@@ -1,1 +1,44 @@
 @import 'govuk-frontend';
+
+@import 'phase-banner';
+
+.govuk-header__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.claim-journey-secondary-heading {
+  color: $govuk-secondary-text-colour;
+  font-weight: 300;
+}
+
+.correspondence-address-form {
+  .pcs-address-component {
+    .govuk-details__text {
+      border-left: none;
+      padding-left: 0;
+      padding-bottom: 0;
+      position: relative;
+
+      &::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: -5px;
+        left: -40px;
+        width: 5px;
+        height: 15px;
+        background-color: govuk-colour('white');
+      }
+    }
+
+    .govuk-details {
+      margin-bottom: 5px;
+    }
+  }
+
+  #correspondenceAddress-addressSelectContainer {
+    margin-bottom: 30px;
+  }
+}

@@ -1,0 +1,32 @@
+{% extends "journeyTemplate.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block content %}
+  {% if step.description %}
+    <span class="govuk-caption-l">{{ step.description }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ step.title }}</h1>
+
+  {% if summaryCards and summaryCards | length > 0 %}
+    {% for card in summaryCards %}
+      {{ govukSummaryList(card) }}
+    {% endfor %}
+  {% elif summaryRows and summaryRows | length > 0 %}
+    {{ govukSummaryList({ rows: summaryRows }) }}
+  {% else %}
+    <p class="govuk-body">{{ translations.summary.empty or "No information to display yet." }}</p>
+  {% endif %}
+
+  <form method="post" novalidate>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text:  t('buttons.submit', 'Submit'),
+        attributes: { type: 'submit' }
+      }) }}
+    </div>
+  </form>
+{% endblock %}

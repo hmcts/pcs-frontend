@@ -1,0 +1,13 @@
+{% extends "journeyTemplate.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">{{ step.title }}</h1>
+  <p>Your application has been submitted successfully. Thank you!</p>
+
+  {{ govukButton({
+    text: 'Done',
+    href: '/'
+  }) }}
+{% endblock %} 

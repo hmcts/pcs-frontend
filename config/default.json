@@ -3,7 +3,8 @@
   "appInsights": {
     "instrumentationKey": false
   },
-  "node-env": "dev",
+  "node-env": "development",
+  "use-ssl": false,
   "session": {
     "prefix": "pcs-session",
     "ttlInSeconds": 1200,
@@ -22,16 +23,39 @@
     "ttl": 3600,
     "key": "s2s:service-token"
   },
+  "ccd": {
+    "url": "https://ccd-data-store-api-pcs-api-pr-316.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-316"
+  },
+  "osPostcodeLookup": {
+    "url": "https://api.os.uk/search/places/v1"
+  },
+  "pcq": {
+    "enabled": false,
+    "name": "Equality and Diversity Service",
+    "url": "https://pcq.aat.platform.hmcts.net",
+    "path": "/service-endpoint",
+    "port": 4000,
+    "serviceId": "PCS",
+    "actor": "APPLICANT"
+  },
   "secrets": {
     "pcs": {
       "pcs-frontend-s2s-secret": "AAAAAAAAAAAAAAAA",
       "pcs-session-secret": "pcs-supersecret",
       "redis-connection-string": "redis://localhost:6379",
-      "app-insights-connection-string": "InstrumentationKey=79536ccc-f225-4028-ae0f-edae519eb55f;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3598a202-277f-4848-bfd2-7c0877d11a8b",
+      "app-insights-connection-string": "AAAAAAAAAAAAAAAA",
       "pcs-frontend-idam-secret": "AAAAAAAAAAAAAAAA",
       "pcs-frontend-idam-system-username": "AAAAAAAAAAAA",
-      "pcs-frontend-idam-system-password": "AAAAAAAAAAAAAA",
-      "pcs-frontend-idam-user-temp-password": "AAAAAAAAAAAAAAAA"
+      "pcs-frontend-idam-system-password": {
+        "__name": "AAAAAAAAAAAA"
+      },
+      "launchdarkly-sdk-key": "sdk-placeholder",
+      "pcs-frontend-idam-user-temp-password": {
+        "__name": "AAAAAAAAAAAA"
+      },
+      "pcs-os-client-lookup-key": "AAAAAAAAAAAAAA",
+      "pcs-pcq-token-key": "AAAAAAAAA"
     }
   },
   "oidc": {
@@ -39,18 +63,5 @@
     "clientId": "pcs-frontend",
     "redirectUri": "http://localhost:3209/oauth2/callback",
     "scope": "openid profile roles"
-  },
-  "e2e": {
-    "testUrl": "http://localhost:3209",
-    "idamUrl": "https://idam-api.aat.platform.hmcts.net",
-    "idamTestingSupportUrl": "https://idam-testing-support-api.aat.platform.hmcts.net",
-    "loginEndpoint": "o/token",
-    "grantType": "password",
-    "scope": "profile openid roles",
-    "clientId": "pcs-frontend",
-    "roles": "citizen"
-  },
-  "claimFormTestData": {
-    "pageRoute": "/steps/page1"
   }
 }

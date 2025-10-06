@@ -1,3 +1,4 @@
+import config from 'config';
 import * as express from 'express';
 import helmet from 'helmet';
 
@@ -15,14 +16,29 @@ export class Helmet {
 
   public enableFor(app: express.Express): void {
     // include default helmet functions
-    const scriptSrc = [self, googleAnalyticsDomain, "'sha256-+6WnXIl4mbFTCARd8N3COQmT3bJJmo32N8q8ZSQAIcU='"];
+    const scriptSrc = [self, googleAnalyticsDomain];
 
     if (this.developmentMode) {
       // Uncaught EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval'
       // is not an allowed source of script in the following Content Security Policy directive:
-      // "script-src 'self' *.google-analytics.com 'sha256-+6WnXIl4mbFTCARd8N3COQmT3bJJmo32N8q8ZSQAIcU='".
+      // "script-src 'self' *.google-analytics.com 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='".
       // seems to be related to webpack
       scriptSrc.push("'unsafe-eval'");
+      scriptSrc.push("'unsafe-inline'");
+    } else {
+      scriptSrc.push("'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='");
+    }
+
+    const formAction = [self];
+
+    const pcqDomain: string = config.get('pcq.url');
+    if (pcqDomain) {
+      formAction.push(pcqDomain);
+    }
+    // this is required if user is submitting a form when they need to be logged in
+    const idamDomain: string = new URL(config.get('oidc.issuer')).origin;
+    if (idamDomain) {
+      formAction.push(idamDomain);
     }
 
     app.use(
@@ -37,6 +53,7 @@ export class Helmet {
             scriptSrc,
             styleSrc: [self],
             manifestSrc: [self],
+            formAction,
           },
         },
         referrerPolicy: { policy: 'origin' },

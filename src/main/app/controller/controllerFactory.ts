@@ -18,10 +18,13 @@ export const createGetController = (
     const postData = req.body || {};
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
-
     return {
       ...content,
+      ...formData,
+      lang: req.language || 'en',
+      pageUrl: req.originalUrl || '/',
       selected,
+      t: req.t,
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
@@ -42,14 +45,15 @@ export const validateAndStoreForm = (
   stepName: string,
   fields: FormFieldConfig[],
   nextPage: string | ((body: StepFormData) => string),
-  content?: StepFormData
+  content?: StepFormData,
+  templatePath?: string
 ): { post: (req: Request, res: Response) => void } => {
   return {
     post: (req: Request, res: Response) => {
       const errors = validateForm(req, fields);
 
       if (Object.keys(errors).length > 0) {
-        return res.status(400).render(`steps/${stepName}.njk`, {
+        return res.status(400).render(templatePath ?? `steps/${stepName}.njk`, {
           ...content,
           error: Object.values(errors)[0],
           ...req.body,

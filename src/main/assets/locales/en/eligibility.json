@@ -1,0 +1,136 @@
+{
+  "startPage": {
+    "title": "Before you start",
+    "description": "We're building a new service. Different designs are being tested and changed based on feedback from users.",
+    "eligibilityText": "You'll be asked some questions to check you're eligible to use this service.",
+    "whatYouNeedTitle": "What you'll need",
+    "whatYouNeedText": "To make your claim, you'll need the following information to hand:",
+    "needNoticeInfo": "Information about the type of notice you've given and when it was given (if applicable)",
+    "needPropertyInfo": "Details about the property you'd like to claim possession of",
+    "needDefendantInfo": "The defendants' details (if known)",
+    "needGroundsInfo": "Your grounds for possession and details about your reasons for making a possession claim",
+    "needDocuments": "Copies of relevant documents"
+  },
+  "page2": {
+    "ageLabel": "Are you 18 or over?",
+    "ageDescription": "Select an option to continue.",
+    "ageOptions": {
+      "yes": "Yes",
+      "no": "No"
+    }
+  },
+  "page3": {
+    "title": "What are your grounds for possession?",
+    "description": "Select all grounds that apply to your case",
+    "options": {
+      "rentArrears8": {
+        "text": "Rent arrears (ground 8)",
+        "hint": "The tenant owes at least 2 months' rent"
+      },
+      "breachContract9": {
+        "text": "Breach of contract (ground 9)",
+        "hint": "The tenant has broken terms of the tenancy agreement"
+      },
+      "other10": {
+        "text": "Other (ground 10)",
+        "hint": "Other statutory grounds for possession"
+      }
+    },
+    "errors": {
+      "groundsRequired": "Select at least one option"
+    }
+  },
+  "page4": {
+    "title": "Enter your personal details",
+    "fields": {
+      "title": {
+        "label": "Title",
+        "items": {
+          "mr": "Mr",
+          "ms": "Ms",
+          "miss": "Miss",
+          "mrs": "Mrs"
+        }
+      },
+      "firstName": {
+        "label": "First name",
+        "title": "First name"
+      },
+      "lastName": {
+        "label": "Last name",
+        "title": "Last name"
+      }
+    },
+    "errors": {
+      "title": {
+        "required": "Title is required"
+      },
+      "firstName": {
+        "required": "Enter a first name"
+      },
+      "lastName": {
+        "required": "Enter a last name"
+      }
+    }
+  },
+  "page5": {
+    "title": "Enter your personal and contact details",
+    "fields": {
+      "date": {
+        "hint": "Date of birth",
+        "label": "Date of birth"
+      },
+      "email": {
+        "label": "Email address"
+      }
+    },
+    "errors": {
+      "date": {
+        "required": "Enter a date",
+        "notRealDate": "Enter a valid date of birth",
+        "invalidDay": "Enter a valid day",
+        "invalidMonth": "Enter a valid month",
+        "invalidYear": "Enter a valid year",
+        "invalidValue": "Enter a valid value"
+      },
+      "email": {
+        "required": "Enter an email address",
+        "invalid": "Enter a valid email address"
+      }
+    }
+  },
+  "summary": {
+    "title": "Check your answers",
+    "description": "Review your answers before submitting your claim",
+    "empty": "No information to display yet.",
+    "submit": "Submit"
+  },
+  "confirmation": {
+    "title": "Application complete",
+    "panel": {
+      "refLabel": "Your reference number",
+      "pending": "PCR-PENDING"
+    },
+    "sentEmail": "We have sent you a confirmation email.",
+    "whatNextTitle": "What happens next",
+    "whatNext1": "Your possession claim will be reviewed by the court.",
+    "whatNext2": "You will be contacted within 5 working days with next steps.",
+    "helpTitle": "Help and support",
+    "helpLinkText": "Find legal advice and support",
+    "helpLinkHref": "#",
+    "exit": "Exit"
+  },
+  "ineligible": {
+    "title": "You are not eligible to make a claim",
+    "reason": "You need to be 18 or over to make a possession claim.",
+    "changeAnswer": "If you think this is incorrect, you can go back and change your answer.",
+    "exit": "Exit application"
+  },
+  "errors": {
+    "address": {
+      "addressLine1": "Enter Address line 1",
+      "town": "Enter Town or city",
+      "postcode": "Enter a valid Postcode"
+    }
+  }
+}
