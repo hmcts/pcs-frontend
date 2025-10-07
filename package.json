@@ -32,7 +32,7 @@
     "test:pact": "jest -c jest.pact.config.ts --runInBand",
     "pact:publish": "ts-node src/test/contract/publish/*.ts",
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",
-    "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $GIT_COMMIT --broker-base-url https://pact-broker.platform.hmcts.net",
+    "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $(git rev-parse --short HEAD) --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:openAllureReport": "yarn allure open allure-report",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"
