@@ -31,26 +31,12 @@ export class HttpService {
         await this.regenerateToken();
       }
       config.headers['ServiceAuthorization'] = `Bearer ${this.s2sToken}`;
-
-      // Log outgoing requests
-      this.logger.info(`[HTTP Request] ${config.method?.toUpperCase()} ${config.url}`);
-      if (config.data) {
-        this.logger.info(`[HTTP Request] Body: ${JSON.stringify(config.data, null, 2)}`);
-      }
-
       return config;
     });
 
     // Response interceptor for handling 401s
     this.instance.interceptors.response.use(
-      response => {
-        // Log successful responses
-        this.logger.info(
-          `[HTTP Response] ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`
-        );
-        this.logger.info(`[HTTP Response] Data: ${JSON.stringify(response.data, null, 2)}`);
-        return response;
-      },
+      response => response,
       async error => {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest.__isRetryRequest) {
@@ -64,17 +50,6 @@ export class HttpService {
             return Promise.reject(retryError);
           }
         }
-
-        // Log error responses
-        if (error.response) {
-          this.logger.error(
-            `[HTTP Error] ${error.response.status} ${error.config?.method?.toUpperCase()} ${error.config?.url}`
-          );
-          this.logger.error(`[HTTP Error] Response data: ${JSON.stringify(error.response.data, null, 2)}`);
-        } else {
-          this.logger.error(`[HTTP Error] Network error: ${error.message}`);
-        }
-
         return Promise.reject(error);
       }
     );

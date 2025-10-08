@@ -14,10 +14,4 @@
       {{ taskGroup(dashboardTaskGroup) }}
   {% endfor %}
 
-  <script>
-    // Log PCS API data in browser console
-    console.log('PCS API Notifications:', {{ notifications | dump | safe }});
-    console.log('PCS API Task Groups:', {{ taskGroups | dump | safe }});
-  </script>
-
 {% endblock %}
