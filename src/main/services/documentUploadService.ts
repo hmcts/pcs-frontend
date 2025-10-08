@@ -1,10 +1,11 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Request } from 'express';
 
-import { CaseDocumentManagementClient, Classification , DocumentManagementFile } from '../app/document/CaseDocumentManagementClient';
+import { CaseDocumentManagementClient } from '../app/document/CaseDocumentManagementClient';
+import { CaseDocument } from '../interfaces/caseDocument.interface';
+import { Classification, DocumentManagementFile } from '../interfaces/documentManagement.interface';
 
 const logger = Logger.getLogger('DocumentUploadService');
-
 
 export interface UploadResult {
   success: boolean;
@@ -17,15 +18,29 @@ export interface UploadResult {
 }
 
 export class DocumentUploadService {
-  /**
-   * req Express request object containing files and user session
-   * caseReference Case reference to associate documents with
-   */
-  static async uploadSupportingDocuments(req: Request, caseReference: string): Promise<UploadResult> {
-    logger.info('Starting document upload process', {
+  // cdam to pcs format
+  private static getCaseDocuments(documents: DocumentManagementFile[]): CaseDocument[] {
+    return documents.map(document => {
+      const documentId = document._links.self.href.split('/').pop();
+      return {
+        id: documentId!,
+        value: {
+          documentLink: {
+            document_url: document._links.self.href,
+            document_filename: document.originalDocumentName,
+            document_binary_url: document._links.binary.href,
+          },
+          comment: document.description || null,
+        },
+      };
+    });
+  }
+
+  // logging transformed payload for backend
+  static async uploadAndSubmitDocument(req: Request, caseReference: string): Promise<UploadResult> {
+    logger.info('[DocumentUpload-POC] Starting upload and submit process', {
       caseReference,
       userId: req.session?.user?.id,
-      fileCount: Object.keys(req.files || {}).length,
     });
 
     try {
@@ -38,7 +53,7 @@ export class DocumentUploadService {
         throw new Error('No files uploaded');
       }
 
-      // Create CDAM client - map user properties to match UserDetails interface
+      // create cdam client
       const userDetails = {
         accessToken: user.accessToken,
         id: String(user.sub || user.uid || user.id || 'unknown'),
@@ -46,45 +61,78 @@ export class DocumentUploadService {
       };
       const cdamClient = new CaseDocumentManagementClient(caseReference, userDetails);
 
-      logger.info('Created CDAM client for case reference:', caseReference);
-
-      // classification and upload
+      // upload to cdam
       const uploadedDocuments = await cdamClient.create({
         files: req.files,
         classification: Classification.Public,
       });
 
-      logger.info('Document upload successful', {
+      logger.info('[DocumentUpload-POC] CDAM upload successful', {
         caseReference,
-        documentCount: uploadedDocuments.length,
         documents: uploadedDocuments.map(doc => ({
-          originalName: doc.originalDocumentName,
+          id: doc._links.self.href.split('/').pop(),
+          filename: doc.originalDocumentName,
           size: doc.size,
-          mimeType: doc.mimeType,
-          createdOn: doc.createdOn,
-          selfHref: doc._links.self.href,
         })),
       });
 
+      // transform to pcs format
+      const supportingDocuments = this.getCaseDocuments(uploadedDocuments);
+
+      // log transformed PCS payload
+      const pcsPayload = { supportingDocuments };
+
+      logger.info('[DocumentUpload-POC] Data transformation completed successfully', {
+        caseReference,
+        documentsUploaded: uploadedDocuments.length,
+        transformedPayload: JSON.stringify(pcsPayload, null, 2),
+      });
+
+      logger.info('[DocumentUpload-POC] === COMPLETE TRANSFORMED PAYLOAD FOR BACKEND ===', {
+        caseReference,
+        payloadSummary: {
+          supportingDocumentsCount: supportingDocuments.length,
+          documentDetails: supportingDocuments.map(doc => ({
+            documentId: doc.id,
+            filename: doc.value.documentLink.document_filename,
+            documentUrl: doc.value.documentLink.document_url,
+            binaryUrl: doc.value.documentLink.document_binary_url,
+            comment: doc.value.comment,
+          })),
+        },
+        fullPayload: pcsPayload,
+      });
+
+      logger.info(
+        '[DocumentUpload-POC] Process completed successfully - CDAM upload and PCS format transformation done',
+        {
+          caseReference,
+          status: 'SUCCESS',
+          steps: {
+            '1_CDAM_Upload': 'COMPLETE',
+            '2_PCS_Transformation': 'COMPLETE',
+          },
+        }
+      );
+
       return {
         success: true,
-        message: 'Document uploaded successfully',
+        message: 'Document uploaded to CDAM and transformed to PCS format successfully',
         caseReference,
         documents: uploadedDocuments,
         document: uploadedDocuments[0],
         documentId: uploadedDocuments[0]?._links?.self?.href?.split('/').pop(),
       };
     } catch (error) {
-      logger.error('Document upload failed', {
+      logger.error('[DocumentUpload-POC] Process failed', {
         caseReference,
         error: error.message,
-        stack: error.stack,
         userId: req.session?.user?.id,
       });
 
       return {
         success: false,
-        error: error.message || 'Unknown upload error',
+        error: error.message || 'Upload and submit failed',
       };
     }
   }

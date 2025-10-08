@@ -27,7 +27,7 @@
     "url": "https://ccd-data-store-api-pcs-api-pr-672.preview.platform.hmcts.net",
     "caseTypeId": "PCS-672"
   },
-  "caseType": "PCS-672",
+  "caseType": "PCS",
   "jurisdiction": "PCS",
   "uploadTimeout": 30000,
   "services": {

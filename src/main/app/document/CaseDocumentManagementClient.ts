@@ -1,7 +1,7 @@
 import config from 'config';
-import { UploadedFile } from 'express-fileupload';
 import FormData from 'form-data';
 
+import { Classification, DocumentManagementFile, UploadedFiles } from '../../interfaces/documentManagement.interface';
 import { http } from '../../modules/http';
 
 interface UserDetails {
@@ -12,37 +12,6 @@ interface UserDetails {
 
 interface CaseDocumentManagementResponse {
   documents: DocumentManagementFile[];
-}
-
-export interface DocumentManagementFile {
-  description?: string;
-  size: number;
-  mimeType: string;
-  originalDocumentName: string;
-  modifiedOn: string;
-  createdOn: string;
-  classification: Classification;
-  _links: {
-    self: {
-      href: string;
-    };
-    binary: {
-      href: string;
-    };
-    thumbnail?: {
-      href: string;
-    };
-  };
-}
-
-export type UploadedFiles = {
-  [fieldname: string]: UploadedFile | UploadedFile[];
-};
-
-export enum Classification {
-  Private = 'PRIVATE',
-  Restricted = 'RESTRICTED',
-  Public = 'PUBLIC',
 }
 
 export class CaseDocumentManagementClient {
