@@ -31,8 +31,10 @@ withPipeline(type, product, component) {
   env.NODE_CONFIG_ENV = 'test'
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    // Skipping PACT publish on PRs until contracts are verified and CONSUMER_DEPLOY_CHECK can be added
-    // enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+    enablePactAs([
+      AppPipelineDsl.PactRoles.CONSUMER,
+      AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
+    ])
     afterAlways('functionalTest:preview') {
       try {
         publishHTML([
@@ -51,7 +53,10 @@ withPipeline(type, product, component) {
 
   onMaster() {
     env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
-    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+    enablePactAs([
+      AppPipelineDsl.PactRoles.CONSUMER,
+      AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
+    ])
     afterAlways('functionalTest:aat') {
       try {
         publishHTML([
