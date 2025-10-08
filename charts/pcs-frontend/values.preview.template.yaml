@@ -13,4 +13,10 @@ nodejs:
     REDIS_CONNECTION_STRING: redis://${SERVICE_NAME}-redis-master:6379
     OIDC_REDIRECT_URI: 'https://${SERVICE_FQDN}/oauth2/callback'
 redis:
+  image:
+    registry: hmctspublic.azurecr.io
+    repository: imported/bitnami/redis
   enabled: true
+global:
+  security:
+    allowInsecureImages: true
