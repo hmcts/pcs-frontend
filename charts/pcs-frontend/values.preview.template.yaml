@@ -5,7 +5,7 @@ nodejs:
   keyVaults:
     pcs:
       secrets:
-        - pcs-frontend-s2s-secret
+        - pcs-api-s2s-secret
         - pcs-frontend-idam-secret
         - launchdarkly-sdk-key
         - pcs-os-client-lookup-key
