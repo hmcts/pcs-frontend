@@ -5,6 +5,8 @@ import { CaseDocumentManagementClient } from '../app/document/CaseDocumentManage
 import { CaseDocument } from '../interfaces/caseDocument.interface';
 import { Classification, DocumentManagementFile } from '../interfaces/documentManagement.interface';
 
+import { ccdCaseService } from './ccdCaseService';
+
 const logger = Logger.getLogger('DocumentUploadService');
 
 export interface UploadResult {
@@ -103,21 +105,42 @@ export class DocumentUploadService {
         fullPayload: pcsPayload,
       });
 
+      // send to CCD
+      logger.info('[DocumentUpload-POC] Starting CCD submission', {
+        caseReference,
+        documentsCount: supportingDocuments.length,
+      });
+
+      const ccdCase = {
+        id: caseReference,
+        data: {
+          supportingDocuments,
+        },
+      };
+
+      const updatedCase = await ccdCaseService.updateCase(user.accessToken, ccdCase);
+
+      logger.info('[DocumentUpload-POC] CCD submission successful', {
+        caseId: updatedCase.id,
+        documentsCount: supportingDocuments.length,
+      });
+
       logger.info(
-        '[DocumentUpload-POC] Process completed successfully - CDAM upload and PCS format transformation done',
+        '[DocumentUpload-POC] Process completed successfully - CDAM upload, PCS transformation, and CCD submission done',
         {
           caseReference,
           status: 'SUCCESS',
           steps: {
             '1_CDAM_Upload': 'COMPLETE',
             '2_PCS_Transformation': 'COMPLETE',
+            '3_CCD_Submission': 'COMPLETE',
           },
         }
       );
 
       return {
         success: true,
-        message: 'Document uploaded to CDAM and transformed to PCS format successfully',
+        message: 'Document uploaded to CDAM, transformed, and sent to CCD successfully',
         caseReference,
         documents: uploadedDocuments,
         document: uploadedDocuments[0],

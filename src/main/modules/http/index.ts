@@ -22,15 +22,36 @@ export class HttpService {
 
     // Request interceptor
     this.instance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+      this.logger.info('[HttpService] Request interceptor triggered', {
+        url: config.url,
+        method: config.method,
+        hasS2sToken: !!this.s2sToken,
+        s2sTokenLength: this.s2sToken?.length || 0,
+        isTokenExpired: this.isTokenExpired(),
+        hasTokenRegenerator: !!this.tokenRegenerator,
+      });
+
       if ((!this.s2sToken || this.isTokenExpired()) && !this.tokenRegenerator) {
         this.logger.error('No token regenerator configured!');
         throw new Error('No valid S2S token available and no regenerator configured');
       }
 
       if (!this.s2sToken || this.isTokenExpired()) {
+        this.logger.info('[HttpService] Token missing or expired, regenerating...');
         await this.regenerateToken();
       }
+
       config.headers['ServiceAuthorization'] = `Bearer ${this.s2sToken}`;
+
+      this.logger.info('[HttpService] Final request headers', {
+        hasAuthorization: !!config.headers['Authorization'],
+        hasServiceAuthorization: !!config.headers['ServiceAuthorization'],
+        authorizationPrefix: config.headers['Authorization']
+          ? String(config.headers['Authorization']).substring(0, 20) + '...'
+          : 'MISSING',
+        serviceAuthPrefix: this.s2sToken ? this.s2sToken.substring(0, 20) + '...' : 'MISSING',
+      });
+
       return config;
     });
 

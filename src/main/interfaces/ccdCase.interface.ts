@@ -1,3 +1,5 @@
+import { CaseDocument } from './caseDocument.interface';
+
 export enum CaseState {
   DRAFT = 'Draft',
   SUBMITTED = 'Submitted',
@@ -32,6 +34,7 @@ export interface CcdCaseData {
     PostCode: string;
     Country: string;
   };
+  supportingDocuments?: CaseDocument[];
 }
 
 export interface CcdCase {

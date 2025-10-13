@@ -20,7 +20,7 @@ function getCaseTypeId(): string {
 }
 
 function getCaseHeaders(token: string) {
-  return {
+  const headers = {
     headers: {
       Authorization: `Bearer ${token}`,
       experimental: true,
@@ -28,17 +28,36 @@ function getCaseHeaders(token: string) {
       'Content-Type': 'application/json',
     },
   };
+
+  // Debug logging for headers
+  logger.info('[ccdCaseService] Request headers prepared', {
+    hasAuthToken: !!token,
+    authTokenLength: token?.length || 0,
+    authTokenPrefix: token ? token.substring(0, 20) + '...' : 'MISSING',
+  });
+
+  return headers;
 }
 
 async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
     logger.info(`[ccdCaseService] Calling getEventToken with URL: ${url}`);
+    logger.info('[ccdCaseService] User token info', {
+      hasToken: !!userToken,
+      tokenLength: userToken?.length || 0,
+    });
+
     const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
     logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.token;
   } catch (error) {
     const axiosError = error as AxiosError;
-    logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+    logger.error('[ccdCaseService] getEventToken failed', {
+      error: axiosError.message,
+      status: axiosError.response?.status,
+      statusText: axiosError.response?.statusText,
+      responseData: axiosError.response?.data,
+    });
     throw error;
   }
 }
@@ -63,13 +82,25 @@ async function submitEvent(
 
   try {
     logger.info(`[ccdCaseService] Calling submitEvent with URL: ${url}`);
+    logger.info('[ccdCaseService] Event submission details', {
+      eventId,
+      hasEventToken: !!eventToken,
+      eventTokenLength: eventToken?.length || 0,
+      hasUserToken: !!userToken,
+      userTokenLength: userToken?.length || 0,
+    });
     logger.info(`[ccdCaseService] Payload: ${JSON.stringify(payload, null, 2)}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
     logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError;
-    logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+    logger.error('[ccdCaseService] submitEvent failed', {
+      error: axiosError.message,
+      status: axiosError.response?.status,
+      statusText: axiosError.response?.statusText,
+      responseData: axiosError.response?.data,
+    });
     throw error;
   }
 }

@@ -1,4 +1,4 @@
-export const DEFAULT_CASE_REFERENCE = '1759241919150004';
+export const DEFAULT_CASE_REFERENCE = '1760102391462712';
 
 // PCS API Event Constants
-export const CITIZEN_PCS_UPDATE_CASE = 'citizen-pcs-update-case';
+export const CITIZEN_UPDATE_APPLICATION = 'citizenUpdateApplication';
