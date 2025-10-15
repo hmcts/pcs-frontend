@@ -27,12 +27,13 @@ export class DocumentUploadService {
       return {
         id: documentId!,
         value: {
-          documentLink: {
+          documentType: 'CUI_DOC_UPLOAD_POC',
+          description: document.description || null,
+          document: {
             document_url: document._links.self.href,
             document_filename: document.originalDocumentName,
             document_binary_url: document._links.binary.href,
           },
-          comment: document.description || null,
         },
       };
     });
@@ -96,10 +97,11 @@ export class DocumentUploadService {
           supportingDocumentsCount: supportingDocuments.length,
           documentDetails: supportingDocuments.map(doc => ({
             documentId: doc.id,
-            filename: doc.value.documentLink.document_filename,
-            documentUrl: doc.value.documentLink.document_url,
-            binaryUrl: doc.value.documentLink.document_binary_url,
-            comment: doc.value.comment,
+            documentType: doc.value.documentType,
+            filename: doc.value.document.document_filename,
+            documentUrl: doc.value.document.document_url,
+            binaryUrl: doc.value.document.document_binary_url,
+            description: doc.value.description,
           })),
         },
         fullPayload: pcsPayload,

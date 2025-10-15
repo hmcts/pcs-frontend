@@ -46,10 +46,8 @@ export class HttpService {
       this.logger.info('[HttpService] Final request headers', {
         hasAuthorization: !!config.headers['Authorization'],
         hasServiceAuthorization: !!config.headers['ServiceAuthorization'],
-        authorizationPrefix: config.headers['Authorization']
-          ? String(config.headers['Authorization']).substring(0, 20) + '...'
-          : 'MISSING',
-        serviceAuthPrefix: this.s2sToken ? this.s2sToken.substring(0, 20) + '...' : 'MISSING',
+        authorizationPrefix: config.headers['Authorization'] ? String(config.headers['Authorization']) : 'MISSING',
+        serviceAuthPrefix: this.s2sToken ? this.s2sToken : 'MISSING',
       });
 
       return config;
