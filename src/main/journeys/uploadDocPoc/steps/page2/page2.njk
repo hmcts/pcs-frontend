@@ -13,46 +13,70 @@
     <p class="govuk-body govuk-!-font-weight-bold">{{ data.caseReference or DEFAULT_CASE_REFERENCE }}</p>
   </div>
 
-  <h2 class="govuk-heading-m">
-    {{ t('page2.fileUploadLabel') }}
-  </h2>
-  <p class="govuk-body">
-    {{ t('page2.fileUploadHint') }}
-  </p>
+  <!-- Stage 1: upload form in view -->
+  <div id="upload-stage">
+    <h2 class="govuk-heading-m">
+      {{ t('page2.fileUploadLabel') }}
+    </h2>
+    <p class="govuk-body">
+      {{ t('page2.fileUploadHint') }}
+    </p>
 
-  <form method="post" action="/uploadDocPoc/page2/upload" enctype="multipart/form-data" novalidate>
-    <input type="hidden" name="caseReference" value="{{ data.caseReference or DEFAULT_CASE_REFERENCE }}">
+    <form id="uploadForm" method="post" enctype="multipart/form-data" novalidate>
 
       <div class="govuk-form-group">
-         <label class="govuk-label govuk-label--s" for="upload">
-        {{ t('page2.fileUploadLabel2') }}
-      </label>
-      <div id="upload-hint" class="govuk-hint">
-        {{ t('page2.fileUploadHint2') }}
+        <label class="govuk-label govuk-label--s" for="upload">
+          {{ t('page2.fileUploadLabel2') }}
+        </label>
+        <div id="upload-hint" class="govuk-hint">
+          {{ t('page2.fileUploadHint2') }}
+        </div>
+        <input class="govuk-file-upload" id="upload" name="upload" type="file" aria-describedby="upload-hint">
       </div>
-      <input class="govuk-file-upload" id="upload" name="upload" type="file" aria-describedby="upload-hint">
-    </div>
 
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: t('page2.uploadButton'),
-        attributes: { type: 'submit' }
-      }) }}
-    </div>
-  </form>
-
-  <!-- error success log results -->
-  <div id="upload-results" style="display: none;">
-    <div class="govuk-panel govuk-panel--confirmation">
-      <h1 class="govuk-panel__title">Document uploaded and submitted successfully</h1>
-      <div class="govuk-panel__body">
-        <strong id="document-name"></strong><br>
-        Document ID: <strong id="document-id"></strong><br>
-        Case Reference: <strong id="case-reference"></strong>
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: t('page2.uploadButton'),
+          attributes: { 
+            type: 'button',
+            id: 'uploadButton'
+          }
+        }) }}
       </div>
-    </div>
+    </form>
   </div>
 
+  <!-- Stage 2: show document info and continue Button - after upload) -->
+  <div id="continue-stage" style="display: none;">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h2 class="govuk-panel__title">Document uploaded to storage</h2>
+      <div class="govuk-panel__body">
+        <strong id="document-name"></strong><br>
+        Document ID: <strong id="document-id"></strong>
+      </div>
+    </div>
+
+    <p class="govuk-body govuk-!-margin-top-6">
+      Your document has been uploaded successfully. Click continue to associate it with the case.
+    </p>
+
+    <form id="submitForm" method="post" action="/uploadDocPoc/page2/submitDocument">
+      <input type="hidden" id="documentReferencesInput" name="documentReferences" value="">
+      <input type="hidden" name="caseReference" value="{{ data.caseReference or DEFAULT_CASE_REFERENCE }}">
+      
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: 'Continue',
+          attributes: { 
+            type: 'submit',
+            id: 'continueButton'
+          }
+        }) }}
+      </div>
+    </form>
+  </div>
+
+  <!-- Error Display -->
   <div id="upload-error" style="display: none;">
     <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
       <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
@@ -64,39 +88,5 @@
     </div>
   </div>
 
-  <script>
-    document.querySelector('form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const formData = new FormData(this);
-      const uploadResults = document.getElementById('upload-results');
-      const uploadError = document.getElementById('upload-error');
-      
-      uploadResults.style.display = 'none';
-      uploadError.style.display = 'none';
-      
-      try {
-        const response = await fetch('/uploadDocPoc/page2/upload', {
-          method: 'POST',
-          body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          document.getElementById('document-name').textContent = result.document.originalDocumentName;
-          document.getElementById('document-id').textContent = result.documentId;
-          document.getElementById('case-reference').textContent = result.caseReference;
-          uploadResults.style.display = 'block';
-        } else {
-          document.getElementById('error-message').textContent = result.message || 'Upload failed';
-          uploadError.style.display = 'block';
-        }
-      } catch (error) {
-        document.getElementById('error-message').textContent = 'Upload failed: ' + error.message;
-        uploadError.style.display = 'block';
-      }
-    });
-  </script>
 
 {% endblock %}

@@ -3,53 +3,111 @@ import express, { Request, Response, Router } from 'express';
 import fileUpload from 'express-fileupload';
 
 import { DEFAULT_CASE_REFERENCE } from '../config/constants';
+import { CaseDocument } from '../interfaces/caseDocument.interface';
 import { oidcMiddleware } from '../middleware/oidc';
 import { DocumentUploadService } from '../services/documentUploadService';
 
 const logger = Logger.getLogger('uploadDocument');
 const router = Router();
 
+// Stage 1: upload document to cdam
 router.post(
-  '/uploadDocPoc/page2/upload',
+  '/uploadDocPoc/page2/uploadDocument',
   oidcMiddleware,
   fileUpload({
     limits: { fileSize: 1024 * 1024 * 101 },
   }),
   async (req: Request, res: Response) => {
     try {
-      logger.info('[uploadDocument-POC] Starting direct upload and submit process');
-      logger.info('[uploadDocument-POC] Request body:', JSON.stringify(req.body, null, 2));
+      logger.info('[uploadDocument-POC] Stage 1: Starting CDAM upload');
       logger.info('[uploadDocument-POC] Files received:', req.files ? Object.keys(req.files) : 'No files');
 
-      const caseReference = req.body.caseReference || DEFAULT_CASE_REFERENCE;
-
-      logger.info('[uploadDocument-POC] Using direct upload and submit method', {
-        caseReference,
-        userId: req.session?.user?.id,
-      });
-
-      const result = await DocumentUploadService.uploadAndSubmitDocument(req, caseReference);
+      const result = await DocumentUploadService.uploadDocumentToCDAM(req);
 
       if (result.success) {
-        logger.info('[uploadDocument-POC] Direct upload and submit completed successfully:', {
-          caseReference: result.caseReference,
+        logger.info('[uploadDocument-POC] Stage 1: CDAM upload completed successfully:', {
           documentCount: result.documents?.length || 0,
           message: result.message,
         });
         return res.json(result);
       } else {
-        logger.error('[uploadDocument-POC] Direct upload and submit failed:', result.error);
+        logger.error('[uploadDocument-POC] Stage 1: CDAM upload failed:', result.error);
         return res.status(500).json({
           success: false,
-          error: 'Upload and submit failed',
+          error: 'Upload to CDAM failed',
           message: result.error,
         });
       }
     } catch (error) {
-      logger.error('[uploadDocument-POC] Unexpected error:', error);
+      logger.error('[uploadDocument-POC] Stage 1: Unexpected error:', error);
       return res.status(500).json({
         success: false,
-        error: 'Upload and submit failed',
+        error: 'Upload to CDAM failed',
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
+      });
+    }
+  }
+);
+
+// Stage 2: document ref to case in ccd
+router.post(
+  '/uploadDocPoc/page2/submitDocument',
+  oidcMiddleware,
+  express.json(),
+  async (req: Request, res: Response) => {
+    try {
+      logger.info('[uploadDocument-POC] Stage 2: Starting CCD association');
+      logger.info('[uploadDocument-POC] Request body:', JSON.stringify(req.body, null, 2));
+
+      const { documentReferences, caseReference } = req.body;
+
+      if (!documentReferences || !Array.isArray(documentReferences)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request: documentReferences array required',
+        });
+      }
+
+      const caseRef = caseReference || DEFAULT_CASE_REFERENCE;
+
+      logger.info('[uploadDocument-POC] Stage 2: Associating documents with case', {
+        caseReference: caseRef,
+        documentCount: documentReferences.length,
+      });
+
+      const user = req.session?.user;
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          error: 'User not authenticated',
+        });
+      }
+
+      const result = await DocumentUploadService.submitDocumentToCase(
+        user.accessToken,
+        documentReferences as CaseDocument[],
+        caseRef
+      );
+
+      if (result.success) {
+        logger.info('[uploadDocument-POC] Stage 2: CCD association completed successfully:', {
+          caseReference: result.caseReference,
+          message: result.message,
+        });
+        return res.json(result);
+      } else {
+        logger.error('[uploadDocument-POC] Stage 2: CCD association failed:', result.error);
+        return res.status(500).json({
+          success: false,
+          error: 'CCD association failed',
+          message: result.error,
+        });
+      }
+    } catch (error) {
+      logger.error('[uploadDocument-POC] Stage 2: Unexpected error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'CCD association failed',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
       });
     }

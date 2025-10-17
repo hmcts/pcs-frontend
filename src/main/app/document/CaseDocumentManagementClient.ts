@@ -16,11 +16,9 @@ interface CaseDocumentManagementResponse {
 
 export class CaseDocumentManagementClient {
   BASE_URL: string = config.get('services.cdam.url');
-  private caseReference: string;
   private user?: UserDetails;
 
-  constructor(caseReference: string, user?: UserDetails) {
-    this.caseReference = caseReference;
+  constructor(user?: UserDetails) {
     this.user = user;
   }
 
@@ -35,7 +33,6 @@ export class CaseDocumentManagementClient {
     formData.append('caseTypeId', config.get('caseType'));
     formData.append('jurisdictionId', config.get('jurisdiction'));
     formData.append('classification', classification);
-    formData.append('caseReference', this.caseReference);
 
     for (const [, file] of Object.entries(files)) {
       const uploadedFile = Array.isArray(file) ? file[0] : file;

@@ -10,7 +10,3 @@ export interface CaseDocument {
     };
   };
 }
-
-export interface DocumentSubmissionPayload {
-  supportingDocuments?: CaseDocument[];
-}
