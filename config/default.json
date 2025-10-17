@@ -18,7 +18,7 @@
     "url": "http://pcs-api-aat.service.core-compute-aat.internal"
   },
   "s2s": {
-    "microservice": "pcs_api",
+    "microservice": "pcs_frontend",
     "url": "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
     "ttl": 3600,
     "key": "s2s:service-token"
