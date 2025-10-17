@@ -19,19 +19,13 @@ router.post(
   }),
   async (req: Request, res: Response) => {
     try {
-      logger.info('[uploadDocument-POC] Stage 1: Starting CDAM upload');
-      logger.info('[uploadDocument-POC] Files received:', req.files ? Object.keys(req.files) : 'No files');
-
       const result = await DocumentUploadService.uploadDocumentToCDAM(req);
 
       if (result.success) {
-        logger.info('[uploadDocument-POC] Stage 1: CDAM upload completed successfully:', {
-          documentCount: result.documents?.length || 0,
-          message: result.message,
-        });
+        logger.info('[uploadDocument-POC] Stage 1 Complete: CDAM upload successful');
         return res.json(result);
       } else {
-        logger.error('[uploadDocument-POC] Stage 1: CDAM upload failed:', result.error);
+        logger.error('[uploadDocument-POC] Stage 1 Failed: CDAM upload error:', result.error);
         return res.status(500).json({
           success: false,
           error: 'Upload to CDAM failed',
@@ -56,9 +50,6 @@ router.post(
   express.json(),
   async (req: Request, res: Response) => {
     try {
-      logger.info('[uploadDocument-POC] Stage 2: Starting CCD association');
-      logger.info('[uploadDocument-POC] Request body:', JSON.stringify(req.body, null, 2));
-
       const { documentReferences, caseReference } = req.body;
 
       if (!documentReferences || !Array.isArray(documentReferences)) {
@@ -69,11 +60,6 @@ router.post(
       }
 
       const caseRef = caseReference || DEFAULT_CASE_REFERENCE;
-
-      logger.info('[uploadDocument-POC] Stage 2: Associating documents with case', {
-        caseReference: caseRef,
-        documentCount: documentReferences.length,
-      });
 
       const user = req.session?.user;
       if (!user) {
@@ -90,13 +76,10 @@ router.post(
       );
 
       if (result.success) {
-        logger.info('[uploadDocument-POC] Stage 2: CCD association completed successfully:', {
-          caseReference: result.caseReference,
-          message: result.message,
-        });
+        logger.info('[uploadDocument-POC] Stage 2 Complete: CCD association successful');
         return res.json(result);
       } else {
-        logger.error('[uploadDocument-POC] Stage 2: CCD association failed:', result.error);
+        logger.error('[uploadDocument-POC] Stage 2 Failed: CCD association error:', result.error);
         return res.status(500).json({
           success: false,
           error: 'CCD association failed',

@@ -91,8 +91,12 @@ export function initDocumentUpload(): void {
         const uploadStage = document.getElementById('upload-stage');
         const continueStage = document.getElementById('continue-stage');
 
-        if (uploadStage) {uploadStage.style.display = 'none';}
-        if (continueStage) {continueStage.style.display = 'block';}
+        if (uploadStage) {
+          uploadStage.style.display = 'none';
+        }
+        if (continueStage) {
+          continueStage.style.display = 'block';
+        }
       } else {
         const errorMessageEl = document.getElementById('error-message');
         if (errorMessageEl) {

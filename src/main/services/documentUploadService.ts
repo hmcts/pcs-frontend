@@ -22,8 +22,6 @@ export interface UploadResult {
 export class DocumentUploadService {
   // Stage 1: Upload to CDAM
   static async uploadDocumentToCDAM(req: Request): Promise<UploadResult> {
-    logger.info('[DocumentUpload-POC] Starting Stage 1: Upload to CDAM only');
-
     try {
       const user = req.session?.user;
       if (!user) {
@@ -48,7 +46,8 @@ export class DocumentUploadService {
         classification: Classification.Public,
       });
 
-      logger.info('[DocumentUpload-POC] Stage 1 Complete: CDAM upload successful', {
+      // Log CDAM response
+      logger.info('[DocumentUpload-POC] CDAM Response:', {
         documentsCount: uploadedDocuments.length,
         documents: uploadedDocuments.map(doc => ({
           id: doc._links.self.href.split('/').pop(),
@@ -60,9 +59,13 @@ export class DocumentUploadService {
       // transform to pcs format
       const supportingDocuments = this.getCaseDocuments(uploadedDocuments);
 
-      logger.info('[DocumentUpload-POC] Document references prepared for client', {
+      // Log formatted response
+      logger.info('[DocumentUpload-POC] Formatted Response (CaseDocument):', {
         documentsCount: supportingDocuments.length,
+        documents: supportingDocuments,
       });
+
+      logger.info('[DocumentUpload-POC] Stage 1 Complete: Success');
 
       return {
         success: true,
@@ -72,7 +75,7 @@ export class DocumentUploadService {
         documentId: uploadedDocuments[0]?._links?.self?.href?.split('/').pop(),
       };
     } catch (error) {
-      logger.error('[DocumentUpload-POC] Stage 1 failed - CDAM upload error', {
+      logger.error('[DocumentUpload-POC] Stage 1 Failed:', {
         error: error.message,
         userId: req.session?.user?.id,
       });
@@ -90,15 +93,11 @@ export class DocumentUploadService {
     documentReferences: CaseDocument[],
     caseReference: string
   ): Promise<UploadResult> {
-    logger.info('[DocumentUpload-POC] Starting Stage 2: Associate documents with case', {
-      caseReference,
-      documentsCount: documentReferences.length,
-    });
-
     try {
       const pcsPayload = { supportingDocuments: documentReferences };
 
-      logger.info('[DocumentUpload-POC] CCD Submission Payload', {
+      // Log CCD submission payload
+      logger.info('[DocumentUpload-POC] CCD Submission Payload:', {
         caseReference,
         payload: pcsPayload,
       });
@@ -113,18 +112,8 @@ export class DocumentUploadService {
 
       const updatedCase = await ccdCaseService.updateCase(userToken, ccdCase);
 
-      logger.info('[DocumentUpload-POC] Stage 2 Complete: CCD submission successful', {
+      logger.info('[DocumentUpload-POC] Stage 2 Complete: Success', {
         caseId: updatedCase.id,
-        documentsCount: documentReferences.length,
-      });
-
-      logger.info('[DocumentUpload-POC] Two-stage process completed successfully', {
-        caseReference,
-        status: 'SUCCESS',
-        steps: {
-          '1_CDAM_Upload': 'COMPLETE',
-          '2_CCD_Association': 'COMPLETE',
-        },
       });
 
       return {
@@ -133,7 +122,7 @@ export class DocumentUploadService {
         caseReference,
       };
     } catch (error) {
-      logger.error('[DocumentUpload-POC] Stage 2 failed - CCD association error', {
+      logger.error('[DocumentUpload-POC] Stage 2 Failed:', {
         caseReference,
         error: error.message,
       });

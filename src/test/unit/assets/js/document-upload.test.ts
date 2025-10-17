@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jest-environment-jsdom
+ */
+
 import { initDocumentUpload } from '../../../../main/assets/js/document-upload';
 
 const flushPromises = () => new Promise<void>(resolve => setTimeout(resolve, 0));
