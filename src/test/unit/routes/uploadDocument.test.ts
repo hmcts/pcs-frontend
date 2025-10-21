@@ -88,7 +88,7 @@ describe('uploadDocument routes', () => {
       expect(response.status).toBe(500);
       expect(response.body).toEqual({
         success: false,
-        error: 'Upload to CDAM failed',
+        error: 'CDAM upload failed',
         message: 'CDAM service unavailable',
       });
     });
