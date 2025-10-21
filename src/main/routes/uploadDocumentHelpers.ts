@@ -1,12 +1,18 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Response } from 'express';
 
+import { DocumentManagementFile } from '../interfaces/documentManagement.interface';
+
 const logger = Logger.getLogger('uploadDocument');
 
 interface ServiceResult {
   success: boolean;
   error?: string;
-  [key: string]: unknown;
+  message?: string;
+  documents?: DocumentManagementFile[];
+  document?: DocumentManagementFile;
+  documentId?: string;
+  caseReference?: string;
 }
 
 /**
