@@ -1,0 +1,92 @@
+{% extends "journeyTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{# Import the case reference constant #}
+{% set DEFAULT_CASE_REFERENCE = '1761061165632943' %}
+
+{% block content %}
+
+  <h1 class="govuk-heading-l">{{ t('page2.title') }}</h1>
+
+  <div class="govuk-inset-text">
+    <p class="govuk-body">{{ t('page2.caseReferenceHint') }}</p>
+    <p class="govuk-body govuk-!-font-weight-bold">{{ data.caseReference or DEFAULT_CASE_REFERENCE }}</p>
+  </div>
+
+  <!-- Stage 1: upload form in view -->
+  <div id="upload-stage">
+    <h2 class="govuk-heading-m">
+      {{ t('page2.fileUploadLabel') }}
+    </h2>
+    <p class="govuk-body">
+      {{ t('page2.fileUploadHint') }}
+    </p>
+
+    <form id="uploadForm" method="post" enctype="multipart/form-data" novalidate>
+
+      <div class="govuk-form-group">
+        <label class="govuk-label govuk-label--s" for="upload">
+          {{ t('page2.fileUploadLabel2') }}
+        </label>
+        <div id="upload-hint" class="govuk-hint">
+          {{ t('page2.fileUploadHint2') }}
+        </div>
+        <input class="govuk-file-upload" id="upload" name="upload" type="file" aria-describedby="upload-hint">
+      </div>
+
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: t('page2.uploadButton'),
+          attributes: { 
+            type: 'button',
+            id: 'uploadButton'
+          }
+        }) }}
+      </div>
+    </form>
+  </div>
+
+  <!-- Stage 2: show document info and continue Button - after upload) -->
+  <div id="continue-stage" style="display: none;">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h2 class="govuk-panel__title">Document uploaded to storage</h2>
+      <div class="govuk-panel__body">
+        <strong id="document-name"></strong><br>
+        Document ID: <strong id="document-id"></strong>
+      </div>
+    </div>
+
+    <p class="govuk-body govuk-!-margin-top-6">
+      Your document has been uploaded successfully. Click continue to associate it with the case.
+    </p>
+
+    <form id="submitForm" method="post" action="/uploadDocPoc/page2/submitDocument">
+      <input type="hidden" id="documentReferencesInput" name="documentReferences" value="">
+      <input type="hidden" name="caseReference" value="{{ data.caseReference or DEFAULT_CASE_REFERENCE }}">
+      
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: 'Continue',
+          attributes: { 
+            type: 'submit',
+            id: 'continueButton'
+          }
+        }) }}
+      </div>
+    </form>
+  </div>
+
+  <!-- Error Display -->
+  <div id="upload-error" style="display: none;">
+    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
+      <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          <li><span id="error-message"></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}

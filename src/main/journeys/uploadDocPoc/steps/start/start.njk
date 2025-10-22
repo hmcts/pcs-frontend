@@ -1,0 +1,31 @@
+{% extends "journeyTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+
+  <h1 class="govuk-heading-l">{{ t('startPage.title') }}</h1>
+
+  <p class="govuk-body">{{ t('startPage.description') }}</p>
+
+  <h2 class="govuk-heading-s">{{ t('startPage.whatYouNeedTitle') }}</h2>
+
+    <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+    <li>{{ t('startPage.whatYouNeedText') }}</li>
+    <li>{{ t('startPage.whatYouNeedText2') }}</li>
+    </ul>
+
+  <h2 class="govuk-heading-s">{{ t('startPage.expectedBehaviorTitle') }}</h2>
+  <p class="govuk-body">{{ t('startPage.expectedBehavior') }}</p>
+  <p class="govuk-body">{{ t('startPage.expectedBehavior2') }}</p>
+
+
+  <form method="post" novalidate>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.start', 'Start'),
+        attributes: { type: 'submit' }
+      }) }}
+    </div>
+  </form>
+
+{% endblock %}
