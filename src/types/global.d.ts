@@ -11,6 +11,7 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
   idToken: string;
   refreshToken: string;
+  uid?: string; // IDAM user ID from JWT token
 }
 
 export interface AddressLookupSessionData {
