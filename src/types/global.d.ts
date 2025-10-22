@@ -3,6 +3,7 @@ import { type TokenEndpointResponse, type UserInfoResponse } from 'openid-client
 import { type Redis } from 'ioredis';
 import { type Environment } from 'nunjucks';
 import { type CcdCase } from '../main/interfaces/ccdCase.interface';
+import { type CaseDocument } from '../main/interfaces/caseDocument.interface';
 import { S2S } from '../main/modules/s2s';
 import { type DocumentManagementFile } from '../main/app/document/CaseDocumentManagementClient';
 
@@ -32,6 +33,7 @@ interface CustomSessionData extends SessionData {
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
   supportingCaseDocuments?: DocumentManagementFile[];
+  uploadedDocuments?: CaseDocument[];
   _addressLookup?: AddressLookupSessionData;
   destroy(callback: (err?: Error) => void): void;
 }

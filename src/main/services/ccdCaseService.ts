@@ -4,6 +4,7 @@ import config from 'config';
 
 import { CaseState, CcdCase, CcdCaseData, CcdUserCases } from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
+import { sanitizeCaseReference, validateCaseReference } from '../utils/validation';
 
 const logger = Logger.getLogger('ccdCaseService');
 
@@ -154,9 +155,20 @@ export const ccdCaseService = {
       throw 'Cannot UPDATE Case, CCD Case Not found';
     }
 
-    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/citizenUpdateApplication`;
+    // Validate case reference format to prevent SSRF attacks
+    if (!validateCaseReference(ccdCase.id)) {
+      logger.error('[ccdCaseService] Invalid case reference format in updateCase', {
+        caseId: ccdCase.id,
+      });
+      throw new Error('Invalid case reference format. Must be a 16-digit numeric string.');
+    }
+
+    // Sanitize case ID for URL usage
+    const sanitizedCaseId = sanitizeCaseReference(ccdCase.id);
+
+    const eventUrl = `${getBaseUrl()}/cases/${sanitizedCaseId}/event-triggers/citizenUpdateApplication`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
-    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
+    const url = `${getBaseUrl()}/cases/${sanitizedCaseId}/events`;
     return submitEvent(accessToken || '', url, 'citizenUpdateApplication', eventToken, ccdCase.data);
   },
 
@@ -164,9 +176,21 @@ export const ccdCaseService = {
     if (!ccdCase.id) {
       throw 'Cannot SUBMIT Case, CCD Case Not found';
     }
-    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/citizenSubmitApplication`;
+
+    // Validate case reference format to prevent SSRF attacks
+    if (!validateCaseReference(ccdCase.id)) {
+      logger.error('[ccdCaseService] Invalid case reference format in submitCase', {
+        caseId: ccdCase.id,
+      });
+      throw new Error('Invalid case reference format. Must be a 16-digit numeric string.');
+    }
+
+    // Sanitize case ID for URL usage
+    const sanitizedCaseId = sanitizeCaseReference(ccdCase.id);
+
+    const eventUrl = `${getBaseUrl()}/cases/${sanitizedCaseId}/event-triggers/citizenSubmitApplication`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
-    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
+    const url = `${getBaseUrl()}/cases/${sanitizedCaseId}/events`;
     return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
   },
 };

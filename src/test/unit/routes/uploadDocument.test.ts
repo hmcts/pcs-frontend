@@ -1,7 +1,6 @@
 import express, { Application } from 'express';
 import request from 'supertest';
 
-import { CaseDocument } from '../../../main/interfaces/caseDocument.interface';
 import { Classification, DocumentManagementFile } from '../../../main/interfaces/documentManagement.interface';
 import uploadDocumentRoute from '../../../main/routes/uploadDocument';
 import { DocumentUploadService, UploadResult } from '../../../main/services/documentUploadService';
@@ -26,6 +25,20 @@ describe('uploadDocument routes', () => {
           sub: 'user-123',
           email: 'test@example.com',
         },
+        uploadedDocuments: [
+          {
+            id: 'doc-123',
+            value: {
+              documentType: 'CUI_DOC_UPLOAD_POC',
+              description: null,
+              document: {
+                document_url: 'http://dm-store.example.com/documents/doc-123',
+                document_filename: 'test.pdf',
+                document_binary_url: 'http://dm-store.example.com/documents/doc-123/binary',
+              },
+            },
+          },
+        ],
       } as never;
       next();
     });
@@ -95,22 +108,46 @@ describe('uploadDocument routes', () => {
   });
 
   describe('POST /uploadDocPoc/page2/submitDocument (Stage 2 - CCD Association)', () => {
-    it('should successfully associate documents with case', async () => {
-      const documentReferences: CaseDocument[] = [
-        {
-          id: 'doc-123',
-          value: {
-            documentType: 'CUI_DOC_UPLOAD_POC',
-            description: null,
-            document: {
-              document_url: 'http://dm-store.example.com/documents/doc-123',
-              document_filename: 'test.pdf',
-              document_binary_url: 'http://dm-store.example.com/documents/doc-123/binary',
-            },
-          },
-        },
-      ];
+    it('should return 400 error for invalid case reference format', async () => {
+      const response = await request(app).post('/uploadDocPoc/page2/submitDocument').send({
+        caseReference: 'invalid-case-ref',
+      });
 
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        success: false,
+        error: 'Invalid case reference format. Must be a 16-digit numeric string.',
+      });
+      expect(DocumentUploadService.submitDocumentToCase).not.toHaveBeenCalled();
+    });
+
+    it('should reject SSRF attack - path traversal attempt', async () => {
+      const response = await request(app).post('/uploadDocPoc/page2/submitDocument').send({
+        caseReference: '../admin/delete',
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        success: false,
+        error: 'Invalid case reference format. Must be a 16-digit numeric string.',
+      });
+      expect(DocumentUploadService.submitDocumentToCase).not.toHaveBeenCalled();
+    });
+
+    it('should reject SSRF attack - URL manipulation attempt', async () => {
+      const response = await request(app).post('/uploadDocPoc/page2/submitDocument').send({
+        caseReference: '@malicious.com',
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        success: false,
+        error: 'Invalid case reference format. Must be a 16-digit numeric string.',
+      });
+      expect(DocumentUploadService.submitDocumentToCase).not.toHaveBeenCalled();
+    });
+
+    it('should successfully associate documents with case using session documents', async () => {
       const mockResult: UploadResult = {
         success: true,
         message: 'Documents associated with case successfully',
@@ -120,31 +157,51 @@ describe('uploadDocument routes', () => {
       jest.spyOn(DocumentUploadService, 'submitDocumentToCase').mockResolvedValue(mockResult);
 
       const response = await request(app).post('/uploadDocPoc/page2/submitDocument').send({
-        documentReferences,
         caseReference: '1234567890123456',
       });
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockResult);
-      expect(DocumentUploadService.submitDocumentToCase).toHaveBeenCalled();
+      expect(DocumentUploadService.submitDocumentToCase).toHaveBeenCalledWith(
+        'mock-token',
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'doc-123',
+          }),
+        ]),
+        '1234567890123456'
+      );
+    });
+
+    it('should return 400 error when no documents in session', async () => {
+      // Create app with no documents in session
+      const appNoSession = express();
+      appNoSession.use(express.json());
+      appNoSession.use((req, res, next) => {
+        req.session = {
+          user: {
+            accessToken: 'mock-token',
+            sub: 'user-123',
+            email: 'test@example.com',
+          },
+        } as never;
+        next();
+      });
+      uploadDocumentRoute(appNoSession);
+
+      const response = await request(appNoSession).post('/uploadDocPoc/page2/submitDocument').send({
+        caseReference: '1234567890123456',
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        success: false,
+        error: 'No documents found. Please upload documents first.',
+      });
+      expect(DocumentUploadService.submitDocumentToCase).not.toHaveBeenCalled();
     });
 
     it('should return 500 error when CCD association fails', async () => {
-      const documentReferences: CaseDocument[] = [
-        {
-          id: 'doc-123',
-          value: {
-            documentType: 'CUI_DOC_UPLOAD_POC',
-            description: null,
-            document: {
-              document_url: 'http://dm-store.example.com/documents/doc-123',
-              document_filename: 'test.pdf',
-              document_binary_url: 'http://dm-store.example.com/documents/doc-123/binary',
-            },
-          },
-        },
-      ];
-
       const mockResult: UploadResult = {
         success: false,
         error: 'CCD service unavailable',
@@ -153,7 +210,6 @@ describe('uploadDocument routes', () => {
       jest.spyOn(DocumentUploadService, 'submitDocumentToCase').mockResolvedValue(mockResult);
 
       const response = await request(app).post('/uploadDocPoc/page2/submitDocument').send({
-        documentReferences,
         caseReference: '1234567890123456',
       });
 

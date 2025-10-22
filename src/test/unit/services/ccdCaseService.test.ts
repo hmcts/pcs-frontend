@@ -84,12 +84,62 @@ describe('ccdCaseService', () => {
         'Cannot UPDATE Case, CCD Case Not found'
       );
     });
+
+    it('throws if case id has invalid format', async () => {
+      await expect(ccdCaseService.updateCase(accessToken, { id: 'invalid-id', data: {} })).rejects.toThrow(
+        'Invalid case reference format. Must be a 16-digit numeric string.'
+      );
+    });
+
+    it('throws if case id contains path traversal attempt', async () => {
+      await expect(ccdCaseService.updateCase(accessToken, { id: '../admin/delete', data: {} })).rejects.toThrow(
+        'Invalid case reference format. Must be a 16-digit numeric string.'
+      );
+    });
+
+    it('successfully updates case with valid 16-digit case id', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockResolvedValue({ data: { id: '1761061165632943', data: { applicantForename: 'John' } } });
+
+      const result = await ccdCaseService.updateCase(accessToken, {
+        id: '1761061165632943',
+        data: { applicantForename: 'John' },
+      });
+
+      expect(result).toEqual({ id: '1761061165632943', data: { applicantForename: 'John' } });
+      expect(mockGet).toHaveBeenCalledWith(
+        expect.stringContaining('/cases/1761061165632943/event-triggers/citizenUpdateApplication'),
+        expect.any(Object)
+      );
+    });
   });
 
   describe('submitCase', () => {
     it('throws if case id is missing', async () => {
       await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toEqual(
         'Cannot SUBMIT Case, CCD Case Not found'
+      );
+    });
+
+    it('throws if case id has invalid format', async () => {
+      await expect(ccdCaseService.submitCase(accessToken, { id: 'malicious@evil.com', data: {} })).rejects.toThrow(
+        'Invalid case reference format. Must be a 16-digit numeric string.'
+      );
+    });
+
+    it('successfully submits case with valid 16-digit case id', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockResolvedValue({ data: { id: '1761061165632943', data: { applicantForename: 'John' } } });
+
+      const result = await ccdCaseService.submitCase(accessToken, {
+        id: '1761061165632943',
+        data: { applicantForename: 'John' },
+      });
+
+      expect(result).toEqual({ id: '1761061165632943', data: { applicantForename: 'John' } });
+      expect(mockGet).toHaveBeenCalledWith(
+        expect.stringContaining('/cases/1761061165632943/event-triggers/citizenSubmitApplication'),
+        expect.any(Object)
       );
     });
   });
