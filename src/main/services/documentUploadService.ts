@@ -41,11 +41,6 @@ export class DocumentUploadService {
 
   // logging transformed payload for backend
   static async uploadAndSubmitDocument(req: Request, caseReference: string): Promise<UploadResult> {
-    logger.info('[DocumentUpload-POC] Starting upload and submit process', {
-      caseReference,
-      userId: req.session?.user?.id,
-    });
-
     try {
       const user = req.session?.user;
       if (!user) {
@@ -56,10 +51,18 @@ export class DocumentUploadService {
         throw new Error('No files uploaded');
       }
 
+      // extract user ID from session user object
+      const userId = user.uid || user.sub || user.email || 'unknown';
+
+      logger.info('[DocumentUpload-POC] Starting upload and submit process', {
+        caseReference,
+        userId,
+      });
+
       // create cdam client
       const userDetails = {
         accessToken: user.accessToken,
-        id: String(user.sub || user.uid || user.id || 'unknown'),
+        id: userId,
         email: user.email,
       };
       const cdamClient = new CaseDocumentManagementClient(caseReference, userDetails);
@@ -149,10 +152,14 @@ export class DocumentUploadService {
         documentId: uploadedDocuments[0]?._links?.self?.href?.split('/').pop(),
       };
     } catch (error) {
+      const user = req.session?.user;
+      const userId = user ? user.uid || user.sub || user.email || 'unknown' : 'no-user';
+
       logger.error('[DocumentUpload-POC] Process failed', {
         caseReference,
         error: error.message,
-        userId: req.session?.user?.id,
+        userId,
+        userObjectAvailable: !!user,
       });
 
       return {

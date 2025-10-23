@@ -10,6 +10,7 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
   idToken: string;
   refreshToken: string;
+  uid?: string;
 }
 
 export interface AddressLookupSessionData {
