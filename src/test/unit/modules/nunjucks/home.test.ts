@@ -1,12 +1,10 @@
-import path from 'path';
-
 import express from 'express';
-import nunjucks from 'nunjucks';
+import * as nunjucks from 'nunjucks';
 
 import { Nunjucks } from '../../../../main/modules/nunjucks';
 
 describe('home.njk renders personal greeting', () => {
-  let env: nunjucks.Environment;
+  let env: nunjucks.Environment;;
 
   beforeAll(() => {
     const app = express();
@@ -14,16 +12,7 @@ describe('home.njk renders personal greeting', () => {
     const nunjucksInstance = new Nunjucks(false);
     nunjucksInstance.enableFor(app);
 
-    env = nunjucks.configure(
-      [
-        path.join(__dirname, '../../../../main/views'),
-        path.join(__dirname, '../../../../..', 'node_modules/govuk-frontend/dist/govuk'),
-      ],
-      {
-        autoescape: true,
-        express: app,
-      }
-    );
+    env = app.locals.nunjucksEnv;
   });
 
   it('renders "Hi from Amanda!"', () => {
@@ -31,3 +20,4 @@ describe('home.njk renders personal greeting', () => {
     expect(html).toContain('<p>Hi from Amanda!</p>');
   });
 });
+
