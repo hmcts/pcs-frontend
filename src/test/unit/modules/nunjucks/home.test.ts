@@ -4,7 +4,7 @@ import * as nunjucks from 'nunjucks';
 import { Nunjucks } from '../../../../main/modules/nunjucks';
 
 describe('home.njk renders personal greeting', () => {
-  let env: nunjucks.Environment;;
+  let env: nunjucks.Environment;
 
   beforeAll(() => {
     const app = express();
@@ -20,4 +20,3 @@ describe('home.njk renders personal greeting', () => {
     expect(html).toContain('<p>Hi from Amanda!</p>');
   });
 });
-
