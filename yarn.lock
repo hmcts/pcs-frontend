@@ -4287,50 +4287,50 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-darwin-arm64@npm:16.1.4":
-  version: 16.1.4
-  resolution: "@pact-foundation/pact-cli-darwin-arm64@npm:16.1.4"
+"@pact-foundation/pact-cli-darwin-arm64@npm:16.1.5":
+  version: 16.1.5
+  resolution: "@pact-foundation/pact-cli-darwin-arm64@npm:16.1.5"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-darwin-x64@npm:16.1.4":
-  version: 16.1.4
-  resolution: "@pact-foundation/pact-cli-darwin-x64@npm:16.1.4"
+"@pact-foundation/pact-cli-darwin-x64@npm:16.1.5":
+  version: 16.1.5
+  resolution: "@pact-foundation/pact-cli-darwin-x64@npm:16.1.5"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-linux-arm64@npm:16.1.4":
-  version: 16.1.4
-  resolution: "@pact-foundation/pact-cli-linux-arm64@npm:16.1.4"
+"@pact-foundation/pact-cli-linux-arm64@npm:16.1.5":
+  version: 16.1.5
+  resolution: "@pact-foundation/pact-cli-linux-arm64@npm:16.1.5"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-linux-x64@npm:16.1.4":
-  version: 16.1.4
-  resolution: "@pact-foundation/pact-cli-linux-x64@npm:16.1.4"
+"@pact-foundation/pact-cli-linux-x64@npm:16.1.5":
+  version: 16.1.5
+  resolution: "@pact-foundation/pact-cli-linux-x64@npm:16.1.5"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-windows-x64@npm:16.1.4":
-  version: 16.1.4
-  resolution: "@pact-foundation/pact-cli-windows-x64@npm:16.1.4"
+"@pact-foundation/pact-cli-windows-x64@npm:16.1.5":
+  version: 16.1.5
+  resolution: "@pact-foundation/pact-cli-windows-x64@npm:16.1.5"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
 "@pact-foundation/pact-cli@npm:^16.0.7":
-  version: 16.1.4
-  resolution: "@pact-foundation/pact-cli@npm:16.1.4"
+  version: 16.1.5
+  resolution: "@pact-foundation/pact-cli@npm:16.1.5"
   dependencies:
-    "@pact-foundation/pact-cli-darwin-arm64": "npm:16.1.4"
-    "@pact-foundation/pact-cli-darwin-x64": "npm:16.1.4"
-    "@pact-foundation/pact-cli-linux-arm64": "npm:16.1.4"
-    "@pact-foundation/pact-cli-linux-x64": "npm:16.1.4"
-    "@pact-foundation/pact-cli-windows-x64": "npm:16.1.4"
+    "@pact-foundation/pact-cli-darwin-arm64": "npm:16.1.5"
+    "@pact-foundation/pact-cli-darwin-x64": "npm:16.1.5"
+    "@pact-foundation/pact-cli-linux-arm64": "npm:16.1.5"
+    "@pact-foundation/pact-cli-linux-x64": "npm:16.1.5"
+    "@pact-foundation/pact-cli-windows-x64": "npm:16.1.5"
     chalk: "npm:4.1.2"
     check-types: "npm:11.2.3"
     cross-spawn: "npm:7.0.6"
@@ -4364,7 +4364,7 @@ __metadata:
     pact-stub-service: bin/pact-stub-service.js
     pact-verifier: bin/pact-verifier.js
     pactflow: bin/pactflow.js
-  checksum: 10/6f3aadeec9e868c3e16ec9c4f69dc24cbfc4ed2ef22fd5658a54f289fff5ead1cb9534cbefedcbc2c273685f03d51125e7d807f9197f08c9e3311ef946e414dc
+  checksum: 10/6b1b5e8847f60edbb9dac72e6d6e2fbfd57abfdb78d57d8d476127815898c5cb8b921c0aca6621fc8c70dfeda7590a950424dd94ddda5191957b744e651b3cf3
   conditions: (os=darwin | os=linux | os=win32) & (cpu=x64 | cpu=arm64)
   languageName: node
   linkType: hard
@@ -6565,13 +6565,13 @@ __metadata:
   linkType: hard
 
 "axios@npm:^1.12.0":
-  version: 1.12.0
-  resolution: "axios@npm:1.12.0"
+  version: 1.12.2
+  resolution: "axios@npm:1.12.2"
   dependencies:
     follow-redirects: "npm:^1.15.6"
     form-data: "npm:^4.0.4"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10/6c45e294b6ee72f832dbee94cb3fe7331bf2961874fa6b656d909a93b3574c59281f0c62eb92baf7b3e4f39be71936c9f1fcbbe494c90f7ff4d7cc2d7932f06d
+  checksum: 10/886a79770594eaad76493fecf90344b567bd956240609b5dcd09bd0afe8d3e6f1ad6d3257a93a483b6192b409d4b673d9515a34619e3e3ed1b2c0ec2a83b20ba
   languageName: node
   linkType: hard
 
@@ -13508,6 +13508,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"playwright-core@npm:1.56.1":
+  version: 1.56.1
+  resolution: "playwright-core@npm:1.56.1"
+  bin:
+    playwright-core: cli.js
+  checksum: 10/df785eb3b3a8392b10dcde5f768e09b7fe459a7b06ed81180da69e048f2154b761f86d79572c2b62037a1f18a44e4ace72f5b6547f4f473b4ab13ab1d94007d2
+  languageName: node
+  linkType: hard
+
 "playwright-lighthouse@npm:^4.0.0":
   version: 4.0.0
   resolution: "playwright-lighthouse@npm:4.0.0"
@@ -13524,7 +13533,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright@npm:1.55.0, playwright@npm:^1.36.2":
+"playwright@npm:1.55.0":
   version: 1.55.0
   resolution: "playwright@npm:1.55.0"
   dependencies:
@@ -13536,6 +13545,21 @@ __metadata:
   bin:
     playwright: cli.js
   checksum: 10/df02529693923b9b671822dac8a2ac8a8471c9142a05e14a24f8d0038a7dcf705712363991a070fc927466bbbe70e485145cf7a77882613822f56960afc4b892
+  languageName: node
+  linkType: hard
+
+"playwright@npm:^1.36.2":
+  version: 1.56.1
+  resolution: "playwright@npm:1.56.1"
+  dependencies:
+    fsevents: "npm:2.3.2"
+    playwright-core: "npm:1.56.1"
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    playwright: cli.js
+  checksum: 10/f1743f93b26f1d497257771428d93f3c9ed2d75b00d935f0cd1556ff2dc61d47f2df8b381d752fbd2c47082b685f0ffe4cc4b7ba440d7b4ba3a08572aec58fba
   languageName: node
   linkType: hard
 
@@ -14569,11 +14593,11 @@ __metadata:
   linkType: hard
 
 "semver@npm:^7.5.2":
-  version: 7.7.2
-  resolution: "semver@npm:7.7.2"
+  version: 7.7.3
+  resolution: "semver@npm:7.7.3"
   bin:
     semver: bin/semver.js
-  checksum: 10/7a24cffcaa13f53c09ce55e05efe25cd41328730b2308678624f8b9f5fc3093fc4d189f47950f0b811ff8f3c3039c24a2c36717ba7961615c682045bf03e1dda
+  checksum: 10/8dbc3168e057a38fc322af909c7f5617483c50caddba135439ff09a754b20bdd6482a5123ff543dad4affa488ecf46ec5fb56d61312ad20bb140199b88dfaea9
   languageName: node
   linkType: hard
 
@@ -15755,8 +15779,8 @@ __metadata:
   linkType: hard
 
 "ts-jest@npm:^29.2.6":
-  version: 29.4.2
-  resolution: "ts-jest@npm:29.4.2"
+  version: 29.4.5
+  resolution: "ts-jest@npm:29.4.5"
   dependencies:
     bs-logger: "npm:^0.2.6"
     fast-json-stable-stringify: "npm:^2.1.0"
@@ -15764,7 +15788,7 @@ __metadata:
     json5: "npm:^2.2.3"
     lodash.memoize: "npm:^4.1.2"
     make-error: "npm:^1.3.6"
-    semver: "npm:^7.7.2"
+    semver: "npm:^7.7.3"
     type-fest: "npm:^4.41.0"
     yargs-parser: "npm:^21.1.1"
   peerDependencies:
@@ -15790,7 +15814,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: 10/09494224db6933f666a5f6a0dc5694181515d65f1abe8d602b5edfe45c475c20c4c5e59ca4755030439400efb9cf0d727e5bb8700b5234a2103fe09cf7d5bdf1
+  checksum: 10/48d867e0707474241b6339336cbe57d85122d6018fef957c8c095ff365e5d9428f112fe2cb11a8301343bbd32cec3ff639523d9bf9eea3a371734aa9a100f8a2
   languageName: node
   linkType: hard
 
