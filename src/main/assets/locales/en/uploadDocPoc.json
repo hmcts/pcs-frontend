@@ -1,0 +1,25 @@
+{
+  "startPage": {
+    "title": "Document upload proof of concept",
+    "description": "This is a proof of concept for the CUI upload document journey.",
+    "whatYouNeedTitle": "What you'll need",
+    "whatYouNeedText": "A document to be uploaded",
+    "whatYouNeedText2": "A PCSCase reference to associate the document to",
+    "expectedBehaviorTitle": "The expected outcome will be:",
+    "expectedBehavior": "When you upload a document to the associated case reference, you should see a message confirming the document has been uploaded.",
+    "expectedBehavior2": "You should see the document in the JSON structure for pcsCase table."
+  },
+  "page2": {
+    "title": "Upload Documents",
+    "caseReferenceLabel": "Case Reference",
+    "caseReferenceHint": "Upload any docuemnts that you think are relevant to your response for case reference:",
+    "fileUploadLabel": "Before you upload your docuemnts",
+    "fileUploadHint": "Give them a name that explains what they are. For example, 'Receipt of payament from Jane Smith'",
+    "fileUploadLabel2": "Upload a file",
+    "fileUploadHint2": "Each docuemtn must be less then 1GB. You can upload the following file types: DOC/PDF.",
+    "uploadButton": "Upload Document",
+    "errors": {
+      "fileRequired": "Please select a file to upload"
+    }
+  }
+}
