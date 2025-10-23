@@ -2870,15 +2870,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:0.206.0":
-  version: 0.206.0
-  resolution: "@opentelemetry/api-logs@npm:0.206.0"
-  dependencies:
-    "@opentelemetry/api": "npm:^1.3.0"
-  checksum: 10/11d6fb362b8d39f8c6b18bb844e42064db3fffc9ae0a67a7a25d17496ab8417a0c2653adfec382cd7b8f0de92b57e3538b7d86c79fbae16830bc726344caba5f
-  languageName: node
-  linkType: hard
-
 "@opentelemetry/api@npm:^1.3.0, @opentelemetry/api@npm:^1.9.0":
   version: 1.9.0
   resolution: "@opentelemetry/api@npm:1.9.0"
@@ -3512,19 +3503,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-redis@npm:^0.55.0":
-  version: 0.55.0
-  resolution: "@opentelemetry/instrumentation-redis@npm:0.55.0"
-  dependencies:
-    "@opentelemetry/instrumentation": "npm:^0.206.0"
-    "@opentelemetry/redis-common": "npm:^0.38.2"
-    "@opentelemetry/semantic-conventions": "npm:^1.27.0"
-  peerDependencies:
-    "@opentelemetry/api": ^1.3.0
-  checksum: 10/2d5fbe56849cfefad02ad23a42ffbb8879eae979663e6997a88f5084619d7dd765587328311527e181b8c686f1faad0752fbf786fcd3585486a806e3cccd5fca
-  languageName: node
-  linkType: hard
-
 "@opentelemetry/instrumentation-tedious@npm:0.18.1":
   version: 0.18.1
   resolution: "@opentelemetry/instrumentation-tedious@npm:0.18.1"
@@ -3562,16 +3540,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation@npm:0.206.0":
-  version: 0.206.0
-  resolution: "@opentelemetry/instrumentation@npm:0.206.0"
+"@opentelemetry/instrumentation@npm:0.204.0":
+  version: 0.204.0
+  resolution: "@opentelemetry/instrumentation@npm:0.204.0"
   dependencies:
-    "@opentelemetry/api-logs": "npm:0.206.0"
+    "@opentelemetry/api-logs": "npm:0.204.0"
     import-in-the-middle: "npm:^1.8.1"
-    require-in-the-middle: "npm:^8.0.0"
+    require-in-the-middle: "npm:^7.1.1"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/877299373fd9dc9ff6eb01c723444803d366bcda842d73ccdf2d56e4cbcf7bd469ddec37186c483bebc4735211ff1bc89f541e613c62e8e9211edb4fd2e54c3a
+  checksum: 10/a32b93e714e555dc1fca6c212bde565342370f0f62c1421e02cb307193ced1f8167223b3b70adc6e4539bf8508424f56b7249ecb527995406944434b29b73066
   languageName: node
   linkType: hard
 
@@ -3683,7 +3661,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/redis-common@npm:^0.38.0, @opentelemetry/redis-common@npm:^0.38.2":
+"@opentelemetry/redis-common@npm:^0.38.0":
   version: 0.38.2
   resolution: "@opentelemetry/redis-common@npm:0.38.2"
   checksum: 10/2a4f992572b1990a407ac92c7db941aecb6e8d71f034f4ea0b00b2b1739ad07c22767198a6759ab634cbbe9eebfbea062e2b79a25484289c226c665558041503
@@ -12547,7 +12525,6 @@ __metadata:
     "@hmcts/playwright-common": "npm:1.0.36"
     "@hmcts/properties-volume": "npm:^1.2.0"
     "@launchdarkly/node-server-sdk": "npm:^9.10.0"
-    "@opentelemetry/instrumentation-redis": "npm:^0.55.0"
     "@pact-foundation/pact": "npm:^15.0.0"
     "@pact-foundation/pact-cli": "npm:^16.0.7"
     "@playwright/test": "npm:^1.56.1"
@@ -13564,13 +13541,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"require-in-the-middle@npm:^8.0.0":
-  version: 8.0.1
-  resolution: "require-in-the-middle@npm:8.0.1"
+"require-in-the-middle@npm:^7.1.1":
+  version: 7.5.2
+  resolution: "require-in-the-middle@npm:7.5.2"
   dependencies:
     debug: "npm:^4.3.5"
     module-details-from-path: "npm:^1.0.3"
-  checksum: 10/4ce98c681489d383a0ffccb79b06df7a1dffbb31c13f3b713ae2c5a1967597a259e67612507ef69748d83d531bba7c9bb0477211771fe78c685e1d52b1a44b64
+    resolve: "npm:^1.22.8"
+  checksum: 10/d8f137d72eec1c53987647d19cd3bd2c64d5417bcd06b9ac8f7a14e83924c1e7636e327df7d96066a2b446b41f50d0bc1856a521388d5e90ba5c3b18dd5ab4e8
   languageName: node
   linkType: hard
 
@@ -13611,7 +13589,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@npm:^1.1.6, resolve@npm:^1.20.0, resolve@npm:^1.22.10, resolve@npm:^1.22.4":
+"resolve@npm:^1.1.6, resolve@npm:^1.20.0, resolve@npm:^1.22.10, resolve@npm:^1.22.4, resolve@npm:^1.22.8":
   version: 1.22.11
   resolution: "resolve@npm:1.22.11"
   dependencies:
@@ -13624,7 +13602,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@patch:resolve@npm%3A^1.1.6#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.20.0#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.10#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.4#optional!builtin<compat/resolve>":
+"resolve@patch:resolve@npm%3A^1.1.6#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.20.0#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.10#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.4#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.8#optional!builtin<compat/resolve>":
   version: 1.22.11
   resolution: "resolve@patch:resolve@npm%3A1.22.11#optional!builtin<compat/resolve>::version=1.22.11&hash=c3c19d"
   dependencies:

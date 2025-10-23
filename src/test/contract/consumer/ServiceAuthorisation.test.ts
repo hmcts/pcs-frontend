@@ -10,6 +10,7 @@ const mockProvider = new Pact({
   logLevel: 'info',
 });
 
+ 
 // temporarily disabled until  DTSPO-27978 is done
 describe.skip('Service Authorisation Consumer Pact Test', () => {
   beforeAll(async () => {

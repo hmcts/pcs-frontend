@@ -44,7 +44,6 @@
     "@hmcts/playwright-common": "1.0.36",
     "@hmcts/properties-volume": "^1.2.0",
     "@launchdarkly/node-server-sdk": "^9.10.0",
-    "@opentelemetry/instrumentation-redis": "^0.55.0",
     "applicationinsights": "3.9.0",
     "axios": "^1.12.0",
     "body-parser": "^2.0.0",
@@ -167,8 +166,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "resolutions": {
-    "validator": "^13.16.0",
-    "@opentelemetry/instrumentation": "0.206.0",
+    "@opentelemetry/instrumentation": "0.204.0",
     "semver": "^7.5.2",
     "axios": "^1.12.0",
     "@types/express-serve-static-core": "*",
