@@ -17,7 +17,7 @@ describe('home.njk renders personal greeting', () => {
     env = nunjucks.configure(
       [
         path.join(__dirname, '../../../../main/views'),
-        path.join(__dirname, '../../../../..', 'node_modules/govuk-frontend/govuk'),
+        path.join(__dirname, '../../../../..', 'node_modules/govuk-frontend/dist/govuk'),
       ],
       {
         autoescape: true,
