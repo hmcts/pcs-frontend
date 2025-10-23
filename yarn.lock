@@ -2870,6 +2870,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opentelemetry/api-logs@npm:0.207.0":
+  version: 0.207.0
+  resolution: "@opentelemetry/api-logs@npm:0.207.0"
+  dependencies:
+    "@opentelemetry/api": "npm:^1.3.0"
+  checksum: 10/d50251e34f1cb8208d02870d3c25a0ba31eb2e33844a1ed5c0107d920bfbb52dbc3a1c5072586501a5096778f90e9ef1ce2fef63fa6ab5908bc1f94099121264
+  languageName: node
+  linkType: hard
+
 "@opentelemetry/api@npm:^1.3.0, @opentelemetry/api@npm:^1.9.0":
   version: 1.9.0
   resolution: "@opentelemetry/api@npm:1.9.0"
@@ -3547,16 +3556,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation@npm:0.204.0":
-  version: 0.204.0
-  resolution: "@opentelemetry/instrumentation@npm:0.204.0"
+"@opentelemetry/instrumentation@npm:0.207.0":
+  version: 0.207.0
+  resolution: "@opentelemetry/instrumentation@npm:0.207.0"
   dependencies:
-    "@opentelemetry/api-logs": "npm:0.204.0"
-    import-in-the-middle: "npm:^1.8.1"
-    require-in-the-middle: "npm:^7.1.1"
+    "@opentelemetry/api-logs": "npm:0.207.0"
+    import-in-the-middle: "npm:^2.0.0"
+    require-in-the-middle: "npm:^8.0.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/a32b93e714e555dc1fca6c212bde565342370f0f62c1421e02cb307193ced1f8167223b3b70adc6e4539bf8508424f56b7249ecb527995406944434b29b73066
+  checksum: 10/ea9b9a7324016116ba5ded98ebf7e8db722625a7408532be707db2ad9f5a760e7f17809097c5fc61b95f135281349534045e0242eaa9fc57c4b508d2ddf4c181
   languageName: node
   linkType: hard
 
@@ -9603,7 +9612,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"import-in-the-middle@npm:^1.14.2, import-in-the-middle@npm:^1.8.1":
+"import-in-the-middle@npm:^1.14.2":
   version: 1.15.0
   resolution: "import-in-the-middle@npm:1.15.0"
   dependencies:
@@ -9612,6 +9621,18 @@ __metadata:
     cjs-module-lexer: "npm:^1.2.2"
     module-details-from-path: "npm:^1.0.3"
   checksum: 10/a1ff65ea557ffe67e63dd67b411255fedd8622b324ff22ba99f4436b8fcf74da0333e62b4e8142f447e5db64a42ec9e65f926d50fa55e89c4e4d64626d8cf5f8
+  languageName: node
+  linkType: hard
+
+"import-in-the-middle@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "import-in-the-middle@npm:2.0.0"
+  dependencies:
+    acorn: "npm:^8.14.0"
+    acorn-import-attributes: "npm:^1.9.5"
+    cjs-module-lexer: "npm:^1.2.2"
+    module-details-from-path: "npm:^1.0.3"
+  checksum: 10/badb8359552f1e9fedc8569299dd1937e802256ce0fe6aa9cb348bca6f217f06e16a3ca46f889bfcb66028a096a1956674d257de9e809db4271ca0e508521c30
   languageName: node
   linkType: hard
 
@@ -13557,14 +13578,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"require-in-the-middle@npm:^7.1.1":
-  version: 7.5.2
-  resolution: "require-in-the-middle@npm:7.5.2"
+"require-in-the-middle@npm:^8.0.0":
+  version: 8.0.1
+  resolution: "require-in-the-middle@npm:8.0.1"
   dependencies:
     debug: "npm:^4.3.5"
     module-details-from-path: "npm:^1.0.3"
-    resolve: "npm:^1.22.8"
-  checksum: 10/d8f137d72eec1c53987647d19cd3bd2c64d5417bcd06b9ac8f7a14e83924c1e7636e327df7d96066a2b446b41f50d0bc1856a521388d5e90ba5c3b18dd5ab4e8
+  checksum: 10/4ce98c681489d383a0ffccb79b06df7a1dffbb31c13f3b713ae2c5a1967597a259e67612507ef69748d83d531bba7c9bb0477211771fe78c685e1d52b1a44b64
   languageName: node
   linkType: hard
 
@@ -13605,7 +13625,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@npm:^1.1.6, resolve@npm:^1.20.0, resolve@npm:^1.22.10, resolve@npm:^1.22.4, resolve@npm:^1.22.8":
+"resolve@npm:^1.1.6, resolve@npm:^1.20.0, resolve@npm:^1.22.10, resolve@npm:^1.22.4":
   version: 1.22.11
   resolution: "resolve@npm:1.22.11"
   dependencies:
@@ -13618,7 +13638,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@patch:resolve@npm%3A^1.1.6#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.20.0#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.10#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.4#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.8#optional!builtin<compat/resolve>":
+"resolve@patch:resolve@npm%3A^1.1.6#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.20.0#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.10#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.4#optional!builtin<compat/resolve>":
   version: 1.22.11
   resolution: "resolve@patch:resolve@npm%3A1.22.11#optional!builtin<compat/resolve>::version=1.22.11&hash=c3c19d"
   dependencies:
