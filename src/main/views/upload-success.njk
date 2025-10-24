@@ -1,0 +1,84 @@
+{% extends "template.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      
+      {{ govukPanel({
+        titleText: "Documents uploaded successfully",
+        html: uploadedDocuments.length + " document(s) uploaded to CDAM"
+      }) }}
+
+      <h2 class="govuk-heading-m">Uploaded Documents</h2>
+
+      {% if uploadedDocuments and uploadedDocuments.length > 0 %}
+        
+        {% for doc in uploadedDocuments %}
+          <div class="govuk-!-margin-bottom-6">
+            <h3 class="govuk-heading-s">Document {{ loop.index }}</h3>
+            
+            <dl class="govuk-summary-list">
+              {% if doc.originalDocumentName %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Filename</dt>
+                <dd class="govuk-summary-list__value">{{ doc.originalDocumentName }}</dd>
+              </div>
+              {% endif %}
+              
+              {% if doc.classification %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Classification</dt>
+                <dd class="govuk-summary-list__value">{{ doc.classification }}</dd>
+              </div>
+              {% endif %}
+              
+              {% if doc._links and doc._links.self and doc._links.self.href %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Document URL</dt>
+                <dd class="govuk-summary-list__value">{{ doc._links.self.href }}</dd>
+              </div>
+              {% endif %}
+              
+              {% if doc._links and doc._links.binary and doc._links.binary.href %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Binary URL</dt>
+                <dd class="govuk-summary-list__value">{{ doc._links.binary.href }}</dd>
+              </div>
+              {% endif %}
+            </dl>
+
+            <details class="govuk-details govuk-!-margin-top-4">
+              <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  View raw CDAM response for this document
+                </span>
+              </summary>
+              <div class="govuk-details__text">
+                <pre style="background: #f3f2f1; padding: 15px; overflow-x: auto; font-size: 14px;"><code>{{ doc | dump(2) }}</code></pre>
+              </div>
+            </details>
+          </div>
+        {% endfor %}
+
+      {% else %}
+        <p class="govuk-body">No documents have been uploaded yet.</p>
+      {% endif %}
+
+      <div class="govuk-button-group govuk-!-margin-top-6">
+        {{ govukButton({
+          text: "Upload more documents",
+          href: "/upload-documents"
+        }) }}
+        
+        {{ govukButton({
+          text: "Go to home",
+          href: "/",
+          classes: "govuk-button--secondary"
+        }) }}
+      </div>
+
+    </div>
+  </div>
+{% endblock %}
