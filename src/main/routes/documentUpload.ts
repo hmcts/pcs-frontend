@@ -4,7 +4,6 @@ import type { UploadedFile } from 'express-fileupload';
 
 import { oidcMiddleware } from '../middleware';
 import { cdamService } from '../services/cdamService';
-import { formatCdamForCcd } from '../utils/documentFormatter';
 
 const logger = Logger.getLogger('documentUpload');
 
@@ -52,7 +51,17 @@ export default function (app: Application): void {
       logger.info(`Successfully uploaded ${cdamResponse.length} documents to CDAM`);
 
       // format CDAM response for CCD
-      const ccdFormattedDocuments = formatCdamForCcd(cdamResponse);
+      const ccdFormattedDocuments = cdamResponse.map(doc => ({
+        id: doc._links?.self?.href?.split('/').pop() || '',
+        value: {
+          documentLink: {
+            document_url: doc._links?.self?.href || '',
+            document_filename: doc.originalDocumentName || '',
+            document_binary_url: doc._links?.binary?.href || '',
+          },
+          comment: doc.description || null,
+        },
+      }));
 
       logger.info(`Formatted ${ccdFormattedDocuments.length} documents for CCD`);
       logger.info('CCD Formatted Documents:', JSON.stringify(ccdFormattedDocuments, null, 2));
