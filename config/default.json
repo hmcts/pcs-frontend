@@ -27,6 +27,11 @@
     "url": "https://ccd-data-store-api-pcs-api-pr-316.preview.platform.hmcts.net",
     "caseTypeId": "PCS-316"
   },
+  "cdam": {
+    "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+  },
+  "caseType": "PCS",
+  "jurisdiction": "PCS",
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
   },

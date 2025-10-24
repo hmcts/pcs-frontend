@@ -4707,6 +4707,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/busboy@npm:*":
+  version: 1.5.4
+  resolution: "@types/busboy@npm:1.5.4"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10/43cdd26754603fbee81f538ac52769f2cc8445d5f238666845d99a9fee22e0b608a075d0c346f78c43ade4ce4ec04433a51a1ffa21524ca29ead9d2375f4ec9c
+  languageName: node
+  linkType: hard
+
 "@types/chai-as-promised@npm:^8.0.0":
   version: 8.0.2
   resolution: "@types/chai-as-promised@npm:8.0.2"
@@ -4827,6 +4836,16 @@ __metadata:
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
   checksum: 10/25a4c16a6752538ffde2826c2cc0c6491d90e69cd6187bef4a006dd2c3c45469f049e643d7e516c515f21484dc3d48fd5c870be158a5beb72f5baf3dc43e4099
+  languageName: node
+  linkType: hard
+
+"@types/express-fileupload@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "@types/express-fileupload@npm:1.5.1"
+  dependencies:
+    "@types/busboy": "npm:*"
+    "@types/express": "npm:*"
+  checksum: 10/15c6c7c5016515ee8e66e1ec765e48e600f048fc6c81aeca10f229897ab9fb14164fe4c1df36c31231c42a8995f753bcf948c653a6a7f2cf2de1e64e00d43a6f
   languageName: node
   linkType: hard
 
@@ -6517,6 +6536,15 @@ __metadata:
   dependencies:
     run-applescript: "npm:^7.0.0"
   checksum: 10/1d966c8d2dbf4d9d394e53b724ac756c2414c45c01340b37743621f59cc565a435024b394ddcb62b9b335d1c9a31f4640eb648c3fec7f97ee74dc0694c9beb6c
+  languageName: node
+  linkType: hard
+
+"busboy@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "busboy@npm:1.6.0"
+  dependencies:
+    streamsearch: "npm:^1.1.0"
+  checksum: 10/bee10fa10ea58e7e3e7489ffe4bda6eacd540a17de9f9cd21cc37e297b2dd9fe52b2715a5841afaec82900750d810d01d7edb4b2d456427f449b92b417579763
   languageName: node
   linkType: hard
 
@@ -8354,6 +8382,15 @@ __metadata:
   version: 3.1.3
   resolution: "exponential-backoff@npm:3.1.3"
   checksum: 10/ca25962b4bbab943b7c4ed0b5228e263833a5063c65e1cdeac4be9afad350aae5466e8e619b5051f4f8d37b2144a2d6e8fcc771b6cc82934f7dade2f964f652c
+  languageName: node
+  linkType: hard
+
+"express-fileupload@npm:^1.5.2":
+  version: 1.5.2
+  resolution: "express-fileupload@npm:1.5.2"
+  dependencies:
+    busboy: "npm:^1.6.0"
+  checksum: 10/f13c5a4d882e4c523b92760ef56f3985a0864b3a236bfafc350e752ab6c9cda0350a181cdaa7d5b263bf3fd83527411ac62c8034c38ad72239dba95b3eea9bf1
   languageName: node
   linkType: hard
 
@@ -12567,6 +12604,7 @@ __metadata:
     "@types/csurf": "npm:^1.11.2"
     "@types/es6-promisify": "npm:^6.0.1"
     "@types/express": "npm:^5.0.1"
+    "@types/express-fileupload": "npm:^1.5.1"
     "@types/express-session": "npm:^1.18.1"
     "@types/git-rev-sync": "npm:^2.0.2"
     "@types/glob": "npm:^8.1.0"
@@ -12605,8 +12643,10 @@ __metadata:
     eslint-plugin-import: "npm:^2.28.0"
     eslint-plugin-jest: "npm:^28.0.0"
     express: "npm:^5.0.0"
+    express-fileupload: "npm:^1.5.2"
     express-nunjucks: "npm:^3.1.1"
     express-session: "npm:^1.18.1"
+    form-data: "npm:^4.0.4"
     git-rev-sync: "npm:^3.0.2"
     glob: "npm:^11.0.0"
     globals: "npm:^16.2.0"
@@ -14386,6 +14426,13 @@ __metadata:
     es-errors: "npm:^1.3.0"
     internal-slot: "npm:^1.1.0"
   checksum: 10/ff36c4db171ee76c936ccfe9541946b77017f12703d4c446652017356816862d3aa029a64e7d4c4ceb484e00ed4a81789333896390d808458638f3a216aa1f41
+  languageName: node
+  linkType: hard
+
+"streamsearch@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "streamsearch@npm:1.1.0"
+  checksum: 10/612c2b2a7dbcc859f74597112f80a42cbe4d448d03da790d5b7b39673c1197dd3789e91cd67210353e58857395d32c1e955a9041c4e6d5bae723436b3ed9ed14
   languageName: node
   linkType: hard
 
