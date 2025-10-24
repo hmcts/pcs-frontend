@@ -4,6 +4,7 @@ import type { UploadedFile } from 'express-fileupload';
 
 import { oidcMiddleware } from '../middleware';
 import { cdamService } from '../services/cdamService';
+import { formatCdamForCcd } from '../utils/documentFormatter';
 
 const logger = Logger.getLogger('documentUpload');
 
@@ -46,15 +47,21 @@ export default function (app: Application): void {
       logger.info('Uploading documents to CDAM for user:', user.uid);
 
       // upload to CDAM
-      const uploadedDocuments = await cdamService.uploadDocuments(files, user.uid as string, user.accessToken);
+      const cdamResponse = await cdamService.uploadDocuments(files, user.uid as string, user.accessToken);
 
-      logger.info(`Successfully uploaded ${uploadedDocuments.length} documents to CDAM`);
+      logger.info(`Successfully uploaded ${cdamResponse.length} documents to CDAM`);
 
-      // store raw CDAM response in session
+      // format CDAM response for CCD
+      const ccdFormattedDocuments = formatCdamForCcd(cdamResponse);
+
+      logger.info(`Formatted ${ccdFormattedDocuments.length} documents for CCD`);
+      logger.info('CCD Formatted Documents:', JSON.stringify(ccdFormattedDocuments, null, 2));
+
+      // store CCD-formatted documents in session
       if (!req.session.uploadedDocuments) {
         req.session.uploadedDocuments = [];
       }
-      req.session.uploadedDocuments.push(...uploadedDocuments);
+      req.session.uploadedDocuments.push(...ccdFormattedDocuments);
 
       // save session and redirect to success page
       req.session.save(err => {

@@ -8,6 +8,10 @@ import { http } from '../modules/http';
 
 const logger = Logger.getLogger('cdamService');
 
+interface CDAMResponse {
+  documents: DocumentManagementFile[];
+}
+
 export class CDAMService {
   private readonly cdamUrl: string;
   private readonly jurisdictionId: string;
@@ -50,7 +54,7 @@ export class CDAMService {
       });
 
       // send request to CDAM
-      const response = await http.post(`${this.cdamUrl}/cases/documents`, formData, {
+      const response = await http.post<CDAMResponse>(`${this.cdamUrl}/cases/documents`, formData, {
         headers: {
           ...formData.getHeaders(),
           Authorization: `Bearer ${accessToken}`,
@@ -63,9 +67,8 @@ export class CDAMService {
       // log the raw response for debugging
       logger.info('CDAM Raw Response:', JSON.stringify(response.data, null, 2));
 
-      // return whatever CDAM sent back
-      const documents = response.data || response || [];
-      const documentsArray = Array.isArray(documents) ? documents : [documents];
+      // extract documents array from CDAM response
+      const documentsArray = response.data?.documents || [];
 
       logger.info(`Successfully uploaded ${documentsArray.length} documents to CDAM`);
       return documentsArray;

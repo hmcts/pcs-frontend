@@ -38,6 +38,19 @@ export interface DocumentManagementFile {
   [key: string]: any; // Allow additional fields from CDAM
 }
 
+// CCD document structure
+export interface CaseDocument {
+  id: string;
+  value: {
+    documentLink: {
+      document_url: string;
+      document_filename: string;
+      document_binary_url: string;
+    };
+    comment: string | null;
+  };
+}
+
 export interface AddressLookupSessionData {
   [stepId: string]: {
     [fieldNamePrefix: string]: {
@@ -58,7 +71,7 @@ interface CustomSessionData extends SessionData {
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
   _addressLookup?: AddressLookupSessionData;
-  uploadedDocuments?: DocumentManagementFile[];
+  uploadedDocuments?: CaseDocument[];
   destroy(callback: (err?: Error) => void): void;
 }
 
