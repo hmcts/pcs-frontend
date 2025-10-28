@@ -141,7 +141,7 @@ export default function (app: Application): void {
       const errorMessage = error instanceof Error ? error.message : 'Failed to submit documents to CCD';
       logger.error('CCD submission error:', error);
 
-      // Show error on the same page (like CDAM errors)
+      // Show error on the same page
       res.status(500).render('upload-success', {
         error: errorMessage,
         uploadedDocuments: req.session.uploadedDocuments || [],
