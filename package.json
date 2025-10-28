@@ -75,7 +75,7 @@
     "require-directory": "^2.1.1",
     "serve-favicon": "^2.5.0",
     "totp-generator": "^1.0.0",
-    "validator": "^13.15.15",
+    "validator": "^13.15.20",
     "zod": "^3.25.32",
     "zod-i18n-map": "^2.27.0"
   },
