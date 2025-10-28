@@ -151,7 +151,7 @@ describe('Document Upload Route', () => {
       routeHandler(mockReq as unknown as Request, mockRes as unknown as Response);
 
       expect(mockRes.status).toHaveBeenCalledWith(500);
-      expect(mockRes.render).toHaveBeenCalledWith('error', { message: 'Failed to load upload page' });
+      expect(mockRes.render).toHaveBeenCalledWith('error', { message: 'Render error' });
     });
   });
 
@@ -480,7 +480,7 @@ describe('Document Upload Route', () => {
       routeHandler(mockReq as unknown as Request, mockRes as unknown as Response);
 
       expect(mockRes.status).toHaveBeenCalledWith(500);
-      expect(mockRes.render).toHaveBeenCalledWith('error', { message: 'Failed to load success page' });
+      expect(mockRes.render).toHaveBeenCalledWith('error', { message: 'Render error' });
     });
   });
 
@@ -641,7 +641,7 @@ describe('Document Upload Route', () => {
       routeHandler(mockReq as unknown as Request, mockRes as unknown as Response);
 
       expect(mockRes.status).toHaveBeenCalledWith(500);
-      expect(mockRes.render).toHaveBeenCalledWith('error', { message: 'Failed to load success page' });
+      expect(mockRes.render).toHaveBeenCalledWith('error', { message: 'Render error' });
     });
   });
 });

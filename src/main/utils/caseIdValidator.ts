@@ -1,5 +1,5 @@
 // Hardcoded case ID for document uploads
-export const CASE_ID = '1761661176604037';
+export const CASE_ID = '1761673515643527';
 
 // Case ID validation regex (16 digits only)
 export const CASE_ID_PATTERN = /^\d{16}$/;

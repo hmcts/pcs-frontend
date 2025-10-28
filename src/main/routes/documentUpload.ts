@@ -6,6 +6,12 @@ import { oidcMiddleware } from '../middleware';
 import { ccdCaseService } from '../services/ccdCaseService';
 import { cdamService } from '../services/cdamService';
 import { CASE_ID } from '../utils/caseIdValidator';
+import {
+  getUploadedDocuments,
+  handleRouteError,
+  saveSessionAndRedirect,
+  validateUserAuth,
+} from '../utils/documentUploadHelpers';
 
 const logger = Logger.getLogger('documentUpload');
 
@@ -13,14 +19,13 @@ export default function (app: Application): void {
   // GET /upload-documents - Display upload form
   app.get('/upload-documents', oidcMiddleware, (req: Request, res: Response) => {
     try {
-      const uploadedDocuments = req.session.uploadedDocuments || [];
+      const uploadedDocuments = getUploadedDocuments(req);
 
       res.render('upload-documents', {
         uploadedDocuments,
       });
     } catch (error: unknown) {
-      logger.error('Error displaying upload form:', error);
-      res.status(500).render('error', { message: 'Failed to load upload page' });
+      handleRouteError(error, res, 'load upload page');
     }
   });
 
@@ -31,15 +36,14 @@ export default function (app: Application): void {
       if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).render('upload-documents', {
           error: 'No files were uploaded',
-          uploadedDocuments: req.session.uploadedDocuments || [],
+          uploadedDocuments: getUploadedDocuments(req),
         });
       }
 
       // get user info from session
-      const user = req.session.user;
-      if (!user || !user.accessToken || !user.uid) {
-        logger.error('User session missing required auth data');
-        return res.status(401).render('error', { message: 'Authentication required' });
+      const user = validateUserAuth(req, res);
+      if (!user || !user.uid) {
+        return;
       }
 
       // get uploaded files
@@ -71,20 +75,10 @@ export default function (app: Application): void {
       req.session.uploadedDocuments.push(...ccdFormattedDocuments);
 
       // save session and redirect to success page
-      req.session.save(err => {
-        if (err) {
-          logger.error('Session save error:', err);
-          return res.status(500).render('error', { message: 'Failed to save upload session' });
-        }
-
-        res.redirect('/upload-success');
-      });
+      saveSessionAndRedirect(req, res, '/upload-success', 'Failed to save upload session');
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to upload documents';
-      logger.error('Document upload error:', error);
-      res.status(500).render('upload-documents', {
-        error: errorMessage,
-        uploadedDocuments: req.session.uploadedDocuments || [],
+      handleRouteError(error, res, 'upload documents', 'upload-documents', {
+        uploadedDocuments: getUploadedDocuments(req),
       });
     }
   });
@@ -92,14 +86,13 @@ export default function (app: Application): void {
   // GET /upload-success - display success page with uploaded documents
   app.get('/upload-success', oidcMiddleware, (req: Request, res: Response) => {
     try {
-      const uploadedDocuments = req.session.uploadedDocuments || [];
+      const uploadedDocuments = getUploadedDocuments(req);
 
       res.render('upload-success', {
         uploadedDocuments,
       });
     } catch (error: unknown) {
-      logger.error('Error displaying success page:', error);
-      res.status(500).render('error', { message: 'Failed to load success page' });
+      handleRouteError(error, res, 'load success page');
     }
   });
 
@@ -107,14 +100,13 @@ export default function (app: Application): void {
   app.post('/submit-to-ccd', oidcMiddleware, async (req: Request, res: Response) => {
     try {
       // Get user info from session
-      const user = req.session.user;
-      if (!user || !user.accessToken) {
-        logger.error('User session missing required auth data');
-        return res.status(401).render('error', { message: 'Authentication required' });
+      const user = validateUserAuth(req, res);
+      if (!user) {
+        return;
       }
 
       // Get documents from session (already formatted for CCD)
-      const documentsToSubmit = req.session.uploadedDocuments || [];
+      const documentsToSubmit = getUploadedDocuments(req);
 
       if (documentsToSubmit.length === 0) {
         return res.status(400).render('upload-success', {
@@ -130,21 +122,11 @@ export default function (app: Application): void {
       req.session.uploadedDocuments = [];
 
       // Redirect to CCD success page
-      req.session.save(err => {
-        if (err) {
-          logger.error('Session save error:', err);
-          return res.status(500).render('error', { message: 'Failed to save session' });
-        }
-        res.redirect('/ccd-success');
-      });
+      saveSessionAndRedirect(req, res, '/ccd-success');
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to submit documents to CCD';
-      logger.error('CCD submission error:', error);
-
       // Show error on the same page
-      res.status(500).render('upload-success', {
-        error: errorMessage,
-        uploadedDocuments: req.session.uploadedDocuments || [],
+      handleRouteError(error, res, 'submit documents to CCD', 'upload-success', {
+        uploadedDocuments: getUploadedDocuments(req),
       });
     }
   });
@@ -154,8 +136,7 @@ export default function (app: Application): void {
     try {
       res.render('ccd-success');
     } catch (error: unknown) {
-      logger.error('Error displaying CCD success page:', error);
-      res.status(500).render('error', { message: 'Failed to load success page' });
+      handleRouteError(error, res, 'load CCD success page');
     }
   });
 }
