@@ -1,0 +1,33 @@
+{% extends "template.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      
+      {{ govukPanel({
+        titleText: "Documents submitted to CCD successfully",
+        html: "Your documents have been stored in the case management system"
+      }) }}
+
+      <h2 class="govuk-heading-m">What happens next</h2>
+      <p class="govuk-body">Your documents have been successfully uploaded to CDAM and submitted to the CCD case management system.</p>
+      <p class="govuk-body">The documents are now part of your case record and can be accessed by the relevant parties.</p>
+
+      <div class="govuk-button-group govuk-!-margin-top-6">
+        {{ govukButton({
+          text: "Upload more documents",
+          href: "/upload-documents"
+        }) }}
+        
+        {{ govukButton({
+          text: "Go to home",
+          href: "/",
+          classes: "govuk-button--secondary"
+        }) }}
+      </div>
+
+    </div>
+  </div>
+{% endblock %}

@@ -3,7 +3,9 @@ import { Application, Request, Response } from 'express';
 import type { UploadedFile } from 'express-fileupload';
 
 import { oidcMiddleware } from '../middleware';
+import { ccdCaseService } from '../services/ccdCaseService';
 import { cdamService } from '../services/cdamService';
+import { CASE_ID } from '../utils/caseIdValidator';
 
 const logger = Logger.getLogger('documentUpload');
 
@@ -43,27 +45,23 @@ export default function (app: Application): void {
       // get uploaded files
       const files = req.files.documents as UploadedFile | UploadedFile[];
 
-      logger.info('Uploading documents to CDAM for user:', user.uid);
-
       // upload to CDAM
       const cdamResponse = await cdamService.uploadDocuments(files, user.uid as string, user.accessToken);
-
-      logger.info(`Successfully uploaded ${cdamResponse.length} documents to CDAM`);
 
       // format CDAM response for CCD
       const ccdFormattedDocuments = cdamResponse.map(doc => ({
         id: doc._links?.self?.href?.split('/').pop() || '',
         value: {
-          documentLink: {
+          documentType: 'LETTER_FROM_CLAIMANT',
+          document: {
             document_url: doc._links?.self?.href || '',
             document_filename: doc.originalDocumentName || '',
             document_binary_url: doc._links?.binary?.href || '',
           },
-          comment: doc.description || null,
+          description: doc.description || null,
         },
       }));
 
-      logger.info(`Formatted ${ccdFormattedDocuments.length} documents for CCD`);
       logger.info('CCD Formatted Documents:', JSON.stringify(ccdFormattedDocuments, null, 2));
 
       // store CCD-formatted documents in session
@@ -101,6 +99,62 @@ export default function (app: Application): void {
       });
     } catch (error: unknown) {
       logger.error('Error displaying success page:', error);
+      res.status(500).render('error', { message: 'Failed to load success page' });
+    }
+  });
+
+  // POST /submit-to-ccd - submit documents to CCD
+  app.post('/submit-to-ccd', oidcMiddleware, async (req: Request, res: Response) => {
+    try {
+      // Get user info from session
+      const user = req.session.user;
+      if (!user || !user.accessToken) {
+        logger.error('User session missing required auth data');
+        return res.status(401).render('error', { message: 'Authentication required' });
+      }
+
+      // Get documents from session (already formatted for CCD)
+      const documentsToSubmit = req.session.uploadedDocuments || [];
+
+      if (documentsToSubmit.length === 0) {
+        return res.status(400).render('upload-success', {
+          error: 'No documents to submit',
+          uploadedDocuments: documentsToSubmit,
+        });
+      }
+
+      // Send to CCD
+      await ccdCaseService.updateCaseDocuments(user.accessToken, CASE_ID, documentsToSubmit);
+
+      // Clear uploaded documents from session since they're now in CCD
+      req.session.uploadedDocuments = [];
+
+      // Redirect to CCD success page
+      req.session.save(err => {
+        if (err) {
+          logger.error('Session save error:', err);
+          return res.status(500).render('error', { message: 'Failed to save session' });
+        }
+        res.redirect('/ccd-success');
+      });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit documents to CCD';
+      logger.error('CCD submission error:', error);
+
+      // Show error on the same page (like CDAM errors)
+      res.status(500).render('upload-success', {
+        error: errorMessage,
+        uploadedDocuments: req.session.uploadedDocuments || [],
+      });
+    }
+  });
+
+  // GET /ccd-success - display CCD submission success page
+  app.get('/ccd-success', oidcMiddleware, (req: Request, res: Response) => {
+    try {
+      res.render('ccd-success');
+    } catch (error: unknown) {
+      logger.error('Error displaying CCD success page:', error);
       res.status(500).render('error', { message: 'Failed to load success page' });
     }
   });

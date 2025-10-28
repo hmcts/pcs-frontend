@@ -42,12 +42,13 @@ export interface DocumentManagementFile {
 export interface CaseDocument {
   id: string;
   value: {
-    documentLink: {
+    documentType: string;
+    document: {
       document_url: string;
       document_filename: string;
       document_binary_url: string;
     };
-    comment: string | null;
+    description: string | null;
   };
 }
 

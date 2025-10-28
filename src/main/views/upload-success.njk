@@ -1,11 +1,23 @@
 {% extends "template.njk" %}
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       
+      {% if error %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: [
+            {
+              text: error
+            }
+          ]
+        }) }}
+      {% endif %}
+
       {{ govukPanel({
         titleText: "Documents uploaded successfully",
         html: uploadedDocuments.length + " document(s) uploaded to CDAM"
@@ -72,11 +84,12 @@
           href: "/upload-documents"
         }) }}
         
-        {{ govukButton({
-          text: "Go to home",
-          href: "/",
-          classes: "govuk-button--secondary"
-        }) }}
+        <form method="POST" action="/submit-to-ccd" style="display: inline;">
+          {{ govukButton({
+            text: "Submit to CCD",
+            classes: "govuk-button--secondary"
+          }) }}
+        </form>
       </div>
 
     </div>

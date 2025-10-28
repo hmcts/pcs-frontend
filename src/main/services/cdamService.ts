@@ -36,8 +36,6 @@ export class CDAMService {
     accessToken: string
   ): Promise<DocumentManagementFile[]> {
     try {
-      logger.info('Uploading documents to CDAM');
-
       // create FormData with CDAM parameters
       const formData = new FormData();
       formData.append('classification', 'PUBLIC');
@@ -64,13 +62,12 @@ export class CDAMService {
         maxBodyLength: Infinity,
       });
 
-      // log the raw response for debugging
-      logger.info('CDAM Raw Response:', JSON.stringify(response.data, null, 2));
-
       // extract documents array from CDAM response
       const documentsArray = response.data?.documents || [];
 
-      logger.info(`Successfully uploaded ${documentsArray.length} documents to CDAM`);
+      // log the raw response
+      logger.info('CDAM Raw Response:', JSON.stringify(response.data, null, 2));
+
       return documentsArray;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
