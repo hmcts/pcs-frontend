@@ -75,6 +75,27 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
+  async getCaseByReference(accessToken: string | undefined, caseId: string): Promise<CcdCase | null> {
+    const url = `${getBaseUrl()}/cases/${caseId}`;
+    const headersConfig = getCaseHeaders(accessToken || '');
+
+    logger.info(`[ccdCaseService] Calling getCaseByReference with URL: ${url}`);
+
+    try {
+      const response = await http.get<CcdCase>(url, headersConfig);
+      logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response?.data, null, 2)}`);
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 404) {
+        logger.warn(`[ccdCaseService] Case ${caseId} not found, returning null.`);
+        return null;
+      }
+      logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+      throw error;
+    }
+  },
+
   async getCase(accessToken: string | undefined): Promise<CcdCase | null> {
     const url = `${getBaseUrl()}/searchCases?ctid=${getCaseTypeId()}`;
     const headersConfig = getCaseHeaders(accessToken || '');
