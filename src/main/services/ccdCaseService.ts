@@ -4,6 +4,7 @@ import config from 'config';
 
 import { CaseState, CcdCase, CcdCaseData, CcdUserCases } from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
+import { sanitizeCaseId, validateCaseId } from '../utils/caseIdValidator';
 
 const logger = Logger.getLogger('ccdCaseService');
 
@@ -32,13 +33,11 @@ function getCaseHeaders(token: string) {
 
 async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
-    logger.info(`[ccdCaseService] Calling getEventToken with URL: ${url}`);
     const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
-    logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.token;
   } catch (error) {
     const axiosError = error as AxiosError;
-    logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+    logger.error(`[ccdCaseService] Event token error: ${axiosError.message}`);
     throw error;
   }
 }
@@ -51,25 +50,21 @@ async function submitEvent(
   data: CcdCaseData
 ): Promise<CcdCase> {
   const payload = {
-    data,
     event: {
       id: eventId,
-      summary: `Citizen ${eventId} summary`,
-      description: `Citizen ${eventId} description`,
     },
+    data,
     event_token: eventToken,
-    ignore_warning: false,
   };
 
   try {
-    logger.info(`[ccdCaseService] Calling submitEvent with URL: ${url}`);
-    logger.info(`[ccdCaseService] Payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info('[CCD] Payload:', JSON.stringify(payload, null, 2));
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response.data, null, 2)}`);
+    logger.info('[CCD] Response:', JSON.stringify(response.data, null, 2));
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError;
-    logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+    logger.error(`[CCD] Error: ${axiosError.message}`);
     throw error;
   }
 }
@@ -84,12 +79,9 @@ export const ccdCaseService = {
       sort: [{ created_date: { order: 'desc' } }],
     };
 
-    logger.info(`[ccdCaseService] Calling ccdCaseService search with URL: ${url}`);
-
     try {
       const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
       const allCases = response?.data?.cases;
-      logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response?.data?.cases, null, 2)}`);
       const draftCase = allCases?.find(c => c.state === CaseState.DRAFT);
 
       if (draftCase) {
@@ -103,10 +95,9 @@ export const ccdCaseService = {
     } catch (error) {
       const axiosError = error as AxiosError;
       if (axiosError.response?.status === 404) {
-        logger.warn('[ccdCaseService] No case found, returning null.');
         return null;
       }
-      logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+      logger.error(`[CCD] Get case error: ${axiosError.message}`);
       throw error;
     }
   },
@@ -137,5 +128,42 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
     return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
+  },
+
+  async updateCaseDocuments(
+    accessToken: string,
+    caseId: string,
+    documents: {
+      id: string;
+      value: {
+        documentType: string;
+        document: {
+          document_url: string;
+          document_filename: string;
+          document_binary_url: string;
+        };
+        description: string | null;
+      };
+    }[]
+  ): Promise<CcdCase> {
+    // Validate case ID to prevent SSRF attacks
+    if (!validateCaseId(caseId)) {
+      throw new Error('Invalid case ID format');
+    }
+
+    const sanitizedCaseId = sanitizeCaseId(caseId);
+
+    // Get event token
+    const eventUrl = `${getBaseUrl()}/cases/${sanitizedCaseId}/event-triggers/citizenUpdateApplication`;
+    const eventToken = await getEventToken(accessToken, eventUrl);
+
+    // Prepare data with documents
+    const caseData: CcdCaseData = {
+      citizenDocuments: documents,
+    };
+
+    // Submit to CCD
+    const url = `${getBaseUrl()}/cases/${sanitizedCaseId}/events`;
+    return submitEvent(accessToken, url, 'citizenUpdateApplication', eventToken, caseData);
   },
 };

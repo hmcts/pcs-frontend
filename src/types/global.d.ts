@@ -11,6 +11,47 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   refreshToken: string;
 }
 
+// Document structure for CDAM uploads
+export interface DocumentManagementFile {
+  classification?: string;
+  size?: number;
+  mimeType?: string;
+  originalDocumentName?: string;
+  hashToken?: string;
+  createdOn?: string;
+  createdBy?: string;
+  lastModifiedBy?: string;
+  modifiedOn?: string;
+  ttl?: string;
+  metadata?: {
+    case_type_id?: string;
+    jurisdiction?: string;
+  };
+  _links?: {
+    self?: {
+      href?: string;
+    };
+    binary?: {
+      href?: string;
+    };
+  };
+  [key: string]: any; // Allow additional fields from CDAM
+}
+
+// CCD document structure
+export interface CaseDocument {
+  id: string;
+  value: {
+    documentType: string;
+    document: {
+      document_url: string;
+      document_filename: string;
+      document_binary_url: string;
+    };
+    description: string | null;
+  };
+}
+
 export interface AddressLookupSessionData {
   [stepId: string]: {
     [fieldNamePrefix: string]: {
@@ -31,6 +72,7 @@ interface CustomSessionData extends SessionData {
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
   _addressLookup?: AddressLookupSessionData;
+  uploadedDocuments?: CaseDocument[];
   destroy(callback: (err?: Error) => void): void;
 }
 

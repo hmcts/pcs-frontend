@@ -1,0 +1,55 @@
+{% extends "template.njk" %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      
+      <h1 class="govuk-heading-xl">Upload Documents</h1>
+
+      {% if error %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: [
+            {
+              text: error,
+              href: "#documents"
+            }
+          ]
+        }) }}
+      {% endif %}
+
+      <p class="govuk-body">
+        Upload documents to CDAM (Case Document Access Management).
+      </p>
+
+      <form action="/upload-documents" method="post" enctype="multipart/form-data" novalidate>
+        {{ govukFileUpload({
+          id: "documents",
+          name: "documents",
+          label: {
+            text: "Select files to upload",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: "You can select multiple files"
+          },
+          attributes: {
+            multiple: "multiple"
+          },
+          errorMessage: {
+            text: error
+          } if error
+        }) }}
+
+        {{ govukButton({
+          text: "Upload documents",
+          type: "submit"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

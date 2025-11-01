@@ -32,6 +32,18 @@ export interface CcdCaseData {
     PostCode: string;
     Country: string;
   };
+  citizenDocuments?: {
+    id: string;
+    value: {
+      documentType: string;
+      document: {
+        document_url: string;
+        document_filename: string;
+        document_binary_url: string;
+      };
+      description: string | null;
+    };
+  }[];
 }
 
 export interface CcdCase {

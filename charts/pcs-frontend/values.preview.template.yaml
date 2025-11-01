@@ -12,6 +12,8 @@ nodejs:
   environment:
     REDIS_CONNECTION_STRING: redis://${SERVICE_NAME}-redis-master:6379
     OIDC_REDIRECT_URI: 'https://${SERVICE_FQDN}/oauth2/callback'
+    CCD_URL: 'https://ccd-data-store-api-pcs-api-pr-833.preview.platform.hmcts.net'
+    CASE_TYPE_ID: 'PCS-833'
 redis:
   image:
     registry: hmctspublic.azurecr.io
