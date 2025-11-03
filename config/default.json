@@ -24,10 +24,10 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-833.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-833"
+    "url": "https://ccd-data-store-api-pcs-api-pr-875.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-875"
   },
-  "caseReference": "1762166433671216",
+  "caseReference": "1762185183640486",
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
   },
