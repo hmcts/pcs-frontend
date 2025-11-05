@@ -3,7 +3,7 @@ import { CASE_ID, CASE_ID_PATTERN, sanitizeCaseId, validateCaseId } from '../../
 describe('caseIdValidator', () => {
   describe('Constants', () => {
     it('should export CASE_ID with correct value', () => {
-      expect(CASE_ID).toBe('1762341630169013');
+      expect(CASE_ID).toBe('1762343012234472');
       expect(CASE_ID).toHaveLength(16);
     });
 
