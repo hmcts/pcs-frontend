@@ -24,8 +24,8 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-875.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-875"
+    "url": "https://ccd-data-store-api-pcs-api-pr-897.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-897"
   },
   "caseReference": "1762189553821023",
   "osPostcodeLookup": {
