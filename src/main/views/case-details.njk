@@ -29,17 +29,6 @@
     </dl>
 
     <h2 class="govuk-heading-m">Case Data</h2>
-    
-    {# <details class="govuk-details" data-module="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          View raw case data (JSON)
-        </span>
-      </summary>
-      <div class="govuk-details__text">
-        <pre style="background: #f3f2f1; padding: 20px; overflow-x: auto;">{{ caseData | dump(2) }}</pre>
-      </div>
-    </details> #}
 
     {% if caseData.data %}
       
@@ -75,9 +64,13 @@
               <ul class="govuk-list">
                 {% for doc in caseData.data.tenancyLicenceDocuments %}
                   <li>
-                    <a href="{{ doc.value.document_binary_url }}" class="govuk-link" target="_blank" rel="noopener noreferrer">
-                      {{ doc.value.document_filename }}
-                    </a>
+                    {% if doc.documentUuid %}
+                      <a href="/documents/{{ doc.documentUuid }}/download" class="govuk-link">
+                        {{ doc.value.document_filename }}
+                      </a>
+                    {% else %}
+                      <span class="govuk-body">{{ doc.value.document_filename }} (Unable to download - invalid document URL)</span>
+                    {% endif %}
                   </li>
                 {% endfor %}
               </ul>

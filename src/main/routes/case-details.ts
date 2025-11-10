@@ -4,6 +4,7 @@ import { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware/oidc';
 import { ccdCaseService } from '../services/ccdCaseService';
+import { documentIdExtractor } from '../services/documentClient';
 
 export default function (app: Application): void {
   const logger = Logger.getLogger('case-details');
@@ -28,6 +29,33 @@ export default function (app: Application): void {
       }
 
       logger.info(`[case-details] Successfully retrieved case data for: ${caseReference}`);
+
+      // Pre-process documents to extract the document UUID for download links
+      if (caseData?.data?.tenancyLicenceDocuments) {
+        caseData.data.tenancyLicenceDocuments = caseData.data.tenancyLicenceDocuments.map(doc => {
+          logger.info(`[case-details] Processing document with binary URL: ${doc.value.document_binary_url}`);
+          const extractedUuid = documentIdExtractor(doc.value.document_binary_url);
+          logger.info(`[case-details] Extracted UUID: ${extractedUuid}`);
+
+          if (!extractedUuid) {
+            logger.warn(
+              `[case-details] Failed to extract UUID from: ${doc.value.document_binary_url}, trying document_url: ${doc.value.document_url}`
+            );
+            // Try document_url as fallback
+            const fallbackUuid = documentIdExtractor(doc.value.document_url);
+            logger.info(`[case-details] Fallback UUID from document_url: ${fallbackUuid}`);
+            return {
+              ...doc,
+              documentUuid: fallbackUuid,
+            };
+          }
+
+          return {
+            ...doc,
+            documentUuid: extractedUuid,
+          };
+        });
+      }
 
       res.render('case-details', {
         caseReference,
