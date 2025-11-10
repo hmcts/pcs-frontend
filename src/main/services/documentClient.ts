@@ -72,7 +72,8 @@ export class DocumentClient {
 
       return new FileResponse(contentType, fileName, response.data);
     } catch (error) {
-      logger.error(`[documentClient] Error retrieving document ${documentId}:`, error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error(`[documentClient] Error retrieving document ${documentId}: ${errorMessage}`);
       throw error;
     }
   }

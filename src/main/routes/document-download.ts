@@ -33,7 +33,8 @@ export default function (app: Application): void {
 
       logger.info(`[document-download] Successfully downloaded document ${fileResponse.fileName}`);
     } catch (error) {
-      logger.error('[document-download] Failed to download document:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error(`[document-download] Failed to download document: ${errorMessage}`);
       res.status(500).send('Failed to download document');
     }
   });
