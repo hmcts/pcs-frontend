@@ -6,11 +6,6 @@ import { http } from '../modules/http';
 
 const logger = Logger.getLogger('documentClient');
 
-/**
- * Extract document ID (UUID) from document_binary_url
- * Example: http://dm-store:8080/documents/ef47045d-29d9-4a60-a7e9-cf22a0b8adab/binary
- * Returns: ef47045d-29d9-4a60-a7e9-cf22a0b8adab
- */
 export function documentIdExtractor(documentBinaryUrl: string): string | undefined {
   if (!documentBinaryUrl) {
     return undefined;
