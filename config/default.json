@@ -24,8 +24,8 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-897.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-897"
+    "url": "https://ccd-data-store-api-pcs-api-pr-925.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-925"
   },
   "cdam": {
     "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
