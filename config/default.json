@@ -15,7 +15,7 @@
     "deadline": 15000
   },
   "api": {
-    "url": "https://pcs-api-pr-897.preview.platform.hmcts.net"
+    "url": "http://pcs-api-aat.service.core-compute-aat.internal"
   },
   "s2s": {
     "microservice": "pcs_frontend",
@@ -27,6 +27,11 @@
     "url": "https://ccd-data-store-api-pcs-api-pr-897.preview.platform.hmcts.net",
     "caseTypeId": "PCS-897"
   },
+  "cdam": {
+    "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+  },
+  "caseType": "PCS",
+  "jurisdiction": "PCS",
   "caseReference": "1762504013272874",
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
