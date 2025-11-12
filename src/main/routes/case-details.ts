@@ -30,6 +30,17 @@ export default function (app: Application): void {
 
       logger.info(`[case-details] Successfully retrieved case data for: ${caseReference}`);
 
+      // Store case ID in session for SSRF protection
+      if (caseData.id) {
+        if (!req.session.authorisedCaseIds) {
+          req.session.authorisedCaseIds = [];
+        }
+        if (!req.session.authorisedCaseIds.includes(caseData.id)) {
+          req.session.authorisedCaseIds.push(caseData.id);
+          logger.info(`[case-details] Added case ${caseData.id} to authorised cases in session`);
+        }
+      }
+
       // Pre-process documents to extract the document UUID for download links
       if (caseData?.data?.tenancyLicenceDocuments) {
         caseData.data.tenancyLicenceDocuments = caseData.data.tenancyLicenceDocuments.map(doc => {
