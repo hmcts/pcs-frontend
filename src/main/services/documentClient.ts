@@ -45,17 +45,16 @@ export class DocumentClient {
 
   /**
    * Retrieve document from PCS API
-   * @param caseId - The case ID
    * @param documentId - The document UUID extracted from document_binary_url
    * @param accessToken - User's authentication token
    * @returns FileResponse containing file metadata and binary data
    */
-  async retrieveDocument(caseId: string, documentId: string, accessToken: string): Promise<FileResponse> {
+  async retrieveDocument(documentId: string, accessToken: string): Promise<FileResponse> {
     try {
-      logger.info(`[documentClient] Retrieving document ${documentId} for case ${caseId} from ${this.baseUrl}`);
+      logger.info(`[documentClient] Retrieving document ${documentId} from ${this.baseUrl}`);
 
       const response: AxiosResponse<Buffer> = await http.get(
-        `${this.baseUrl}/case/document/downloadDocument/${caseId}/${documentId}`,
+        `${this.baseUrl}/case/document/downloadDocument/${documentId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

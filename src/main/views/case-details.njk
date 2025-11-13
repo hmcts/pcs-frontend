@@ -65,7 +65,7 @@
                 {% for doc in caseData.data.tenancyLicenceDocuments %}
                   <li>
                     {% if doc.documentUuid %}
-                      <a href="/case/{{ caseData.id }}/documents/{{ doc.documentUuid }}/download" class="govuk-link">
+                      <a href="/documents/{{ doc.documentUuid }}/download" class="govuk-link">
                         {{ doc.value.document_filename }}
                       </a>
                     {% else %}

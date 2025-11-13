@@ -31,7 +31,6 @@ interface CustomSessionData extends SessionData {
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
   _addressLookup?: AddressLookupSessionData;
-  authorisedCaseIds?: string[];
   destroy(callback: (err?: Error) => void): void;
 }
 
