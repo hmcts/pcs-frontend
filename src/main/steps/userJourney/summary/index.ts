@@ -5,7 +5,6 @@ import { TranslationContent, loadTranslations } from '../../../app/utils/loadTra
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'summary';
 
@@ -28,22 +27,20 @@ export const step: StepDefinition = {
         ...generateContent(lang),
         userDetails,
         address,
-        backUrl: `/steps/user-journey/enter-address?lang=${lang}`,
+        // i18next-http-middleware handles language via cookies, no query string needed
+        backUrl: '/steps/user-journey/enter-address',
         lang,
       };
     }),
   postController: {
     post: async (req: Request, res: Response) => {
       try {
-        const lang: SupportedLang = getValidatedLanguage(req);
-
         if (req.session.ccdCase && req.session.user) {
           await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
         }
+        // i18next-http-middleware handles language via cookies, no query string needed
         const redirectPath = '/steps/user-journey/application-submitted' as const;
-        const qs = new URLSearchParams({ lang }).toString();
-
-        res.redirect(303, `${redirectPath}?${qs}`);
+        res.redirect(303, redirectPath);
       } catch {
         res.status(500).send('There was an error submitting your application.');
       }

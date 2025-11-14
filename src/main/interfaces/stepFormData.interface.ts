@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 
 import { GetController } from '../app/controller/GetController';
-import { type SupportedLang } from '../utils/getValidatedLanguage';
+import { type SupportedLang } from '../utils/getLanguageFromRequest';
 
 export interface ErrorField {
   field: string;
@@ -30,4 +30,15 @@ export interface StepDefinition {
   getController: GetController | ((lang?: SupportedLang) => GetController);
   postController?: { post: RequestHandler };
   middleware?: RequestHandler[];
+
+  // Dynamic navigation
+  getNextStep?: (formData: Record<string, unknown>, allData: Record<string, unknown>) => string | null; // Returns step name or null if end of journey
+
+  getPreviousStep?: (allData: Record<string, unknown>) => string | null; // Returns step name or null if first step
+
+  // Step metadata (optional, for better organization)
+  stepNumber?: number;
+  section?: string;
+  prerequisites?: string[]; // Step names that must be completed first
+  description?: string;
 }

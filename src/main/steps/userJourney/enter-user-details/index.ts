@@ -7,7 +7,7 @@ import { TranslationContent, loadTranslations } from '../../../app/utils/loadTra
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
+import { SupportedLang, getLanguageFromRequest } from '../../../utils/getLanguageFromRequest';
 
 const stepName = 'enter-user-details';
 
@@ -55,7 +55,7 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
-      const lang: SupportedLang = getValidatedLanguage(req);
+      const lang: SupportedLang = getLanguageFromRequest(req);
       const content = generateContent(lang);
       const fields = getFields(content);
       const errors = validateForm(req, fields, content);
@@ -71,7 +71,6 @@ export const step: StepDefinition = {
       setFormData(req, stepName, req.body);
       const ccdCase = req.session.ccdCase;
       const user = req.session.user;
-
       if (ccdCase?.id) {
         req.session.ccdCase = await ccdCaseService.updateCase(user?.accessToken, {
           id: ccdCase.id,
@@ -88,10 +87,9 @@ export const step: StepDefinition = {
         });
       }
 
+      // i18next-http-middleware handles language via cookies, no query string needed
       const redirectPath = '/steps/user-journey/enter-address' as const;
-      const qs = new URLSearchParams({ lang }).toString();
-
-      res.redirect(303, `${redirectPath}?${qs}`);
+      res.redirect(303, redirectPath);
     },
   },
 };

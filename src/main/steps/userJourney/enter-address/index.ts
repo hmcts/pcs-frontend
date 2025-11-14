@@ -8,7 +8,7 @@ import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
-import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
+import { SupportedLang, getLanguageFromRequest } from '../../../utils/getLanguageFromRequest';
 
 const stepName = 'enter-address';
 
@@ -63,19 +63,19 @@ export const step: StepDefinition = {
         addressResults,
         error,
         selectedAddressIndex: savedData?.selectedAddressIndex || null,
-        backUrl: `/steps/user-journey/enter-user-details?lang=${lang}`,
+        // i18next-http-middleware handles language via cookies, no query string needed
+        backUrl: '/steps/user-journey/enter-user-details',
       };
     });
   },
   postController: {
     post: async (req: Request, res: Response) => {
       const { action, lookupPostcode, selectedAddressIndex } = req.body;
-      const lang: SupportedLang = getValidatedLanguage(req);
+      const lang: SupportedLang = getLanguageFromRequest(req);
       const content = generateContent(lang);
 
       const enterAddressPath = '/steps/user-journey/enter-address' as const;
       const summaryPath = '/steps/user-journey/summary' as const;
-      const qs = new URLSearchParams({ lang }).toString();
 
       // 🔹 Handle Find Address
       if (action === 'find-address') {
@@ -85,7 +85,8 @@ export const step: StepDefinition = {
             field: 'lookupPostcode',
             text: content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode',
           };
-          return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
+          // i18next-http-middleware handles language via cookies, no query string needed
+          return res.redirect(303, `${enterAddressPath}?lookup=1`);
         }
 
         try {
@@ -98,12 +99,12 @@ export const step: StepDefinition = {
               text: content.errors?.noAddressesFound || 'No addresses found for that postcode',
             };
 
-            return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
+            return res.redirect(303, `${enterAddressPath}?lookup=1`);
           }
 
           req.session.lookupPostcode = lookupPostcode;
           req.session.postcodeLookupResult = addressResults;
-          return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
+          return res.redirect(303, `${enterAddressPath}?lookup=1`);
         } catch {
           req.session.lookupPostcode = lookupPostcode;
 
@@ -111,7 +112,7 @@ export const step: StepDefinition = {
             field: 'lookupPostcode',
             text: content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
           };
-          return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
+          return res.redirect(303, `${enterAddressPath}?lookup=1`);
         }
       }
 
@@ -133,7 +134,8 @@ export const step: StepDefinition = {
           });
         }
 
-        return res.redirect(303, `${enterAddressPath}?${qs}`);
+        // i18next-http-middleware handles language via cookies, no query string needed
+        return res.redirect(303, enterAddressPath);
       }
 
       // 🔹 Handle Final Submission
@@ -160,7 +162,8 @@ export const step: StepDefinition = {
             },
             errorSummaryTitle: content.errorSummaryTitle,
             addressResults: req.session.postcodeLookupResult || null,
-            backUrl: `/steps/user-journey/enter-user-details?lang=${lang}`,
+            // i18next-http-middleware handles language via cookies, no query string needed
+            backUrl: '/steps/user-journey/enter-user-details',
           });
         }
 
@@ -185,9 +188,11 @@ export const step: StepDefinition = {
             },
           });
         }
-        return res.redirect(303, `${summaryPath}?${qs}`);
+        // i18next-http-middleware handles language via cookies, no query string needed
+        return res.redirect(303, summaryPath);
       }
-      return res.redirect(303, `${enterAddressPath}?${qs}`);
+      // i18next-http-middleware handles language via cookies, no query string needed
+      return res.redirect(303, enterAddressPath);
     },
   },
 };
