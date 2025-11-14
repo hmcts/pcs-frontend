@@ -93,4 +93,57 @@ describe('ccdCaseService', () => {
       );
     });
   });
+
+  describe('getCaseByReference', () => {
+    it('returns case data when case is found', async () => {
+      const mockCaseData = {
+        id: '1234567890123456',
+        data: { applicantForename: 'John', applicantSurname: 'Doe' },
+      };
+      mockGet.mockResolvedValue({ data: mockCaseData });
+
+      const result = await ccdCaseService.getCaseByReference(accessToken, '1234567890123456');
+
+      expect(mockGet).toHaveBeenCalledWith(`${mockUrl}/cases/1234567890123456`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          experimental: true,
+          Accept: '*/*',
+          'Content-Type': 'application/json',
+        },
+      });
+      expect(result).toEqual(mockCaseData);
+    });
+
+    it('returns null when case is not found (404)', async () => {
+      mockGet.mockRejectedValue({ response: { status: 404 } });
+
+      const result = await ccdCaseService.getCaseByReference(accessToken, '9999999999999999');
+
+      expect(result).toBeNull();
+    });
+
+    it('throws on unexpected error', async () => {
+      mockGet.mockRejectedValue(new Error('Network error'));
+
+      await expect(ccdCaseService.getCaseByReference(accessToken, '1234567890123456')).rejects.toThrow('Network error');
+    });
+
+    it('handles undefined access token', async () => {
+      const mockCaseData = { id: '1234567890123456', data: { applicantForename: 'Jane' } };
+      mockGet.mockResolvedValue({ data: mockCaseData });
+
+      const result = await ccdCaseService.getCaseByReference(undefined, '1234567890123456');
+
+      expect(mockGet).toHaveBeenCalledWith(`${mockUrl}/cases/1234567890123456`, {
+        headers: {
+          Authorization: 'Bearer ',
+          experimental: true,
+          Accept: '*/*',
+          'Content-Type': 'application/json',
+        },
+      });
+      expect(result).toEqual(mockCaseData);
+    });
+  });
 });
