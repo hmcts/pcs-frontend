@@ -27,7 +27,6 @@ export const step: StepDefinition = {
         ...generateContent(lang),
         userDetails,
         address,
-        // i18next-http-middleware handles language via cookies, no query string needed
         backUrl: '/steps/user-journey/enter-address',
         lang,
       };
@@ -38,7 +37,6 @@ export const step: StepDefinition = {
         if (req.session.ccdCase && req.session.user) {
           await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
         }
-        // i18next-http-middleware handles language via cookies, no query string needed
         const redirectPath = '/steps/user-journey/application-submitted' as const;
         res.redirect(303, redirectPath);
       } catch {

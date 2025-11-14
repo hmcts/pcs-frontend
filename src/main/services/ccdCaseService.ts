@@ -62,14 +62,14 @@ async function submitEvent(
   };
 
   try {
-    logger.info(`[ccdCaseService] Calling submitEvent with URL: ${url}`);
-    logger.info(`[ccdCaseService] Payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`Calling submitEvent with URL: ${url}`);
+    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response.data, null, 2)}`);
+    logger.info(`esponse data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError;
-    logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+    logger.error(`Unexpected error: ${axiosError.message}`);
     throw error;
   }
 }
@@ -84,7 +84,7 @@ export const ccdCaseService = {
       sort: [{ created_date: { order: 'desc' } }],
     };
 
-    logger.info(`[ccdCaseService] Calling ccdCaseService search with URL: ${url}`);
+    logger.info(`Calling ccdCaseService search with URL: ${url}`);
 
     try {
       const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
@@ -103,10 +103,10 @@ export const ccdCaseService = {
     } catch (error) {
       const axiosError = error as AxiosError;
       if (axiosError.response?.status === 404) {
-        logger.warn('[ccdCaseService] No case found, returning null.');
+        logger.warn('No case found, returning null.');
         return null;
       }
-      logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+      logger.error(`Unexpected error: ${axiosError.message}`);
       throw error;
     }
   },

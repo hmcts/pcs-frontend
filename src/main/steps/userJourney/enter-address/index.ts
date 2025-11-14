@@ -63,7 +63,6 @@ export const step: StepDefinition = {
         addressResults,
         error,
         selectedAddressIndex: savedData?.selectedAddressIndex || null,
-        // i18next-http-middleware handles language via cookies, no query string needed
         backUrl: '/steps/user-journey/enter-user-details',
       };
     });
@@ -77,7 +76,6 @@ export const step: StepDefinition = {
       const enterAddressPath = '/steps/user-journey/enter-address' as const;
       const summaryPath = '/steps/user-journey/summary' as const;
 
-      // 🔹 Handle Find Address
       if (action === 'find-address') {
         if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
           req.session.lookupPostcode = lookupPostcode;
@@ -85,7 +83,6 @@ export const step: StepDefinition = {
             field: 'lookupPostcode',
             text: content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode',
           };
-          // i18next-http-middleware handles language via cookies, no query string needed
           return res.redirect(303, `${enterAddressPath}?lookup=1`);
         }
 
@@ -134,7 +131,6 @@ export const step: StepDefinition = {
           });
         }
 
-        // i18next-http-middleware handles language via cookies, no query string needed
         return res.redirect(303, enterAddressPath);
       }
 
@@ -162,7 +158,6 @@ export const step: StepDefinition = {
             },
             errorSummaryTitle: content.errorSummaryTitle,
             addressResults: req.session.postcodeLookupResult || null,
-            // i18next-http-middleware handles language via cookies, no query string needed
             backUrl: '/steps/user-journey/enter-user-details',
           });
         }
@@ -188,10 +183,8 @@ export const step: StepDefinition = {
             },
           });
         }
-        // i18next-http-middleware handles language via cookies, no query string needed
         return res.redirect(303, summaryPath);
       }
-      // i18next-http-middleware handles language via cookies, no query string needed
       return res.redirect(303, enterAddressPath);
     },
   },

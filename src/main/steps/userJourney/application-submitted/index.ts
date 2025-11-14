@@ -29,7 +29,6 @@ export const step: StepDefinition = {
       delete req.session.formData;
       delete req.session.postcodeLookupResult;
 
-      // i18next-http-middleware handles language via cookies, no query string needed
       const redirectPath = '/steps/user-journey/enter-user-details' as const;
       res.redirect(303, redirectPath);
     },

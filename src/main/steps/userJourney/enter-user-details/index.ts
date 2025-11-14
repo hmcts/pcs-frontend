@@ -87,7 +87,6 @@ export const step: StepDefinition = {
         });
       }
 
-      // i18next-http-middleware handles language via cookies, no query string needed
       const redirectPath = '/steps/user-journey/enter-address' as const;
       res.redirect(303, redirectPath);
     },

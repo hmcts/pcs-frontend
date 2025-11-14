@@ -42,7 +42,6 @@ export function getNextStepUrl(
     throw new Error(`Step not found: ${nextStepName}`);
   }
 
-  // i18next-http-middleware handles language via cookies, no need for query string
   return nextStep.url;
 }
 
@@ -62,7 +61,6 @@ export function getPreviousStepUrl(currentStepName: string, allData: Record<stri
     return null;
   }
 
-  // i18next-http-middleware handles language via cookies, no need for query string
   return prevStep.url;
 }
 
