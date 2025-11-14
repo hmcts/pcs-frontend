@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
 import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { getAllFormData, getBackUrl, getNextStepUrl } from '../../../app/utils/navigation';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';
@@ -17,6 +18,9 @@ export const step: StepDefinition = {
   name: stepName,
   view: 'steps/userJourney/summary.njk',
   stepDir: __dirname,
+  stepNumber: 3,
+  section: 'review',
+  description: 'Review and submit application',
   generateContent,
   middleware: [pcqRedirectMiddleware()],
   getController: (lang = 'en') =>
@@ -27,7 +31,7 @@ export const step: StepDefinition = {
         ...generateContent(lang),
         userDetails,
         address,
-        backUrl: '/steps/user-journey/enter-address',
+        backUrl: getBackUrl(req, stepName),
         lang,
       };
     }),
@@ -37,8 +41,9 @@ export const step: StepDefinition = {
         if (req.session.ccdCase && req.session.user) {
           await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
         }
-        const redirectPath = '/steps/user-journey/application-submitted' as const;
-        res.redirect(303, redirectPath);
+        const allFormData = getAllFormData(req);
+        const nextStepUrl = getNextStepUrl(stepName, req.body, allFormData);
+        res.redirect(303, nextStepUrl);
       } catch {
         res.status(500).send('There was an error submitting your application.');
       }

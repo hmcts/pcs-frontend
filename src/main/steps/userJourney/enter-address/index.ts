@@ -4,6 +4,7 @@ import { createGetController } from '../../../app/controller/controllerFactory';
 import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
 import { validateForm } from '../../../app/controller/validation';
 import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { getAllFormData, getBackUrl, getNextStepUrl } from '../../../app/utils/navigation';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
@@ -43,6 +44,9 @@ export const step: StepDefinition = {
   name: stepName,
   view: 'steps/userJourney/enterAddress.njk',
   stepDir: __dirname,
+  stepNumber: 2,
+  section: 'address-details',
+  description: 'Enter address details',
   generateContent,
   getController: (lang = 'en') => {
     const content = generateContent(lang);
@@ -63,7 +67,7 @@ export const step: StepDefinition = {
         addressResults,
         error,
         selectedAddressIndex: savedData?.selectedAddressIndex || null,
-        backUrl: '/steps/user-journey/enter-user-details',
+        backUrl: getBackUrl(req, stepName),
       };
     });
   },
@@ -73,9 +77,6 @@ export const step: StepDefinition = {
       const lang: SupportedLang = getLanguageFromRequest(req);
       const content = generateContent(lang);
 
-      const enterAddressPath = '/steps/user-journey/enter-address' as const;
-      const summaryPath = '/steps/user-journey/summary' as const;
-
       if (action === 'find-address') {
         if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
           req.session.lookupPostcode = lookupPostcode;
@@ -83,7 +84,7 @@ export const step: StepDefinition = {
             field: 'lookupPostcode',
             text: content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode',
           };
-          return res.redirect(303, `${enterAddressPath}?lookup=1`);
+          return res.redirect(303, '/steps/user-journey/enter-address?lookup=1');
         }
 
         try {
@@ -96,12 +97,12 @@ export const step: StepDefinition = {
               text: content.errors?.noAddressesFound || 'No addresses found for that postcode',
             };
 
-            return res.redirect(303, `${enterAddressPath}?lookup=1`);
+            return res.redirect(303, '/steps/user-journey/enter-address?lookup=1');
           }
 
           req.session.lookupPostcode = lookupPostcode;
           req.session.postcodeLookupResult = addressResults;
-          return res.redirect(303, `${enterAddressPath}?lookup=1`);
+          return res.redirect(303, '/steps/user-journey/enter-address?lookup=1');
         } catch {
           req.session.lookupPostcode = lookupPostcode;
 
@@ -109,7 +110,7 @@ export const step: StepDefinition = {
             field: 'lookupPostcode',
             text: content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
           };
-          return res.redirect(303, `${enterAddressPath}?lookup=1`);
+          return res.redirect(303, '/steps/user-journey/enter-address?lookup=1');
         }
       }
 
@@ -131,7 +132,7 @@ export const step: StepDefinition = {
           });
         }
 
-        return res.redirect(303, enterAddressPath);
+        return res.redirect(303, '/steps/user-journey/enter-address');
       }
 
       // 🔹 Handle Final Submission
@@ -158,7 +159,7 @@ export const step: StepDefinition = {
             },
             errorSummaryTitle: content.errorSummaryTitle,
             addressResults: req.session.postcodeLookupResult || null,
-            backUrl: '/steps/user-journey/enter-user-details',
+            backUrl: getBackUrl(req, stepName),
           });
         }
 
@@ -183,9 +184,11 @@ export const step: StepDefinition = {
             },
           });
         }
-        return res.redirect(303, summaryPath);
+        const allFormData = getAllFormData(req);
+        const nextStepUrl = getNextStepUrl(stepName, req.body, allFormData);
+        return res.redirect(303, nextStepUrl);
       }
-      return res.redirect(303, enterAddressPath);
+      return res.redirect(303, '/steps/user-journey/enter-address');
     },
   },
 };

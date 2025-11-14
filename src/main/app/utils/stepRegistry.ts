@@ -33,6 +33,18 @@ export class StepRegistry {
   }
 
   /**
+   * Get a step by URL (optional utility)
+   */
+  getStepByUrl(url: string): StepDefinition | undefined {
+    for (const step of this.steps.values()) {
+      if (step.url === url) {
+        return step;
+      }
+    }
+    return undefined;
+  }
+
+  /**
    * Get all registered steps
    */
   getAllSteps(): StepDefinition[] {

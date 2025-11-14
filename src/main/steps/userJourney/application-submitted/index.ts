@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
 import { type TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { getAllFormData, getNextStepUrl } from '../../../app/utils/navigation';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { type SupportedLang } from '../../../utils/getLanguageFromRequest';
 
@@ -16,6 +17,9 @@ export const step: StepDefinition = {
   name: stepName,
   view: 'steps/userJourney/applicationSubmitted.njk',
   stepDir: __dirname,
+  stepNumber: 4,
+  section: 'completion',
+  description: 'Application submitted confirmation',
   generateContent,
   getController: (lang: SupportedLang = 'en') => {
     const content = generateContent(lang);
@@ -29,8 +33,12 @@ export const step: StepDefinition = {
       delete req.session.formData;
       delete req.session.postcodeLookupResult;
 
-      const redirectPath = '/steps/user-journey/enter-user-details' as const;
-      res.redirect(303, redirectPath);
+      // Redirect back to first step (start of journey)
+      const allFormData = getAllFormData(req);
+      const nextStepUrl = getNextStepUrl(stepName, req.body, allFormData);
+      res.redirect(303, nextStepUrl);
     },
   },
+  // Custom next step: always go back to first step after submission
+  getNextStep: () => 'enter-user-details',
 };

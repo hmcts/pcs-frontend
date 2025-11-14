@@ -4,6 +4,7 @@ import { createGetController } from '../../../app/controller/controllerFactory';
 import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
 import { validateForm } from '../../../app/controller/validation';
 import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { getAllFormData, getBackUrl, getNextStepUrl } from '../../../app/utils/navigation';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
@@ -38,6 +39,9 @@ export const step: StepDefinition = {
   name: stepName,
   view: 'steps/userJourney/enterUserDetails.njk',
   stepDir: __dirname,
+  stepNumber: 1,
+  section: 'personal-details',
+  description: 'Enter user personal details',
   generateContent,
   getController: (lang = 'en') => {
     const content = generateContent(lang);
@@ -50,6 +54,7 @@ export const step: StepDefinition = {
         labels: content.labels,
         errors: content.errors,
         title: content.title,
+        backUrl: getBackUrl(req, stepName),
       };
     });
   },
@@ -87,8 +92,9 @@ export const step: StepDefinition = {
         });
       }
 
-      const redirectPath = '/steps/user-journey/enter-address' as const;
-      res.redirect(303, redirectPath);
+      const allFormData = getAllFormData(req);
+      const nextStepUrl = getNextStepUrl(stepName, req.body, allFormData);
+      res.redirect(303, nextStepUrl);
     },
   },
 };
