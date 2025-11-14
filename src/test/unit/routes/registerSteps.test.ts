@@ -9,8 +9,8 @@ jest.mock('@hmcts/nodejs-logging', () => ({
   },
 }));
 
-jest.mock('../../../main/utils/getValidatedLanguage', () => ({
-  getValidatedLanguage: jest.fn(() => 'en'),
+jest.mock('../../../main/utils/getLanguageFromRequest', () => ({
+  getLanguageFromRequest: jest.fn(() => 'en'),
 }));
 
 jest.mock('../../../main/middleware', () => ({
@@ -65,7 +65,7 @@ import { Application } from 'express';
 
 import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
 import registerSteps from '../../../main/routes/registerSteps';
-import { getValidatedLanguage } from '../../../main/utils/getValidatedLanguage';
+import { getLanguageFromRequest } from '../../../main/utils/getLanguageFromRequest';
 
 describe('registerSteps', () => {
   const mockGet = jest.fn();
@@ -167,7 +167,7 @@ describe('registerSteps', () => {
     expect(stepWithMiddlewareCall![2]).toBeInstanceOf(Function);
   });
 
-  it('calls getValidatedLanguage for each GET route', () => {
+  it('calls getLanguageFromRequest for each GET route', () => {
     const additionalProps = {
       language: 'en',
       cookies: { lang: 'en' },
@@ -176,7 +176,7 @@ describe('registerSteps', () => {
 
     const { mockReq, mockRes } = executeHandler('/steps/unprotected', additionalProps);
 
-    expect(getValidatedLanguage).toHaveBeenCalledWith(mockReq);
+    expect(getLanguageFromRequest).toHaveBeenCalledWith(mockReq);
     expect(mockStepsData.unprotectedStep.getController.get).toHaveBeenCalledWith(mockReq, mockRes);
   });
 

@@ -65,7 +65,7 @@ async function submitEvent(
     logger.info(`Calling submitEvent with URL: ${url}`);
     logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`esponse data: ${JSON.stringify(response.data, null, 2)}`);
+    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError;
