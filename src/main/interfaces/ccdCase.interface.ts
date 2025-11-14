@@ -18,6 +18,15 @@ export interface CcdUserCases {
   cases: CcdUserCase[];
 }
 
+export interface CaseDocument {
+  id: string;
+  value: {
+    document_url: string;
+    document_filename: string;
+    document_binary_url: string;
+  };
+}
+
 export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
@@ -32,6 +41,7 @@ export interface CcdCaseData {
     PostCode: string;
     Country: string;
   };
+  tenancyLicenceDocuments?: CaseDocument[];
 }
 
 export interface CcdCase {
