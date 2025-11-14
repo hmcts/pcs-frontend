@@ -289,12 +289,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-browser@npm:4.26.0":
-  version: 4.26.0
-  resolution: "@azure/msal-browser@npm:4.26.0"
+"@azure/msal-browser@npm:4.26.1":
+  version: 4.26.1
+  resolution: "@azure/msal-browser@npm:4.26.1"
   dependencies:
     "@azure/msal-common": "npm:15.13.1"
-  checksum: 10/6fbfc0a6ae4bdff1db24e56003d5fd88b4da11843c4d7f8084805b498aaff76bfcbea93f68d4232137adc27f43bc8f5b8b2224876d033a9d542162b6f75568ca
+  checksum: 10/843b63b5555eb972e80ea0ed2611680220992ac7c92af5575031fa2c9c094c6fe8ed3e7b554d4968de4724510c3686cbc0333764c35c311d71868a5e70e5c8dc
   languageName: node
   linkType: hard
 
@@ -2089,9 +2089,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts/playwright-common@npm:1.0.37":
-  version: 1.0.37
-  resolution: "@hmcts/playwright-common@npm:1.0.37"
+"@hmcts/playwright-common@npm:1.0.39":
+  version: 1.0.39
+  resolution: "@hmcts/playwright-common@npm:1.0.39"
   dependencies:
     "@axe-core/playwright": "npm:^4.10.0"
     "@eslint/js": "npm:^9.11.1"
@@ -2113,7 +2113,7 @@ __metadata:
   bin:
     delete-nightly-dev-branch: ./dist/scripts/delete-nightly-dev-branch.js
     get-secrets: ./dist/scripts/get-secrets.js
-  checksum: 10/29056a06e37063d7b1a6e26727bea98c157f2a5857ce89e781a3ae254d304137d5436a13ccb5cb52bc743d1344266e8162d263e8b6166e77517951b2baa46666
+  checksum: 10/8ca8d4a45e92a44fd95b75ef5de98bbd8c079789898e94b58c67e51e603afe9673a35a4d017febea1205c2adeb284961401b743b153bdacd6e60bb14f27190c6
   languageName: node
   linkType: hard
 
@@ -2971,12 +2971,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:0.207.0":
-  version: 0.207.0
-  resolution: "@opentelemetry/api-logs@npm:0.207.0"
+"@opentelemetry/api-logs@npm:0.208.0":
+  version: 0.208.0
+  resolution: "@opentelemetry/api-logs@npm:0.208.0"
   dependencies:
     "@opentelemetry/api": "npm:^1.3.0"
-  checksum: 10/d50251e34f1cb8208d02870d3c25a0ba31eb2e33844a1ed5c0107d920bfbb52dbc3a1c5072586501a5096778f90e9ef1ce2fef63fa6ab5908bc1f94099121264
+  checksum: 10/ae339416a244e90b1718af1ed5430348188be60871f3799c847bab409bba1513337cac7da40b4883bf7f280680754319b44a9dc95fa2879d15c0413c9955b145
   languageName: node
   linkType: hard
 
@@ -3594,16 +3594,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.56.0":
-  version: 0.56.0
-  resolution: "@opentelemetry/instrumentation-redis@npm:0.56.0"
+"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.57.0":
+  version: 0.57.0
+  resolution: "@opentelemetry/instrumentation-redis@npm:0.57.0"
   dependencies:
-    "@opentelemetry/instrumentation": "npm:^0.207.0"
+    "@opentelemetry/instrumentation": "npm:^0.208.0"
     "@opentelemetry/redis-common": "npm:^0.38.2"
     "@opentelemetry/semantic-conventions": "npm:^1.27.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/1dbf36f8d7c5bf0a598984a7bf354fc14b96bc8734d99824ec914409b702c906b558fbcbbdd01ee70e55bd5ba5f7fa6b0dc79151db0eb98208c99d3a6bee30a0
+  checksum: 10/171f5e57d0141088f8e4cdb8f744226d7999ca045842708e65c8b784f53a41e25a7248f22382bf1b4a80b6fa1cc4c41658502bb15340b3fa2c22f2e9db8b76e0
   languageName: node
   linkType: hard
 
@@ -3657,16 +3657,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation@npm:0.207.0":
-  version: 0.207.0
-  resolution: "@opentelemetry/instrumentation@npm:0.207.0"
+"@opentelemetry/instrumentation@npm:0.208.0":
+  version: 0.208.0
+  resolution: "@opentelemetry/instrumentation@npm:0.208.0"
   dependencies:
-    "@opentelemetry/api-logs": "npm:0.207.0"
+    "@opentelemetry/api-logs": "npm:0.208.0"
     import-in-the-middle: "npm:^2.0.0"
     require-in-the-middle: "npm:^8.0.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/ea9b9a7324016116ba5ded98ebf7e8db722625a7408532be707db2ad9f5a760e7f17809097c5fc61b95f135281349534045e0242eaa9fc57c4b508d2ddf4c181
+  checksum: 10/0591121c1bab29b8246ba879b1ed91f2db17680cfce56a635bf2e81390a9140f029b094ff4498ff154132379192bf424d7d234d2114883735603e4a6581a4a79
   languageName: node
   linkType: hard
 
@@ -9808,15 +9808,15 @@ __metadata:
   linkType: hard
 
 "i18next-http-middleware@npm:^3.7.4":
-  version: 3.8.1
-  resolution: "i18next-http-middleware@npm:3.8.1"
-  checksum: 10/1a97eb8b56627cf95ea0b4dc3c4e6ede753888b6ede975ea589058a2411cb3a03dde92454dfc28080dc751091842ece6dd7883a9db756f8d35361326ccacd451
+  version: 3.8.2
+  resolution: "i18next-http-middleware@npm:3.8.2"
+  checksum: 10/3ac40911ab49d1e06a464343ba6378378d88c0e16c970020ddfedad7062ee976bd2d0080528a5206e9ec9370baff36e1af285669bfe8dd112f12a7e5cc5c5d77
   languageName: node
   linkType: hard
 
 "i18next@npm:^25.3.2":
-  version: 25.6.0
-  resolution: "i18next@npm:25.6.0"
+  version: 25.6.1
+  resolution: "i18next@npm:25.6.1"
   dependencies:
     "@babel/runtime": "npm:^7.27.6"
   peerDependencies:
@@ -9824,7 +9824,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/3eaa354f7028ff6051e4294c09bf518183c6653c019cfeed73fc4504786b3a474c3b55ed6b9832e122ba2538167b3eb85ae71fdd6423fb9ec9ebe2156b061d66
+  checksum: 10/a4622a0dc37eed0ae79f8814cae8dcf8206b011e618f109a1497815364d293b5c80e177722cfbcd2577aca8a163af861ff142012bc2957240cd2efc65e57805c
   languageName: node
   linkType: hard
 
@@ -12879,7 +12879,7 @@ __metadata:
     "@hmcts/info-provider": "npm:^1.1.0"
     "@hmcts/nodejs-healthcheck": "npm:^1.8.0"
     "@hmcts/nodejs-logging": "npm:^4.0.4"
-    "@hmcts/playwright-common": "npm:1.0.37"
+    "@hmcts/playwright-common": "npm:1.0.39"
     "@hmcts/properties-volume": "npm:^1.2.0"
     "@launchdarkly/node-server-sdk": "npm:^9.10.0"
     "@pact-foundation/pact": "npm:^15.0.0"
@@ -15180,15 +15180,15 @@ __metadata:
   linkType: hard
 
 "tar@npm:^7.4.3":
-  version: 7.5.1
-  resolution: "tar@npm:7.5.1"
+  version: 7.5.2
+  resolution: "tar@npm:7.5.2"
   dependencies:
     "@isaacs/fs-minipass": "npm:^4.0.0"
     chownr: "npm:^3.0.0"
     minipass: "npm:^7.1.2"
     minizlib: "npm:^3.1.0"
     yallist: "npm:^5.0.0"
-  checksum: 10/4848cd2fa2fcaf0734cf54e14bc685056eb43a74d7cc7f954c3ac88fea88c85d95b1d7896619f91aab6f2234c5eec731c18aaa201a78fcf86985bdc824ed7a00
+  checksum: 10/dbad9c9a07863cd1bdf8801d563b3280aa7dd0f4a6cead779ff7516d148dc80b4c04639ba732d47f91f04002f57e8c3c6573a717d649daecaac74ce71daa7ad3
   languageName: node
   linkType: hard
 
@@ -15905,9 +15905,9 @@ __metadata:
   linkType: hard
 
 "validator@npm:^13.15.15":
-  version: 13.15.20
-  resolution: "validator@npm:13.15.20"
-  checksum: 10/498f9b201dda7b09207bbc13606e6f90595987eab9e3a60fc5b8d8d96141c9351192aea56d392c78640e2462770eedccf545cf13b2ef43e87d73a755ba485c5d
+  version: 13.15.23
+  resolution: "validator@npm:13.15.23"
+  checksum: 10/03e4a37c04c4e8337b0c91e529bdb6376de6b52ef683616e2e909276be73903e6054203d274ed35e88e3498ec68764125b194338dd2ee893818d3008fbad1ba7
   languageName: node
   linkType: hard
 
