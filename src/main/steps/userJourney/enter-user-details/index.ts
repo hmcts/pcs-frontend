@@ -6,7 +6,7 @@ import { validateForm } from '../../../app/controller/validation';
 import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
 import { getAllFormData, getBackUrl, getNextStepUrl } from '../../../app/utils/navigation';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { StepDefinition, StepFormData } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { SupportedLang, getLanguageFromRequest } from '../../../utils/getLanguageFromRequest';
 
@@ -50,12 +50,8 @@ export const step: StepDefinition = {
       return {
         ...content,
         ...savedData,
-        common: content,
-        labels: content.labels,
-        errors: content.errors,
-        title: content.title,
         backUrl: getBackUrl(req, stepName),
-      };
+      } as StepFormData;
     });
   },
   postController: {
@@ -63,7 +59,7 @@ export const step: StepDefinition = {
       const lang: SupportedLang = getLanguageFromRequest(req);
       const content = generateContent(lang);
       const fields = getFields(content);
-      const errors = validateForm(req, fields, content);
+      const errors = validateForm(req, fields, content.errors);
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
         return res.status(400).render('steps/userJourney/enterUserDetails.njk', {
@@ -87,8 +83,8 @@ export const step: StepDefinition = {
         });
       } else {
         req.session.ccdCase = await ccdCaseService.createCase(user?.accessToken, {
-          // applicantForename: req.body.applicantForename,
-          // applicantSurname: req.body.applicantSurname,
+          applicantForename: req.body.applicantForename,
+          applicantSurname: req.body.applicantSurname,
         });
       }
 

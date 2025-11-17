@@ -31,12 +31,10 @@ export interface StepDefinition {
   postController?: { post: RequestHandler };
   middleware?: RequestHandler[];
 
-  // Dynamic navigation
   getNextStep?: (formData: Record<string, unknown>, allData: Record<string, unknown>) => string | null; // Returns step name or null if end of journey
 
   getPreviousStep?: (allData: Record<string, unknown>) => string | null; // Returns step name or null if first step
 
-  // Step metadata (optional, for better organization)
   stepNumber?: number;
   section?: string;
   prerequisites?: string[]; // Step names that must be completed first

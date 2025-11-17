@@ -33,12 +33,10 @@ export const step: StepDefinition = {
       delete req.session.formData;
       delete req.session.postcodeLookupResult;
 
-      // Redirect back to first step (start of journey)
       const allFormData = getAllFormData(req);
       const nextStepUrl = getNextStepUrl(stepName, req.body, allFormData);
       res.redirect(303, nextStepUrl);
     },
   },
-  // Custom next step: always go back to first step after submission
   getNextStep: () => 'enter-user-details',
 };
