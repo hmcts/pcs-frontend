@@ -1,0 +1,31 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">{{ ineligible.title }}</h1>
+    <p class="govuk-body">{{ ineligible.reason }}</p>
+    <p class="govuk-body">{{ ineligible.changeAnswer }}</p>
+
+    {% if backUrl %}
+      <div class="govuk-button-group">
+        {{ govukButton({
+          href: backUrl,
+          text: buttons.back,
+          classes: "govuk-button--secondary"
+        }) }}
+      </div>
+    {% endif %}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        href: "/",
+        text: ineligible.exit,
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

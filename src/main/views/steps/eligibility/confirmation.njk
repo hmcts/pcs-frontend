@@ -1,0 +1,38 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {% set referenceNumber = confirmation.panel.pending %}
+
+    {{ govukPanel({
+      titleText: confirmation.title,
+      html: confirmation.panel.refLabel ~ '<br><strong>' ~ referenceNumber ~ '</strong>'
+    }) }}
+
+    <p class="govuk-body">{{ confirmation.sentEmail }}</p>
+
+    <h2 class="govuk-heading-m">{{ confirmation.whatNextTitle }}</h2>
+    <p class="govuk-body">{{ confirmation.whatNext1 }}</p>
+    <p class="govuk-body">{{ confirmation.whatNext2 }}</p>
+
+    <h2 class="govuk-heading-m">{{ confirmation.helpTitle }}</h2>
+    <p class="govuk-body">
+      <a href="{{ confirmation.helpLinkHref }}" class="govuk-link">
+        {{ confirmation.helpLinkText }}
+      </a>
+    </p>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        href: "/",
+        text: confirmation.exit,
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,34 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">{{ startPage.title }}</h1>
+
+    <p class="govuk-body">{{ startPage.description }}</p>
+    <p class="govuk-body">{{ startPage.eligibilityText }}</p>
+
+    <h2 class="govuk-heading-s">{{ startPage.whatYouNeedTitle }}</h2>
+    <p class="govuk-body">{{ startPage.whatYouNeedText }}</p>
+
+    <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+      <li>{{ startPage.needNoticeInfo }}</li>
+      <li>{{ startPage.needPropertyInfo }}</li>
+      <li>{{ startPage.needDefendantInfo }}</li>
+      <li>{{ startPage.needGroundsInfo }}</li>
+      <li>{{ startPage.needDocuments }}</li>
+    </ul>
+
+    <form method="post" novalidate>
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: buttons.start,
+          attributes: { type: 'submit' }
+        }) }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

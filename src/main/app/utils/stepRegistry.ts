@@ -8,12 +8,7 @@ export class StepRegistry {
     this.steps.set(step.name, step);
 
     if (!this.stepOrder.includes(step.name)) {
-      if (step.stepNumber !== undefined) {
-        const insertIndex = Math.min(step.stepNumber - 1, this.stepOrder.length);
-        this.stepOrder.splice(insertIndex, 0, step.name);
-      } else {
-        this.stepOrder.push(step.name);
-      }
+      this.stepOrder.push(step.name);
     }
   }
 
@@ -56,11 +51,25 @@ export class StepRegistry {
       return null;
     }
 
-    const currentIndex = this.stepOrder.indexOf(currentStepName);
-    if (currentIndex === -1 || currentIndex === this.stepOrder.length - 1) {
+    const currentUrl = currentStep.url;
+    const urlPrefix = currentUrl.split('/').slice(0, 3).join('/');
+
+    const allSteps = Array.from(this.steps.values());
+    const stepsInJourney = allSteps
+      .filter(step => step.url.startsWith(urlPrefix) && step.stepNumber !== undefined)
+      .sort((a, b) => (a.stepNumber || 0) - (b.stepNumber || 0));
+
+    const currentStepInJourney = stepsInJourney.find(step => step.name === currentStepName);
+    if (!currentStepInJourney) {
       return null;
     }
-    return this.stepOrder[currentIndex + 1];
+
+    const currentIndex = stepsInJourney.indexOf(currentStepInJourney);
+    if (currentIndex === -1 || currentIndex === stepsInJourney.length - 1) {
+      return null;
+    }
+
+    return stepsInJourney[currentIndex + 1]?.name || null;
   }
 
   getPreviousStepName(currentStepName: string, allData?: Record<string, unknown>): string | null {
@@ -77,11 +86,25 @@ export class StepRegistry {
       return null;
     }
 
-    const currentIndex = this.stepOrder.indexOf(currentStepName);
+    const currentUrl = currentStep.url;
+    const urlPrefix = currentUrl.split('/').slice(0, 3).join('/');
+
+    const allSteps = Array.from(this.steps.values());
+    const stepsInJourney = allSteps
+      .filter(step => step.url.startsWith(urlPrefix) && step.stepNumber !== undefined)
+      .sort((a, b) => (a.stepNumber || 0) - (b.stepNumber || 0));
+
+    const currentStepInJourney = stepsInJourney.find(step => step.name === currentStepName);
+    if (!currentStepInJourney) {
+      return null;
+    }
+
+    const currentIndex = stepsInJourney.indexOf(currentStepInJourney);
     if (currentIndex <= 0) {
       return null;
     }
-    return this.stepOrder[currentIndex - 1];
+
+    return stepsInJourney[currentIndex - 1]?.name || null;
   }
 
   arePrerequisitesMet(stepName: string, completedSteps: string[]): boolean {

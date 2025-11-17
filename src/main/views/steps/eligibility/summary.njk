@@ -1,0 +1,85 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">{{ summary.title }}</h1>
+    <p class="govuk-body">{{ summary.description }}</p>
+
+    {% set ageText = "Under 18" %}
+    {% if age === "yes" %}
+      {% set ageText = "18 or over" %}
+    {% endif %}
+
+    {% set dateOfBirthText = "" %}
+    {% if dateOfBirthDay and dateOfBirthMonth and dateOfBirthYear %}
+      {% set dateOfBirthText = dateOfBirthDay ~ "/" ~ dateOfBirthMonth ~ "/" ~ dateOfBirthYear %}
+    {% endif %}
+
+    {% set addressParts = [addressLine1, addressLine2, addressLine3, town, county, postcode, country] | reject("falsy") %}
+    {% set correspondenceAddressText = addressParts | join("<br>") %}
+    {% if isCorrespondenceAddress === "yes" %}
+      {% set correspondenceAddressText = "Same as provided address" %}
+    {% endif %}
+
+    {% set groundsArray = grounds or [] %}
+    {% if groundsArray is string %}
+      {% set groundsArray = [groundsArray] %}
+    {% endif %}
+    {% set groundsText = groundsArray | join(", ") %}
+    {% set groundsText = groundsText | replace("rent-arrears-8", "Rent arrears (ground 8)") %}
+    {% set groundsText = groundsText | replace("breach-contract-9", "Breach of contract (ground 9)") %}
+    {% set groundsText = groundsText | replace("other-10", "Other (ground 10)") %}
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { text: "Age" },
+          value: { text: ageText }
+        },
+        {
+          key: { text: "Grounds" },
+          value: {
+            html: groundsText
+          }
+        },
+        {
+          key: { text: "Title" },
+          value: { text: title or "" }
+        },
+        {
+          key: { text: "First name" },
+          value: { text: firstName or "" }
+        },
+        {
+          key: { text: "Last name" },
+          value: { text: lastName or "" }
+        },
+        {
+          key: { text: "Date of birth" },
+          value: {
+            text: dateOfBirthText
+          }
+        },
+        {
+          key: { text: "Email" },
+          value: { text: email or "" }
+        },
+        {
+          key: { text: "Correspondence address" },
+          value: {
+            html: correspondenceAddressText
+          }
+        }
+      ]
+    }) }}
+
+    <form method="post" novalidate>
+      {{ govukButton({ text: summary.submit }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}
+

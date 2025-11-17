@@ -1,0 +1,70 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">{{ page3.title }}</h1>
+    <p class="govuk-body">{{ page3.description }}</p>
+
+    {% if error %}
+      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+        <h2 class="govuk-error-summary__title" id="error-summary-title">{{ errorSummaryTitle }}</h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            <li><a href="#{{ error.field }}">{{ error.text }}</a></li>
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% set checkedGrounds = grounds or [] %}
+      {% if checkedGrounds is string %}
+        {% set checkedGrounds = [checkedGrounds] %}
+      {% endif %}
+
+      {{ govukCheckboxes({
+        name: "grounds",
+        fieldset: {
+          legend: {
+            text: page3.title,
+            classes: "govuk-visually-hidden"
+          }
+        },
+        items: [
+          {
+            value: "rent-arrears-8",
+            text: page3.options.rentArrears8.text,
+            hint: {
+              text: page3.options.rentArrears8.hint
+            },
+            checked: checkedGrounds.includes("rent-arrears-8")
+          },
+          {
+            value: "breach-contract-9",
+            text: page3.options.breachContract9.text,
+            hint: {
+              text: page3.options.breachContract9.hint
+            },
+            checked: checkedGrounds.includes("breach-contract-9")
+          },
+          {
+            value: "other-10",
+            text: page3.options.other10.text,
+            hint: {
+              text: page3.options.other10.hint
+            },
+            checked: checkedGrounds.includes("other-10")
+          }
+        ],
+        errorMessage: error?.field === "grounds" and { text: error.text }
+      }) }}
+
+      {{ govukButton({ text: buttons.continue }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}
+
