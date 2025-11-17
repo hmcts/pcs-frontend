@@ -1,0 +1,1 @@
+{"value":"js-yaml","children":{"ID":1109754,"Issue":"js-yaml has prototype pollution in merge (<<)","URL":"https://github.com/advisories/GHSA-mh29-5h37-fv8m","Severity":"moderate","Vulnerable Versions":"<4.1.1","Tree Versions":["4.1.0"],"Dependents":["@hmcts/info-provider@npm:1.2.3"]}}
