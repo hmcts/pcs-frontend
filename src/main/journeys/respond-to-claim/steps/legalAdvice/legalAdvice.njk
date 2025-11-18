@@ -1,0 +1,71 @@
+{% extends "templates/respondToClaim.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% block respondToClaimContent %}
+
+  <h2 class="govuk-heading-m">Help available now online</h2>
+
+  <p class="govuk-body">
+    Housing experts are ready and waiting to help you, and it takes just minutes to find one in your area.
+  </p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>
+      Visit the 
+      <a href="https://find-legal-advice.justice.gov.uk/" rel="noopener noreferrer" target="_blank" class="govuk-link">
+        Find a legal adviser service (opens in new tab)
+      </a>.
+    </li>
+    <li>Enter your postcode and select the ‘Housing Loss Prevention Advice Service’ and ‘Housing’ options.</li>
+    <li>Choose a local expert.</li>
+    <li>Call them to discuss your options.</li>
+  </ol>
+
+  <h2 class="govuk-heading-m">Civil Legal Advice (CLA)</h2>
+  <p class="govuk-body">
+    Civil Legal Advice (CLA) can also put you in touch with a local expert. You can either:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>
+      Call 
+      <a href="tel:03453454345" class="govuk-link">0345 345 4345</a>.
+      Lines are open Monday to Friday, from 9am to 8pm and Saturday from 9am to 12.30pm.
+    </li>
+    <li>
+      Text ‘legalaid’ and your name to 80010 to ask CLA to call you back.
+      This costs the same as a normal text message.
+    </li>
+  </ul>
+
+  <h2 class="govuk-heading-m">Help that might be available at the hearing</h2>
+  <p class="govuk-body">
+    If you do not have your own legal adviser, you might be able to speak to a duty adviser (a legal professional who helps people at court) on the day of your hearing.
+    If they’re available, they can give you advice and represent you at the hearing for free.
+  </p>
+  <p class="govuk-body">
+    If you want to speak to the duty adviser, arrive at least 45 minutes before your hearing.
+  </p>
+
+    <form method="post" novalidate>
+
+      {% for fieldName, fieldConfig in step.fields %}
+        {% if fieldConfig.type == 'radios' %}
+          {{ govukRadios(fieldConfig) }}
+        {% endif %}
+      {% endfor %}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.continue', 'Save and continue'),
+        attributes: { type: 'submit' }
+      }) }}
+
+      <a href="/" class="govuk-link">{{ t('buttons.cancel', 'Cancel') }}</a>
+    </div>
+
+    
+  </form>
+
+{% endblock %}
