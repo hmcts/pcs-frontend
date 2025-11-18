@@ -68,7 +68,7 @@ describe('DocumentClient', () => {
         data: mockBuffer,
         headers: {
           'content-type': 'application/pdf',
-          'original-file-name': 'test-document.pdf',
+          'content-disposition': 'attachment; filename="test-document.pdf"',
         },
       });
 
@@ -95,7 +95,7 @@ describe('DocumentClient', () => {
       mockGet.mockResolvedValue({
         data: mockBuffer,
         headers: {
-          'original-file-name': 'test.txt',
+          'content-disposition': 'attachment; filename="test.txt"',
         },
       });
 
@@ -120,6 +120,24 @@ describe('DocumentClient', () => {
 
       expect(result.contentType).toBe('text/plain');
       expect(result.fileName).toBe('document-test-doc-id');
+    });
+
+    it('parses UTF-8 encoded filename from Content-Disposition', async () => {
+      const mockDocumentId = 'test-doc-id';
+      const mockBuffer = Buffer.from('test content');
+
+      mockGet.mockResolvedValue({
+        data: mockBuffer,
+        headers: {
+          'content-type': 'application/pdf',
+          'content-disposition': 'attachment; filename="docupload-pdf.pdf"; filename*=UTF-8\'\'docupload-pdf.pdf',
+        },
+      });
+
+      const result = await documentClient.retrieveDocument(mockDocumentId, mockAccessToken);
+
+      expect(result.contentType).toBe('application/pdf');
+      expect(result.fileName).toBe('docupload-pdf.pdf');
     });
 
     it('throws error when document retrieval fails', async () => {

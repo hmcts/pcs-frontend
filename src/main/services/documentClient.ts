@@ -66,7 +66,23 @@ export class DocumentClient {
 
       // Extract content type and filename from response headers
       const contentType = response.headers['content-type'] || 'application/octet-stream';
-      const fileName = response.headers['original-file-name'] || `document-${documentId}`;
+
+      // Parse filename from Content-Disposition header
+      let fileName = `document-${documentId}`;
+      const contentDisposition = response.headers['content-disposition'];
+      if (contentDisposition) {
+        // Try to extract filename* (UTF-8 encoded) first: filename*=UTF-8''filename.pdf
+        const filenameStarMatch = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+        if (filenameStarMatch) {
+          fileName = decodeURIComponent(filenameStarMatch[1]);
+        } else {
+          // Try standard filename with quotes: filename="filename.pdf"
+          const filenameMatch = contentDisposition.match(/filename="([^"]+)"/i);
+          if (filenameMatch) {
+            fileName = filenameMatch[1];
+          }
+        }
+      }
 
       logger.info(`[documentClient] Successfully retrieved document: ${fileName} (${contentType})`);
 
