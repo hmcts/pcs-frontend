@@ -1,9 +1,9 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 
-import { getValidatedLanguage } from '../app/utils/getValidatedLanguage';
+import { getValidatedLanguage } from '../app/utils/i18n';
+import { stepDependencyCheckMiddleware } from '../app/utils/stepFlow';
 import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
-import { stepDependencyCheckMiddleware } from '../middleware/stepDependencyCheck';
 import { stepsWithContent } from '../steps';
 import { userJourneyFlowConfig } from '../steps/userJourney/flow.config';
 
@@ -11,8 +11,6 @@ const logger = Logger.getLogger('registerSteps');
 
 export default function registerSteps(app: Application): void {
   for (const step of stepsWithContent) {
-    // Check if step requires auth from flow configuration
-    // Defaults to true if requiresAuth is not specified
     const stepConfig = userJourneyFlowConfig.steps[step.name];
     const requiresAuth = stepConfig?.requiresAuth !== false;
     const middlewares = requiresAuth ? [oidcMiddleware, ccdCaseMiddleware] : [];
@@ -49,7 +47,6 @@ export default function registerSteps(app: Application): void {
 
   const protectedStepsCount = stepsWithContent.filter(step => {
     const stepConfig = userJourneyFlowConfig.steps[step.name];
-    // Default to true if requiresAuth is undefined/null
     return stepConfig?.requiresAuth !== false;
   }).length;
 

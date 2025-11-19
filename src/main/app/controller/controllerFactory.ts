@@ -2,16 +2,28 @@ import { Request, Response } from 'express';
 
 import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
-import { getValidatedLanguage } from '../utils/getValidatedLanguage';
-import type { SupportedLang } from '../utils/getValidatedLanguage';
-import { stepNavigation } from '../utils/stepNavigation';
+import { type SupportedLang, getValidatedLanguage } from '../utils/i18n';
+import { stepNavigation } from '../utils/stepFlow';
 
-import { GetController } from './GetController';
-import { getFormData, setFormData } from './sessionHelper';
-import { validateForm } from './validation';
+import { getFormData, setFormData, validateForm } from './formHelpers';
 
 type GenerateContentFn = (lang?: SupportedLang) => StepFormData;
 type PostControllerCallback = (req: Request, res: Response) => Promise<void> | void;
+type TranslationFn = (req: Request) => StepFormData;
+
+export class GetController {
+  constructor(
+    private view: string,
+    private generateContent: TranslationFn
+  ) {}
+
+  get = (req: Request, res: Response): void => {
+    const content = this.generateContent(req);
+    res.render(this.view, {
+      ...content,
+    });
+  };
+}
 
 export const createGetController = (
   view: string,
@@ -56,15 +68,6 @@ export const createPostRedirectController = (nextUrl: string): { post: (req: Req
   };
 };
 
-/**
- * Creates a post controller with automatic validation and redirect to next step
- * @param stepName - Name of the current step
- * @param generateContent - Function to generate content for error rendering
- * @param getFields - Function to get form field configurations
- * @param view - View template path for error rendering
- * @param beforeRedirect - Optional callback to execute before redirect (e.g., update CCD case)
- * @returns Post controller handler
- */
 export const createPostController = (
   stepName: string,
   generateContent: GenerateContentFn,

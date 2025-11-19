@@ -1,11 +1,16 @@
 import type { Request } from 'express';
 
 import { createGetController } from '../../../../main/app/controller/controllerFactory';
-import { getFormData } from '../../../../main/app/controller/sessionHelper';
+import { getFormData } from '../../../../main/app/controller/formHelpers';
 
-jest.mock('../../../../main/app/controller/sessionHelper');
-jest.mock('../../../../main/app/utils/getValidatedLanguage', () => ({
+jest.mock('../../../../main/app/controller/formHelpers');
+jest.mock('../../../../main/app/utils/i18n', () => ({
   getValidatedLanguage: jest.fn(() => 'en'),
+}));
+jest.mock('../../../../main/app/utils/stepFlow', () => ({
+  stepNavigation: {
+    getBackUrl: jest.fn(() => null),
+  },
 }));
 
 const mockGetFormData = getFormData as jest.Mock;
@@ -51,6 +56,7 @@ describe('createGetController', () => {
       lang: 'en',
       pageUrl: '/',
       t: undefined,
+      backUrl: null,
     });
   });
 
@@ -79,6 +85,7 @@ describe('createGetController', () => {
       lang: 'en',
       pageUrl: '/',
       t: undefined,
+      backUrl: null,
     });
   });
 
@@ -107,6 +114,7 @@ describe('createGetController', () => {
       lang: 'en',
       pageUrl: '/',
       t: undefined,
+      backUrl: null,
     });
   });
 });

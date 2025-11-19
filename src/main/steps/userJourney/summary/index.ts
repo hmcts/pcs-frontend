@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 
 import { createGetController, createPostController } from '../../../app/controller/controllerFactory';
-import { createGenerateContent } from '../../../app/utils/createGenerateContent';
+import { createGenerateContent } from '../../../app/utils/i18n';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';

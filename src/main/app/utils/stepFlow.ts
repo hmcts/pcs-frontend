@@ -1,73 +1,11 @@
-/**
- * Condition function that determines if a route should be taken
- */
-export type StepCondition = (formData: Record<string, unknown>, currentStepData: Record<string, unknown>) => boolean;
+import { Logger } from '@hmcts/nodejs-logging';
+import { NextFunction, Request, Response } from 'express';
 
-/**
- * Defines where to go next based on conditions
- */
-export interface StepRoute {
-  /**
-   * Condition to check. If not provided, this is the default route.
-   * If multiple routes are provided, the first matching condition is used.
-   */
-  condition?: StepCondition;
-  /**
-   * Name of the next step to go to
-   */
-  nextStep: string;
-}
+import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
+import { userJourneyFlowConfig } from '../../steps/userJourney/flow.config';
 
-/**
- * Step flow configuration
- */
-export interface StepConfig {
-  /**
-   * Dependencies - steps that must be completed before this step can be accessed
-   */
-  dependencies?: string[];
-  /**
-   * Routes to determine where to go after this step is submitted
-   * If multiple routes are provided, the first matching condition is used.
-   */
-  routes?: StepRoute[];
-  /**
-   * Default next step if no routes are provided or no conditions match
-   */
-  defaultNext?: string;
-  /**
-   * Whether this step requires authentication
-   */
-  requiresAuth?: boolean;
-}
+const logger = Logger.getLogger('stepDependencyCheck');
 
-/**
- * Complete step flow configuration for a journey
- */
-export interface JourneyFlowConfig {
-  /**
-   * Base path for the journey URLs (e.g., '/steps/user-journey', '/defendant', '/applicant')
-   * If not provided, defaults to '/steps/{journeyName}'
-   */
-  basePath?: string;
-  /**
-   * Journey name/path used for URL generation (e.g., 'user-journey', 'eligibility')
-   * Only used if basePath is not provided
-   */
-  journeyName?: string;
-  /**
-   * Ordered list of step names defining the default flow
-   */
-  stepOrder: string[];
-  /**
-   * Configuration for each step
-   */
-  steps: Record<string, StepConfig>;
-}
-
-/**
- * Get the next step name for a given step
- */
 export function getNextStep(
   currentStepName: string,
   flowConfig: JourneyFlowConfig,
@@ -75,17 +13,8 @@ export function getNextStep(
   currentStepData: Record<string, unknown> = {}
 ): string | null {
   const stepConfig = flowConfig.steps[currentStepName];
-  if (!stepConfig) {
-    // If no config, use step order
-    const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
-    if (currentIndex >= 0 && currentIndex < flowConfig.stepOrder.length - 1) {
-      return flowConfig.stepOrder[currentIndex + 1];
-    }
-    return null;
-  }
 
-  // Check conditional routes first
-  if (stepConfig.routes && stepConfig.routes.length > 0) {
+  if (stepConfig?.routes) {
     for (const route of stepConfig.routes) {
       if (!route.condition || route.condition(formData, currentStepData)) {
         return route.nextStep;
@@ -93,12 +22,10 @@ export function getNextStep(
     }
   }
 
-  // Use default next step if provided
-  if (stepConfig.defaultNext) {
+  if (stepConfig?.defaultNext) {
     return stepConfig.defaultNext;
   }
 
-  // Otherwise, use step order
   const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
   if (currentIndex >= 0 && currentIndex < flowConfig.stepOrder.length - 1) {
     return flowConfig.stepOrder[currentIndex + 1];
@@ -107,9 +34,6 @@ export function getNextStep(
   return null;
 }
 
-/**
- * Get the previous step name for a given step
- */
 export function getPreviousStep(currentStepName: string, flowConfig: JourneyFlowConfig): string | null {
   const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
   if (currentIndex > 0) {
@@ -118,30 +42,18 @@ export function getPreviousStep(currentStepName: string, flowConfig: JourneyFlow
   return null;
 }
 
-/**
- * Get the URL for a step by name
- * @param stepName - Name of the step
- * @param flowConfig - Journey flow configuration
- */
 export function getStepUrl(stepName: string, flowConfig: JourneyFlowConfig): string {
-  // Use basePath if provided, otherwise construct from journeyName
   if (flowConfig.basePath) {
     return `${flowConfig.basePath}/${stepName}`;
   }
 
-  // Fallback to default structure if journeyName is provided
   if (flowConfig.journeyName) {
     return `/steps/${flowConfig.journeyName}/${stepName}`;
   }
 
-  // Last resort: just use step name (shouldn't happen in practice)
   return `/${stepName}`;
 }
 
-/**
- * Check if a step can be accessed based on dependencies
- * @returns Name of the first missing dependency, or null if all dependencies are met
- */
 export function checkStepDependencies(
   stepName: string,
   flowConfig: JourneyFlowConfig,
@@ -153,11 +65,61 @@ export function checkStepDependencies(
   }
 
   for (const dependency of stepConfig.dependencies) {
-    // A dependency is considered complete if the step's data exists in formData
     if (!formData[dependency]) {
       return dependency;
     }
   }
 
   return null;
+}
+
+export function createStepNavigation(flowConfig: JourneyFlowConfig): {
+  getNextStepUrl: (req: Request, currentStepName: string, currentStepData?: Record<string, unknown>) => string | null;
+  getBackUrl: (req: Request, currentStepName: string) => string | null;
+  getStepUrl: (stepName: string) => string;
+} {
+  return {
+    getNextStepUrl: (
+      req: Request,
+      currentStepName: string,
+      currentStepData: Record<string, unknown> = {}
+    ): string | null => {
+      const formData = req.session.formData || {};
+      const nextStep = getNextStep(currentStepName, flowConfig, formData, currentStepData);
+      return nextStep ? getStepUrl(nextStep, flowConfig) : null;
+    },
+
+    getBackUrl: (req: Request, currentStepName: string): string | null => {
+      const previousStep = getPreviousStep(currentStepName, flowConfig);
+      return previousStep ? getStepUrl(previousStep, flowConfig) : null;
+    },
+
+    getStepUrl: (stepName: string): string => {
+      return getStepUrl(stepName, flowConfig);
+    },
+  };
+}
+
+export const stepNavigation = createStepNavigation(userJourneyFlowConfig);
+
+export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = userJourneyFlowConfig) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const urlParts = req.path.split('/');
+    const stepName = urlParts[urlParts.length - 1];
+
+    if (!stepName) {
+      return next();
+    }
+
+    const formData = req.session.formData || {};
+    const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
+
+    if (missingDependency) {
+      logger.debug(`Step ${stepName} has unmet dependency: ${missingDependency}`);
+      const dependencyUrl = getStepUrl(missingDependency, flowConfig);
+      return res.redirect(303, dependencyUrl);
+    }
+
+    next();
+  };
 }

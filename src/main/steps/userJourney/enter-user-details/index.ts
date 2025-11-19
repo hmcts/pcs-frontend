@@ -1,9 +1,8 @@
 import type { Request } from 'express';
 
 import { createGetController, createPostController } from '../../../app/controller/controllerFactory';
-import { getFormData } from '../../../app/controller/sessionHelper';
-import { createGenerateContent } from '../../../app/utils/createGenerateContent';
-import type { TranslationContent } from '../../../app/utils/loadTranslations';
+import { getFormData } from '../../../app/controller/formHelpers';
+import { type TranslationContent, createGenerateContent } from '../../../app/utils/i18n';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
@@ -12,7 +11,7 @@ const stepName = 'enter-user-details';
 const generateContent = createGenerateContent(stepName, 'userJourney');
 
 const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
-  const errors = t.errors || {};
+  const errors = (t.errors as Record<string, string>) || {};
   return [
     {
       name: 'applicantForename',

@@ -1,12 +1,14 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
-import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
-import { validateForm } from '../../../app/controller/validation';
-import { createGenerateContent } from '../../../app/utils/createGenerateContent';
-import { SupportedLang, getValidatedLanguage } from '../../../app/utils/getValidatedLanguage';
-import type { TranslationContent } from '../../../app/utils/loadTranslations';
-import { stepNavigation } from '../../../app/utils/stepNavigation';
+import { getFormData, setFormData, validateForm } from '../../../app/controller/formHelpers';
+import {
+  type SupportedLang,
+  type TranslationContent,
+  createGenerateContent,
+  getValidatedLanguage,
+} from '../../../app/utils/i18n';
+import { stepNavigation } from '../../../app/utils/stepFlow';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
@@ -19,7 +21,7 @@ export const partialUkPostcodePattern = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s*[0-9]?[A-Z]
 const postcodeRegex = new RegExp(partialUkPostcodePattern);
 
 const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
-  const errors = t.errors || {};
+  const errors = (t.errors as Record<string, string>) || {};
   return [
     { name: 'addressLine1', type: 'text', required: true, errorMessage: errors.addressLine1 || 'Enter address line 1' },
     { name: 'addressLine2', type: 'text', required: false },
@@ -74,9 +76,10 @@ export const step: StepDefinition = {
       if (action === 'find-address') {
         if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
           req.session.lookupPostcode = lookupPostcode;
+          const errors = (content.errors as Record<string, string>) || {};
           req.session.lookupError = {
             field: 'lookupPostcode',
-            text: content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode',
+            text: errors.invalidPostcode || 'Enter a valid or partial UK postcode',
           };
           return res.redirect(303, `${enterAddressPath}?lookup=1`);
         }
@@ -86,9 +89,10 @@ export const step: StepDefinition = {
 
           if (addressResults.length === 0) {
             req.session.lookupPostcode = lookupPostcode;
+            const errors = (content.errors as Record<string, string>) || {};
             req.session.lookupError = {
               field: 'lookupPostcode',
-              text: content.errors?.noAddressesFound || 'No addresses found for that postcode',
+              text: errors.noAddressesFound || 'No addresses found for that postcode',
             };
 
             return res.redirect(303, `${enterAddressPath}?lookup=1`);
@@ -99,10 +103,10 @@ export const step: StepDefinition = {
           return res.redirect(303, `${enterAddressPath}?lookup=1`);
         } catch {
           req.session.lookupPostcode = lookupPostcode;
-
+          const errors = (content.errors as Record<string, string>) || {};
           req.session.lookupError = {
             field: 'lookupPostcode',
-            text: content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
+            text: errors.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
           };
           return res.redirect(303, `${enterAddressPath}?lookup=1`);
         }
