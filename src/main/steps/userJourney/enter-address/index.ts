@@ -3,21 +3,19 @@ import type { Request, Response } from 'express';
 import { createGetController } from '../../../app/controller/controllerFactory';
 import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
 import { validateForm } from '../../../app/controller/validation';
-import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { createGenerateContent } from '../../../app/utils/createGenerateContent';
+import { SupportedLang, getValidatedLanguage } from '../../../app/utils/getValidatedLanguage';
+import type { TranslationContent } from '../../../app/utils/loadTranslations';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
-import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'enter-address';
+const generateContent = createGenerateContent(stepName, 'userJourney');
 
 export const partialUkPostcodePattern = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s*[0-9]?[A-Z]{0,2}$/i;
 const postcodeRegex = new RegExp(partialUkPostcodePattern);
-
-const generateContent = (lang = 'en'): TranslationContent => {
-  return loadTranslations(lang, ['common', 'userJourney/enterAddress']);
-};
 
 const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
   const errors = t.errors || {};
@@ -44,12 +42,10 @@ export const step: StepDefinition = {
   view: 'steps/userJourney/enterAddress.njk',
   stepDir: __dirname,
   generateContent,
-  getController: (lang = 'en') => {
-    const content = generateContent(lang);
-
-    return createGetController('steps/userJourney/enterAddress.njk', stepName, content, req => {
-      const requestLang = getValidatedLanguage(req);
-      const requestContent = generateContent(requestLang);
+  getController: () => {
+    return createGetController('steps/userJourney/enterAddress.njk', stepName, generateContent('en'), req => {
+      const lang = getValidatedLanguage(req);
+      const content = generateContent(lang);
       const savedData = getFormData(req, stepName);
       const lookupPostcode = req.session.lookupPostcode || '';
       const addressResults = req.session.postcodeLookupResult || null;
@@ -59,7 +55,7 @@ export const step: StepDefinition = {
       delete req.session.lookupError;
 
       return {
-        ...requestContent,
+        ...content,
         ...savedData,
         lookupPostcode,
         addressResults,

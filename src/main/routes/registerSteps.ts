@@ -1,9 +1,9 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 
+import { getValidatedLanguage } from '../app/utils/getValidatedLanguage';
 import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
 import { protectedSteps, stepsWithContent } from '../steps';
-import { getValidatedLanguage } from '../utils/getValidatedLanguage';
 
 const logger = Logger.getLogger('registerSteps');
 
@@ -29,7 +29,7 @@ export default function registerSteps(app: Application): void {
           },
         });
 
-        const controller = typeof step.getController === 'function' ? step.getController(lang) : step.getController;
+        const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
         return controller.get(req, res);
       });
     }

@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import type { ParsedQs } from 'qs';
 
-import { getValidatedLanguage } from '../../../main/utils/getValidatedLanguage';
+import { getValidatedLanguage } from '../../../main/app/utils/getValidatedLanguage';
 
 describe('getValidatedLanguage', () => {
   function createMockRequest(lang: unknown): Partial<Request> {

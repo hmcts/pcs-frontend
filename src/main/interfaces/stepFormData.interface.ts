@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 
 import { GetController } from '../app/controller/GetController';
-import { type SupportedLang } from '../utils/getValidatedLanguage';
+import { type SupportedLang } from '../app/utils/getValidatedLanguage';
 
 export interface ErrorField {
   field: string;

@@ -1,17 +1,14 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
-import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { createGenerateContent } from '../../../app/utils/createGenerateContent';
+import { getValidatedLanguage } from '../../../app/utils/getValidatedLanguage';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'summary';
-
-const generateContent = (lang = 'en'): TranslationContent => {
-  return loadTranslations(lang, ['common', 'userJourney/summary']);
-};
+const generateContent = createGenerateContent(stepName, 'userJourney');
 
 export const step: StepDefinition = {
   url: '/steps/user-journey/summary',
@@ -20,17 +17,17 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   generateContent,
   middleware: [pcqRedirectMiddleware()],
-  getController: (lang: SupportedLang = 'en') =>
-    createGetController('steps/userJourney/summary.njk', stepName, generateContent(lang), req => {
-      const requestLang = getValidatedLanguage(req);
+  getController: () =>
+    createGetController('steps/userJourney/summary.njk', stepName, generateContent('en'), req => {
+      const lang = getValidatedLanguage(req);
+      const content = generateContent(lang);
       const userDetails = req.session.formData?.['enter-user-details'];
       const address = req.session.formData?.['enter-address'];
       return {
-        ...generateContent(requestLang),
+        ...content,
         userDetails,
         address,
         backUrl: '/steps/user-journey/enter-address',
-        lang: requestLang,
       };
     }),
   postController: {

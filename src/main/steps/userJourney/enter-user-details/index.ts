@@ -3,17 +3,15 @@ import type { Request, Response } from 'express';
 import { createGetController } from '../../../app/controller/controllerFactory';
 import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
 import { validateForm } from '../../../app/controller/validation';
-import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { createGenerateContent } from '../../../app/utils/createGenerateContent';
+import { SupportedLang, getValidatedLanguage } from '../../../app/utils/getValidatedLanguage';
+import type { TranslationContent } from '../../../app/utils/loadTranslations';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'enter-user-details';
-
-const generateContent = (lang = 'en'): TranslationContent => {
-  return loadTranslations(lang, ['common', 'userJourney/enterUserDetails']);
-};
+const generateContent = createGenerateContent(stepName, 'userJourney');
 
 const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
   const errors = t.errors || {};
@@ -39,19 +37,14 @@ export const step: StepDefinition = {
   view: 'steps/userJourney/enterUserDetails.njk',
   stepDir: __dirname,
   generateContent,
-  getController: (lang = 'en') => {
-    const content = generateContent(lang);
-    return createGetController('steps/userJourney/enterUserDetails.njk', stepName, content, req => {
-      const requestLang = getValidatedLanguage(req);
-      const requestContent = generateContent(requestLang);
+  getController: () => {
+    return createGetController('steps/userJourney/enterUserDetails.njk', stepName, generateContent('en'), req => {
+      const lang = getValidatedLanguage(req);
+      const content = generateContent(lang);
       const savedData = getFormData(req, stepName);
       return {
-        ...requestContent,
+        ...content,
         ...savedData,
-        common: requestContent,
-        labels: requestContent.labels,
-        errors: requestContent.errors,
-        title: requestContent.title,
       };
     });
   },

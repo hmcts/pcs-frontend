@@ -1,15 +1,12 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
-import { type TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { createGenerateContent } from '../../../app/utils/createGenerateContent';
+import { getValidatedLanguage } from '../../../app/utils/getValidatedLanguage';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { type SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'application-submitted';
-
-const generateContent = (lang: SupportedLang = 'en'): TranslationContent => {
-  return loadTranslations(lang, ['common', 'userJourney/applicationSubmitted']);
-};
+const generateContent = createGenerateContent(stepName, 'userJourney');
 
 export const step: StepDefinition = {
   url: '/steps/user-journey/application-submitted',
@@ -17,12 +14,11 @@ export const step: StepDefinition = {
   view: 'steps/userJourney/applicationSubmitted.njk',
   stepDir: __dirname,
   generateContent,
-  getController: (lang: SupportedLang = 'en') => {
-    const content = generateContent(lang);
-    return createGetController('steps/userJourney/applicationSubmitted.njk', stepName, content, req => {
-      const requestLang = getValidatedLanguage(req);
+  getController: () => {
+    return createGetController('steps/userJourney/applicationSubmitted.njk', stepName, generateContent('en'), req => {
+      const lang = getValidatedLanguage(req);
       return {
-        ...generateContent(requestLang),
+        ...generateContent(lang),
       };
     });
   },

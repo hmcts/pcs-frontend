@@ -9,7 +9,7 @@ jest.mock('@hmcts/nodejs-logging', () => ({
   },
 }));
 
-jest.mock('../../../main/utils/getValidatedLanguage', () => ({
+jest.mock('../../../main/app/utils/getValidatedLanguage', () => ({
   getValidatedLanguage: jest.fn(() => 'en'),
 }));
 
@@ -63,9 +63,9 @@ jest.mock('../../../main/steps', () => ({
 
 import { Application } from 'express';
 
+import { getValidatedLanguage } from '../../../main/app/utils/getValidatedLanguage';
 import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
 import registerSteps from '../../../main/routes/registerSteps';
-import { getValidatedLanguage } from '../../../main/utils/getValidatedLanguage';
 
 describe('registerSteps', () => {
   const mockGet = jest.fn();
@@ -149,7 +149,7 @@ describe('registerSteps', () => {
     const { mockReq, mockRes } = executeHandler('/steps/function-controller');
 
     const mockGetControllerFn = mockStepsData.stepWithFunctionController.getController as jest.Mock;
-    expect(mockGetControllerFn).toHaveBeenCalledWith('en');
+    expect(mockGetControllerFn).toHaveBeenCalledWith();
 
     const returnedController = mockGetControllerFn.mock.results[0].value;
     expect(returnedController.get).toHaveBeenCalledWith(mockReq, mockRes);
