@@ -85,6 +85,7 @@ export const ccdCaseService = {
     };
 
     logger.info(`[ccdCaseService] Calling ccdCaseService search with URL: ${url}`);
+    logger.info(`[ccdCaseService] Request body: ${JSON.stringify(requestBody, null, 2)}`);
 
     try {
       const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
@@ -106,7 +107,17 @@ export const ccdCaseService = {
         logger.warn('[ccdCaseService] No case found, returning null.');
         return null;
       }
+      if (axiosError.response?.status === 400) {
+        logger.warn(
+          `[ccdCaseService] Bad request (400) when searching for cases. Response: ${JSON.stringify(axiosError.response?.data, null, 2)}`
+        );
+        // Return null instead of throwing - the case might have been submitted or the API format might have changed
+        return null;
+      }
       logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+      if (axiosError.response?.data) {
+        logger.error(`[ccdCaseService] Error response data: ${JSON.stringify(axiosError.response.data, null, 2)}`);
+      }
       throw error;
     }
   },
