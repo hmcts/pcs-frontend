@@ -2,33 +2,45 @@ import { Request, Response } from 'express';
 
 import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
+import { getValidatedLanguage } from '../utils/getValidatedLanguage';
+import type { SupportedLang } from '../utils/getValidatedLanguage';
 
 import { GetController } from './GetController';
 import { getFormData, setFormData } from './sessionHelper';
 import { validateForm } from './validation';
 
+type GenerateContentFn = (lang?: SupportedLang) => StepFormData;
+
 export const createGetController = (
   view: string,
   stepName: string,
-  content: StepFormData,
-  extendContent?: (req: Request) => StepFormData
+  generateContent: GenerateContentFn,
+  extendContent?: (req: Request, content: StepFormData) => StepFormData
 ): GetController => {
   return new GetController(view, (req: Request) => {
     const formData = getFormData(req, stepName);
     const postData = req.body || {};
 
+    // Get validated language and generate content
+    const lang = getValidatedLanguage(req);
+    const content = generateContent(lang);
+
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
-    return {
+    const baseContent = {
       ...content,
       ...formData,
-      lang: req.language || 'en',
+      lang,
       pageUrl: req.originalUrl || '/',
       selected,
       t: req.t,
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
-      ...(extendContent ? extendContent(req) : {}),
+    };
+
+    return {
+      ...baseContent,
+      ...(extendContent ? extendContent(req, content) : {}),
     };
   });
 };

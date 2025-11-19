@@ -2,7 +2,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { AxiosError } from 'axios';
 import config from 'config';
 
-import { CaseState, CcdCase, CcdCaseData, CcdUserCases } from '../interfaces/ccdCase.interface';
+import { CaseState, CcdCase, CcdUserCases, UserJourneyCaseData } from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
 
 const logger = Logger.getLogger('ccdCaseService');
@@ -48,7 +48,7 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: CcdCaseData
+  data: UserJourneyCaseData
 ): Promise<CcdCase> {
   const payload = {
     data,
@@ -111,7 +111,7 @@ export const ccdCaseService = {
     }
   },
 
-  async createCase(accessToken: string | undefined, data: CcdCaseData): Promise<CcdCase> {
+  async createCase(accessToken: string | undefined, data: UserJourneyCaseData): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/cases`;

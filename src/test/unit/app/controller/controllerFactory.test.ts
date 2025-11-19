@@ -4,6 +4,9 @@ import { createGetController } from '../../../../main/app/controller/controllerF
 import { getFormData } from '../../../../main/app/controller/sessionHelper';
 
 jest.mock('../../../../main/app/controller/sessionHelper');
+jest.mock('../../../../main/app/utils/getValidatedLanguage', () => ({
+  getValidatedLanguage: jest.fn(() => 'en'),
+}));
 
 const mockGetFormData = getFormData as jest.Mock;
 describe('createGetController', () => {
@@ -14,6 +17,13 @@ describe('createGetController', () => {
 
   const stepName = 'page1';
   const viewPath = 'steps/page1.njk';
+
+  const mockGenerateContent = jest.fn((_lang?: string) => mockContent);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGenerateContent.mockReturnValue(mockContent);
+  });
 
   it('should merge content with form data from session when available', () => {
     const req = {
@@ -27,9 +37,10 @@ describe('createGetController', () => {
 
     mockGetFormData.mockReturnValue({ answer: 'sessionAnswer', choices: ['choice1'] });
 
-    const controller = createGetController(viewPath, stepName, mockContent);
+    const controller = createGetController(viewPath, stepName, mockGenerateContent);
     controller.get(req, res);
 
+    expect(mockGenerateContent).toHaveBeenCalledWith('en');
     expect(mockGetFormData).toHaveBeenCalledWith(req, 'page1');
     expect(res.render).toHaveBeenCalledWith(viewPath, {
       ...mockContent,
@@ -55,9 +66,10 @@ describe('createGetController', () => {
 
     mockGetFormData.mockReturnValue({ answer: 'sessionAnswer' });
 
-    const controller = createGetController(viewPath, stepName, mockContent);
+    const controller = createGetController(viewPath, stepName, mockGenerateContent);
     controller.get(req, res);
 
+    expect(mockGenerateContent).toHaveBeenCalledWith('en');
     expect(res.render).toHaveBeenCalledWith(viewPath, {
       ...mockContent,
       selected: 'sessionAnswer',
@@ -82,9 +94,10 @@ describe('createGetController', () => {
 
     mockGetFormData.mockReturnValue({});
 
-    const controller = createGetController(viewPath, stepName, mockContent);
+    const controller = createGetController(viewPath, stepName, mockGenerateContent);
     controller.get(req, res);
 
+    expect(mockGenerateContent).toHaveBeenCalledWith('en');
     expect(res.render).toHaveBeenCalledWith(viewPath, {
       ...mockContent,
       selected: undefined,

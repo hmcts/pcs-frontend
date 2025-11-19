@@ -43,9 +43,7 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   generateContent,
   getController: () => {
-    return createGetController('steps/userJourney/enterAddress.njk', stepName, generateContent('en'), req => {
-      const lang = getValidatedLanguage(req);
-      const content = generateContent(lang);
+    return createGetController('steps/userJourney/enterAddress.njk', stepName, generateContent, (req, _content) => {
       const savedData = getFormData(req, stepName);
       const lookupPostcode = req.session.lookupPostcode || '';
       const addressResults = req.session.postcodeLookupResult || null;
@@ -55,7 +53,6 @@ export const step: StepDefinition = {
       delete req.session.lookupError;
 
       return {
-        ...content,
         ...savedData,
         lookupPostcode,
         addressResults,

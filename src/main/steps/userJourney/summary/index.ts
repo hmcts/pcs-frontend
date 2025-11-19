@@ -2,7 +2,6 @@ import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
 import { createGenerateContent } from '../../../app/utils/createGenerateContent';
-import { getValidatedLanguage } from '../../../app/utils/getValidatedLanguage';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';
@@ -18,13 +17,10 @@ export const step: StepDefinition = {
   generateContent,
   middleware: [pcqRedirectMiddleware()],
   getController: () =>
-    createGetController('steps/userJourney/summary.njk', stepName, generateContent('en'), req => {
-      const lang = getValidatedLanguage(req);
-      const content = generateContent(lang);
+    createGetController('steps/userJourney/summary.njk', stepName, generateContent, (req, _content) => {
       const userDetails = req.session.formData?.['enter-user-details'];
       const address = req.session.formData?.['enter-address'];
       return {
-        ...content,
         userDetails,
         address,
         backUrl: '/steps/user-journey/enter-address',

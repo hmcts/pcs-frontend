@@ -38,12 +38,9 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   generateContent,
   getController: () => {
-    return createGetController('steps/userJourney/enterUserDetails.njk', stepName, generateContent('en'), req => {
-      const lang = getValidatedLanguage(req);
-      const content = generateContent(lang);
+    return createGetController('steps/userJourney/enterUserDetails.njk', stepName, generateContent, (req, _content) => {
       const savedData = getFormData(req, stepName);
       return {
-        ...content,
         ...savedData,
       };
     });
