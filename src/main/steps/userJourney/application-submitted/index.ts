@@ -19,22 +19,22 @@ export const step: StepDefinition = {
   generateContent,
   getController: (lang: SupportedLang = 'en') => {
     const content = generateContent(lang);
-    return createGetController('steps/userJourney/applicationSubmitted.njk', stepName, content, _req => ({
-      ...content,
-    }));
+    return createGetController('steps/userJourney/applicationSubmitted.njk', stepName, content, req => {
+      const requestLang = getValidatedLanguage(req);
+      return {
+        ...generateContent(requestLang),
+      };
+    });
   },
   postController: {
     post: async (req: Request, res: Response) => {
-      const lang: SupportedLang = getValidatedLanguage(req);
-
       delete req.session.ccdCase;
       delete req.session.formData;
       delete req.session.postcodeLookupResult;
 
       const redirectPath = '/steps/user-journey/enter-user-details' as const;
-      const qs = new URLSearchParams({ lang }).toString();
 
-      res.redirect(303, `${redirectPath}?${qs}`);
+      res.redirect(303, redirectPath);
     },
   },
 };

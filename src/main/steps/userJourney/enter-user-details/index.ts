@@ -42,14 +42,16 @@ export const step: StepDefinition = {
   getController: (lang = 'en') => {
     const content = generateContent(lang);
     return createGetController('steps/userJourney/enterUserDetails.njk', stepName, content, req => {
+      const requestLang = getValidatedLanguage(req);
+      const requestContent = generateContent(requestLang);
       const savedData = getFormData(req, stepName);
       return {
-        ...content,
+        ...requestContent,
         ...savedData,
-        common: content,
-        labels: content.labels,
-        errors: content.errors,
-        title: content.title,
+        common: requestContent,
+        labels: requestContent.labels,
+        errors: requestContent.errors,
+        title: requestContent.title,
       };
     });
   },
@@ -89,9 +91,8 @@ export const step: StepDefinition = {
       }
 
       const redirectPath = '/steps/user-journey/enter-address' as const;
-      const qs = new URLSearchParams({ lang }).toString();
 
-      res.redirect(303, `${redirectPath}?${qs}`);
+      res.redirect(303, redirectPath);
     },
   },
 };

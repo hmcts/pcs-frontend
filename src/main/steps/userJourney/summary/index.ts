@@ -20,30 +20,28 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   generateContent,
   middleware: [pcqRedirectMiddleware()],
-  getController: (lang = 'en') =>
+  getController: (lang: SupportedLang = 'en') =>
     createGetController('steps/userJourney/summary.njk', stepName, generateContent(lang), req => {
+      const requestLang = getValidatedLanguage(req);
       const userDetails = req.session.formData?.['enter-user-details'];
       const address = req.session.formData?.['enter-address'];
       return {
-        ...generateContent(lang),
+        ...generateContent(requestLang),
         userDetails,
         address,
-        backUrl: `/steps/user-journey/enter-address?lang=${lang}`,
-        lang,
+        backUrl: '/steps/user-journey/enter-address',
+        lang: requestLang,
       };
     }),
   postController: {
     post: async (req: Request, res: Response) => {
       try {
-        const lang: SupportedLang = getValidatedLanguage(req);
-
         if (req.session.ccdCase && req.session.user) {
           await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
         }
         const redirectPath = '/steps/user-journey/application-submitted' as const;
-        const qs = new URLSearchParams({ lang }).toString();
 
-        res.redirect(303, `${redirectPath}?${qs}`);
+        res.redirect(303, redirectPath);
       } catch {
         res.status(500).send('There was an error submitting your application.');
       }
