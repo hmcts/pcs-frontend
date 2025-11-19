@@ -1,10 +1,8 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 
-import { createGetController } from '../../../app/controller/controllerFactory';
-import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
-import { validateForm } from '../../../app/controller/validation';
+import { createGetController, createPostController } from '../../../app/controller/controllerFactory';
+import { getFormData } from '../../../app/controller/sessionHelper';
 import { createGenerateContent } from '../../../app/utils/createGenerateContent';
-import { SupportedLang, getValidatedLanguage } from '../../../app/utils/getValidatedLanguage';
 import type { TranslationContent } from '../../../app/utils/loadTranslations';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
@@ -45,22 +43,12 @@ export const step: StepDefinition = {
       };
     });
   },
-  postController: {
-    post: async (req: Request, res: Response) => {
-      const lang: SupportedLang = getValidatedLanguage(req);
-      const content = generateContent(lang);
-      const fields = getFields(content);
-      const errors = validateForm(req, fields, content);
-      if (Object.keys(errors).length > 0) {
-        const firstField = Object.keys(errors)[0];
-        return res.status(400).render('steps/userJourney/enterUserDetails.njk', {
-          ...content,
-          ...req.body,
-          error: { field: firstField, text: errors[firstField] },
-        });
-      }
-
-      setFormData(req, stepName, req.body);
+  postController: createPostController(
+    stepName,
+    generateContent,
+    getFields,
+    'steps/userJourney/enterUserDetails.njk',
+    async (req: Request) => {
       const ccdCase = req.session.ccdCase;
       const user = req.session.user;
 
@@ -79,10 +67,6 @@ export const step: StepDefinition = {
           applicantSurname: req.body.applicantSurname,
         });
       }
-
-      const redirectPath = '/steps/user-journey/enter-address' as const;
-
-      res.redirect(303, redirectPath);
-    },
-  },
+    }
+  ),
 };

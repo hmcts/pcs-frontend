@@ -6,6 +6,7 @@ import { validateForm } from '../../../app/controller/validation';
 import { createGenerateContent } from '../../../app/utils/createGenerateContent';
 import { SupportedLang, getValidatedLanguage } from '../../../app/utils/getValidatedLanguage';
 import type { TranslationContent } from '../../../app/utils/loadTranslations';
+import { stepNavigation } from '../../../app/utils/stepNavigation';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
@@ -58,7 +59,6 @@ export const step: StepDefinition = {
         addressResults,
         error,
         selectedAddressIndex: savedData?.selectedAddressIndex || null,
-        backUrl: '/steps/user-journey/enter-user-details',
       };
     });
   },
@@ -68,8 +68,7 @@ export const step: StepDefinition = {
       const lang: SupportedLang = getValidatedLanguage(req);
       const content = generateContent(lang);
 
-      const enterAddressPath = '/steps/user-journey/enter-address' as const;
-      const summaryPath = '/steps/user-journey/summary' as const;
+      const enterAddressPath = stepNavigation.getStepUrl(stepName);
 
       // 🔹 Handle Find Address
       if (action === 'find-address') {
@@ -179,7 +178,14 @@ export const step: StepDefinition = {
             },
           });
         }
-        return res.redirect(303, summaryPath);
+
+        const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+
+        if (!redirectPath) {
+          return res.status(500).send('Unable to determine next step');
+        }
+
+        return res.redirect(303, redirectPath);
       }
       return res.redirect(303, enterAddressPath);
     },

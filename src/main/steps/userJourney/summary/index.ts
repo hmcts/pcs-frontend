@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 
-import { createGetController } from '../../../app/controller/controllerFactory';
+import { createGetController, createPostController } from '../../../app/controller/controllerFactory';
 import { createGenerateContent } from '../../../app/utils/createGenerateContent';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
@@ -23,21 +23,22 @@ export const step: StepDefinition = {
       return {
         userDetails,
         address,
-        backUrl: '/steps/user-journey/enter-address',
       };
     }),
-  postController: {
-    post: async (req: Request, res: Response) => {
+  postController: createPostController(
+    stepName,
+    generateContent,
+    () => [], // No validation fields for summary
+    'steps/userJourney/summary.njk',
+    async (req: Request, res: Response) => {
       try {
         if (req.session.ccdCase && req.session.user) {
           await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
         }
-        const redirectPath = '/steps/user-journey/application-submitted' as const;
-
-        res.redirect(303, redirectPath);
       } catch {
         res.status(500).send('There was an error submitting your application.');
+        return;
       }
-    },
-  },
+    }
+  ),
 };
