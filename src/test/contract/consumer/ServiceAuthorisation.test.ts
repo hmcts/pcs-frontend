@@ -10,8 +10,8 @@ const mockProvider = new Pact({
   logLevel: 'info',
 });
 
-// eslint-disable-next-line jest/no-disabled-tests
 // temporarily disabled until  DTSPO-27978 is done
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('Service Authorisation Consumer Pact Test', () => {
   beforeAll(async () => {
     await mockProvider.setup();
