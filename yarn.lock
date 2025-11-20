@@ -10863,13 +10863,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-pact@npm:^0.11.2":
-  version: 0.11.4
-  resolution: "jest-pact@npm:0.11.4"
+"jest-pact@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "jest-pact@npm:0.13.0"
   peerDependencies:
-    "@pact-foundation/pact": ^v10.0.0-beta.61 || ^10.0.2 || ^11.0.2 || ^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0
+    "@pact-foundation/pact": ^16.0.0
     jest: ^24.0.0 || ^25.0.0 || ^26.0.0 || ^27.0.0 || ^28.0.0 || ^29.0.0 || ^30.0.0
-  checksum: 10/756a481b90d6e9f8754fcf5fca232edf3cfa2ae2e9217f411f5594a5ceffe99fd30178b9f97f0ee9f601f28c9bf8c980d4c908624e79989149a3b5e8998ef0d9
+  checksum: 10/aec455f69053384847bcb3e93666ff3281a3edbc7a5ee0c842daaeb23fd7a71d247795b9818e9288753584f7be3b71fd4f0da11295617676b25a2fb5fa4e57fe
   languageName: node
   linkType: hard
 
@@ -12940,7 +12940,7 @@ __metadata:
     jest: "npm:^29.6.2"
     jest-environment-jsdom: "npm:^30.0.4"
     jest-html-reporter: "npm:^4.0.0"
-    jest-pact: "npm:^0.11.2"
+    jest-pact: "npm:^0.13.0"
     jquery: "npm:^3.7.0"
     lint-staged: "npm:^15.5.1"
     lodash: "npm:^4.17.21"
