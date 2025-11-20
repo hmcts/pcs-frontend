@@ -4,7 +4,7 @@ import config from 'config';
 
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const baseUrl = (config.get('e2e.testUrl') as string);
+const baseUrl = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   await parentSuite('Home Page');
