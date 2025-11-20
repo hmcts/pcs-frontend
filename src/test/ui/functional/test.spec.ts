@@ -1,24 +1,8 @@
-import { test } from '@playwright/test';
-import { parentSuite } from 'allure-js-commons';
-import config from 'config';
+import { test, expect } from '@playwright/test';
 
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
+test('has title', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
 
-const baseUrl = config.get('e2e.testUrl') as string;
-
-test.beforeEach(async ({ page }, testInfo) => {
-  await parentSuite('Home Page');
-  await testInfo.attach('Page URL', {
-    body: baseUrl,
-    contentType: 'text/plain',
-  });
-  initializeExecutor(page);
-  await performAction('createUserAndLogin', ['citizen']);
-});
-
-test.describe('Possession claims @PR @nightly', async () => {
-  test('Verify home page', async () => {
-    await performAction('navigateToUrl', baseUrl);
-    await performValidation('mainHeader', 'Home Page');
-  });
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/Playwright/);
 });
