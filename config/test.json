@@ -18,9 +18,6 @@
         "__name": "PCS_FRONTEND_IDAM_USER_TEMP_PASSWORD"
       },
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
-    },
-    "claimFormTestData": {
-      "eligibility": "/eligibility"
     }
   }
 }
