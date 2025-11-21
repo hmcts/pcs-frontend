@@ -24,9 +24,15 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-316.preview.platform.hmcts.net",
-    "caseTypeId": "PCS-316"
+    "url": "https://ccd-data-store-api-pcs-api-pr-925.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-925"
   },
+  "cdam": {
+    "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+  },
+  "caseType": "PCS",
+  "jurisdiction": "PCS",
+  "caseReference": "1763548752271505",
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
   },
