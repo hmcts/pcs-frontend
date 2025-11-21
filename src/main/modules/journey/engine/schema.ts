@@ -499,7 +499,7 @@ export type RadiosFieldDraft = MacroCommon &
   WithFieldset &
   WithValidation & {
     type: 'radios';
-    items?: FieldOption[];
+    items?: FieldOption[] & { divider?: string };
   };
 
 export type CheckboxesFieldDraft = MacroCommon &

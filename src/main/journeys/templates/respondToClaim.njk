@@ -17,7 +17,9 @@
       {{ govukErrorSummary(errorSummary) }}
     {% endif %}
     
-    <h1 class="govuk-heading-m govuk-!-margin-bottom-0 claim-journey-secondary-heading">Respond to a claim</h1>
+    {% if step.id != 'start' %}
+    <h1 class="govuk-heading-m govuk-!-margin-bottom-0 claim-journey-secondary-heading">Respond to a property possession claim</h1>
+    {% endif %}
     {% if step.title %}
       <h2 class="govuk-heading-l">{{ step.title }}</h2>
     {% endif %}
