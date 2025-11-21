@@ -12,19 +12,28 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 
 jest.mock('fs');
 
-import { loadTranslations } from '../../../../main/app/utils/loadTranslations';
+import { loadTranslations } from '../../../../main/app/utils/i18n';
 
 const mockedFs = fs as jest.Mocked<typeof fs>;
 const mockLogger = require('@hmcts/nodejs-logging').Logger.getLogger();
 
 describe('loadTranslations', () => {
-  const basePath = path.resolve(__dirname, '../../../../main/public/locales/en');
+  const localesDir = path.resolve(__dirname, '../../../../main/public/locales');
+  const basePath = path.join(localesDir, 'en');
   const commonContent = JSON.stringify({ title: 'Common Title' });
   const pageContent = JSON.stringify({ title: 'User Details Title' });
 
   beforeEach(() => {
     mockedFs.readFileSync.mockReset();
+    mockedFs.existsSync.mockReset();
     mockLogger.error.mockReset();
+
+    // Mock findLocalesDir - it checks for the locales directory (without language subdirectory)
+    mockedFs.existsSync.mockImplementation((filePath: fs.PathLike) => {
+      const file = filePath.toString();
+      // Return true if it's the locales directory itself (not a subdirectory)
+      return file === localesDir || file.replace(/\\/g, '/').endsWith('/public/locales');
+    });
   });
 
   it('should load translations from given namespaces', () => {

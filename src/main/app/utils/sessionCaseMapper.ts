@@ -1,11 +1,11 @@
-import type { CcdCase, CcdFormDataMap } from '../../interfaces/ccdCase.interface';
+import type { CcdCase, UserJourneyFormDataMap } from '../../interfaces/ccdCase.interface';
 
-export function mapCaseDataToFormData(caseData: CcdCase | null): Partial<CcdFormDataMap> {
+export function mapCaseDataToFormData(caseData: CcdCase | null): Partial<UserJourneyFormDataMap> {
   if (!caseData?.id || !caseData.data) {
     return {};
   }
 
-  const formData: Partial<CcdFormDataMap> = {};
+  const formData: Partial<UserJourneyFormDataMap> = {};
 
   const { applicantForename, applicantSurname, propertyAddress } = caseData.data;
 
