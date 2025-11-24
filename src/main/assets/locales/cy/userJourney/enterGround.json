@@ -1,0 +1,9 @@
+{
+  "title": "Beth yw eich sail am feddiannu?",
+  "hint": "Dewiswch yr holl seiliau sy'n berthnasol i'ch achos",
+  "continue": "Parhau",
+  "errorSummaryTitle": "Mae problem",
+  "errors": {
+    "grounds": "Dewiswch o leiaf un opsiwn"
+  }
+}

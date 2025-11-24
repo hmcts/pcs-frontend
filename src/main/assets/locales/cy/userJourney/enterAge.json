@@ -1,0 +1,8 @@
+{
+  "question": "Ydych chi dros 18?",
+  "continue": "Parhau",
+  "errorSummaryTitle": "Mae problem",
+  "errors": {
+    "age": "Dewiswch opsiwn i barhau"
+  }
+}

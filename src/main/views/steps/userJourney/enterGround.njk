@@ -1,0 +1,85 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if error %}
+      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+        <h2 class="govuk-error-summary__title" id="error-summary-title">{{ errorSummaryTitle }}</h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            <li><a href="#grounds">{{ error.text }}</a></li>
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+
+    <form method="post" action="{{ url }}">
+      <h1 class="govuk-heading-l">{{ title }}</h1>
+      
+      {% if hint %}
+        <p class="govuk-hint">{{ hint }}</p>
+      {% endif %}
+
+      {% set groundsArray = [] %}
+      {% if grounds %}
+        {% if grounds is iterable and grounds is not string %}
+          {% set groundsArray = grounds %}
+        {% else %}
+          {% set groundsArray = [grounds] %}
+        {% endif %}
+      {% endif %}
+      {% set rentArrearsChecked = false %}
+      {% set breachContractChecked = false %}
+      {% set otherChecked = false %}
+      {% for ground in groundsArray %}
+        {% if ground == "rent-arrears-8" %}
+          {% set rentArrearsChecked = true %}
+        {% endif %}
+        {% if ground == "breach-contract-9" %}
+          {% set breachContractChecked = true %}
+        {% endif %}
+        {% if ground == "other-10" %}
+          {% set otherChecked = true %}
+        {% endif %}
+      {% endfor %}
+      {{ govukCheckboxes({
+        id: "grounds",
+        name: "grounds",
+        fieldset: {
+          legend: {
+            text: title,
+            isPageHeading: false,
+            classes: "govuk-visually-hidden"
+          }
+        },
+        items: [
+          {
+            value: "rent-arrears-8",
+            text: "Rent arrears (ground 8)",
+            checked: rentArrearsChecked
+          },
+          {
+            value: "breach-contract-9",
+            text: "Breach of contract (ground 9)",
+            checked: breachContractChecked
+          },
+          {
+            value: "other-10",
+            text: "Other (ground 10)",
+            checked: otherChecked
+          }
+        ],
+        errorMessage: error?.field === "grounds" and { text: error.text }
+      }) }}
+
+      {{ govukButton({ text: continue }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}
+

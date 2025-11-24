@@ -1,0 +1,9 @@
+{
+  "title": "What are your grounds for possession?",
+  "hint": "Select all grounds that apply to your case",
+  "continue": "Continue",
+  "errorSummaryTitle": "There is a problem",
+  "errors": {
+    "grounds": "Select at least one option"
+  }
+}

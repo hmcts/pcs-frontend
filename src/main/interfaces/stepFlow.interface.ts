@@ -5,10 +5,13 @@ export interface StepRoute {
   nextStep: string;
 }
 
+export type PreviousStep = string | ((formData: Record<string, unknown>) => string);
+
 export interface StepConfig {
   dependencies?: string[];
   routes?: StepRoute[];
   defaultNext?: string;
+  previousStep?: PreviousStep;
   requiresAuth?: boolean;
 }
 
