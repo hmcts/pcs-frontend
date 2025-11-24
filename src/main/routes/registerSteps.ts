@@ -1,17 +1,23 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 
+import { getValidatedLanguage } from '../app/utils/i18n';
+import { stepDependencyCheckMiddleware } from '../app/utils/stepFlow';
 import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
-import { protectedSteps, stepsWithContent } from '../steps';
-import { getValidatedLanguage } from '../utils/getValidatedLanguage';
+import { getFlowConfigForStep, stepsWithContent } from '../steps';
 
 const logger = Logger.getLogger('registerSteps');
 
 export default function registerSteps(app: Application): void {
   for (const step of stepsWithContent) {
-    const isProtected = protectedSteps.includes(step);
-    const middlewares = isProtected ? [oidcMiddleware, ccdCaseMiddleware] : [];
-    const allGetMiddleware = step.middleware ? [...middlewares, ...step.middleware] : middlewares;
+    const flowConfig = getFlowConfigForStep(step);
+    const stepConfig = flowConfig?.steps[step.name];
+    const requiresAuth = stepConfig?.requiresAuth !== false;
+    const middlewares = requiresAuth ? [oidcMiddleware, ccdCaseMiddleware] : [];
+    const dependencyCheck = flowConfig ? stepDependencyCheckMiddleware(flowConfig) : stepDependencyCheckMiddleware();
+    const allGetMiddleware = step.middleware
+      ? [...middlewares, dependencyCheck, ...step.middleware]
+      : [...middlewares, dependencyCheck];
 
     if (step.getController) {
       app.get(step.url, ...allGetMiddleware, (req, res) => {
@@ -29,7 +35,7 @@ export default function registerSteps(app: Application): void {
           },
         });
 
-        const controller = typeof step.getController === 'function' ? step.getController(lang) : step.getController;
+        const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
         return controller.get(req, res);
       });
     }
@@ -39,8 +45,14 @@ export default function registerSteps(app: Application): void {
     }
   }
 
+  const protectedStepsCount = stepsWithContent.filter(step => {
+    const flowConfig = getFlowConfigForStep(step);
+    const stepConfig = flowConfig?.steps[step.name];
+    return stepConfig?.requiresAuth !== false;
+  }).length;
+
   logger.info('Steps registered successfully', {
     totalSteps: stepsWithContent.length,
-    protectedSteps: protectedSteps.length,
+    protectedSteps: protectedStepsCount,
   });
 }
