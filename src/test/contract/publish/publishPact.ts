@@ -15,7 +15,7 @@ const opts = {
   pactFilesOrDirs: [path.resolve(process.cwd(), PACT_DIRECTORY)],
   pactBroker: PACT_BROKER_URL,
   consumerVersion: git.short(),
-  tags: [PACT_BRANCH_NAME === 'master' ? 'master' : 'Dev'],
+  tags: [PACT_BRANCH_NAME]
 };
 
 console.debug(`Publishing Pacts with options: ${JSON.stringify(opts, null, 2)}`);
