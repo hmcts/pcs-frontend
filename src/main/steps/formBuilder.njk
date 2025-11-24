@@ -1,0 +1,114 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if error %}
+      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+        <h2 class="govuk-error-summary__title" id="error-summary-title">{{ errorSummaryTitle }}</h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            <li><a href="#{{ error.field }}">{{ error.text }}</a></li>
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if title %}
+      <h1 class="govuk-heading-l">{{ title }}</h1>
+    {% endif %}
+
+    <form method="post" action="{{ url }}">
+      {% for field in fields %}
+        {% if field.type == 'text' %}
+          {% set fieldValue = (fieldValues[field.name] | default("")) %}
+          {{ govukInput({
+            id: field.name,
+            name: field.name,
+            label: { text: field.label or field.name },
+            hint: field.hint and { text: field.hint } or null,
+            value: fieldValue,
+            classes: field.classes or "govuk-!-width-three-quarters",
+            attributes: field.attributes or {},
+            errorMessage: error and error.field == field.name and { text: error.text } or null
+          }) }}
+
+        {% elif field.type == 'radio' %}
+          {% set fieldValue = (fieldValues[field.name] | default("")) %}
+          {% set radioItems = [] %}
+          {% for option in field.options or [] %}
+            {% set radioItems = (radioItems.push({
+              value: option.value,
+              text: option.text,
+              checked: fieldValue == option.value
+            }), radioItems) %}
+          {% endfor %}
+          
+          {{ govukRadios({
+            id: field.name,
+            name: field.name,
+            fieldset: {
+              legend: {
+                text: field.label or field.name,
+                isPageHeading: loop.first and not title,
+                classes: loop.first and not title and "govuk-fieldset__legend--l" or ""
+              }
+            },
+            hint: field.hint and { text: field.hint } or null,
+            items: radioItems,
+            errorMessage: error and error.field == field.name and { text: error.text } or null
+          }) }}
+
+        {% elif field.type == 'checkbox' %}
+          {% set checkboxValue = (fieldValues[field.name] | default([])) %}
+          {% set checkboxArray = [] %}
+          {% if checkboxValue is iterable and checkboxValue is not string %}
+            {% set checkboxArray = checkboxValue %}
+          {% elif checkboxValue %}
+            {% set checkboxArray = [checkboxValue] %}
+          {% endif %}
+          
+          {% set checkboxItems = [] %}
+          {% for option in field.options or [] %}
+            {% set isChecked = false %}
+            {% for val in checkboxArray %}
+              {% if val == option.value %}
+                {% set isChecked = true %}
+              {% endif %}
+            {% endfor %}
+            {% set checkboxItems = (checkboxItems.push({
+              value: option.value,
+              text: option.text,
+              checked: isChecked
+            }), checkboxItems) %}
+          {% endfor %}
+          
+          {{ govukCheckboxes({
+            id: field.name,
+            name: field.name,
+            fieldset: {
+              legend: {
+                text: field.label or field.name,
+                isPageHeading: loop.first and not title,
+                classes: loop.first and not title and "govuk-fieldset__legend--l" or ""
+              }
+            },
+            hint: field.hint and { text: field.hint } or null,
+            items: checkboxItems,
+            errorMessage: error and error.field == field.name and { text: error.text } or null
+          }) }}
+        {% endif %}
+      {% endfor %}
+
+      {{ govukButton({ text: continue }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}
+
