@@ -1,11 +1,12 @@
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 
 import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../interfaces/stepFormData.interface';
-import { createGetController, createPostController } from '../controller/controllerFactory';
-import { getFormData } from '../controller/formHelpers';
+import { createGetController } from '../controller/controllerFactory';
+import { getFormData, setFormData, validateForm } from '../controller/formHelpers';
 
-import { type TranslationContent, createGenerateContent } from './i18n';
+import { type SupportedLang, type TranslationContent, createGenerateContent, getValidatedLanguage } from './i18n';
+import { stepNavigation } from './stepFlow';
 
 export interface FormBuilderConfig {
   stepName: string;
@@ -38,6 +39,80 @@ function getNestedTranslation(translations: TranslationContent, key: string): st
 export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir } = config;
   const generateContent = createGenerateContent(stepName, journeyFolder);
+
+  // Helper function to build form content (used for both GET and error rendering)
+  const buildFormContent = (
+    content: TranslationContent,
+    bodyData: Record<string, unknown> = {}
+  ): Record<string, unknown> => {
+    const savedData = bodyData as Record<string, unknown>;
+    const fieldsWithLabels = getFields(content);
+    const pageTitle = (content.title as string) || (content.question as string) || undefined;
+
+    // Use common translations for continue and errorSummaryTitle (from buttons.continue and errors.title)
+    const buttons = (content.buttons as Record<string, string>) || {};
+    const errors = (content.errors as Record<string, string>) || {};
+    const continueText = buttons.continue || 'Continue';
+    const errorSummaryTitle = errors.title || 'There is a problem';
+
+    const fieldValues: Record<string, unknown> = {};
+
+    // Normalize field values and create fieldValues object for template access
+    for (const field of fields) {
+      if (field.type === 'checkbox') {
+        if (savedData?.[field.name]) {
+          const value = savedData[field.name];
+          if (typeof value === 'string') {
+            fieldValues[field.name] = [value];
+          } else if (Array.isArray(value)) {
+            fieldValues[field.name] = value;
+          } else {
+            fieldValues[field.name] = [];
+          }
+        } else {
+          fieldValues[field.name] = [];
+        }
+      } else if (field.type === 'date') {
+        // Handle date fields - normalize from body data or saved data
+        if (savedData?.[field.name] && typeof savedData[field.name] === 'object') {
+          const dateValue = savedData[field.name] as { day?: string; month?: string; year?: string };
+          fieldValues[field.name] = {
+            day: dateValue.day || '',
+            month: dateValue.month || '',
+            year: dateValue.year || '',
+          };
+        } else if (
+          savedData?.[`${field.name}-day`] ||
+          savedData?.[`${field.name}-month`] ||
+          savedData?.[`${field.name}-year`]
+        ) {
+          // Handle date fields from form submission (day, month, year as separate fields)
+          fieldValues[field.name] = {
+            day: (savedData[`${field.name}-day`] as string) || '',
+            month: (savedData[`${field.name}-month`] as string) || '',
+            year: (savedData[`${field.name}-year`] as string) || '',
+          };
+        } else {
+          fieldValues[field.name] = { day: '', month: '', year: '' };
+        }
+      } else if (field.type === 'textarea') {
+        // For textarea fields, use saved value or empty string
+        fieldValues[field.name] = savedData?.[field.name] ?? '';
+      } else {
+        // For text and radio fields, use saved value or empty string
+        fieldValues[field.name] = savedData?.[field.name] ?? '';
+      }
+    }
+
+    return {
+      ...savedData,
+      fieldValues,
+      fields: fieldsWithLabels,
+      title: pageTitle,
+      continue: continueText,
+      errorSummaryTitle,
+    };
+  };
 
   const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
     const errors = (t.errors as Record<string, string>) || {};
@@ -110,71 +185,85 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     generateContent,
     getController: () => {
       return createGetController(viewPath, stepName, generateContent, (req, content) => {
-        // Note: createGetController already spreads formData into baseContent,
-        // so we just need to add fields configuration and ensure field values are accessible
         const savedData = getFormData(req, stepName);
-
-        // Get fields with labels from translations
-        const fieldsWithLabels = getFields(content);
-
-        // Get title from translations (could be 'title' or 'question')
-        const pageTitle = (content.title as string) || (content.question as string) || undefined;
-
-        // Build extended content - explicitly include all saved form data
-        // This ensures saved form data is available when navigating back
-        // Note: createGetController already spreads formData into baseContent,
-        // but we also need to create a fieldValues object for dynamic template access
-        const fieldValues: Record<string, unknown> = {};
-
-        // Normalize field values and create fieldValues object for template access
-        for (const field of fields) {
-          if (field.type === 'checkbox') {
-            // Handle checkbox arrays - ensure they're always arrays
-            if (savedData?.[field.name]) {
-              const value = savedData[field.name];
-              if (typeof value === 'string') {
-                fieldValues[field.name] = [value];
-              } else if (Array.isArray(value)) {
-                fieldValues[field.name] = value;
-              } else {
-                fieldValues[field.name] = [];
-              }
-            } else {
-              fieldValues[field.name] = [];
-            }
-          } else {
-            // For text and radio fields, use saved value or empty string
-            fieldValues[field.name] = savedData?.[field.name] ?? '';
-          }
-        }
-
-        const extendedContent: Record<string, unknown> = {
-          // Include all saved data (for direct access like addressLine1, etc.)
-          ...savedData,
-          // Add fieldValues object for dynamic access in template
-          fieldValues,
-          // Then add our configuration
-          fields: fieldsWithLabels,
-          title: pageTitle,
-        };
+        const formContent = buildFormContent(content, savedData);
 
         // extendGetContent is still supported for backward compatibility and custom content
-        return extendGetContent ? { ...extendedContent, ...extendGetContent(req, content) } : extendedContent;
+        return extendGetContent ? { ...formContent, ...extendGetContent(req, content) } : formContent;
       });
     },
-    postController: createPostController(stepName, generateContent, getFields, viewPath, async (req: Request) => {
-      // Normalize checkbox values - Express sends a single string when only one checkbox is selected
-      for (const field of fields) {
-        if (field.type === 'checkbox' && req.body[field.name]) {
-          if (typeof req.body[field.name] === 'string') {
-            req.body[field.name] = [req.body[field.name]];
+    postController: {
+      post: async (req: Request, res: Response) => {
+        const lang: SupportedLang = getValidatedLanguage(req);
+        const content = generateContent(lang);
+        const fieldsWithLabels = getFields(content);
+        // Pass errors object from translations for validation messages
+        const translationErrors = (content.errors as Record<string, string>) || {};
+        const errors = validateForm(req, fieldsWithLabels, translationErrors);
+
+        // Handle validation errors - include fields and fieldValues in the error response
+        if (Object.keys(errors).length > 0) {
+          const firstField = Object.keys(errors)[0];
+          // Build form content with submitted data for error display
+          const formContent = buildFormContent(content, req.body);
+
+          return res.status(400).render(viewPath, {
+            ...content,
+            ...formContent,
+            error: { field: firstField, text: errors[firstField] },
+            backUrl: stepNavigation.getBackUrl(req, stepName),
+            lang,
+            pageUrl: req.originalUrl || '/',
+            t: req.t,
+          });
+        }
+
+        // Normalize checkbox and date values before saving
+        for (const field of fields) {
+          if (field.type === 'checkbox' && req.body[field.name]) {
+            if (typeof req.body[field.name] === 'string') {
+              req.body[field.name] = [req.body[field.name]];
+            }
+          } else if (field.type === 'date') {
+            // Normalize date fields - combine day, month, year into an object
+            const day = req.body[`${field.name}-day`]?.trim() || '';
+            const month = req.body[`${field.name}-month`]?.trim() || '';
+            const year = req.body[`${field.name}-year`]?.trim() || '';
+
+            req.body[field.name] = {
+              day,
+              month,
+              year,
+            };
+
+            // Remove the individual day/month/year fields from body
+            delete req.body[`${field.name}-day`];
+            delete req.body[`${field.name}-month`];
+            delete req.body[`${field.name}-year`];
           }
         }
-      }
 
-      if (beforeRedirect) {
-        await beforeRedirect(req);
-      }
-    }),
+        // Save form data
+        setFormData(req, stepName, req.body);
+
+        // Execute custom logic before redirect (e.g., update CCD case)
+        if (beforeRedirect) {
+          await beforeRedirect(req);
+          // If beforeRedirect sent a response, don't continue
+          if (res.headersSent) {
+            return;
+          }
+        }
+
+        // Get next step URL and redirect
+        const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+
+        if (!redirectPath) {
+          return res.status(500).send('Unable to determine next step');
+        }
+
+        res.redirect(303, redirectPath);
+      },
+    },
   };
 }

@@ -1,14 +1,12 @@
 {
-  "title": "Beth yw eich sail am feddiannu?",
-  "hint": "Dewiswch yr holl seiliau sy'n berthnasol i'ch achos",
-  "continue": "Parhau",
-  "errorSummaryTitle": "Mae problem",
+  "title": "cyWhat are your grounds for possession?",
+  "hint": "cySelect all grounds that apply to your case",
   "errors": {
-    "grounds": "Dewiswch o leiaf un opsiwn"
+    "grounds": "cySelect at least one option"
   },
   "options": {
-    "rentArrears": "Arrears rhent (sail 8)",
-    "breachContract": "Torri contract (sail 9)",
-    "other": "Arall (sail 10)"
+    "rentArrears": "cyRent arrears (ground 8)",
+    "breachContract": "cyBreach of contract (ground 9)",
+    "other": "cyOther (ground 10)"
   }
 }

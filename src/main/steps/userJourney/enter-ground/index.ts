@@ -10,7 +10,6 @@ export const step: StepDefinition = createFormStep({
       name: 'grounds',
       type: 'checkbox',
       required: true,
-      // Explicitly map to translation keys
       translationKey: {
         label: 'title', // Uses 'title' from enterGround.json
         hint: 'hint', // Uses 'hint' from enterGround.json

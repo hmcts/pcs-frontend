@@ -13,8 +13,6 @@
     "submit": "cySubmit"
   },
   "change": "cyChange",
-  "defaultRequired": "cyThis field is required",
-  "defaultInvalid": "cyInvalid format",
   "chooseOption": "cyChoose an option",
   "back": "cyBack",
   "date": {
@@ -25,6 +23,9 @@
   "errors": {
     "title": "cyThere is a problem",
     "required": "cyEnter a value",
+    "defaultRequired": "cyThis field is required",
+    "defaultInvalid": "cyInvalid format",
+    "defaultMaxLength": "cyMust be {max} characters or fewer",
     "email": {
       "required": "cyEnter an email address",
       "invalid": "cyEnter a valid email address"

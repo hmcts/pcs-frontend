@@ -13,9 +13,6 @@
     "submit": "Submit"
   },
   "change": "Change",
-  "defaultRequired": "This field is required",
-  "defaultInvalid": "Invalid format",
-  "chooseOption": "Choose an option",
   "back": "Back",
   "date": {
     "day": "Day",
@@ -25,6 +22,10 @@
   "errors": {
     "title": "There is a problem",
     "required": "Enter a value",
+    "defaultRequired": "This field is required",
+    "defaultInvalid": "Invalid format",
+    "defaultMaxLength": "Must be {max} characters or fewer",
+    "chooseOption": "Choose an option",
     "email": {
       "required": "Enter an email address",
       "invalid": "Enter a valid email address"

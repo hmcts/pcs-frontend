@@ -22,22 +22,67 @@ export function validateForm(
   const errors: Record<string, string> = {};
 
   for (const field of fields) {
-    const value = req.body[field.name];
+    if (field.type === 'date') {
+      // Date fields have day, month, year structure
+      const day = req.body[`${field.name}-day`]?.trim() || '';
+      const month = req.body[`${field.name}-month`]?.trim() || '';
+      const year = req.body[`${field.name}-year`]?.trim() || '';
 
-    const isMissing =
-      field.type === 'checkbox'
-        ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && value.trim() === '')
-        : value === undefined || value === null || value === '';
+      if (field.required) {
+        if (!day || !month || !year) {
+          errors[field.name] = field.errorMessage || translations?.defaultRequired || 'Enter your date of birth';
+          continue;
+        }
 
-    if (field.required && isMissing) {
-      errors[field.name] = field.errorMessage || translations?.defaultRequired || 'This field is required';
-      continue;
-    }
+        // Basic validation for date parts
+        const isNumeric = (s: string) => /^\d+$/.test(s);
+        if (!isNumeric(day) || !isNumeric(month) || !isNumeric(year)) {
+          errors[field.name] = field.errorMessage || translations?.defaultInvalid || 'Enter a valid date';
+          continue;
+        }
 
-    if (field.pattern && typeof value === 'string' && value.trim() !== '') {
-      const regex = new RegExp(field.pattern);
-      if (!regex.test(value.trim())) {
-        errors[field.name] = field.errorMessage || translations?.defaultInvalid || 'Invalid format';
+        const dayNum = parseInt(day, 10);
+        const monthNum = parseInt(month, 10);
+        const yearNum = parseInt(year, 10);
+
+        if (
+          dayNum < 1 ||
+          dayNum > 31 ||
+          monthNum < 1 ||
+          monthNum > 12 ||
+          yearNum < 1900 ||
+          yearNum > new Date().getFullYear()
+        ) {
+          errors[field.name] = field.errorMessage || translations?.defaultInvalid || 'Enter a valid date';
+        }
+      }
+    } else {
+      const value = req.body[field.name];
+
+      const isMissing =
+        field.type === 'checkbox'
+          ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && value.trim() === '')
+          : value === undefined || value === null || value === '';
+
+      if (field.required && isMissing) {
+        errors[field.name] = field.errorMessage || translations?.defaultRequired || 'This field is required';
+        continue;
+      }
+
+      // Only validate pattern and maxLength if value is provided
+      if (value !== undefined && value !== null && value !== '') {
+        if (field.pattern && typeof value === 'string' && value.trim() !== '') {
+          const regex = new RegExp(field.pattern);
+          if (!regex.test(value.trim())) {
+            errors[field.name] = field.errorMessage || translations?.defaultInvalid || 'Invalid format';
+          }
+        }
+
+        // Check maxLength for text and textarea fields
+        if (field.maxLength && typeof value === 'string' && value.length > field.maxLength) {
+          const maxLengthMsg = translations?.defaultMaxLength?.replace('{max}', field.maxLength.toString());
+          errors[field.name] = field.errorMessage || maxLengthMsg || `Must be ${field.maxLength} characters or fewer`;
+        }
       }
     }
   }

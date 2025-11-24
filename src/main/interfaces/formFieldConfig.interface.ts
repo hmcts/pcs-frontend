@@ -6,9 +6,10 @@ export interface FormFieldOption {
 
 export interface FormFieldConfig {
   name: string;
-  type: 'radio' | 'checkbox' | 'text';
+  type: 'radio' | 'checkbox' | 'text' | 'date' | 'textarea';
   required?: boolean;
   pattern?: string;
+  maxLength?: number; // Maximum character length (for text and textarea fields)
   errorMessage?: string;
   label?: string; // Direct label text (overrides translationKey.label)
   hint?: string; // Direct hint text (overrides translationKey.hint)
@@ -18,5 +19,5 @@ export interface FormFieldConfig {
   };
   options?: FormFieldOption[]; // For radio and checkbox fields
   classes?: string; // For styling (e.g., input width)
-  attributes?: Record<string, unknown>; // For additional HTML attributes
+  attributes?: Record<string, unknown>; // For additional HTML attributes (e.g., rows for textarea)
 }

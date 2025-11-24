@@ -1,12 +1,10 @@
 {
-  "question": "Ydych chi dros 18?",
-  "continue": "Parhau",
-  "errorSummaryTitle": "Mae problem",
+  "question": "cyAre you over 18?",
   "errors": {
-    "age": "Dewiswch opsiwn i barhau"
+    "age": "cySelect an option to continue"
   },
   "options": {
-    "yes": "Ie",
-    "no": "Na"
+    "yes": "cyYes",
+    "no": "cyNo"
   }
 }

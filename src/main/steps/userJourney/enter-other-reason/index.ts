@@ -2,21 +2,22 @@ import { createFormStep } from '../../../app/utils/formBuilder';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'enter-age',
+  stepName: 'enter-other-reason',
   journeyFolder: 'userJourney',
   stepDir: __dirname,
   fields: [
     {
-      name: 'age',
-      type: 'radio',
+      name: 'otherReason',
+      type: 'textarea',
       required: true,
+      maxLength: 250,
       translationKey: {
-        label: 'question', // Uses 'question' from enterAge.json
+        label: 'title',
+        hint: 'hint',
       },
-      options: [
-        { value: 'yes', translationKey: 'options.yes' },
-        { value: 'no', translationKey: 'options.no' },
-      ],
+      attributes: {
+        rows: 5,
+      },
     },
   ],
 });

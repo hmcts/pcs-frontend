@@ -13,7 +13,6 @@ export const step: StepDefinition = createFormStep({
       name: 'applicantForename',
       type: 'text',
       required: true,
-      // Explicitly map to 'firstNameLabel' key in translation file
       translationKey: {
         label: 'firstNameLabel', // Uses 'firstNameLabel' from enterUserDetails.json
       },
@@ -25,7 +24,6 @@ export const step: StepDefinition = createFormStep({
       name: 'applicantSurname',
       type: 'text',
       required: true,
-      // Explicitly map to 'lastNameLabel' key in translation file
       translationKey: {
         label: 'lastNameLabel', // Uses 'lastNameLabel' from enterUserDetails.json
       },

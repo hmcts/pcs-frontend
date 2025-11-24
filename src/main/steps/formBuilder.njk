@@ -1,8 +1,10 @@
 {% extends "stepsTemplate.njk" %}
 
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block content %}
@@ -36,6 +38,22 @@
             value: fieldValue,
             classes: field.classes or "govuk-!-width-three-quarters",
             attributes: field.attributes or {},
+            errorMessage: error and error.field == field.name and { text: error.text } or null
+          }) }}
+
+        {% elif field.type == 'textarea' %}
+          {% set fieldValue = (fieldValues[field.name] | default("")) %}
+          {% set textareaAttributes = field.attributes or {} %}
+          {% set textareaRows = textareaAttributes.rows or 5 %}
+          {{ govukTextarea({
+            id: field.name,
+            name: field.name,
+            label: { text: field.label or field.name },
+            hint: field.hint and { text: field.hint } or null,
+            value: fieldValue,
+            rows: textareaRows,
+            maxlength: field.maxLength or null,
+            attributes: textareaAttributes,
             errorMessage: error and error.field == field.name and { text: error.text } or null
           }) }}
 
@@ -101,6 +119,45 @@
             },
             hint: field.hint and { text: field.hint } or null,
             items: checkboxItems,
+            errorMessage: error and error.field == field.name and { text: error.text } or null
+          }) }}
+
+        {% elif field.type == 'date' %}
+          {% set dateValue = (fieldValues[field.name] | default({ day: '', month: '', year: '' })) %}
+          {{ govukDateInput({
+            id: field.name,
+            namePrefix: field.name,
+            fieldset: {
+              legend: {
+                text: field.label or field.name,
+                isPageHeading: loop.first and not title,
+                classes: loop.first and not title and "govuk-fieldset__legend--l" or ""
+              }
+            },
+            hint: field.hint and { text: field.hint } or null,
+            items: [
+              {
+                name: "day",
+                label: date.day,
+                value: dateValue.day,
+                classes: "govuk-input--width-2",
+                attributes: { maxlength: 2, inputmode: "numeric" }
+              },
+              {
+                name: "month",
+                label: date.month,
+                value: dateValue.month,
+                classes: "govuk-input--width-2",
+                attributes: { maxlength: 2, inputmode: "numeric" }
+              },
+              {
+                name: "year",
+                label: date.year,
+                value: dateValue.year,
+                classes: "govuk-input--width-4",
+                attributes: { maxlength: 4, inputmode: "numeric" }
+              }
+            ],
             errorMessage: error and error.field == field.name and { text: error.text } or null
           }) }}
         {% endif %}
