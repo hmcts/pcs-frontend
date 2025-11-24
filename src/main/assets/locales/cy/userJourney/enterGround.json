@@ -5,5 +5,10 @@
   "errorSummaryTitle": "Mae problem",
   "errors": {
     "grounds": "Dewiswch o leiaf un opsiwn"
+  },
+  "options": {
+    "rentArrears": "Arrears rhent (sail 8)",
+    "breachContract": "Torri contract (sail 9)",
+    "other": "Arall (sail 10)"
   }
 }

@@ -8,10 +8,10 @@ const generateContent = createGenerateContent(stepName, 'userJourney');
 export const step: StepDefinition = {
   url: '/steps/user-journey/ineligible',
   name: stepName,
-  view: 'steps/userJourney/ineligible.njk',
+  view: 'userJourney/ineligible/ineligible.njk',
   stepDir: __dirname,
   generateContent,
   getController: () => {
-    return createGetController('steps/userJourney/ineligible.njk', stepName, generateContent);
+    return createGetController('userJourney/ineligible/ineligible.njk', stepName, generateContent);
   },
 };

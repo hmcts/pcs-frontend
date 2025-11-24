@@ -5,5 +5,10 @@
   "errorSummaryTitle": "There is a problem",
   "errors": {
     "grounds": "Select at least one option"
+  },
+  "options": {
+    "rentArrears": "Rent arrears (ground 8)",
+    "breachContract": "Breach of contract (ground 9)",
+    "other": "Other (ground 10)"
   }
 }

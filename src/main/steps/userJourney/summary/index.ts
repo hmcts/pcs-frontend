@@ -12,12 +12,12 @@ const generateContent = createGenerateContent(stepName, 'userJourney');
 export const step: StepDefinition = {
   url: '/steps/user-journey/summary',
   name: stepName,
-  view: 'steps/userJourney/summary.njk',
+  view: 'userJourney/summary/summary.njk',
   stepDir: __dirname,
   generateContent,
   middleware: [pcqRedirectMiddleware()],
   getController: () =>
-    createGetController('steps/userJourney/summary.njk', stepName, generateContent, (req, _content) => {
+    createGetController('userJourney/summary/summary.njk', stepName, generateContent, (req, _content) => {
       const userDetails = req.session.formData?.['enter-user-details'];
       const address = req.session.formData?.['enter-address'];
       return {
@@ -29,7 +29,7 @@ export const step: StepDefinition = {
     stepName,
     generateContent,
     () => [], // No validation fields for summary
-    'steps/userJourney/summary.njk',
+    'userJourney/summary/summary.njk',
     async (req: Request, res: Response) => {
       try {
         if (req.session.ccdCase && req.session.user) {

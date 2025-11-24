@@ -4,5 +4,9 @@
   "errorSummaryTitle": "Mae problem",
   "errors": {
     "age": "Dewiswch opsiwn i barhau"
+  },
+  "options": {
+    "yes": "Ie",
+    "no": "Na"
   }
 }

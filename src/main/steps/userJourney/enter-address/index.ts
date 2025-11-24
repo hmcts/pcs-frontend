@@ -42,27 +42,32 @@ const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
 export const step: StepDefinition = {
   url: '/steps/user-journey/enter-address',
   name: stepName,
-  view: 'steps/userJourney/enterAddress.njk',
+  view: 'userJourney/enter-address/enterAddress.njk',
   stepDir: __dirname,
   generateContent,
   getController: () => {
-    return createGetController('steps/userJourney/enterAddress.njk', stepName, generateContent, (req, _content) => {
-      const savedData = getFormData(req, stepName);
-      const lookupPostcode = req.session.lookupPostcode || '';
-      const addressResults = req.session.postcodeLookupResult || null;
-      const error = req.session.lookupError || undefined;
+    return createGetController(
+      'userJourney/enter-address/enterAddress.njk',
+      stepName,
+      generateContent,
+      (req, _content) => {
+        const savedData = getFormData(req, stepName);
+        const lookupPostcode = req.session.lookupPostcode || '';
+        const addressResults = req.session.postcodeLookupResult || null;
+        const error = req.session.lookupError || undefined;
 
-      delete req.session.lookupPostcode;
-      delete req.session.lookupError;
+        delete req.session.lookupPostcode;
+        delete req.session.lookupError;
 
-      return {
-        ...savedData,
-        lookupPostcode,
-        addressResults,
-        error,
-        selectedAddressIndex: savedData?.selectedAddressIndex || null,
-      };
-    });
+        return {
+          ...savedData,
+          lookupPostcode,
+          addressResults,
+          error,
+          selectedAddressIndex: savedData?.selectedAddressIndex || null,
+        };
+      }
+    );
   },
   postController: {
     post: async (req: Request, res: Response) => {
@@ -148,7 +153,7 @@ export const step: StepDefinition = {
 
         if (Object.keys(errors).length > 0) {
           const firstField = Object.keys(errors)[0];
-          return res.status(400).render('steps/userJourney/enterAddress.njk', {
+          return res.status(400).render('userJourney/enter-address/enterAddress.njk', {
             ...content,
             ...req.body,
             error: {

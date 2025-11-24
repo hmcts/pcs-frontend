@@ -4,5 +4,9 @@
   "errorSummaryTitle": "There is a problem",
   "errors": {
     "age": "Select an option to continue"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }
