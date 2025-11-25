@@ -1,7 +1,8 @@
 {
   "title": "Respond to a claim",
   "description": "Use this service to respond to a possession claim made against you.",
+  "secondaryHeading": "Respond to a property possession claim",
   "buttons": {
-    "start": "Start now"
+    "startNow": "Start now"
   }
 }

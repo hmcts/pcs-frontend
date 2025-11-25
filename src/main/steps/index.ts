@@ -3,6 +3,7 @@ import type { JourneyFlowConfig } from '../interfaces/stepFlow.interface';
 import type { StepDefinition } from './../interfaces/stepFormData.interface';
 import { respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { step as startNow } from './respond-to-claim/start-now';
+import { step as freeLegalAdvice } from './respond-to-claim/free-legal-advice';
 import { step as applicationSubmitted } from './userJourney/application-submitted';
 import { step as enterAddress } from './userJourney/enter-address';
 import { step as enterUserDetails } from './userJourney/enter-user-details';
@@ -18,6 +19,7 @@ const userJourneyStepRegistry: Record<string, StepDefinition> = {
 
 const respondToClaimStepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
+  'free-legal-advice': freeLegalAdvice,
 };
 
 const allStepRegistries = {
