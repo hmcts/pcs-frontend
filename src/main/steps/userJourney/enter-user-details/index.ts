@@ -1,22 +1,17 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 
-import { createGetController } from '../../../app/controller/controllerFactory';
-import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
-import { validateForm } from '../../../app/controller/validation';
-import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { createGetController, createPostController } from '../../../app/controller/controllerFactory';
+import { getFormData } from '../../../app/controller/formHelpers';
+import { type TranslationContent, createGenerateContent } from '../../../app/utils/i18n';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'enter-user-details';
-
-const generateContent = (lang = 'en'): TranslationContent => {
-  return loadTranslations(lang, ['common', 'userJourney/enterUserDetails']);
-};
+const generateContent = createGenerateContent(stepName, 'userJourney');
 
 const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
-  const errors = t.errors || {};
+  const errors = (t.errors as Record<string, string>) || {};
   return [
     {
       name: 'applicantForename',
@@ -39,36 +34,20 @@ export const step: StepDefinition = {
   view: 'steps/userJourney/enterUserDetails.njk',
   stepDir: __dirname,
   generateContent,
-  getController: (lang = 'en') => {
-    const content = generateContent(lang);
-    return createGetController('steps/userJourney/enterUserDetails.njk', stepName, content, req => {
+  getController: () => {
+    return createGetController('steps/userJourney/enterUserDetails.njk', stepName, generateContent, (req, _content) => {
       const savedData = getFormData(req, stepName);
       return {
-        ...content,
         ...savedData,
-        common: content,
-        labels: content.labels,
-        errors: content.errors,
-        title: content.title,
       };
     });
   },
-  postController: {
-    post: async (req: Request, res: Response) => {
-      const lang: SupportedLang = getValidatedLanguage(req);
-      const content = generateContent(lang);
-      const fields = getFields(content);
-      const errors = validateForm(req, fields, content);
-      if (Object.keys(errors).length > 0) {
-        const firstField = Object.keys(errors)[0];
-        return res.status(400).render('steps/userJourney/enterUserDetails.njk', {
-          ...content,
-          ...req.body,
-          error: { field: firstField, text: errors[firstField] },
-        });
-      }
-
-      setFormData(req, stepName, req.body);
+  postController: createPostController(
+    stepName,
+    generateContent,
+    getFields,
+    'steps/userJourney/enterUserDetails.njk',
+    async (req: Request) => {
       const ccdCase = req.session.ccdCase;
       const user = req.session.user;
 
@@ -83,15 +62,10 @@ export const step: StepDefinition = {
         });
       } else {
         req.session.ccdCase = await ccdCaseService.createCase(user?.accessToken, {
-          // applicantForename: req.body.applicantForename,
-          // applicantSurname: req.body.applicantSurname,
+          applicantForename: req.body.applicantForename,
+          applicantSurname: req.body.applicantSurname,
         });
       }
-
-      const redirectPath = '/steps/user-journey/enter-address' as const;
-      const qs = new URLSearchParams({ lang }).toString();
-
-      res.redirect(303, `${redirectPath}?${qs}`);
-    },
-  },
+    }
+  ),
 };

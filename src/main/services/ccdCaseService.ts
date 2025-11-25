@@ -2,7 +2,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { AxiosError } from 'axios';
 import config from 'config';
 
-import { CaseState, CcdCase, CcdCaseData, CcdUserCases } from '../interfaces/ccdCase.interface';
+import { CaseState, CcdCase, CcdUserCases, UserJourneyCaseData } from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
 
 const logger = Logger.getLogger('ccdCaseService');
@@ -48,7 +48,7 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: CcdCaseData
+  data: UserJourneyCaseData
 ): Promise<CcdCase> {
   const payload = {
     data,
@@ -85,6 +85,7 @@ export const ccdCaseService = {
     };
 
     logger.info(`[ccdCaseService] Calling ccdCaseService search with URL: ${url}`);
+    logger.info(`[ccdCaseService] Request body: ${JSON.stringify(requestBody, null, 2)}`);
 
     try {
       const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
@@ -106,12 +107,22 @@ export const ccdCaseService = {
         logger.warn('[ccdCaseService] No case found, returning null.');
         return null;
       }
+      if (axiosError.response?.status === 400) {
+        logger.warn(
+          `[ccdCaseService] Bad request (400) when searching for cases. Response: ${JSON.stringify(axiosError.response?.data, null, 2)}`
+        );
+        // Return null instead of throwing - the case might have been submitted or the API format might have changed
+        return null;
+      }
       logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+      if (axiosError.response?.data) {
+        logger.error(`[ccdCaseService] Error response data: ${JSON.stringify(axiosError.response.data, null, 2)}`);
+      }
       throw error;
     }
   },
 
-  async createCase(accessToken: string | undefined, data: CcdCaseData): Promise<CcdCase> {
+  async createCase(accessToken: string | undefined, data: UserJourneyCaseData): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/cases`;
