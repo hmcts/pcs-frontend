@@ -1,7 +1,8 @@
 {
   "title": "cyRespond to a claim",
-  "description": "cyUse this service to respond to a possession claim made against you.",
+  "description": "cyThere’s no fee to respond to a claim. You must respond within 14 days of receiving the claim pack in the post. </p><p class=\"govuk-body\">This service is also available in <a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
   "buttons": {
     "start": "cyStart now"
-  }
+  },
+  "previousStepUrl": "/"
 }

@@ -1,8 +1,8 @@
 {
-  "title": "Respond to a claim",
-  "description": "Use this service to respond to a possession claim made against you.",
-  "secondaryHeading": "Respond to a property possession claim",
+  "title": "Respond to a property possession claim online",
+  "description": "There’s no fee to respond to a claim. You must respond within 14 days of receiving the claim pack in the post. </p><p class=\"govuk-body\">This service is also available in <a href=\"?lang=cy\" class=\"govuk-link language\">Welsh (Cymraeg)</a>",
   "buttons": {
     "startNow": "Start now"
-  }
+  },
+  "previousStepUrl": "/"
 }

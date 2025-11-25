@@ -10,15 +10,13 @@
       {{ govukErrorSummary(errorSummary) }}
     {% endif %}
     
-    <h1 class="govuk-heading-m govuk-!-margin-bottom-0 claim-journey-secondary-heading">{{ secondaryHeading }}</h1>
-
-    {% if title %}
-      <h2 class="govuk-heading-l">{{ title }}</h2>
+    {% if secondaryHeading %}
+      <h1 class="govuk-heading-m govuk-!-margin-bottom-0 claim-journey-secondary-heading">{{ secondaryHeading }}</h1>
     {% endif %}
 
-    {% if description %}
-      <p class="govuk-body">{{ description }}</p>
-    {% endif %}
+    <h2 class="govuk-heading-l">{{ title }}</h2>
+
+    <p class="govuk-body">{{ description | safe }}</p>
   
   {% block respondToClaimContent %}{% endblock %}
 
