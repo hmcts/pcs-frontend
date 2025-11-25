@@ -22,6 +22,7 @@ export function initPostcodeLookup(): void {
       findBtn: byId('findAddressBtn') as HTMLButtonElement | null,
       select: byId('selectedAddress') as HTMLSelectElement | null,
       selectContainer: byId('addressSelectContainer') as HTMLDivElement | null,
+      errorMessage: byId('postcode-error') as HTMLParagraphElement | null,
       addressLine1: byId('addressLine1') as HTMLInputElement | null,
       addressLine2: byId('addressLine2') as HTMLInputElement | null,
       town: byId('town') as HTMLInputElement | null,
@@ -99,13 +100,52 @@ export function initPostcodeLookup(): void {
     populateAddressFields(container, selected);
   };
 
+  const showError = (errorMessage: HTMLParagraphElement | null, input: HTMLInputElement | null) => {
+    if (errorMessage) {
+      errorMessage.classList.remove('govuk-visually-hidden');
+    }
+    if (input) {
+      input.classList.add('govuk-input--error');
+    }
+  };
+
+  const hideError = (errorMessage: HTMLParagraphElement | null, input: HTMLInputElement | null) => {
+    if (errorMessage) {
+      errorMessage.classList.add('govuk-visually-hidden');
+    }
+    if (input) {
+      input.classList.remove('govuk-input--error');
+    }
+  };
+
+  const showEmptyDropdown = (
+    select: HTMLSelectElement,
+    selectContainer: HTMLDivElement | null,
+    message: string = 'No addresses found'
+  ) => {
+    clearOptions(select);
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.disabled = true;
+    opt.textContent = message;
+    select.appendChild(opt);
+    if (selectContainer) {
+      selectContainer.hidden = false;
+    }
+    select.hidden = false;
+  };
+
   const performPostcodeLookup = async (
     postcode: string,
     select: HTMLSelectElement,
     selectContainer: HTMLDivElement | null,
-    button: HTMLButtonElement
+    button: HTMLButtonElement,
+    errorMessage: HTMLParagraphElement | null,
+    input: HTMLInputElement | null
   ) => {
     button.disabled = true;
+    hideError(errorMessage, input);
+
     try {
       const resp = await fetch(`/api/postcode-lookup?postcode=${encodeURIComponent(postcode)}`, {
         headers: { Accept: 'application/json' },
@@ -116,17 +156,16 @@ export function initPostcodeLookup(): void {
       }
       const json = (await resp.json()) as { addresses?: Record<string, string>[] };
       const addresses = json.addresses || [];
-      populateOptions(select, selectContainer, addresses);
-    } catch {
-      clearOptions(select);
-      const opt = document.createElement('option');
-      opt.value = '';
-      opt.textContent = 'No addresses found';
-      select.appendChild(opt);
-      if (selectContainer) {
-        selectContainer.hidden = false;
+
+      if (addresses.length === 0) {
+        showError(errorMessage, input);
+        showEmptyDropdown(select, selectContainer);
+      } else {
+        populateOptions(select, selectContainer, addresses);
       }
-      select.hidden = false;
+    } catch {
+      showError(errorMessage, input);
+      showEmptyDropdown(select, selectContainer);
     } finally {
       button.disabled = false;
     }
@@ -152,7 +191,7 @@ export function initPostcodeLookup(): void {
       if (!container) {
         return;
       }
-      const { postcodeInput, select, selectContainer } = getParts(container);
+      const { postcodeInput, select, selectContainer, errorMessage } = getParts(container);
       if (!postcodeInput || !select) {
         return;
       }
@@ -161,7 +200,7 @@ export function initPostcodeLookup(): void {
       if (!value) {
         return;
       }
-      await performPostcodeLookup(value, select, selectContainer, btn);
+      await performPostcodeLookup(value, select, selectContainer, btn, errorMessage, postcodeInput);
     });
 
     document.addEventListener('change', evt => {
@@ -188,7 +227,7 @@ export function initPostcodeLookup(): void {
   }
 
   containers.forEach(container => {
-    const { postcodeInput, findBtn, select, selectContainer } = getParts(container);
+    const { postcodeInput, findBtn, select, selectContainer, errorMessage } = getParts(container);
     if (!postcodeInput || !findBtn || !select) {
       return;
     }
@@ -201,7 +240,7 @@ export function initPostcodeLookup(): void {
       if (!value) {
         return;
       }
-      await performPostcodeLookup(value, select, selectContainer, findBtn);
+      await performPostcodeLookup(value, select, selectContainer, findBtn, errorMessage, postcodeInput);
     });
   });
 }
