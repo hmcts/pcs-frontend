@@ -1,26 +1,27 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
-import { getFormData, setFormData } from '../../../app/controller/sessionHelper';
-import { validateForm } from '../../../app/controller/validation';
-import { TranslationContent, loadTranslations } from '../../../app/utils/loadTranslations';
+import { getFormData, setFormData, validateForm } from '../../../app/controller/formHelpers';
+import {
+  type SupportedLang,
+  type TranslationContent,
+  createGenerateContent,
+  getValidatedLanguage,
+} from '../../../app/utils/i18n';
+import { stepNavigation } from '../../../app/utils/stepFlow';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
-import { SupportedLang, getValidatedLanguage } from '../../../utils/getValidatedLanguage';
 
 const stepName = 'enter-address';
+const generateContent = createGenerateContent(stepName, 'userJourney');
 
 export const partialUkPostcodePattern = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s*[0-9]?[A-Z]{0,2}$/i;
 const postcodeRegex = new RegExp(partialUkPostcodePattern);
 
-const generateContent = (lang = 'en'): TranslationContent => {
-  return loadTranslations(lang, ['common', 'userJourney/enterAddress']);
-};
-
 const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
-  const errors = t.errors || {};
+  const errors = (t.errors as Record<string, string>) || {};
   return [
     { name: 'addressLine1', type: 'text', required: true, errorMessage: errors.addressLine1 || 'Enter address line 1' },
     { name: 'addressLine2', type: 'text', required: false },
@@ -44,10 +45,8 @@ export const step: StepDefinition = {
   view: 'steps/userJourney/enterAddress.njk',
   stepDir: __dirname,
   generateContent,
-  getController: (lang = 'en') => {
-    const content = generateContent(lang);
-
-    return createGetController('steps/userJourney/enterAddress.njk', stepName, content, req => {
+  getController: () => {
+    return createGetController('steps/userJourney/enterAddress.njk', stepName, generateContent, (req, _content) => {
       const savedData = getFormData(req, stepName);
       const lookupPostcode = req.session.lookupPostcode || '';
       const addressResults = req.session.postcodeLookupResult || null;
@@ -57,13 +56,11 @@ export const step: StepDefinition = {
       delete req.session.lookupError;
 
       return {
-        ...content,
         ...savedData,
         lookupPostcode,
         addressResults,
         error,
         selectedAddressIndex: savedData?.selectedAddressIndex || null,
-        backUrl: `/steps/user-journey/enter-user-details?lang=${lang}`,
       };
     });
   },
@@ -73,19 +70,18 @@ export const step: StepDefinition = {
       const lang: SupportedLang = getValidatedLanguage(req);
       const content = generateContent(lang);
 
-      const enterAddressPath = '/steps/user-journey/enter-address' as const;
-      const summaryPath = '/steps/user-journey/summary' as const;
-      const qs = new URLSearchParams({ lang }).toString();
+      const enterAddressPath = stepNavigation.getStepUrl(stepName);
 
       // 🔹 Handle Find Address
       if (action === 'find-address') {
         if (!lookupPostcode || !postcodeRegex.test(lookupPostcode.trim())) {
           req.session.lookupPostcode = lookupPostcode;
+          const errors = (content.errors as Record<string, string>) || {};
           req.session.lookupError = {
             field: 'lookupPostcode',
-            text: content.errors?.invalidPostcode || 'Enter a valid or partial UK postcode',
+            text: errors.invalidPostcode || 'Enter a valid or partial UK postcode',
           };
-          return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
+          return res.redirect(303, `${enterAddressPath}?lookup=1`);
         }
 
         try {
@@ -93,25 +89,26 @@ export const step: StepDefinition = {
 
           if (addressResults.length === 0) {
             req.session.lookupPostcode = lookupPostcode;
+            const errors = (content.errors as Record<string, string>) || {};
             req.session.lookupError = {
               field: 'lookupPostcode',
-              text: content.errors?.noAddressesFound || 'No addresses found for that postcode',
+              text: errors.noAddressesFound || 'No addresses found for that postcode',
             };
 
-            return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
+            return res.redirect(303, `${enterAddressPath}?lookup=1`);
           }
 
           req.session.lookupPostcode = lookupPostcode;
           req.session.postcodeLookupResult = addressResults;
-          return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
+          return res.redirect(303, `${enterAddressPath}?lookup=1`);
         } catch {
           req.session.lookupPostcode = lookupPostcode;
-
+          const errors = (content.errors as Record<string, string>) || {};
           req.session.lookupError = {
             field: 'lookupPostcode',
-            text: content.errors?.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
+            text: errors.addressLookupFailed || 'There was a problem finding addresses. Please try again.',
           };
-          return res.redirect(303, `${enterAddressPath}?${qs}&lookup=1`);
+          return res.redirect(303, `${enterAddressPath}?lookup=1`);
         }
       }
 
@@ -133,7 +130,7 @@ export const step: StepDefinition = {
           });
         }
 
-        return res.redirect(303, `${enterAddressPath}?${qs}`);
+        return res.redirect(303, enterAddressPath);
       }
 
       // 🔹 Handle Final Submission
@@ -160,7 +157,7 @@ export const step: StepDefinition = {
             },
             errorSummaryTitle: content.errorSummaryTitle,
             addressResults: req.session.postcodeLookupResult || null,
-            backUrl: `/steps/user-journey/enter-user-details?lang=${lang}`,
+            backUrl: '/steps/user-journey/enter-user-details',
           });
         }
 
@@ -185,9 +182,16 @@ export const step: StepDefinition = {
             },
           });
         }
-        return res.redirect(303, `${summaryPath}?${qs}`);
+
+        const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+
+        if (!redirectPath) {
+          return res.status(500).send('Unable to determine next step');
+        }
+
+        return res.redirect(303, redirectPath);
       }
-      return res.redirect(303, `${enterAddressPath}?${qs}`);
+      return res.redirect(303, enterAddressPath);
     },
   },
 };
