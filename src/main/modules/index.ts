@@ -20,6 +20,5 @@ export const modules = [
   'Session',
   'S2S',
   'OIDCModule',
-  'Journey',
   'LaunchDarkly',
 ];
