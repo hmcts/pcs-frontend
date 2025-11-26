@@ -55,7 +55,9 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
 
     const buttons = (content.buttons as Record<string, string>) || {};
     const errors = (content.errors as Record<string, string>) || {};
-    const continueText = buttons.continue || 'Continue';
+    const continueText = buttons.continue || 'Save and continue';
+    const saveForLaterText = buttons.saveForLater || 'Save for later';
+    const cancelText = buttons.cancel || 'Cancel';
     const errorSummaryTitle = errors.title || 'There is a problem';
 
     const fieldValues: Record<string, unknown> = {};
@@ -110,7 +112,11 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       pageTitle: customPageTitle,
       content: pageContent,
       continue: continueText,
+      saveForLater: saveForLaterText,
+      cancel: cancelText,
       errorSummaryTitle,
+      stepName,
+      journeyFolder,
     };
   };
 
@@ -176,13 +182,46 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       return createGetController(viewPath, stepName, generateContent, (req, content) => {
         const savedData = getFormData(req, stepName);
         const formContent = buildFormContent(content, savedData);
-        return extendGetContent ? { ...formContent, ...extendGetContent(req, content) } : formContent;
+        const ccdId = req.session?.ccdCase?.id;
+        const result = extendGetContent ? { ...formContent, ...extendGetContent(req, content) } : formContent;
+        return { ...result, ccdId };
       });
     },
     postController: {
       post: async (req: Request, res: Response) => {
         const lang: SupportedLang = getValidatedLanguage(req);
         const content = generateContent(lang);
+        const action = req.body.action as string | undefined;
+
+        if (action === 'saveForLater') {
+          for (const field of fields) {
+            if (field.type === 'checkbox' && req.body[field.name]) {
+              if (typeof req.body[field.name] === 'string') {
+                req.body[field.name] = [req.body[field.name]];
+              }
+            } else if (field.type === 'date') {
+              const day = req.body[`${field.name}-day`]?.trim() || '';
+              const month = req.body[`${field.name}-month`]?.trim() || '';
+              const year = req.body[`${field.name}-year`]?.trim() || '';
+
+              req.body[field.name] = { day, month, year };
+              delete req.body[`${field.name}-day`];
+              delete req.body[`${field.name}-month`];
+              delete req.body[`${field.name}-year`];
+            }
+          }
+
+          const bodyWithoutAction = { ...req.body };
+          delete bodyWithoutAction.action;
+          setFormData(req, stepName, bodyWithoutAction);
+
+          const ccdId = req.session?.ccdCase?.id;
+          if (ccdId) {
+            return res.redirect(303, `/dashboard/${ccdId}`);
+          }
+          return res.redirect(303, '/dashboard');
+        }
+
         const fieldsWithLabels = getFields(content);
         const translationErrors = (content.errors as Record<string, string>) || {};
         const errors = validateForm(req, fieldsWithLabels, translationErrors);
@@ -191,6 +230,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           const firstField = Object.keys(errors)[0];
           const formContent = buildFormContent(content, req.body);
 
+          const ccdId = req.session?.ccdCase?.id;
           return res.status(400).render(viewPath, {
             ...content,
             ...formContent,
@@ -199,6 +239,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
             lang,
             pageUrl: req.originalUrl || '/',
             t: req.t,
+            ccdId,
           });
         }
 
@@ -219,7 +260,10 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           }
         }
 
-        setFormData(req, stepName, req.body);
+        const bodyWithoutAction = { ...req.body };
+        delete bodyWithoutAction.action;
+
+        setFormData(req, stepName, bodyWithoutAction);
 
         if (beforeRedirect) {
           await beforeRedirect(req);
@@ -228,7 +272,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           }
         }
 
-        const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+        const redirectPath = stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
 
         if (!redirectPath) {
           return res.status(500).send('Unable to determine next step');

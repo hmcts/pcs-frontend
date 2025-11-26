@@ -189,7 +189,27 @@
         {% endif %}
       {% endfor %}
 
-      {{ govukButton({ text: continue }) }}
+      {% set excludedSteps = ['summary', 'ineligible', 'application-submitted'] %}
+      {% set showSaveForLater = journeyFolder == 'userJourney' and stepName not in excludedSteps %}
+      {% set dashboardUrl = ccdId and ('/dashboard/' + ccdId) or '/dashboard' %}
+      
+      <div class="govuk-button-group">
+        {{ govukButton({ 
+          text: continue,
+          attributes: { type: 'submit', name: 'action', value: 'continue' }
+        }) }}
+        {% if showSaveForLater %}
+          {{ govukButton({ 
+            text: saveForLater,
+            classes: 'govuk-button--secondary',
+            attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+          }) }}
+        {% endif %}
+      </div>
+      
+      <p class="govuk-body">
+        <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+      </p>
     </form>
   </div>
 </div>

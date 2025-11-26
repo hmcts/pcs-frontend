@@ -5,7 +5,8 @@
   "languageToggle": "<a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
   "logout": "cylogout",
   "buttons": {
-    "continue": "cyContinue",
+    "continue": "cySave and continue",
+    "saveForLater": "cySave for later",
     "back": "cyBack",
     "cancel": "cyCancel",
     "finish": "cyStart a new application",
