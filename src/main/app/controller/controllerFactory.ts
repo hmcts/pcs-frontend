@@ -25,7 +25,7 @@ export class GetController {
   };
 }
 
-export const  createGetController = (
+export const createGetController = (
   view: string,
   stepName: string,
   generateContent: GenerateContentFn,

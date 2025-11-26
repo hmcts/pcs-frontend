@@ -22,7 +22,7 @@ const respondToClaimStepRegistry: Record<string, StepDefinition> = {
   'free-legal-advice': freeLegalAdvice,
 };
 
-const allStepRegistries = {
+const allStepRegistries: Record<string, { config: JourneyFlowConfig; registry: Record<string, StepDefinition> }> = {
   [userJourneyFlowConfig.basePath!]: {
     config: userJourneyFlowConfig,
     registry: userJourneyStepRegistry,
