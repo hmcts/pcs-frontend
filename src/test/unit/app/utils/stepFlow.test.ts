@@ -145,6 +145,98 @@ describe('stepFlow', () => {
       const result = getPreviousStep('unknown', mockFlowConfig);
       expect(result).toBeNull();
     });
+
+    it('should return explicit previousStep when configured', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {},
+          step2: {
+            previousStep: 'step1',
+          },
+          step3: {},
+        },
+      };
+      const result = getPreviousStep('step2', config);
+      expect(result).toBe('step1');
+    });
+
+    it('should return previousStep from function when configured', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {},
+          step2: {
+            previousStep: (formData: Record<string, unknown>) => {
+              return formData.condition === true ? 'step1' : 'step3';
+            },
+          },
+          step3: {},
+        },
+      };
+      const result = getPreviousStep('step2', config, { condition: true });
+      expect(result).toBe('step1');
+    });
+
+    it('should find previous step from conditional route', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            routes: [
+              {
+                condition: formData => formData.condition === true,
+                nextStep: 'step2',
+              },
+            ],
+          },
+          step2: {},
+          step3: {},
+        },
+      };
+      const result = getPreviousStep('step2', config, { condition: true });
+      expect(result).toBe('step1');
+    });
+
+    it('should find previous step from defaultNext', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            defaultNext: 'step2',
+          },
+          step2: {},
+          step3: {},
+        },
+      };
+      const result = getPreviousStep('step2', config);
+      expect(result).toBe('step1');
+    });
+
+    it('should not find previous step when route condition is false', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            routes: [
+              {
+                condition: formData => formData.condition === true,
+                nextStep: 'step2',
+              },
+            ],
+          },
+          step2: {},
+          step3: {},
+        },
+      };
+      const result = getPreviousStep('step2', config, { condition: false });
+      expect(result).toBe('step1');
+    });
   });
 
   describe('getStepUrl', () => {
