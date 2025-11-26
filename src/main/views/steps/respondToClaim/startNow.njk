@@ -3,51 +3,51 @@
 
 {% block respondToClaimContent %}
 
-  <h2 class="govuk-heading-m">Completing your response</h2>
+  <h2 class="govuk-heading-m">{{completingYourResponse}}</h2>
 
   <p class="govuk-body">
-  You can save your response as a draft and return to it later. You will be able to review and edit your answers before you submit them.
+  {{saveDraftInfo}}
   </p>
 
   <p class="govuk-body">
-  After you finish answering the questions, you can upload any documents to support your response. 
+  {{uploadDocumentsInfo}}
   </p>
 
   <p class="govuk-body">
-  The claimant will be able to see any documents you upload and your answers.
+  {{claimantVisibilityInfo}}
   </p>
 
-  <h2 class="govuk-heading-m">What you will need</h2>
+  <h2 class="govuk-heading-m">{{whatYouWillNeed}}</h2>
 
   <p class="govuk-body">
-  You will be asked to provide or confirm details, such as:
-  </p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>your name</li>
-    <li>your date of birth</li>
-    <li>any dependants (people you look after financially)</li>
-    <li>your circumstances and any exceptional hardship you would experience if you had to leave your home</li>
-  </ul>
-
-  <p class="govuk-body">
-  You can also share details about:
+  {{provideDetailsInfo}}
   </p>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>your income and expenses</li>
-    <li>any priority debts you have</li>
+    <li>{{listItemName}}</li>
+    <li>{{listItemDateOfBirth}}</li>
+    <li>{{listItemDependants}}</li>
+    <li>{{listItemCircumstances}}</li>
   </ul>
 
   <p class="govuk-body">
-  You do not have to answer questions about your financial situation, but sharing this information can help a judge understand your circumstances.
+  {{shareDetailsInfo}}
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{listItemIncomeExpenses}}</li>
+    <li>{{listItemPriorityDebts}}</li>
+  </ul>
+
+  <p class="govuk-body">
+  {{financialSituationInfo}}
   </p>
 
 
-  <h2 class="govuk-heading-m">Support to use HMCTS services</h2>
+  <h2 class="govuk-heading-m">{{supportToUseHmctsServices}}</h2>
 
   <p class="govuk-body">
-  If you need support to use HMCTS services, like step-free access to a court for your hearing, you can either request this as part of your response, or at a later time. 
+  {{hmctsSupportInfo}}
   </p>
 
   <form method="post" action="{{ url }}" novalidate>

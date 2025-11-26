@@ -1,8 +1,26 @@
 {
-  "title": "cyRespond to a claim",
-  "description": "cyThere’s no fee to respond to a claim. You must respond within 14 days of receiving the claim pack in the post. </p><p class=\"govuk-body\">This service is also available in <a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
+  "title": "Ymateb i hawliad meddiant eiddo ar-lein",
+  "description": "Does dim ffi i ymateb i hawliad. Rhaid i chi ymateb o fewn 14 diwrnod o dderbyn y pecyn hawliad drwy'r post. </p><p class=\"govuk-body\">Mae'r gwasanaeth hwn hefyd ar gael yn <a href=\"?lang=en\" class=\"govuk-link language\">Saesneg</a>",
   "buttons": {
-    "start": "cyStart now"
+    "startNow": "Dechrau nawr"
   },
+  "completingYourResponse": "Cwblhau eich ymateb",
+  "saveDraftInfo": "Gallwch gadw eich ymateb fel drafft a dychwelyd ato nes ymlaen. Byddwch yn gallu adolygu a golygu eich atebion cyn eu cyflwyno.",
+  "uploadDocumentsInfo": "Ar ôl i chi orffen ateb y cwestiynau, gallwch lanlwytho unrhyw ddogfennau i gefnogi eich ymateb.",
+  "claimantVisibilityInfo": "Bydd yr hawlydd yn gallu gweld unrhyw ddogfennau rydych chi'n eu lanlwytho a'ch atebion.",
+  "whatYouWillNeed": "Beth fydd ei angen arnoch",
+  "provideDetailsInfo": "Gofynnir i chi ddarparu neu gadarnhau manylion, megis:",
+  "listItemName": "eich enw",
+  "listItemDateOfBirth": "eich dyddiad geni",
+  "listItemDependants": "unrhyw bersonau sy'n dibynnu arnoch (pobl rydych chi'n gofalu amdanynt yn ariannol)",
+  "listItemCircumstances": "eich amgylchiadau ac unrhyw galedi eithriadol y byddech chi'n ei brofi pe baech chi'n gorfod gadael eich cartref",
+  "shareDetailsInfo": "Gallwch hefyd rannu manylion am:",
+  "listItemIncomeExpenses": "eich incwm a'ch gwariant",
+  "listItemPriorityDebts": "unrhyw ddyledion blaenoriaeth sydd gennych",
+  "financialSituationInfo": "Nid oes rhaid i chi ateb cwestiynau am eich sefyllfa ariannol, ond gall rannu'r wybodaeth hon helpu barnwr i ddeall eich amgylchiadau.",
+  "supportToUseHmctsServices": "Cymorth i ddefnyddio gwasanaethau GLlTEM",
+  "hmctsSupportInfo": "Os oes angen cymorth arnoch i ddefnyddio gwasanaethau GLlTEM, megis mynediad di-risiau i lys ar gyfer eich gwrandawiad, gallwch wneud cais am hyn fel rhan o'ch ymateb, neu ar adeg ddiweddarach.",
+  "contactUsForHelp": "Cysylltwch â ni am gymorth",
+  "contactUsForHelpText": "Os oes angen help arnoch i ddefnyddio'r gwasanaeth hwn, cysylltwch â ni.",
   "previousStepUrl": "/"
 }

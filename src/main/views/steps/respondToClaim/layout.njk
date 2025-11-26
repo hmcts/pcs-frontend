@@ -1,6 +1,7 @@
 {% extends "journeyTemplate.njk" %}
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% block content %}
 <div class="govuk-grid-row">
@@ -25,13 +26,10 @@
   <div class="govuk-grid-column-one-third">
     <aside class="app-related-items" role="complementary">
       <nav role="navigation" aria-labelledby="subsection-title">
-        <ul class="govuk-list govuk-!-font-size-16">
-          <li>
-            <a class="govuk-link govuk-details__summary" href="#">
-              {{ contactUsForHelp }}
-            </a>
-          </li>
-        </ul>
+        {{ govukDetails({
+          summaryText: contactUsForHelp,
+          text: contactUsForHelpText
+        }) }}
       </nav>
     </aside>
   </div>
