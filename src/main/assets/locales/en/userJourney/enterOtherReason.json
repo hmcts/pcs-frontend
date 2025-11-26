@@ -1,6 +1,5 @@
 {
   "title": "What is your other reason for possession?",
-  "hint": "You can enter up to 250 characters",
   "errors": {
     "otherReason": "Enter your other reason for possession"
   }

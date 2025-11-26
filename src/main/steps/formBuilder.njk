@@ -2,6 +2,7 @@
 
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
@@ -22,8 +23,14 @@
       </div>
     {% endif %}
 
-    {% if title %}
+    {% if pageTitle %}
+      <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+    {% elif title %}
       <h1 class="govuk-heading-l">{{ title }}</h1>
+    {% endif %}
+
+    {% if content %}
+      <p class="govuk-body">{{ content | safe }}</p>
     {% endif %}
 
     <form method="post" action="{{ url }}">
@@ -53,6 +60,25 @@
             value: fieldValue,
             rows: textareaRows,
             maxlength: field.maxLength or null,
+            attributes: textareaAttributes,
+            errorMessage: error and error.field == field.name and { text: error.text } or null
+          }) }}
+
+        {% elif field.type == 'character-count' %}
+          {% set fieldValue = (fieldValues[field.name] | default("")) %}
+          {% set textareaAttributes = field.attributes or {} %}
+          {% set textareaRows = textareaAttributes.rows or 5 %}
+          {{ govukCharacterCount({
+            id: field.name,
+            name: field.name,
+            maxlength: field.maxLength,
+            rows: textareaRows,
+            label: { 
+              text: field.label or field.name,
+              isPageHeading: loop.first and not title
+            },
+            hint: field.hint and { text: field.hint } or null,
+            value: fieldValue,
             attributes: textareaAttributes,
             errorMessage: error and error.field == field.name and { text: error.text } or null
           }) }}

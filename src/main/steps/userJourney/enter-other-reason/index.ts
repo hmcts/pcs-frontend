@@ -8,12 +8,11 @@ export const step: StepDefinition = createFormStep({
   fields: [
     {
       name: 'otherReason',
-      type: 'textarea',
+      type: 'character-count',
       required: true,
       maxLength: 250,
       translationKey: {
         label: 'title',
-        hint: 'hint',
       },
       attributes: {
         rows: 5,

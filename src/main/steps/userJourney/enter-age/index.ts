@@ -5,6 +5,10 @@ export const step: StepDefinition = createFormStep({
   stepName: 'enter-age',
   journeyFolder: 'userJourney',
   stepDir: __dirname,
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    content: 'content',
+  },
   fields: [
     {
       name: 'age',

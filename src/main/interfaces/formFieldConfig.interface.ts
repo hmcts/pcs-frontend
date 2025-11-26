@@ -1,23 +1,23 @@
 export interface FormFieldOption {
   value: string;
-  text?: string; // Direct text (overrides translationKey)
-  translationKey?: string; // Translation key for the option text (e.g., 'options.rentArrears')
+  text?: string;
+  translationKey?: string;
 }
 
 export interface FormFieldConfig {
   name: string;
-  type: 'radio' | 'checkbox' | 'text' | 'date' | 'textarea';
+  type: 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count';
   required?: boolean;
   pattern?: string;
-  maxLength?: number; // Maximum character length (for text and textarea fields)
+  maxLength?: number;
   errorMessage?: string;
-  label?: string; // Direct label text (overrides translationKey.label)
-  hint?: string; // Direct hint text (overrides translationKey.hint)
+  label?: string;
+  hint?: string;
   translationKey?: {
-    label?: string; // Translation key for label (e.g., 'question', 'title', 'firstNameLabel')
-    hint?: string; // Translation key for hint (e.g., 'hint')
+    label?: string;
+    hint?: string;
   };
-  options?: FormFieldOption[]; // For radio and checkbox fields
-  classes?: string; // For styling (e.g., input width)
-  attributes?: Record<string, unknown>; // For additional HTML attributes (e.g., rows for textarea)
+  options?: FormFieldOption[];
+  classes?: string;
+  attributes?: Record<string, unknown>;
 }
