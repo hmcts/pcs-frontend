@@ -118,13 +118,13 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
       currentStepName: string,
       currentStepData: Record<string, unknown> = {}
     ): string | null => {
-      const formData = req.session.formData || {};
+      const formData = req.session?.formData || {};
       const nextStep = getNextStep(currentStepName, flowConfig, formData, currentStepData);
       return nextStep ? getStepUrl(nextStep, flowConfig) : null;
     },
 
     getBackUrl: (req: Request, currentStepName: string): string | null => {
-      const formData = req.session.formData || {};
+      const formData = req.session?.formData || {};
       const previousStep = getPreviousStep(currentStepName, flowConfig, formData);
       return previousStep ? getStepUrl(previousStep, flowConfig) : null;
     },
@@ -146,7 +146,7 @@ export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = us
       return next();
     }
 
-    const formData = req.session.formData || {};
+    const formData = req.session?.formData || {};
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
     if (missingDependency) {
