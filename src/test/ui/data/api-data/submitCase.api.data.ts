@@ -68,6 +68,5 @@ export const submitCaseApiData = {
     languageUsed: 'ENGLISH',
     completionNextStep: 'SUBMIT_AND_PAY_NOW',
   },
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  submitCaseApiEndPoint: () => `/cases/${process.env.CASE_NUMBER}/events`,
+  submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };

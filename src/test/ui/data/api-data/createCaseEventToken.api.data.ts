@@ -1,6 +1,7 @@
+import { AxiosRequestConfig } from 'axios';
+
 export const createCaseEventTokenApiData = {
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  createCaseApiInstance: () => ({
+  createCaseApiInstance: (): AxiosRequestConfig => ({
     baseURL: process.env.DATA_STORE_URL_BASE,
     headers: {
       Authorization: `Bearer ${process.env.BEARER_TOKEN}`,
@@ -10,5 +11,6 @@ export const createCaseEventTokenApiData = {
       Accept: '*/*',
     },
   }),
+
   createCaseEventTokenApiEndPoint: `/case-types/PCS${process.env.CHANGE_ID ? '-' + process.env.CHANGE_ID : ''}/event-triggers/createPossessionClaim`,
 };

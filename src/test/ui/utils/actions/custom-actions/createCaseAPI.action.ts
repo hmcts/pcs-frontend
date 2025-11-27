@@ -27,14 +27,14 @@ export class CreateCaseAPIAction implements IAction {
 
   private async createCaseAPI(caseData: actionData): Promise<void> {
     const createCaseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
-    process.env.CREATE_EVENT_TOKEN = (
+    const CREATE_EVENT_TOKEN = (
       await createCaseApi.get(createCaseEventTokenApiData.createCaseEventTokenApiEndPoint)
     ).data.token;
     const createCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
     const createResponse = await createCaseApi.post(createCaseApiData.createCaseApiEndPoint, {
       data: createCasePayloadData,
       event: { id: createCaseApiData.createCaseEventName },
-      event_token: process.env.CREATE_EVENT_TOKEN,
+      event_token: CREATE_EVENT_TOKEN,
     });
     process.env.CASE_NUMBER = createResponse.data.id;
     caseInfo.id = createResponse.data.id;
@@ -44,14 +44,14 @@ export class CreateCaseAPIAction implements IAction {
 
   private async submitCaseAPI(caseData: actionData): Promise<void> {
     const submitCaseApi = Axios.create(submitCaseEventTokenApiData.createCaseApiInstance());
-    process.env.SUBMIT_EVENT_TOKEN = (
+    const SUBMIT_EVENT_TOKEN = (
       await submitCaseApi.get(submitCaseEventTokenApiData.submitCaseEventTokenApiEndPoint())
     ).data.token;
     const submitCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
     const submitResponse = await submitCaseApi.post(submitCaseApiData.submitCaseApiEndPoint(), {
       data: submitCasePayloadData,
       event: { id: submitCaseApiData.submitCaseEventName },
-      event_token: process.env.SUBMIT_EVENT_TOKEN,
+      event_token: SUBMIT_EVENT_TOKEN,
     });
     caseInfo.id = submitResponse.data.id;
     caseInfo.fid = submitResponse.data.id.replace(/(.{4})(?=.)/g, '$1-');

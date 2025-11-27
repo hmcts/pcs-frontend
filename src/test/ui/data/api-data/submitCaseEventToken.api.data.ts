@@ -1,6 +1,5 @@
 export const submitCaseEventTokenApiData = {
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  createCaseApiInstance: () => ({
+  createCaseApiInstance: (): Record<string, unknown> => ({
     baseURL: process.env.DATA_STORE_URL_BASE,
     headers: {
       Authorization: `Bearer ${process.env.BEARER_TOKEN}`,
@@ -10,6 +9,7 @@ export const submitCaseEventTokenApiData = {
       Accept: '*/*',
     },
   }),
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  submitCaseEventTokenApiEndPoint: () => `/cases/${process.env.CASE_NUMBER}/event-triggers/resumePossessionClaim`,
+
+  submitCaseEventTokenApiEndPoint: (): string =>
+    `/cases/${process.env.CASE_NUMBER}/event-triggers/resumePossessionClaim`,
 };
