@@ -68,7 +68,7 @@ describe('Nunjucks', () => {
       nunjucksInstance.enableFor(mockApp);
 
       expect(mockApp.set).toHaveBeenCalledWith('view engine', 'njk');
-      expect(nunjucks.configure).toHaveBeenCalledWith(['test/views/path', 'test/views/path'], {
+      expect(nunjucks.configure).toHaveBeenCalledWith(['test/views/path'], {
         autoescape: true,
         watch: true,
         express: mockApp,
