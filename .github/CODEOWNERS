@@ -1,4 +1,4 @@
 * @hmcts/possession-claim-service-admins
 
-src/test @hmcts/possession-claim-service-qa-admins @hmcts/possession-claim-service-admins
+src/test/ui @hmcts/possession-claim-service-qa-admins @hmcts/possession-claim-service-admins
 
