@@ -28,7 +28,8 @@ export function initPostcodeLookup(): void {
       town: byId('town') as HTMLInputElement | null,
       county: byId('county') as HTMLInputElement | null,
       postcodeOut: byId('postcode') as HTMLInputElement | null,
-      details: container.querySelector('.govuk-details, details'),
+      addressForm: byId('addressForm') as HTMLDivElement | null,
+      enterManuallyDetails: byId('enterManuallyDetails') as HTMLDetailsElement | null,
     };
   };
 
@@ -69,10 +70,17 @@ export function initPostcodeLookup(): void {
   };
 
   const populateAddressFields = (container: HTMLElement, selected: HTMLOptionElement) => {
-    const { addressLine1, addressLine2, town, county, postcodeOut, details } = getParts(container);
+    const { addressLine1, addressLine2, town, county, postcodeOut, addressForm, enterManuallyDetails } =
+      getParts(container);
 
-    if (details && !(details as HTMLDetailsElement).open) {
-      (details as HTMLDetailsElement).open = true;
+    // Show the address form by removing govuk-visually-hidden class
+    if (addressForm) {
+      addressForm.classList.remove('govuk-visually-hidden');
+    }
+
+    // Hide the "Enter manually" Details component when address is selected
+    if (enterManuallyDetails) {
+      enterManuallyDetails.style.display = 'none';
     }
 
     const fieldMappings = [
@@ -141,7 +149,8 @@ export function initPostcodeLookup(): void {
     selectContainer: HTMLDivElement | null,
     button: HTMLButtonElement,
     errorMessage: HTMLParagraphElement | null,
-    input: HTMLInputElement | null
+    input: HTMLInputElement | null,
+    enterManuallyDetails: HTMLDetailsElement | null
   ) => {
     button.disabled = true;
     hideError(errorMessage, input);
@@ -161,6 +170,10 @@ export function initPostcodeLookup(): void {
         showError(errorMessage, input);
         showEmptyDropdown(select, selectContainer);
       } else {
+        // Hide the "Enter manually" Details component when addresses are found
+        if (enterManuallyDetails) {
+          enterManuallyDetails.style.display = 'none';
+        }
         populateOptions(select, selectContainer, addresses);
       }
     } catch {
@@ -191,7 +204,7 @@ export function initPostcodeLookup(): void {
       if (!container) {
         return;
       }
-      const { postcodeInput, select, selectContainer, errorMessage } = getParts(container);
+      const { postcodeInput, select, selectContainer, errorMessage, enterManuallyDetails } = getParts(container);
       if (!postcodeInput || !select) {
         return;
       }
@@ -200,7 +213,15 @@ export function initPostcodeLookup(): void {
       if (!value) {
         return;
       }
-      await performPostcodeLookup(value, select, selectContainer, btn, errorMessage, postcodeInput);
+      await performPostcodeLookup(
+        value,
+        select,
+        selectContainer,
+        btn,
+        errorMessage,
+        postcodeInput,
+        enterManuallyDetails
+      );
     });
 
     document.addEventListener('change', evt => {
@@ -218,6 +239,22 @@ export function initPostcodeLookup(): void {
       }
       handleSelectionChange(container, select);
     });
+
+    // Handle Details component toggle to show address form
+    document.addEventListener('toggle', (evt: Event) => {
+      const target = evt.target as HTMLDetailsElement | null;
+      if (!target?.id?.endsWith('-enterManuallyDetails')) {
+        return;
+      }
+      const container = target.closest('[data-address-component]') as HTMLElement;
+      if (!container) {
+        return;
+      }
+      const { addressForm } = getParts(container);
+      if (target.open && addressForm) {
+        addressForm.classList.remove('govuk-visually-hidden');
+      }
+    });
     return;
   }
 
@@ -227,7 +264,7 @@ export function initPostcodeLookup(): void {
   }
 
   containers.forEach(container => {
-    const { postcodeInput, findBtn, select, selectContainer, errorMessage } = getParts(container);
+    const { postcodeInput, findBtn, select, selectContainer, errorMessage, enterManuallyDetails } = getParts(container);
     if (!postcodeInput || !findBtn || !select) {
       return;
     }
@@ -240,7 +277,27 @@ export function initPostcodeLookup(): void {
       if (!value) {
         return;
       }
-      await performPostcodeLookup(value, select, selectContainer, findBtn, errorMessage, postcodeInput);
+      await performPostcodeLookup(
+        value,
+        select,
+        selectContainer,
+        findBtn,
+        errorMessage,
+        postcodeInput,
+        enterManuallyDetails
+      );
     });
+
+    // Handle Details component toggle to show address form
+    if (enterManuallyDetails) {
+      enterManuallyDetails.addEventListener('toggle', () => {
+        if (enterManuallyDetails.open) {
+          const { addressForm } = getParts(container);
+          if (addressForm) {
+            addressForm.classList.remove('govuk-visually-hidden');
+          }
+        }
+      });
+    }
   });
 }
