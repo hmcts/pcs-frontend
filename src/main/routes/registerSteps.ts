@@ -4,17 +4,17 @@ import { Application } from 'express';
 import { getValidatedLanguage } from '../app/utils/i18n';
 import { stepDependencyCheckMiddleware } from '../app/utils/stepFlow';
 import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
-import { stepsWithContent } from '../steps';
-import { userJourneyFlowConfig } from '../steps/userJourney/flow.config';
+import { getFlowConfigForStep, stepsWithContent } from '../steps';
 
 const logger = Logger.getLogger('registerSteps');
 
 export default function registerSteps(app: Application): void {
   for (const step of stepsWithContent) {
-    const stepConfig = userJourneyFlowConfig.steps[step.name];
+    const flowConfig = getFlowConfigForStep(step);
+    const stepConfig = flowConfig?.steps[step.name];
     const requiresAuth = stepConfig?.requiresAuth !== false;
     const middlewares = requiresAuth ? [oidcMiddleware, ccdCaseMiddleware] : [];
-    const dependencyCheck = stepDependencyCheckMiddleware();
+    const dependencyCheck = flowConfig ? stepDependencyCheckMiddleware(flowConfig) : stepDependencyCheckMiddleware();
     const allGetMiddleware = step.middleware
       ? [...middlewares, dependencyCheck, ...step.middleware]
       : [...middlewares, dependencyCheck];
@@ -46,7 +46,8 @@ export default function registerSteps(app: Application): void {
   }
 
   const protectedStepsCount = stepsWithContent.filter(step => {
-    const stepConfig = userJourneyFlowConfig.steps[step.name];
+    const flowConfig = getFlowConfigForStep(step);
+    const stepConfig = flowConfig?.steps[step.name];
     return stepConfig?.requiresAuth !== false;
   }).length;
 

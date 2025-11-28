@@ -2,6 +2,7 @@
 {% from "govuk/components/header/macro.njk" import govukHeader %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% block head %}
   <title>{% block pageTitle %}Possession claims{% endblock %} - GOV.UK</title>
@@ -39,6 +40,30 @@
   {% endif %}
 {% endblock %}
 
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% block mainContent %}
+        {# Steps can override this block for their content #}
+        {# If mainContent is not overridden, steps can still override content block directly #}
+      {% endblock %}
+    </div>
+    
+    {% if contactUsForHelp %}
+      <div class="govuk-grid-column-one-third">
+        <aside class="app-related-items" role="complementary">
+          <nav role="navigation" aria-labelledby="subsection-title">
+            {{ govukDetails({
+              summaryText: contactUsForHelp,
+              text: contactUsForHelpText or ""
+            }) }}
+          </nav>
+        </aside>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
 
 {% block bodyEnd %}
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
