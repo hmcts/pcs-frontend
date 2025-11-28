@@ -25,7 +25,13 @@ export async function performAction(
 ): Promise<void> {
   const executor = getExecutor();
   const actionInstance = ActionRegistry.getAction(action);
-  await test.step(`${action}${fieldName !== undefined ? ` - ${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}` : ''} ${value !== undefined ? ` with value '${typeof value === 'object' ? readValuesFromInputObjects(value) : value}'` : ''}`, async () => {
+  await test.step(`${action}${
+    fieldName !== undefined
+      ? ` - ${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}`
+      : ''
+  } ${
+    value !== undefined ? ` with value '${typeof value === 'object' ? readValuesFromInputObjects(value) : value}'` : ''
+  }`, async () => {
     await actionInstance.execute(executor.page, action, fieldName, value);
   });
 }
@@ -38,7 +44,9 @@ export async function performValidation(
   const executor = getExecutor();
   const [fieldName, data] = typeof inputFieldName === 'string' ? [inputFieldName, inputData] : ['', inputFieldName];
   const validationInstance = ValidationRegistry.getValidation(validation);
-  await test.step(`Validated ${validation} - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'${data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''}`, async () => {
+  await test.step(`Validated ${validation} - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'${
+    data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''
+  }`, async () => {
     await validationInstance.validate(executor.page, validation, fieldName, data);
   });
 }

@@ -5,7 +5,9 @@ import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 import { createGetController } from '../controller/controllerFactory';
 import { getFormData, setFormData, validateForm } from '../controller/formHelpers';
 
-import { type SupportedLang, type TranslationContent, createGenerateContent, getValidatedLanguage } from './i18n';
+import type { SupportedLang, TranslationContent } from './i18n';
+import { createGenerateContent, getValidatedLanguage } from './i18n';
+import { DASHBOARD_ROUTE, getDashboardUrl } from './routes';
 import { stepNavigation } from './stepFlow';
 
 export interface FormBuilderConfig {
@@ -184,7 +186,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         const formContent = buildFormContent(content, savedData);
         const ccdId = req.session?.ccdCase?.id;
         const result = extendGetContent ? { ...formContent, ...extendGetContent(req, content) } : formContent;
-        return { ...result, ccdId };
+        return { ...result, ccdId, dashboardRoute: DASHBOARD_ROUTE };
       });
     },
     postController: {
@@ -216,10 +218,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           setFormData(req, stepName, bodyWithoutAction);
 
           const ccdId = req.session?.ccdCase?.id;
-          if (ccdId) {
-            return res.redirect(303, `/dashboard/${ccdId}`);
-          }
-          return res.redirect(303, '/dashboard');
+          return res.redirect(303, getDashboardUrl(ccdId));
         }
 
         const fieldsWithLabels = getFields(content);
@@ -240,6 +239,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
             pageUrl: req.originalUrl || '/',
             t: req.t,
             ccdId,
+            dashboardRoute: DASHBOARD_ROUTE,
           });
         }
 
