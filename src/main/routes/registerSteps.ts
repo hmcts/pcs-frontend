@@ -18,11 +18,9 @@ export default function registerSteps(app: Application): void {
     const allGetMiddleware = step.middleware
       ? [...middlewares, dependencyCheck, ...step.middleware]
       : [...middlewares, dependencyCheck];
-
     if (step.getController) {
       app.get(step.url, ...allGetMiddleware, (req, res) => {
         const lang = getValidatedLanguage(req);
-
         logger.debug('Language information', {
           url: req.url,
           step: step.name,
@@ -34,12 +32,10 @@ export default function registerSteps(app: Application): void {
             'accept-language': req.headers?.['accept-language'] || undefined,
           },
         });
-
         const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
         return controller.get(req, res);
       });
     }
-
     if (step.postController?.post) {
       app.post(step.url, ...middlewares, step.postController.post);
     }

@@ -25,8 +25,7 @@ export const step: StepDefinition = {
       const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
 
       if (!redirectPath) {
-        // No next step defined yet - for now just stay on the same page
-        // This can be updated when more steps are added
+        // No next step defined - show not found page
         return res.redirect(303, req.url);
       }
 
