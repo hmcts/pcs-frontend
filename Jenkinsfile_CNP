@@ -22,9 +22,7 @@ static Map < String, Object > secret(String secretName, String envVariable) {
 def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
-    secret('pcs-api-idam-secret', 'PCS_API_IDAM_SECRET'),
-  ]
+    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')  ]
 ]
 
 withPipeline(type, product, component) {
