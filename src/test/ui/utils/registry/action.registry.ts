@@ -1,21 +1,33 @@
-import { LoginAction } from '../actions/custom-actions/login.action';
-import { NavigateToUrl } from '../actions/custom-actions/navigateToUrl.action';
-import { CheckAction } from '../actions/element-actions/check.action';
-import { ClickButtonAction } from '../actions/element-actions/clickButton.action';
+import { CreateCaseAPIAction, LoginAction, NavigateToUrlAction } from '../actions/custom-actions';
+import {
+  CheckAction,
+  ClickButtonAction,
+  ClickRadioButtonAction,
+  ClickTabAction,
+  InputTextAction,
+  SelectAction,
+  UploadFileAction,
+  clickLinkAndVerifyNewTabTitleAction,
+} from '../actions/element-actions';
 import { ClickLinkAction } from '../actions/element-actions/clickLink.action';
-import { ClickRadioButton } from '../actions/element-actions/clickRadioButton.action';
-import { InputTextAction } from '../actions/element-actions/inputText.action';
-import { IAction } from '../interfaces/action.interface';
+import { IAction } from '../interfaces';
 
 export class ActionRegistry {
   private static actions: Map<string, IAction> = new Map([
+    ['check', new CheckAction()],
     ['clickButton', new ClickButtonAction()],
     ['clickLink', new ClickLinkAction()],
+    ['clickLinkAndVerifyNewTabTitle', new clickLinkAndVerifyNewTabTitleAction()],
+    ['clickRadioButton', new ClickRadioButtonAction()],
+    ['clickTab', new ClickTabAction()],
     ['inputText', new InputTextAction()],
-    ['check', new CheckAction()],
-    ['clickRadioButton', new ClickRadioButton()],
+    ['select', new SelectAction()],
+    ['UploadFile', new UploadFileAction()],
+    ['login', new LoginAction()],
     ['createUserAndLogin', new LoginAction()],
-    ['navigateToUrl', new NavigateToUrl()],
+    ['navigateToUrl', new NavigateToUrlAction()],
+    ['createCaseAPI', new CreateCaseAPIAction()],
+    ['submitCaseAPI', new CreateCaseAPIAction()],
   ]);
 
   static getAction(actionName: string): IAction {

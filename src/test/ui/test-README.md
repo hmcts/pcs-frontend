@@ -63,25 +63,11 @@ The framework's modular design consists of these key layers:
 Playwright 1.30+ | TypeScript 4.9+
 ```
 
-## 4. Available Actions and Validations
+## 4. Actions and Validations
 
-### Actions
+### Actions are listed in `src/test/ui/utils/registry/action.registry.ts`
 
-| Action             | Example Usage                                                 |
-| ------------------ | ------------------------------------------------------------- |
-| inputText          | `performAction('inputText', 'Email', 'test@example.com')`     |
-| check              | `performAction('check', 'RememberMe')`                        |
-| clickButton        | `performAction('clickButton', 'Submit')`                      |
-| clickRadioButton   | `performAction('clickRadioButton', 'testRadio')`              |
-| navigateToUrl      | `performAction('navigateToUrl', 'testUrl')`                   |
-| createUserAndLogin | `performAction('createUserAndLogin', 'citizen', ['citizen'])` |
-| clickLink          | `performAction('clickLink', 'English')`                       |
-
-### Validations
-
-| Validation | Example Usage                                                    |
-| ---------- | ---------------------------------------------------------------- |
-| mainHeader | `performValidation('mainHeader', eligibility.mainHeaderEnglish)` |
+### Validations are listed in `src/test/ui/utils/registry/validation.registry.ts`
 
 ### Basic Test
 
@@ -149,6 +135,10 @@ await performValidationGroup(
 - IDAM_SYSTEM_PASSWORD
 - IDAM_SYSTEM_USERNAME
 - IDAM_PCS_USER_PASSWORD
+- PCS_IDAM_TEST_USER_PASSWORD
+- CHANGE_ID
+- DATA_STORE_URL_BASE
+- PCS_API_IDAM_SECRET
 
 ```bash
 yarn test:functional
@@ -162,3 +152,25 @@ yarn test:functional
 | "Validation not found" | Check registration                          |
 | Locator failures       | Verify fieldName matches UI text/attributes |
 | Timeout errors         | Add explicit waits in components            |
+
+## 9. Content Auto-Validation
+
+How It Works -
+Automatic: Triggers after click actions that cause page navigation
+
+Data-Driven: Uses page data files in data/page-data-figma/
+
+Smart Mapping: Automatically maps URLs to page data files, including numeric URLs using h1/h2 headers
+
+Comprehensive: Validates buttons, headers, links, paragraphs, and other UI elements
+
+Validation Summary -
+After each test, you'll see a detailed report:
+
+```
+📊 PAGE CONTENT VALIDATION SUMMARY (Test #1):
+Total pages validated: 3
+Pages passed: 2
+Pages failed: 1
+Missing elements: Submit button, Continue link
+```
