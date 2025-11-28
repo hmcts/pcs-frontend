@@ -1,0 +1,21 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ title }}</h1>
+      <p class="govuk-body">{{ description }}</p>
+
+      <form method="post" action="{{ url }}" novalidate>
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: buttons.start,
+            attributes: { type: 'submit' }
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+

@@ -75,6 +75,14 @@ const mockStepsData = {
 jest.mock('../../../main/steps', () => ({
   stepsWithContent: mockStepsData.allSteps,
   protectedSteps: mockStepsData.protectedSteps,
+  getFlowConfigForStep: jest.fn(_step => ({
+    steps: {
+      'protected-step': { requiresAuth: true },
+      'unprotected-step': { requiresAuth: false },
+      'function-controller-step': { requiresAuth: true },
+      'middleware-step': { requiresAuth: true },
+    },
+  })),
 }));
 
 import { Application } from 'express';
@@ -246,6 +254,11 @@ describe('registerSteps', () => {
         },
       ],
       protectedSteps: [],
+      getFlowConfigForStep: jest.fn(() => ({
+        steps: {
+          'no-controllers': { requiresAuth: true },
+        },
+      })),
     }));
 
     jest.resetModules();

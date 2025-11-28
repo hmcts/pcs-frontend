@@ -1,0 +1,7 @@
+{
+  "title": "cyRespond to a claim",
+  "description": "cyUse this service to respond to a possession claim made against you.",
+  "buttons": {
+    "start": "cyStart now"
+  }
+}
