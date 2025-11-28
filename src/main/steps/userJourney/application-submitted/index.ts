@@ -11,11 +11,11 @@ const generateContent = createGenerateContent(stepName, 'userJourney');
 export const step: StepDefinition = {
   url: '/steps/user-journey/application-submitted',
   name: stepName,
-  view: 'steps/userJourney/applicationSubmitted.njk',
+  view: 'userJourney/application-submitted/applicationSubmitted.njk',
   stepDir: __dirname,
   generateContent,
   getController: () => {
-    return createGetController('steps/userJourney/applicationSubmitted.njk', stepName, generateContent);
+    return createGetController('userJourney/application-submitted/applicationSubmitted.njk', stepName, generateContent);
   },
   postController: {
     post: async (req: Request, res: Response) => {

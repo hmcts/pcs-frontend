@@ -1,0 +1,1110 @@
+import type { Request, Response } from 'express';
+
+import { type FormBuilderConfig, createFormStep } from '../../../../main/app/utils/formBuilder';
+
+const mockGetFormData = jest.fn();
+const mockSetFormData = jest.fn();
+const mockValidateForm = jest.fn();
+
+jest.mock('../../../../main/app/controller/controllerFactory', () => ({
+  createGetController: jest.fn((view, stepName, generateContent, buildContent) => ({
+    get: jest.fn((req: Request, res: Response) => {
+      const content = generateContent('en');
+      const builtContent = buildContent(req, content);
+      return res.render(view, builtContent);
+    }),
+  })),
+}));
+
+jest.mock('../../../../main/app/controller/formHelpers', () => ({
+  getFormData: (...args: unknown[]) => mockGetFormData(...args),
+  setFormData: (...args: unknown[]) => mockSetFormData(...args),
+  validateForm: (...args: unknown[]) => mockValidateForm(...args),
+}));
+
+const mockGetNextStepUrl = jest.fn();
+const mockGetBackUrl = jest.fn();
+
+jest.mock('../../../../main/app/utils/stepFlow', () => ({
+  stepNavigation: {
+    getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
+    getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
+  },
+}));
+
+const mockCreateGenerateContent = jest.fn();
+const mockGetValidatedLanguage = jest.fn();
+
+jest.mock('../../../../main/app/utils/i18n', () => ({
+  createGenerateContent: (...args: unknown[]) => mockCreateGenerateContent(...args),
+  getValidatedLanguage: (...args: unknown[]) => mockGetValidatedLanguage(...args),
+}));
+
+describe('formBuilder', () => {
+  const mockStepDir = '/test/step/dir';
+  const baseConfig: FormBuilderConfig = {
+    stepName: 'test-step',
+    journeyFolder: 'testJourney',
+    stepDir: mockStepDir,
+    fields: [
+      {
+        name: 'testField',
+        type: 'text',
+        required: true,
+        translationKey: {
+          label: 'title',
+        },
+      },
+    ],
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetFormData.mockImplementation((req: Request, stepName: string) => {
+      const session = req.session as { formData?: Record<string, unknown> };
+      return session?.formData?.[stepName] || {};
+    });
+    mockSetFormData.mockImplementation((req: Request, stepName: string, data: unknown) => {
+      const session = req.session as { formData?: Record<string, unknown> };
+      if (!session.formData) {
+        session.formData = {};
+      }
+      session.formData[stepName] = data;
+    });
+    mockValidateForm.mockReturnValue({});
+    mockGetNextStepUrl.mockReturnValue('/steps/test-journey/next-step');
+    mockGetBackUrl.mockReturnValue('/steps/test-journey/previous-step');
+    mockCreateGenerateContent.mockReturnValue(() => ({
+      title: 'Test Title',
+      question: 'Test Question',
+      buttons: {
+        continue: 'Continue',
+        saveForLater: 'Save for Later',
+        cancel: 'Cancel',
+      },
+      errors: {
+        title: 'There is a problem',
+      },
+    }));
+    mockGetValidatedLanguage.mockReturnValue('en' as const);
+  });
+
+  describe('createFormStep', () => {
+    it('should create a step definition with correct URL', () => {
+      const step = createFormStep(baseConfig);
+      expect(step.url).toBe('/steps/test-journey/test-step');
+      expect(step.name).toBe('test-step');
+      expect(step.view).toBe('formBuilder.njk');
+      expect(step.stepDir).toBe(mockStepDir);
+    });
+
+    it('should handle journeyFolder with camelCase', () => {
+      const config = { ...baseConfig, journeyFolder: 'userJourney' };
+      const step = createFormStep(config);
+      expect(step.url).toBe('/steps/user-journey/test-step');
+    });
+
+    it('should create getController that renders with form content', async () => {
+      const step = createFormStep(baseConfig);
+      const req = {
+        session: {
+          formData: {
+            'test-step': { testField: 'saved value' },
+          },
+          ccdCase: { id: '123' },
+        },
+      } as unknown as Request;
+      const res = {
+        render: jest.fn(),
+      } as unknown as Response;
+
+      expect(step.getController).toBeDefined();
+      expect(typeof step.getController).toBe('function');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const controller = (step.getController as any)();
+      await controller.get(req, res);
+
+      expect(res.render).toHaveBeenCalledWith(
+        'formBuilder.njk',
+        expect.objectContaining({
+          fieldValues: { testField: 'saved value' },
+          stepName: 'test-step',
+          journeyFolder: 'testJourney',
+          ccdId: '123',
+        })
+      );
+    });
+
+    it('should include ccdId in getController response', async () => {
+      const step = createFormStep(baseConfig);
+      const req = {
+        session: {
+          formData: {},
+          ccdCase: { id: '456' },
+        },
+      } as unknown as Request;
+      const res = {
+        render: jest.fn(),
+      } as unknown as Response;
+
+      expect(step.getController).toBeDefined();
+      expect(typeof step.getController).toBe('function');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const controller = (step.getController as any)();
+      await controller.get(req, res);
+
+      expect(res.render).toHaveBeenCalledWith(
+        'formBuilder.njk',
+        expect.objectContaining({
+          ccdId: '456',
+        })
+      );
+    });
+
+    it('should handle extendGetContent callback', async () => {
+      const extendGetContent = jest.fn(() => ({ customField: 'customValue' }));
+      const config = { ...baseConfig, extendGetContent };
+      const step = createFormStep(config);
+      const req = {
+        session: { formData: {} },
+      } as unknown as Request;
+      const res = {
+        render: jest.fn(),
+      } as unknown as Response;
+
+      expect(step.getController).toBeDefined();
+      expect(typeof step.getController).toBe('function');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const controller = (step.getController as any)();
+      await controller.get(req, res);
+
+      expect(extendGetContent).toHaveBeenCalled();
+      expect(res.render).toHaveBeenCalledWith(
+        'formBuilder.njk',
+        expect.objectContaining({
+          customField: 'customValue',
+        })
+      );
+    });
+
+    describe('buildFormContent', () => {
+      it('should build form content with field values', async () => {
+        const step = createFormStep(baseConfig);
+        const req = {
+          session: {
+            formData: {
+              'test-step': { testField: 'value' },
+            },
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { testField: 'value' },
+          })
+        );
+      });
+
+      it('should handle checkbox fields - string value', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'checkboxField',
+              type: 'checkbox',
+              options: [{ value: 'option1' }, { value: 'option2' }],
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: {
+            formData: {
+              'test-step': { checkboxField: 'option1' },
+            },
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { checkboxField: ['option1'] },
+          })
+        );
+      });
+
+      it('should handle checkbox fields - array value', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'checkboxField',
+              type: 'checkbox',
+              options: [{ value: 'option1' }, { value: 'option2' }],
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: {
+            formData: {
+              'test-step': { checkboxField: ['option1', 'option2'] },
+            },
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { checkboxField: ['option1', 'option2'] },
+          })
+        );
+      });
+
+      it('should handle checkbox fields - empty value', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'checkboxField',
+              type: 'checkbox',
+              options: [{ value: 'option1' }],
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: {
+            formData: {},
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { checkboxField: [] },
+          })
+        );
+      });
+
+      it('should handle date fields - object format', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'dateField',
+              type: 'date',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: {
+            formData: {
+              'test-step': { dateField: { day: '01', month: '02', year: '2023' } },
+            },
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { dateField: { day: '01', month: '02', year: '2023' } },
+          })
+        );
+      });
+
+      it('should handle date fields - separate day/month/year format', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'dateField',
+              type: 'date',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: {
+            formData: {
+              'test-step': {
+                'dateField-day': '01',
+                'dateField-month': '02',
+                'dateField-year': '2023',
+              },
+            },
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { dateField: { day: '01', month: '02', year: '2023' } },
+          })
+        );
+      });
+
+      it('should handle date fields - empty value', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'dateField',
+              type: 'date',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: {
+            formData: {},
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { dateField: { day: '', month: '', year: '' } },
+          })
+        );
+      });
+
+      it('should handle textarea fields', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'textareaField',
+              type: 'textarea',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: {
+            formData: {
+              'test-step': { textareaField: 'some text' },
+            },
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { textareaField: 'some text' },
+          })
+        );
+      });
+
+      it('should handle character-count fields', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'charCountField',
+              type: 'character-count',
+              maxLength: 250,
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: {
+            formData: {
+              'test-step': { charCountField: 'some text' },
+            },
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { charCountField: 'some text' },
+          })
+        );
+      });
+
+      it('should handle text fields', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'textField',
+              type: 'text',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: {
+            formData: {
+              'test-step': { textField: 'text value' },
+            },
+          },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            fieldValues: { textField: 'text value' },
+          })
+        );
+      });
+
+      it('should use pageTitle from translationKeys when provided', async () => {
+        mockCreateGenerateContent.mockReturnValueOnce(() => ({
+          pageTitle: 'Custom Page Title',
+          buttons: {},
+          errors: {},
+        }));
+
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          translationKeys: {
+            pageTitle: 'pageTitle',
+          },
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: { formData: {} },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            pageTitle: 'Custom Page Title',
+          })
+        );
+      });
+
+      it('should use content from translationKeys when provided', async () => {
+        mockCreateGenerateContent.mockReturnValueOnce(() => ({
+          content: 'Custom content text',
+          buttons: {},
+          errors: {},
+        }));
+
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          translationKeys: {
+            content: 'content',
+          },
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: { formData: {} },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            content: 'Custom content text',
+          })
+        );
+      });
+    });
+
+    describe('getFields', () => {
+      it('should translate field labels from translationKey', async () => {
+        mockCreateGenerateContent.mockReturnValueOnce(() => ({
+          title: 'Translated Title',
+          buttons: {},
+          errors: {},
+        }));
+
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'testField',
+              type: 'text',
+              translationKey: {
+                label: 'title',
+              },
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: { formData: {} },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        const renderCall = (res.render as jest.Mock).mock.calls[0];
+        const fields = renderCall[1].fields;
+        expect(fields[0].label).toBe('Translated Title');
+      });
+
+      it('should use fallback label pattern when translationKey not found', async () => {
+        mockCreateGenerateContent.mockReturnValueOnce(() => ({
+          testFieldLabel: 'Fallback Label',
+          buttons: {},
+          errors: {},
+        }));
+
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'testField',
+              type: 'text',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: { formData: {} },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        const renderCall = (res.render as jest.Mock).mock.calls[0];
+        const fields = renderCall[1].fields;
+        expect(fields[0].label).toBe('Fallback Label');
+      });
+
+      it('should translate field hints from translationKey', async () => {
+        mockCreateGenerateContent.mockReturnValueOnce(() => ({
+          hint: 'Translated Hint',
+          buttons: {},
+          errors: {},
+        }));
+
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'testField',
+              type: 'text',
+              translationKey: {
+                hint: 'hint',
+              },
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: { formData: {} },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        const renderCall = (res.render as jest.Mock).mock.calls[0];
+        const fields = renderCall[1].fields;
+        expect(fields[0].hint).toBe('Translated Hint');
+      });
+
+      it('should translate option texts with nested keys', async () => {
+        mockCreateGenerateContent.mockReturnValueOnce(() => ({
+          options: {
+            yes: 'Yes',
+            no: 'No',
+          },
+          buttons: {},
+          errors: {},
+        }));
+
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'radioField',
+              type: 'radio',
+              options: [
+                { value: 'yes', translationKey: 'options.yes' },
+                { value: 'no', translationKey: 'options.no' },
+              ],
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: { formData: {} },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        const renderCall = (res.render as jest.Mock).mock.calls[0];
+        const fields = renderCall[1].fields;
+        expect(fields[0].options?.[0].text).toBe('Yes');
+        expect(fields[0].options?.[1].text).toBe('No');
+      });
+
+      it('should use error message from translations', async () => {
+        mockCreateGenerateContent.mockReturnValueOnce(() => ({
+          buttons: {},
+          errors: {
+            testField: 'Custom error message',
+          },
+        }));
+
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'testField',
+              type: 'text',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          session: { formData: {} },
+        } as unknown as Request;
+        const res = {
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.getController).toBeDefined();
+        expect(typeof step.getController).toBe('function');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controller = (step.getController as any)();
+        await controller.get(req, res);
+
+        const renderCall = (res.render as jest.Mock).mock.calls[0];
+        const fields = renderCall[1].fields;
+        expect(fields[0].errorMessage).toBe('Custom error message');
+      });
+    });
+
+    describe('postController', () => {
+      it('should handle saveForLater action', async () => {
+        const step = createFormStep(baseConfig);
+        const req = {
+          body: {
+            action: 'saveForLater',
+            testField: 'value',
+          },
+          session: {
+            ccdCase: { id: '123' },
+          },
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/123');
+      });
+
+      it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
+        const step = createFormStep(baseConfig);
+        const req = {
+          body: {
+            action: 'saveForLater',
+            testField: 'value',
+          },
+          session: {},
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard');
+      });
+
+      it('should normalize checkbox field for saveForLater', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'checkboxField',
+              type: 'checkbox',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          body: {
+            action: 'saveForLater',
+            checkboxField: 'option1',
+          },
+          session: {},
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { checkboxField: ['option1'] });
+      });
+
+      it('should normalize date field for saveForLater', async () => {
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'dateField',
+              type: 'date',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          body: {
+            action: 'saveForLater',
+            'dateField-day': '01',
+            'dateField-month': '02',
+            'dateField-year': '2023',
+          },
+          session: {},
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', {
+          dateField: { day: '01', month: '02', year: '2023' },
+        });
+      });
+
+      it('should handle validation errors', async () => {
+        mockValidateForm.mockReturnValueOnce({ testField: 'Error message' });
+
+        const step = createFormStep(baseConfig);
+        const req = {
+          body: {
+            action: 'continue',
+            testField: '',
+          },
+          session: {
+            ccdCase: { id: '123' },
+          },
+          originalUrl: '/test-url',
+          t: jest.fn(),
+        } as unknown as Request;
+        const res = {
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            error: { field: 'testField', text: 'Error message' },
+            ccdId: '123',
+          })
+        );
+      });
+
+      it('should normalize checkbox field for continue action', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'checkboxField',
+              type: 'checkbox',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          body: {
+            action: 'continue',
+            checkboxField: 'option1',
+          },
+          session: {},
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { checkboxField: ['option1'] });
+      });
+
+      it('should normalize date field for continue action', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          fields: [
+            {
+              name: 'dateField',
+              type: 'date',
+            },
+          ],
+        };
+        const step = createFormStep(config);
+        const req = {
+          body: {
+            action: 'continue',
+            'dateField-day': '01',
+            'dateField-month': '02',
+            'dateField-year': '2023',
+          },
+          session: {},
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', {
+          dateField: { day: '01', month: '02', year: '2023' },
+        });
+      });
+
+      it('should call beforeRedirect callback', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
+        const beforeRedirect = jest.fn();
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          beforeRedirect,
+        };
+        const step = createFormStep(config);
+        const req = {
+          body: {
+            action: 'continue',
+            testField: 'value',
+          },
+          session: {},
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+          headersSent: false,
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(beforeRedirect).toHaveBeenCalledWith(req);
+      });
+
+      it('should return early if beforeRedirect sends response', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
+        const beforeRedirect = jest.fn();
+        const config: FormBuilderConfig = {
+          ...baseConfig,
+          beforeRedirect,
+        };
+        const step = createFormStep(config);
+        const req = {
+          body: {
+            action: 'continue',
+            testField: 'value',
+          },
+          session: {},
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+          headersSent: true,
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(beforeRedirect).toHaveBeenCalledWith(req);
+        expect(res.redirect).not.toHaveBeenCalled();
+      });
+
+      it('should redirect to next step on successful validation', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
+        const step = createFormStep(baseConfig);
+        const req = {
+          body: {
+            action: 'continue',
+            testField: 'value',
+          },
+          session: {},
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(res.redirect).toHaveBeenCalledWith(303, '/steps/test-journey/next-step');
+      });
+
+      it('should return 500 when no redirect path available', async () => {
+        mockGetNextStepUrl.mockReturnValueOnce(null as unknown as string);
+        mockValidateForm.mockReturnValueOnce({});
+
+        const step = createFormStep(baseConfig);
+        const req = {
+          body: {
+            action: 'continue',
+            testField: 'value',
+          },
+          session: {},
+        } as unknown as Request;
+        const res = {
+          redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          send: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(req, res, jest.fn());
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith('Unable to determine next step');
+      });
+    });
+  });
+});

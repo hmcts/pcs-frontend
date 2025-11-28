@@ -79,6 +79,7 @@ RUN yarn workspaces focus --production --all
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/src/main/public ./dist/main/public
 COPY --from=build /app/src/main/views ./dist/main/views
+COPY --from=build /app/src/main/steps ./dist/main/steps
 COPY --from=build /app/config ./config
 
 RUN chmod +x /app/dist/main/server.js
