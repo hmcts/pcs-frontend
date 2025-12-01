@@ -21,7 +21,7 @@ export const step: StepDefinition = {
       const ccdCaseId = req.session?.ccdCase?.id;
       return {
         ...content,
-        backUrl: ccdCaseId ? `/dashboard/${ccdCaseId}` : `/dashboard/1`, //TODO: we need to replace this /dashboard/1 once we had a real CCD backend setup
+        backUrl: ccdCaseId ? `/dashboard/${ccdCaseId}` : '/dashboard/1', //TODO: we need to replace this /dashboard/1 once we had a real CCD backend setup
       };
     });
   },
