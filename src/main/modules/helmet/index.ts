@@ -17,6 +17,7 @@ export class Helmet {
   public enableFor(app: express.Express): void {
     // include default helmet functions
     const scriptSrc = [self, googleAnalyticsDomain];
+    const styleSrc = [self];
 
     if (this.developmentMode) {
       // Uncaught EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval'
@@ -51,7 +52,7 @@ export class Helmet {
             imgSrc: [self, googleAnalyticsDomain],
             objectSrc: [self],
             scriptSrc,
-            styleSrc: [self],
+            styleSrc,
             manifestSrc: [self],
             formAction,
           },

@@ -9604,6 +9604,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hmcts-header-shell-demo@file:../../rpx/to-replicate-cdx::locator=pcs-frontend%40workspace%3A.":
+  version: 0.0.2
+  resolution: "hmcts-header-shell-demo@file:../../rpx/to-replicate-cdx#../../rpx/to-replicate-cdx::hash=540c7c&locator=pcs-frontend%40workspace%3A."
+  checksum: 10/575deceeb95c2115cf7e24fe2cccd1f335971c7aea070b76d4737f3a56a37745fe0acb26349191368a98520fc600adb186af0bfbecd67485a289d7ca7dfe7639
+  languageName: node
+  linkType: hard
+
 "hookified@npm:^1.12.2":
   version: 1.12.2
   resolution: "hookified@npm:1.12.2"
@@ -12939,6 +12946,7 @@ __metadata:
     govuk-frontend: "npm:5.11.2"
     graphql: "npm:^16.10.0"
     helmet: "npm:^8.0.0"
+    hmcts-header-shell-demo: "file:../../rpx/to-replicate-cdx"
     html-webpack-plugin: "npm:^5.5.3"
     http-status-codes: "npm:^2.3.0"
     http-terminator: "npm:^3.2.0"

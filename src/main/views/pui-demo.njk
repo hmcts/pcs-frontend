@@ -1,0 +1,46 @@
+{% extends "template.njk" %}
+
+{% block head %}
+  {{ super() }}
+  <script type="module" src="/hmcts-header.js"></script>
+  <style>
+    body { margin: 0; }
+  </style>
+{% endblock %}
+
+{% block header %}
+  <hmcts-header-shell data-roles="pui-case-manager"></hmcts-header-shell>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-width-container">
+  <main class="govuk-main-wrapper" id="content" role="main">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-l">Demo</span>
+        <h1 class="govuk-heading-l">PUI header shell</h1>
+        <p class="govuk-body">Simple form underneath the Manage Cases header web component.</p>
+
+        <form method="post" action="#">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="demo-name">Name</label>
+            <input class="govuk-input govuk-!-width-two-thirds" id="demo-name" name="demo-name" type="text" autocomplete="name">
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="demo-case-reference">Case reference</label>
+            <input class="govuk-input govuk-input--width-20" id="demo-case-reference" name="demo-case-reference" type="text" inputmode="numeric" autocomplete="off">
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="demo-notes">Notes</label>
+            <textarea class="govuk-textarea" id="demo-notes" name="demo-notes" rows="5"></textarea>
+          </div>
+
+          <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

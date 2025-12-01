@@ -113,6 +113,12 @@ export class S2S {
   }
 
   async enableFor(app: Express): Promise<void> {
+    if (process.env.S2S_DISABLED === 'true') {
+      this.logger.warn('S2S disabled via S2S_DISABLED env var; skipping token acquisition');
+      app.locals.s2s = this;
+      return;
+    }
+
     const s2sSecret = config.get<string>('secrets.pcs.pcs-frontend-s2s-secret');
     const s2sConfig = config.get<S2SConfig>('s2s');
     const redisClient = app.locals.redisClient;
