@@ -13,5 +13,5 @@ export const createCaseApiData = {
     },
     legislativeCountry: 'England',
   },
-  createCaseApiEndPoint: `/case-types/PCS${process.env.API_CHANGE_ID ? '-' + process.env.API_CHANGE_ID : ''}/cases`,
+  createCaseApiEndPoint: `/case-types/PCS${process.env.PCS_API_CHANGE_ID ? '-' + process.env.PCS_API_CHANGE_ID : ''}/cases`,
 };
