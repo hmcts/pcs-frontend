@@ -9606,8 +9606,8 @@ __metadata:
 
 "hmcts-header-shell-demo@file:../../rpx/to-replicate-cdx::locator=pcs-frontend%40workspace%3A.":
   version: 0.0.2
-  resolution: "hmcts-header-shell-demo@file:../../rpx/to-replicate-cdx#../../rpx/to-replicate-cdx::hash=540c7c&locator=pcs-frontend%40workspace%3A."
-  checksum: 10/575deceeb95c2115cf7e24fe2cccd1f335971c7aea070b76d4737f3a56a37745fe0acb26349191368a98520fc600adb186af0bfbecd67485a289d7ca7dfe7639
+  resolution: "hmcts-header-shell-demo@file:../../rpx/to-replicate-cdx#../../rpx/to-replicate-cdx::hash=826262&locator=pcs-frontend%40workspace%3A."
+  checksum: 10/0aa3d1eb132a7997ed8d00dc84ddd105543879d5a4b3667697ece19855c36510e98917332ee9cf232fe7aef573bbd1f8629129475f056f4f908ea4e4ffa21af4
   languageName: node
   linkType: hard
 

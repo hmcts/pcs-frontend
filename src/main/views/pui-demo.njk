@@ -2,14 +2,14 @@
 
 {% block head %}
   {{ super() }}
-  <script type="module" src="/hmcts-header.js"></script>
+  <script type="module" src="{{ headerShell.assets.scripts[0] }}"></script>
   <style>
     body { margin: 0; }
   </style>
 {% endblock %}
 
 {% block header %}
-  <hmcts-header-shell data-roles="pui-case-manager" data-theme="{{ themeName | default('case-manager') }}"></hmcts-header-shell>
+  {{ headerShell.html | safe }}
 {% endblock %}
 
 {% block content %}
