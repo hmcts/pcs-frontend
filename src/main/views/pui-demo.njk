@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block header %}
-  <hmcts-header-shell data-roles="pui-case-manager"></hmcts-header-shell>
+  <hmcts-header-shell data-roles="pui-case-manager" data-theme="{{ themeName | default('case-manager') }}"></hmcts-header-shell>
 {% endblock %}
 
 {% block content %}
@@ -20,6 +20,13 @@
         <span class="govuk-caption-l">Demo</span>
         <h1 class="govuk-heading-l">PUI header shell</h1>
         <p class="govuk-body">Simple form underneath the Manage Cases header web component.</p>
+
+        <form method="get" action="/pui-demo" class="govuk-!-margin-bottom-6">
+          <input type="hidden" name="theme" value="{{ nextTheme | default('judicial') }}">
+          <button class="govuk-button govuk-button--secondary" type="submit">
+            Switch to {{ nextTheme | default('judicial') }} theme
+          </button>
+        </form>
 
         <form method="post" action="#">
           <div class="govuk-form-group">
