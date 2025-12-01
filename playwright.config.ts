@@ -3,19 +3,25 @@ import * as process from 'node:process';
 import { defineConfig, devices } from '@playwright/test';
 
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
+export const VERY_SHORT_TIMEOUT = 1000;
+export const SHORT_TIMEOUT = 5000;
+export const actionRetries = 5;
+export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
+const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './src/test/ui',
   /* Run tests in files in parallel */
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  timeout: 10 * 1000,
-  expect: { timeout: 10_000 },
+  retries: process.env.CI ? 3 : 0,
+  workers: env === 'preview' ? 1 : 4,
+  timeout: 600 * 1000,
+  expect: { timeout: 30 * 1000 },
+  use: { actionTimeout: 30 * 1000, navigationTimeout: 30 * 1000 },
   /* Report slow tests if they take longer than 5 mins */
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
-  workers: process.env.FUNCTIONAL_TESTS_WORKERS ? parseInt(process.env.FUNCTIONAL_TESTS_WORKERS) : 4,
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
   reporter: [

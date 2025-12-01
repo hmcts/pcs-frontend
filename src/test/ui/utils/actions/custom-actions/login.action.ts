@@ -3,7 +3,7 @@ import { Page } from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 
 import { performAction } from '../../controller';
-import { IAction, actionData } from '../../interfaces/action.interface';
+import { IAction, actionData } from '../../interfaces';
 
 export class LoginAction implements IAction {
   async execute(page: Page, action: string, userType?: actionData, roles?: actionData): Promise<void> {
@@ -25,7 +25,7 @@ export class LoginAction implements IAction {
   }
 
   private async createUserAndLogin(userType: string, roles: string[]): Promise<void> {
-    const token = process.env.CREATE_USER_BEARER_TOKEN as string;
+    const token = process.env.BEARER_TOKEN as string;
     const password = process.env.IDAM_PCS_USER_PASSWORD as string;
     const uniqueId = uuidv4();
     const email = (process.env.IDAM_PCS_USER_EMAIL = `TEST_PCS_USER.${userType}.${uniqueId}@test.test`);
