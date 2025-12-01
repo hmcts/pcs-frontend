@@ -31,14 +31,13 @@ withPipeline(type, product, component) {
   env.NODE_CONFIG_ENV = 'test'
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    def labels = CHANGE_LABELS ?: ""
-    def apiMatch = labels.find { it =~ /pcs-api-pr-\d+/ }
-    if (apiMatch) {
-      def API_CHANGE_ID = (apiMatch =~ /pcs-api-pr-(\d+)/)[0][1]
-      env.DATA_STORE_URL_BASE = "https://ccd-data-store-api-pcs-api-pr-${API_CHANGE_ID}.preview.platform.hmcts.net"
-    } else {
-      env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    }
+    env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    def apiLabels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pcs-api-pr-")
+     if (apiLabels && apiLabels.size() > 0) {
+       def labelName = apiLabels[0].name
+       env.API_CHANGE_ID = labelName.replace("pcs-api-pr-", "")
+       env.DATA_STORE_URL_BASE = "https://ccd-data-store-api-pcs-api-pr-${API_CHANGE_ID}.preview.platform.hmcts.net"
+      }
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
