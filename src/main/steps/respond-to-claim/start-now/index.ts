@@ -17,7 +17,13 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   generateContent,
   getController: () => {
-    return createGetController('steps/respondToClaim/startNow.njk', stepName, generateContent);
+    return createGetController('steps/respondToClaim/startNow.njk', stepName, generateContent, (req, content) => {
+      const ccdCaseId = req.session?.ccdCase?.id;
+      return {
+        ...content,
+        backUrl: ccdCaseId ? `/dashboard/${ccdCaseId}` : `/dashboard/1`, //TODO: we need to replace this /dashboard/1 once we had a real CCD backend setup
+      };
+    });
   },
   postController: {
     post: async (req: Request, res: Response) => {

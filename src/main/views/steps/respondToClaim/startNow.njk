@@ -6,7 +6,7 @@
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  
+
   {% if secondaryHeading %}
     <h1 class="govuk-heading-m govuk-!-margin-bottom-0 claim-journey-secondary-heading">{{ secondaryHeading }}</h1>
   {% endif %}
@@ -69,8 +69,6 @@
           isStartButton: true,
           attributes: { type: 'submit' }
         }) }}
-        <a href="/" class="govuk-link">{{ t('buttons.cancel', 'Cancel') }}</a>
-
       </div>
     </form>
 {% endblock %}
