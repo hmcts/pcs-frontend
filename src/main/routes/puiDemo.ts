@@ -2,7 +2,7 @@ import { Application, Request, Response } from 'express';
 
 // Temporary import from the header shell package; uses CommonJS, so require here for type simplicity.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { renderHeaderShell } = require('hmcts-header-shell-demo/render');
+const { renderHeaderShell, renderFooterShell } = require('hmcts-header-shell-demo/render');
 
 export default function (app: Application): void {
   app.get('/pui-demo', (req: Request, res: Response) => {
@@ -15,11 +15,13 @@ export default function (app: Application): void {
       theme: themeName,
       assetBase: '/',
     });
+    const footerShell = renderFooterShell({ assetBase: '/' });
 
     res.render('pui-demo', {
       themeName,
       nextTheme,
       headerShell,
+      footerShell,
     });
   });
 }

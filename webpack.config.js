@@ -24,6 +24,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: path.join(headerComponentPath, 'hmcts-header.js'), to: '.' },
+        { from: path.join(headerComponentPath, 'hmcts-footer.js'), to: '.' },
         { from: path.join(headerComponentPath, 'header-styles.css'), to: '.' },
         { from: path.join(headerComponentPath, 'combined-inline.css'), to: '.' },
         { from: path.join(headerComponentPath, 'shell-styles.css'), to: '.' },

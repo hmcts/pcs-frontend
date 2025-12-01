@@ -3,9 +3,9 @@
 {% block head %}
   {{ super() }}
   <script type="module" src="{{ headerShell.assets.scripts[0] }}"></script>
-  <style>
-    body { margin: 0; }
-  </style>
+  {% if footerShell %}
+    <script type="module" src="{{ footerShell.assets.scripts[0] }}"></script>
+  {% endif %}
 {% endblock %}
 
 {% block header %}
@@ -50,4 +50,10 @@
     </div>
   </main>
 </div>
+{% endblock %}
+
+{% block footer %}
+  {% if footerShell %}
+    {{ footerShell.html | safe }}
+  {% endif %}
 {% endblock %}
