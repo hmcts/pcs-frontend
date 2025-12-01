@@ -12,5 +12,5 @@ export const createCaseEventTokenApiData = {
     },
   }),
 
-  createCaseEventTokenApiEndPoint: `/case-types/PCS${process.env.CHANGE_ID ? '-' + process.env.CHANGE_ID : ''}/event-triggers/createPossessionClaim`,
+  createCaseEventTokenApiEndPoint: `/case-types/PCS${process.env.API_CHANGE_ID ? '-' + process.env.API_CHANGE_ID : ''}/event-triggers/createPossessionClaim`,
 };

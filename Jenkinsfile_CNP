@@ -31,9 +31,14 @@ withPipeline(type, product, component) {
   env.NODE_CONFIG_ENV = 'test'
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-pcs-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CASE_API_URL = "https://pcs-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.DATA_STORE_URL_BASE="https://ccd-data-store-api-pcs-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    def labels = CHANGE_LABELS ?: ""
+    def apiMatch = labels.find { it =~ /pcs-api-pr-\d+/ }
+    if (apiMatch) {
+      def API_CHANGE_ID = (apiMatch =~ /pcs-api-pr-(\d+)/)[0][1]
+      env.DATA_STORE_URL_BASE = "https://ccd-data-store-api-pcs-api-pr-${API_CHANGE_ID}.preview.platform.hmcts.net"
+    } else {
+      env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    }
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
@@ -56,8 +61,6 @@ withPipeline(type, product, component) {
 
   onMaster() {
     env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
-    env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
-    env.CASE_API_URL = "http://pcs-api-aat.service.core-compute-aat.internal"
     env.DATA_STORE_URL_BASE="http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,
