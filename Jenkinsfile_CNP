@@ -28,12 +28,13 @@ def secrets = [
 ]
 
 withPipeline(type, product, component) {
+  def githubApi = new GithubAPI(this)
   loadVaultSecrets(secrets)
   env.NODE_CONFIG_ENV = 'test'
   onPR() {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    def apiLabels = steps.githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pcs-api-pr-")
+    def apiLabels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pcs-api-pr-")
     if (apiLabels && apiLabels.size() > 0) {
       def labelName = apiLabels[0].name
       env.API_CHANGE_ID = labelName.replace("pcs-api-pr-", "")
