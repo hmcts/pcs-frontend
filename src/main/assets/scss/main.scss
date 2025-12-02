@@ -13,26 +13,6 @@
   font-weight: 300;
 }
 
-.govuk-back-link {
-  color: $govuk-link-colour;
-
-  &:link {
-    color: $govuk-link-colour;
-  }
-
-  &:visited {
-    color: $govuk-link-visited-colour;
-  }
-
-  &:hover {
-    color: $govuk-link-hover-colour;
-  }
-
-  &:active {
-    color: $govuk-link-active-colour;
-  }
-}
-
 .correspondence-address-form {
   .pcs-address-component {
     .govuk-details__text {
