@@ -10,6 +10,7 @@ import favicon from 'serve-favicon';
 import { HTTPError } from './HttpError';
 import { setupDev } from './development';
 import * as modules from './modules';
+import puiSample from './routes/pui-sample';
 import registerSteps from './routes/registerSteps';
 
 const env = process.env.NODE_ENV || 'development';
@@ -41,6 +42,8 @@ app.use((req, res, next) => {
 });
 
 registerSteps(app);
+
+puiSample(app);
 
 glob
   .sync(__dirname + '/routes/**/*.+(ts|js)')
