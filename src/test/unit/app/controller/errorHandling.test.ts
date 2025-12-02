@@ -185,13 +185,7 @@ describe('errorHandling', () => {
 
       const content = {};
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
       expect(statusSpy).toHaveBeenCalledWith(400);
     });
@@ -209,20 +203,17 @@ describe('errorHandling', () => {
         customField: 'custom value',
       };
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        pageTitle: 'Test Page',
-        customField: 'custom value',
-        field1: 'value1',
-        field2: 'value2',
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          pageTitle: 'Test Page',
+          customField: 'custom value',
+          field1: 'value1',
+          field2: 'value2',
+        })
+      );
     });
 
     it('should include errors in render data', () => {
@@ -235,17 +226,14 @@ describe('errorHandling', () => {
 
       const content = {};
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        errors,
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          errors,
+        })
+      );
     });
 
     it('should include fieldErrors in render data', () => {
@@ -262,20 +250,17 @@ describe('errorHandling', () => {
 
       const content = {};
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        fieldErrors: {
-          field1: 'Field 1 is required',
-          field2: 'Field 2 is invalid',
-        },
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          fieldErrors: {
+            field1: 'Field 1 is required',
+            field2: 'Field 2 is invalid',
+          },
+        })
+      );
     });
 
     it('should include first error in render data', () => {
@@ -292,20 +277,17 @@ describe('errorHandling', () => {
 
       const content = {};
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        error: {
-          field: 'field1',
-          text: 'Field 1 is required',
-        },
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          error: {
+            field: 'field1',
+            text: 'Field 1 is required',
+          },
+        })
+      );
     });
 
     it('should include errorSummary when errors exist', () => {
@@ -318,25 +300,22 @@ describe('errorHandling', () => {
 
       const content = {};
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        errorSummary: {
-          titleText: 'There is a problem',
-          errorList: [
-            {
-              text: 'Field 1 is required',
-              href: '#field1',
-            },
-          ],
-        },
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          errorSummary: {
+            titleText: 'There is a problem',
+            errorList: [
+              {
+                text: 'Field 1 is required',
+                href: '#field1',
+              },
+            ],
+          },
+        })
+      );
     });
 
     it('should use errorSummaryTitle from content when provided', () => {
@@ -351,20 +330,17 @@ describe('errorHandling', () => {
         errorSummaryTitle: 'Custom error summary title',
       };
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        errorSummary: expect.objectContaining({
-          titleText: 'Custom error summary title',
-        }),
-        errorSummaryTitle: 'Custom error summary title',
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          errorSummary: expect.objectContaining({
+            titleText: 'Custom error summary title',
+          }),
+          errorSummaryTitle: 'Custom error summary title',
+        })
+      );
     });
 
     it('should not use errorSummaryTitle from content when it is not a string', () => {
@@ -379,20 +355,17 @@ describe('errorHandling', () => {
         errorSummaryTitle: 123,
       };
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        errorSummary: expect.objectContaining({
-          titleText: 'There is a problem',
-        }),
-        errorSummaryTitle: 'There is a problem',
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          errorSummary: expect.objectContaining({
+            titleText: 'There is a problem',
+          }),
+          errorSummaryTitle: 'There is a problem',
+        })
+      );
     });
 
     it('should handle empty req.body', () => {
@@ -409,17 +382,14 @@ describe('errorHandling', () => {
 
       mockRequest.body = {};
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        pageTitle: 'Test Page',
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          pageTitle: 'Test Page',
+        })
+      );
     });
 
     it('should handle undefined req.body', () => {
@@ -436,17 +406,14 @@ describe('errorHandling', () => {
 
       mockRequest.body = undefined;
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        pageTitle: 'Test Page',
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          pageTitle: 'Test Page',
+        })
+      );
     });
 
     it('should include errorSummaryTitle from summary when summary exists', () => {
@@ -459,17 +426,14 @@ describe('errorHandling', () => {
 
       const content = {};
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        errorSummaryTitle: 'There is a problem',
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          errorSummaryTitle: 'There is a problem',
+        })
+      );
     });
 
     it('should use errorSummaryTitle from content when summary is null', () => {
@@ -479,18 +443,15 @@ describe('errorHandling', () => {
         errorSummaryTitle: 'Custom title',
       };
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        errorSummary: null,
-        errorSummaryTitle: 'Custom title',
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          errorSummary: null,
+          errorSummaryTitle: 'Custom title',
+        })
+      );
     });
 
     it('should return the response object', () => {
@@ -503,13 +464,7 @@ describe('errorHandling', () => {
 
       const content = {};
 
-      const result = renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      const result = renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
       expect(result).toBe(mockResponse);
     });
@@ -529,29 +484,25 @@ describe('errorHandling', () => {
 
       const content = {};
 
-      renderWithErrors(
-        mockRequest as Request,
-        mockResponse as Response,
-        'test-view',
-        errors,
-        content
-      );
+      renderWithErrors(mockRequest as Request, mockResponse as Response, 'test-view', errors, content);
 
-      expect(renderSpy).toHaveBeenCalledWith('test-view', expect.objectContaining({
-        errorSummary: expect.objectContaining({
-          errorList: [
-            {
-              text: 'Field 1 is required',
-              href: '#custom-anchor-1',
-            },
-            {
-              text: 'Field 2 is invalid',
-              href: '#field2',
-            },
-          ],
-        }),
-      }));
+      expect(renderSpy).toHaveBeenCalledWith(
+        'test-view',
+        expect.objectContaining({
+          errorSummary: expect.objectContaining({
+            errorList: [
+              {
+                text: 'Field 1 is required',
+                href: '#custom-anchor-1',
+              },
+              {
+                text: 'Field 2 is invalid',
+                href: '#field2',
+              },
+            ],
+          }),
+        })
+      );
     });
   });
 });
-

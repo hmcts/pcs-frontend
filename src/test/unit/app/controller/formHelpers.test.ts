@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 
 import { getAllFormData, getFormData, setFormData, validateForm } from '../../../../main/app/controller/formHelpers';
+import type { FormFieldConfig } from '../../../../main/interfaces/formFieldConfig.interface';
 
 describe('formHelpers', () => {
   describe('getFormData', () => {
@@ -52,7 +53,7 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      expect((req.session as any).formData).toEqual({
+      expect((req.session as { formData?: Record<string, unknown> }).formData).toEqual({
         'test-step': {
           field1: 'value1',
         },
@@ -72,7 +73,7 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'new-value', field2: 'value2' });
 
-      expect((req.session as any).formData).toEqual({
+      expect((req.session as { formData?: Record<string, unknown> }).formData).toEqual({
         'test-step': {
           field1: 'new-value',
           field2: 'value2',
@@ -87,8 +88,9 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      expect((req.session as any).formData).toBeDefined();
-      expect((req.session as any).formData?.['test-step']).toEqual({ field1: 'value1' });
+      const sessionWithFormData = req.session as { formData?: Record<string, unknown> };
+      expect(sessionWithFormData.formData).toBeDefined();
+      expect(sessionWithFormData.formData?.['test-step']).toEqual({ field1: 'value1' });
     });
   });
 
@@ -97,11 +99,11 @@ describe('formHelpers', () => {
       const req = {
         session: {
           formData: {
-            'step1': {
+            step1: {
               field1: 'value1',
               field2: 'value2',
             },
-            'step2': {
+            step2: {
               field3: 'value3',
             },
           },
@@ -149,10 +151,10 @@ describe('formHelpers', () => {
       const req = {
         session: {
           formData: {
-            'step1': {
+            step1: {
               field1: 'value1',
             },
-            'step2': {
+            step2: {
               field1: 'value2',
             },
           },
@@ -647,10 +649,10 @@ describe('formHelpers', () => {
       const fields = [
         {
           name: 'field1',
-          type: 'unknown' as any,
+          type: 'unknown' as unknown as FormFieldConfig['type'],
           required: false,
         },
-      ];
+      ] as FormFieldConfig[];
 
       const result = validateForm(req, fields);
       expect(result).toEqual({});
