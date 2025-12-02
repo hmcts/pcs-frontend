@@ -1,5 +1,5 @@
 export const startNow = {
-  subHeader: 'Respond to a property possession claim online',
+  mainHeader: 'Respond to a property possession claim online',
   respondWithinParagraph:
     'There’s no fee to respond to a claim. You must respond within 14 days of receiving the claim pack in the post.',
   thisServiceIsAlsoAvailableParagraph: 'This service is also available in ',
