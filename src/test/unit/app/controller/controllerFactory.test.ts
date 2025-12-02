@@ -7,9 +7,11 @@ import {
   createPostRedirectController,
   validateAndStoreForm,
 } from '../../../../main/app/controller/controllerFactory';
+import { renderWithErrors } from '../../../../main/app/controller/errorHandling';
 import { getFormData, setFormData, validateForm } from '../../../../main/app/controller/formHelpers';
 
 jest.mock('../../../../main/app/controller/formHelpers');
+jest.mock('../../../../main/app/controller/errorHandling');
 jest.mock('../../../../main/app/utils/i18n', () => ({
   getValidatedLanguage: jest.fn(() => 'en'),
 }));
@@ -23,6 +25,7 @@ jest.mock('../../../../main/app/utils/stepFlow', () => ({
 const mockGetFormData = getFormData as jest.Mock;
 const mockSetFormData = setFormData as jest.Mock;
 const mockValidateForm = validateForm as jest.Mock;
+const mockRenderWithErrors = renderWithErrors as jest.Mock;
 describe('createGetController', () => {
   const mockContent = {
     serviceName: 'Test Service',
@@ -191,10 +194,11 @@ describe('createPostController', () => {
     jest.clearAllMocks();
     mockValidateForm.mockReturnValue({});
     mockGetFields.mockReturnValue([]);
+    mockRenderWithErrors.mockReturnValue(undefined);
   });
 
-  it('should validate form and return errors when validation fails', async () => {
-    const errors = { field1: 'Error message' };
+  it('should validate form and delegate rendering when validation fails', async () => {
+    const errors = { field1: { field: 'field1', text: 'Error message' } };
     mockValidateForm.mockReturnValue(errors);
 
     const controller = createPostController(stepName, mockGenerateContent, mockGetFields, view);
@@ -208,12 +212,7 @@ describe('createPostController', () => {
     await controller.post(req, res);
 
     expect(mockValidateForm).toHaveBeenCalled();
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.render).toHaveBeenCalledWith(view, {
-      title: 'Test',
-      field1: '',
-      error: { field: 'field1', text: 'Error message' },
-    });
+    expect(mockRenderWithErrors).toHaveBeenCalledWith(req, res, view, errors, { title: 'Test' });
   });
 
   it('should save form data and redirect when validation passes', async () => {
@@ -298,7 +297,7 @@ describe('validateAndStoreForm', () => {
   });
 
   it('should render error when validation fails', () => {
-    const errors = { field1: 'Error message' };
+    const errors = { field1: { field: 'field1', text: 'Error message' } };
     mockValidateForm.mockReturnValue(errors);
 
     const controller = validateAndStoreForm(stepName, fields, '/next', content, templatePath);
@@ -307,20 +306,15 @@ describe('validateAndStoreForm', () => {
       session: {},
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
+    const res = {} as any;
 
     controller.post(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.render).toHaveBeenCalledWith(templatePath, {
-      title: 'Test',
-      field1: '',
-      error: 'Error message',
-    });
+    expect(mockRenderWithErrors).toHaveBeenCalledWith(req, res, templatePath, errors, content);
   });
 
   it('should use default template path when not provided', () => {
-    const errors = { field1: 'Error message' };
+    const errors = { field1: { field: 'field1', text: 'Error message' } };
     mockValidateForm.mockReturnValue(errors);
 
     const controller = validateAndStoreForm(stepName, fields, '/next', content);
@@ -329,11 +323,11 @@ describe('validateAndStoreForm', () => {
       session: {},
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
+    const res = {} as any;
 
     controller.post(req, res);
 
-    expect(res.render).toHaveBeenCalledWith('steps/test-step.njk', expect.any(Object));
+    expect(mockRenderWithErrors).toHaveBeenCalledWith(req, res, 'steps/test-step.njk', errors, content);
   });
 
   it('should convert single checkbox value to array', () => {

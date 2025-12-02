@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
-import { getFormData, setFormData, validateForm } from '../../../app/controller/formHelpers';
+import { renderWithErrors } from '../../../app/controller/errorHandling';
+import { getAllFormData, getFormData, setFormData, validateForm } from '../../../app/controller/formHelpers';
 import {
   type SupportedLang,
   type TranslationContent,
@@ -50,7 +51,7 @@ export const step: StepDefinition = {
       const savedData = getFormData(req, stepName);
       const lookupPostcode = req.session.lookupPostcode || '';
       const addressResults = req.session.postcodeLookupResult || null;
-      const error = req.session.lookupError || undefined;
+      const lookupError = req.session.lookupError || undefined;
 
       delete req.session.lookupPostcode;
       delete req.session.lookupError;
@@ -59,7 +60,7 @@ export const step: StepDefinition = {
         ...savedData,
         lookupPostcode,
         addressResults,
-        error,
+        lookupError,
         selectedAddressIndex: savedData?.selectedAddressIndex || null,
       };
     });
@@ -144,18 +145,11 @@ export const step: StepDefinition = {
         }
 
         const fields = getFields(content);
-        const errors = validateForm(req, fields);
+        const errors = validateForm(req, fields, undefined, getAllFormData(req));
 
         if (Object.keys(errors).length > 0) {
-          const firstField = Object.keys(errors)[0];
-          return res.status(400).render('steps/userJourney/enterAddress.njk', {
+          return renderWithErrors(req, res, 'steps/userJourney/enterAddress.njk', errors, {
             ...content,
-            ...req.body,
-            error: {
-              field: firstField,
-              text: errors[firstField],
-            },
-            errorSummaryTitle: content.errorSummaryTitle,
             addressResults: req.session.postcodeLookupResult || null,
             backUrl: '/steps/user-journey/enter-user-details',
           });

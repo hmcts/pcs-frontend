@@ -124,7 +124,7 @@ describe('formHelpers', () => {
 
       const result = validateForm(req, fields);
       expect(result).toHaveProperty('field2');
-      expect(result.field2).toBe('This field is required');
+      expect(result.field2?.text).toBe('This field is required');
     });
 
     it('should use custom error message when provided', () => {
@@ -142,7 +142,7 @@ describe('formHelpers', () => {
       ];
 
       const result = validateForm(req, fields);
-      expect(result.field1).toBe('Custom error message');
+      expect(result.field1?.text).toBe('Custom error message');
     });
 
     it('should use translation error message when provided', () => {
@@ -163,7 +163,7 @@ describe('formHelpers', () => {
       };
 
       const result = validateForm(req, fields, translations);
-      expect(result.field1).toBe('Translation error message');
+      expect(result.field1?.text).toBe('Translation error message');
     });
 
     it('should validate pattern when field has pattern', () => {
@@ -183,8 +183,7 @@ describe('formHelpers', () => {
       ];
 
       const result = validateForm(req, fields);
-      expect(result).toHaveProperty('field1');
-      expect(result.field1).toBe('Invalid format');
+      expect(result.field1?.text).toBe('Invalid format');
     });
 
     it('should not validate pattern for empty fields', () => {
@@ -223,7 +222,7 @@ describe('formHelpers', () => {
       ];
 
       const result = validateForm(req, fields);
-      expect(result).toHaveProperty('field1');
+      expect(result.field1?.text).toBe('This field is required');
     });
 
     it('should validate checkbox field - empty string', () => {
@@ -242,7 +241,7 @@ describe('formHelpers', () => {
       ];
 
       const result = validateForm(req, fields);
-      expect(result).toHaveProperty('field1');
+      expect(result.field1?.text).toBe('This field is required');
     });
 
     it('should pass validation for checkbox with values', () => {
@@ -280,7 +279,7 @@ describe('formHelpers', () => {
       ];
 
       const result = validateForm(req, fields);
-      expect(result).toHaveProperty('field1');
+      expect(result.field1?.text).toBe('This field is required');
     });
 
     it('should handle null values', () => {
@@ -320,7 +319,7 @@ describe('formHelpers', () => {
       ];
 
       const result = validateForm(req, fields);
-      expect(result.field1).toBe('Custom pattern error');
+      expect(result.field1?.text).toBe('Custom pattern error');
     });
 
     it('should use translation error message for pattern validation', () => {
@@ -344,7 +343,57 @@ describe('formHelpers', () => {
       };
 
       const result = validateForm(req, fields, translations);
-      expect(result.field1).toBe('Translation pattern error');
+      expect(result.field1?.text).toBe('Translation pattern error');
+    });
+
+    it('should evaluate dynamic required predicates using all form data', () => {
+      const req = {
+        body: {
+          dependantField: '',
+        },
+        session: {
+          formData: {
+            previous: {
+              triggerField: 'YES',
+            },
+          },
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dependantField',
+          type: 'text' as const,
+          required: (_formData: Record<string, unknown>, allFormData: Record<string, unknown>) =>
+            allFormData.triggerField === 'YES',
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result.dependantField?.text).toBe('This field is required');
+    });
+
+    it('should support cross-field validators', () => {
+      const req = {
+        body: {
+          email: 'person@example.com',
+          confirmEmail: 'different@example.com',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'confirmEmail',
+          type: 'text' as const,
+          required: true,
+          validator: (value: unknown, _formData: Record<string, unknown>, allFormData: Record<string, unknown>) => {
+            return value === allFormData.email ? undefined : 'Email addresses must match';
+          },
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result.confirmEmail?.text).toBe('Email addresses must match');
     });
   });
 });
