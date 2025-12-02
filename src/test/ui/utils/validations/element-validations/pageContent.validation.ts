@@ -19,6 +19,7 @@ const ELEMENT_TYPES = [
   'HintText',
   'TextLabel',
   'Paragraph',
+  'List',
 ] as const;
 
 type ValidationResult = { element: string; expected: string; status: 'pass' | 'fail' };
@@ -105,6 +106,11 @@ export class PageContentValidation implements IValidation {
                     .text-content:text("${value}"),
                     .govuk-body:text("${value}"),
                     .govuk-list:text("${value}")`),
+    List: (page: Page, value: string) =>
+      page.locator(`
+                    li:text("${value}"),
+                    ul li:text("${value}"),
+                    ol li:text("${value}")`),
     Text: (page: Page, value: string) => page.locator(`:text("${value}")`),
     Tab: (page: Page, value: string) => page.getByRole('tab', { name: value }),
   };
