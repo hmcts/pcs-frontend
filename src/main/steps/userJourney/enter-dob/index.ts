@@ -1,4 +1,4 @@
-import { createFormStep } from '../../../app/utils/formBuilder';
+import { createFormStep } from '../../../app/utils/formBuilder/index';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({

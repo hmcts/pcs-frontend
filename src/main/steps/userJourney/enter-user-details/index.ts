@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { createFormStep } from '../../../app/utils/formBuilder';
+import { createFormStep } from '../../../app/utils/formBuilder/index';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 

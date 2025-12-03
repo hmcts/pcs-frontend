@@ -35,157 +35,20 @@
 
     <form method="post" action="{{ url }}">
       {% for field in fields %}
-        {% if field.type == 'text' %}
-          {% set fieldValue = (fieldValues[field.name] | default("")) %}
-          {{ govukInput({
-            id: field.name,
-            name: field.name,
-            label: { text: field.label or field.name },
-            hint: field.hint and { text: field.hint } or null,
-            value: fieldValue,
-            classes: field.classes or "govuk-!-width-three-quarters",
-            attributes: field.attributes or {},
-            errorMessage: error and error.field == field.name and { text: error.text } or null
-          }) }}
-
-        {% elif field.type == 'textarea' %}
-          {% set fieldValue = (fieldValues[field.name] | default("")) %}
-          {% set textareaAttributes = field.attributes or {} %}
-          {% set textareaRows = textareaAttributes.rows or 5 %}
-          {{ govukTextarea({
-            id: field.name,
-            name: field.name,
-            label: { text: field.label or field.name },
-            hint: field.hint and { text: field.hint } or null,
-            value: fieldValue,
-            rows: textareaRows,
-            maxlength: field.maxLength or null,
-            attributes: textareaAttributes,
-            errorMessage: error and error.field == field.name and { text: error.text } or null
-          }) }}
-
-        {% elif field.type == 'character-count' %}
-          {% set fieldValue = (fieldValues[field.name] | default("")) %}
-          {% set textareaAttributes = field.attributes or {} %}
-          {% set textareaRows = textareaAttributes.rows or 5 %}
-          {{ govukCharacterCount({
-            id: field.name,
-            name: field.name,
-            maxlength: field.maxLength,
-            rows: textareaRows,
-            label: { 
-              text: field.label or field.name,
-              isPageHeading: loop.first and not title
-            },
-            hint: field.hint and { text: field.hint } or null,
-            value: fieldValue,
-            attributes: textareaAttributes,
-            errorMessage: error and error.field == field.name and { text: error.text } or null
-          }) }}
-
-        {% elif field.type == 'radio' %}
-          {% set fieldValue = (fieldValues[field.name] | default("")) %}
-          {% set radioItems = [] %}
-          {% for option in field.options or [] %}
-            {% set radioItems = (radioItems.push({
-              value: option.value,
-              text: option.text,
-              checked: fieldValue == option.value
-            }), radioItems) %}
-          {% endfor %}
-          
-          {{ govukRadios({
-            id: field.name,
-            name: field.name,
-            fieldset: {
-              legend: {
-                text: field.label or field.name,
-                isPageHeading: loop.first and not title,
-                classes: loop.first and not title and "govuk-fieldset__legend--l" or ""
-              }
-            },
-            hint: field.hint and { text: field.hint } or null,
-            items: radioItems,
-            errorMessage: error and error.field == field.name and { text: error.text } or null
-          }) }}
-
-        {% elif field.type == 'checkbox' %}
-          {% set checkboxValue = (fieldValues[field.name] | default([])) %}
-          {% set checkboxArray = [] %}
-          {% if checkboxValue is iterable and checkboxValue is not string %}
-            {% set checkboxArray = checkboxValue %}
-          {% elif checkboxValue %}
-            {% set checkboxArray = [checkboxValue] %}
+        {% if field.component and field.componentType %}
+          {% if field.componentType == 'input' %}
+            {{ govukInput(field.component) }}
+          {% elif field.componentType == 'textarea' %}
+            {{ govukTextarea(field.component) }}
+          {% elif field.componentType == 'characterCount' %}
+            {{ govukCharacterCount(field.component) }}
+          {% elif field.componentType == 'radios' %}
+            {{ govukRadios(field.component) }}
+          {% elif field.componentType == 'checkboxes' %}
+            {{ govukCheckboxes(field.component) }}
+          {% elif field.componentType == 'dateInput' %}
+            {{ govukDateInput(field.component) }}
           {% endif %}
-          
-          {% set checkboxItems = [] %}
-          {% for option in field.options or [] %}
-            {% set isChecked = false %}
-            {% for val in checkboxArray %}
-              {% if val == option.value %}
-                {% set isChecked = true %}
-              {% endif %}
-            {% endfor %}
-            {% set checkboxItems = (checkboxItems.push({
-              value: option.value,
-              text: option.text,
-              checked: isChecked
-            }), checkboxItems) %}
-          {% endfor %}
-          
-          {{ govukCheckboxes({
-            id: field.name,
-            name: field.name,
-            fieldset: {
-              legend: {
-                text: field.label or field.name,
-                isPageHeading: loop.first and not title,
-                classes: loop.first and not title and "govuk-fieldset__legend--l" or ""
-              }
-            },
-            hint: field.hint and { text: field.hint } or null,
-            items: checkboxItems,
-            errorMessage: error and error.field == field.name and { text: error.text } or null
-          }) }}
-
-        {% elif field.type == 'date' %}
-          {% set dateValue = (fieldValues[field.name] | default({ day: '', month: '', year: '' })) %}
-          {{ govukDateInput({
-            id: field.name,
-            namePrefix: field.name,
-            fieldset: {
-              legend: {
-                text: field.label or field.name,
-                isPageHeading: loop.first and not title,
-                classes: loop.first and not title and "govuk-fieldset__legend--l" or ""
-              }
-            },
-            hint: field.hint and { text: field.hint } or null,
-            items: [
-              {
-                name: "day",
-                label: date.day,
-                value: dateValue.day,
-                classes: "govuk-input--width-2",
-                attributes: { maxlength: 2, inputmode: "numeric" }
-              },
-              {
-                name: "month",
-                label: date.month,
-                value: dateValue.month,
-                classes: "govuk-input--width-2",
-                attributes: { maxlength: 2, inputmode: "numeric" }
-              },
-              {
-                name: "year",
-                label: date.year,
-                value: dateValue.year,
-                classes: "govuk-input--width-4",
-                attributes: { maxlength: 4, inputmode: "numeric" }
-              }
-            ],
-            errorMessage: error and error.field == field.name and { text: error.text } or null
-          }) }}
         {% endif %}
       {% endfor %}
 

@@ -44,6 +44,27 @@ export function getValidatedLanguage(req: Request): SupportedLang {
   return LANG_MAP[normalized] ?? 'en';
 }
 
+function deepMerge(target: TranslationContent, source: TranslationContent): TranslationContent {
+  const result = { ...target };
+
+  for (const key in source) {
+    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      // If both target and source have objects at this key, merge them recursively
+      if (target[key] && typeof target[key] === 'object' && !Array.isArray(target[key])) {
+        result[key] = deepMerge(target[key] as TranslationContent, source[key] as TranslationContent);
+      } else {
+        // Otherwise, use the source value
+        result[key] = source[key];
+      }
+    } else {
+      // For primitives and arrays, source overrides target
+      result[key] = source[key];
+    }
+  }
+
+  return result;
+}
+
 export function loadTranslations(lang: string, namespaces: string[]): TranslationContent {
   const translations: TranslationContent = {};
   const localesDir = findLocalesDir();
@@ -60,7 +81,8 @@ export function loadTranslations(lang: string, namespaces: string[]): Translatio
       const filePath = path.join(basePath, `${ns}.json`);
       const fileContent = fs.readFileSync(filePath, 'utf8');
       const parsed = JSON.parse(fileContent);
-      Object.assign(translations, parsed);
+      // Use deep merge to merge nested objects instead of replacing them
+      Object.assign(translations, deepMerge(translations, parsed));
     } catch (error) {
       logger.error(`Failed to load translation for: ${lang}/${ns} with error ${error}`);
     }
@@ -78,4 +100,17 @@ export function createGenerateContent(stepName: string, folder: string) {
   return (lang: SupportedLang = 'en'): TranslationContent => {
     return loadTranslations(lang, ['common', `${folder}/${namespace}`]);
   };
+}
+
+export function getNestedTranslation(translations: TranslationContent, key: string): string | undefined {
+  const keys = key.split('.');
+  let value: unknown = translations;
+  for (const k of keys) {
+    if (value && typeof value === 'object' && k in value) {
+      value = (value as Record<string, unknown>)[k];
+    } else {
+      return undefined;
+    }
+  }
+  return typeof value === 'string' ? value : undefined;
 }
