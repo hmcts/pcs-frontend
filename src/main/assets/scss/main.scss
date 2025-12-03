@@ -8,6 +8,16 @@
   justify-content: space-between;
 }
 
+.govuk-width-container {
+  // Match the wider, left-aligned layout used by XUI
+  max-width: 1920px;
+  width: 100%;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .claim-journey-secondary-heading {
   color: $govuk-secondary-text-colour;
   font-weight: 300;
