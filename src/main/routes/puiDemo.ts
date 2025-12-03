@@ -27,6 +27,27 @@ interface DemoViewModel {
   paymentsQueryString: string;
 }
 
+const keepOnlyCreateCaseNav = (html: string): string => {
+  const listMatch = html.match(/(<ul class="hmcts-primary-navigation__list">)([\s\S]*?)(<\/ul>)/);
+  if (!listMatch) {
+    return html;
+  }
+
+  const items = Array.from(listMatch[2].matchAll(/<li class="hmcts-primary-navigation__item">[\s\S]*?<\/li>/g)).map(match => match[0]);
+  const createCaseItem = items.find(item => /Create case/i.test(item));
+
+  if (!createCaseItem) {
+    return html;
+  }
+
+  return html.replace(
+    listMatch[0],
+    `${listMatch[1]}
+                  ${createCaseItem}
+                ${listMatch[3]}`
+  );
+};
+
 const buildDemoViewModel = (req: Request): DemoViewModel => {
   const theme = typeof req.query.theme === 'string' ? req.query.theme : 'case-manager';
   const allowedThemes = new Set<DemoTheme>(['judicial', 'case-manager', 'default']);
@@ -50,11 +71,18 @@ const buildDemoViewModel = (req: Request): DemoViewModel => {
   }, 0);
   const totalArrears = `£${totalArrearsValue}`;
   const caseReference = '#1234-5678-9101';
-  const headerShell = renderHeaderShell({
-    roles: ['pui-case-manager'],
-    theme: themeName,
-    assetBase: '/',
-  });
+  const headerShell = (() => {
+    const shell = renderHeaderShell({
+      roles: ['pui-case-manager'],
+      theme: themeName,
+      assetBase: '/',
+    });
+
+    return {
+      ...shell,
+      html: keepOnlyCreateCaseNav(shell.html),
+    };
+  })();
   const footerShell = renderFooterShell({ assetBase: '/' });
 
   const queryParts = [`theme=${encodeURIComponent(themeName)}`, ...Array.from(removalSet).map(value => `remove=${encodeURIComponent(value)}`)];

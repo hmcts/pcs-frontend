@@ -1,11 +1,9 @@
 {% extends "template.njk" %}
+{% from "govuk/components/footer/macro.njk" import govukFooter %}
 
 {% block head %}
   {{ super() }}
   <script type="module" src="{{ headerShell.assets.scripts[0] }}"></script>
-  {% if footerShell %}
-    <script type="module" src="{{ footerShell.assets.scripts[0] }}"></script>
-  {% endif %}
 {% endblock %}
 
 {% block header %}
@@ -55,7 +53,77 @@
 {% endblock %}
 
 {% block footer %}
-  {% if footerShell %}
-    {{ footerShell.html | safe }}
-  {% endif %}
+  {{ govukFooter({}) }}
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script>
+    (() => {
+      const getShellRoot = () => {
+        const shell = document.querySelector('hmcts-header-shell');
+        return shell && (shell.shadowRoot || shell.querySelector('template[shadowrootmode="open"]')?.content);
+      };
+
+      const getNavList = () => {
+        const root = getShellRoot();
+        return root && root.querySelector('.hmcts-primary-navigation__list');
+      };
+
+      const trimNavToCreateCase = () => {
+        const list = getNavList();
+        if (!list) return false;
+
+        const items = Array.from(list.querySelectorAll('.hmcts-primary-navigation__item'));
+        const createCase = items.find(item => /Create case/i.test(item.textContent || ''));
+        if (!createCase) return false;
+
+        if (list.firstElementChild !== createCase || list.children.length !== 1) {
+          list.innerHTML = '';
+          list.appendChild(createCase);
+        }
+        return true;
+      };
+
+      const setupObserver = () => {
+        const list = getNavList();
+        if (!list) return false;
+
+        trimNavToCreateCase();
+        const observer = new MutationObserver(() => trimNavToCreateCase());
+        observer.observe(list, { childList: true });
+        return true;
+      };
+
+      const adjustPhaseBannerPadding = () => {
+        const root = getShellRoot();
+        const phaseText = root && root.querySelector('.govuk-phase-banner__text');
+        if (!phaseText) return false;
+
+        phaseText.style.paddingLeft = '0';
+        return true;
+      };
+
+      const start = () => {
+        adjustPhaseBannerPadding();
+        if (setupObserver()) return;
+
+        let attempts = 0;
+        const interval = setInterval(() => {
+          const observerReady = setupObserver();
+          adjustPhaseBannerPadding();
+          if (observerReady || attempts >= 50) {
+            clearInterval(interval);
+          }
+          attempts += 1;
+        }, 200);
+      };
+
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        start();
+      } else {
+        document.addEventListener('DOMContentLoaded', start);
+      }
+    })();
+  </script>
 {% endblock %}
