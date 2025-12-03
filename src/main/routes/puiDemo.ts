@@ -13,43 +13,81 @@ const basePayments = [
   { instance: 'Payment 6', dueDate: '30/06/2025', amountDue: '£125', amountPaid: '£0' },
 ];
 
+type DemoTheme = 'judicial' | 'case-manager' | 'default';
+
+interface DemoViewModel {
+  themeName: DemoTheme;
+  nextTheme: DemoTheme;
+  headerShell: unknown;
+  footerShell: unknown;
+  payments: typeof basePayments;
+  totalArrears: string;
+  caseReference: string;
+  removeList: string[];
+  paymentsQueryString: string;
+}
+
+const buildDemoViewModel = (req: Request): DemoViewModel => {
+  const theme = typeof req.query.theme === 'string' ? req.query.theme : 'case-manager';
+  const allowedThemes = new Set<DemoTheme>(['judicial', 'case-manager', 'default']);
+  const themeName = allowedThemes.has(theme as DemoTheme) ? (theme as DemoTheme) : 'case-manager';
+  const nextTheme = themeName === 'judicial' ? 'case-manager' : 'judicial';
+
+  const removeParam = req.query.remove;
+  const removeCandidates = Array.isArray(removeParam)
+    ? removeParam
+    : typeof removeParam === 'string'
+      ? [removeParam]
+      : [];
+  const removeList = removeCandidates.filter((value): value is string => typeof value === 'string');
+  const validRemovals = removeList.filter(value => basePayments.some(payment => payment.instance === value));
+  const removalSet = new Set(validRemovals);
+  const payments = basePayments.filter(payment => !removalSet.has(payment.instance));
+
+  const totalArrearsValue = payments.reduce((sum, payment) => {
+    const numeric = parseInt(payment.amountDue.replace(/[^0-9.-]/g, ''), 10);
+    return sum + (Number.isFinite(numeric) ? numeric : 0);
+  }, 0);
+  const totalArrears = `£${totalArrearsValue}`;
+  const caseReference = '#1234-5678-9101';
+  const headerShell = renderHeaderShell({
+    roles: ['pui-case-manager'],
+    theme: themeName,
+    assetBase: '/',
+  });
+  const footerShell = renderFooterShell({ assetBase: '/' });
+
+  const queryParts = [`theme=${encodeURIComponent(themeName)}`, ...Array.from(removalSet).map(value => `remove=${encodeURIComponent(value)}`)];
+  const paymentsQueryString = queryParts.length ? `?${queryParts.join('&')}` : '';
+
+  return {
+    themeName,
+    nextTheme,
+    headerShell,
+    footerShell,
+    payments,
+    totalArrears,
+    caseReference,
+    removeList: Array.from(removalSet),
+    paymentsQueryString,
+  };
+};
+
 export default function (app: Application): void {
   app.get('/pui-demo', (req: Request, res: Response) => {
-    const theme = typeof req.query.theme === 'string' ? req.query.theme : 'case-manager';
-    const allowedThemes = new Set(['judicial', 'case-manager', 'default']);
-    const themeName = allowedThemes.has(theme) ? theme : 'case-manager';
-    const nextTheme = themeName === 'judicial' ? 'case-manager' : 'judicial';
-    const removeParam = req.query.remove;
-    const removeList = Array.isArray(removeParam)
-      ? removeParam
-      : typeof removeParam === 'string'
-        ? [removeParam]
-        : [];
-    const validRemovals = removeList.filter(value => basePayments.some(payment => payment.instance === value));
-    const removalSet = new Set(validRemovals);
-    const payments = basePayments.filter(payment => !removalSet.has(payment.instance));
-    const totalArrearsValue = payments.reduce((sum, payment) => {
-      const numeric = parseInt(payment.amountDue.replace(/[^0-9.-]/g, ''), 10);
-      return sum + (Number.isFinite(numeric) ? numeric : 0);
-    }, 0);
-    const totalArrears = `£${totalArrearsValue}`;
-    const caseReference = '#1234-5678-9101';
-    const headerShell = renderHeaderShell({
-      roles: ['pui-case-manager'],
-      theme: themeName,
-      assetBase: '/',
-    });
-    const footerShell = renderFooterShell({ assetBase: '/' });
+    const viewModel = buildDemoViewModel(req);
 
-    res.render('pui-demo', {
-      themeName,
-      nextTheme,
-      headerShell,
-      footerShell,
-      payments,
-      totalArrears,
-      caseReference,
-      removeList: Array.from(removalSet),
+    res.render('pui-demo', viewModel);
+  });
+
+  app.get('/pui-demo/check-answers', (req: Request, res: Response) => {
+    const viewModel = buildDemoViewModel(req);
+    const addPaymentChoice = typeof req.query['add-payment'] === 'string' && req.query['add-payment'] === 'yes' ? 'Yes' : 'No';
+
+    res.render('pui-demo-check-answers', {
+      ...viewModel,
+      addPaymentChoice,
+      outstandingPaymentCount: viewModel.payments.length,
     });
   });
 }

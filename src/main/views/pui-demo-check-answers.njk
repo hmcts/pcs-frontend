@@ -1,0 +1,61 @@
+{% extends "template.njk" %}
+
+{% block head %}
+  {{ super() }}
+  <script type="module" src="{{ headerShell.assets.scripts[0] }}"></script>
+  {% if footerShell %}
+    <script type="module" src="{{ footerShell.assets.scripts[0] }}"></script>
+  {% endif %}
+{% endblock %}
+
+{% block header %}
+  {{ headerShell.html | safe }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-width-container">
+  <main class="govuk-main-wrapper" id="content" role="main">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-l">Make a claim</span>
+        <h1 class="govuk-heading-l">Check your answers</h1>
+
+        <dl class="govuk-summary-list govuk-!-margin-bottom-6">
+          {% if payments.length %}
+            {% for payment in payments %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ payment.instance }}</dt>
+                <dd class="govuk-summary-list__value">
+                  Due {{ payment.dueDate }} – {{ payment.amountDue }} outstanding ({{ payment.amountPaid }} paid)
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="/pui-demo{{ paymentsQueryString }}">Change<span class="govuk-visually-hidden"> payment {{ payment.instance }}</span></a>
+                </dd>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Outstanding payments</dt>
+              <dd class="govuk-summary-list__value">None remaining</dd>
+              <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" href="/pui-demo{{ paymentsQueryString }}">Change<span class="govuk-visually-hidden"> outstanding payments</span></a>
+              </dd>
+            </div>
+          {% endif %}
+        </dl>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="button">Confirm and submit</button>
+          <a class="govuk-link" href="/pui-demo{{ paymentsQueryString }}">Change your answers</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block footer %}
+  {% if footerShell %}
+    {{ footerShell.html | safe }}
+  {% endif %}
+{% endblock %}

@@ -30,12 +30,6 @@
         <span class="govuk-caption-l">Make a claim</span>
         <h1 class="govuk-heading-l">Payment history</h1>
         <p class="govuk-body govuk-!-margin-bottom-2">{{ reference }}</p>
-        <div class="govuk-phase-banner govuk-!-margin-bottom-4">
-          <p class="govuk-phase-banner__content">
-            <strong class="govuk-tag govuk-phase-banner__content__tag">ALPHA</strong>
-            <span class="govuk-phase-banner__text">This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.</span>
-          </p>
-        </div>
 
         <form method="get" action="/pui-demo" class="govuk-!-margin-bottom-6">
           <input type="hidden" name="theme" value="{{ nextTheme | default('judicial') }}">
@@ -76,7 +70,11 @@
           </tbody>
         </table>
 
-        <form method="post" action="#">
+        <form method="get" action="/pui-demo/check-answers">
+          <input type="hidden" name="theme" value="{{ themeName | default('case-manager') }}">
+          {% for removed in removeList | default([]) %}
+            <input type="hidden" name="remove" value="{{ removed }}">
+          {% endfor %}
           <p class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-3">
             Total accumulated arrears: {{ arrearsTotal }}
           </p>
