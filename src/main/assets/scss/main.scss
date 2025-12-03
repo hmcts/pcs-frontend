@@ -12,10 +12,19 @@
   // Match the wider, left-aligned layout used by XUI
   max-width: 1920px;
   width: 100%;
-  padding-left: 30px;
+  padding-left: 15px;
   padding-right: 30px;
   margin-left: 0;
   margin-right: 0;
+}
+
+.govuk-main-wrapper {
+  padding-top: 0;
+  padding-left: 0;
+}
+
+.width-50 {
+  width: 50%;
 }
 
 .claim-journey-secondary-heading {
