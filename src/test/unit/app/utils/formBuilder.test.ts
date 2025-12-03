@@ -34,30 +34,15 @@ jest.mock('../../../../main/app/utils/stepFlow', () => ({
 
 const mockCreateGenerateContent = jest.fn();
 const mockGetValidatedLanguage = jest.fn();
-const mockGetNestedTranslation = jest.fn();
 
 jest.mock('../../../../main/app/utils/i18n', () => ({
   createGenerateContent: (...args: unknown[]) => mockCreateGenerateContent(...args),
   getValidatedLanguage: (...args: unknown[]) => mockGetValidatedLanguage(...args),
-  getNestedTranslation: (...args: unknown[]) => mockGetNestedTranslation(...args),
 }));
 
 describe('formBuilder', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Default mock implementation for getNestedTranslation
-    mockGetNestedTranslation.mockImplementation((translations: Record<string, unknown>, key: string) => {
-      const keys = key.split('.');
-      let value: unknown = translations;
-      for (const k of keys) {
-        if (value && typeof value === 'object' && k in value) {
-          value = (value as Record<string, unknown>)[k];
-        } else {
-          return undefined;
-        }
-      }
-      return typeof value === 'string' ? value : undefined;
-    });
   });
 
   const mockStepDir = '/test/step/dir';
