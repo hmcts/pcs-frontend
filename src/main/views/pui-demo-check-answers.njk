@@ -27,7 +27,7 @@
                   Due {{ payment.dueDate }} – {{ payment.amountDue }} outstanding ({{ payment.amountPaid }} paid)
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                  <a class="govuk-link" href="/pui-demo{{ paymentsQueryString }}">Change<span class="govuk-visually-hidden"> payment {{ payment.instance }}</span></a>
+                  <a class="govuk-link" href="{{ basePath }}{{ paymentsQueryString }}">Change<span class="govuk-visually-hidden"> payment {{ payment.instance }}</span></a>
                 </dd>
               </div>
             {% endfor %}
@@ -36,15 +36,15 @@
               <dt class="govuk-summary-list__key">Outstanding payments</dt>
               <dd class="govuk-summary-list__value">None remaining</dd>
               <dd class="govuk-summary-list__actions">
-                <a class="govuk-link" href="/pui-demo{{ paymentsQueryString }}">Change<span class="govuk-visually-hidden"> outstanding payments</span></a>
+                <a class="govuk-link" href="{{ basePath }}{{ paymentsQueryString }}">Change<span class="govuk-visually-hidden"> outstanding payments</span></a>
               </dd>
             </div>
           {% endif %}
         </dl>
 
         <div class="govuk-button-group">
-          <button class="govuk-button" data-module="govuk-button" type="button">Confirm and submit</button>
-          <a class="govuk-link" href="/pui-demo{{ paymentsQueryString }}">Change your answers</a>
+          <a class="govuk-button" data-module="govuk-button" role="button" href="http://localhost:3000/cases/case-details/PCS/PCS/{{ caseReference | urlencode }}">Confirm and submit</a>
+          <a class="govuk-link" href="{{ basePath }}{{ paymentsQueryString }}">Change your answers</a>
         </div>
       </div>
     </div>

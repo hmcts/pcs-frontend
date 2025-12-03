@@ -24,17 +24,10 @@
           { instance: 'Payment 6', dueDate: '30/06/2025', amountDue: '£125', amountPaid: '£0' }
         ], true) %}
         {% set arrearsTotal = totalArrears | default('£750') %}
-        {% set reference = caseReference | default('#1234-5678-9101') %}
+        {% set reference = caseReference | default('1234-5678-9101') %}
         <span class="govuk-caption-l">Make a claim</span>
         <h1 class="govuk-heading-l">Payment history</h1>
         <p class="govuk-body govuk-!-margin-bottom-2">{{ reference }}</p>
-
-        <form method="get" action="/pui-demo" class="govuk-!-margin-bottom-6">
-          <input type="hidden" name="theme" value="{{ nextTheme | default('judicial') }}">
-          <button class="govuk-button govuk-button--secondary" type="submit">
-            Switch to {{ nextTheme | default('judicial') }} theme
-          </button>
-        </form>
 
         <table class="govuk-table">
           <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">Payment history</caption>
@@ -59,7 +52,7 @@
                   <a class="govuk-link" href="#">Change<span class="govuk-visually-hidden"> payment {{ payment.instance }}</span></a>
                 </td>
                 <td class="govuk-table__cell govuk-table__cell--numeric">
-                  <a class="govuk-link" href="/pui-demo?theme={{ themeName }}{% for removed in removeList | default([]) %}&remove={{ removed | urlencode }}{% endfor %}&remove={{ payment.instance | urlencode }}">
+                  <a class="govuk-link" href="{{ basePath }}?theme={{ themeName }}{% for removed in removeList | default([]) %}&remove={{ removed | urlencode }}{% endfor %}&remove={{ payment.instance | urlencode }}">
                     Remove<span class="govuk-visually-hidden"> payment {{ payment.instance }}</span>
                   </a>
                 </td>
@@ -68,7 +61,7 @@
           </tbody>
         </table>
 
-        <form method="get" action="/pui-demo/check-answers">
+        <form method="get" action="{{ basePath }}/check-answers">
           <input type="hidden" name="theme" value="{{ themeName | default('case-manager') }}">
           {% for removed in removeList | default([]) %}
             <input type="hidden" name="remove" value="{{ removed }}">
@@ -98,7 +91,7 @@
           <div class="govuk-button-group">
             <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
             <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="button">Previous</button>
-            <a class="govuk-link" href="#">Cancel</a>
+            <a class="govuk-link" href="http://localhost:3000/cases/case-details/PCS/PCS/{{ caseReference | urlencode }}">Cancel</a>
           </div>
         </form>
       </div>

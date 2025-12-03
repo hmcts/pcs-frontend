@@ -17,12 +17,12 @@ type DemoTheme = 'judicial' | 'case-manager' | 'default';
 
 interface DemoViewModel {
   themeName: DemoTheme;
-  nextTheme: DemoTheme;
   headerShell: unknown;
   footerShell: unknown;
   payments: typeof basePayments;
   totalArrears: string;
   caseReference: string;
+  basePath: string;
   removeList: string[];
   paymentsQueryString: string;
 }
@@ -48,11 +48,14 @@ const keepOnlyCreateCaseNav = (html: string): string => {
   );
 };
 
-const buildDemoViewModel = (req: Request): DemoViewModel => {
+const defaultCaseReference = '1234-5678-9101';
+
+const buildDemoViewModel = (req: Request, caseReferenceParam?: string): DemoViewModel => {
   const theme = typeof req.query.theme === 'string' ? req.query.theme : 'case-manager';
   const allowedThemes = new Set<DemoTheme>(['judicial', 'case-manager', 'default']);
   const themeName = allowedThemes.has(theme as DemoTheme) ? (theme as DemoTheme) : 'case-manager';
-  const nextTheme = themeName === 'judicial' ? 'case-manager' : 'judicial';
+  const caseReference = caseReferenceParam && caseReferenceParam.trim() ? caseReferenceParam : defaultCaseReference;
+  const basePath = `/pui-demo/${encodeURIComponent(caseReference)}`;
 
   const removeParam = req.query.remove;
   const removeCandidates = Array.isArray(removeParam)
@@ -70,7 +73,6 @@ const buildDemoViewModel = (req: Request): DemoViewModel => {
     return sum + (Number.isFinite(numeric) ? numeric : 0);
   }, 0);
   const totalArrears = `£${totalArrearsValue}`;
-  const caseReference = '#1234-5678-9101';
   const headerShell = (() => {
     const shell = renderHeaderShell({
       roles: ['pui-case-manager'],
@@ -90,26 +92,20 @@ const buildDemoViewModel = (req: Request): DemoViewModel => {
 
   return {
     themeName,
-    nextTheme,
     headerShell,
     footerShell,
     payments,
     totalArrears,
     caseReference,
+    basePath,
     removeList: Array.from(removalSet),
     paymentsQueryString,
   };
 };
 
 export default function (app: Application): void {
-  app.get('/pui-demo', (req: Request, res: Response) => {
-    const viewModel = buildDemoViewModel(req);
-
-    res.render('pui-demo', viewModel);
-  });
-
-  app.get('/pui-demo/check-answers', (req: Request, res: Response) => {
-    const viewModel = buildDemoViewModel(req);
+  app.get('/pui-demo/:caseReference/check-answers', (req: Request, res: Response) => {
+    const viewModel = buildDemoViewModel(req, req.params.caseReference);
     const addPaymentChoice = typeof req.query['add-payment'] === 'string' && req.query['add-payment'] === 'yes' ? 'Yes' : 'No';
 
     res.render('pui-demo-check-answers', {
@@ -117,5 +113,21 @@ export default function (app: Application): void {
       addPaymentChoice,
       outstandingPaymentCount: viewModel.payments.length,
     });
+  });
+
+  app.get('/pui-demo/check-answers', (req: Request, res: Response) => {
+    res.redirect(
+      `/pui-demo/${defaultCaseReference}/check-answers${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`
+    );
+  });
+
+  app.get('/pui-demo/:caseReference', (req: Request, res: Response) => {
+    const viewModel = buildDemoViewModel(req, req.params.caseReference);
+
+    res.render('pui-demo', viewModel);
+  });
+
+  app.get('/pui-demo', (req: Request, res: Response) => {
+    res.redirect(`/pui-demo/${defaultCaseReference}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`);
   });
 }
