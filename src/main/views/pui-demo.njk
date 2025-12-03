@@ -15,36 +15,97 @@
 {% block content %}
 <div class="govuk-width-container">
   <main class="govuk-main-wrapper" id="content" role="main">
-    <div class="width-50">
-      <span class="govuk-caption-l">Demo</span>
-      <h1 class="govuk-heading-l">PUI header shell</h1>
-      <p class="govuk-body">Simple form underneath the Manage Cases header web component.</p>
-
-      <form method="get" action="/pui-demo" class="govuk-!-margin-bottom-6">
-        <input type="hidden" name="theme" value="{{ nextTheme | default('judicial') }}">
-        <button class="govuk-button govuk-button--secondary" type="submit">
-          Switch to {{ nextTheme | default('judicial') }} theme
-        </button>
-      </form>
-
-      <form method="post" action="#">
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="demo-name">Name</label>
-          <input class="govuk-input govuk-!-width-two-thirds" id="demo-name" name="demo-name" type="text" autocomplete="name">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {% set paymentList = payments | default([
+          { instance: 'Payment 1', dueDate: '31/01/2025', amountDue: '£125', amountPaid: '£0' },
+          { instance: 'Payment 2', dueDate: '27/02/2025', amountDue: '£125', amountPaid: '£0' },
+          { instance: 'Payment 3', dueDate: '31/03/2025', amountDue: '£125', amountPaid: '£0' },
+          { instance: 'Payment 4', dueDate: '30/04/2025', amountDue: '£125', amountPaid: '£0' },
+          { instance: 'Payment 5', dueDate: '31/05/2025', amountDue: '£125', amountPaid: '£0' },
+          { instance: 'Payment 6', dueDate: '30/06/2025', amountDue: '£125', amountPaid: '£0' }
+        ], true) %}
+        {% set arrearsTotal = totalArrears | default('£750') %}
+        {% set reference = caseReference | default('#1234-5678-9101') %}
+        <span class="govuk-caption-l">Make a claim</span>
+        <h1 class="govuk-heading-l">Payment history</h1>
+        <p class="govuk-body govuk-!-margin-bottom-2">{{ reference }}</p>
+        <div class="govuk-phase-banner govuk-!-margin-bottom-4">
+          <p class="govuk-phase-banner__content">
+            <strong class="govuk-tag govuk-phase-banner__content__tag">ALPHA</strong>
+            <span class="govuk-phase-banner__text">This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.</span>
+          </p>
         </div>
 
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="demo-case-reference">Case reference</label>
-          <input class="govuk-input govuk-input--width-20" id="demo-case-reference" name="demo-case-reference" type="text" inputmode="numeric" autocomplete="off">
-        </div>
+        <form method="get" action="/pui-demo" class="govuk-!-margin-bottom-6">
+          <input type="hidden" name="theme" value="{{ nextTheme | default('judicial') }}">
+          <button class="govuk-button govuk-button--secondary" type="submit">
+            Switch to {{ nextTheme | default('judicial') }} theme
+          </button>
+        </form>
 
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="demo-notes">Notes</label>
-          <textarea class="govuk-textarea" id="demo-notes" name="demo-notes" rows="5"></textarea>
-        </div>
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">Payment history</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Payment instance</th>
+              <th scope="col" class="govuk-table__header">Due date</th>
+              <th scope="col" class="govuk-table__header">Amount due</th>
+              <th scope="col" class="govuk-table__header">Amount paid</th>
+              <th scope="col" class="govuk-table__header govuk-table__header--numeric">Change</th>
+              <th scope="col" class="govuk-table__header govuk-table__header--numeric">Remove</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for payment in paymentList %}
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">{{ payment.instance }}</th>
+                <td class="govuk-table__cell">{{ payment.dueDate }}</td>
+                <td class="govuk-table__cell">{{ payment.amountDue }}</td>
+                <td class="govuk-table__cell">{{ payment.amountPaid }}</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">
+                  <a class="govuk-link" href="#">Change<span class="govuk-visually-hidden"> payment {{ payment.instance }}</span></a>
+                </td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">
+                  <a class="govuk-link" href="/pui-demo?theme={{ themeName }}{% for removed in removeList | default([]) %}&remove={{ removed | urlencode }}{% endfor %}&remove={{ payment.instance | urlencode }}">
+                    Remove<span class="govuk-visually-hidden"> payment {{ payment.instance }}</span>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
 
-        <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
-      </form>
+        <form method="post" action="#">
+          <p class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-3">
+            Total accumulated arrears: {{ arrearsTotal }}
+          </p>
+
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <h2 class="govuk-fieldset__heading">Do you need to add another missed payment?</h2>
+              </legend>
+              <div class="govuk-radios" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="add-payment-yes" name="add-payment" type="radio" value="yes">
+                  <label class="govuk-label govuk-radios__label" for="add-payment-yes">Yes</label>
+                </div>
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="add-payment-no" name="add-payment" type="radio" value="no" checked>
+                  <label class="govuk-label govuk-radios__label" for="add-payment-no">No</label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="button">Previous</button>
+            <a class="govuk-link" href="#">Cancel</a>
+          </div>
+        </form>
+      </div>
     </div>
   </main>
 </div>
