@@ -28,5 +28,5 @@ export const startNow = {
   startNowButton: 'Start now',
   contactUsForHelpText: 'Contact us for help',
   backLink: 'Back',
-  CymraegLink: 'Cymraeg',
+  cymraegLink: 'Cymraeg',
 };
