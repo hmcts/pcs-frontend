@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { startNow } from '../data/page-data-figma';
+import { startNow } from '../data/page-data';
 import { initializeExecutor, performAction } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 

@@ -169,7 +169,7 @@ export class PageContentValidation implements IValidation {
 
   private async getFileName(urlSegment: string, page: Page): Promise<string | null> {
     try {
-      const mappingPath = path.join(__dirname, '../../../data/page-data-figma/urlToFileMapping.ts');
+      const mappingPath = path.join(__dirname, '../../../data/page-data/urlToFileMapping.ts');
       if (!fs.existsSync(mappingPath)) {
         return null;
       }
@@ -222,7 +222,7 @@ export class PageContentValidation implements IValidation {
   }
 
   private async loadPageDataFile(fileName: string): Promise<null> {
-    const filePath = path.join(__dirname, '../../../data/page-data-figma', `${fileName}.page.data.ts`);
+    const filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
     if (!fs.existsSync(filePath)) {
       return null;
     }
@@ -348,7 +348,7 @@ export class PageContentValidation implements IValidation {
     const segment = segments[segments.length - 1] || 'home';
 
     try {
-      const mappingPath = path.join(__dirname, '../../../data/page-data-figma/urlToFileMapping.ts');
+      const mappingPath = path.join(__dirname, '../../../data/page-data/urlToFileMapping.ts');
       if (!fs.existsSync(mappingPath)) {
         return segment;
       }
