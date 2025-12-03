@@ -1,6 +1,5 @@
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { TranslationContent } from '../i18n';
-import { getNestedTranslation } from '../i18n';
 
 import { buildComponentConfig } from './componentBuilders';
 
@@ -89,10 +88,17 @@ export function translateFields(
     const translatedOptions = field.options?.map(option => {
       let text = option.text;
       if (!text && option.translationKey) {
-        const translationValue = option.translationKey.includes('.')
-          ? getNestedTranslation(translations, option.translationKey)
-          : (translations[option.translationKey] as string);
-        text = translationValue || option.value;
+        const keys = option.translationKey.split('.');
+        let value: unknown = translations;
+        for (const key of keys) {
+          if (value && typeof value === 'object' && key in value) {
+            value = (value as Record<string, unknown>)[key];
+          } else {
+            value = undefined;
+            break;
+          }
+        }
+        text = (typeof value === 'string' ? value : undefined) || option.value;
       } else if (!text) {
         text = option.value;
       }
