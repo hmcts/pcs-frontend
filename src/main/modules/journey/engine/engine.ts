@@ -9,6 +9,7 @@ import { type JourneyStore } from './storage/index';
 import { TemplateUtils } from './templateUtils';
 import { RequestWithStep } from './types';
 import { JourneyValidator } from './validation';
+import { DataProviderManager, type DataProviderConfig } from './dataProviders';
 
 export class WizardEngine {
   public readonly journey: JourneyConfig;
@@ -17,6 +18,7 @@ export class WizardEngine {
   private readonly validator: JourneyValidator;
   private static validatedJourneys: Map<string, JourneyConfig> = new Map();
   private readonly store!: JourneyStore;
+  private readonly dataProviderManager: DataProviderManager;
 
   logger = Logger.getLogger('WizardEngine');
 
@@ -55,6 +57,10 @@ export class WizardEngine {
     this.validator = new JourneyValidator();
     const storeType = this.journey.config?.store?.type ?? 'session';
     this.store = this.setStore(storeType);
+
+    // Initialize data provider manager if configured
+    const dataProviderConfig = this.journey.config?.dataProviders as DataProviderConfig | undefined;
+    this.dataProviderManager = new DataProviderManager(dataProviderConfig, this.logger);
   }
 
   private setStore(storeType: string) {
@@ -126,6 +132,7 @@ export class WizardEngine {
       store: this.store,
       validator: this.validator,
       logger: this.logger,
+      dataProviderManager: this.dataProviderManager,
     });
 
     // Add route to start a new journey (creates caseId in the session and redirects to first step)

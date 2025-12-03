@@ -6,6 +6,7 @@ import { getAddressesByPostcode } from '../../../services/osPostcodeLookupServic
 
 import { ContextBuilder } from './contextBuilder';
 import { DataCleanup } from './dataCleanup';
+import { DataProviderManager } from './dataProviders';
 import { FeatureFlags } from './featureFlags';
 import { Navigation } from './navigation';
 import { FieldConfig, JourneyConfig, StepConfig } from './schema';
@@ -26,6 +27,7 @@ interface HandlerDependencies {
     error: (msg: string, ...args: unknown[]) => void;
     info: (msg: string, ...args: unknown[]) => void;
   };
+  dataProviderManager: DataProviderManager;
 }
 
 export class Handlers {
@@ -156,14 +158,17 @@ export class Handlers {
         return;
       }
 
-      let context = ContextBuilder.buildJourneyContext(
+      let context = await ContextBuilder.buildJourneyContext(
         step,
         caseId,
         this.deps.journey,
         this.deps.basePath,
         data,
         t,
-        lang
+        lang,
+        undefined,
+        this.deps.dataProviderManager,
+        req
       );
 
       const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
@@ -252,14 +257,17 @@ export class Handlers {
         addressLookupStore[step.id][lookupPrefix] = { postcode, addresses };
 
         const { data } = await this.deps.store.load(req, caseId);
-        let context = ContextBuilder.buildJourneyContext(
+        let context = await ContextBuilder.buildJourneyContext(
           step,
           caseId,
           this.deps.journey,
           this.deps.basePath,
           data,
           t,
-          lang
+          lang,
+          undefined,
+          this.deps.dataProviderManager,
+          req
         );
         const prevVisible = await this.getPreviousVisibleStep(step.id, req, data);
         context = {
@@ -329,14 +337,17 @@ export class Handlers {
         }
 
         const patchedAllData = { ...data, [step.id]: reconstructedData };
-        let context = ContextBuilder.buildJourneyContext(
+        let context = await ContextBuilder.buildJourneyContext(
           step,
           caseId,
           this.deps.journey,
           this.deps.basePath,
           patchedAllData,
           t,
-          lang
+          lang,
+          undefined,
+          this.deps.dataProviderManager,
+          req
         );
         const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);
         context = {
@@ -369,7 +380,7 @@ export class Handlers {
         const patchedAllData = { ...data, [step.id]: reconstructedData };
 
         // Build i18n-aware context for error render
-        let context = ContextBuilder.buildJourneyContext(
+        let context = await ContextBuilder.buildJourneyContext(
           step,
           caseId,
           this.deps.journey,
@@ -377,7 +388,9 @@ export class Handlers {
           patchedAllData,
           t,
           lang,
-          validationResult.errors
+          validationResult.errors,
+          this.deps.dataProviderManager,
+          req
         );
 
         const prevVisible = await this.getPreviousVisibleStep(step.id, req, patchedAllData);

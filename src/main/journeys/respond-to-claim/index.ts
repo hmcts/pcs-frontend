@@ -1,4 +1,8 @@
+import type { Request } from 'express';
+
 import { JourneyDraft } from '../../modules/journey/engine/schema';
+import type { DataProvider } from '../../modules/journey/engine/dataProviders';
+import type { JourneyConfig, StepConfig } from '../../modules/journey/engine/schema';
 
 import legalAdvice from './steps/legalAdvice/step';
 import start from './steps/start/step';
@@ -20,7 +24,7 @@ const journey: JourneyDraft = {
           type: 'radios',
           fieldset: {
             legend: {
-              text: 'Is your name Billy Wright?',
+              text: 'Is your name {{claimantName}}?',
               classes: 'govuk-fieldset__legend--l',
             },
           },
@@ -43,6 +47,21 @@ const journey: JourneyDraft = {
             type: 'submit',
           },
         },
+      },
+    },
+  },
+  config: {
+    dataProviders: {
+      steps: {
+        correctName: [
+          (async (req: Request, step: StepConfig, allData: Record<string, unknown>, journey: JourneyConfig) => {
+            // TODO: Replace with actual data source (API, database, etc.)
+            // For now, using example data
+            return {
+              claimantName: 'Billy Wright',
+            };
+          }) as DataProvider,
+        ],
       },
     },
   },

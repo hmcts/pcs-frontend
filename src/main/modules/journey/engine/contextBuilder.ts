@@ -1,13 +1,16 @@
 import type { TFunction } from 'i18next';
+import type { Request as ExpressRequest } from 'express';
+import type { Environment } from 'nunjucks';
 
 import { processErrorsForTemplate } from './errorUtils';
 import { Navigation } from './navigation';
 import { FieldConfig, JourneyConfig, StepConfig } from './schema';
 import { SummaryBuilder } from './summaryBuilder';
 import { JourneyContext } from './types';
+import { DataProviderManager } from './dataProviders';
 
 export class ContextBuilder {
-  static buildJourneyContext(
+  static async buildJourneyContext(
     step: StepConfig,
     caseId: string,
     journey: JourneyConfig,
@@ -15,10 +18,44 @@ export class ContextBuilder {
     allData: Record<string, unknown>,
     t: TFunction,
     lang: string = 'en',
-    errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>
-  ): JourneyContext & {
+    errors?: Record<string, { day?: string; month?: string; year?: string; message: string; anchor?: string }>,
+    dataProviderManager?: DataProviderManager,
+    req?: ExpressRequest
+  ): Promise<JourneyContext & {
     dateItems?: Record<string, { name: string; classes: string; value: string; attributes?: Record<string, string> }[]>;
-  } {
+  }> {
+    // Get dynamic data first so we can use it for Nunjucks interpolation in field text
+    let dynamicData: Record<string, unknown> = {};
+    if (dataProviderManager && req) {
+      dynamicData = await dataProviderManager.getDynamicData(req, step, allData, journey);
+    }
+
+    // Get Nunjucks environment for template rendering
+    const nunjucksEnv: Environment | undefined = req?.app?.locals?.nunjucksEnv;
+
+    // Helper function to render strings as Nunjucks templates
+    // If Nunjucks is available and the string contains template syntax, render it
+    // Otherwise, return the string as-is
+    const renderTemplate = (text: string, context: Record<string, unknown>): string => {
+      if (!nunjucksEnv) {
+        return text;
+      }
+
+      // Check if the string contains Nunjucks template syntax
+      if (!text.includes('{{') && !text.includes('{%')) {
+        return text;
+      }
+
+      try {
+        // Render the string as a Nunjucks template with dynamic data in context
+        return nunjucksEnv.renderString(text, context);
+      } catch (err) {
+        // If rendering fails, return original string
+        console.warn('Failed to render Nunjucks template in field text:', err);
+        return text;
+      }
+    };
+
     const previousStepUrl = Navigation.findPreviousStep(step.id, journey, allData);
     const summaryRows =
       step.type === 'summary' ? SummaryBuilder.buildSummaryRows(journey, basePath, allData, t, lang) : undefined;
@@ -75,10 +112,12 @@ export class ContextBuilder {
 
     // Translate step-level title/description if they are keys
     if (typeof stepCopy.title === 'string') {
-      stepCopy.title = t(stepCopy.title, stepCopy.title);
+      const rendered = renderTemplate(stepCopy.title, dynamicData);
+      stepCopy.title = t(rendered, rendered);
     }
     if (typeof stepCopy.description === 'string') {
-      stepCopy.description = t(stepCopy.description, stepCopy.description);
+      const rendered = renderTemplate(stepCopy.description, dynamicData);
+      stepCopy.description = t(rendered, rendered);
     }
 
     if (step.fields) {
@@ -108,28 +147,34 @@ export class ContextBuilder {
         if (typedFieldConfig.label && typeof typedFieldConfig.label === 'object') {
           const newLabel = { ...(typedFieldConfig.label as Record<string, unknown>) };
           if (typeof newLabel.text === 'string') {
-            newLabel.text = t(newLabel.text, newLabel.text);
+            const rendered = renderTemplate(newLabel.text, dynamicData);
+            newLabel.text = t(rendered, rendered);
           }
           if (typeof newLabel.html === 'string') {
-            newLabel.html = t(newLabel.html, newLabel.html);
+            const rendered = renderTemplate(newLabel.html, dynamicData);
+            newLabel.html = t(rendered, rendered);
           }
           processed.label = newLabel;
         } else if (typeof typedFieldConfig.label === 'string') {
-          processed.label = { text: t(typedFieldConfig.label, typedFieldConfig.label) };
+          const rendered = renderTemplate(typedFieldConfig.label, dynamicData);
+          processed.label = { text: t(rendered, rendered) };
         }
 
         // Translate hint
         if (typedFieldConfig.hint && typeof typedFieldConfig.hint === 'object') {
           const newHint = { ...(typedFieldConfig.hint as Record<string, unknown>) };
           if (typeof newHint.text === 'string') {
-            newHint.text = t(newHint.text, newHint.text);
+            const rendered = renderTemplate(newHint.text, dynamicData);
+            newHint.text = t(rendered, rendered);
           }
           if (typeof newHint.html === 'string') {
-            newHint.html = t(newHint.html, newHint.html);
+            const rendered = renderTemplate(newHint.html, dynamicData);
+            newHint.html = t(rendered, rendered);
           }
           processed.hint = newHint;
         } else if (typeof typedFieldConfig.hint === 'string') {
-          processed.hint = { text: t(typedFieldConfig.hint, typedFieldConfig.hint) };
+          const rendered = renderTemplate(typedFieldConfig.hint, dynamicData);
+          processed.hint = { text: t(rendered, rendered) };
         }
 
         // Translate fieldset.legend.{text|html}
@@ -139,10 +184,12 @@ export class ContextBuilder {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const newLegend: any = { ...legend };
           if (typeof newLegend.text === 'string') {
-            newLegend.text = t(newLegend.text, newLegend.text);
+            const rendered = renderTemplate(newLegend.text, dynamicData);
+            newLegend.text = t(rendered, rendered);
           }
           if (typeof newLegend.html === 'string') {
-            newLegend.html = t(newLegend.html, newLegend.html);
+            const rendered = renderTemplate(newLegend.html, dynamicData);
+            newLegend.html = t(rendered, rendered);
           }
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           processed.fieldset = { ...(typedFieldConfig.fieldset as any), legend: newLegend };
@@ -264,6 +311,8 @@ export class ContextBuilder {
       summaryRows,
       summaryCards,
       dateItems,
+      // Merge dynamic data into context (can be accessed in templates)
+      ...dynamicData,
     };
   }
 }

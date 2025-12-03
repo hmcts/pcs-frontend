@@ -330,6 +330,11 @@ export const JourneySchema = z
           })
           .optional(),
         i18nNamespace: z.string().optional(),
+        /**
+         * Data providers allow developers to inject dynamic data into the journey context.
+         * This is not validated by Zod as it's runtime configuration.
+         */
+        dataProviders: z.custom<unknown>().optional(),
       })
       .optional(),
   })
