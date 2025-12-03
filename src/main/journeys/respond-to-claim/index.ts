@@ -29,7 +29,7 @@ const journey: JourneyDraft = {
             },
           },
           hint: {
-            text: 'This is the name provided by Treetops Housing.',
+            text: 'This is the name provided by {{organisationName | upper}}.',
           },
           items: [
             { value: 'yes', text: 'Yes' },
@@ -59,6 +59,7 @@ const journey: JourneyDraft = {
             // For now, using example data
             return {
               claimantName: 'Billy Wright',
+              organisationName: 'Treetops Housing',
             };
           }) as DataProvider,
         ],
