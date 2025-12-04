@@ -1,21 +1,23 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
-import { createGenerateContent } from '../../../app/utils/i18n';
 import { stepNavigation } from '../../../app/utils/stepFlow';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 
 const stepName = 'application-submitted';
-const generateContent = createGenerateContent(stepName, 'userJourney');
 
 export const step: StepDefinition = {
   url: '/steps/user-journey/application-submitted',
   name: stepName,
   view: 'userJourney/application-submitted/applicationSubmitted.njk',
   stepDir: __dirname,
-  generateContent,
   getController: () => {
-    return createGetController('userJourney/application-submitted/applicationSubmitted.njk', stepName, generateContent);
+    return createGetController(
+      'userJourney/application-submitted/applicationSubmitted.njk',
+      stepName,
+      undefined,
+      'userJourney'
+    );
   },
   postController: {
     post: async (req: Request, res: Response) => {

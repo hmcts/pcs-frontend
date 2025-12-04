@@ -1,45 +1,35 @@
+import type { TFunction } from 'i18next';
+
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
-import type { TranslationContent } from '../i18n';
 
 import { buildFieldValues, translateFields } from './fieldTranslation';
+import { getTranslation } from './helpers';
 
 export function buildFormContent(
   fields: FormFieldConfig[],
-  content: TranslationContent,
+  t: TFunction,
   bodyData: Record<string, unknown> = {},
   error?: { field: string; text: string },
   translationKeys?: TranslationKeys
 ): Record<string, unknown> {
-  // Build field values from saved data
   const fieldValues = buildFieldValues(fields, bodyData);
-
-  // Determine if there's a page title
-  const pageTitle = (content.title as string) || (content.question as string) || undefined;
-  const hasTitle = !!pageTitle;
-
-  // Translate fields and build component configs
-  const fieldsWithLabels = translateFields(fields, content, fieldValues, error, hasTitle);
-
-  // Extract page content
-  const customPageTitle = translationKeys?.pageTitle
-    ? (content[translationKeys.pageTitle] as string) || undefined
-    : undefined;
-  const pageContent = translationKeys?.content ? (content[translationKeys.content] as string) || undefined : undefined;
-
-  // Extract button and error text
-  const buttons = (content.buttons as Record<string, string>) || {};
-  const errors = (content.errors as Record<string, string>) || {};
+  const pageTitle = getTranslation(t, 'title', undefined) || getTranslation(t, 'question', undefined);
+  const fieldsWithLabels = translateFields(fields, t, fieldValues, error, !!pageTitle);
 
   return {
     ...bodyData,
     fieldValues,
     fields: fieldsWithLabels,
     title: pageTitle,
-    pageTitle: customPageTitle,
-    content: pageContent,
-    continue: buttons.continue,
-    saveForLater: buttons.saveForLater,
-    cancel: buttons.cancel,
-    errorSummaryTitle: errors.title,
+    pageTitle: translationKeys?.pageTitle ? t(translationKeys.pageTitle) : undefined,
+    content: translationKeys?.content ? t(translationKeys.content) : undefined,
+    continue: t('buttons.continue'),
+    saveForLater: t('buttons.saveForLater'),
+    cancel: t('buttons.cancel'),
+    errorSummaryTitle: t('errors.title'),
+    serviceName: t('serviceName'),
+    phase: t('phase'),
+    feedback: t('feedback'),
+    back: t('back'),
   };
 }

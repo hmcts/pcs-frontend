@@ -27,9 +27,7 @@ jest.mock('@launchdarkly/node-server-sdk', () => ({
   init: () => ({ variation: variationMock }),
 }));
 
-jest.mock('../../../../../main/app/utils/i18n', () => ({
-  loadTranslations: () => ({}),
-}));
+jest.mock('../../../../../main/app/utils/i18n', () => ({}));
 
 const makeReq = () =>
   ({

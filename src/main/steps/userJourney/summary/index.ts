@@ -1,34 +1,36 @@
 import type { Request, Response } from 'express';
+import type { TFunction } from 'i18next';
 
 import { createGetController, createPostController } from '../../../app/controller/controllerFactory';
-import { createGenerateContent } from '../../../app/utils/i18n';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const stepName = 'summary';
-const generateContent = createGenerateContent(stepName, 'userJourney');
 
 export const step: StepDefinition = {
   url: '/steps/user-journey/summary',
   name: stepName,
   view: 'userJourney/summary/summary.njk',
   stepDir: __dirname,
-  generateContent,
   middleware: [pcqRedirectMiddleware()],
   getController: () =>
-    createGetController('userJourney/summary/summary.njk', stepName, generateContent, (req, _content) => {
-      const userDetails = req.session.formData?.['enter-user-details'];
-      const address = req.session.formData?.['enter-address'];
-      return {
-        userDetails,
-        address,
-      };
-    }),
+    createGetController(
+      'userJourney/summary/summary.njk',
+      stepName,
+      req => {
+        const userDetails = req.session.formData?.['enter-user-details'];
+        const address = req.session.formData?.['enter-address'];
+        return {
+          userDetails,
+          address,
+        };
+      },
+      'userJourney'
+    ),
   postController: createPostController(
     stepName,
-    generateContent,
-    () => [], // No validation fields for summary
+    (_t: TFunction) => [], // No validation fields for summary
     'userJourney/summary/summary.njk',
     async (req: Request, res: Response) => {
       try {
@@ -39,6 +41,7 @@ export const step: StepDefinition = {
         res.status(500).send('There was an error submitting your application.');
         return;
       }
-    }
+    },
+    'userJourney'
   ),
 };

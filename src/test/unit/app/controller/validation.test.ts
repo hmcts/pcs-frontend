@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { validateForm } from '../../../../main/app/controller/formHelpers';
+import { validateForm } from '../../../../main/app/utils/formBuilder/helpers';
 import type { FormFieldConfig } from '../../../../main/interfaces/formFieldConfig.interface';
 
 describe('validateForm', () => {

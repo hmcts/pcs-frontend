@@ -1,15 +1,17 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import { Request, Response } from 'express';
+import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
-import { type SupportedLang, getValidatedLanguage } from '../utils/i18n';
+import { getFormData, setFormData, validateForm } from '../utils/formBuilder/helpers';
+import { getStepNamespace, getStepTranslations, getValidatedLanguage, loadStepNamespace } from '../utils/i18n';
 import { stepNavigation } from '../utils/stepFlow';
 
-import { getFormData, setFormData, validateForm } from './formHelpers';
+const logger = Logger.getLogger('controllerFactory');
 
-type GenerateContentFn = (lang?: SupportedLang) => StepFormData;
 type PostControllerCallback = (req: Request, res: Response) => Promise<void> | void;
-type TranslationFn = (req: Request) => StepFormData;
+type TranslationFn = (req: Request) => StepFormData | Promise<StepFormData>;
 
 export class GetController {
   constructor(
@@ -17,8 +19,8 @@ export class GetController {
     private generateContent: TranslationFn
   ) {}
 
-  get = (req: Request, res: Response): void => {
-    const content = this.generateContent(req);
+  get = async (req: Request, res: Response): Promise<void> => {
+    const content = await this.generateContent(req);
     res.render(this.view, {
       ...content,
     });
@@ -28,35 +30,68 @@ export class GetController {
 export const createGetController = (
   view: string,
   stepName: string,
-  generateContent: GenerateContentFn,
-  extendContent?: (req: Request, content: StepFormData) => StepFormData
+  extendContent?: (req: Request) => StepFormData | Promise<StepFormData>,
+  journeyFolder?: string
 ): GetController => {
-  return new GetController(view, (req: Request) => {
+  return new GetController(view, async (req: Request) => {
+    if (journeyFolder && req.i18n) {
+      try {
+        await loadStepNamespace(req, stepName, journeyFolder);
+      } catch (error) {
+        logger.warn(`Failed to load namespace for step ${stepName}:`, error);
+      }
+    }
+
     const formData = getFormData(req, stepName);
     const postData = req.body || {};
-
-    // Get validated language and generate content
     const lang = getValidatedLanguage(req);
-    const content = generateContent(lang);
+
+    const reqLang = req.language || 'en';
+    let t: TFunction = req.t || ((key: string) => key);
+
+    if (journeyFolder && req.i18n) {
+      const stepNamespace = getStepNamespace(stepName);
+      t = req.i18n.getFixedT(reqLang, [stepNamespace, 'common']) || t;
+    }
+
+    req.t = t;
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
-    const baseContent = {
-      ...content,
+
+    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName) : {};
+    const commonTranslations = req.i18n?.getResourceBundle(reqLang, 'common') || {};
+    const commonContent: Record<string, unknown> = {};
+    for (const key of ['change', 'buttons']) {
+      if (commonTranslations[key]) {
+        commonContent[key] = commonTranslations[key];
+      }
+    }
+
+    const baseContent: StepFormData = {
       ...formData,
       lang,
       pageUrl: req.originalUrl || '/',
       selected,
-      t: req.t,
+      t,
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
       backUrl: stepNavigation.getBackUrl(req, stepName),
+      serviceName: t('serviceName'),
+      phase: t('phase'),
+      feedback: t('feedback'),
+      back: t('back'),
+      languageToggle: t('languageToggle'),
+      ...commonContent,
+      ...stepTranslations,
     };
 
-    return {
-      ...baseContent,
-      ...(extendContent ? extendContent(req, content) : {}),
-    };
+    if (extendContent) {
+      const extended = await extendContent(req);
+      return { ...baseContent, ...extended };
+    }
+
+    return baseContent;
   });
 };
 
@@ -70,84 +105,59 @@ export const createPostRedirectController = (nextUrl: string): { post: (req: Req
 
 export const createPostController = (
   stepName: string,
-  generateContent: GenerateContentFn,
-  getFields: (content: StepFormData) => FormFieldConfig[],
+  getFields: (t: TFunction) => FormFieldConfig[],
   view: string,
-  beforeRedirect?: PostControllerCallback
+  beforeRedirect?: PostControllerCallback,
+  journeyFolder?: string
 ): { post: (req: Request, res: Response) => Promise<void | Response> } => {
   return {
     post: async (req: Request, res: Response) => {
-      const lang: SupportedLang = getValidatedLanguage(req);
-      const content = generateContent(lang);
-      const fields = getFields(content);
+      if (journeyFolder && req.i18n) {
+        try {
+          await loadStepNamespace(req, stepName, journeyFolder);
+        } catch (error) {
+          logger.warn(`Failed to load namespace for step ${stepName}:`, error);
+        }
+      }
+
+      const reqLang = req.language || 'en';
+      let t: TFunction = req.t || ((key: string) => key);
+
+      if (journeyFolder && req.i18n) {
+        const stepNamespace = getStepNamespace(stepName);
+        t = req.i18n.getFixedT(reqLang, [stepNamespace, 'common']) || t;
+      }
+
+      const fields = getFields(t);
       const errors = validateForm(req, fields);
 
-      // Handle validation errors
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
         return res.status(400).render(view, {
-          ...content,
           ...req.body,
           error: { field: firstField, text: errors[firstField] },
+          lang: reqLang,
+          pageUrl: req.originalUrl || '/',
+          t,
+          backUrl: stepNavigation.getBackUrl(req, stepName),
         });
       }
 
-      // Save form data
       setFormData(req, stepName, req.body);
 
-      // Execute custom logic before redirect (e.g., update CCD case)
       if (beforeRedirect) {
         await beforeRedirect(req, res);
-        // If beforeRedirect sent a response, don't continue
         if (res.headersSent) {
           return;
         }
       }
 
-      // Get next step URL and redirect
       const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
-
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }
 
       res.redirect(303, redirectPath);
-    },
-  };
-};
-
-export const validateAndStoreForm = (
-  stepName: string,
-  fields: FormFieldConfig[],
-  nextPage: string | ((body: StepFormData) => string),
-  content?: StepFormData,
-  templatePath?: string
-): { post: (req: Request, res: Response) => void } => {
-  return {
-    post: (req: Request, res: Response) => {
-      const errors = validateForm(req, fields);
-
-      if (Object.keys(errors).length > 0) {
-        return res.status(400).render(templatePath ?? `steps/${stepName}.njk`, {
-          ...content,
-          error: Object.values(errors)[0],
-          ...req.body,
-        });
-      }
-
-      for (const field of fields) {
-        if (field.type === 'checkbox') {
-          const value = req.body[field.name];
-          if (typeof value === 'string') {
-            req.body[field.name] = [value];
-          }
-        }
-      }
-
-      setFormData(req, stepName, req.body);
-
-      const redirectUrl = typeof nextPage === 'function' ? nextPage(req.body) : nextPage;
-      res.redirect(redirectUrl);
     },
   };
 };

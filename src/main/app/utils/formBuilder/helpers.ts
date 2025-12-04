@@ -1,7 +1,49 @@
 import type { Request } from 'express';
+import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
-import type { StepFormData } from '../../interfaces/stepFormData.interface';
+import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
+import type { StepFormData } from '../../../interfaces/stepFormData.interface';
+
+export function getLanguage(req: Request): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (req as any).language || 'en';
+}
+
+export function getTranslation(t: TFunction, key: string, fallback?: string): string | undefined {
+  const translation = t(key);
+  return translation !== key ? translation : fallback;
+}
+
+export function processFieldData(req: Request, fields: FormFieldConfig[]): void {
+  for (const field of fields) {
+    if (field.type === 'checkbox' && req.body[field.name]) {
+      if (typeof req.body[field.name] === 'string') {
+        req.body[field.name] = [req.body[field.name]];
+      }
+    } else if (field.type === 'date') {
+      const day = req.body[`${field.name}-day`]?.trim() || '';
+      const month = req.body[`${field.name}-month`]?.trim() || '';
+      const year = req.body[`${field.name}-year`]?.trim() || '';
+
+      req.body[field.name] = { day, month, year };
+      delete req.body[`${field.name}-day`];
+      delete req.body[`${field.name}-month`];
+      delete req.body[`${field.name}-year`];
+    }
+  }
+}
+
+export function getTranslationErrors(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
+  const translationErrors: Record<string, string> = {};
+  for (const field of fields) {
+    const errorKey = `errors.${field.name}`;
+    const errorMsg = t(errorKey);
+    if (errorMsg && errorMsg !== errorKey) {
+      translationErrors[field.name] = errorMsg;
+    }
+  }
+  return translationErrors;
+}
 
 export const getFormData = (req: Request, stepName: string): StepFormData => {
   return req.session.formData?.[stepName] || {};
@@ -23,7 +65,6 @@ export function validateForm(
 
   for (const field of fields) {
     if (field.type === 'date') {
-      // Date fields have day, month, year structure
       const day = req.body[`${field.name}-day`]?.trim() || '';
       const month = req.body[`${field.name}-month`]?.trim() || '';
       const year = req.body[`${field.name}-year`]?.trim() || '';
@@ -34,7 +75,6 @@ export function validateForm(
           continue;
         }
 
-        // Basic validation for date parts
         const isNumeric = (s: string) => /^\d+$/.test(s);
         if (!isNumeric(day) || !isNumeric(month) || !isNumeric(year)) {
           errors[field.name] = field.errorMessage || translations?.defaultInvalid || 'Enter a valid date';
@@ -69,7 +109,6 @@ export function validateForm(
         continue;
       }
 
-      // Only validate pattern and maxLength if value is provided
       if (value !== undefined && value !== null && value !== '') {
         if (field.pattern && typeof value === 'string' && value.trim() !== '') {
           const regex = new RegExp(field.pattern);
@@ -78,7 +117,6 @@ export function validateForm(
           }
         }
 
-        // Check maxLength for text and textarea fields
         if (field.maxLength && typeof value === 'string' && value.length > field.maxLength) {
           const maxLengthMsg = translations?.defaultMaxLength?.replace('{max}', field.maxLength.toString());
           errors[field.name] = field.errorMessage || maxLengthMsg || `Must be ${field.maxLength} characters or fewer`;

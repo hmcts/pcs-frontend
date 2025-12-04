@@ -1,70 +1,64 @@
 import type { Request, Response } from 'express';
+import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
-import { setFormData, validateForm } from '../../controller/formHelpers';
-import type { SupportedLang, TranslationContent } from '../i18n';
-import { getValidatedLanguage } from '../i18n';
+import { getStepNamespace, loadStepNamespace } from '../i18n';
 import { DASHBOARD_ROUTE, getDashboardUrl } from '../routes';
 import { stepNavigation } from '../stepFlow';
 
 import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';
+import { getLanguage, getTranslationErrors, processFieldData, setFormData, validateForm } from './helpers';
 
 export function createPostHandler(
   fields: FormFieldConfig[],
   stepName: string,
   viewPath: string,
-  generateContent: (lang: SupportedLang) => TranslationContent,
+  journeyFolder: string,
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys
 ): { post: (req: Request, res: Response) => Promise<void | Response> } {
   return {
     post: async (req: Request, res: Response) => {
-      const lang: SupportedLang = getValidatedLanguage(req);
-      const content = generateContent(lang);
+      await loadStepNamespace(req, stepName, journeyFolder);
+
+      const lang = getLanguage(req);
+      const t: TFunction =
+        req.i18n?.getFixedT(lang, [getStepNamespace(stepName), 'common']) || req.t || ((key: string) => key);
       const action = req.body.action as string | undefined;
 
-      // Handle save for later
       if (action === 'saveForLater') {
         processFieldData(req, fields);
         const bodyWithoutAction = { ...req.body };
         delete bodyWithoutAction.action;
         setFormData(req, stepName, bodyWithoutAction);
-
-        const ccdId = req.session?.ccdCase?.id;
-        return res.redirect(303, getDashboardUrl(ccdId));
+        return res.redirect(303, getDashboardUrl(req.session?.ccdCase?.id));
       }
 
-      // Validate form
-      const fieldsWithLabels = translateFields(fields, content, {}, undefined, false);
-      const translationErrors = (content.errors as Record<string, string>) || {};
-      const errors = validateForm(req, fieldsWithLabels, translationErrors);
+      const fieldsWithLabels = translateFields(fields, t, {}, undefined, false);
+      const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fieldsWithLabels));
 
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
         const error = { field: firstField, text: errors[firstField] };
-        const formContent = buildFormContent(fields, content, req.body, error, translationKeys);
+        const formContent = buildFormContent(fields, t, req.body, error, translationKeys);
 
-        const ccdId = req.session?.ccdCase?.id;
         return res.status(400).render(viewPath, {
-          ...content,
           ...formContent,
           error,
           backUrl: stepNavigation.getBackUrl(req, stepName),
           lang,
           pageUrl: req.originalUrl || '/',
-          t: req.t,
-          ccdId,
+          t,
+          ccdId: req.session?.ccdCase?.id,
           dashboardRoute: DASHBOARD_ROUTE,
+          languageToggle: t('languageToggle'),
         });
       }
 
-      // Process field data for submission
       processFieldData(req, fields);
-
       const bodyWithoutAction = { ...req.body };
       delete bodyWithoutAction.action;
-
       setFormData(req, stepName, bodyWithoutAction);
 
       if (beforeRedirect) {
@@ -75,7 +69,6 @@ export function createPostHandler(
       }
 
       const redirectPath = stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
-
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }
@@ -83,23 +76,4 @@ export function createPostHandler(
       res.redirect(303, redirectPath);
     },
   };
-}
-
-function processFieldData(req: Request, fields: FormFieldConfig[]): void {
-  for (const field of fields) {
-    if (field.type === 'checkbox' && req.body[field.name]) {
-      if (typeof req.body[field.name] === 'string') {
-        req.body[field.name] = [req.body[field.name]];
-      }
-    } else if (field.type === 'date') {
-      const day = req.body[`${field.name}-day`]?.trim() || '';
-      const month = req.body[`${field.name}-month`]?.trim() || '';
-      const year = req.body[`${field.name}-year`]?.trim() || '';
-
-      req.body[field.name] = { day, month, year };
-      delete req.body[`${field.name}-day`];
-      delete req.body[`${field.name}-month`];
-      delete req.body[`${field.name}-year`];
-    }
-  }
 }

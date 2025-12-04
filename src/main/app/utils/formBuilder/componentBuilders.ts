@@ -1,5 +1,19 @@
+import type { TFunction } from 'i18next';
+
 import type { ComponentConfig, ComponentType, FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { TranslationContent } from '../i18n';
+
+function createFieldsetLegend(
+  label: string,
+  isFirstField: boolean
+): { legend: { text: string; isPageHeading: boolean; classes: string } } {
+  return {
+    legend: {
+      text: label,
+      isPageHeading: isFirstField,
+      classes: isFirstField ? 'govuk-fieldset__legend--l' : '',
+    },
+  };
+}
 
 export function buildComponentConfig(
   field: FormFieldConfig,
@@ -11,11 +25,9 @@ export function buildComponentConfig(
   errorText: string | undefined,
   index: number,
   hasTitle: boolean,
-  translations: TranslationContent
+  t: TFunction
 ): ComponentConfig {
   const isFirstField = index === 0 && !hasTitle;
-
-  // Base component configuration
   const component: Record<string, unknown> = {
     id: field.name,
     name: field.name,
@@ -28,7 +40,6 @@ export function buildComponentConfig(
 
   let componentType: ComponentType;
 
-  // Add type-specific configuration
   switch (field.type) {
     case 'text': {
       component.value = (fieldValue as string) || '';
@@ -59,13 +70,7 @@ export function buildComponentConfig(
     }
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
-      component.fieldset = {
-        legend: {
-          text: label,
-          isPageHeading: isFirstField,
-          classes: isFirstField ? 'govuk-fieldset__legend--l' : '',
-        },
-      };
+      component.fieldset = createFieldsetLegend(label, isFirstField);
       component.items =
         translatedOptions?.map(option => ({
           value: option.value,
@@ -83,13 +88,7 @@ export function buildComponentConfig(
           : checkboxValue
             ? [checkboxValue]
             : [];
-      component.fieldset = {
-        legend: {
-          text: label,
-          isPageHeading: isFirstField,
-          classes: isFirstField ? 'govuk-fieldset__legend--l' : '',
-        },
-      };
+      component.fieldset = createFieldsetLegend(label, isFirstField);
       component.items =
         translatedOptions?.map(option => ({
           value: option.value,
@@ -106,31 +105,25 @@ export function buildComponentConfig(
         year: '',
       };
       component.namePrefix = field.name;
-      component.fieldset = {
-        legend: {
-          text: label,
-          isPageHeading: isFirstField,
-          classes: isFirstField ? 'govuk-fieldset__legend--l' : '',
-        },
-      };
+      component.fieldset = createFieldsetLegend(label, isFirstField);
       component.items = [
         {
           name: 'day',
-          label: (translations.date as { day?: string })?.day || 'Day',
+          label: t('date.day') || 'Day',
           value: dateValue.day || '',
           classes: 'govuk-input--width-2',
           attributes: { maxlength: 2, inputmode: 'numeric' },
         },
         {
           name: 'month',
-          label: (translations.date as { month?: string })?.month || 'Month',
+          label: t('date.month') || 'Month',
           value: dateValue.month || '',
           classes: 'govuk-input--width-2',
           attributes: { maxlength: 2, inputmode: 'numeric' },
         },
         {
           name: 'year',
-          label: (translations.date as { year?: string })?.year || 'Year',
+          label: t('date.year') || 'Year',
           value: dateValue.year || '',
           classes: 'govuk-input--width-4',
           attributes: { maxlength: 4, inputmode: 'numeric' },

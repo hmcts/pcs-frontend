@@ -28,6 +28,65 @@ function findLocalesDir(): string | null {
   return null;
 }
 
+export function getStepNamespace(stepName: string): string {
+  return stepName
+    .split('-')
+    .map((part, index) => (index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)))
+    .join('');
+}
+
+export function getStepTranslationPath(stepName: string, folder: string): string {
+  return `${folder}/${getStepNamespace(stepName)}`;
+}
+
+export async function loadStepNamespace(req: Request, stepName: string, folder: string): Promise<void> {
+  if (!req.i18n) {
+    return;
+  }
+
+  const stepNamespace = getStepNamespace(stepName);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const lang = (req as any).language || 'en';
+
+  if (req.i18n.getResourceBundle(lang, stepNamespace)) {
+    return;
+  }
+
+  const localesDir = findLocalesDir();
+  if (!localesDir) {
+    return;
+  }
+
+  try {
+    const translationPath = getStepTranslationPath(stepName, folder);
+    const filePath = path.join(localesDir, lang, `${translationPath}.json`);
+
+    if (fs.existsSync(filePath)) {
+      const translations = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      req.i18n.addResourceBundle(lang, stepNamespace, translations, true, true);
+
+      await new Promise<void>((resolve, reject) => {
+        req.i18n!.loadNamespaces(stepNamespace, err => (err ? reject(err) : resolve()));
+      });
+    } else {
+      logger.warn(`Translation file not found: ${filePath}`);
+    }
+  } catch (error) {
+    logger.error(`Failed to load translation file for ${stepName}:`, error);
+  }
+}
+
+export function getStepTranslations(req: Request, stepName: string): TranslationContent {
+  if (!req.i18n) {
+    return {};
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const lang = (req as any).language || 'en';
+  const resources = req.i18n.getResourceBundle(lang, getStepNamespace(stepName));
+  return (resources as TranslationContent) || {};
+}
+
 export function getValidatedLanguage(req: Request): SupportedLang {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const i18nLang = (req as any).language;
@@ -42,62 +101,4 @@ export function getValidatedLanguage(req: Request): SupportedLang {
     '';
   const normalized = raw.toLowerCase().trim();
   return LANG_MAP[normalized] ?? 'en';
-}
-
-function deepMerge(target: TranslationContent, source: TranslationContent): TranslationContent {
-  const result = { ...target };
-
-  for (const key in source) {
-    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-      // If both target and source have objects at this key, merge them recursively
-      if (target[key] && typeof target[key] === 'object' && !Array.isArray(target[key])) {
-        result[key] = deepMerge(target[key] as TranslationContent, source[key] as TranslationContent);
-      } else {
-        // Otherwise, use the source value
-        result[key] = source[key];
-      }
-    } else {
-      // For primitives and arrays, source overrides target
-      result[key] = source[key];
-    }
-  }
-
-  return result;
-}
-
-export function loadTranslations(lang: string, namespaces: string[]): TranslationContent {
-  const translations: TranslationContent = {};
-  const localesDir = findLocalesDir();
-
-  if (!localesDir) {
-    logger.error('No locales directory found. Translations will be empty.');
-    return translations;
-  }
-
-  const basePath = path.join(localesDir, lang);
-
-  for (const ns of namespaces) {
-    try {
-      const filePath = path.join(basePath, `${ns}.json`);
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      const parsed = JSON.parse(fileContent);
-      // Use deep merge to merge nested objects instead of replacing them
-      Object.assign(translations, deepMerge(translations, parsed));
-    } catch (error) {
-      logger.error(`Failed to load translation for: ${lang}/${ns} with error ${error}`);
-    }
-  }
-
-  return translations;
-}
-
-export function createGenerateContent(stepName: string, folder: string) {
-  const namespace = stepName
-    .split('-')
-    .map((part, index) => (index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)))
-    .join('');
-
-  return (lang: SupportedLang = 'en'): TranslationContent => {
-    return loadTranslations(lang, ['common', `${folder}/${namespace}`]);
-  };
 }

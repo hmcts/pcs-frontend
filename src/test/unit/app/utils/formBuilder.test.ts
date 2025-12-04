@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import type { TFunction } from 'i18next';
 
 import { type FormBuilderConfig, createFormStep } from '../../../../main/app/utils/formBuilder';
 
@@ -7,19 +8,43 @@ const mockSetFormData = jest.fn();
 const mockValidateForm = jest.fn();
 
 jest.mock('../../../../main/app/controller/controllerFactory', () => ({
-  createGetController: jest.fn((view, stepName, generateContent, buildContent) => ({
-    get: jest.fn((req: Request, res: Response) => {
-      const content = generateContent('en');
-      const builtContent = buildContent(req, content);
-      return res.render(view, builtContent);
+  createGetController: jest.fn((view, stepName, extendContent) => ({
+    get: jest.fn(async (req: Request, res: Response) => {
+      const content = extendContent ? await extendContent(req) : {};
+      return res.render(view, content);
     }),
   })),
 }));
 
-jest.mock('../../../../main/app/controller/formHelpers', () => ({
+jest.mock('../../../../main/app/utils/formBuilder/helpers', () => ({
   getFormData: (...args: unknown[]) => mockGetFormData(...args),
   setFormData: (...args: unknown[]) => mockSetFormData(...args),
   validateForm: (...args: unknown[]) => mockValidateForm(...args),
+  getLanguage: jest.fn((req: Request) => req.language || 'en'),
+  getTranslation: jest.fn((t: (key: string) => string, key: string, fallback?: string) => {
+    const translation = t(key);
+    return translation !== key ? translation : fallback;
+  }),
+  processFieldData: jest.fn((req: Request, fields: unknown[]) => {
+    const fieldsArray = fields as { name: string; type: string }[];
+    for (const field of fieldsArray) {
+      if (field.type === 'checkbox' && req.body[field.name]) {
+        if (typeof req.body[field.name] === 'string') {
+          req.body[field.name] = [req.body[field.name]];
+        }
+      } else if (field.type === 'date') {
+        const day = req.body[`${field.name}-day`]?.trim() || '';
+        const month = req.body[`${field.name}-month`]?.trim() || '';
+        const year = req.body[`${field.name}-year`]?.trim() || '';
+
+        req.body[field.name] = { day, month, year };
+        delete req.body[`${field.name}-day`];
+        delete req.body[`${field.name}-month`];
+        delete req.body[`${field.name}-year`];
+      }
+    }
+  }),
+  getTranslationErrors: jest.fn(() => ({})),
 }));
 
 const mockGetNextStepUrl = jest.fn();
@@ -32,12 +57,13 @@ jest.mock('../../../../main/app/utils/stepFlow', () => ({
   },
 }));
 
-const mockCreateGenerateContent = jest.fn();
 const mockGetValidatedLanguage = jest.fn();
 
 jest.mock('../../../../main/app/utils/i18n', () => ({
-  createGenerateContent: (...args: unknown[]) => mockCreateGenerateContent(...args),
   getValidatedLanguage: (...args: unknown[]) => mockGetValidatedLanguage(...args),
+  getStepNamespace: jest.fn((stepName: string) => stepName),
+  loadStepNamespace: jest.fn(),
+  getStepTranslations: jest.fn(() => ({})),
 }));
 
 describe('formBuilder', () => {
@@ -62,6 +88,23 @@ describe('formBuilder', () => {
     ],
   };
 
+  const createMockT = (translations: Record<string, string> = {}) => {
+    return jest.fn((key: string) => translations[key] || key) as unknown as TFunction;
+  };
+
+  const createMockRequest = (overrides: Partial<Request> = {}): Request => {
+    const defaultT = createMockT();
+    return {
+      session: { formData: {} },
+      language: 'en',
+      t: defaultT,
+      i18n: {
+        getFixedT: jest.fn(() => defaultT),
+      },
+      ...overrides,
+    } as unknown as Request;
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetFormData.mockImplementation((req: Request, stepName: string) => {
@@ -78,18 +121,6 @@ describe('formBuilder', () => {
     mockValidateForm.mockReturnValue({});
     mockGetNextStepUrl.mockReturnValue('/steps/test-journey/next-step');
     mockGetBackUrl.mockReturnValue('/steps/test-journey/previous-step');
-    mockCreateGenerateContent.mockReturnValue(() => ({
-      title: 'Test Title',
-      question: 'Test Question',
-      buttons: {
-        continue: 'Continue',
-        saveForLater: 'Save for Later',
-        cancel: 'Cancel',
-      },
-      errors: {
-        title: 'There is a problem',
-      },
-    }));
     mockGetValidatedLanguage.mockReturnValue('en' as const);
   });
 
@@ -110,14 +141,14 @@ describe('formBuilder', () => {
 
     it('should create getController that renders with form content', async () => {
       const step = createFormStep(baseConfig);
-      const req = {
+      const req = createMockRequest({
         session: {
           formData: {
             'test-step': { testField: 'saved value' },
           },
           ccdCase: { id: '123' },
         },
-      } as unknown as Request;
+      } as unknown as Request);
       const res = {
         render: jest.fn(),
       } as unknown as Response;
@@ -141,12 +172,12 @@ describe('formBuilder', () => {
 
     it('should include ccdId in getController response', async () => {
       const step = createFormStep(baseConfig);
-      const req = {
+      const req = createMockRequest({
         session: {
           formData: {},
           ccdCase: { id: '456' },
         },
-      } as unknown as Request;
+      } as unknown as Request);
       const res = {
         render: jest.fn(),
       } as unknown as Response;
@@ -169,9 +200,7 @@ describe('formBuilder', () => {
       const extendGetContent = jest.fn(() => ({ customField: 'customValue' }));
       const config = { ...baseConfig, extendGetContent };
       const step = createFormStep(config);
-      const req = {
-        session: { formData: {} },
-      } as unknown as Request;
+      const req = createMockRequest();
       const res = {
         render: jest.fn(),
       } as unknown as Response;
@@ -194,13 +223,13 @@ describe('formBuilder', () => {
     describe('buildFormContent', () => {
       it('should build form content with field values', async () => {
         const step = createFormStep(baseConfig);
-        const req = {
+        const req = createMockRequest({
           session: {
             formData: {
               'test-step': { testField: 'value' },
             },
           },
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -231,13 +260,13 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           session: {
             formData: {
               'test-step': { checkboxField: 'option1' },
             },
           },
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -268,13 +297,13 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           session: {
             formData: {
               'test-step': { checkboxField: ['option1', 'option2'] },
             },
           },
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -305,11 +334,7 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
-          session: {
-            formData: {},
-          },
-        } as unknown as Request;
+        const req = createMockRequest();
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -339,13 +364,13 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           session: {
             formData: {
               'test-step': { dateField: { day: '01', month: '02', year: '2023' } },
             },
           },
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -375,7 +400,7 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           session: {
             formData: {
               'test-step': {
@@ -385,7 +410,7 @@ describe('formBuilder', () => {
               },
             },
           },
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -415,11 +440,7 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
-          session: {
-            formData: {},
-          },
-        } as unknown as Request;
+        const req = createMockRequest();
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -449,13 +470,13 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           session: {
             formData: {
               'test-step': { textareaField: 'some text' },
             },
           },
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -486,13 +507,13 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           session: {
             formData: {
               'test-step': { charCountField: 'some text' },
             },
           },
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -522,13 +543,13 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           session: {
             formData: {
               'test-step': { textField: 'text value' },
             },
           },
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -548,12 +569,6 @@ describe('formBuilder', () => {
       });
 
       it('should use pageTitle from translationKeys when provided', async () => {
-        mockCreateGenerateContent.mockReturnValueOnce(() => ({
-          pageTitle: 'Custom Page Title',
-          buttons: {},
-          errors: {},
-        }));
-
         const config: FormBuilderConfig = {
           ...baseConfig,
           translationKeys: {
@@ -561,9 +576,10 @@ describe('formBuilder', () => {
           },
         };
         const step = createFormStep(config);
-        const req = {
-          session: { formData: {} },
-        } as unknown as Request;
+        const mockT = createMockT({ pageTitle: 'Custom Page Title' });
+        const req = createMockRequest();
+        req.t = mockT;
+        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -583,12 +599,6 @@ describe('formBuilder', () => {
       });
 
       it('should use content from translationKeys when provided', async () => {
-        mockCreateGenerateContent.mockReturnValueOnce(() => ({
-          content: 'Custom content text',
-          buttons: {},
-          errors: {},
-        }));
-
         const config: FormBuilderConfig = {
           ...baseConfig,
           translationKeys: {
@@ -596,9 +606,10 @@ describe('formBuilder', () => {
           },
         };
         const step = createFormStep(config);
-        const req = {
-          session: { formData: {} },
-        } as unknown as Request;
+        const mockT = createMockT({ content: 'Custom content text' });
+        const req = createMockRequest();
+        req.t = mockT;
+        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -620,12 +631,6 @@ describe('formBuilder', () => {
 
     describe('getFields', () => {
       it('should translate field labels from translationKey', async () => {
-        mockCreateGenerateContent.mockReturnValueOnce(() => ({
-          title: 'Translated Title',
-          buttons: {},
-          errors: {},
-        }));
-
         const config: FormBuilderConfig = {
           ...baseConfig,
           fields: [
@@ -639,9 +644,10 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
-          session: { formData: {} },
-        } as unknown as Request;
+        const mockT = createMockT({ title: 'Translated Title' });
+        const req = createMockRequest();
+        req.t = mockT;
+        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -658,12 +664,6 @@ describe('formBuilder', () => {
       });
 
       it('should use fallback label pattern when translationKey not found', async () => {
-        mockCreateGenerateContent.mockReturnValueOnce(() => ({
-          testFieldLabel: 'Fallback Label',
-          buttons: {},
-          errors: {},
-        }));
-
         const config: FormBuilderConfig = {
           ...baseConfig,
           fields: [
@@ -674,9 +674,10 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
-          session: { formData: {} },
-        } as unknown as Request;
+        const mockT = createMockT({ testFieldLabel: 'Fallback Label' });
+        const req = createMockRequest();
+        req.t = mockT;
+        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -693,12 +694,6 @@ describe('formBuilder', () => {
       });
 
       it('should translate field hints from translationKey', async () => {
-        mockCreateGenerateContent.mockReturnValueOnce(() => ({
-          hint: 'Translated Hint',
-          buttons: {},
-          errors: {},
-        }));
-
         const config: FormBuilderConfig = {
           ...baseConfig,
           fields: [
@@ -712,9 +707,10 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
-          session: { formData: {} },
-        } as unknown as Request;
+        const mockT = createMockT({ hint: 'Translated Hint' });
+        const req = createMockRequest();
+        req.t = mockT;
+        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -731,15 +727,6 @@ describe('formBuilder', () => {
       });
 
       it('should translate option texts with nested keys', async () => {
-        mockCreateGenerateContent.mockReturnValueOnce(() => ({
-          options: {
-            yes: 'Yes',
-            no: 'No',
-          },
-          buttons: {},
-          errors: {},
-        }));
-
         const config: FormBuilderConfig = {
           ...baseConfig,
           fields: [
@@ -754,9 +741,10 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
-          session: { formData: {} },
-        } as unknown as Request;
+        const mockT = createMockT({ 'options.yes': 'Yes', 'options.no': 'No' });
+        const req = createMockRequest();
+        req.t = mockT;
+        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -774,13 +762,6 @@ describe('formBuilder', () => {
       });
 
       it('should use error message from translations', async () => {
-        mockCreateGenerateContent.mockReturnValueOnce(() => ({
-          buttons: {},
-          errors: {
-            testField: 'Custom error message',
-          },
-        }));
-
         const config: FormBuilderConfig = {
           ...baseConfig,
           fields: [
@@ -791,9 +772,10 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
-          session: { formData: {} },
-        } as unknown as Request;
+        const mockT = createMockT({ 'errors.testField': 'Custom error message' });
+        const req = createMockRequest();
+        req.t = mockT;
+        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -835,13 +817,12 @@ describe('formBuilder', () => {
 
       it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
         const step = createFormStep(baseConfig);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'saveForLater',
             testField: 'value',
           },
-          session: {},
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
         } as unknown as Response;
@@ -863,13 +844,12 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'saveForLater',
             checkboxField: 'option1',
           },
-          session: {},
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
         } as unknown as Response;
@@ -891,15 +871,14 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'saveForLater',
             'dateField-day': '01',
             'dateField-month': '02',
             'dateField-year': '2023',
           },
-          session: {},
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
         } as unknown as Response;
@@ -916,7 +895,7 @@ describe('formBuilder', () => {
         mockValidateForm.mockReturnValueOnce({ testField: 'Error message' });
 
         const step = createFormStep(baseConfig);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'continue',
             testField: '',
@@ -925,8 +904,7 @@ describe('formBuilder', () => {
             ccdCase: { id: '123' },
           },
           originalUrl: '/test-url',
-          t: jest.fn(),
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           status: jest.fn().mockReturnThis(),
           render: jest.fn(),
@@ -958,13 +936,12 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'continue',
             checkboxField: 'option1',
           },
-          session: {},
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
         } as unknown as Response;
@@ -988,15 +965,14 @@ describe('formBuilder', () => {
           ],
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'continue',
             'dateField-day': '01',
             'dateField-month': '02',
             'dateField-year': '2023',
           },
-          session: {},
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
         } as unknown as Response;
@@ -1018,13 +994,12 @@ describe('formBuilder', () => {
           beforeRedirect,
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'continue',
             testField: 'value',
           },
-          session: {},
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
           headersSent: false,
@@ -1045,13 +1020,12 @@ describe('formBuilder', () => {
           beforeRedirect,
         };
         const step = createFormStep(config);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'continue',
             testField: 'value',
           },
-          session: {},
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
           headersSent: true,
@@ -1068,13 +1042,12 @@ describe('formBuilder', () => {
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'continue',
             testField: 'value',
           },
-          session: {},
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
         } as unknown as Response;
@@ -1090,13 +1063,12 @@ describe('formBuilder', () => {
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'continue',
             testField: 'value',
           },
-          session: {},
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
           status: jest.fn().mockReturnThis(),

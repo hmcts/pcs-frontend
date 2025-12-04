@@ -1,7 +1,9 @@
+import type { TFunction } from 'i18next';
+
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { TranslationContent } from '../i18n';
 
 import { buildComponentConfig } from './componentBuilders';
+import { getTranslation } from './helpers';
 
 export function buildFieldValues(
   fields: FormFieldConfig[],
@@ -44,8 +46,6 @@ export function buildFieldValues(
       } else {
         fieldValues[field.name] = { day: '', month: '', year: '' };
       }
-    } else if (field.type === 'textarea' || field.type === 'character-count') {
-      fieldValues[field.name] = savedData?.[field.name] ?? '';
     } else {
       fieldValues[field.name] = savedData?.[field.name] ?? '';
     }
@@ -56,62 +56,34 @@ export function buildFieldValues(
 
 export function translateFields(
   fields: FormFieldConfig[],
-  translations: TranslationContent,
+  t: TFunction,
   fieldValues: Record<string, unknown>,
   error?: { field: string; text: string },
   hasTitle = false
 ): FormFieldConfig[] {
-  const errors = (translations.errors as Record<string, string>) || {};
-
   return fields.map((field, index) => {
-    // Translate label
     let label = field.label;
     if (!label && field.translationKey?.label) {
-      label = (translations[field.translationKey.label] as string) || undefined;
+      label = getTranslation(t, field.translationKey.label, undefined);
     }
     if (!label) {
-      const labelKey = `${field.name}Label`;
-      label = (translations[labelKey] as string) || field.name;
+      label = getTranslation(t, `${field.name}Label`, field.name) || field.name;
     }
 
-    // Translate hint
     let hint = field.hint;
     if (!hint && field.translationKey?.hint) {
-      hint = (translations[field.translationKey.hint] as string) || undefined;
+      hint = getTranslation(t, field.translationKey.hint, undefined);
     }
     if (!hint) {
-      const hintKey = `${field.name}Hint`;
-      hint = (translations[hintKey] as string) || undefined;
+      hint = getTranslation(t, `${field.name}Hint`, undefined);
     }
 
-    // Translate options
     const translatedOptions = field.options?.map(option => {
-      let text = option.text;
-      if (!text && option.translationKey) {
-        const keys = option.translationKey.split('.');
-        let value: unknown = translations;
-        for (const key of keys) {
-          if (value && typeof value === 'object' && key in value) {
-            value = (value as Record<string, unknown>)[key];
-          } else {
-            value = undefined;
-            break;
-          }
-        }
-        text = (typeof value === 'string' ? value : undefined) || option.value;
-      } else if (!text) {
-        text = option.value;
-      }
-      return {
-        ...option,
-        text,
-      };
+      const text = option.text || (option.translationKey ? t(option.translationKey) : null) || option.value;
+      return { ...option, text };
     });
 
-    const errorMessage = field.errorMessage || errors[field.name];
     const hasError = error && error.field === field.name;
-
-    // Build component configuration
     const { component, componentType } = buildComponentConfig(
       field,
       label,
@@ -122,14 +94,14 @@ export function translateFields(
       error?.text,
       index,
       hasTitle,
-      translations
+      t
     );
 
     return {
       ...field,
       label,
       hint,
-      errorMessage,
+      errorMessage: field.errorMessage || getTranslation(t, `errors.${field.name}`, undefined),
       options: translatedOptions,
       component,
       componentType,
