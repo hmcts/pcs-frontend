@@ -2,6 +2,31 @@ import type { TFunction } from 'i18next';
 
 import type { ComponentConfig, ComponentType, FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 
+function getCharacterCountTranslations(t: TFunction):
+  | {
+      charactersUnderLimitText?: { one: string; other: string };
+      charactersAtLimitText?: string;
+      charactersOverLimitText?: { one: string; other: string };
+    }
+  | undefined {
+  try {
+    const characterCount = t('characterCount', { returnObjects: true }) as Record<string, unknown> | string;
+
+    // If t() returns a string (key not found), return undefined
+    if (typeof characterCount === 'string' || !characterCount) {
+      return undefined;
+    }
+
+    return {
+      charactersUnderLimitText: characterCount.charactersUnderLimitText as { one: string; other: string } | undefined,
+      charactersAtLimitText: characterCount.charactersAtLimitText as string | undefined,
+      charactersOverLimitText: characterCount.charactersOverLimitText as { one: string; other: string } | undefined,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
 function createFieldsetLegend(
   label: string,
   isFirstField: boolean
@@ -65,6 +90,23 @@ export function buildComponentConfig(
         text: label,
         isPageHeading: isFirstField,
       };
+
+      // Add translated character count messages
+      if (field.maxLength) {
+        const characterCountTranslations = getCharacterCountTranslations(t);
+        if (characterCountTranslations) {
+          if (characterCountTranslations.charactersUnderLimitText) {
+            component.charactersUnderLimitText = characterCountTranslations.charactersUnderLimitText;
+          }
+          if (characterCountTranslations.charactersAtLimitText) {
+            component.charactersAtLimitText = characterCountTranslations.charactersAtLimitText;
+          }
+          if (characterCountTranslations.charactersOverLimitText) {
+            component.charactersOverLimitText = characterCountTranslations.charactersOverLimitText;
+          }
+        }
+      }
+
       componentType = 'characterCount';
       break;
     }

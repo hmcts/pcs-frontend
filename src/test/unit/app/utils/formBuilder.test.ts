@@ -92,15 +92,38 @@ describe('formBuilder', () => {
     return jest.fn((key: string) => translations[key] || key) as unknown as TFunction;
   };
 
+  const createMockI18n = (t: TFunction) => {
+    const mockCharacterCount = {
+      charactersUnderLimitText: {
+        one: 'You have %{count} character remaining',
+        other: 'You have %{count} characters remaining',
+      },
+      charactersAtLimitText: 'You have reached the limit',
+      charactersOverLimitText: {
+        one: 'You have %{count} character too many',
+        other: 'You have %{count} characters too many',
+      },
+    };
+    return {
+      getFixedT: jest.fn(() => t),
+      getResourceBundle: jest.fn((lang: string, ns: string) => {
+        if (ns === 'common') {
+          return {
+            characterCount: mockCharacterCount,
+          };
+        }
+        return {};
+      }),
+    };
+  };
+
   const createMockRequest = (overrides: Partial<Request> = {}): Request => {
     const defaultT = createMockT();
     return {
       session: { formData: {} },
       language: 'en',
       t: defaultT,
-      i18n: {
-        getFixedT: jest.fn(() => defaultT),
-      },
+      i18n: createMockI18n(defaultT),
       ...overrides,
     } as unknown as Request;
   };
@@ -579,7 +602,7 @@ describe('formBuilder', () => {
         const mockT = createMockT({ pageTitle: 'Custom Page Title' });
         const req = createMockRequest();
         req.t = mockT;
-        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
+        req.i18n = createMockI18n(mockT) as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -609,7 +632,7 @@ describe('formBuilder', () => {
         const mockT = createMockT({ content: 'Custom content text' });
         const req = createMockRequest();
         req.t = mockT;
-        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
+        req.i18n = createMockI18n(mockT) as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -647,7 +670,7 @@ describe('formBuilder', () => {
         const mockT = createMockT({ title: 'Translated Title' });
         const req = createMockRequest();
         req.t = mockT;
-        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
+        req.i18n = createMockI18n(mockT) as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -677,7 +700,7 @@ describe('formBuilder', () => {
         const mockT = createMockT({ testFieldLabel: 'Fallback Label' });
         const req = createMockRequest();
         req.t = mockT;
-        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
+        req.i18n = createMockI18n(mockT) as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -710,7 +733,7 @@ describe('formBuilder', () => {
         const mockT = createMockT({ hint: 'Translated Hint' });
         const req = createMockRequest();
         req.t = mockT;
-        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
+        req.i18n = createMockI18n(mockT) as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -744,7 +767,7 @@ describe('formBuilder', () => {
         const mockT = createMockT({ 'options.yes': 'Yes', 'options.no': 'No' });
         const req = createMockRequest();
         req.t = mockT;
-        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
+        req.i18n = createMockI18n(mockT) as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;
@@ -775,7 +798,7 @@ describe('formBuilder', () => {
         const mockT = createMockT({ 'errors.testField': 'Custom error message' });
         const req = createMockRequest();
         req.t = mockT;
-        req.i18n = { getFixedT: jest.fn(() => mockT) } as unknown as typeof req.i18n;
+        req.i18n = createMockI18n(mockT) as unknown as typeof req.i18n;
         const res = {
           render: jest.fn(),
         } as unknown as Response;

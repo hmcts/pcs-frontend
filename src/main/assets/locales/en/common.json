@@ -60,5 +60,16 @@
     "11": "November",
     "12": "December"
   },
-  "dateFormatLong": "{{day}} {{month}} {{year}}"
+  "dateFormatLong": "{{day}} {{month}} {{year}}",
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "You have %{count} character remaining",
+      "other": "You have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "You have reached the limit",
+    "charactersOverLimitText": {
+      "one": "You have %{count} character too many",
+      "other": "You have %{count} characters too many"
+    }
+  }
 }

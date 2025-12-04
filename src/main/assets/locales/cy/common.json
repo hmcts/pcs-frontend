@@ -60,5 +60,16 @@
     "11": "cyNovember",
     "12": "cyDecember"
   },
-  "dateFormatLong": "{{day}} {{month}} {{year}}"
+  "dateFormatLong": "{{day}} {{month}} {{year}}",
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "cyYou have %{count} character remaining",
+      "other": "cyYou have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "cyYou have reached the limit",
+    "charactersOverLimitText": {
+      "one": "cyYou have %{count} character too many",
+      "other": "cyYou have %{count} characters too many"
+    }
+  }
 }
