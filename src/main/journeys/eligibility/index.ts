@@ -1,4 +1,6 @@
-import { JourneyDraft } from '../../modules/journey/engine/schema';
+import type { Request } from 'express';
+import { DataProvider } from 'modules/journey/engine/dataProviders';
+import { JourneyConfig, JourneyDraft, StepConfig } from '../../modules/journey/engine/schema';
 
 import confirmation from './steps/confirmation/step';
 import correspondenceAddress from './steps/correspondenceAddress/step';
@@ -34,6 +36,25 @@ const journey: JourneyDraft = {
     },
     auth: {
       required: true,
+    },
+    dataProviders: {
+      steps: {
+        correspondenceAddress: [
+          (async (req: Request, step: StepConfig, allData: Record<string, unknown>, journey: JourneyConfig) => {
+            return {
+              organisation: {
+                name: 'Treetops Housing',
+                correspondenceAddress: {
+                  addressLine1: '1 Garden Drive',
+                  town: 'Luton',
+                  county: 'Bedfordshire',
+                  postcode: 'LU1 1AB',
+                },
+              },
+            };
+          }) as DataProvider,
+        ],
+      },
     },
   },
 };

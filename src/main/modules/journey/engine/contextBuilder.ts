@@ -32,6 +32,7 @@ export class ContextBuilder {
 
     // Get Nunjucks environment for template rendering
     const nunjucksEnv: Environment | undefined = req?.app?.locals?.nunjucksEnv;
+    const stepFields = step.fields || {};
 
     // Helper function to render strings as Nunjucks templates
     // If Nunjucks is available and the string contains template syntax, render it
@@ -213,40 +214,313 @@ export class ContextBuilder {
           case 'checkboxes':
           case 'select': {
             const baseOptions = (typedFieldConfig.items ?? []) as (string | Record<string, unknown>)[];
-
-            const items = baseOptions.map(option => {
-              if (typeof option === 'string') {
-                // Translate the displayed text; value stays as the raw string key
-                const obj = { value: option, text: t(option, option) } as Record<string, unknown>;
-                if (typedFieldConfig.type === 'checkboxes') {
-                  obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(option);
-                } else if (typedFieldConfig.type === 'select') {
-                  obj['selected'] = fieldValue === option;
+            
+            const items = await Promise.all(
+              baseOptions.map(async option => {
+                if (typeof option === 'string') {
+                  // Translate the displayed text; value stays as the raw string key
+                  const obj = { value: option, text: t(option, option) } as Record<string, unknown>;
+                  if (typedFieldConfig.type === 'checkboxes') {
+                    obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(option);
+                  } else if (typedFieldConfig.type === 'select') {
+                    obj['selected'] = fieldValue === option;
+                  } else {
+                    obj['checked'] = fieldValue === option;
+                  }
+                  return obj;
                 } else {
-                  obj['checked'] = fieldValue === option;
-                }
-                return obj;
-              } else {
-                const obj = { ...option } as Record<string, unknown>;
-                const optVal = (option as Record<string, unknown>).value as string;
+                  const obj = { ...option } as Record<string, unknown>;
+                  const optVal = (option as Record<string, unknown>).value as string;
 
-                if (typeof obj.text === 'string') {
-                  obj.text = t(obj.text, obj.text as string);
-                }
-                if (typeof obj.html === 'string') {
-                  obj.html = t(obj.html, obj.html as string);
-                }
+                  if (typeof obj.text === 'string') {
+                    obj.text = t(obj.text, obj.text as string);
+                  }
+                  if (typeof obj.html === 'string') {
+                    obj.html = t(obj.html, obj.html as string);
+                  }
 
-                if (typedFieldConfig.type === 'checkboxes') {
-                  obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(optVal);
-                } else if (typedFieldConfig.type === 'select') {
-                  obj['selected'] = fieldValue === optVal;
-                } else {
-                  obj['checked'] = fieldValue === optVal;
+                  // Handle conditional.fields - convert to conditional.html
+                  // Supports: conditional.fields = { fieldName: FieldConfig, ... } (recursive fields structure)
+                  // Also supports legacy: conditional.field = "fieldName" (reference) or conditional.field = { type: ... } (inline)
+                  const conditional = obj.conditional as Record<string, unknown> | undefined;
+                  if (conditional && nunjucksEnv && req) {
+                    try {
+                      let conditionalHtml = '';
+                      
+                      // Check if using new conditional.fields structure (recursive)
+                      if (conditional.fields && typeof conditional.fields === 'object' && conditional.fields !== null) {
+                        const conditionalFields = conditional.fields as Record<string, FieldConfig>;
+                        const conditionalFieldsHtml: string[] = [];
+                        
+                        // Process each field in conditional.fields
+                        for (const [conditionalFieldName, conditionalFieldConfig] of Object.entries(conditionalFields)) {
+                          const conditionalFieldData = data[conditionalFieldName];
+                          const conditionalFieldError = errors && errors[conditionalFieldName];
+                          
+                          // Process the field config (similar to how we process regular fields)
+                          const processedConditionalField = { ...conditionalFieldConfig } as FieldConfig;
+                          
+                          // Ensure id/name for the field
+                          if (!processedConditionalField.id) {
+                            processedConditionalField.id = conditionalFieldName;
+                          }
+                          if (!processedConditionalField.name) {
+                            processedConditionalField.name = conditionalFieldName;
+                          }
+                          
+                          // Translate label
+                          if (typeof processedConditionalField.label === 'string') {
+                            const rendered = renderTemplate(processedConditionalField.label, { ...dynamicData, ...allData });
+                            processedConditionalField.label = { text: t(rendered, rendered) };
+                          } else if (processedConditionalField.label && typeof processedConditionalField.label === 'object') {
+                            const labelObj = { ...(processedConditionalField.label as Record<string, unknown>) };
+                            if (typeof labelObj.text === 'string') {
+                              const rendered = renderTemplate(labelObj.text as string, { ...dynamicData, ...allData });
+                              labelObj.text = t(rendered, rendered);
+                            }
+                            if (typeof labelObj.html === 'string') {
+                              const rendered = renderTemplate(labelObj.html as string, { ...dynamicData, ...allData });
+                              labelObj.html = t(rendered, rendered);
+                            }
+                            processedConditionalField.label = labelObj;
+                          }
+                          
+                          // Translate hint
+                          if (typeof processedConditionalField.hint === 'string') {
+                            const rendered = renderTemplate(processedConditionalField.hint, { ...dynamicData, ...allData });
+                            processedConditionalField.hint = { text: t(rendered, rendered) };
+                          }
+                          
+                          // Add error message if present
+                          if (conditionalFieldError) {
+                            processedConditionalField.errorMessage = { text: t(conditionalFieldError.message, conditionalFieldError.message) };
+                          }
+                          
+                          // Set value if applicable
+                          if (['text', 'email', 'tel', 'url', 'password', 'number', 'textarea'].includes(conditionalFieldConfig.type)) {
+                            // @ts-expect-error value is not typed
+                            processedConditionalField.value = conditionalFieldData ?? '';
+                          }
+                          
+                          // Render the field using Nunjucks
+                          const renderContext = {
+                            fieldConfig: processedConditionalField,
+                            fieldName: conditionalFieldName,
+                            step,
+                            data,
+                            errors,
+                            t,
+                            addressLookup: (
+                              ((req.session as unknown as Record<string, unknown>)?._addressLookup as Record<string, unknown> | undefined)?.[step.id as keyof typeof step] ??
+                              {}
+                            ),
+                          };
+                          
+                          let fieldHtml = '';
+                          switch (conditionalFieldConfig.type) {
+                            case 'address':
+                              fieldHtml = nunjucksEnv.render('components/addressLookup.njk', renderContext);
+                              break;
+                            case 'text':
+                            case 'email':
+                            case 'tel':
+                            case 'password':
+                            case 'url':
+                            case 'number':
+                              fieldHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/input/macro.njk" import govukInput %}{{ govukInput(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'textarea':
+                              fieldHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/textarea/macro.njk" import govukTextarea %}{{ govukTextarea(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'date':
+                              fieldHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/date-input/macro.njk" import govukDateInput %}{{ govukDateInput(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'select':
+                              fieldHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/select/macro.njk" import govukSelect %}{{ govukSelect(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'radios':
+                              fieldHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/radios/macro.njk" import govukRadios %}{{ govukRadios(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'checkboxes':
+                              fieldHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}{{ govukCheckboxes(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                          }
+                          conditionalFieldsHtml.push(fieldHtml);
+                        }
+                        
+                        conditionalHtml = conditionalFieldsHtml.join('');
+                        obj.conditional = { html: conditionalHtml };
+                      } else if (conditional.field) {
+                        // Legacy support: conditional.field (single field reference or inline)
+                        let conditionalFieldConfig: FieldConfig | undefined;
+                        let conditionalFieldName: string;
+                        let conditionalFieldData: unknown;
+                        let conditionalFieldError: { day?: string; month?: string; year?: string; message: string; anchor?: string } | undefined;
+
+                        // Check if conditional.field is a string (reference) or object (inline definition)
+                        if (typeof conditional.field === 'string' && stepFields) {
+                          // Reference to existing field
+                          conditionalFieldName = conditional.field;
+                          conditionalFieldConfig = stepFields[conditionalFieldName] as FieldConfig | undefined;
+                          conditionalFieldData = data[conditionalFieldName];
+                          conditionalFieldError = errors && errors[conditionalFieldName];
+                        } else if (typeof conditional.field === 'object' && conditional.field !== null) {
+                          // Inline field definition
+                          conditionalFieldConfig = conditional.field as FieldConfig;
+                          // Generate a unique field name for inline fields based on the parent field and option value
+                          conditionalFieldName = `${fieldName}_${optVal}_conditional`;
+                          conditionalFieldData = data[conditionalFieldName];
+                          conditionalFieldError = errors && errors[conditionalFieldName];
+                        } else {
+                          conditionalFieldConfig = undefined;
+                          conditionalFieldName = '';
+                        }
+
+                        if (conditionalFieldConfig) {
+                          // Build a minimal processed config for the conditional field
+                          const processedConditionalField = { ...conditionalFieldConfig } as FieldConfig;
+                          
+                          // Ensure id/name for the field
+                          if (!processedConditionalField.id) {
+                            processedConditionalField.id = conditionalFieldName;
+                          }
+                          if (!processedConditionalField.name) {
+                            processedConditionalField.name = conditionalFieldName;
+                          }
+                          
+                          // Translate label
+                          if (typeof processedConditionalField.label === 'string') {
+                            const rendered = renderTemplate(processedConditionalField.label, { ...dynamicData, ...allData });
+                            processedConditionalField.label = { text: t(rendered, rendered) };
+                          } else if (processedConditionalField.label && typeof processedConditionalField.label === 'object') {
+                            const labelObj = { ...(processedConditionalField.label as Record<string, unknown>) };
+                            if (typeof labelObj.text === 'string') {
+                              const rendered = renderTemplate(labelObj.text as string, { ...dynamicData, ...allData });
+                              labelObj.text = t(rendered, rendered);
+                            }
+                            if (typeof labelObj.html === 'string') {
+                              const rendered = renderTemplate(labelObj.html as string, { ...dynamicData, ...allData });
+                              labelObj.html = t(rendered, rendered);
+                            }
+                            processedConditionalField.label = labelObj;
+                          }
+                          
+                          // Translate hint
+                          if (typeof processedConditionalField.hint === 'string') {
+                            const rendered = renderTemplate(processedConditionalField.hint, { ...dynamicData, ...allData });
+                            processedConditionalField.hint = { text: t(rendered, rendered) };
+                          }
+                          
+                          // Add error message if present
+                          if (conditionalFieldError) {
+                            processedConditionalField.errorMessage = { text: t(conditionalFieldError.message, conditionalFieldError.message) };
+                          }
+                          
+                          // Set value if applicable
+                          if (['text', 'email', 'tel', 'url', 'password', 'number', 'textarea'].includes(conditionalFieldConfig.type)) {
+                            // @ts-expect-error value is not typed
+                            processedConditionalField.value = conditionalFieldData ?? '';
+                          }
+                          
+                          // Render using Nunjucks renderString with appropriate macro
+                          const renderContext = {
+                            fieldConfig: processedConditionalField,
+                            fieldName: conditionalFieldName,
+                            step,
+                            data,
+                            errors,
+                            t,
+                            addressLookup: (
+                              ((req.session as unknown as Record<string, unknown>)?._addressLookup as Record<string, unknown> | undefined)?.[step.id as keyof typeof step] ??
+                              {}
+                            ),
+                          };
+                          
+                          switch (conditionalFieldConfig.type) {
+                            case 'address':
+                              conditionalHtml = nunjucksEnv.render('components/addressLookup.njk', renderContext);
+                              break;
+                            case 'text':
+                            case 'email':
+                            case 'tel':
+                            case 'password':
+                            case 'url':
+                            case 'number':
+                              conditionalHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/input/macro.njk" import govukInput %}{{ govukInput(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'textarea':
+                              conditionalHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/textarea/macro.njk" import govukTextarea %}{{ govukTextarea(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'date':
+                              conditionalHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/date-input/macro.njk" import govukDateInput %}{{ govukDateInput(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'select':
+                              conditionalHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/select/macro.njk" import govukSelect %}{{ govukSelect(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'radios':
+                              conditionalHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/radios/macro.njk" import govukRadios %}{{ govukRadios(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                            case 'checkboxes':
+                              conditionalHtml = nunjucksEnv.renderString(
+                                '{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}{{ govukCheckboxes(fieldConfig) }}',
+                                renderContext
+                              );
+                              break;
+                          }
+                          
+                          obj.conditional = { html: conditionalHtml };
+                        }
+                      }
+                    } catch (err) {
+                      // If rendering fails, remove conditional to avoid errors
+                      delete obj.conditional;
+                    }
+                  }
+
+                  if (typedFieldConfig.type === 'checkboxes') {
+                    obj['checked'] = Array.isArray(fieldValue) && (fieldValue as string[]).includes(optVal);
+                  } else if (typedFieldConfig.type === 'select') {
+                    obj['selected'] = fieldValue === optVal;
+                  } else {
+                    obj['checked'] = fieldValue === optVal;
+                  }
+                  return obj;
                 }
-                return obj;
-              }
-            });
+              })
+            );
 
             // For selects add default prompt if author didn't supply one
             if (typedFieldConfig.type === 'select' && !(typedFieldConfig.items && typedFieldConfig.items.length)) {

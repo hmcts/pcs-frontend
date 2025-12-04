@@ -39,6 +39,12 @@ export const ValidationRuleSchema = z
       ])
       .optional()
       .default(false),
+    requiredWhen: z
+      .object({
+        field: z.string(),
+        value: z.unknown(),
+      })
+      .optional(),
     minLength: z.number().min(0).optional().default(0),
     maxLength: z.number().min(1).optional().default(100),
     min: z.number().optional().default(0),
@@ -354,7 +360,14 @@ export const JourneySchema = z
         visited.add(stepId);
         path.add(stepId);
 
-        const step = journey.steps[stepId] as StepConfig;
+        const step = journey.steps[stepId] as StepConfig | undefined;
+        // If step doesn't exist, it's an invalid reference (not a cycle)
+        // Return false to allow validation to continue and catch the missing step elsewhere
+        if (!step) {
+          path.delete(stepId);
+          return false;
+        }
+
         if (step.next) {
           if (typeof step.next === 'string') {
             if (hasCycle(step.next)) {
@@ -390,7 +403,12 @@ export const JourneySchema = z
         }
 
         visited.add(stepId);
-        const step = journey.steps[stepId] as StepConfig;
+        const step = journey.steps[stepId] as StepConfig | undefined;
+        
+        // If step doesn't exist, skip it (invalid reference will be caught by next validation)
+        if (!step) {
+          continue;
+        }
 
         if (step.next) {
           if (typeof step.next === 'string') {
@@ -407,6 +425,29 @@ export const JourneySchema = z
       return visited.size === Object.keys(journey.steps).length;
     },
     { message: 'All steps must be reachable from the start step' }
+  )
+  .refine(
+    journey => {
+      // Validate that all referenced steps exist
+      for (const [, step] of Object.entries(journey.steps)) {
+        if (step.next) {
+          if (typeof step.next === 'string') {
+            if (!journey.steps[step.next]) {
+              return false;
+            }
+          } else {
+            if (!journey.steps[step.next.goto]) {
+              return false;
+            }
+            if (step.next.else && !journey.steps[step.next.else]) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    },
+    { message: 'All step references in "next" must point to existing steps' }
   );
 
 // Parsed/validated type (all defaults applied)
@@ -679,6 +720,18 @@ export const createFieldValidationSchema = (
   };
 
   const isRequired = (): boolean => {
+    // Check requiredWhen condition first
+    if (rules?.requiredWhen) {
+      const { field, value } = rules.requiredWhen;
+      // Check in stepData first (current step), then allData (all journey data)
+      const fieldValue = stepData?.[field] ?? allData?.[field];
+      // Compare values (handles both primitive and object comparisons)
+      if (fieldValue === value) {
+        return true;
+      }
+    }
+
+    // Then check regular required
     if (!rules?.required) {
       return false;
     }

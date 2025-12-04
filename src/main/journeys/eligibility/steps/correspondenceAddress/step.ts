@@ -5,7 +5,7 @@ const step: StepDraft = {
   type: 'form',
   title: 'Your correspondence address',
   description:
-    'Your correspondence address is your postal address. Treetops Housing were asked to provide this so we could send you the claim documents by post.',
+    'Your correspondence address is your postal address. {{ organisation.name | upper }} were asked to provide this so we could send you the claim documents by post.',
   fields: {
     isCorrespondenceAddress: {
       type: 'radios',

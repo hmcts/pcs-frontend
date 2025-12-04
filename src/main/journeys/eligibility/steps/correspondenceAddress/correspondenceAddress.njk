@@ -5,12 +5,12 @@
 
 {% block respondToClaimContent %}
   <!-- TODO: This should be dynamic -->
-  <h3 class="govuk-heading-s">Correspondence address given by Treetops Housing:</h3>
+  <h3 class="govuk-heading-s">Correspondence address given by {{ organisation.name | upper }}:</h3>
   <p class="govuk-body">
-    1 Garden Drive<br>
-    Luton<br>
-    Bedfordshire<br>
-    LU1 1AB
+    {{ organisation.correspondenceAddress.addressLine1 }}<br>
+    {{ organisation.correspondenceAddress.town }}<br>
+    {{ organisation.correspondenceAddress.county }}<br>
+    {{ organisation.correspondenceAddress.postcode }}
   </p>
 
   <form method="post" class="correspondence-address-form" novalidate>
