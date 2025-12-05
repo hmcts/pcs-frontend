@@ -1,3 +1,5 @@
+import path from 'path';
+
 import type { TFunction } from 'i18next';
 
 import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
@@ -13,14 +15,21 @@ import { createPostHandler } from './postHandler';
 
 export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 
+/**
+ * Converts camelCase to kebab-case (e.g., "userJourney" -> "user-journey")
+ */
+function camelToKebabCase(str: string): string {
+  return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+}
+
 export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys } = config;
 
-  const journeyPath = journeyFolder.replace(/([A-Z])/g, '-$1').toLowerCase();
+  const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath = 'formBuilder.njk';
 
   return {
-    url: `/steps/${journeyPath}/${stepName}`,
+    url: path.join('/steps', journeyPath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,
