@@ -41,6 +41,7 @@ export interface UserJourneyFormDataMap {
 export interface UserJourneyCaseData {
   applicantForename?: string;
   applicantSurname?: string;
+  claimantContactEmail?: string;
   userPcqId?: string;
   userPcqIdSet?: YesNoValue;
   propertyAddress?: {
