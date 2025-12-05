@@ -3,6 +3,10 @@
 {% block content %}
   <h1 class="govuk-heading-xl">Welcome to the PCS home page</h1>
 
+<div class="govuk-inset-text">
+  You are signed in as: {{ user.email }} and editing case reference {{ caseReference }}
+</div>
+
 <p>RESPONSE FROM API: {{ apiResponse }}</p>
 
 {% endblock %}

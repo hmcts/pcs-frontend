@@ -1,0 +1,25 @@
+{% extends "template.njk" %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">Claimant details</h1>
+
+<div class="govuk-inset-text">
+  You are signed in as: {{ user.email }} and editing case reference {{ caseReference }}
+</div>
+
+<form action="" method="post">
+
+<div class="govuk-form-group">
+  <h1 class="govuk-label-wrapper">
+    <label class="govuk-label govuk-label--m" for="event-name">
+      What is the claimant's email address?
+    </label>
+  </h1>
+  <input class="govuk-input" id="claimantContactEmail" name="claimantContactEmail" type="text" value="{{ claimantContactEmail }}">
+</div>
+<button type="submit" class="govuk-button" data-module="govuk-button">
+  Submit
+</button>
+</form>
+
+{% endblock %}

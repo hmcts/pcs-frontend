@@ -41,6 +41,9 @@ export class Helmet {
       formAction.push(idamDomain);
     }
 
+    formAction.push('http://localhost:3000');
+    formAction.push('https://xui-pcs-api-pr-1083.preview.platform.hmcts.net/');
+
     app.use(
       helmet({
         contentSecurityPolicy: {

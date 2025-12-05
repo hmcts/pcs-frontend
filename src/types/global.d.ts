@@ -25,6 +25,7 @@ interface CustomSessionData extends SessionData {
   nonce?: string;
   user?: UserInfoResponseWithToken;
   returnTo?: string;
+  puiLoginRefresh?: boolean;
   formData?: Record<string, any>;
   ccdCase?: CcdCase;
   postcodeLookupResult?: any[];
