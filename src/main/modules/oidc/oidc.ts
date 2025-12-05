@@ -13,6 +13,10 @@ export class OIDCModule {
   private readonly logger = Logger.getLogger('oidc');
 
   constructor() {
+    if (process.env.AUTH_DISABLED === 'true') {
+      this.logger.warn('OIDC constructor skipped because AUTH_DISABLED=true');
+      return;
+    }
     this.setupClient();
   }
 
@@ -46,6 +50,37 @@ export class OIDCModule {
 
   public enableFor(app: Express): void {
     app.set('trust proxy', true);
+
+    if (process.env.AUTH_DISABLED === 'true') {
+      this.logger.warn('OIDC disabled via AUTH_DISABLED; injecting stub user and skipping OIDC flow');
+      const stubUser = {
+        uid: 'dev-user',
+        roles: ['judge'],
+        accessToken: 'dev-access-token',
+        idToken: 'dev-id-token',
+        refreshToken: 'dev-refresh-token',
+        sub: 'dev-user',
+        email: 'judge@example.com',
+        givenName: 'Judith',
+        familyName: 'Daley',
+      };
+
+      app.use((req: Request, res: Response, next: NextFunction) => {
+        if (!req.session.user) {
+          req.session.user = { ...stubUser };
+        }
+        req.app.locals.nunjucksEnv.addGlobal('user', req.session.user);
+        next();
+      });
+
+      app.get('/login', (req: Request, res: Response) => res.redirect('/'));
+      app.get('/logout', (req: Request, res: Response) =>
+        req.session.destroy(() => {
+          res.redirect('/');
+        })
+      );
+      return;
+    }
 
     app.use(async (req: Request, res: Response, next: NextFunction) => {
       if (!this.clientConfig) {

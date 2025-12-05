@@ -53,22 +53,27 @@ const keepOnlyCreateCaseNav = (html: string): string => {
 const defaultCaseReference = '1234-5678-9101';
 
 const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoViewModel => {
-  const theme = typeof req.query.theme === 'string' ? req.query.theme : 'case-manager';
+  const theme = typeof req.query.theme === 'string' ? req.query.theme : 'judicial';
   const allowedThemes = new Set<DemoTheme>(['judicial', 'case-manager', 'default']);
-  const themeName = allowedThemes.has(theme as DemoTheme) ? (theme as DemoTheme) : 'case-manager';
+  const themeName = allowedThemes.has(theme as DemoTheme) ? (theme as DemoTheme) : 'judicial';
   const caseReference = caseReferenceParam && caseReferenceParam.trim() ? caseReferenceParam : defaultCaseReference;
   const basePath = `/orders-demo/${encodeURIComponent(caseReference)}`;
 
   const headerShell = (() => {
+    const roles = themeName === 'judicial' ? ['pui-judicial'] : ['pui-case-manager'];
     const shell = renderHeaderShell({
-      roles: ['pui-case-manager'],
+      roles,
       theme: themeName,
       assetBase: '/',
     });
 
+    const adjustedHtml = keepOnlyCreateCaseNav(shell.html)
+      .replace(/data-theme="[^"]*"/, `data-theme="${themeName}"`)
+      .replace(/data-roles="[^"]*"/, `data-roles="${roles.join(',')}"`);
+
     return {
       ...shell,
-      html: keepOnlyCreateCaseNav(shell.html),
+      html: adjustedHtml,
     };
   })();
   const footerShell = renderFooterShell({ assetBase: '/' });
