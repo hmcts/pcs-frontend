@@ -26,7 +26,7 @@ export const step: StepDefinition = {
 
       if (!redirectPath) {
         // No next step defined - show not found page
-        return res.redirect(303, req.url);
+        return res.status(404).render('not-found');
       }
 
       res.redirect(303, redirectPath);
