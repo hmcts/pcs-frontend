@@ -1,5 +1,4 @@
 import { Application, Request, Response } from 'express';
-import { format } from 'date-fns';
 
 // Temporary import from the header shell package; uses CommonJS, so require here for type simplicity.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -79,7 +78,13 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
   })();
   const footerShell = renderFooterShell({ assetBase: '/' });
   const otherDefendants = ['Taylor', 'Patel'];
-  const today = format(new Date(), 'dd/MM/yyyy');
+  const today = (() => {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    return `${day}/${month}/${year}`;
+  })();
 
   return {
     themeName,

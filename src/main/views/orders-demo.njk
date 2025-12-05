@@ -206,19 +206,19 @@
                 <tr class="govuk-table__row">
                   <th scope="row" class="govuk-table__header">Defendant ({{ defendant }})</th>
                   <td class="govuk-table__cell orders-demo__party-cell">
-                    <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
-                      <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="{{ idPrefix }}-lip" name="{{ idPrefix }}-attendance" type="radio" value="lip">
-                        <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-lip">
-                          <span class="govuk-visually-hidden">Defendant</span>
-                        </label>
-                      </div>
+                  <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="{{ idPrefix }}-lip" name="{{ idPrefix }}-attendance" type="radio" value="lip" checked>
+                      <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-lip">
+                        <span class="govuk-visually-hidden">Defendant</span>
+                      </label>
                     </div>
+                  </div>
                   </td>
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="{{ idPrefix }}-counsel" name="{{ idPrefix }}-attendance" type="radio" value="counsel">
+                      <input class="govuk-radios__input" id="{{ idPrefix }}-counsel" name="{{ idPrefix }}-attendance" type="radio" value="counsel">
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-counsel">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -228,7 +228,7 @@
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="{{ idPrefix }}-solicitor" name="{{ idPrefix }}-attendance" type="radio" value="solicitor" {{ 'checked' if loop.first }}>
+                        <input class="govuk-radios__input" id="{{ idPrefix }}-solicitor" name="{{ idPrefix }}-attendance" type="radio" value="solicitor">
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-solicitor">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -238,7 +238,7 @@
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="{{ idPrefix }}-agent" name="{{ idPrefix }}-attendance" type="radio" value="solicitorAgent">
+                      <input class="govuk-radios__input" id="{{ idPrefix }}-agent" name="{{ idPrefix }}-attendance" type="radio" value="solicitorAgent">
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-agent">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -248,7 +248,7 @@
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="{{ idPrefix }}-ho-rep" name="{{ idPrefix }}-attendance" type="radio" value="housingOfficerRep">
+                      <input class="govuk-radios__input" id="{{ idPrefix }}-ho-rep" name="{{ idPrefix }}-attendance" type="radio" value="housingOfficerRep">
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-ho-rep">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -258,7 +258,7 @@
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="{{ idPrefix }}-absent" name="{{ idPrefix }}-attendance" type="radio" value="absent">
+                      <input class="govuk-radios__input" id="{{ idPrefix }}-absent" name="{{ idPrefix }}-attendance" type="radio" value="absent">
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-absent">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -288,6 +288,26 @@
               </div>
 
               <div class="orders-demo__order-body">
+                {% set outrightDateHtml %}
+                  <div class="orders-demo__date-inline orders-demo__date-inline--with-buttons" data-date-group="outrightBy">
+                    {{ govukDateInput({
+                      namePrefix: "outrightBy",
+                      classes: "orders-demo__date-inline",
+                      formGroup: { classes: "govuk-!-margin-bottom-0" },
+                      items: [
+                        { name: "day", classes: "govuk-input--width-2", autocomplete: "off" },
+                        { name: "month", classes: "govuk-input--width-2", autocomplete: "off" },
+                        { name: "year", classes: "govuk-input--width-4", autocomplete: "off" }
+                      ]
+                    }) }}
+                    <div class="orders-demo__date-shortcuts" aria-hidden="true">
+                      <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__date-shortcut" data-offset="14">+14</button>
+                      <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__date-shortcut" data-offset="28">+28</button>
+                      <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__date-shortcut" data-offset="42">+42</button>
+                    </div>
+                  </div>
+                {% endset %}
+
                 <div class="orders-demo__inline-group">
                   {{ govukRadios({
                     classes: "govuk-radios--inline orders-demo__radios-slim",
@@ -296,29 +316,21 @@
                       legend: { text: "Outright possession timing", classes: "govuk-visually-hidden" }
                     },
                     items: [
-                      { value: "forthwith", text: "Outright possession (forthwith)", checked: true },
+                      { value: "forthwith", text: "Outright possession (forthwith)" },
                       {
                         value: "byDate",
                         text: "Outright possession by",
+                        checked: true,
                         conditional: {
-                          html: govukDateInput({
-                            namePrefix: "outrightBy",
-                            classes: "orders-demo__date-inline",
-                            formGroup: { classes: "govuk-!-margin-bottom-0" },
-                            items: [
-                              { name: "day", classes: "govuk-input--width-2", autocomplete: "off" },
-                              { name: "month", classes: "govuk-input--width-2", autocomplete: "off" },
-                              { name: "year", classes: "govuk-input--width-4", autocomplete: "off" }
-                            ]
-                          })
+                          html: outrightDateHtml
                         }
                       }
                     ]
                   }) }}
                 </div>
 
-                {{ govukCheckboxes({
-                  classes: "orders-demo__checkboxes-inline",
+                {{ govukRadios({
+                  classes: "orders-demo__radios-inline",
                   name: "grounds",
                   fieldset: {
                     legend: { text: "Grounds", classes: "govuk-fieldset__legend--s" }
@@ -504,6 +516,50 @@
 
         orderSwitcherInitialised = true;
 
+        const offsetDate = offset => {
+          const date = new Date();
+          date.setDate(date.getDate() + offset);
+          return {
+            day: String(date.getDate()).padStart(2, '0'),
+            month: String(date.getMonth() + 1).padStart(2, '0'),
+            year: String(date.getFullYear())
+          };
+        };
+
+        const setDefaultOutrightDate = () => {
+          const dayInput = document.querySelector('input[name="outrightBy-day"]');
+          const monthInput = document.querySelector('input[name="outrightBy-month"]');
+          const yearInput = document.querySelector('input[name="outrightBy-year"]');
+          if (!dayInput || !monthInput || !yearInput) return;
+
+          if (dayInput.value || monthInput.value || yearInput.value) return;
+
+          const { day, month, year } = offsetDate(14);
+          dayInput.value = day;
+          monthInput.value = month;
+          yearInput.value = year;
+        };
+
+        const initDateShortcuts = () => {
+          const groups = Array.from(document.querySelectorAll('.orders-demo__date-inline--with-buttons'));
+          groups.forEach(group => {
+            const dayInput = group.querySelector('input[name$="-day"]');
+            const monthInput = group.querySelector('input[name$="-month"]');
+            const yearInput = group.querySelector('input[name$="-year"]');
+            if (!dayInput || !monthInput || !yearInput) return;
+
+            group.querySelectorAll('.orders-demo__date-shortcut').forEach(button => {
+              const offset = Number(button.dataset.offset || 0);
+              button.addEventListener('click', () => {
+                const { day, month, year } = offsetDate(offset);
+                dayInput.value = day;
+                monthInput.value = month;
+                yearInput.value = year;
+              });
+            });
+          });
+        };
+
         const setActive = value => {
           sections.forEach(section => {
             const isActive = section.dataset.orderType === value;
@@ -522,6 +578,8 @@
         });
 
         setActive(defaultValue);
+        setDefaultOutrightDate();
+        initDateShortcuts();
       };
 
       const start = () => {
