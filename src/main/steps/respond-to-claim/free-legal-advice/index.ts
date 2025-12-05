@@ -6,24 +6,18 @@ import { createStepNavigation } from '../../../app/utils/stepFlow';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { respondToClaimFlowConfig } from '../flow.config';
 
-const stepName = 'start-now';
+const stepName = 'free-legal-advice';
 const generateContent = createGenerateContent(stepName, 'respondToClaim');
 const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/start-now',
+  url: '/respond-to-claim/free-legal-advice',
   name: stepName,
-  view: 'steps/respondToClaim/startNow.njk',
+  view: 'steps/respondToClaim/freeLegalAdvice.njk',
   stepDir: __dirname,
   generateContent,
   getController: () => {
-    return createGetController('steps/respondToClaim/startNow.njk', stepName, generateContent, (req, content) => {
-      const ccdCaseId = req.session?.ccdCase?.id;
-      return {
-        ...content,
-        backUrl: ccdCaseId ? `/dashboard/${ccdCaseId}` : '/dashboard/1', //TODO: we need to replace this /dashboard/1 once we had a real CCD backend setup
-      };
-    });
+    return createGetController('steps/respondToClaim/freeLegalAdvice.njk', stepName, generateContent);
   },
   postController: {
     post: async (req: Request, res: Response) => {

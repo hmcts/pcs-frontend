@@ -23,15 +23,18 @@ jest.mock('../../../main/middleware', () => ({
   ccdCaseMiddleware: jest.fn((req, res, next) => next()),
 }));
 
-jest.mock('../../../main/steps/userJourney/flow.config', () => ({
-  userJourneyFlowConfig: {
-    steps: {
-      'protected-step': { requiresAuth: true },
-      'unprotected-step': { requiresAuth: false },
-      'function-controller-step': { requiresAuth: true },
-      'middleware-step': { requiresAuth: true },
-    },
+const mockUserJourneyFlowConfig = {
+  basePath: '/steps',
+  steps: {
+    'protected-step': { requiresAuth: true },
+    'unprotected-step': { requiresAuth: false },
+    'function-controller-step': { requiresAuth: true },
+    'middleware-step': { requiresAuth: true },
   },
+};
+
+jest.mock('../../../main/steps/userJourney/flow.config', () => ({
+  userJourneyFlowConfig: mockUserJourneyFlowConfig,
 }));
 
 const protectedStep = {
@@ -71,6 +74,13 @@ const mockStepsData = {
   allSteps: [protectedStep, unprotectedStep, stepWithFunctionController, stepWithMiddleware],
   protectedSteps: [protectedStep],
 };
+
+const mockGetFlowConfigForStep = jest.fn(step => {
+  if (step.url.startsWith('/steps')) {
+    return mockUserJourneyFlowConfig;
+  }
+  return null;
+});
 
 jest.mock('../../../main/steps', () => ({
   stepsWithContent: mockStepsData.allSteps,
@@ -245,6 +255,8 @@ describe('registerSteps', () => {
       get: jest.fn(),
       post: jest.fn(),
     } as unknown as Application;
+
+    const mockGetFlowConfigForStepNoControllers = jest.fn(() => null);
 
     jest.doMock('../../../main/steps', () => ({
       stepsWithContent: [
