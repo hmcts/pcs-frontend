@@ -5,6 +5,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
 
 {% block head %}
   {{ super() }}
@@ -511,6 +512,122 @@
             </div>
           </div>
         </div>
+
+        <div class="orders-demo__section orders-demo__order-section" data-order-type="adjourn">
+          <div class="orders-demo__order-grid">
+            <div class="orders-demo__order-chooser">
+              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="order-adjourn" name="orderType" type="radio" value="adjourn">
+                  <label class="govuk-label govuk-radios__label orders-demo__radio-label" for="order-adjourn">Select</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="orders-demo__order-content">
+              <div class="orders-demo__section-header orders-demo__order-header">
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Adjournment</h2>
+              </div>
+
+              <div class="orders-demo__order-body orders-demo__adjourn-grid">
+                <div class="orders-demo__adjourn-zone">
+                  <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Next hearing (Logistics)</h3>
+                  <div class="orders-demo__inline-group">
+                    {{ govukDateInput({
+                      namePrefix: "adjournNextHearing",
+                      classes: "orders-demo__date-inline",
+                      fieldset: { legend: { text: "Next hearing date", classes: "govuk-visually-hidden" } },
+                      formGroup: { classes: "govuk-!-margin-bottom-0" },
+                      items: [
+                        { name: "day", classes: "govuk-input--width-2", autocomplete: "off", attributes: { placeholder: "DD" } },
+                        { name: "month", classes: "govuk-input--width-2", autocomplete: "off", attributes: { placeholder: "MM" } },
+                        { name: "year", classes: "govuk-input--width-4", autocomplete: "off", attributes: { placeholder: "YYYY" } }
+                      ]
+                    }) }}
+                    {{ govukInput({
+                      label: { text: "Time estimate", classes: "govuk-label--s" },
+                      classes: "govuk-input--width-10",
+                      name: "adjournTimeEstimate",
+                      value: "10 Minutes"
+                    }) }}
+                    <div class="govuk-form-group govuk-!-margin-bottom-0">
+                      <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-margin-bottom-1">Hearing type</legend>
+                        <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline" data-module="govuk-radios">
+                          <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="adjourn-type-review" name="adjournHearingType" type="radio" value="review" checked>
+                            <label class="govuk-label govuk-radios__label" for="adjourn-type-review">Review hearing</label>
+                          </div>
+                          <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="adjourn-type-substantive" name="adjournHearingType" type="radio" value="substantive">
+                            <label class="govuk-label govuk-radios__label" for="adjourn-type-substantive">Substantive hearing</label>
+                          </div>
+                          <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="adjourn-type-disposal" name="adjournHearingType" type="radio" value="disposal">
+                            <label class="govuk-label govuk-radios__label" for="adjourn-type-disposal">Disposal hearing</label>
+                          </div>
+                        </div>
+                      </fieldset>
+                    </div>
+                  </div>
+                  {{ govukInput({
+                    label: { text: "Location", classes: "govuk-label--s" },
+                    classes: "govuk-input--width-20",
+                    name: "adjournLocation",
+                    value: courtLocation | default('Bristol County Court')
+                  }) }}
+                </div>
+
+                <div class="orders-demo__adjourn-zone">
+                  <div class="orders-demo__adjourn-zone__header">
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Directions</h3>
+                    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1 orders-demo__adjourn-insert">Insert standard directions</button>
+                  </div>
+                  {{ govukTextarea({
+                    name: "adjournDirections",
+                    classes: "orders-demo__notes orders-demo__adjourn-textarea",
+                    rows: 6,
+                    label: { text: "Directions", classes: "govuk-visually-hidden" }
+                  }) }}
+                </div>
+
+                <div class="orders-demo__adjourn-zone">
+                  <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Reason for adjournment</h3>
+                  <div class="orders-demo__adjourn-quick">
+                    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2 orders-demo__chip" data-reason="To allow the Defendant an opportunity to seek independent legal advice.">Seek legal advice</button>
+                    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2 orders-demo__chip" data-reason="To allow the Defendant to defend proceedings.">Defend proceedings</button>
+                    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2 orders-demo__chip" data-reason="Adjourned pending resolution of benefit issues.">Benefit issue</button>
+                  </div>
+                  {{ govukTextarea({
+                    name: "adjournReason",
+                    classes: "orders-demo__notes",
+                    rows: 3,
+                    label: { text: "Reason", classes: "govuk-visually-hidden" }
+                  }) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="orders-demo__section orders-demo__costs">
+          <div class="orders-demo__section-header">
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Costs</h3>
+          </div>
+          <div class="orders-demo__inline-group">
+            {{ govukSelect({
+              id: "costsStatus",
+              name: "costsStatus",
+              classes: "govuk-!-margin-bottom-0 orders-demo__costs-select",
+              label: { text: "Costs outcome", classes: "govuk-label--s" },
+              items: [
+                { value: "standard", text: "Standard (Landlord costs £355)", selected: true },
+                { value: "reserved", text: "Costs reserved" },
+                { value: "other", text: "Other / to be assessed" }
+              ]
+            }) }}
+          </div>
+        </div>
       </form>
     </div>
   </main>
@@ -623,14 +740,57 @@
           });
         };
 
-        const initOrderClickTargets = () => {
-          const focusInstalmentAmount = () => {
-            const instalmentInput = document.querySelector('input[name="instalmentAmount"]');
-            if (instalmentInput instanceof HTMLInputElement) {
-              instalmentInput.focus();
-            }
-          };
+        const focusInstalmentAmount = () => {
+          const instalmentInput = document.querySelector('input[name="instalmentAmount"]');
+          if (instalmentInput instanceof HTMLInputElement) {
+            instalmentInput.focus();
+          }
+        };
 
+        const focusAdjournDate = () => {
+          const adjournDay = document.querySelector('input[name="adjournNextHearing-day"]');
+          if (adjournDay instanceof HTMLInputElement) {
+            adjournDay.focus();
+          }
+        };
+
+        const formatDate = ({ day, month, year }) => `${day}/${month}/${year}`;
+
+        const initStandardDirections = () => {
+          const button = document.querySelector('.orders-demo__adjourn-insert');
+          const textarea = document.querySelector('textarea[name="adjournDirections"]');
+          if (!button || !textarea) return;
+
+          button.addEventListener('click', () => {
+            const line1 = `1. The Defendant shall file and serve a Defence and Witness Statement by 4pm on ${formatDate(offsetDate(14))}.`;
+            const line2 = `2. The Claimant shall file and serve a Reply by 4pm on ${formatDate(offsetDate(28))}.`;
+            const line3 = `3. The case be listed for a Review Hearing on the first open date after ${formatDate(offsetDate(35))}.`;
+            textarea.value = `${line1}\n${line2}\n${line3}`;
+            textarea.focus();
+          });
+        };
+
+        const initQuickReasons = () => {
+          const chips = Array.from(document.querySelectorAll('.orders-demo__chip'));
+          const textarea = document.querySelector('textarea[name="adjournReason"]');
+          if (!chips.length || !textarea) return;
+
+          chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+              const reason = chip.dataset.reason || '';
+              textarea.value = reason;
+              textarea.focus();
+            });
+          });
+        };
+
+        const setCostsReserved = () => {
+          const costsSelect = document.getElementById('costsStatus');
+          if (!(costsSelect instanceof HTMLSelectElement)) return;
+          costsSelect.value = 'reserved';
+        };
+
+        const initOrderClickTargets = () => {
           sections.forEach(section => {
             const radio = section.querySelector('input[name="orderType"]');
             if (!radio) return;
@@ -646,9 +806,6 @@
               if (!radio.checked) {
                 radio.checked = true;
                 setActive(radio.value);
-                if (radio.value === 'suspended') {
-                  focusInstalmentAmount();
-                }
               }
             });
           });
@@ -660,6 +817,12 @@
             section.classList.toggle('orders-demo__order-section--active', isActive);
             section.classList.toggle('orders-demo__order-section--inactive', !isActive);
           });
+          if (value === 'suspended') {
+            focusInstalmentAmount();
+          } else if (value === 'adjourn') {
+            focusAdjournDate();
+            setCostsReserved();
+          }
         };
 
         const defaultValue = document.querySelector('input[name="orderType"]:checked')?.value
@@ -676,6 +839,8 @@
         setDefaultDate('suspendedBy');
         initDateShortcuts();
         initOrderClickTargets();
+        initStandardDirections();
+        initQuickReasons();
       };
 
       const start = () => {

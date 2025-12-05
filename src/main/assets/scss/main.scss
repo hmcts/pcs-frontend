@@ -311,6 +311,50 @@
     }
   }
 
+  .orders-demo__adjourn-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .orders-demo__adjourn-zone {
+    background: #f3f2f1;
+    padding: 16px;
+    border-radius: 4px;
+    border: 1px solid #b1b4b6;
+  }
+
+  .orders-demo__adjourn-zone__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .orders-demo__adjourn-textarea {
+    min-height: 180px;
+  }
+
+  .orders-demo__adjourn-quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .orders-demo__chip {
+    padding: 6px 10px;
+  }
+
+  .orders-demo__costs {
+    border-top: 1px solid #b1b4b6;
+    padding-top: 16px;
+    margin-top: 12px;
+  }
+
+  .orders-demo__costs-select {
+    min-width: 240px;
+  }
+
   .orders-demo__checkboxes-inline {
     .govuk-checkboxes {
       display: flex;
