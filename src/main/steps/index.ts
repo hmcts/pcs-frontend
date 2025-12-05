@@ -1,6 +1,9 @@
 import type { JourneyFlowConfig } from '../interfaces/stepFlow.interface';
 
 import type { StepDefinition } from './../interfaces/stepFormData.interface';
+import { respondToClaimFlowConfig } from './respond-to-claim/flow.config';
+import { step as freeLegalAdvice } from './respond-to-claim/free-legal-advice';
+import { step as startNow } from './respond-to-claim/start-now';
 import { step as applicationSubmitted } from './userJourney/application-submitted';
 import { step as enterAddress } from './userJourney/enter-address';
 import { step as enterAge } from './userJourney/enter-age';
@@ -31,6 +34,12 @@ const userJourneyStepRegistry: Record<string, StepDefinition> = {
   'application-submitted': applicationSubmitted,
 };
 
+// Respond to Claim step registry
+const respondToClaimStepRegistry: Record<string, StepDefinition> = {
+  'start-now': startNow,
+  'free-legal-advice': freeLegalAdvice,
+};
+
 // Journey registry - add new journeys here
 export const journeyRegistry: Record<string, JourneyConfig> = {
   userJourney: {
@@ -38,12 +47,11 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     flowConfig: userJourneyFlowConfig,
     stepRegistry: userJourneyStepRegistry,
   },
-  // Add more journeys here as they are created
-  // respondToClaim: {
-  //   name: 'respondToClaim',
-  //   flowConfig: respondToClaimFlowConfig,
-  //   stepRegistry: respondToClaimStepRegistry,
-  // },
+  respondToClaim: {
+    name: 'respondToClaim',
+    flowConfig: respondToClaimFlowConfig,
+    stepRegistry: respondToClaimStepRegistry,
+  },
 };
 
 // Helper function to get steps for a specific journey
@@ -79,3 +87,25 @@ export const protectedSteps: StepDefinition[] = stepsWithContent.filter(step => 
   }
   return true; // Default to protected if we can't find the journey
 });
+
+// Helper function to get flow config for a step (for backward compatibility)
+export function getFlowConfigForStep(step: StepDefinition): JourneyFlowConfig | null {
+  // Find which journey this step belongs to by checking step registries
+  for (const journey of Object.values(journeyRegistry)) {
+    if (journey.stepRegistry[step.name]) {
+      return journey.flowConfig;
+    }
+  }
+  return null;
+}
+
+// Helper function to get step registry for a step (for backward compatibility)
+export function getStepRegistryForStep(step: StepDefinition): Record<string, StepDefinition> | null {
+  // Find which journey this step belongs to by checking step registries
+  for (const journey of Object.values(journeyRegistry)) {
+    if (journey.stepRegistry[step.name]) {
+      return journey.stepRegistry;
+    }
+  }
+  return null;
+}
