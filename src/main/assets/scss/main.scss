@@ -129,10 +129,44 @@
 
     .govuk-form-group {
       margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .govuk-input__wrapper {
       max-width: 100%;
+    }
+
+    .orders-demo__rent-input {
+      width: 100%;
+      max-width: 160px;
+    }
+
+    .orders-demo__rent-frequency {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .govuk-label {
+        min-width: auto;
+        font-weight: 400;
+      }
+
+      .govuk-select {
+        min-width: 140px;
+        margin-bottom: 0;
+      }
+    }
+
+    .govuk-label {
+      margin-bottom: 0;
+      min-width: 160px;
+      font-weight: 400;
+    }
+
+    .govuk-input {
+      margin-bottom: 0;
     }
   }
 

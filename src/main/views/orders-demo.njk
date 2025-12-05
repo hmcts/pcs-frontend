@@ -82,12 +82,19 @@
               }) }}
               {{ govukInput({
                 label: { text: "Current rent", classes: "govuk-label--s" },
-                classes: "govuk-input--width-10",
+                classes: "govuk-input--width-10 orders-demo__rent-input",
                 name: "currentRent",
                 prefix: { text: "£" },
-                suffix: { text: "per month" },
                 attributes: { placeholder: "0.00" }
               }) }}
+              <div class="orders-demo__rent-frequency">
+                <label class="govuk-label govuk-label--s" for="currentRentFrequency">per</label>
+                <select class="govuk-select" id="currentRentFrequency" name="currentRentFrequency">
+                  <option value="month" selected>month</option>
+                  <option value="quarter">quarter</option>
+                  <option value="year">year</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -100,7 +107,7 @@
               classes: "orders-demo__notes",
               rows: 7,
               label: { text: "Add notes for the bench", classes: "govuk-visually-hidden" },
-              hint: { text: "Notes here remain private to judiciary, can be seen by other judges, and will always be associated with this hearing." }
+              hint: { text: "" }
             }) }}
           </div>
         </div>
