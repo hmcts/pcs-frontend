@@ -61,3 +61,125 @@
     margin-bottom: 30px;
   }
 }
+
+.orders-demo {
+  .orders-demo__panel {
+    background: govuk-colour('white');
+    border: 1px solid #b1b4b6;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    padding: 20px 24px 28px;
+  }
+
+  .orders-demo__main {
+    padding-top: 10px;
+  }
+
+  .orders-demo__top-row {
+    border-bottom: 1px solid #b1b4b6;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+
+  .orders-demo__section {
+    border-top: 1px solid #b1b4b6;
+    padding-top: 16px;
+    margin-top: 16px;
+  }
+
+  .orders-demo__section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .orders-demo__input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px 18px;
+
+    .govuk-form-group {
+      margin-bottom: 6px;
+    }
+
+    .govuk-input__wrapper {
+      max-width: 100%;
+    }
+  }
+
+  .orders-demo__notes {
+    min-height: 200px;
+  }
+
+  .orders-demo__party-label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .orders-demo__radios-slim {
+    .govuk-radios__item {
+      margin-right: 18px;
+    }
+
+    .govuk-radios__label {
+      font-weight: 400;
+    }
+
+    .govuk-form-group {
+      margin-bottom: 8px;
+    }
+  }
+
+  .orders-demo__inline-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .orders-demo__checkboxes-inline {
+    .govuk-checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+    }
+
+    .govuk-checkboxes__item {
+      margin-bottom: 6px;
+    }
+
+    .govuk-checkboxes__conditional {
+      padding-left: 0;
+      margin-top: 8px;
+    }
+  }
+
+  .orders-demo__date-inline {
+    .govuk-date-input {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .govuk-date-input__item {
+      margin-right: 0;
+    }
+  }
+
+  .orders-demo__sentence {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    .govuk-input {
+      margin-bottom: 0;
+    }
+  }
+
+  .orders-demo__sentence-label {
+    font-size: 16px;
+  }
+}
