@@ -291,10 +291,18 @@
 
   .orders-demo__inline-group {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     flex-wrap: wrap;
     margin-bottom: 12px;
+
+    .orders-demo__compact-select {
+      margin-bottom: 0;
+
+      .govuk-select {
+        min-width: 160px;
+      }
+    }
   }
 
   .orders-demo__checkboxes-inline {

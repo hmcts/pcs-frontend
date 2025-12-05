@@ -373,72 +373,68 @@
               </div>
 
               <div class="orders-demo__order-body">
-                <div class="orders-demo__inline-group">
-                  <span class="orders-demo__sentence-label">Possession by</span>
-                  {{ govukDateInput({
-                    namePrefix: "suspendedBy",
-                    classes: "orders-demo__date-inline",
-                    formGroup: { classes: "govuk-!-margin-bottom-0" },
-                    items: [
-                      { name: "day", classes: "govuk-input--width-2", value: "26", autocomplete: "off" },
-                      { name: "month", classes: "govuk-input--width-2", value: "12", autocomplete: "off" },
-                      { name: "year", classes: "govuk-input--width-4", value: "2025", autocomplete: "off" }
-                    ]
-                  }) }}
-                </div>
+                {{ govukDateInput({
+                  namePrefix: "suspendedBy",
+                  classes: "orders-demo__date-inline",
+                  fieldset: { legend: { text: "Possession by", classes: "govuk-fieldset__legend--s" } },
+                  formGroup: { classes: "govuk-!-margin-bottom-3" },
+                  items: [
+                    { name: "day", classes: "govuk-input--width-2", value: "26", autocomplete: "off" },
+                    { name: "month", classes: "govuk-input--width-2", value: "12", autocomplete: "off" },
+                    { name: "year", classes: "govuk-input--width-4", value: "2025", autocomplete: "off" }
+                  ]
+                }) }}
 
-                <div class="orders-demo__sentence">
-                  <span class="orders-demo__sentence-label">Suspended on payment of arrears of £</span>
+                <div class="orders-demo__inline-group">
                   {{ govukInput({
-                    label: { text: "Arrears amount", classes: "govuk-visually-hidden" },
+                    label: { text: "Arrears amount (£)", classes: "govuk-label--s" },
                     name: "arrearsAmount",
                     classes: "govuk-input--width-5",
-                    attributes: { placeholder: "0.00" }
+                    attributes: { placeholder: "0.00" },
+                    prefix: { text: "£" }
                   }) }}
-                  <span class="orders-demo__sentence-label">by</span>
                   {{ govukInput({
-                    label: { text: "Arrears due by", classes: "govuk-visually-hidden" },
+                    label: { text: "Arrears due by", classes: "govuk-label--s" },
                     name: "arrearsDueBy",
                     classes: "govuk-input--width-10",
                     attributes: { placeholder: "DD/MM/YYYY" }
                   }) }}
                 </div>
 
-                <div class="orders-demo__sentence">
-                  <span class="orders-demo__sentence-label">An initial payment of £</span>
+                <div class="orders-demo__inline-group">
                   {{ govukInput({
-                    label: { text: "Initial payment amount", classes: "govuk-visually-hidden" },
+                    label: { text: "Initial payment (£)", classes: "govuk-label--s" },
                     name: "initialPayment",
                     classes: "govuk-input--width-5",
-                    attributes: { placeholder: "0.00" }
+                    attributes: { placeholder: "0.00" },
+                    prefix: { text: "£" }
                   }) }}
-                  <span class="orders-demo__sentence-label">by</span>
                   {{ govukInput({
-                    label: { text: "Initial payment due by", classes: "govuk-visually-hidden" },
+                    label: { text: "Initial payment due by", classes: "govuk-label--s" },
                     name: "initialPaymentBy",
                     classes: "govuk-input--width-10",
                     attributes: { placeholder: "DD/MM/YYYY" }
                   }) }}
                 </div>
 
-                <div class="orders-demo__sentence">
-                  <span class="orders-demo__sentence-label">Instalments of £</span>
+                <div class="orders-demo__inline-group">
                   {{ govukInput({
-                    label: { text: "Instalment amount", classes: "govuk-visually-hidden" },
+                    label: { text: "Instalments (£)", classes: "govuk-label--s" },
                     name: "instalmentAmount",
                     classes: "govuk-input--width-5",
-                    attributes: { placeholder: "0.00" }
+                    attributes: { placeholder: "0.00" },
+                    prefix: { text: "£" }
                   }) }}
-                  <span class="orders-demo__sentence-label">per</span>
+                  <div class="govuk-form-group govuk-!-margin-bottom-2 orders-demo__compact-select">
+                    <label class="govuk-label govuk-label--s" for="instalmentFrequency">Instalment frequency</label>
+                    <select class="govuk-select" id="instalmentFrequency" name="instalmentFrequency">
+                      <option value="weekly">weekly</option>
+                      <option value="monthly" selected>monthly</option>
+                      <option value="annually">annually</option>
+                    </select>
+                  </div>
                   {{ govukInput({
-                    label: { text: "Instalment frequency", classes: "govuk-visually-hidden" },
-                    name: "instalmentFrequency",
-                    classes: "govuk-input--width-5",
-                    attributes: { placeholder: "month" }
-                  }) }}
-                  <span class="orders-demo__sentence-label">by</span>
-                  {{ govukInput({
-                    label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
+                    label: { text: "Instalments due by", classes: "govuk-label--s" },
                     name: "instalmentDueBy",
                     classes: "govuk-input--width-10",
                     attributes: { placeholder: "DD/MM/YYYY" }
@@ -560,6 +556,27 @@
           });
         };
 
+        const initOrderClickTargets = () => {
+          sections.forEach(section => {
+            const radio = section.querySelector('input[name="orderType"]');
+            if (!radio) return;
+
+            section.addEventListener('click', event => {
+              const target = event.target;
+              if (!(target instanceof HTMLElement)) return;
+
+              const isFormControl = target.closest('input, select, textarea, button');
+              if (isFormControl && !(isFormControl instanceof HTMLInputElement && isFormControl.type === 'radio')) {
+                return;
+              }
+              if (!radio.checked) {
+                radio.checked = true;
+                setActive(radio.value);
+              }
+            });
+          });
+        };
+
         const setActive = value => {
           sections.forEach(section => {
             const isActive = section.dataset.orderType === value;
@@ -580,6 +597,7 @@
         setActive(defaultValue);
         setDefaultOutrightDate();
         initDateShortcuts();
+        initOrderClickTargets();
       };
 
       const start = () => {
