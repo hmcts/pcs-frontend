@@ -377,7 +377,7 @@
                   <div class="orders-demo__suspended-row orders-demo__suspended-row--date">
                     <div class="orders-demo__checkbox-placeholder" aria-hidden="true"></div>
                     <span class="orders-demo__sentence-lead govuk-label">possession by</span>
-                    <div class="orders-demo__sentence-body orders-demo__sentence-body--date">
+                    <div class="orders-demo__sentence-body orders-demo__sentence-body--date orders-demo__date-inline--with-buttons">
                       {{ govukDateInput({
                         namePrefix: "suspendedBy",
                         classes: "orders-demo__date-inline",
@@ -409,6 +409,7 @@
                         label: { text: "Arrears amount", classes: "govuk-visually-hidden" },
                         name: "arrearsAmount",
                         classes: "govuk-input--width-5 orders-demo__money-input",
+                        value: arrearsAtHearing | default('1250.00'),
                         prefix: { text: "£" },
                         attributes: { placeholder: "0.00" }
                       }) }}
@@ -468,9 +469,9 @@
                       <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select">
                         <label class="govuk-label govuk-visually-hidden" for="instalmentFrequency">Instalment frequency</label>
                         <select class="govuk-select" id="instalmentFrequency" name="instalmentFrequency">
-                          <option value="weekly">weekly</option>
-                          <option value="monthly" selected>monthly</option>
-                          <option value="annually">annually</option>
+                          <option value="week">week</option>
+                          <option value="month" selected>month</option>
+                          <option value="year">year</option>
                         </select>
                       </div>
                       <span class="orders-demo__sentence-label govuk-label">by</span>
@@ -600,6 +601,13 @@
         };
 
         const initOrderClickTargets = () => {
+          const focusInstalmentAmount = () => {
+            const instalmentInput = document.querySelector('input[name="instalmentAmount"]');
+            if (instalmentInput instanceof HTMLInputElement) {
+              instalmentInput.focus();
+            }
+          };
+
           sections.forEach(section => {
             const radio = section.querySelector('input[name="orderType"]');
             if (!radio) return;
@@ -615,6 +623,9 @@
               if (!radio.checked) {
                 radio.checked = true;
                 setActive(radio.value);
+                if (radio.value === 'suspended') {
+                  focusInstalmentAmount();
+                }
               }
             });
           });
