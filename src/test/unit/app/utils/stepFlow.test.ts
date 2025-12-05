@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 
+import type { JourneyFlowConfig } from '../../../../main/interfaces/stepFlow.interface';
 import {
   checkStepDependencies,
   createStepNavigation,
@@ -7,8 +8,7 @@ import {
   getPreviousStep,
   getStepUrl,
   stepDependencyCheckMiddleware,
-} from '../../../../main/app/utils/stepFlow';
-import type { JourneyFlowConfig } from '../../../../main/interfaces/stepFlow.interface';
+} from '../../../../main/modules/steps/flow';
 
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {

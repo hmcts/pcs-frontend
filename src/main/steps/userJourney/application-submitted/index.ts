@@ -1,8 +1,7 @@
 import type { Request, Response } from 'express';
 
-import { createGetController } from '../../../app/controller/controllerFactory';
-import { stepNavigation } from '../../../app/utils/stepFlow';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createGetController, stepNavigation } from '../../../modules/steps';
 
 const stepName = 'application-submitted';
 

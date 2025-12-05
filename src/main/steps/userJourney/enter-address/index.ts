@@ -1,11 +1,9 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { createGetController } from '../../../app/controller/controllerFactory';
-import { getFormData, setFormData, validateForm } from '../../../app/utils/formBuilder/helpers';
-import { stepNavigation } from '../../../app/utils/stepFlow';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createGetController, getFormData, setFormData, stepNavigation, validateForm } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
 

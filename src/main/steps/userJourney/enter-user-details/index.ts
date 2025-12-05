@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
-import { createFormStep } from '../../../app/utils/formBuilder/index';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createFormStep } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({

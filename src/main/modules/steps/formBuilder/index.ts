@@ -2,12 +2,12 @@ import path from 'path';
 
 import type { TFunction } from 'i18next';
 
+import { DASHBOARD_ROUTE } from '../../../app/utils/routes';
 import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController } from '../../controller/controllerFactory';
+import { createGetController } from '../controller';
+import { stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
-import { DASHBOARD_ROUTE } from '../routes';
-import { stepNavigation } from '../stepFlow';
 
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';

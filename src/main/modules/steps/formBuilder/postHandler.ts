@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { DASHBOARD_ROUTE, getDashboardUrl } from '../../../app/utils/routes';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import { stepNavigation } from '../flow';
 import { getRequestLanguage, getTranslationFunction, loadStepNamespace } from '../i18n';
-import { DASHBOARD_ROUTE, getDashboardUrl } from '../routes';
-import { stepNavigation } from '../stepFlow';
 
 import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';

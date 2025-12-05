@@ -4,9 +4,10 @@ import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
-import { getFormData, setFormData, validateForm } from '../utils/formBuilder/helpers';
-import { getRequestLanguage, getStepTranslations, getTranslationFunction, loadStepNamespace } from '../utils/i18n';
-import { stepNavigation } from '../utils/stepFlow';
+
+import { stepNavigation } from './flow';
+import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
+import { getRequestLanguage, getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
 
 const logger = Logger.getLogger('controllerFactory');
 

@@ -1,9 +1,9 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { createGetController, createPostController } from '../../../app/controller/controllerFactory';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { pcqRedirectMiddleware } from '../../../middleware/pcqRedirect';
+import { createGetController, createPostController } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const stepName = 'summary';

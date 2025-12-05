@@ -9,12 +9,12 @@ jest.mock('@hmcts/nodejs-logging', () => ({
   },
 }));
 
-jest.mock('../../../main/app/utils/i18n', () => ({
+jest.mock('../../../main/modules/steps/i18n', () => ({
   getValidatedLanguage: jest.fn(() => 'en'),
 }));
 
 const mockStepDependencyCheck = jest.fn((req, res, next) => next());
-jest.mock('../../../main/app/utils/stepFlow', () => ({
+jest.mock('../../../main/modules/steps/flow', () => ({
   stepDependencyCheckMiddleware: jest.fn(() => mockStepDependencyCheck),
 }));
 
@@ -112,8 +112,8 @@ const mockStepsData = {
 
 import { Application } from 'express';
 
-import { getValidatedLanguage } from '../../../main/app/utils/i18n';
 import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
+import { getValidatedLanguage } from '../../../main/modules/steps';
 import registerSteps from '../../../main/routes/registerSteps';
 
 describe('registerSteps', () => {

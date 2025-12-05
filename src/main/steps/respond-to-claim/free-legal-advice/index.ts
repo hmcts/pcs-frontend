@@ -1,8 +1,7 @@
 import type { Request, Response } from 'express';
 
-import { createGetController } from '../../../app/controller/controllerFactory';
-import { createStepNavigation } from '../../../app/utils/stepFlow';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { respondToClaimFlowConfig } from '../flow.config';
 
 const stepName = 'free-legal-advice';

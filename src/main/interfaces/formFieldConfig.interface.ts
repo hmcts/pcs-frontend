@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { TranslationContent } from '../app/utils/i18n';
+import type { TranslationContent } from '../modules/steps';
 
 export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count';
 export type ComponentType = 'input' | 'textarea' | 'characterCount' | 'radios' | 'checkboxes' | 'dateInput';

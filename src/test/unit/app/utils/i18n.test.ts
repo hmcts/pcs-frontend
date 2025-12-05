@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { getValidatedLanguage } from '../../../../main/app/utils/i18n';
+import { getValidatedLanguage } from '../../../../main/modules/steps';
 
 describe('i18n', () => {
   describe('getValidatedLanguage', () => {

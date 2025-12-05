@@ -6,13 +6,13 @@ import {
   createGetController,
   createPostController,
   createPostRedirectController,
-} from '../../../../main/app/controller/controllerFactory';
+} from '../../../../main/modules/steps/controller';
 
 const mockGetFormData = jest.fn();
 const mockSetFormData = jest.fn();
 const mockValidateForm = jest.fn();
 
-jest.mock('../../../../main/app/utils/formBuilder/helpers', () => ({
+jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
   getFormData: (...args: unknown[]) => mockGetFormData(...args),
   setFormData: (...args: unknown[]) => mockSetFormData(...args),
   validateForm: (...args: unknown[]) => mockValidateForm(...args),
@@ -21,7 +21,7 @@ jest.mock('../../../../main/app/utils/formBuilder/helpers', () => ({
 const mockGetRequestLanguage = jest.fn();
 const mockGetTranslationFunction = jest.fn();
 
-jest.mock('../../../../main/app/utils/i18n', () => ({
+jest.mock('../../../../main/modules/steps/i18n', () => ({
   getValidatedLanguage: jest.fn(() => 'en'),
   getRequestLanguage: (...args: unknown[]) => mockGetRequestLanguage(...args),
   getTranslationFunction: (...args: unknown[]) => mockGetTranslationFunction(...args),
@@ -29,7 +29,7 @@ jest.mock('../../../../main/app/utils/i18n', () => ({
   getStepTranslations: jest.fn(() => ({})),
   loadStepNamespace: jest.fn(),
 }));
-jest.mock('../../../../main/app/utils/stepFlow', () => ({
+jest.mock('../../../../main/modules/steps/flow', () => ({
   stepNavigation: {
     getBackUrl: jest.fn(() => null),
     getNextStepUrl: jest.fn(() => '/next-step'),
@@ -273,7 +273,7 @@ describe('createPostController', () => {
   });
 
   it('should save form data and redirect when validation passes', async () => {
-    const { stepNavigation } = require('../../../../main/app/utils/stepFlow');
+    const { stepNavigation } = require('../../../../main/modules/steps/flow');
     const mockT = jest.fn((key: string) => key);
     const controller = createPostController(stepName, mockGetFields, view);
     const req = {
@@ -333,7 +333,7 @@ describe('createPostController', () => {
   });
 
   it('should return 500 when next step cannot be determined', async () => {
-    const { stepNavigation } = require('../../../../main/app/utils/stepFlow');
+    const { stepNavigation } = require('../../../../main/modules/steps/flow');
     stepNavigation.getNextStepUrl.mockReturnValue(null);
     const mockT = jest.fn((key: string) => key);
 

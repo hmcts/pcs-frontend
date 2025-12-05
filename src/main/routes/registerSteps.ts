@@ -1,9 +1,8 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 
-import { getValidatedLanguage } from '../app/utils/i18n';
-import { stepDependencyCheckMiddleware } from '../app/utils/stepFlow';
 import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
+import { getValidatedLanguage, stepDependencyCheckMiddleware } from '../modules/steps';
 import { getStepsForJourney, journeyRegistry } from '../steps';
 
 const logger = Logger.getLogger('registerSteps');

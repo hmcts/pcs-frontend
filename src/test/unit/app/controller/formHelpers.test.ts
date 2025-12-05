@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { getFormData, setFormData, validateForm } from '../../../../main/app/utils/formBuilder/helpers';
+import { getFormData, setFormData, validateForm } from '../../../../main/modules/steps';
 
 describe('formHelpers', () => {
   describe('getFormData', () => {

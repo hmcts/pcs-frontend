@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { type FormBuilderConfig, createFormStep } from '../../../../main/app/utils/formBuilder';
+import { type FormBuilderConfig, createFormStep } from '../../../../main/modules/steps';
 
 const mockGetFormData = jest.fn();
 const mockSetFormData = jest.fn();
 const mockValidateForm = jest.fn();
 
-jest.mock('../../../../main/app/controller/controllerFactory', () => ({
+jest.mock('../../../../main/modules/steps/controller', () => ({
   createGetController: jest.fn((view, stepName, extendContent) => ({
     get: jest.fn(async (req: Request, res: Response) => {
       const content = extendContent ? await extendContent(req) : {};
@@ -16,7 +16,7 @@ jest.mock('../../../../main/app/controller/controllerFactory', () => ({
   })),
 }));
 
-jest.mock('../../../../main/app/utils/formBuilder/helpers', () => ({
+jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
   getFormData: (...args: unknown[]) => mockGetFormData(...args),
   setFormData: (...args: unknown[]) => mockSetFormData(...args),
   validateForm: (...args: unknown[]) => mockValidateForm(...args),
@@ -49,7 +49,7 @@ jest.mock('../../../../main/app/utils/formBuilder/helpers', () => ({
 const mockGetNextStepUrl = jest.fn();
 const mockGetBackUrl = jest.fn();
 
-jest.mock('../../../../main/app/utils/stepFlow', () => ({
+jest.mock('../../../../main/modules/steps/flow', () => ({
   stepNavigation: {
     getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
     getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
@@ -60,7 +60,7 @@ const mockGetValidatedLanguage = jest.fn();
 const mockGetRequestLanguage = jest.fn();
 const mockGetTranslationFunction = jest.fn();
 
-jest.mock('../../../../main/app/utils/i18n', () => ({
+jest.mock('../../../../main/modules/steps/i18n', () => ({
   getValidatedLanguage: (...args: unknown[]) => mockGetValidatedLanguage(...args),
   getRequestLanguage: (...args: unknown[]) => mockGetRequestLanguage(...args),
   getTranslationFunction: (...args: unknown[]) => mockGetTranslationFunction(...args),

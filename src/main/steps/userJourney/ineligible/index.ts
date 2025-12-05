@@ -1,5 +1,5 @@
-import { createGetController } from '../../../app/controller/controllerFactory';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createGetController } from '../../../modules/steps';
 
 const stepName = 'ineligible';
 
