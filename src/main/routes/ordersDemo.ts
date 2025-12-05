@@ -15,8 +15,18 @@ interface OrdersDemoViewModel {
   caseTitle: string;
   claimantName: string;
   defendantName: string;
+  otherDefendants: string[];
+  defendants: string[];
   lastUpdated: string;
   lastUpdatedBy: string;
+  dateOfTenancy: string;
+  dateNoticeServed: string;
+  grounds: string;
+  arrearsOnIssue: string;
+  arrearsAtNotice: string;
+  arrearsAtHearing: string;
+  currentRent: string;
+  currentRentFrequency: 'month' | 'quarter' | 'year';
 }
 
 const keepOnlyCreateCaseNav = (html: string): string => {
@@ -62,6 +72,7 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
     };
   })();
   const footerShell = renderFooterShell({ assetBase: '/' });
+  const otherDefendants = ['Taylor', 'Patel'];
 
   return {
     themeName,
@@ -72,8 +83,18 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
     caseTitle: 'Smith v Jones',
     claimantName: 'Smith',
     defendantName: 'Jones',
+    otherDefendants,
+    defendants: ['Jones', ...otherDefendants],
     lastUpdated: '25/10/2025',
     lastUpdatedBy: 'DJ Daley',
+    dateOfTenancy: '01/05/2020',
+    dateNoticeServed: '15/09/2024',
+    grounds: '8, 10, 11',
+    arrearsOnIssue: '825.00',
+    arrearsAtNotice: '1100.00',
+    arrearsAtHearing: '1250.00',
+    currentRent: '550.00',
+    currentRentFrequency: 'month',
   };
 };
 
