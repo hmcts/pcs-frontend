@@ -1,0 +1,6 @@
+{
+  "question": "Enter your date of birth",
+  "errors": {
+    "dateOfBirth": "Enter your date of birth"
+  }
+}

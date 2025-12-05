@@ -7,66 +7,63 @@ import { step as postcodeFinder } from './respond-to-claim/postcode-finder';
 import { step as startNow } from './respond-to-claim/start-now';
 import { step as applicationSubmitted } from './userJourney/application-submitted';
 import { step as enterAddress } from './userJourney/enter-address';
+import { step as enterAge } from './userJourney/enter-age';
+import { step as enterDob } from './userJourney/enter-dob';
+import { step as enterGround } from './userJourney/enter-ground';
+import { step as enterOtherReason } from './userJourney/enter-other-reason';
 import { step as enterUserDetails } from './userJourney/enter-user-details';
 import { userJourneyFlowConfig } from './userJourney/flow.config';
+import { step as ineligible } from './userJourney/ineligible';
 import { step as summary } from './userJourney/summary';
 
+export interface JourneyConfig {
+  name: string;
+  flowConfig: JourneyFlowConfig;
+  stepRegistry: Record<string, StepDefinition>;
+}
+
+// User Journey step registry
 const userJourneyStepRegistry: Record<string, StepDefinition> = {
+  'enter-age': enterAge,
+  'enter-dob': enterDob,
+  'enter-ground': enterGround,
+  'enter-other-reason': enterOtherReason,
+  ineligible,
   'enter-user-details': enterUserDetails,
   'enter-address': enterAddress,
   summary,
   'application-submitted': applicationSubmitted,
 };
 
+// Respond to Claim step registry
 const respondToClaimStepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
   'postcode-finder': postcodeFinder,
   'free-legal-advice': freeLegalAdvice,
 };
 
-const allStepRegistries: Record<string, { config: JourneyFlowConfig; registry: Record<string, StepDefinition> }> = {
-  [userJourneyFlowConfig.basePath!]: {
-    config: userJourneyFlowConfig,
-    registry: userJourneyStepRegistry,
+// Journey registry - add new journeys here
+export const journeyRegistry: Record<string, JourneyConfig> = {
+  userJourney: {
+    name: 'userJourney',
+    flowConfig: userJourneyFlowConfig,
+    stepRegistry: userJourneyStepRegistry,
   },
-  [respondToClaimFlowConfig.basePath!]: {
-    config: respondToClaimFlowConfig,
-    registry: respondToClaimStepRegistry,
+  respondToClaim: {
+    name: 'respondToClaim',
+    flowConfig: respondToClaimFlowConfig,
+    stepRegistry: respondToClaimStepRegistry,
   },
 };
 
-export const stepsWithContent: StepDefinition[] = [
-  ...userJourneyFlowConfig.stepOrder
-    .map((stepName: string) => userJourneyStepRegistry[stepName])
-    .filter((step: StepDefinition | undefined): step is StepDefinition => step !== undefined),
-  ...respondToClaimFlowConfig.stepOrder
-    .map((stepName: string) => respondToClaimStepRegistry[stepName])
-    .filter((step: StepDefinition | undefined): step is StepDefinition => step !== undefined),
-];
-
-export const protectedSteps: StepDefinition[] = stepsWithContent.filter(step => {
-  const flowConfig = getFlowConfigForStep(step);
-  if (!flowConfig) {
-    return true;
+// Helper function to get steps for a specific journey
+export function getStepsForJourney(journeyName: string): StepDefinition[] {
+  const journey = journeyRegistry[journeyName];
+  if (!journey) {
+    return [];
   }
-  const stepConfig = flowConfig.steps[step.name];
-  return stepConfig?.requiresAuth !== false;
-});
 
-export function getFlowConfigForStep(step: StepDefinition): JourneyFlowConfig | null {
-  for (const [basePath, { config }] of Object.entries(allStepRegistries)) {
-    if (step.url.startsWith(basePath)) {
-      return config;
-    }
-  }
-  return null;
-}
-
-export function getStepRegistryForStep(step: StepDefinition): Record<string, StepDefinition> | null {
-  for (const [basePath, { registry }] of Object.entries(allStepRegistries)) {
-    if (step.url.startsWith(basePath)) {
-      return registry;
-    }
-  }
-  return null;
+  return journey.flowConfig.stepOrder
+    .map((stepName: string) => journey.stepRegistry[stepName])
+    .filter((step: StepDefinition | undefined): step is StepDefinition => step !== undefined);
 }

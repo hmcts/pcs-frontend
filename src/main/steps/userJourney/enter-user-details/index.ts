@@ -1,71 +1,55 @@
 import type { Request } from 'express';
 
-import { createGetController, createPostController } from '../../../app/controller/controllerFactory';
-import { getFormData } from '../../../app/controller/formHelpers';
-import { type TranslationContent, createGenerateContent } from '../../../app/utils/i18n';
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createFormStep } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
-const stepName = 'enter-user-details';
-const generateContent = createGenerateContent(stepName, 'userJourney');
-
-const getFields = (t: TranslationContent = {}): FormFieldConfig[] => {
-  const errors = (t.errors as Record<string, string>) || {};
-  return [
+export const step: StepDefinition = createFormStep({
+  stepName: 'enter-user-details',
+  journeyFolder: 'userJourney',
+  stepDir: __dirname,
+  fields: [
     {
       name: 'applicantForename',
       type: 'text',
       required: true,
-      errorMessage: errors.firstName,
+      translationKey: {
+        label: 'firstNameLabel', // Uses 'firstNameLabel' from enterUserDetails.json
+      },
+      attributes: {
+        maxlength: 50,
+      },
     },
     {
       name: 'applicantSurname',
       type: 'text',
       required: true,
-      errorMessage: errors.lastName,
+      translationKey: {
+        label: 'lastNameLabel', // Uses 'lastNameLabel' from enterUserDetails.json
+      },
+      attributes: {
+        maxlength: 50,
+      },
     },
-  ];
-};
+  ],
+  beforeRedirect: async (req: Request) => {
+    const ccdCase = req.session.ccdCase;
+    const user = req.session.user;
 
-export const step: StepDefinition = {
-  url: '/steps/user-journey/enter-user-details',
-  name: stepName,
-  view: 'steps/userJourney/enterUserDetails.njk',
-  stepDir: __dirname,
-  generateContent,
-  getController: () => {
-    return createGetController('steps/userJourney/enterUserDetails.njk', stepName, generateContent, (req, _content) => {
-      const savedData = getFormData(req, stepName);
-      return {
-        ...savedData,
-      };
-    });
-  },
-  postController: createPostController(
-    stepName,
-    generateContent,
-    getFields,
-    'steps/userJourney/enterUserDetails.njk',
-    async (req: Request) => {
-      const ccdCase = req.session.ccdCase;
-      const user = req.session.user;
-
-      if (ccdCase?.id) {
-        req.session.ccdCase = await ccdCaseService.updateCase(user?.accessToken, {
-          id: ccdCase.id,
-          data: {
-            ...ccdCase.data,
-            applicantForename: req.body.applicantForename,
-            applicantSurname: req.body.applicantSurname,
-          },
-        });
-      } else {
-        req.session.ccdCase = await ccdCaseService.createCase(user?.accessToken, {
+    if (ccdCase?.id) {
+      req.session.ccdCase = await ccdCaseService.updateCase(user?.accessToken, {
+        id: ccdCase.id,
+        data: {
+          ...ccdCase.data,
           applicantForename: req.body.applicantForename,
           applicantSurname: req.body.applicantSurname,
-        });
-      }
+        },
+      });
+    } else {
+      req.session.ccdCase = await ccdCaseService.createCase(user?.accessToken, {
+        applicantForename: req.body.applicantForename,
+        applicantSurname: req.body.applicantSurname,
+      });
     }
-  ),
-};
+  },
+});

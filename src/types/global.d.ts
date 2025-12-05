@@ -41,6 +41,9 @@ declare module 'express-session' {
 declare module 'express' {
   interface Request {
     session: Session & CustomSessionData;
+    i18n?: import('i18next').i18n;
+    t?: import('i18next').TFunction;
+    language: string;
   }
 
   interface Application {

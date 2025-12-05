@@ -109,7 +109,11 @@ export const ccdCaseService = {
       }
       if (axiosError.response?.status === 400) {
         logger.warn(
-          `[ccdCaseService] Bad request (400) when searching for cases. Response: ${JSON.stringify(axiosError.response?.data, null, 2)}`
+          `[ccdCaseService] Bad request (400) when searching for cases. Response: ${JSON.stringify(
+            axiosError.response?.data,
+            null,
+            2
+          )}`
         );
         // Return null instead of throwing - the case might have been submitted or the API format might have changed
         return null;

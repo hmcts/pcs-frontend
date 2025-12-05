@@ -9,12 +9,12 @@ jest.mock('@hmcts/nodejs-logging', () => ({
   },
 }));
 
-jest.mock('../../../main/app/utils/i18n', () => ({
+jest.mock('../../../main/modules/steps/i18n', () => ({
   getValidatedLanguage: jest.fn(() => 'en'),
 }));
 
 const mockStepDependencyCheck = jest.fn((req, res, next) => next());
-jest.mock('../../../main/app/utils/stepFlow', () => ({
+jest.mock('../../../main/modules/steps/flow', () => ({
   stepDependencyCheckMiddleware: jest.fn(() => mockStepDependencyCheck),
 }));
 
@@ -23,8 +23,9 @@ jest.mock('../../../main/middleware', () => ({
   ccdCaseMiddleware: jest.fn((req, res, next) => next()),
 }));
 
-const mockUserJourneyFlowConfig = {
-  basePath: '/steps',
+const mockFlowConfig = {
+  basePath: '/steps/user-journey',
+  stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
   steps: {
     'protected-step': { requiresAuth: true },
     'unprotected-step': { requiresAuth: false },
@@ -34,9 +35,11 @@ const mockUserJourneyFlowConfig = {
 };
 
 jest.mock('../../../main/steps/userJourney/flow.config', () => ({
-  userJourneyFlowConfig: mockUserJourneyFlowConfig,
+  userJourneyFlowConfig: mockFlowConfig,
 }));
 
+// Create step objects that will be shared between mock and tests
+// These are defined before jest.mock so they're available when the mock factory runs
 const protectedStep = {
   url: '/steps/protected',
   name: 'protected-step',
@@ -66,32 +69,51 @@ const stepWithMiddleware = {
   middleware: [jest.fn((req, res, next) => next())],
 };
 
+const allSteps = [protectedStep, unprotectedStep, stepWithFunctionController, stepWithMiddleware];
+
+jest.mock('../../../main/steps', () => ({
+  journeyRegistry: {
+    userJourney: {
+      name: 'userJourney',
+      flowConfig: {
+        basePath: '/steps/user-journey',
+        stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
+        steps: {
+          'protected-step': { requiresAuth: true },
+          'unprotected-step': { requiresAuth: false },
+          'function-controller-step': { requiresAuth: true },
+          'middleware-step': { requiresAuth: true },
+        },
+      },
+      stepRegistry: {
+        'protected-step': protectedStep,
+        'unprotected-step': unprotectedStep,
+        'function-controller-step': stepWithFunctionController,
+        'middleware-step': stepWithMiddleware,
+      },
+    },
+  },
+  getStepsForJourney: jest.fn((journeyName: string) => {
+    if (journeyName === 'userJourney') {
+      return allSteps;
+    }
+    return [];
+  }),
+}));
+
+// Export step objects for use in tests
 const mockStepsData = {
   protectedStep,
   unprotectedStep,
   stepWithFunctionController,
   stepWithMiddleware,
-  allSteps: [protectedStep, unprotectedStep, stepWithFunctionController, stepWithMiddleware],
-  protectedSteps: [protectedStep],
+  allSteps,
 };
-
-jest.mock('../../../main/steps', () => ({
-  stepsWithContent: mockStepsData.allSteps,
-  protectedSteps: mockStepsData.protectedSteps,
-  getFlowConfigForStep: jest.fn(_step => ({
-    steps: {
-      'protected-step': { requiresAuth: true },
-      'unprotected-step': { requiresAuth: false },
-      'function-controller-step': { requiresAuth: true },
-      'middleware-step': { requiresAuth: true },
-    },
-  })),
-}));
 
 import { Application } from 'express';
 
-import { getValidatedLanguage } from '../../../main/app/utils/i18n';
 import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
+import { getValidatedLanguage } from '../../../main/modules/steps';
 import registerSteps from '../../../main/routes/registerSteps';
 
 describe('registerSteps', () => {
@@ -224,6 +246,7 @@ describe('registerSteps', () => {
     expect(mockLogger.debug).toHaveBeenCalledWith('Language information', {
       url: '/steps/unprotected',
       step: 'unprotected-step',
+      journey: 'userJourney',
       validatedLang: 'en',
       reqLanguage: 'en',
       langCookie: 'en',
@@ -238,8 +261,9 @@ describe('registerSteps', () => {
     registerSteps(app);
 
     expect(mockLogger.info).toHaveBeenCalledWith('Steps registered successfully', {
+      totalJourneys: 1,
       totalSteps: 4,
-      protectedSteps: 3, // protected-step, function-controller-step, middleware-step (unprotected-step has requiresAuth: false)
+      totalProtectedSteps: 3, // protected-step, function-controller-step, middleware-step (unprotected-step has requiresAuth: false)
     });
   });
 
@@ -249,19 +273,28 @@ describe('registerSteps', () => {
       post: jest.fn(),
     } as unknown as Application;
 
+    const stepWithoutControllers = {
+      url: '/steps/no-controllers',
+      name: 'no-controllers',
+    };
+
     jest.doMock('../../../main/steps', () => ({
-      stepsWithContent: [
-        {
-          url: '/steps/no-controllers',
-          name: 'no-controllers',
+      journeyRegistry: {
+        userJourney: {
+          name: 'userJourney',
+          flowConfig: {
+            basePath: '/steps/user-journey',
+            stepOrder: ['no-controllers'],
+            steps: {
+              'no-controllers': { requiresAuth: true },
+            },
+          },
+          stepRegistry: {
+            'no-controllers': stepWithoutControllers,
+          },
         },
-      ],
-      protectedSteps: [],
-      getFlowConfigForStep: jest.fn(() => ({
-        steps: {
-          'no-controllers': { requiresAuth: true },
-        },
-      })),
+      },
+      getStepsForJourney: jest.fn(() => [stepWithoutControllers]),
     }));
 
     jest.resetModules();
