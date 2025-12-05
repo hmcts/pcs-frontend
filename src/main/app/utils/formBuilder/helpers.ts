@@ -4,11 +4,6 @@ import type { TFunction } from 'i18next';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepFormData } from '../../../interfaces/stepFormData.interface';
 
-export function getLanguage(req: Request): string {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (req as any).language || 'en';
-}
-
 export function getTranslation(t: TFunction, key: string, fallback?: string): string | undefined {
   const translation = t(key);
   return translation !== key ? translation : fallback;

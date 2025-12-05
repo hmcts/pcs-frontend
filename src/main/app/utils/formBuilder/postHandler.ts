@@ -2,13 +2,13 @@ import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
-import { getStepNamespace, loadStepNamespace } from '../i18n';
+import { getRequestLanguage, getTranslationFunction, loadStepNamespace } from '../i18n';
 import { DASHBOARD_ROUTE, getDashboardUrl } from '../routes';
 import { stepNavigation } from '../stepFlow';
 
 import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';
-import { getLanguage, getTranslationErrors, processFieldData, setFormData, validateForm } from './helpers';
+import { getTranslationErrors, processFieldData, setFormData, validateForm } from './helpers';
 
 export function createPostHandler(
   fields: FormFieldConfig[],
@@ -22,22 +22,14 @@ export function createPostHandler(
     post: async (req: Request, res: Response) => {
       await loadStepNamespace(req, stepName, journeyFolder);
 
-      const lang = getLanguage(req);
-      const t: TFunction =
-        req.i18n?.getFixedT(lang, [getStepNamespace(stepName), 'common']) || req.t || ((key: string) => key);
+      const lang = getRequestLanguage(req);
+      const t: TFunction = getTranslationFunction(req, stepName, ['common']);
       const action = req.body.action as string | undefined;
-
-      if (action === 'saveForLater') {
-        processFieldData(req, fields);
-        const bodyWithoutAction = { ...req.body };
-        delete bodyWithoutAction.action;
-        setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, getDashboardUrl(req.session?.ccdCase?.id));
-      }
 
       const fieldsWithLabels = translateFields(fields, t, {}, undefined, false);
       const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fieldsWithLabels));
 
+      // If there are validation errors, show them regardless of action
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
         const error = { field: firstField, text: errors[firstField] };
@@ -46,6 +38,8 @@ export function createPostHandler(
         return res.status(400).render(viewPath, {
           ...formContent,
           error,
+          stepName,
+          journeyFolder,
           backUrl: stepNavigation.getBackUrl(req, stepName),
           lang,
           pageUrl: req.originalUrl || '/',
@@ -54,6 +48,15 @@ export function createPostHandler(
           dashboardRoute: DASHBOARD_ROUTE,
           languageToggle: t('languageToggle'),
         });
+      }
+
+      // Handle saveForLater action after validation passes
+      if (action === 'saveForLater') {
+        processFieldData(req, fields);
+        const bodyWithoutAction = { ...req.body };
+        delete bodyWithoutAction.action;
+        setFormData(req, stepName, bodyWithoutAction);
+        return res.redirect(303, getDashboardUrl(req.session?.ccdCase?.id));
       }
 
       processFieldData(req, fields);

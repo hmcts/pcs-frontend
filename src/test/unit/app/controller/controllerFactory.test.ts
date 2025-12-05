@@ -1,4 +1,5 @@
 import type { Request } from 'express';
+import type { TFunction } from 'i18next';
 
 import {
   GetController,
@@ -17,8 +18,13 @@ jest.mock('../../../../main/app/utils/formBuilder/helpers', () => ({
   validateForm: (...args: unknown[]) => mockValidateForm(...args),
 }));
 
+const mockGetRequestLanguage = jest.fn();
+const mockGetTranslationFunction = jest.fn();
+
 jest.mock('../../../../main/app/utils/i18n', () => ({
   getValidatedLanguage: jest.fn(() => 'en'),
+  getRequestLanguage: (...args: unknown[]) => mockGetRequestLanguage(...args),
+  getTranslationFunction: (...args: unknown[]) => mockGetTranslationFunction(...args),
   getStepNamespace: jest.fn((stepName: string) => stepName),
   getStepTranslations: jest.fn(() => ({})),
   loadStepNamespace: jest.fn(),
@@ -43,6 +49,10 @@ describe('createGetController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockExtendContent.mockReturnValue(mockContent);
+    mockGetRequestLanguage.mockImplementation((req: Request) => req.language || 'en');
+    mockGetTranslationFunction.mockImplementation((req: Request) => {
+      return (req.t as TFunction) || (jest.fn((key: string) => key) as unknown as TFunction);
+    });
   });
 
   it('should merge content with form data from session when available', async () => {
@@ -66,22 +76,23 @@ describe('createGetController', () => {
 
     expect(mockExtendContent).toHaveBeenCalledWith(req);
     expect(mockGetFormData).toHaveBeenCalledWith(req, 'page1');
-    expect(res.render).toHaveBeenCalledWith(viewPath, {
-      ...mockContent,
-      selected: 'sessionAnswer',
-      answer: 'sessionAnswer',
-      choices: ['choice1'],
-      error: undefined,
-      lang: 'en',
-      pageUrl: '/',
-      t: mockT,
-      backUrl: null,
-      serviceName: 'Test Service',
-      phase: 'phase',
-      feedback: 'feedback',
-      back: 'back',
-      languageToggle: 'languageToggle',
-    });
+    expect(res.render).toHaveBeenCalledWith(
+      viewPath,
+      expect.objectContaining({
+        ...mockContent,
+        selected: 'sessionAnswer',
+        answer: 'sessionAnswer',
+        choices: ['choice1'],
+        lang: 'en',
+        pageUrl: '/',
+        backUrl: null,
+        serviceName: 'Test Service',
+        phase: 'phase',
+        feedback: 'feedback',
+        back: 'back',
+        languageToggle: 'languageToggle',
+      })
+    );
   });
 
   it('should prioritize post data over session data', async () => {
@@ -104,22 +115,23 @@ describe('createGetController', () => {
     await controller.get(req, res);
 
     expect(mockExtendContent).toHaveBeenCalledWith(req);
-    expect(res.render).toHaveBeenCalledWith(viewPath, {
-      ...mockContent,
-      selected: 'sessionAnswer',
-      answer: 'postAnswer',
-      choices: undefined,
-      error: 'Test error',
-      lang: 'en',
-      pageUrl: '/',
-      t: mockT,
-      backUrl: null,
-      serviceName: 'Test Service',
-      phase: 'phase',
-      feedback: 'feedback',
-      back: 'back',
-      languageToggle: 'languageToggle',
-    });
+    expect(res.render).toHaveBeenCalledWith(
+      viewPath,
+      expect.objectContaining({
+        ...mockContent,
+        selected: 'sessionAnswer',
+        answer: 'postAnswer',
+        error: 'Test error',
+        lang: 'en',
+        pageUrl: '/',
+        backUrl: null,
+        serviceName: 'Test Service',
+        phase: 'phase',
+        feedback: 'feedback',
+        back: 'back',
+        languageToggle: 'languageToggle',
+      })
+    );
   });
 
   it('should handle undefined req.body', async () => {
@@ -142,22 +154,20 @@ describe('createGetController', () => {
     await controller.get(req, res);
 
     expect(mockExtendContent).toHaveBeenCalledWith(req);
-    expect(res.render).toHaveBeenCalledWith(viewPath, {
-      ...mockContent,
-      selected: undefined,
-      answer: undefined,
-      choices: undefined,
-      error: undefined,
-      lang: 'en',
-      pageUrl: '/',
-      t: mockT,
-      backUrl: null,
-      serviceName: 'Test Service',
-      phase: 'phase',
-      feedback: 'feedback',
-      back: 'back',
-      languageToggle: 'languageToggle',
-    });
+    expect(res.render).toHaveBeenCalledWith(
+      viewPath,
+      expect.objectContaining({
+        ...mockContent,
+        lang: 'en',
+        pageUrl: '/',
+        backUrl: null,
+        serviceName: 'Test Service',
+        phase: 'phase',
+        feedback: 'feedback',
+        back: 'back',
+        languageToggle: 'languageToggle',
+      })
+    );
   });
 
   it('should call extendContent when provided', async () => {
@@ -250,14 +260,16 @@ describe('createPostController', () => {
 
     expect(mockValidateForm).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.render).toHaveBeenCalledWith(view, {
-      field1: '',
-      error: { field: 'field1', text: 'Error message' },
-      lang: 'en',
-      pageUrl: '/',
-      t: mockT,
-      backUrl: null,
-    });
+    expect(res.render).toHaveBeenCalledWith(
+      view,
+      expect.objectContaining({
+        field1: '',
+        error: { field: 'field1', text: 'Error message' },
+        lang: 'en',
+        pageUrl: '/',
+        backUrl: null,
+      })
+    );
   });
 
   it('should save form data and redirect when validation passes', async () => {

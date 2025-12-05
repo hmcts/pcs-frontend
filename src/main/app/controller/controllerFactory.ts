@@ -5,7 +5,7 @@ import type { TFunction } from 'i18next';
 import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
 import { getFormData, setFormData, validateForm } from '../utils/formBuilder/helpers';
-import { getStepNamespace, getStepTranslations, getValidatedLanguage, loadStepNamespace } from '../utils/i18n';
+import { getRequestLanguage, getStepTranslations, getTranslationFunction, loadStepNamespace } from '../utils/i18n';
 import { stepNavigation } from '../utils/stepFlow';
 
 const logger = Logger.getLogger('controllerFactory');
@@ -44,22 +44,18 @@ export const createGetController = (
 
     const formData = getFormData(req, stepName);
     const postData = req.body || {};
-    const lang = getValidatedLanguage(req);
+    const lang = getRequestLanguage(req);
 
-    const reqLang = req.language || 'en';
-    let t: TFunction = req.t || ((key: string) => key);
-
-    if (journeyFolder && req.i18n) {
-      const stepNamespace = getStepNamespace(stepName);
-      t = req.i18n.getFixedT(reqLang, [stepNamespace, 'common']) || t;
-    }
+    const t: TFunction = journeyFolder
+      ? getTranslationFunction(req, stepName, ['common'])
+      : getTranslationFunction(req);
 
     req.t = t;
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
 
     const stepTranslations = journeyFolder ? getStepTranslations(req, stepName) : {};
-    const commonTranslations = req.i18n?.getResourceBundle(reqLang, 'common') || {};
+    const commonTranslations = req.i18n?.getResourceBundle(lang, 'common') || {};
     const commonContent: Record<string, unknown> = {};
     for (const key of ['change', 'buttons']) {
       if (commonTranslations[key]) {
@@ -120,13 +116,10 @@ export const createPostController = (
         }
       }
 
-      const reqLang = req.language || 'en';
-      let t: TFunction = req.t || ((key: string) => key);
-
-      if (journeyFolder && req.i18n) {
-        const stepNamespace = getStepNamespace(stepName);
-        t = req.i18n.getFixedT(reqLang, [stepNamespace, 'common']) || t;
-      }
+      const reqLang = getRequestLanguage(req);
+      const t: TFunction = journeyFolder
+        ? getTranslationFunction(req, stepName, ['common'])
+        : getTranslationFunction(req);
 
       const fields = getFields(t);
       const errors = validateForm(req, fields);

@@ -3,12 +3,12 @@ import type { TFunction } from 'i18next';
 import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController } from '../../controller/controllerFactory';
-import { getStepNamespace, loadStepNamespace } from '../i18n';
+import { getTranslationFunction, loadStepNamespace } from '../i18n';
 import { DASHBOARD_ROUTE } from '../routes';
 import { stepNavigation } from '../stepFlow';
 
 import { buildFormContent } from './formContent';
-import { getFormData, getLanguage } from './helpers';
+import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
 
 export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
@@ -28,9 +28,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       return createGetController(viewPath, stepName, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
 
-        const lang = getLanguage(req);
-        const t: TFunction =
-          req.i18n?.getFixedT(lang, [getStepNamespace(stepName), 'common']) || req.t || ((key: string) => key);
+        const t: TFunction = getTranslationFunction(req, stepName, ['common']);
 
         const formContent = buildFormContent(fields, t, getFormData(req, stepName), undefined, translationKeys);
         const result = extendGetContent ? { ...formContent, ...extendGetContent(req, {}) } : formContent;

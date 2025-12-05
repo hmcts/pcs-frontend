@@ -20,7 +20,6 @@ jest.mock('../../../../main/app/utils/formBuilder/helpers', () => ({
   getFormData: (...args: unknown[]) => mockGetFormData(...args),
   setFormData: (...args: unknown[]) => mockSetFormData(...args),
   validateForm: (...args: unknown[]) => mockValidateForm(...args),
-  getLanguage: jest.fn((req: Request) => req.language || 'en'),
   getTranslation: jest.fn((t: (key: string) => string, key: string, fallback?: string) => {
     const translation = t(key);
     return translation !== key ? translation : fallback;
@@ -58,9 +57,13 @@ jest.mock('../../../../main/app/utils/stepFlow', () => ({
 }));
 
 const mockGetValidatedLanguage = jest.fn();
+const mockGetRequestLanguage = jest.fn();
+const mockGetTranslationFunction = jest.fn();
 
 jest.mock('../../../../main/app/utils/i18n', () => ({
   getValidatedLanguage: (...args: unknown[]) => mockGetValidatedLanguage(...args),
+  getRequestLanguage: (...args: unknown[]) => mockGetRequestLanguage(...args),
+  getTranslationFunction: (...args: unknown[]) => mockGetTranslationFunction(...args),
   getStepNamespace: jest.fn((stepName: string) => stepName),
   loadStepNamespace: jest.fn(),
   getStepTranslations: jest.fn(() => ({})),
@@ -119,12 +122,14 @@ describe('formBuilder', () => {
 
   const createMockRequest = (overrides: Partial<Request> = {}): Request => {
     const defaultT = createMockT();
+    const defaultI18n = createMockI18n(defaultT);
     return {
       session: { formData: {} },
       language: 'en',
       t: defaultT,
-      i18n: createMockI18n(defaultT),
       ...overrides,
+      // Ensure i18n is always set even if overrides don't include it
+      i18n: (overrides.i18n ?? defaultI18n) as import('i18next').i18n,
     } as unknown as Request;
   };
 
@@ -145,6 +150,10 @@ describe('formBuilder', () => {
     mockGetNextStepUrl.mockReturnValue('/steps/test-journey/next-step');
     mockGetBackUrl.mockReturnValue('/steps/test-journey/previous-step');
     mockGetValidatedLanguage.mockReturnValue('en' as const);
+    mockGetRequestLanguage.mockImplementation((req: Request) => req.language || 'en');
+    mockGetTranslationFunction.mockImplementation((req: Request) => {
+      return (req.t as TFunction) || jest.fn((key: string) => key);
+    });
   });
 
   describe('createFormStep', () => {
@@ -817,8 +826,10 @@ describe('formBuilder', () => {
 
     describe('postController', () => {
       it('should handle saveForLater action', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
         const step = createFormStep(baseConfig);
-        const req = {
+        const req = createMockRequest({
           body: {
             action: 'saveForLater',
             testField: 'value',
@@ -826,19 +837,25 @@ describe('formBuilder', () => {
           session: {
             ccdCase: { id: '123' },
           },
-        } as unknown as Request;
+        } as unknown as Request);
         const res = {
           redirect: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
         expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/123');
       });
 
       it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
         const step = createFormStep(baseConfig);
         const req = createMockRequest({
           body: {
@@ -851,12 +868,56 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1');
       });
 
+      it('should show validation errors when saveForLater is clicked with invalid data', async () => {
+        mockValidateForm.mockReturnValueOnce({ testField: 'This field is required' });
+
+        const step = createFormStep(baseConfig);
+        const req = createMockRequest({
+          body: {
+            action: 'saveForLater',
+            testField: '',
+          },
+          session: {
+            ccdCase: { id: '123' },
+          },
+          originalUrl: '/test-url',
+        } as unknown as Request);
+        const res = {
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
+          redirect: jest.fn(),
+        } as unknown as Response;
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.render).toHaveBeenCalledWith(
+          'formBuilder.njk',
+          expect.objectContaining({
+            error: { field: 'testField', text: 'This field is required' },
+            ccdId: '123',
+          })
+        );
+        expect(res.redirect).not.toHaveBeenCalled();
+      });
+
       it('should normalize checkbox field for saveForLater', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
         const config: FormBuilderConfig = {
           ...baseConfig,
           fields: [
@@ -878,12 +939,18 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { checkboxField: ['option1'] });
       });
 
       it('should normalize date field for saveForLater', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
         const config: FormBuilderConfig = {
           ...baseConfig,
           fields: [
@@ -907,7 +974,11 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', {
           dateField: { day: '01', month: '02', year: '2023' },
@@ -934,7 +1005,11 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.render).toHaveBeenCalledWith(
@@ -970,7 +1045,11 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { checkboxField: ['option1'] });
       });
@@ -1001,7 +1080,11 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', {
           dateField: { day: '01', month: '02', year: '2023' },
@@ -1029,7 +1112,11 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(beforeRedirect).toHaveBeenCalledWith(req);
       });
@@ -1055,7 +1142,11 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(beforeRedirect).toHaveBeenCalledWith(req);
         expect(res.redirect).not.toHaveBeenCalled();
@@ -1076,7 +1167,11 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(res.redirect).toHaveBeenCalledWith(303, '/steps/test-journey/next-step');
       });
@@ -1099,7 +1194,11 @@ describe('formBuilder', () => {
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
-        await step.postController!.post(req, res, jest.fn());
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
 
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.send).toHaveBeenCalledWith('Unable to determine next step');
