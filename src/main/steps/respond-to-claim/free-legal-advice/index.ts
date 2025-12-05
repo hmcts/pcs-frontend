@@ -1,23 +1,25 @@
 import type { Request, Response } from 'express';
 
 import { createGetController } from '../../../app/controller/controllerFactory';
-import { createGenerateContent } from '../../../app/utils/i18n';
 import { createStepNavigation } from '../../../app/utils/stepFlow';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { respondToClaimFlowConfig } from '../flow.config';
 
 const stepName = 'free-legal-advice';
-const generateContent = createGenerateContent(stepName, 'respondToClaim');
 const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
 
 export const step: StepDefinition = {
   url: '/respond-to-claim/free-legal-advice',
   name: stepName,
-  view: 'steps/respondToClaim/freeLegalAdvice.njk',
+  view: 'respond-to-claim/free-legal-advice/freeLegalAdvice.njk',
   stepDir: __dirname,
-  generateContent,
   getController: () => {
-    return createGetController('steps/respondToClaim/freeLegalAdvice.njk', stepName, generateContent);
+    return createGetController(
+      'respond-to-claim/free-legal-advice/freeLegalAdvice.njk',
+      stepName,
+      undefined,
+      'respondToClaim'
+    );
   },
   postController: {
     post: async (req: Request, res: Response) => {

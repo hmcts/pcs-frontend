@@ -853,7 +853,7 @@ describe('formBuilder', () => {
         expect(step.postController?.post).toBeDefined();
         await step.postController!.post(req, res, jest.fn());
 
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1');
       });
 
       it('should normalize checkbox field for saveForLater', async () => {
