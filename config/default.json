@@ -7,8 +7,14 @@
   "use-ssl": false,
   "session": {
     "prefix": "pcs-session",
-    "ttlInSeconds": 1200,
-    "cookieName": "pcs_session"
+    "cookieName": "pcs_session",
+    "redis": {
+      "ttlInSeconds": 5400
+    },
+    "timeout": {
+      "idleModalDisplayTime": 1,
+      "totalIdleTime": 2
+    }
   },
   "health": {
     "timeout": 10000,

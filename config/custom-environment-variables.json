@@ -24,7 +24,13 @@
   "use-ssl": "USE_SSL",
   "session": {
     "prefix": "REDIS_SESSION_PREFIX",
-    "ttlInSeconds": "REDIS_TTL"
+    "redis": {
+      "ttlInSeconds": "REDIS_TTL"
+    },
+    "timeout": {
+      "idleModalDisplayTime": "SESSION_IDLE_MODAL_DISPLAY_TIME",
+      "totalIdleTime": "SESSION_TOTAL_IDLE_TIME"
+    }
   },
   "s2s": {
     "url": "S2S_URL",
