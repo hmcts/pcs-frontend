@@ -105,9 +105,9 @@
     top: 0px;
     z-index: 3;
     background: #f3f2f1;
-    padding-top: 6px;
-    padding-bottom: 10px;
+    padding: 6px 16px 10px 16px;
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+    margin: 0 -16px;
   }
 
   .orders-demo__section {
