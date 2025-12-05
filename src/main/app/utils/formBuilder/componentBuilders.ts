@@ -2,31 +2,6 @@ import type { TFunction } from 'i18next';
 
 import type { ComponentConfig, ComponentType, FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 
-function getCharacterCountTranslations(t: TFunction):
-  | {
-      charactersUnderLimitText?: { one: string; other: string };
-      charactersAtLimitText?: string;
-      charactersOverLimitText?: { one: string; other: string };
-    }
-  | undefined {
-  try {
-    const characterCount = t('characterCount', { returnObjects: true }) as Record<string, unknown> | string;
-
-    // If t() returns a string (key not found), return undefined
-    if (typeof characterCount === 'string' || !characterCount) {
-      return undefined;
-    }
-
-    return {
-      charactersUnderLimitText: characterCount.charactersUnderLimitText as { one: string; other: string } | undefined,
-      charactersAtLimitText: characterCount.charactersAtLimitText as string | undefined,
-      charactersOverLimitText: characterCount.charactersOverLimitText as { one: string; other: string } | undefined,
-    };
-  } catch {
-    return undefined;
-  }
-}
-
 function createFieldsetLegend(
   label: string,
   isFirstField: boolean
@@ -92,18 +67,16 @@ export function buildComponentConfig(
       };
 
       // Add translated character count messages
+      // i18next handles pluralization via the 'one' and 'other' keys in the translation object
+      // The GOV.UK component will use these keys to select the correct plural form
       if (field.maxLength) {
-        const characterCountTranslations = getCharacterCountTranslations(t);
-        if (characterCountTranslations) {
-          if (characterCountTranslations.charactersUnderLimitText) {
-            component.charactersUnderLimitText = characterCountTranslations.charactersUnderLimitText;
-          }
-          if (characterCountTranslations.charactersAtLimitText) {
-            component.charactersAtLimitText = characterCountTranslations.charactersAtLimitText;
-          }
-          if (characterCountTranslations.charactersOverLimitText) {
-            component.charactersOverLimitText = characterCountTranslations.charactersOverLimitText;
-          }
+        const characterCount = t('characterCount', { returnObjects: true }) as Record<string, unknown> | string;
+        if (characterCount && typeof characterCount === 'object') {
+          Object.assign(component, {
+            charactersUnderLimitText: characterCount.charactersUnderLimitText,
+            charactersAtLimitText: characterCount.charactersAtLimitText,
+            charactersOverLimitText: characterCount.charactersOverLimitText,
+          });
         }
       }
 
@@ -151,21 +124,21 @@ export function buildComponentConfig(
       component.items = [
         {
           name: 'day',
-          label: t('date.day') || 'Day',
+          label: t('date.day', 'Day'),
           value: dateValue.day || '',
           classes: 'govuk-input--width-2',
           attributes: { maxlength: 2, inputmode: 'numeric' },
         },
         {
           name: 'month',
-          label: t('date.month') || 'Month',
+          label: t('date.month', 'Month'),
           value: dateValue.month || '',
           classes: 'govuk-input--width-2',
           attributes: { maxlength: 2, inputmode: 'numeric' },
         },
         {
           name: 'year',
-          label: t('date.year') || 'Year',
+          label: t('date.year', 'Year'),
           value: dateValue.year || '',
           classes: 'govuk-input--width-4',
           attributes: { maxlength: 4, inputmode: 'numeric' },

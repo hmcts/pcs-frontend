@@ -20,17 +20,17 @@ const getFields = (t: TFunction): FormFieldConfig[] => {
       name: 'addressLine1',
       type: 'text',
       required: true,
-      errorMessage: t('errors.addressLine1') || 'Enter address line 1',
+      errorMessage: t('errors.addressLine1', 'Enter address line 1'),
     },
     { name: 'addressLine2', type: 'text', required: false },
     { name: 'addressLine3', type: 'text', required: false },
-    { name: 'town', type: 'text', required: true, errorMessage: t('errors.town') || 'Enter the town or city' },
+    { name: 'town', type: 'text', required: true, errorMessage: t('errors.town', 'Enter the town or city') },
     { name: 'county', type: 'text', required: false },
     {
       name: 'postcode',
       type: 'text',
       required: true,
-      errorMessage: t('errors.postcode') || 'Enter the valid postcode',
+      errorMessage: t('errors.postcode', 'Enter the valid postcode'),
       pattern: partialUkPostcodePattern.source,
     },
     { name: 'country', type: 'text', required: false },
@@ -80,7 +80,7 @@ export const step: StepDefinition = {
           req.session.lookupPostcode = lookupPostcode;
           req.session.lookupError = {
             field: 'lookupPostcode',
-            text: t('errors.invalidPostcode') || 'Enter a valid or partial UK postcode',
+            text: t('errors.invalidPostcode', 'Enter a valid or partial UK postcode'),
           };
           return res.redirect(303, `${enterAddressPath}?lookup=1`);
         }
@@ -92,7 +92,7 @@ export const step: StepDefinition = {
             req.session.lookupPostcode = lookupPostcode;
             req.session.lookupError = {
               field: 'lookupPostcode',
-              text: t('errors.noAddressesFound') || 'No addresses found for that postcode',
+              text: t('errors.noAddressesFound', 'No addresses found for that postcode'),
             };
 
             return res.redirect(303, `${enterAddressPath}?lookup=1`);
@@ -105,7 +105,7 @@ export const step: StepDefinition = {
           req.session.lookupPostcode = lookupPostcode;
           req.session.lookupError = {
             field: 'lookupPostcode',
-            text: t('errors.addressLookupFailed') || 'There was a problem finding addresses. Please try again.',
+            text: t('errors.addressLookupFailed', 'There was a problem finding addresses. Please try again.'),
           };
           return res.redirect(303, `${enterAddressPath}?lookup=1`);
         }
