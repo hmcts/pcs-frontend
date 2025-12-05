@@ -99,14 +99,6 @@ jest.mock('../../../main/steps', () => ({
     }
     return [];
   }),
-  stepsWithContent: allSteps,
-  protectedSteps: [protectedStep],
-  getFlowConfigForStep: jest.fn((step: { url: string }) => {
-    if (step.url.startsWith('/steps')) {
-      return mockFlowConfig;
-    }
-    return null;
-  }),
 }));
 
 // Export step objects for use in tests
@@ -116,7 +108,6 @@ const mockStepsData = {
   stepWithFunctionController,
   stepWithMiddleware,
   allSteps,
-  protectedSteps: [protectedStep],
 };
 
 import { Application } from 'express';
@@ -304,9 +295,6 @@ describe('registerSteps', () => {
         },
       },
       getStepsForJourney: jest.fn(() => [stepWithoutControllers]),
-      stepsWithContent: [stepWithoutControllers],
-      protectedSteps: [],
-      getFlowConfigForStep: jest.fn(() => null),
     }));
 
     jest.resetModules();
