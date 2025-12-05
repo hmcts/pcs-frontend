@@ -265,7 +265,8 @@
   }
 
   .orders-demo__party-table {
-    max-width: 820px;
+    width: 100%;
+    max-width: 1100px;
     font-size: 15px;
     margin-left: 0;
 
@@ -286,6 +287,11 @@
 
     .govuk-radios__label {
       margin-left: 4px;
+    }
+
+    .orders-demo__party-name-input {
+      max-width: none;
+      width: 100%;
     }
   }
 

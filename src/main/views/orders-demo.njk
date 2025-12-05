@@ -131,6 +131,7 @@
                 <th scope="col" class="govuk-table__header">S/A</th>
                 <th scope="col" class="govuk-table__header">H/O Rep</th>
                 <th scope="col" class="govuk-table__header">Not present</th>
+                <th scope="col" class="govuk-table__header">Name</th>
               </tr>
             </thead>
             <tbody class="govuk-table__body">
@@ -139,7 +140,7 @@
                 <td class="govuk-table__cell orders-demo__party-cell">
                   <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                     <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="claimant-lip" name="claimantAttendance" type="radio" value="lip" checked>
+                      <input class="govuk-radios__input" id="claimant-lip" name="claimantAttendance" type="radio" value="lip">
                       <label class="govuk-label govuk-radios__label" for="claimant-lip">
                         <span class="govuk-visually-hidden">Claimant</span>
                       </label>
@@ -159,7 +160,7 @@
                 <td class="govuk-table__cell orders-demo__party-cell">
                   <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                     <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="claimant-solicitor" name="claimantAttendance" type="radio" value="solicitor">
+                      <input class="govuk-radios__input" id="claimant-solicitor" name="claimantAttendance" type="radio" value="solicitor" checked>
                       <label class="govuk-label govuk-radios__label" for="claimant-solicitor">
                         <span class="govuk-visually-hidden">Claimant</span>
                       </label>
@@ -196,12 +197,21 @@
                     </div>
                   </div>
                 </td>
+                <td class="govuk-table__cell orders-demo__party-cell">
+                  {{ govukInput({
+                    label: { text: "Claimant name", classes: "govuk-visually-hidden" },
+                    classes: "govuk-input--width-40 orders-demo__party-name-input",
+                    name: "claimantAttendanceName",
+                    value: 'A. Solicitor',
+                    attributes: { placeholder: "Name" }
+                  }) }}
+                </td>
               </tr>
               {% set defendantList = defendants | default([]) %}
               {% if defendantList | length == 0 %}
                 {% set defendantList = [defendantName | default('Jones'), 'Taylor', 'Patel'] %}
               {% endif %}
-              {% set attendanceDefaults = ['lip', 'counsel', 'absent', 'solicitor', 'housingOfficerRep', 'solicitorAgent'] %}
+              {% set attendanceDefaults = ['lip'] %}
               {% for defendant in defendantList %}
                 {% set idPrefix = 'defendant-' ~ loop.index %}
                 {% set defaultAttendance = attendanceDefaults[(loop.index0) % (attendanceDefaults | length)] %}
@@ -259,13 +269,22 @@
                   </td>
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
-                      <div class="govuk-radios__item">
+                    <div class="govuk-radios__item">
                       <input class="govuk-radios__input" id="{{ idPrefix }}-absent" name="{{ idPrefix }}-attendance" type="radio" value="absent" {{ 'checked' if defaultAttendance == 'absent' }}>
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-absent">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
                       </div>
                     </div>
+                  </td>
+                  <td class="govuk-table__cell orders-demo__party-cell">
+                    {{ govukInput({
+                      label: { text: "Defendant name", classes: "govuk-visually-hidden" },
+                      classes: "govuk-input--width-40 orders-demo__party-name-input",
+                      name: idPrefix ~ '-attendance-name',
+                      value: defendant,
+                      attributes: { placeholder: "Name" }
+                    }) }}
                   </td>
                 </tr>
               {% endfor %}
