@@ -75,17 +75,17 @@ const mockStepsData = {
   protectedSteps: [protectedStep],
 };
 
-const mockGetFlowConfigForStep = jest.fn(step => {
-  if (step.url.startsWith('/steps')) {
-    return mockUserJourneyFlowConfig;
-  }
-  return null;
-});
-
 jest.mock('../../../main/steps', () => ({
   stepsWithContent: mockStepsData.allSteps,
   protectedSteps: mockStepsData.protectedSteps,
-  getFlowConfigForStep: mockGetFlowConfigForStep,
+  getFlowConfigForStep: jest.fn(_step => ({
+    steps: {
+      'protected-step': { requiresAuth: true },
+      'unprotected-step': { requiresAuth: false },
+      'function-controller-step': { requiresAuth: true },
+      'middleware-step': { requiresAuth: true },
+    },
+  })),
 }));
 
 import { Application } from 'express';
@@ -249,8 +249,6 @@ describe('registerSteps', () => {
       post: jest.fn(),
     } as unknown as Application;
 
-    const mockGetFlowConfigForStepNoControllers = jest.fn(() => null);
-
     jest.doMock('../../../main/steps', () => ({
       stepsWithContent: [
         {
@@ -259,7 +257,11 @@ describe('registerSteps', () => {
         },
       ],
       protectedSteps: [],
-      getFlowConfigForStep: mockGetFlowConfigForStepNoControllers,
+      getFlowConfigForStep: jest.fn(() => ({
+        steps: {
+          'no-controllers': { requiresAuth: true },
+        },
+      })),
     }));
 
     jest.resetModules();
