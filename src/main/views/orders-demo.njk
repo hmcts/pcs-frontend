@@ -373,72 +373,115 @@
               </div>
 
               <div class="orders-demo__order-body">
-                {{ govukDateInput({
-                  namePrefix: "suspendedBy",
-                  classes: "orders-demo__date-inline",
-                  fieldset: { legend: { text: "Possession by", classes: "govuk-fieldset__legend--s" } },
-                  formGroup: { classes: "govuk-!-margin-bottom-3" },
-                  items: [
-                    { name: "day", classes: "govuk-input--width-2", value: "26", autocomplete: "off" },
-                    { name: "month", classes: "govuk-input--width-2", value: "12", autocomplete: "off" },
-                    { name: "year", classes: "govuk-input--width-4", value: "2025", autocomplete: "off" }
-                  ]
-                }) }}
-
-                <div class="orders-demo__inline-group">
-                  {{ govukInput({
-                    label: { text: "Arrears amount (£)", classes: "govuk-label--s" },
-                    name: "arrearsAmount",
-                    classes: "govuk-input--width-5",
-                    attributes: { placeholder: "0.00" },
-                    prefix: { text: "£" }
-                  }) }}
-                  {{ govukInput({
-                    label: { text: "Arrears due by", classes: "govuk-label--s" },
-                    name: "arrearsDueBy",
-                    classes: "govuk-input--width-10",
-                    attributes: { placeholder: "DD/MM/YYYY" }
-                  }) }}
-                </div>
-
-                <div class="orders-demo__inline-group">
-                  {{ govukInput({
-                    label: { text: "Initial payment (£)", classes: "govuk-label--s" },
-                    name: "initialPayment",
-                    classes: "govuk-input--width-5",
-                    attributes: { placeholder: "0.00" },
-                    prefix: { text: "£" }
-                  }) }}
-                  {{ govukInput({
-                    label: { text: "Initial payment due by", classes: "govuk-label--s" },
-                    name: "initialPaymentBy",
-                    classes: "govuk-input--width-10",
-                    attributes: { placeholder: "DD/MM/YYYY" }
-                  }) }}
-                </div>
-
-                <div class="orders-demo__inline-group">
-                  {{ govukInput({
-                    label: { text: "Instalments (£)", classes: "govuk-label--s" },
-                    name: "instalmentAmount",
-                    classes: "govuk-input--width-5",
-                    attributes: { placeholder: "0.00" },
-                    prefix: { text: "£" }
-                  }) }}
-                  <div class="govuk-form-group govuk-!-margin-bottom-2 orders-demo__compact-select">
-                    <label class="govuk-label govuk-label--s" for="instalmentFrequency">Instalment frequency</label>
-                    <select class="govuk-select" id="instalmentFrequency" name="instalmentFrequency">
-                      <option value="weekly">weekly</option>
-                      <option value="monthly" selected>monthly</option>
-                      <option value="annually">annually</option>
-                    </select>
+                <div class="orders-demo__suspended-rows">
+                  <div class="orders-demo__suspended-row orders-demo__suspended-row--date">
+                    <div class="orders-demo__checkbox-placeholder" aria-hidden="true"></div>
+                    <span class="orders-demo__sentence-lead govuk-label">possession by</span>
+                    <div class="orders-demo__sentence-body orders-demo__sentence-body--date">
+                      {{ govukDateInput({
+                        namePrefix: "suspendedBy",
+                        classes: "orders-demo__date-inline",
+                        formGroup: { classes: "govuk-!-margin-bottom-0" },
+                        items: [
+                          { name: "day", classes: "govuk-input--width-2", autocomplete: "off" },
+                          { name: "month", classes: "govuk-input--width-2", autocomplete: "off" },
+                          { name: "year", classes: "govuk-input--width-4", autocomplete: "off" }
+                        ]
+                      }) }}
+                      <div class="orders-demo__date-shortcuts" aria-hidden="true">
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__date-shortcut" data-offset="14">+14</button>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__date-shortcut" data-offset="28">+28</button>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__date-shortcut" data-offset="42">+42</button>
+                      </div>
+                    </div>
                   </div>
-                  {{ govukInput({
-                    label: { text: "Instalments due by", classes: "govuk-label--s" },
-                    name: "instalmentDueBy",
-                    classes: "govuk-input--width-10",
-                    attributes: { placeholder: "DD/MM/YYYY" }
-                  }) }}
+
+                  <div class="orders-demo__suspended-row">
+                    <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="arrearsCheckbox" name="arrearsCheckbox" type="checkbox" value="arrears" checked>
+                        <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="arrearsCheckbox">Arrears checkbox</label>
+                      </div>
+                    </div>
+                    <span class="orders-demo__sentence-lead govuk-label">suspended on payment of arrears of</span>
+                    <div class="orders-demo__sentence-body">
+                      {{ govukInput({
+                        label: { text: "Arrears amount", classes: "govuk-visually-hidden" },
+                        name: "arrearsAmount",
+                        classes: "govuk-input--width-5 orders-demo__money-input",
+                        prefix: { text: "£" },
+                        attributes: { placeholder: "0.00" }
+                      }) }}
+                      <span class="orders-demo__sentence-label govuk-label">by</span>
+                      {{ govukInput({
+                        label: { text: "Arrears due by", classes: "govuk-visually-hidden" },
+                        name: "arrearsDueBy",
+                        classes: "govuk-input--width-10 orders-demo__date-input",
+                        attributes: { placeholder: "DD/MM/YYYY" }
+                      }) }}
+                    </div>
+                  </div>
+
+                  <div class="orders-demo__suspended-row">
+                    <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="initialPaymentCheckbox" name="initialPaymentCheckbox" type="checkbox" value="initialPayment">
+                        <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="initialPaymentCheckbox">Initial payment checkbox</label>
+                      </div>
+                    </div>
+                    <span class="orders-demo__sentence-lead govuk-label">an initial payment of</span>
+                    <div class="orders-demo__sentence-body">
+                      {{ govukInput({
+                        label: { text: "Initial payment amount", classes: "govuk-visually-hidden" },
+                        name: "initialPayment",
+                        classes: "govuk-input--width-5 orders-demo__money-input",
+                        prefix: { text: "£" },
+                        attributes: { placeholder: "0.00" }
+                      }) }}
+                      <span class="orders-demo__sentence-label govuk-label">by</span>
+                      {{ govukInput({
+                        label: { text: "Initial payment due by", classes: "govuk-visually-hidden" },
+                        name: "initialPaymentBy",
+                        classes: "govuk-input--width-10 orders-demo__date-input",
+                        attributes: { placeholder: "DD/MM/YYYY" }
+                      }) }}
+                    </div>
+                  </div>
+
+                  <div class="orders-demo__suspended-row">
+                    <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="instalmentCheckbox" name="instalmentCheckbox" type="checkbox" value="instalments">
+                        <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="instalmentCheckbox">Instalments checkbox</label>
+                      </div>
+                    </div>
+                    <span class="orders-demo__sentence-lead govuk-label">instalments of</span>
+                    <div class="orders-demo__sentence-body orders-demo__sentence-body--spread">
+                      {{ govukInput({
+                        label: { text: "Instalment amount", classes: "govuk-visually-hidden" },
+                        name: "instalmentAmount",
+                        classes: "govuk-input--width-5 orders-demo__money-input",
+                        prefix: { text: "£" },
+                        attributes: { placeholder: "0.00" }
+                      }) }}
+                      <span class="orders-demo__sentence-label govuk-label">per</span>
+                      <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select">
+                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequency">Instalment frequency</label>
+                        <select class="govuk-select" id="instalmentFrequency" name="instalmentFrequency">
+                          <option value="weekly">weekly</option>
+                          <option value="monthly" selected>monthly</option>
+                          <option value="annually">annually</option>
+                        </select>
+                      </div>
+                      <span class="orders-demo__sentence-label govuk-label">by</span>
+                      {{ govukInput({
+                        label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
+                        name: "instalmentDueBy",
+                        classes: "govuk-input--width-10 orders-demo__date-input",
+                        attributes: { placeholder: "DD/MM/YYYY" }
+                      }) }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -522,15 +565,15 @@
           };
         };
 
-        const setDefaultOutrightDate = () => {
-          const dayInput = document.querySelector('input[name="outrightBy-day"]');
-          const monthInput = document.querySelector('input[name="outrightBy-month"]');
-          const yearInput = document.querySelector('input[name="outrightBy-year"]');
+        const setDefaultDate = (groupName, offsetDays = 14) => {
+          const dayInput = document.querySelector(`input[name="${groupName}-day"]`);
+          const monthInput = document.querySelector(`input[name="${groupName}-month"]`);
+          const yearInput = document.querySelector(`input[name="${groupName}-year"]`);
           if (!dayInput || !monthInput || !yearInput) return;
 
           if (dayInput.value || monthInput.value || yearInput.value) return;
 
-          const { day, month, year } = offsetDate(14);
+          const { day, month, year } = offsetDate(offsetDays);
           dayInput.value = day;
           monthInput.value = month;
           yearInput.value = year;
@@ -595,7 +638,8 @@
         });
 
         setActive(defaultValue);
-        setDefaultOutrightDate();
+        setDefaultDate('outrightBy');
+        setDefaultDate('suspendedBy');
         initDateShortcuts();
         initOrderClickTargets();
       };

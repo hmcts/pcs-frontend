@@ -334,22 +334,6 @@
     }
   }
 
-  .orders-demo__sentence {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
-
-    .govuk-input {
-      margin-bottom: 0;
-    }
-  }
-
-  .orders-demo__sentence-label {
-    font-size: 16px;
-  }
-
   .orders-demo__date-inline--with-buttons {
     display: flex;
     align-items: flex-end;
@@ -360,7 +344,7 @@
   .orders-demo__date-shortcuts {
     display: flex;
     gap: 8px;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
 
     .govuk-button {
       padding: 4px 10px;
@@ -374,6 +358,98 @@
     border-color: #b7bcc0;
     filter: brightness(0.95);
     transition: filter 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .orders-demo__suspended-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .orders-demo__suspended-row {
+    display: grid;
+    grid-template-columns: 32px 260px 1fr;
+    align-items: center;
+    column-gap: 16px;
+    row-gap: 6px;
+
+    @media (max-width: 700px) {
+      grid-template-columns: auto 1fr;
+    }
+
+    .govuk-checkboxes__item {
+      margin-bottom: 0;
+    }
+
+    .govuk-form-group {
+      margin-bottom: 0;
+    }
+  }
+
+  .orders-demo__suspended-row--date {
+    align-items: flex-start;
+  }
+
+  .orders-demo__checkbox-single {
+    margin-bottom: 0;
+    padding-top: 4px;
+    align-self: start;
+    justify-self: center;
+  }
+
+  .orders-demo__checkbox-placeholder {
+    width: 28px;
+    height: 28px;
+  }
+
+  .orders-demo__sentence-lead {
+    display: inline-flex;
+    align-items: center;
+    min-width: 240px;
+    font-size: 19px;
+    line-height: 1.31579;
+    margin: 0;
+    font-weight: 400;
+
+    @media (max-width: 700px) {
+      min-width: auto;
+    }
+  }
+
+  .orders-demo__sentence-body {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .orders-demo__sentence-body--spread {
+    gap: 12px 16px;
+  }
+
+  .orders-demo__sentence-body--date {
+    gap: 16px;
+    align-items: flex-end;
+  }
+
+  .orders-demo__money-input {
+    width: 100%;
+    min-width: 110px;
+    max-width: 140px;
+  }
+
+  .orders-demo__sentence-label {
+    display: inline-flex;
+    align-items: center;
+    font-size: 19px;
+    white-space: nowrap;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .orders-demo__date-input {
+    min-width: 170px;
   }
 
   .orders-demo__order-section--active {
