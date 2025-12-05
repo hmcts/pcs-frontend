@@ -32,12 +32,14 @@ describe('initPostcodeLookup', () => {
           <option value="">Initial</option>
         </select>
       </div>
-      <details></details>
-      <input id="${prefix}-addressLine1" name="${prefix}[addressLine1]" />
-      <input id="${prefix}-addressLine2" name="${prefix}[addressLine2]" />
-      <input id="${prefix}-town" name="${prefix}[town]" />
-      <input id="${prefix}-county" name="${prefix}[county]" />
-      <input id="${prefix}-postcode" name="${prefix}[postcode]" />
+      <details id="${prefix}-enterManuallyDetails"></details>
+      <div id="${prefix}-addressForm" class="govuk-visually-hidden">
+        <input id="${prefix}-addressLine1" name="${prefix}[addressLine1]" />
+        <input id="${prefix}-addressLine2" name="${prefix}[addressLine2]" />
+        <input id="${prefix}-town" name="${prefix}[town]" />
+        <input id="${prefix}-county" name="${prefix}[county]" />
+        <input id="${prefix}-postcode" name="${prefix}[postcode]" />
+      </div>
     </div>
   `;
 
@@ -156,13 +158,14 @@ describe('initPostcodeLookup', () => {
     expect(button.disabled).toBe(false);
   });
 
-  it('populates fields and opens details on selection change (via postcode-select)', () => {
+  it('populates fields and shows addressForm on selection change (via postcode-select)', () => {
     document.body.innerHTML = buildComponent();
     initPostcodeLookup();
     initPostcodeSelection();
 
     const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-    const details = document.querySelector('details') as HTMLDetailsElement;
+    const addressForm = document.getElementById('address-addressForm') as HTMLDivElement;
+    const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
     const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
     const line1FocusSpy = jest.spyOn(line1, 'focus');
 
@@ -181,7 +184,7 @@ describe('initPostcodeLookup', () => {
     opt.dataset.postcode = 'AB1 2CD';
     select.appendChild(opt);
 
-    expect(details.open).toBe(false);
+    expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(true);
     select.selectedIndex = 0;
     select.dispatchEvent(new Event('change'));
 
@@ -190,7 +193,8 @@ describe('initPostcodeLookup', () => {
     expect((document.getElementById('address-town') as HTMLInputElement).value).toBe('Townsville');
     expect((document.getElementById('address-county') as HTMLInputElement).value).toBe('Countyshire');
     expect((document.getElementById('address-postcode') as HTMLInputElement).value).toBe('AB1 2CD');
-    expect(details.open).toBe(true);
+    expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(false);
+    expect(enterManuallyDetails.style.display).toBe('none');
     expect(line1FocusSpy).toHaveBeenCalled();
   });
 
@@ -329,7 +333,7 @@ describe('initPostcodeLookup', () => {
     }).not.toThrow();
   });
 
-  it('handles details element with different selectors', () => {
+  it('handles addressForm visibility on selection with new structure', () => {
     document.body.innerHTML = `
       <div data-address-component>
         <input id="address-lookupPostcode" />
@@ -337,8 +341,10 @@ describe('initPostcodeLookup', () => {
         <select id="address-selectedAddress">
           <option value="">Initial</option>
         </select>
-        <div class="govuk-details"></div>
-        <input id="address-addressLine1" />
+        <details id="address-enterManuallyDetails"></details>
+        <div id="address-addressForm" class="govuk-visually-hidden">
+          <input id="address-addressLine1" />
+        </div>
       </div>
     `;
 
@@ -346,7 +352,8 @@ describe('initPostcodeLookup', () => {
     initPostcodeSelection();
 
     const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-    const details = document.querySelector('.govuk-details') as HTMLDetailsElement;
+    const addressForm = document.getElementById('address-addressForm') as HTMLDivElement;
+    const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
 
     // Replace options with a selected entry
     while (select.options.length) {
@@ -358,13 +365,14 @@ describe('initPostcodeLookup', () => {
     opt.dataset.line1 = '1 Main St';
     select.appendChild(opt);
 
-    // Check that details is initially closed (no open attribute or property)
-    expect(details.hasAttribute('open')).toBe(false);
+    // Check that addressForm is initially hidden
+    expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(true);
     select.selectedIndex = 0;
     select.dispatchEvent(new Event('change'));
 
-    // The code sets details.open = true, so check the property
-    expect(details.open).toBe(true);
+    // The addressForm should now be visible and enterManuallyDetails hidden
+    expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(false);
+    expect(enterManuallyDetails.style.display).toBe('none');
   });
 
   it('handles selection change with no value selected', () => {
