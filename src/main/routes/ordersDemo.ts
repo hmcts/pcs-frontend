@@ -1,4 +1,5 @@
 import { Application, Request, Response } from 'express';
+import { format } from 'date-fns';
 
 // Temporary import from the header shell package; uses CommonJS, so require here for type simplicity.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -78,6 +79,7 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
   })();
   const footerShell = renderFooterShell({ assetBase: '/' });
   const otherDefendants = ['Taylor', 'Patel'];
+  const today = format(new Date(), 'dd/MM/yyyy');
 
   return {
     themeName,
@@ -90,7 +92,7 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
     defendantName: 'Jones',
     otherDefendants,
     defendants: ['Jones', ...otherDefendants],
-    lastUpdated: '25/10/2025',
+    lastUpdated: today,
     lastUpdatedBy: 'DJ Daley',
     dateOfTenancy: '01/05/2020',
     dateNoticeServed: '15/09/2024',

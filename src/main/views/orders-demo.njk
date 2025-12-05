@@ -33,7 +33,6 @@
               <h2 class="govuk-heading-m govuk-!-margin-bottom-1">Judicial Notes (Tenancy)</h2>
               <p class="govuk-body-s govuk-!-margin-bottom-3">
                 Last updated {{ lastUpdated | default('25/10/2025') }} by {{ lastUpdatedBy | default('DJ Daley') }}
-                <span class="govuk-hint govuk-!-display-inline-block govuk-!-margin-bottom-0">[or System]</span>
               </p>
             </div>
 
@@ -272,135 +271,169 @@
           </table>
         </div>
 
-        <div class="orders-demo__section">
-          <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Outright possession order</h2>
+        <div class="orders-demo__section orders-demo__order-section" data-order-type="outright">
+          <div class="orders-demo__order-grid">
+            <div class="orders-demo__order-chooser">
+              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="order-outright" name="orderType" type="radio" value="outright" checked>
+                  <label class="govuk-label govuk-radios__label orders-demo__radio-label" for="order-outright">Select</label>
+                </div>
+              </div>
+            </div>
 
-          <div class="orders-demo__inline-group">
-            {{ govukRadios({
-              classes: "govuk-radios--inline orders-demo__radios-slim",
-              name: "outrightTiming",
-              fieldset: {
-                legend: { text: "Outright possession timing", classes: "govuk-visually-hidden" }
-              },
-              items: [
-                { value: "forthwith", text: "Outright possession (forthwith)", checked: true },
-                {
-                  value: "byDate",
-                  text: "Outright possession by",
-                  conditional: {
-                    html: govukDateInput({
-                      namePrefix: "outrightBy",
-                      classes: "orders-demo__date-inline",
-                      formGroup: { classes: "govuk-!-margin-bottom-0" },
-                      items: [
-                        { name: "day", classes: "govuk-input--width-2", autocomplete: "off" },
-                        { name: "month", classes: "govuk-input--width-2", autocomplete: "off" },
-                        { name: "year", classes: "govuk-input--width-4", autocomplete: "off" }
-                      ]
-                    })
-                  }
-                }
-              ]
-            }) }}
+            <div class="orders-demo__order-content">
+              <div class="orders-demo__section-header orders-demo__order-header">
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Outright possession order</h2>
+              </div>
+
+              <div class="orders-demo__order-body">
+                <div class="orders-demo__inline-group">
+                  {{ govukRadios({
+                    classes: "govuk-radios--inline orders-demo__radios-slim",
+                    name: "outrightTiming",
+                    fieldset: {
+                      legend: { text: "Outright possession timing", classes: "govuk-visually-hidden" }
+                    },
+                    items: [
+                      { value: "forthwith", text: "Outright possession (forthwith)", checked: true },
+                      {
+                        value: "byDate",
+                        text: "Outright possession by",
+                        conditional: {
+                          html: govukDateInput({
+                            namePrefix: "outrightBy",
+                            classes: "orders-demo__date-inline",
+                            formGroup: { classes: "govuk-!-margin-bottom-0" },
+                            items: [
+                              { name: "day", classes: "govuk-input--width-2", autocomplete: "off" },
+                              { name: "month", classes: "govuk-input--width-2", autocomplete: "off" },
+                              { name: "year", classes: "govuk-input--width-4", autocomplete: "off" }
+                            ]
+                          })
+                        }
+                      }
+                    ]
+                  }) }}
+                </div>
+
+                {{ govukCheckboxes({
+                  classes: "orders-demo__checkboxes-inline",
+                  name: "grounds",
+                  fieldset: {
+                    legend: { text: "Grounds", classes: "govuk-fieldset__legend--s" }
+                  },
+                  items: [
+                    { value: "discretionary", text: "Discretionary grounds" },
+                    {
+                      value: "mandatory",
+                      text: "Mandatory grounds",
+                      conditional: {
+                        html: govukInput({
+                          label: { text: "Specify mandatory grounds", classes: "govuk-visually-hidden" },
+                          name: "mandatoryGroundsDetails",
+                          classes: "govuk-input--width-20",
+                          attributes: { placeholder: "Specify mandatory grounds" }
+                        })
+                      }
+                    }
+                  ]
+                }) }}
+              </div>
+            </div>
           </div>
-
-          {{ govukCheckboxes({
-            classes: "orders-demo__checkboxes-inline",
-            name: "grounds",
-            fieldset: {
-              legend: { text: "Grounds", classes: "govuk-fieldset__legend--s" }
-            },
-            items: [
-              { value: "discretionary", text: "Discretionary grounds" },
-              {
-                value: "mandatory",
-                text: "Mandatory grounds",
-                conditional: {
-                  html: govukInput({
-                    label: { text: "Specify mandatory grounds", classes: "govuk-visually-hidden" },
-                    name: "mandatoryGroundsDetails",
-                    classes: "govuk-input--width-20",
-                    attributes: { placeholder: "Specify mandatory grounds" }
-                  })
-                }
-              }
-            ]
-          }) }}
         </div>
 
-        <div class="orders-demo__section">
-          <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Suspended possession order (tenancy)</h2>
+        <div class="orders-demo__section orders-demo__order-section" data-order-type="suspended">
+          <div class="orders-demo__order-grid">
+            <div class="orders-demo__order-chooser">
+              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="order-suspended" name="orderType" type="radio" value="suspended">
+                  <label class="govuk-label govuk-radios__label orders-demo__radio-label" for="order-suspended">Select</label>
+                </div>
+              </div>
+            </div>
 
-          <div class="orders-demo__inline-group">
-            <span class="orders-demo__sentence-label">Possession by</span>
-            {{ govukDateInput({
-              namePrefix: "suspendedBy",
-              classes: "orders-demo__date-inline",
-              formGroup: { classes: "govuk-!-margin-bottom-0" },
-              items: [
-                { name: "day", classes: "govuk-input--width-2", value: "26", autocomplete: "off" },
-                { name: "month", classes: "govuk-input--width-2", value: "12", autocomplete: "off" },
-                { name: "year", classes: "govuk-input--width-4", value: "2025", autocomplete: "off" }
-              ]
-            }) }}
-          </div>
+            <div class="orders-demo__order-content">
+              <div class="orders-demo__section-header orders-demo__order-header">
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Suspended possession order (tenancy)</h2>
+              </div>
 
-          <div class="orders-demo__sentence">
-            <span class="orders-demo__sentence-label">Suspended on payment of arrears of £</span>
-            {{ govukInput({
-              label: { text: "Arrears amount", classes: "govuk-visually-hidden" },
-              name: "arrearsAmount",
-              classes: "govuk-input--width-5",
-              attributes: { placeholder: "0.00" }
-            }) }}
-            <span class="orders-demo__sentence-label">by</span>
-            {{ govukInput({
-              label: { text: "Arrears due by", classes: "govuk-visually-hidden" },
-              name: "arrearsDueBy",
-              classes: "govuk-input--width-10",
-              attributes: { placeholder: "DD/MM/YYYY" }
-            }) }}
-          </div>
+              <div class="orders-demo__order-body">
+                <div class="orders-demo__inline-group">
+                  <span class="orders-demo__sentence-label">Possession by</span>
+                  {{ govukDateInput({
+                    namePrefix: "suspendedBy",
+                    classes: "orders-demo__date-inline",
+                    formGroup: { classes: "govuk-!-margin-bottom-0" },
+                    items: [
+                      { name: "day", classes: "govuk-input--width-2", value: "26", autocomplete: "off" },
+                      { name: "month", classes: "govuk-input--width-2", value: "12", autocomplete: "off" },
+                      { name: "year", classes: "govuk-input--width-4", value: "2025", autocomplete: "off" }
+                    ]
+                  }) }}
+                </div>
 
-          <div class="orders-demo__sentence">
-            <span class="orders-demo__sentence-label">An initial payment of £</span>
-            {{ govukInput({
-              label: { text: "Initial payment amount", classes: "govuk-visually-hidden" },
-              name: "initialPayment",
-              classes: "govuk-input--width-5",
-              attributes: { placeholder: "0.00" }
-            }) }}
-            <span class="orders-demo__sentence-label">by</span>
-            {{ govukInput({
-              label: { text: "Initial payment due by", classes: "govuk-visually-hidden" },
-              name: "initialPaymentBy",
-              classes: "govuk-input--width-10",
-              attributes: { placeholder: "DD/MM/YYYY" }
-            }) }}
-          </div>
+                <div class="orders-demo__sentence">
+                  <span class="orders-demo__sentence-label">Suspended on payment of arrears of £</span>
+                  {{ govukInput({
+                    label: { text: "Arrears amount", classes: "govuk-visually-hidden" },
+                    name: "arrearsAmount",
+                    classes: "govuk-input--width-5",
+                    attributes: { placeholder: "0.00" }
+                  }) }}
+                  <span class="orders-demo__sentence-label">by</span>
+                  {{ govukInput({
+                    label: { text: "Arrears due by", classes: "govuk-visually-hidden" },
+                    name: "arrearsDueBy",
+                    classes: "govuk-input--width-10",
+                    attributes: { placeholder: "DD/MM/YYYY" }
+                  }) }}
+                </div>
 
-          <div class="orders-demo__sentence">
-            <span class="orders-demo__sentence-label">Instalments of £</span>
-            {{ govukInput({
-              label: { text: "Instalment amount", classes: "govuk-visually-hidden" },
-              name: "instalmentAmount",
-              classes: "govuk-input--width-5",
-              attributes: { placeholder: "0.00" }
-            }) }}
-            <span class="orders-demo__sentence-label">per</span>
-            {{ govukInput({
-              label: { text: "Instalment frequency", classes: "govuk-visually-hidden" },
-              name: "instalmentFrequency",
-              classes: "govuk-input--width-5",
-              attributes: { placeholder: "month" }
-            }) }}
-            <span class="orders-demo__sentence-label">by</span>
-            {{ govukInput({
-              label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
-              name: "instalmentDueBy",
-              classes: "govuk-input--width-10",
-              attributes: { placeholder: "DD/MM/YYYY" }
-            }) }}
+                <div class="orders-demo__sentence">
+                  <span class="orders-demo__sentence-label">An initial payment of £</span>
+                  {{ govukInput({
+                    label: { text: "Initial payment amount", classes: "govuk-visually-hidden" },
+                    name: "initialPayment",
+                    classes: "govuk-input--width-5",
+                    attributes: { placeholder: "0.00" }
+                  }) }}
+                  <span class="orders-demo__sentence-label">by</span>
+                  {{ govukInput({
+                    label: { text: "Initial payment due by", classes: "govuk-visually-hidden" },
+                    name: "initialPaymentBy",
+                    classes: "govuk-input--width-10",
+                    attributes: { placeholder: "DD/MM/YYYY" }
+                  }) }}
+                </div>
+
+                <div class="orders-demo__sentence">
+                  <span class="orders-demo__sentence-label">Instalments of £</span>
+                  {{ govukInput({
+                    label: { text: "Instalment amount", classes: "govuk-visually-hidden" },
+                    name: "instalmentAmount",
+                    classes: "govuk-input--width-5",
+                    attributes: { placeholder: "0.00" }
+                  }) }}
+                  <span class="orders-demo__sentence-label">per</span>
+                  {{ govukInput({
+                    label: { text: "Instalment frequency", classes: "govuk-visually-hidden" },
+                    name: "instalmentFrequency",
+                    classes: "govuk-input--width-5",
+                    attributes: { placeholder: "month" }
+                  }) }}
+                  <span class="orders-demo__sentence-label">by</span>
+                  {{ govukInput({
+                    label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
+                    name: "instalmentDueBy",
+                    classes: "govuk-input--width-10",
+                    attributes: { placeholder: "DD/MM/YYYY" }
+                  }) }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </form>
@@ -417,6 +450,8 @@
   {{ super() }}
   <script>
     (() => {
+      let orderSwitcherInitialised = false;
+
       const getShellRoot = () => {
         const shell = document.querySelector('hmcts-header-shell');
         return shell && (shell.shadowRoot || shell.querySelector('template[shadowrootmode="open"]')?.content);
@@ -461,14 +496,44 @@
         return true;
       };
 
+      const initOrderSwitcher = () => {
+        if (orderSwitcherInitialised) return;
+
+        const sections = Array.from(document.querySelectorAll('.orders-demo__order-section'));
+        if (!sections.length) return;
+
+        orderSwitcherInitialised = true;
+
+        const setActive = value => {
+          sections.forEach(section => {
+            const isActive = section.dataset.orderType === value;
+            section.classList.toggle('orders-demo__order-section--active', isActive);
+            section.classList.toggle('orders-demo__order-section--inactive', !isActive);
+          });
+        };
+
+        const defaultValue = document.querySelector('input[name="orderType"]:checked')?.value
+          || sections[0].dataset.orderType;
+
+        sections.forEach(section => {
+          const radio = section.querySelector('input[name="orderType"]');
+          if (!radio) return;
+          radio.addEventListener('change', () => setActive(radio.value));
+        });
+
+        setActive(defaultValue);
+      };
+
       const start = () => {
         adjustPhaseBannerPadding();
+        initOrderSwitcher();
         if (setupObserver()) return;
 
         let attempts = 0;
         const interval = setInterval(() => {
           const observerReady = setupObserver();
           adjustPhaseBannerPadding();
+          initOrderSwitcher();
           if (observerReady || attempts >= 50) {
             clearInterval(interval);
           }

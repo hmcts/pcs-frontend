@@ -116,10 +116,45 @@
     margin-top: 16px;
   }
 
+  .orders-demo__section.orders-demo__order-section {
+    border: 1px solid #b1b4b6;
+    border-radius: 6px;
+    padding: 12px 16px 12px;
+    margin-top: 18px;
+    background: govuk-colour('white');
+
+    .orders-demo__order-grid {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 12px;
+
+      @media (max-width: 700px) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
   .orders-demo__section-header {
     display: flex;
     align-items: baseline;
     gap: 8px;
+  }
+
+  .orders-demo__order-header {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .orders-demo__radio-label {
+    color: #0b0c0c;
+    min-height: auto;
+  }
+
+  .orders-demo__order-choice {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 4px;
   }
 
   .orders-demo__input-grid {
@@ -305,5 +340,17 @@
 
   .orders-demo__sentence-label {
     font-size: 16px;
+  }
+
+  .orders-demo__order-section--inactive {
+    background: #e9eaec;
+    border-color: #b7bcc0;
+    filter: brightness(0.95);
+    transition: filter 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .orders-demo__order-section--active {
+    border-color: #1d70b8;
+    box-shadow: 0 0 0 2px rgba(29, 112, 184, 0.15);
   }
 }
