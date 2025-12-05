@@ -1,1 +1,3 @@
-export * from '../../data/page-data/home.page.data';
+export * from './home.page.data';
+export * from './startNow.page.data';
+export * from './freeLegalAdvice.page.data';
