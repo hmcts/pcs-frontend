@@ -31,18 +31,24 @@ export class Session {
     const redisStore = new (RedisStore as any)({
       client: redis,
       prefix: config.get('session.prefix') + ':',
-      ttl: config.get('session.ttlInSeconds'),
+      ttl: config.get('session.redis.ttlInSeconds'),
     });
 
     const secure = config.get<string>('node-env').toLowerCase() === 'production';
+
+    const totalIdleTimeMinutes = config.get<number>('session.timeout.totalIdleTime');
+    const idleModalDisplayTimeMinutes = config.get<number>('session.timeout.idleModalDisplayTime');
 
     const sessionMiddleware: session.SessionOptions = {
       secret: config.get<string>('secrets.pcs.pcs-session-secret'),
       resave: false,
       saveUninitialized: false,
+      // rolling is an existing express session para, when true it extends the session
+      rolling: true,
       cookie: {
         sameSite: secure ? 'strict' : 'lax',
         secure,
+        maxAge: totalIdleTimeMinutes * 60 * 1000,
       },
       name: config.get<string>('session.cookieName'),
       store: redisStore,
@@ -50,6 +56,16 @@ export class Session {
 
     app.set('trust proxy', true);
     app.use(session(sessionMiddleware));
+
+    // Make timeout config available to templates
+    app.locals.sessionTimeout = {
+      idleModalDisplayTime: idleModalDisplayTimeMinutes,
+      totalIdleTime: totalIdleTimeMinutes,
+    };
+
     this.logger.info('Session middleware configured with Redis store');
+    this.logger.info(
+      `Session timeout: ${totalIdleTimeMinutes} minutes, warning at ${idleModalDisplayTimeMinutes} minutes before expiry`
+    );
   }
 }
