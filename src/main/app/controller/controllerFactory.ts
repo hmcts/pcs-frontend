@@ -5,7 +5,8 @@ import type { StepFormData } from '../../interfaces/stepFormData.interface';
 import { type SupportedLang, getValidatedLanguage } from '../utils/i18n';
 import { stepNavigation } from '../utils/stepFlow';
 
-import { getFormData, setFormData, validateForm } from './formHelpers';
+import { renderWithErrors } from './errorHandling';
+import { getAllFormData, getFormData, setFormData, validateForm } from './formHelpers';
 
 type GenerateContentFn = (lang?: SupportedLang) => StepFormData;
 type PostControllerCallback = (req: Request, res: Response) => Promise<void> | void;
@@ -80,16 +81,11 @@ export const createPostController = (
       const lang: SupportedLang = getValidatedLanguage(req);
       const content = generateContent(lang);
       const fields = getFields(content);
-      const errors = validateForm(req, fields);
+      const errors = validateForm(req, fields, undefined, getAllFormData(req));
 
       // Handle validation errors
       if (Object.keys(errors).length > 0) {
-        const firstField = Object.keys(errors)[0];
-        return res.status(400).render(view, {
-          ...content,
-          ...req.body,
-          error: { field: firstField, text: errors[firstField] },
-        });
+        return renderWithErrors(req, res, view, errors, content);
       }
 
       // Save form data
@@ -125,14 +121,10 @@ export const validateAndStoreForm = (
 ): { post: (req: Request, res: Response) => void } => {
   return {
     post: (req: Request, res: Response) => {
-      const errors = validateForm(req, fields);
+      const errors = validateForm(req, fields, undefined, getAllFormData(req));
 
       if (Object.keys(errors).length > 0) {
-        return res.status(400).render(templatePath ?? `steps/${stepName}.njk`, {
-          ...content,
-          error: Object.values(errors)[0],
-          ...req.body,
-        });
+        return renderWithErrors(req, res, templatePath ?? `steps/${stepName}.njk`, errors, content ?? {});
       }
 
       for (const field of fields) {

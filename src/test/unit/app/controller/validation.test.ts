@@ -12,7 +12,7 @@ describe('validateForm', () => {
     const req = { body: {} } as Partial<Request>;
     const errors = validateForm(req as Request, fields);
 
-    expect(errors.answer).toBe('Please choose an option');
+    expect(errors.answer?.text).toBe('Please choose an option');
   });
 
   it('should return error for empty checkbox', () => {
@@ -23,7 +23,7 @@ describe('validateForm', () => {
     const req = { body: { choices: [] } } as Partial<Request>;
     const errors = validateForm(req as Request, fields);
 
-    expect(errors.choices).toBe('Please select at least one');
+    expect(errors.choices?.text).toBe('Please select at least one');
   });
 
   it('should return no error if required fields are filled', () => {
