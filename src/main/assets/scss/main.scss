@@ -349,10 +349,39 @@
     border-top: 1px solid #b1b4b6;
     padding-top: 16px;
     margin-top: 12px;
-  }
 
-  .orders-demo__costs-select {
-    min-width: 240px;
+    .orders-demo__costs-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .orders-demo__costs-modes {
+      max-width: 760px;
+    }
+
+    .orders-demo__costs-payby {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      min-width: 280px;
+    }
+
+    .orders-demo__costs-payby-label {
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    .orders-demo__costs-add-debt {
+      margin-left: 8px;
+    }
+
+    .orders-demo__radios-inline .govuk-radios__item {
+      margin-right: 24px;
+    }
   }
 
   .orders-demo__checkboxes-inline {

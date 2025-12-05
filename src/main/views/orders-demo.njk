@@ -5,7 +5,6 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/select/macro.njk" import govukSelect %}
 
 {% block head %}
   {{ super() }}
@@ -614,18 +613,75 @@
           <div class="orders-demo__section-header">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Costs</h3>
           </div>
-          <div class="orders-demo__inline-group">
-            {{ govukSelect({
-              id: "costsStatus",
-              name: "costsStatus",
-              classes: "govuk-!-margin-bottom-0 orders-demo__costs-select",
-              label: { text: "Costs outcome", classes: "govuk-label--s" },
-              items: [
-                { value: "standard", text: "Standard (Landlord costs £355)", selected: true },
-                { value: "reserved", text: "Costs reserved" },
-                { value: "other", text: "Other / to be assessed" }
-              ]
-            }) }}
+          <div class="orders-demo__costs-grid">
+            <div class="orders-demo__costs-modes">
+              {{ govukRadios({
+                classes: "orders-demo__radios-inline",
+                name: "costsMode",
+                fieldset: {
+                  legend: { text: "Costs mode", classes: "govuk-fieldset__legend--s govuk-visually-hidden" }
+                },
+                items: [
+                  {
+                    value: "fixed",
+                    text: "Fixed costs (standard)",
+                    checked: true,
+                    conditional: {
+                      html: govukInput({
+                        label: { text: "Total costs to be paid by Defendant", classes: "govuk-label--s" },
+                        name: "costsFixedAmount",
+                        classes: "govuk-input--width-10 orders-demo__money-input",
+                        prefix: { text: "£" },
+                        value: "424.50"
+                      })
+                    }
+                  },
+                  {
+                    value: "assessed",
+                    text: "Summarily assessed",
+                    conditional: {
+                      html:
+                        govukInput({
+                          label: { text: "Assessed costs", classes: "govuk-label--s" },
+                          name: "costsAssessedAmount",
+                          classes: "govuk-input--width-10 orders-demo__money-input",
+                          prefix: { text: "£" },
+                          attributes: { placeholder: "0.00" }
+                        }) +
+                        govukInput({
+                          label: { text: "Basis of assessment (optional)", classes: "govuk-label--s" },
+                          name: "costsAssessedBasis",
+                          classes: "govuk-input--width-20",
+                          attributes: { placeholder: "e.g. Conduct of Defendant" }
+                        })
+                    }
+                  },
+                  { value: "reserved", text: "Costs reserved" },
+                  { value: "noOrder", text: "No order for costs" }
+                ]
+              }) }}
+            </div>
+
+            <div class="orders-demo__costs-payby" data-costs-payby>
+              <div class="orders-demo__costs-payby-date" data-payby-date>
+                <label class="govuk-label govuk-label--s orders-demo__costs-payby-label" for="costsPayBy">Pay by</label>
+                {{ govukInput({
+                  id: "costsPayBy",
+                  label: { text: "Pay by", classes: "govuk-visually-hidden" },
+                  name: "costsPayBy",
+                  classes: "govuk-input--width-10 orders-demo__date-input",
+                  attributes: { placeholder: "DD/MM/YYYY" }
+                }) }}
+              </div>
+              <div class="orders-demo__costs-add-debt" data-payby-debt hidden>
+                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="costsAddToDebt" name="costsAddToDebt" type="checkbox" value="addToDebt" checked>
+                    <label class="govuk-label govuk-checkboxes__label" for="costsAddToDebt">Add to judgment debt</label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </form>
@@ -784,12 +840,6 @@
           });
         };
 
-        const setCostsReserved = () => {
-          const costsSelect = document.getElementById('costsStatus');
-          if (!(costsSelect instanceof HTMLSelectElement)) return;
-          costsSelect.value = 'reserved';
-        };
-
         const initOrderClickTargets = () => {
           sections.forEach(section => {
             const radio = section.querySelector('input[name="orderType"]');
@@ -811,18 +861,89 @@
           });
         };
 
+        const applyCostsModeDefaults = mode => {
+          if (mode === 'fixed') {
+            const fixed = document.querySelector('input[name="costsFixedAmount"]');
+            if (fixed instanceof HTMLInputElement && !fixed.value) {
+              fixed.value = '424.50';
+            }
+          }
+          if (mode === 'assessed') {
+            const assessed = document.querySelector('input[name="costsAssessedAmount"]');
+            const basis = document.querySelector('input[name="costsAssessedBasis"]');
+            if (assessed instanceof HTMLInputElement) {
+              assessed.value = '';
+              assessed.focus();
+            }
+            if (basis instanceof HTMLInputElement) {
+              basis.value = '';
+            }
+          }
+        };
+
+        const setCostsMode = mode => {
+          const radio = document.querySelector(`input[name="costsMode"][value="${mode}"]`);
+          if (!(radio instanceof HTMLInputElement)) return;
+          radio.checked = true;
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+          applyCostsModeDefaults(mode);
+        };
+
+        const setCostsPayBy = orderType => {
+          const payByWrapper = document.querySelector('[data-costs-payby]');
+          const payByDate = document.querySelector('[data-payby-date]');
+          const payByInput = document.getElementById('costsPayBy');
+          const addToDebt = document.querySelector('[data-payby-debt]');
+          const debtCheckbox = document.getElementById('costsAddToDebt');
+
+          if (!payByWrapper || !payByDate || !(payByInput instanceof HTMLInputElement) || !addToDebt) return;
+
+          const showDebt = orderType === 'suspended';
+          addToDebt.hidden = !showDebt;
+          payByDate.hidden = showDebt;
+          if (showDebt) {
+            if (debtCheckbox instanceof HTMLInputElement) debtCheckbox.checked = true;
+            return;
+          }
+
+          const group = orderType === 'suspended' ? 'suspendedBy' : 'outrightBy';
+          const dayInput = document.querySelector(`input[name="${group}-day"]`);
+          const monthInput = document.querySelector(`input[name="${group}-month"]`);
+          const yearInput = document.querySelector(`input[name="${group}-year"]`);
+          const hasDate = dayInput?.value && monthInput?.value && yearInput?.value;
+          const { day, month, year } = hasDate
+            ? { day: dayInput.value.padStart(2, '0'), month: monthInput.value.padStart(2, '0'), year: yearInput.value }
+            : offsetDate(14);
+          payByInput.value = `${day}/${month}/${year}`;
+        };
+
+        const initCostsRadios = () => {
+          const radios = Array.from(document.querySelectorAll('input[name="costsMode"]'));
+          radios.forEach(radio => {
+            radio.addEventListener('change', () => applyCostsModeDefaults(radio.value));
+          });
+        };
+
         const setActive = value => {
           sections.forEach(section => {
             const isActive = section.dataset.orderType === value;
             section.classList.toggle('orders-demo__order-section--active', isActive);
             section.classList.toggle('orders-demo__order-section--inactive', !isActive);
           });
+
           if (value === 'suspended') {
             focusInstalmentAmount();
+            setCostsMode('fixed');
           } else if (value === 'adjourn') {
             focusAdjournDate();
-            setCostsReserved();
+            setCostsMode('reserved');
+          } else if (value === 'outright') {
+            setCostsMode('fixed');
+          } else {
+            setCostsMode('noOrder');
           }
+
+          setCostsPayBy(value);
         };
 
         const defaultValue = document.querySelector('input[name="orderType"]:checked')?.value
@@ -841,6 +962,7 @@
         initOrderClickTargets();
         initStandardDirections();
         initQuickReasons();
+        initCostsRadios();
       };
 
       const start = () => {
