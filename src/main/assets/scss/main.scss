@@ -80,6 +80,24 @@
     margin-bottom: 20px;
   }
 
+  .orders-demo__top-grid {
+    display: grid;
+    grid-template-columns: 0.28fr 0.48fr 0.24fr;
+    gap: 18px;
+    align-items: start;
+    border-bottom: 1px solid #b1b4b6;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+
+    @media (max-width: 1100px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .orders-demo__summary {
+    min-width: 240px;
+  }
+
   .orders-demo__section {
     border-top: 1px solid #b1b4b6;
     padding-top: 16px;

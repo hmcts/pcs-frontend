@@ -20,15 +20,15 @@
   <main class="govuk-main-wrapper orders-demo__main" id="content" role="main">
     <div class="orders-demo__panel">
       <form class="orders-demo__form" action="#" method="post" novalidate>
-        <div class="govuk-grid-row orders-demo__top-row">
-          <div class="govuk-grid-column-one-third">
+        <div class="orders-demo__top-grid">
+          <div class="orders-demo__summary">
             <p class="govuk-caption-l govuk-!-margin-bottom-1">Case</p>
             <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Make an order</h1>
             <p class="govuk-body govuk-!-margin-bottom-1 govuk-!-font-weight-bold">{{ caseReference | default('1234-5678-9101') }}</p>
             <p class="govuk-body govuk-!-margin-bottom-4">{{ caseTitle | default('Smith v Jones') }}</p>
           </div>
 
-          <div class="govuk-grid-column-one-half orders-demo__judicial">
+          <div class="orders-demo__judicial">
             <div class="orders-demo__section-header">
               <h2 class="govuk-heading-m govuk-!-margin-bottom-1">Judicial Notes (Tenancy)</h2>
               <p class="govuk-body-s govuk-!-margin-bottom-3">
@@ -91,7 +91,7 @@
             </div>
           </div>
 
-          <div class="govuk-grid-column-one-third orders-demo__hearing">
+          <div class="orders-demo__hearing">
             <div class="orders-demo__section-header">
               <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Hearing Notes</h2>
             </div>
