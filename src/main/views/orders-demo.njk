@@ -201,14 +201,16 @@
               {% if defendantList | length == 0 %}
                 {% set defendantList = [defendantName | default('Jones'), 'Taylor', 'Patel'] %}
               {% endif %}
+              {% set attendanceDefaults = ['lip', 'counsel', 'absent', 'solicitor', 'housingOfficerRep', 'solicitorAgent'] %}
               {% for defendant in defendantList %}
                 {% set idPrefix = 'defendant-' ~ loop.index %}
+                {% set defaultAttendance = attendanceDefaults[(loop.index0) % (attendanceDefaults | length)] %}
                 <tr class="govuk-table__row">
                   <th scope="row" class="govuk-table__header">Defendant ({{ defendant }})</th>
                   <td class="govuk-table__cell orders-demo__party-cell">
                   <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                     <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="{{ idPrefix }}-lip" name="{{ idPrefix }}-attendance" type="radio" value="lip" checked>
+                        <input class="govuk-radios__input" id="{{ idPrefix }}-lip" name="{{ idPrefix }}-attendance" type="radio" value="lip" {{ 'checked' if defaultAttendance == 'lip' }}>
                       <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-lip">
                         <span class="govuk-visually-hidden">Defendant</span>
                       </label>
@@ -218,7 +220,7 @@
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="{{ idPrefix }}-counsel" name="{{ idPrefix }}-attendance" type="radio" value="counsel">
+                      <input class="govuk-radios__input" id="{{ idPrefix }}-counsel" name="{{ idPrefix }}-attendance" type="radio" value="counsel" {{ 'checked' if defaultAttendance == 'counsel' }}>
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-counsel">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -228,7 +230,7 @@
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="{{ idPrefix }}-solicitor" name="{{ idPrefix }}-attendance" type="radio" value="solicitor">
+                        <input class="govuk-radios__input" id="{{ idPrefix }}-solicitor" name="{{ idPrefix }}-attendance" type="radio" value="solicitor" {{ 'checked' if defaultAttendance == 'solicitor' }}>
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-solicitor">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -238,7 +240,7 @@
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="{{ idPrefix }}-agent" name="{{ idPrefix }}-attendance" type="radio" value="solicitorAgent">
+                      <input class="govuk-radios__input" id="{{ idPrefix }}-agent" name="{{ idPrefix }}-attendance" type="radio" value="solicitorAgent" {{ 'checked' if defaultAttendance == 'solicitorAgent' }}>
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-agent">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -248,7 +250,7 @@
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="{{ idPrefix }}-ho-rep" name="{{ idPrefix }}-attendance" type="radio" value="housingOfficerRep">
+                      <input class="govuk-radios__input" id="{{ idPrefix }}-ho-rep" name="{{ idPrefix }}-attendance" type="radio" value="housingOfficerRep" {{ 'checked' if defaultAttendance == 'housingOfficerRep' }}>
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-ho-rep">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -258,7 +260,7 @@
                   <td class="govuk-table__cell orders-demo__party-cell">
                     <div class="govuk-radios govuk-radios--inline orders-demo__radios-inline">
                       <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="{{ idPrefix }}-absent" name="{{ idPrefix }}-attendance" type="radio" value="absent">
+                      <input class="govuk-radios__input" id="{{ idPrefix }}-absent" name="{{ idPrefix }}-attendance" type="radio" value="absent" {{ 'checked' if defaultAttendance == 'absent' }}>
                         <label class="govuk-label govuk-radios__label" for="{{ idPrefix }}-absent">
                           <span class="govuk-visually-hidden">Defendant</span>
                         </label>
@@ -340,11 +342,13 @@
                     {
                       value: "mandatory",
                       text: "Mandatory grounds",
+                      checked: true,
                       conditional: {
                         html: govukInput({
                           label: { text: "Specify mandatory grounds", classes: "govuk-visually-hidden" },
                           name: "mandatoryGroundsDetails",
                           classes: "govuk-input--width-20",
+                          value: '8',
                           attributes: { placeholder: "Specify mandatory grounds" }
                         })
                       }
