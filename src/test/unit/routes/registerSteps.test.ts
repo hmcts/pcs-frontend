@@ -75,13 +75,6 @@ const mockStepsData = {
   protectedSteps: [protectedStep],
 };
 
-const mockGetFlowConfigForStep = jest.fn(step => {
-  if (step.url.startsWith('/steps')) {
-    return mockUserJourneyFlowConfig;
-  }
-  return null;
-});
-
 jest.mock('../../../main/steps', () => ({
   stepsWithContent: mockStepsData.allSteps,
   protectedSteps: mockStepsData.protectedSteps,
@@ -255,8 +248,6 @@ describe('registerSteps', () => {
       get: jest.fn(),
       post: jest.fn(),
     } as unknown as Application;
-
-    const mockGetFlowConfigForStepNoControllers = jest.fn(() => null);
 
     jest.doMock('../../../main/steps', () => ({
       stepsWithContent: [
