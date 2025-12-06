@@ -292,6 +292,10 @@
           </table>
         </div>
 
+        <div class="orders-demo__section">
+          <h2 class="govuk-heading-m govuk-!-margin-bottom-3">Order</h2>
+        </div>
+
         <div class="orders-demo__section orders-demo__order-section" data-order-type="outright">
           <div class="orders-demo__order-grid">
             <div class="orders-demo__order-chooser">
@@ -549,6 +553,12 @@
                       name: "adjournTimeEstimate",
                       value: "10 Minutes"
                     }) }}
+                    {{ govukInput({
+                      label: { text: "Time (optional)", classes: "govuk-label--s" },
+                      classes: "govuk-input--width-10",
+                      name: "adjournTime",
+                      attributes: { placeholder: "10:00am" }
+                    }) }}
                     <div class="govuk-form-group govuk-!-margin-bottom-0">
                       <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-margin-bottom-1">Hearing type</legend>
@@ -684,6 +694,29 @@
             </div>
           </div>
         </div>
+
+        <div class="orders-demo__preview" data-preview>
+          <button type="button" class="orders-demo__preview-toggle" data-preview-toggle aria-expanded="false">
+            <span class="orders-demo__preview-chevron" aria-hidden="true">▶</span>
+            <span class="orders-demo__preview-label">Preview draft order</span>
+            <span class="orders-demo__preview-status" data-preview-status>Standard order generated</span>
+          </button>
+          <div class="orders-demo__preview-panel" data-preview-panel hidden>
+            <div class="orders-demo__preview-body" data-preview-body>
+              <p class="govuk-body">Preview will appear here.</p>
+            </div>
+            <textarea class="govuk-textarea orders-demo__preview-textarea" name="previewFreeText" rows="12" data-preview-textarea hidden></textarea>
+            <div class="orders-demo__preview-actions">
+              <div>
+                <button type="button" class="govuk-button govuk-button--secondary orders-demo__preview-edit" data-preview-edit>Edit as free text</button>
+                <button type="button" class="govuk-link orders-demo__preview-revert" data-preview-revert hidden>Return to generated preview</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="orders-demo__footer-actions">
+          <button type="button" class="govuk-button orders-demo__preview-submit">Make order</button>
+        </div>
       </form>
     </div>
   </main>
@@ -699,6 +732,7 @@
   <script>
     (() => {
       let orderSwitcherInitialised = false;
+      let previewLocked = false;
 
       const getShellRoot = () => {
         const shell = document.querySelector('hmcts-header-shell');
@@ -742,6 +776,30 @@
 
         phaseText.style.paddingLeft = '0';
         return true;
+      };
+
+      const getInputValue = name => {
+        const el = document.querySelector(`[name="${name}"]`);
+        if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) {
+          return el.value.trim();
+        }
+        return '';
+      };
+
+      const getMoneyValue = (name, fallback = '0.00') => {
+        const raw = getInputValue(name);
+        const cleaned = raw.replace(/[^0-9.\\-]/g, '');
+        const num = Number.parseFloat(cleaned);
+        if (Number.isNaN(num)) return fallback;
+        return num.toFixed(2);
+      };
+
+      const getDateString = prefix => {
+        const day = getInputValue(`${prefix}-day`).padStart(2, '0');
+        const month = getInputValue(`${prefix}-month`).padStart(2, '0');
+        const year = getInputValue(`${prefix}-year`);
+        if (!day || !month || !year) return '';
+        return `${day}/${month}/${year}`;
       };
 
       const initOrderSwitcher = () => {
@@ -791,6 +849,7 @@
                 dayInput.value = day;
                 monthInput.value = month;
                 yearInput.value = year;
+                updatePreview();
               });
             });
           });
@@ -823,6 +882,7 @@
             const line3 = `3. The case be listed for a Review Hearing on the first open date after ${formatDate(offsetDate(35))}.`;
             textarea.value = `${line1}\n${line2}\n${line3}`;
             textarea.focus();
+            updatePreview();
           });
         };
 
@@ -836,8 +896,162 @@
               const reason = chip.dataset.reason || '';
               textarea.value = reason;
               textarea.focus();
+              updatePreview();
             });
           });
+        };
+
+        const buildCostsLine = (mode, payByText) => {
+          const fixedAmount = getMoneyValue('costsFixedAmount', '424.50');
+          const assessedAmount = getMoneyValue('costsAssessedAmount', '');
+
+          if (mode === 'fixed') {
+            return `The Defendant shall pay the Claimant's costs of this claim summarily assessed in the sum of £${fixedAmount}${payByText ? ` by ${payByText}` : ''}.`;
+          }
+          if (mode === 'assessed') {
+            if (!assessedAmount) return 'The Defendant shall pay the Claimant\'s costs of this claim, summarily assessed.';
+            const basis = getInputValue('costsAssessedBasis');
+            const basisText = basis ? ` (basis: ${basis})` : '';
+            return `The Defendant shall pay the Claimant's costs of this claim summarily assessed in the sum of £${assessedAmount}${basisText}${payByText ? ` by ${payByText}` : ''}.`;
+          }
+          if (mode === 'reserved') return 'The costs of this hearing are reserved.';
+          if (mode === 'noOrder') return 'No order as to costs.';
+          return '';
+        };
+
+        const buildPreview = () => {
+          const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'outright';
+          const possessionDate = orderType === 'suspended'
+            ? getDateString('suspendedBy') || getDateString('outrightBy')
+            : getDateString('outrightBy') || getDateString('suspendedBy');
+          const arrears = getMoneyValue('arrearsAmount', getMoneyValue('arrearsAtHearing', '0.00'));
+          const rent = getMoneyValue('currentRent', '0.00');
+          const instalment = getMoneyValue('instalmentAmount', '0.00');
+          const instalmentFreq = getInputValue('instalmentFrequency') || 'month';
+          const address = '12 High Street, Bristol';
+          const costsMode = document.querySelector('input[name="costsMode"]:checked')?.value || 'fixed';
+          const payByCheckbox = document.getElementById('costsAddToDebt');
+          const payByText = (() => {
+            const addDebt = payByCheckbox instanceof HTMLInputElement && !payByCheckbox.closest('[data-payby-debt]')?.hidden && payByCheckbox.checked;
+            if (addDebt) return 'being added to the judgment debt';
+            return getInputValue('costsPayBy');
+          })();
+
+          const moneyToNumber = val => {
+            const num = Number.parseFloat(val);
+            return Number.isNaN(num) ? 0 : num;
+          };
+
+          const lines = [];
+          let status = 'Draft order generated';
+
+          if (orderType === 'adjourn') {
+            const nextDate = getDateString('adjournNextHearing');
+            const time = getInputValue('adjournTime') || '10:00am';
+            const estimate = getInputValue('adjournTimeEstimate') || '10 Minutes';
+            const location = getInputValue('adjournLocation') || 'Bristol County Court';
+            const directions = getInputValue('adjournDirections');
+            const reason = getInputValue('adjournReason');
+
+            lines.push('IT IS ORDERED THAT:');
+            lines.push(`1. The claim is adjourned to ${nextDate || '[date]'} at ${time} at ${location} with a time estimate of ${estimate}.`);
+            if (directions) {
+              lines.push(`2. ${directions}`);
+            }
+            const costsLine = buildCostsLine(costsMode, payByText);
+            if (costsLine) lines.push(`${directions ? '3' : '2'}. ${costsLine}`);
+            if (reason) {
+              const reasonNumber = directions ? (costsLine ? '4' : '3') : (costsLine ? '3' : '2');
+              lines.push(`${reasonNumber}. REASONS: ${reason}`);
+            }
+            status = 'Adjournment draft generated';
+          } else if (orderType === 'suspended') {
+            const total = (moneyToNumber(arrears) + moneyToNumber(getMoneyValue('costsFixedAmount', '424.50'))).toFixed(2);
+            lines.push('Upon hearing the Solicitor for the Claimant and the Defendant in Person.');
+            lines.push('IT IS ORDERED THAT:');
+            lines.push(`1. The Defendant give the Claimant possession of ${address} on or before ${possessionDate || '[date]'}.`);
+            lines.push(`2. This order is not to be enforced so long as the Defendant pays the Claimant the current rent of £${rent} per ${instalmentFreq}, plus £${instalment} per ${instalmentFreq} towards the arrears.`);
+            lines.push(`3. The first payment to be made on or before ${possessionDate || '[date]'}.`);
+            const costsLine = buildCostsLine(costsMode, payByText);
+            if (costsLine) lines.push(`4. ${costsLine}`);
+            lines.push(`5. The Defendant pay the Claimant the total sum of £${total}.`);
+            status = 'Suspended order draft generated';
+          } else {
+            const costsAmount = costsMode === 'fixed' ? getMoneyValue('costsFixedAmount', '424.50') : getMoneyValue('costsAssessedAmount', '0.00');
+            const total = (moneyToNumber(arrears) + moneyToNumber(costsAmount)).toFixed(2);
+            lines.push('Upon hearing the Solicitor for the Claimant and the Defendant in Person.');
+            lines.push('IT IS ORDERED THAT:');
+            lines.push(`1. The Defendant give the Claimant possession of ${address} on or before ${possessionDate || '[date]'}.`);
+            lines.push(`2. The Defendant pay the Claimant the total sum of £${total} (comprising arrears of £${arrears} and costs of £${costsAmount})${payByText ? ` by ${payByText}` : ''}.`);
+            const costsLine = buildCostsLine(costsMode, payByText);
+            if (costsLine && costsMode !== 'fixed') lines.push(`3. ${costsLine}`);
+            status = 'Outright order draft generated';
+          }
+
+          return { text: lines.join('\n\n'), status };
+        };
+
+        const initPreview = () => {
+          const toggle = document.querySelector('[data-preview-toggle]');
+          const panel = document.querySelector('[data-preview-panel]');
+          const chevron = document.querySelector('.orders-demo__preview-chevron');
+          const body = document.querySelector('[data-preview-body]');
+          const textarea = document.querySelector('[data-preview-textarea]');
+          const edit = document.querySelector('[data-preview-edit]');
+          const revert = document.querySelector('[data-preview-revert]');
+          const statusEl = document.querySelector('[data-preview-status]');
+          if (!toggle || !panel || !body || !textarea || !edit || !statusEl) return;
+
+          const setExpanded = expanded => {
+            panel.hidden = !expanded;
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            if (chevron) {
+              chevron.style.transform = expanded ? 'rotate(90deg)' : 'rotate(0deg)';
+            }
+            if (expanded && !previewLocked) {
+              const { text, status } = buildPreview();
+              body.textContent = text;
+              statusEl.textContent = status;
+            }
+          };
+
+          toggle.addEventListener('click', () => setExpanded(panel.hidden));
+
+          edit.addEventListener('click', () => {
+            const { text } = buildPreview();
+            body.hidden = true;
+            textarea.hidden = false;
+            textarea.value = text;
+            previewLocked = true;
+            if (revert) revert.hidden = false;
+            textarea.focus();
+          });
+
+          if (revert) {
+            revert.addEventListener('click', () => {
+              previewLocked = false;
+              textarea.hidden = true;
+              body.hidden = false;
+              revert.hidden = true;
+              const { text, status } = buildPreview();
+              body.textContent = text;
+              statusEl.textContent = status;
+            });
+          }
+
+          const { text, status } = buildPreview();
+          body.textContent = text;
+          statusEl.textContent = status;
+        };
+
+        const updatePreview = () => {
+          if (previewLocked) return;
+          const body = document.querySelector('[data-preview-body]');
+          const statusEl = document.querySelector('[data-preview-status]');
+          if (!body || !statusEl) return;
+          const { text, status } = buildPreview();
+          body.textContent = text;
+          statusEl.textContent = status;
         };
 
         const initOrderClickTargets = () => {
@@ -903,6 +1117,7 @@
           payByDate.hidden = showDebt;
           if (showDebt) {
             if (debtCheckbox instanceof HTMLInputElement) debtCheckbox.checked = true;
+            updatePreview();
             return;
           }
 
@@ -915,12 +1130,14 @@
             ? { day: dayInput.value.padStart(2, '0'), month: monthInput.value.padStart(2, '0'), year: yearInput.value }
             : offsetDate(14);
           payByInput.value = `${day}/${month}/${year}`;
+          updatePreview();
         };
 
         const initCostsRadios = () => {
           const radios = Array.from(document.querySelectorAll('input[name="costsMode"]'));
           radios.forEach(radio => {
             radio.addEventListener('change', () => applyCostsModeDefaults(radio.value));
+            radio.addEventListener('change', updatePreview);
           });
         };
 
@@ -944,10 +1161,11 @@
           }
 
           setCostsPayBy(value);
+          updatePreview();
         };
 
         const defaultValue = document.querySelector('input[name="orderType"]:checked')?.value
-          || sections[0].dataset.orderType;
+          || sections[0]?.dataset.orderType;
 
         sections.forEach(section => {
           const radio = section.querySelector('input[name="orderType"]');
@@ -963,6 +1181,13 @@
         initStandardDirections();
         initQuickReasons();
         initCostsRadios();
+        initPreview();
+
+        const form = document.querySelector('.orders-demo__form');
+        if (form) {
+          form.addEventListener('input', updatePreview);
+          form.addEventListener('change', updatePreview);
+        }
       };
 
       const start = () => {
