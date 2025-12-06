@@ -48,14 +48,16 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: UserJourneyCaseData
+  data: UserJourneyCaseData,
+  summary?: string,
+  description?: string
 ): Promise<CcdCase> {
   const payload = {
     data,
     event: {
       id: eventId,
-      summary: `Citizen ${eventId} summary`,
-      description: `Citizen ${eventId} description`,
+      summary: summary ?? `Citizen ${eventId} summary`,
+      description: description ?? `Citizen ${eventId} description`,
     },
     event_token: eventToken,
     ignore_warning: false,
@@ -75,6 +77,11 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
+  async getEventTokenForEvent(accessToken: string | undefined, caseId: string, eventId: string): Promise<string> {
+    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}`;
+    return getEventToken(accessToken || '', eventUrl);
+  },
+
   async getCase(accessToken: string | undefined): Promise<CcdCase | null> {
     const url = `${getBaseUrl()}/searchCases?ctid=${getCaseTypeId()}`;
     const headersConfig = getCaseHeaders(accessToken || '');
@@ -148,5 +155,26 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
     return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
+  },
+
+  async createOrder(
+    accessToken: string | undefined,
+    caseId: string,
+    data: UserJourneyCaseData,
+    eventToken?: string
+  ): Promise<CcdCase> {
+    const token =
+      eventToken ||
+      (await getEventToken(accessToken || '', `${getBaseUrl()}/cases/${caseId}/event-triggers/createOrder`));
+    const url = `${getBaseUrl()}/cases/${caseId}/events`;
+    return submitEvent(
+      accessToken || '',
+      url,
+      'createOrder',
+      token,
+      data,
+      'Create order',
+      'Order created from demo UI'
+    );
   },
 };

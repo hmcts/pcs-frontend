@@ -1,7 +1,6 @@
 import { Application, Request, Response } from 'express';
 
 // Temporary import from the header shell package; uses CommonJS, so require here for type simplicity.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { renderHeaderShell, renderFooterShell } = require('hmcts-header-shell-demo/render');
 
 const basePayments = [
@@ -33,7 +32,9 @@ const keepOnlyCreateCaseNav = (html: string): string => {
     return html;
   }
 
-  const items = Array.from(listMatch[2].matchAll(/<li class="hmcts-primary-navigation__item">[\s\S]*?<\/li>/g)).map(match => match[0]);
+  const items = Array.from(listMatch[2].matchAll(/<li class="hmcts-primary-navigation__item">[\s\S]*?<\/li>/g)).map(
+    match => match[0]
+  );
   const createCaseItem = items.find(item => /Create case/i.test(item));
 
   if (!createCaseItem) {
@@ -87,7 +88,10 @@ const buildDemoViewModel = (req: Request, caseReferenceParam?: string): DemoView
   })();
   const footerShell = renderFooterShell({ assetBase: '/' });
 
-  const queryParts = [`theme=${encodeURIComponent(themeName)}`, ...Array.from(removalSet).map(value => `remove=${encodeURIComponent(value)}`)];
+  const queryParts = [
+    `theme=${encodeURIComponent(themeName)}`,
+    ...Array.from(removalSet).map(value => `remove=${encodeURIComponent(value)}`),
+  ];
   const paymentsQueryString = queryParts.length ? `?${queryParts.join('&')}` : '';
 
   return {
@@ -106,7 +110,8 @@ const buildDemoViewModel = (req: Request, caseReferenceParam?: string): DemoView
 export default function (app: Application): void {
   app.get('/pui-demo/:caseReference/check-answers', (req: Request, res: Response) => {
     const viewModel = buildDemoViewModel(req, req.params.caseReference);
-    const addPaymentChoice = typeof req.query['add-payment'] === 'string' && req.query['add-payment'] === 'yes' ? 'Yes' : 'No';
+    const addPaymentChoice =
+      typeof req.query['add-payment'] === 'string' && req.query['add-payment'] === 'yes' ? 'Yes' : 'No';
 
     res.render('pui-demo-check-answers', {
       ...viewModel,
@@ -128,6 +133,8 @@ export default function (app: Application): void {
   });
 
   app.get('/pui-demo', (req: Request, res: Response) => {
-    res.redirect(`/pui-demo/${defaultCaseReference}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`);
+    res.redirect(
+      `/pui-demo/${defaultCaseReference}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`
+    );
   });
 }

@@ -1,7 +1,11 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import { Application, Request, Response } from 'express';
 
+import { OrdersDemoPayload } from '../interfaces/ccdCase.interface';
+import { oidcMiddleware } from '../middleware';
+import { ccdCaseService } from '../services/ccdCaseService';
+
 // Temporary import from the header shell package; uses CommonJS, so require here for type simplicity.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { renderHeaderShell, renderFooterShell } = require('hmcts-header-shell-demo/render');
 
 type DemoTheme = 'judicial' | 'case-manager' | 'default';
@@ -29,13 +33,17 @@ interface OrdersDemoViewModel {
   currentRentFrequency: 'month' | 'quarter' | 'year';
 }
 
+const logger = Logger.getLogger('ordersDemo');
+
 const keepOnlyCreateCaseNav = (html: string): string => {
   const listMatch = html.match(/(<ul class="hmcts-primary-navigation__list">)([\s\S]*?)(<\/ul>)/);
   if (!listMatch) {
     return html;
   }
 
-  const items = Array.from(listMatch[2].matchAll(/<li class="hmcts-primary-navigation__item">[\s\S]*?<\/li>/g)).map(match => match[0]);
+  const items = Array.from(listMatch[2].matchAll(/<li class="hmcts-primary-navigation__item">[\s\S]*?<\/li>/g)).map(
+    match => match[0]
+  );
   const createCaseItem = items.find(item => /Create case/i.test(item));
 
   if (!createCaseItem) {
@@ -51,6 +59,141 @@ const keepOnlyCreateCaseNav = (html: string): string => {
 };
 
 const defaultCaseReference = '1234-5678-9101';
+
+const normaliseDate = (body: Request['body'], prefix: string): string | null => {
+  const direct = typeof body[prefix] === 'string' ? body[prefix].trim() : '';
+  const day = typeof body[`${prefix}-day`] === 'string' ? body[`${prefix}-day`].padStart(2, '0') : '';
+  const month = typeof body[`${prefix}-month`] === 'string' ? body[`${prefix}-month`].padStart(2, '0') : '';
+  const year = typeof body[`${prefix}-year`] === 'string' ? body[`${prefix}-year`] : '';
+
+  if (day && month && year) {
+    return `${day}/${month}/${year}`;
+  }
+  return direct || null;
+};
+
+const parseMoney = (value: unknown): number | null => {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const cleaned = value.replace(/[^0-9.-]/g, '');
+  const parsed = Number.parseFloat(cleaned);
+  return Number.isNaN(parsed) ? null : Number(parsed.toFixed(2));
+};
+
+const buildOrdersPayload = (body: Request['body']): OrdersDemoPayload => {
+  const asArray = (value: unknown): string[] => {
+    if (Array.isArray(value)) {
+      return value.filter(v => typeof v === 'string') as string[];
+    }
+    return typeof value === 'string' ? [value] : [];
+  };
+
+  const groundsValues = asArray(body.grounds);
+  const groundsMode =
+    groundsValues.find(value => value === 'discretionary' || value === 'mandatory') ||
+    (typeof body.grounds === 'string' && (body.grounds === 'discretionary' || body.grounds === 'mandatory')
+      ? body.grounds
+      : null);
+  const judicialGrounds =
+    groundsValues.find(value => value !== 'discretionary' && value !== 'mandatory') ||
+    (typeof body.grounds === 'string' && body.grounds !== 'discretionary' && body.grounds !== 'mandatory'
+      ? body.grounds
+      : '');
+
+  const getAttendanceEntries = (): OrdersDemoPayload['attendance'] => {
+    const defendantAttendances = Object.entries(body)
+      .filter(([key]) => /^defendant-\d+-attendance$/.test(key))
+      .map(([key, value]) => {
+        const match = key.match(/^defendant-(\d+)-attendance$/);
+        const idx = match ? match[1] : '';
+        const nameKey = `defendant-${idx}-attendance-name`;
+        return {
+          party: `Defendant ${idx}`,
+          mode: typeof value === 'string' ? value : null,
+          name: typeof body[nameKey] === 'string' ? body[nameKey] : null,
+        };
+      });
+
+    return {
+      claimant: {
+        party: 'Claimant',
+        mode: typeof body.claimantAttendance === 'string' ? body.claimantAttendance : null,
+        name: typeof body.claimantAttendanceName === 'string' ? body.claimantAttendanceName : null,
+      },
+      defendants: defendantAttendances,
+    };
+  };
+
+  const isChecked = (value: unknown): boolean => typeof value === 'string' && value.length > 0;
+  const previewText =
+    (typeof body.previewFreeText === 'string' && body.previewFreeText.trim()) ||
+    (typeof body.generatedPreviewText === 'string' && body.generatedPreviewText.trim()) ||
+    '';
+
+  return {
+    orderType: typeof body.orderType === 'string' ? body.orderType : 'outright',
+    previewText,
+    previewStatus: typeof body.generatedPreviewStatus === 'string' ? body.generatedPreviewStatus : null,
+    previewWasEdited: Boolean(typeof body.previewFreeText === 'string' && body.previewFreeText.trim()),
+    judicialNotes: {
+      dateOfTenancy: typeof body.dateOfTenancy === 'string' ? body.dateOfTenancy : undefined,
+      dateNoticeServed: typeof body.dateNotice === 'string' ? body.dateNotice : undefined,
+      groundsText: judicialGrounds,
+      arrearsOnIssue: typeof body.arrearsOnIssue === 'string' ? body.arrearsOnIssue : undefined,
+      arrearsAtNotice: typeof body.arrearsAtNotice === 'string' ? body.arrearsAtNotice : undefined,
+      arrearsAtHearing: typeof body.arrearsAtHearing === 'string' ? body.arrearsAtHearing : undefined,
+      currentRent: typeof body.currentRent === 'string' ? body.currentRent : undefined,
+      currentRentFrequency: typeof body.currentRentFrequency === 'string' ? body.currentRentFrequency : undefined,
+      hearingNotes: typeof body.hearingNotes === 'string' ? body.hearingNotes : undefined,
+    },
+    attendance: getAttendanceEntries(),
+    orderDetails: {
+      groundsMode: typeof groundsMode === 'string' ? groundsMode : null,
+      mandatoryGroundsDetails: typeof body.mandatoryGroundsDetails === 'string' ? body.mandatoryGroundsDetails : null,
+      outright: {
+        timing: typeof body.outrightTiming === 'string' ? body.outrightTiming : null,
+        possessionDate: normaliseDate(body, 'outrightBy'),
+      },
+      suspended: {
+        possessionDate: normaliseDate(body, 'suspendedBy'),
+        arrears: {
+          enabled: isChecked(body.arrearsCheckbox),
+          amount: typeof body.arrearsAmount === 'string' ? body.arrearsAmount : null,
+          dueBy: typeof body.arrearsDueBy === 'string' ? body.arrearsDueBy : null,
+        },
+        initialPayment: {
+          enabled: isChecked(body.initialPaymentCheckbox),
+          amount: typeof body.initialPayment === 'string' ? body.initialPayment : null,
+          dueBy: typeof body.initialPaymentBy === 'string' ? body.initialPaymentBy : null,
+        },
+        instalments: {
+          enabled: isChecked(body.instalmentCheckbox),
+          amount: typeof body.instalmentAmount === 'string' ? body.instalmentAmount : null,
+          frequency: typeof body.instalmentFrequency === 'string' ? body.instalmentFrequency : null,
+          dueBy: typeof body.instalmentDueBy === 'string' ? body.instalmentDueBy : null,
+        },
+      },
+      adjournment: {
+        nextHearingDate: normaliseDate(body, 'adjournNextHearing'),
+        timeEstimate: typeof body.adjournTimeEstimate === 'string' ? body.adjournTimeEstimate : null,
+        time: typeof body.adjournTime === 'string' ? body.adjournTime : null,
+        hearingType: typeof body.adjournHearingType === 'string' ? body.adjournHearingType : null,
+        location: typeof body.adjournLocation === 'string' ? body.adjournLocation : null,
+        directions: typeof body.adjournDirections === 'string' ? body.adjournDirections : null,
+        reason: typeof body.adjournReason === 'string' ? body.adjournReason : null,
+      },
+    },
+    costs: {
+      mode: typeof body.costsMode === 'string' ? body.costsMode : null,
+      fixedAmount: parseMoney(body.costsFixedAmount),
+      assessedAmount: parseMoney(body.costsAssessedAmount),
+      assessedBasis: typeof body.costsAssessedBasis === 'string' ? body.costsAssessedBasis : null,
+      payBy: typeof body.costsPayBy === 'string' ? body.costsPayBy : null,
+      addToDebt: isChecked(body.costsAddToDebt),
+    },
+  };
+};
 
 const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoViewModel => {
   const theme = typeof req.query.theme === 'string' ? req.query.theme : 'judicial';
@@ -111,13 +254,66 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
 };
 
 export default function (app: Application): void {
-  app.get('/orders-demo/:caseReference', (req: Request, res: Response) => {
-    const viewModel = buildViewModel(req, req.params.caseReference);
+  app.get('/orders-demo/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
+    try {
+      const viewModel = buildViewModel(req, req.params.caseReference);
 
-    res.render('orders-demo', viewModel);
+      if (req.session.user?.accessToken) {
+        try {
+          req.session.ordersDemoEventToken = undefined;
+          const eventToken = await ccdCaseService.getEventTokenForEvent(
+            req.session.user.accessToken,
+            viewModel.caseReference,
+            'createOrder'
+          );
+          req.session.ordersDemoEventToken = { caseReference: viewModel.caseReference, token: eventToken };
+        } catch (error) {
+          logger.error(
+            `[ordersDemo] Failed to start createOrder event for case ${viewModel.caseReference}: ${
+              (error as Error).message
+            }`
+          );
+        }
+      }
+
+      const submitted = req.query.submitted === '1';
+      res.render('orders-demo', { ...viewModel, submitted });
+    } catch (error) {
+      next(error);
+    }
   });
 
-  app.get('/orders-demo', (req: Request, res: Response) => {
-    res.redirect(`/orders-demo/${defaultCaseReference}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`);
+  app.post('/orders-demo/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
+    const caseReference = req.params.caseReference?.trim();
+    const userToken = req.session.user?.accessToken;
+
+    if (!caseReference) {
+      return res.status(400).send('A case reference is required');
+    }
+
+    if (!userToken) {
+      return res.status(401).send('User not authenticated');
+    }
+
+    try {
+      const caseData = { ordersDemoPayload: buildOrdersPayload(req.body) };
+      const token =
+        req.session.ordersDemoEventToken?.caseReference === caseReference
+          ? req.session.ordersDemoEventToken.token
+          : undefined;
+
+      await ccdCaseService.createOrder(userToken, caseReference, caseData, token);
+      req.session.ordersDemoEventToken = undefined;
+      return res.redirect(303, `/orders-demo/${encodeURIComponent(caseReference)}?submitted=1`);
+    } catch (error) {
+      logger.error(`[ordersDemo] Failed to submit createOrder event: ${(error as Error).message}`);
+      return next(error);
+    }
+  });
+
+  app.get('/orders-demo', oidcMiddleware, (req: Request, res: Response) => {
+    res.redirect(
+      `/orders-demo/${defaultCaseReference}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`
+    );
   });
 }

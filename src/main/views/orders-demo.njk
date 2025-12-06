@@ -19,13 +19,20 @@
 <div class="govuk-width-container orders-demo">
   <main class="govuk-main-wrapper orders-demo__main" id="content" role="main">
     <div class="orders-demo__panel">
-      <form class="orders-demo__form" action="#" method="post" novalidate>
+      <form class="orders-demo__form" action="{{ basePath }}" method="post" novalidate>
+        <input type="hidden" name="generatedPreviewText" value="">
+        <input type="hidden" name="generatedPreviewStatus" value="">
         <div class="orders-demo__top-grid orders-demo__top-grid--sticky">
           <div class="orders-demo__summary">
             <p class="govuk-caption-l govuk-!-margin-bottom-1">Case</p>
             <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Make an order</h1>
             <p class="govuk-body govuk-!-margin-bottom-1 govuk-!-font-weight-bold">{{ caseReference | default('1234-5678-9101') }}</p>
             <p class="govuk-body govuk-!-margin-bottom-4">{{ caseTitle | default('Smith v Jones') }}</p>
+            {% if submitted %}
+              <div class="govuk-inset-text govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+                Order submitted to CCD.
+              </div>
+            {% endif %}
           </div>
 
           <div class="orders-demo__judicial">
@@ -333,7 +340,7 @@
                   </div>
                 {% endset %}
 
-                <div class="orders-demo__inline-group">
+                <div class="orders-demo__inline-group orders-demo__order-inline">
                   {{ govukRadios({
                     classes: "govuk-radios--inline orders-demo__radios-slim",
                     name: "outrightTiming",
@@ -354,30 +361,33 @@
                   }) }}
                 </div>
 
-                {{ govukRadios({
-                  classes: "orders-demo__radios-inline",
-                  name: "grounds",
-                  fieldset: {
-                    legend: { text: "Grounds", classes: "govuk-fieldset__legend--s" }
-                  },
-                  items: [
-                    { value: "discretionary", text: "Discretionary grounds" },
-                    {
-                      value: "mandatory",
-                      text: "Mandatory grounds",
-                      checked: true,
-                      conditional: {
-                        html: govukInput({
-                          label: { text: "Specify mandatory grounds", classes: "govuk-visually-hidden" },
-                          name: "mandatoryGroundsDetails",
-                          classes: "govuk-input--width-20",
-                          value: '8',
-                          attributes: { placeholder: "Specify mandatory grounds" }
-                        })
-                      }
-                    }
-                  ]
-                }) }}
+                <div class="orders-demo__order-grid-row">
+                  <div>
+                    <label class="govuk-label govuk-label--s">Grounds</label>
+                    {{ govukRadios({
+                      classes: "orders-demo__radios-inline",
+                      name: "grounds",
+                      fieldset: { legend: { text: "Grounds", classes: "govuk-visually-hidden" } },
+                      items: [
+                        { value: "discretionary", text: "Discretionary grounds" },
+                        {
+                          value: "mandatory",
+                          text: "Mandatory grounds",
+                          checked: true,
+                          conditional: {
+                            html: govukInput({
+                              label: { text: "Specify mandatory grounds", classes: "govuk-visually-hidden" },
+                              name: "mandatoryGroundsDetails",
+                              classes: "govuk-input--width-20",
+                              value: '8',
+                              attributes: { placeholder: "Specify mandatory grounds" }
+                            })
+                          }
+                        }
+                      ]
+                    }) }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -715,7 +725,7 @@
           </div>
         </div>
         <div class="orders-demo__footer-actions">
-          <button type="button" class="govuk-button orders-demo__preview-submit">Make order</button>
+          <button type="submit" class="govuk-button orders-demo__preview-submit">Make order</button>
         </div>
       </form>
     </div>
@@ -1184,9 +1194,24 @@
         initPreview();
 
         const form = document.querySelector('.orders-demo__form');
+        const generatedPreviewInput = document.querySelector('input[name="generatedPreviewText"]');
+        const generatedPreviewStatusInput = document.querySelector('input[name="generatedPreviewStatus"]');
         if (form) {
           form.addEventListener('input', updatePreview);
           form.addEventListener('change', updatePreview);
+          form.addEventListener('submit', () => {
+            const { text, status } = buildPreview();
+            const freeText = document.querySelector('[data-preview-textarea]');
+            const editedText =
+              freeText instanceof HTMLTextAreaElement && !freeText.hidden && freeText.value ? freeText.value : '';
+
+            if (generatedPreviewInput instanceof HTMLInputElement) {
+              generatedPreviewInput.value = editedText || text;
+            }
+            if (generatedPreviewStatusInput instanceof HTMLInputElement) {
+              generatedPreviewStatusInput.value = status || '';
+            }
+          });
         }
       };
 
