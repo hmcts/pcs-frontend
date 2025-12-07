@@ -1,5 +1,6 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application, Request, Response } from 'express';
+import config from 'config';
 
 import { OrdersDemoPayload } from '../interfaces/ccdCase.interface';
 import { oidcMiddleware } from '../middleware';
@@ -258,24 +259,6 @@ export default function (app: Application): void {
     try {
       const viewModel = buildViewModel(req, req.params.caseReference);
 
-      if (req.session.user?.accessToken) {
-        try {
-          req.session.ordersDemoEventToken = undefined;
-          const eventToken = await ccdCaseService.getEventTokenForEvent(
-            req.session.user.accessToken,
-            viewModel.caseReference,
-            'createOrder'
-          );
-          req.session.ordersDemoEventToken = { caseReference: viewModel.caseReference, token: eventToken };
-        } catch (error) {
-          logger.error(
-            `[ordersDemo] Failed to start createOrder event for case ${viewModel.caseReference}: ${
-              (error as Error).message
-            }`
-          );
-        }
-      }
-
       const submitted = req.query.submitted === '1';
       res.render('orders-demo', { ...viewModel, submitted });
     } catch (error) {
@@ -285,25 +268,22 @@ export default function (app: Application): void {
 
   app.post('/orders-demo/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
     const caseReference = req.params.caseReference?.trim();
-    const userToken = req.session.user?.accessToken;
 
     if (!caseReference) {
       return res.status(400).send('A case reference is required');
     }
 
-    if (!userToken) {
-      return res.status(401).send('User not authenticated');
-    }
-
     try {
+      const accessToken =
+        req.session.user?.accessToken ||
+        process.env.PCS_IDAM_TOKEN ||
+        process.env.IDAM_ACCESS_TOKEN ||
+        ((config as { has?: (key: string) => boolean }).has?.('secrets.pcs.pcs-judge-token')
+          ? (config.get('secrets.pcs.pcs-judge-token') as string)
+          : undefined);
+      req.session.user = { ...(req.session.user || {}), accessToken } as Request['session']['user'];
       const caseData = { ordersDemoPayload: buildOrdersPayload(req.body) };
-      const token =
-        req.session.ordersDemoEventToken?.caseReference === caseReference
-          ? req.session.ordersDemoEventToken.token
-          : undefined;
-
-      await ccdCaseService.createOrder(userToken, caseReference, caseData, token);
-      req.session.ordersDemoEventToken = undefined;
+      await ccdCaseService.createOrder(caseReference, caseData, accessToken);
       return res.redirect(303, `/orders-demo/${encodeURIComponent(caseReference)}?submitted=1`);
     } catch (error) {
       logger.error(`[ordersDemo] Failed to submit createOrder event: ${(error as Error).message}`);

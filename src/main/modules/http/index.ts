@@ -7,6 +7,8 @@ import axios, {
 } from 'axios';
 type TokenRegenerator = () => Promise<void>;
 
+const isS2SDisabled = (): boolean => (process.env.S2S_DISABLED || '').toLowerCase() === 'true';
+
 export class HttpService {
   private instance: AxiosInstance;
   private s2sToken: string | null = null;
@@ -22,9 +24,8 @@ export class HttpService {
 
     // Request interceptor
     this.instance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
-      if ((!this.s2sToken || this.isTokenExpired()) && !this.tokenRegenerator) {
-        this.logger.error('No token regenerator configured!');
-        throw new Error('No valid S2S token available and no regenerator configured');
+      if (isS2SDisabled() || !this.tokenRegenerator) {
+        return config;
       }
 
       if (!this.s2sToken || this.isTokenExpired()) {
@@ -38,6 +39,10 @@ export class HttpService {
     this.instance.interceptors.response.use(
       response => response,
       async error => {
+        if (isS2SDisabled() || !this.tokenRegenerator) {
+          return Promise.reject(error);
+        }
+
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest.__isRetryRequest) {
           this.logger.warn('Received 401, attempting token regeneration and retry...');

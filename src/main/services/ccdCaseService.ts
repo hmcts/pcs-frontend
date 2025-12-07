@@ -1,6 +1,8 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import config from 'config';
+import { randomUUID } from 'node:crypto';
+import { TOTP } from 'totp-generator';
 
 import { CaseState, CcdCase, CcdUserCases, UserJourneyCaseData } from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
@@ -11,8 +13,23 @@ interface EventTokenResponse {
   token: string;
 }
 
+const hasConfig = (key: string): boolean => typeof (config as { has?: (key: string) => boolean }).has === 'function' && config.has(key);
+
 function getBaseUrl(): string {
   return config.get('ccd.url');
+}
+
+function getPersistenceBaseUrl(): string {
+  if (hasConfig('ccd.persistenceUrl')) {
+    return config.get('ccd.persistenceUrl');
+  }
+  if (hasConfig('persistence.url')) {
+    return config.get('persistence.url');
+  }
+  if (hasConfig('api.url')) {
+    return config.get('api.url');
+  }
+  return getBaseUrl();
 }
 
 function getCaseTypeId(): string {
@@ -30,6 +47,41 @@ function getCaseHeaders(token: string) {
   };
 }
 
+async function getServiceAuthToken(): Promise<string | null> {
+  const has = (key: string): boolean => typeof (config as { has?: (key: string) => boolean }).has === 'function' && config.has(key);
+  const secretKey = has('secrets.pcs.pcs-frontend-s2s-secret')
+    ? (config.get('secrets.pcs.pcs-frontend-s2s-secret') as string)
+    : '';
+  const s2sUrl = has('s2s.url') ? (config.get('s2s.url') as string) : '';
+
+  if (!secretKey || !s2sUrl) {
+    logger.warn('[ccdCaseService] S2S secret or URL missing; skipping ServiceAuthorization header');
+    return null;
+  }
+
+  try {
+    const { otp } = TOTP.generate(secretKey);
+    const response = await axios.post(
+      `${s2sUrl}/lease`,
+      { microservice: 'pcs_frontend', oneTimePassword: otp },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        validateStatus: () => true,
+      }
+    );
+    if (response.status >= 200 && response.status < 300 && typeof response.data === 'string') {
+      return response.data;
+    }
+    logger.warn(
+      `[ccdCaseService] Failed to obtain S2S token. Status: ${response.status}, Body: ${JSON.stringify(response.data)}`
+    );
+    return null;
+  } catch (error) {
+    logger.error(`[ccdCaseService] Error fetching S2S token: ${(error as Error).message}`);
+    return null;
+  }
+}
+
 async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
     logger.info(`[ccdCaseService] Calling getEventToken with URL: ${url}`);
@@ -42,6 +94,77 @@ async function getEventToken(userToken: string, url: string): Promise<string> {
     throw error;
   }
 }
+
+function getDefaultAccessToken(): string | undefined {
+  const envToken = process.env.PCS_IDAM_TOKEN || process.env.IDAM_ACCESS_TOKEN;
+  if (envToken) {
+    logger.info('[ccdCaseService] Using PCS_IDAM_TOKEN/IDAM_ACCESS_TOKEN from env');
+    return envToken;
+  }
+  if (hasConfig('secrets.pcs.pcs-judge-token')) {
+    logger.info('[ccdCaseService] Using pcs-judge-token from config');
+    return config.get('secrets.pcs.pcs-judge-token') as string;
+  }
+  if (hasConfig('secrets.pcs.dev-access-token')) {
+    logger.info('[ccdCaseService] Using dev-access-token from config');
+    return config.get('secrets.pcs.dev-access-token') as string;
+  }
+   logger.warn('[ccdCaseService] No default access token found; falling back to dev-access-token');
+  return undefined;
+}
+
+interface PersistedCaseDetails {
+  id?: string | number;
+  reference?: string | number;
+  state?: string;
+  version?: number;
+  jurisdiction?: string;
+  case_type_id?: string;
+  caseTypeId?: string;
+  security_classification?: string;
+  securityClassification?: string;
+}
+
+async function fetchPersistedCase(
+  caseReference: string,
+  headers: Record<string, string | undefined>
+): Promise<PersistedCaseDetails | null> {
+  const queryUrl = `${getPersistenceBaseUrl()}/ccd-persistence/cases?case-refs=${caseReference}`;
+  try {
+    const response = await axios.get(queryUrl, {
+      headers,
+      validateStatus: () => true,
+    });
+    if (response.status >= 400) {
+      logger.warn(
+        `[ccdCaseService] Failed to fetch persisted case ${caseReference}. Status: ${response.status}, Body: ${JSON.stringify(response.data)}`
+      );
+      return null;
+    }
+
+    const raw = Array.isArray(response.data) ? response.data[0] : response.data;
+    if (!raw) {
+      return null;
+    }
+
+    // API returns snake_case by default; guard for either.
+    const caseDetails = raw.case_details || raw.caseDetails || raw;
+    return caseDetails as PersistedCaseDetails;
+  } catch (error) {
+    logger.error(`[ccdCaseService] Error fetching persisted case ${caseReference}: ${(error as Error).message}`);
+    return null;
+  }
+}
+
+const toYesNo = (value: unknown): 'Yes' | 'No' | undefined => {
+  if (value === true) {
+    return 'Yes';
+  }
+  if (value === false) {
+    return 'No';
+  }
+  return undefined;
+};
 
 async function submitEvent(
   userToken: string,
@@ -157,24 +280,122 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
   },
 
-  async createOrder(
-    accessToken: string | undefined,
-    caseId: string,
-    data: UserJourneyCaseData,
-    eventToken?: string
-  ): Promise<CcdCase> {
-    const token =
-      eventToken ||
-      (await getEventToken(accessToken || '', `${getBaseUrl()}/cases/${caseId}/event-triggers/createOrder`));
-    const url = `${getBaseUrl()}/cases/${caseId}/events`;
-    return submitEvent(
-      accessToken || '',
-      url,
-      'createOrder',
-      token,
-      data,
-      'Create order',
-      'Order created from demo UI'
-    );
+  async createOrder(caseId: string, data: UserJourneyCaseData, accessToken?: string): Promise<unknown> {
+    const caseReference = caseId.replace(/\D/g, '');
+    if (!caseReference) {
+      throw new Error('A numeric case reference is required to submit an order');
+    }
+
+    const url = `${getPersistenceBaseUrl()}/ccd-persistence/cases`;
+    const s2sToken = await getServiceAuthToken();
+    const headers = {
+      Authorization: `Bearer ${accessToken || getDefaultAccessToken() || 'dev-access-token'}`,
+      ServiceAuthorization: s2sToken ? `Bearer ${s2sToken}` : undefined,
+      'Idempotency-Key': randomUUID(),
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    };
+
+    const persisted = await fetchPersistedCase(caseReference, headers);
+    const internalCaseId = 1; // For PCS demo: internal DB id for the seeded case reference
+    const persistedState = persisted?.state || 'PENDING_CASE_ISSUED';
+    const persistedVersion = persisted?.version;
+
+    const ordersPayload = data.ordersDemoPayload
+      ? {
+          ...data.ordersDemoPayload,
+          previewWasEdited: toYesNo(data.ordersDemoPayload.previewWasEdited),
+          orderDetails: data.ordersDemoPayload.orderDetails
+            ? {
+                ...data.ordersDemoPayload.orderDetails,
+                suspended: data.ordersDemoPayload.orderDetails.suspended
+                  ? {
+                      ...data.ordersDemoPayload.orderDetails.suspended,
+                      arrears: data.ordersDemoPayload.orderDetails.suspended.arrears
+                        ? {
+                            ...data.ordersDemoPayload.orderDetails.suspended.arrears,
+                            enabled: toYesNo(data.ordersDemoPayload.orderDetails.suspended.arrears.enabled),
+                          }
+                        : undefined,
+                      initialPayment: data.ordersDemoPayload.orderDetails.suspended.initialPayment
+                        ? {
+                            ...data.ordersDemoPayload.orderDetails.suspended.initialPayment,
+                            enabled: toYesNo(data.ordersDemoPayload.orderDetails.suspended.initialPayment.enabled),
+                          }
+                        : undefined,
+                      instalments: data.ordersDemoPayload.orderDetails.suspended.instalments
+                        ? {
+                            ...data.ordersDemoPayload.orderDetails.suspended.instalments,
+                            enabled: toYesNo(data.ordersDemoPayload.orderDetails.suspended.instalments.enabled),
+                          }
+                        : undefined,
+                    }
+                  : undefined,
+              }
+            : undefined,
+          costs: data.ordersDemoPayload.costs
+            ? {
+                ...data.ordersDemoPayload.costs,
+                addToDebt: toYesNo(data.ordersDemoPayload.costs.addToDebt),
+              }
+            : undefined,
+        }
+      : undefined;
+
+    const payload = {
+      case_details: {
+        id: caseReference,
+        jurisdiction: hasConfig('ccd.jurisdiction') ? config.get('ccd.jurisdiction') : 'PCS',
+        case_type_id: getCaseTypeId(),
+        state: persistedState,
+        version: persistedVersion,
+        security_classification: 'PUBLIC',
+        case_data: {
+          ...data,
+          ...(ordersPayload ? { ordersDemoPayload: ordersPayload } : {}),
+        },
+      },
+      event_details: {
+        case_type: getCaseTypeId(),
+        event_id: 'ordersDemoSubmit',
+        event_name: 'Orders demo submit',
+        description: 'Order created from demo UI',
+        summary: 'Orders demo submit',
+      },
+    };
+
+    try {
+      logger.info(`[ccdCaseService] Calling decentralised submitEvent with URL: ${url}`);
+      logger.info(
+        `[ccdCaseService] Payload: ${JSON.stringify(
+          { ...payload, internal_case_id: internalCaseId },
+          null,
+          2
+        )}`
+      );
+      logger.info(
+        `[ccdCaseService] Headers: ${JSON.stringify({
+          Authorization: headers.Authorization ? `${headers.Authorization.slice(0, 20)}...` : null,
+          ServiceAuthorization: headers.ServiceAuthorization ? 'set' : 'missing',
+        })}`
+      );
+      const response = await axios.post(
+        url,
+        { ...payload, internal_case_id: internalCaseId },
+        {
+          headers,
+          validateStatus: () => true,
+        }
+      );
+      logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response.data, null, 2)}`);
+      if (response.status >= 400) {
+        throw new Error(`Decentralised submitEvent failed with status ${response.status}`);
+      }
+      return response.data as unknown;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      logger.error(`[ccdCaseService] Unexpected error: ${axiosError.message}`);
+      throw error;
+    }
   },
 };

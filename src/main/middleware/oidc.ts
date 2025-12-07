@@ -1,4 +1,26 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
+import config from 'config';
+import { Logger } from '@hmcts/nodejs-logging';
+
+const logger = Logger.getLogger('oidc');
+
+const pickAccessToken = (): string => {
+  const envToken = process.env.PCS_IDAM_TOKEN || process.env.IDAM_ACCESS_TOKEN;
+  if (envToken) {
+    logger.info('[oidc] Using access token from environment');
+    return envToken;
+  }
+  if ((config as { has?: (key: string) => boolean }).has?.('secrets.pcs.pcs-judge-token')) {
+    logger.info('[oidc] Using pcs-judge-token from config');
+    return config.get('secrets.pcs.pcs-judge-token') as string;
+  }
+  if ((config as { has?: (key: string) => boolean }).has?.('secrets.pcs.dev-access-token')) {
+    logger.info('[oidc] Using dev-access-token from config');
+    return config.get('secrets.pcs.dev-access-token') as string;
+  }
+  logger.warn('[oidc] Falling back to hard-coded dev-access-token');
+  return 'dev-access-token';
+};
 
 /**
  * Authentication middleware
@@ -8,19 +30,18 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
  */
 export const oidcMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
   if (process.env.AUTH_DISABLED === 'true') {
-    req.session.user =
-      req.session.user ||
-      ({
-        uid: 'dev-user',
-        roles: ['judge'],
-        accessToken: 'dev-access-token',
-        idToken: 'dev-id-token',
-        refreshToken: 'dev-refresh-token',
-        sub: 'dev-user',
-        email: 'judge@example.com',
-        givenName: 'Judith',
-        familyName: 'Daley',
-      } as unknown as Request['session']['user']);
+    const existing = (req.session.user as Record<string, unknown>) || {};
+    req.session.user = {
+      uid: existing.uid || 'dev-user',
+      roles: existing.roles || ['judge'],
+      accessToken: pickAccessToken(),
+      idToken: existing.idToken || 'dev-id-token',
+      refreshToken: existing.refreshToken || 'dev-refresh-token',
+      sub: existing.sub || 'dev-user',
+      email: existing.email || 'judge@example.com',
+      givenName: existing.givenName || 'Judith',
+      familyName: existing.familyName || 'Daley',
+    } as unknown as Request['session']['user'];
     req.app.locals.nunjucksEnv.addGlobal('user', req.session.user);
     return next();
   }
