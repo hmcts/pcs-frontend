@@ -79,9 +79,16 @@ export const createGetController = (
       feedback: t('feedback'),
       back: t('back'),
       languageToggle: t('languageToggle'),
+      contactUsForHelp: t('contactUsForHelp'),
       ...commonContent,
       ...stepTranslations,
     };
+
+    // contactUsForHelpText is optional - template handles it gracefully with fallback to empty string
+    const contactUsForHelpText = t('contactUsForHelpText');
+    if (contactUsForHelpText !== 'contactUsForHelpText') {
+      baseContent.contactUsForHelpText = contactUsForHelpText;
+    }
 
     if (extendContent) {
       const extended = await extendContent(req);

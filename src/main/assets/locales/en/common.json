@@ -5,6 +5,7 @@
   "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link language\">Cymraeg</a>",
   "logout": "logout",
   "contactUsForHelp": "Contact us for help",
+  "contactUsForHelpText": "If you need help using this service, contact us.",
   "buttons": {
     "continue": "Save and continue",
     "saveForLater": "Save for later",

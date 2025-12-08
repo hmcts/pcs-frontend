@@ -70,6 +70,12 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
     res.locals.feedback = t('feedback');
     res.locals.languageToggle = t('languageToggle');
     res.locals.back = t('back');
+    res.locals.contactUsForHelp = t('contactUsForHelp');
+    // contactUsForHelpText is optional - template handles it gracefully with fallback to empty string
+    const contactUsForHelpText = t('contactUsForHelpText');
+    if (contactUsForHelpText !== 'contactUsForHelpText') {
+      res.locals.contactUsForHelpText = contactUsForHelpText;
+    }
 
     res.status(status);
     res.render('error');

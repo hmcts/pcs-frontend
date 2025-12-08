@@ -5,6 +5,7 @@
   "languageToggle": "<a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
   "logout": "cylogout",
   "contactUsForHelp": "cyContact us for help",
+  "contactUsForHelpText": "cyIf you need help using this service, contact us.",
   "buttons": {
     "continue": "cySave and continue",
     "saveForLater": "cySave for later",
