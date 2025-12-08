@@ -39,7 +39,7 @@ export default function (app: Application): void {
 
     await ccdCaseService.submitEvent(accessToken, 'caseworkerUpdateCase', ccdCase);
 
-    res.redirect(`https://xui-pcs-api-pr-1083.preview.platform.hmcts.net/cases/case-details/${caseReference}`);
+    res.redirect(`https://xui-pcs-api-pr-1085.preview.platform.hmcts.net/cases/case-details/${caseReference}`);
     // res.redirect(`http://localhost:3000/cases/case-details/${caseReference}`);
   });
 }
