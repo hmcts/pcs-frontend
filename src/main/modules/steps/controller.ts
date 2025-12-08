@@ -1,5 +1,5 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
@@ -106,9 +106,9 @@ export const createPostController = (
   view: string,
   beforeRedirect?: PostControllerCallback,
   journeyFolder?: string
-): { post: (req: Request, res: Response) => Promise<void | Response> } => {
+): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } => {
   return {
-    post: async (req: Request, res: Response) => {
+    post: async (req: Request, res: Response, next: NextFunction) => {
       if (journeyFolder && req.i18n) {
         try {
           await loadStepNamespace(req, stepName, journeyFolder);
@@ -140,9 +140,13 @@ export const createPostController = (
       setFormData(req, stepName, req.body);
 
       if (beforeRedirect) {
-        await beforeRedirect(req, res);
-        if (res.headersSent) {
-          return;
+        try {
+          await beforeRedirect(req, res);
+          if (res.headersSent) {
+            return;
+          }
+        } catch (error) {
+          return next(error);
         }
       }
 

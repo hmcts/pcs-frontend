@@ -72,5 +72,19 @@
       "one": "You have %{count} character too many",
       "other": "You have %{count} characters too many"
     }
+  },
+  "errorPages": {
+    "403": {
+      "title": "Not Authorised",
+      "paragraph": "Sorry you do not have access to this account."
+    },
+    "404": {
+      "title": "Page not found",
+      "paragraph": "This could be because you've followed a broken or outdated link, or because there's an error on our site. Use the browser back button to go to the previous page."
+    },
+    "500": {
+      "title": "Sorry, we're having technical problems",
+      "paragraph": "Please try again in a few minutes."
+    }
   }
 }

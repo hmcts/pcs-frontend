@@ -12,11 +12,11 @@
 {% block header %}
   {{ govukHeader({
     containerClasses: "govuk-width-container",
-    serviceName: serviceName or "Possession claims",
+    serviceName: (serviceName or t('serviceName') or "Possession claims"),
     serviceUrl: "/",
     navigation: [
     {
-      text: 'logout',
+      text: (t('logout') or 'logout'),
       href: '/logout'
     }
   ]
@@ -27,14 +27,14 @@
     <div class="govuk-width-container">
       {{ govukPhaseBanner({
         tag: {
-          text: phase | safe
+          text: (phase or t('phase') or 'ALPHA') | safe
         },
-        html:(feedback + languageToggle) | safe
+        html: ((feedback or t('feedback') or '') + (languageToggle or t('languageToggle') or '')) | safe
       }) }}
   </div>
   {% if backUrl %}
     {{ govukBackLink({
-      text: back or "Back",
+      text: (back or t('back') or "Back"),
       href: backUrl
     }) }}
   {% endif %}
