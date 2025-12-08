@@ -12,8 +12,8 @@
       "ttlInSeconds": 5400
     },
     "timeout": {
-      "idleModalDisplayTime": 1,
-      "totalIdleTime": 2
+      "idleModalDisplayTime": 5,
+      "totalIdleTime": 6
     }
   },
   "health": {

@@ -1,11 +1,6 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/header/macro.njk" import govukHeader %}
 
-{% block bodyAttributes %}
-  data-session-timeout="{{ sessionTimeout.totalIdleTime }}"
-  data-session-warning="{{ sessionTimeout.idleModalDisplayTime }}"
-{% endblock %}
-
 {% block head %}
   {% include "webpack/css.njk" %}
 {% endblock %}

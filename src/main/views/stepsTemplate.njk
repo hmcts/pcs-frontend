@@ -4,6 +4,11 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
+{% block bodyAttributes %}
+  data-session-timeout="{{ sessionTimeout.totalIdleTime }}"
+  data-session-warning="{{ sessionTimeout.idleModalDisplayTime }}"
+{% endblock %}
+
 {% block head %}
   <title>{% block pageTitle %}Possession claims{% endblock %} - GOV.UK</title>
   {% include "webpack/css.njk" %}
@@ -23,6 +28,7 @@
   }) }}
 {% endblock %}
 
+
 {% block beforeContent %}
     <div class="govuk-width-container">
       {{ govukPhaseBanner({
@@ -38,6 +44,9 @@
       href: backUrl
     }) }}
   {% endif %}
+  {% block modal %}
+    {% include "components/timeout-modal.njk" %}
+  {% endblock %}
 {% endblock %}
 
 
@@ -69,5 +78,3 @@
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}
 {% endblock %}
-
-

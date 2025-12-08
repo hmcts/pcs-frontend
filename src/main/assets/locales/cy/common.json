@@ -59,5 +59,12 @@
     "11": "cyNovember",
     "12": "cyDecember"
   },
-  "dateFormatLong": "{{day}} {{month}} {{year}}"
+  "dateFormatLong": "{{day}} {{month}} {{year}}",
+  "timeout": {
+    "title": "cyYou'll be signed out soon",
+    "part1": "cyFor your security, you'll be signed out in",
+    "part2": "cyYour previous answers have been saved.",
+    "buttonText": "cyStay signed in",
+    "signOutLinkText": "cySign out"
+  }
 }
