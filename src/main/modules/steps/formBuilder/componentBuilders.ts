@@ -120,6 +120,7 @@ export function buildComponentConfig(
         year: '',
       };
       component.namePrefix = field.name;
+      component.idPrefix = field.name;
       component.fieldset = createFieldsetLegend(label, isFirstField);
       component.items = [
         {

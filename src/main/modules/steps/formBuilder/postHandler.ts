@@ -32,7 +32,10 @@ export function createPostHandler(
       // If there are validation errors, show them regardless of action
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
-        const error = { field: firstField, text: errors[firstField] };
+        const fieldConfig = fields.find(f => f.name === firstField);
+        // For date fields, the error link should point to the day input
+        const errorAnchor = fieldConfig?.type === 'date' ? `${firstField}-day` : firstField;
+        const error = { field: firstField, anchor: errorAnchor, text: errors[firstField] };
         const formContent = buildFormContent(fields, t, req.body, error, translationKeys);
 
         return res.status(400).render(viewPath, {
