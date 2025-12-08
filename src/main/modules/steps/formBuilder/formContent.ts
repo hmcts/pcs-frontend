@@ -9,7 +9,7 @@ export function buildFormContent(
   fields: FormFieldConfig[],
   t: TFunction,
   bodyData: Record<string, unknown> = {},
-  error?: { field: string; text: string },
+  error?: { field: string; anchor?: string; text: string },
   translationKeys?: TranslationKeys
 ): Record<string, unknown> {
   const fieldValues = buildFieldValues(fields, bodyData);
