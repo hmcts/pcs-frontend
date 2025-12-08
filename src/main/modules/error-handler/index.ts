@@ -42,12 +42,14 @@ function getErrorMessages(
   };
 }
 
-export function setupErrorHandlers(app: Express, env: string): void {
-  app.use((req: Request, res: Response, next: NextFunction) => {
+export function createNotFoundHandler(): (req: Request, res: Response, next: NextFunction) => void {
+  return (req: Request, res: Response, next: NextFunction) => {
     next(new HTTPError('Page not found', 404));
-  });
+  };
+}
 
-  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+export function createErrorHandler(env: string): (err: Error, req: Request, res: Response, next: NextFunction) => void {
+  return (err: Error, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) {
       return next(err);
     }
@@ -71,5 +73,10 @@ export function setupErrorHandlers(app: Express, env: string): void {
 
     res.status(status);
     res.render('error');
-  });
+  };
+}
+
+export function setupErrorHandlers(app: Express, env: string): void {
+  app.use(createNotFoundHandler());
+  app.use(createErrorHandler(env));
 }

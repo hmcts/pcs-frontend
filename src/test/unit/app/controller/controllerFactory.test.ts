@@ -255,8 +255,9 @@ describe('createPostController', () => {
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(mockValidateForm).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
@@ -285,8 +286,9 @@ describe('createPostController', () => {
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { redirect: jest.fn() } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(mockSetFormData).toHaveBeenCalledWith(req, stepName, { field1: 'value1' });
     expect(stepNavigation.getNextStepUrl).toHaveBeenCalledWith(req, stepName, { field1: 'value1' });
@@ -306,8 +308,9 @@ describe('createPostController', () => {
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { redirect: jest.fn(), headersSent: false } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(beforeRedirect).toHaveBeenCalledWith(req, res);
   });
@@ -325,8 +328,9 @@ describe('createPostController', () => {
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { redirect: jest.fn(), headersSent: true } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(beforeRedirect).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
@@ -347,8 +351,9 @@ describe('createPostController', () => {
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { status: jest.fn().mockReturnThis(), send: jest.fn() } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith('Unable to determine next step');
