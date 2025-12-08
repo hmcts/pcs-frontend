@@ -19,6 +19,7 @@ const ELEMENT_TYPES = [
   'HintText',
   'TextLabel',
   'Paragraph',
+  'List',
 ] as const;
 
 type ValidationResult = { element: string; expected: string; status: 'pass' | 'fail' };
@@ -105,6 +106,11 @@ export class PageContentValidation implements IValidation {
                     .text-content:text("${value}"),
                     .govuk-body:text("${value}"),
                     .govuk-list:text("${value}")`),
+    List: (page: Page, value: string) =>
+      page.locator(`
+                    li:text("${value}"),
+                    ul li:text("${value}"),
+                    ol li:text("${value}")`),
     Text: (page: Page, value: string) => page.locator(`:text("${value}")`),
     Tab: (page: Page, value: string) => page.getByRole('tab', { name: value }),
   };
@@ -163,7 +169,7 @@ export class PageContentValidation implements IValidation {
 
   private async getFileName(urlSegment: string, page: Page): Promise<string | null> {
     try {
-      const mappingPath = path.join(__dirname, '../../../data/page-data-figma/urlToFileMapping.ts');
+      const mappingPath = path.join(__dirname, '../../../data/page-data/urlToFileMapping.ts');
       if (!fs.existsSync(mappingPath)) {
         return null;
       }
@@ -216,7 +222,7 @@ export class PageContentValidation implements IValidation {
   }
 
   private async loadPageDataFile(fileName: string): Promise<null> {
-    const filePath = path.join(__dirname, '../../../data/page-data-figma', `${fileName}.page.data.ts`);
+    const filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
     if (!fs.existsSync(filePath)) {
       return null;
     }
@@ -342,7 +348,7 @@ export class PageContentValidation implements IValidation {
     const segment = segments[segments.length - 1] || 'home';
 
     try {
-      const mappingPath = path.join(__dirname, '../../../data/page-data-figma/urlToFileMapping.ts');
+      const mappingPath = path.join(__dirname, '../../../data/page-data/urlToFileMapping.ts');
       if (!fs.existsSync(mappingPath)) {
         return segment;
       }
