@@ -36,15 +36,20 @@ const keepOnlyCreateCaseNav = (html: string): string => {
     match => match[0]
   );
   const createCaseItem = items.find(item => /Create case/i.test(item));
+  const myWorkItem = `
+                  <li class="hmcts-primary-navigation__item">
+                    <a class="hmcts-primary-navigation__link" href="/work">
+                      <span class="hmcts-primary-navigation__link-text">My work</span>
+                    </a>
+                  </li>`;
 
-  if (!createCaseItem) {
-    return html;
-  }
+  const baseItems = createCaseItem ? [createCaseItem] : items;
+  const navItems = baseItems.some(item => /My work/i.test(item)) ? baseItems : [myWorkItem, ...baseItems];
 
   return html.replace(
     listMatch[0],
     `${listMatch[1]}
-                  ${createCaseItem}
+                  ${navItems.join('\n                  ')}
                 ${listMatch[3]}`
   );
 };

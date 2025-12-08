@@ -46,15 +46,20 @@ const keepOnlyCreateCaseNav = (html: string): string => {
     match => match[0]
   );
   const createCaseItem = items.find(item => /Create case/i.test(item));
+  const myWorkItem = `
+                  <li class="hmcts-primary-navigation__item">
+                    <a class="hmcts-primary-navigation__link" href="/work">
+                      <span class="hmcts-primary-navigation__link-text">My work</span>
+                    </a>
+                  </li>`;
 
-  if (!createCaseItem) {
-    return html;
-  }
+  const baseItems = createCaseItem ? [createCaseItem] : items;
+  const navItems = baseItems.some(item => /My work/i.test(item)) ? baseItems : [myWorkItem, ...baseItems];
 
   return html.replace(
     listMatch[0],
     `${listMatch[1]}
-                  ${createCaseItem}
+                  ${navItems.join('\n                  ')}
                 ${listMatch[3]}`
   );
 };
@@ -82,7 +87,8 @@ const parseMoney = (value: unknown): number | null => {
   return Number.isNaN(parsed) ? null : Number(parsed.toFixed(2));
 };
 
-const buildOrdersPayload = (body: Request['body']): OrdersDemoPayload => {
+const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
+  const body = (rawBody || {}) as Record<string, unknown>;
   const asArray = (value: unknown): string[] => {
     if (Array.isArray(value)) {
       return value.filter(v => typeof v === 'string') as string[];
@@ -135,7 +141,7 @@ const buildOrdersPayload = (body: Request['body']): OrdersDemoPayload => {
   return {
     orderType: typeof body.orderType === 'string' ? body.orderType : 'outright',
     previewText,
-    previewStatus: typeof body.generatedPreviewStatus === 'string' ? body.generatedPreviewStatus : null,
+    previewStatus: typeof body.generatedPreviewStatus === 'string' ? body.generatedPreviewStatus : undefined,
     previewWasEdited: Boolean(typeof body.previewFreeText === 'string' && body.previewFreeText.trim()),
     judicialNotes: {
       dateOfTenancy: typeof body.dateOfTenancy === 'string' ? body.dateOfTenancy : undefined,
@@ -284,7 +290,9 @@ export default function (app: Application): void {
       req.session.user = { ...(req.session.user || {}), accessToken } as Request['session']['user'];
       const caseData = { ordersDemoPayload: buildOrdersPayload(req.body) };
       await ccdCaseService.createOrder(caseReference, caseData, accessToken);
-      return res.redirect(303, `/orders-demo/${encodeURIComponent(caseReference)}?submitted=1`);
+      const targetReference = caseReference.replace(/\D/g, '') || caseReference;
+      const redirectUrl = `http://localhost:3000/cases/case-details/PCS/PCS/${encodeURIComponent(targetReference)}#History`;
+      return res.redirect(303, redirectUrl);
     } catch (error) {
       logger.error(`[ordersDemo] Failed to submit createOrder event: ${(error as Error).message}`);
       return next(error);

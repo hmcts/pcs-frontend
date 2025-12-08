@@ -357,10 +357,10 @@ export const ccdCaseService = {
       },
       event_details: {
         case_type: getCaseTypeId(),
-        event_id: 'ordersDemoSubmit',
-        event_name: 'Orders demo submit',
+        event_id: 'makeOrder',
+        event_name: 'Make order',
         description: 'Order created from demo UI',
-        summary: 'Orders demo submit',
+        summary: 'Make order',
       },
     };
 

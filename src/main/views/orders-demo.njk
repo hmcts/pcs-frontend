@@ -754,6 +754,27 @@
         return root && root.querySelector('.hmcts-primary-navigation__list');
       };
 
+      const ensureMyWorkNav = () => {
+        const list = getNavList();
+        if (!list) return false;
+        const items = Array.from(list.querySelectorAll('.hmcts-primary-navigation__item'));
+        const exists = items.some(item => item.textContent && item.textContent.trim().toLowerCase() === 'my work');
+        if (!exists) {
+          const li = document.createElement('li');
+          li.className = 'hmcts-primary-navigation__item';
+          const link = document.createElement('a');
+          link.className = 'hmcts-primary-navigation__link';
+          link.href = '/work';
+          const span = document.createElement('span');
+          span.className = 'hmcts-primary-navigation__link-text';
+          span.textContent = 'My work';
+          link.appendChild(span);
+          li.appendChild(link);
+          list.insertBefore(li, list.firstChild);
+        }
+        return true;
+      };
+
       const trimNavToCreateCase = () => {
         const list = getNavList();
         if (!list) return false;
@@ -766,6 +787,7 @@
           list.innerHTML = '';
           list.appendChild(createCase);
         }
+        ensureMyWorkNav();
         return true;
       };
 
@@ -774,7 +796,10 @@
         if (!list) return false;
 
         trimNavToCreateCase();
-        const observer = new MutationObserver(() => trimNavToCreateCase());
+        const observer = new MutationObserver(() => {
+          trimNavToCreateCase();
+          ensureMyWorkNav();
+        });
         observer.observe(list, { childList: true });
         return true;
       };
@@ -1199,7 +1224,8 @@
         if (form) {
           form.addEventListener('input', updatePreview);
           form.addEventListener('change', updatePreview);
-          form.addEventListener('submit', () => {
+          form.addEventListener('submit', event => {
+            event.preventDefault();
             const { text, status } = buildPreview();
             const freeText = document.querySelector('[data-preview-textarea]');
             const editedText =
@@ -1211,6 +1237,65 @@
             if (generatedPreviewStatusInput instanceof HTMLInputElement) {
               generatedPreviewStatusInput.value = status || '';
             }
+
+            const formData = new FormData(form);
+            const urlEncoded = new URLSearchParams();
+            formData.forEach((value, key) => {
+              if (typeof value === 'string') {
+                urlEncoded.append(key, value);
+              }
+            });
+
+            const numericCaseRef = (() => {
+              try {
+                const url = new URL(form.action);
+                const match = url.pathname.match(/orders-demo\/([^/?#]+)/);
+                return (match?.[1] || '').replace(/\D/g, '');
+              } catch (e) {
+                return '';
+              }
+            })();
+            const historyUrl =
+              numericCaseRef &&
+              `http://localhost:3000/cases/case-details/PCS/PCS/${encodeURIComponent(numericCaseRef)}#History`;
+
+            fetch(form.action, {
+              method: 'POST',
+              body: urlEncoded,
+              redirect: 'manual',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            })
+              .then(response => {
+                if (response.type === 'opaqueredirect' || response.status === 0) {
+                  window.location.href = historyUrl || `${form.action}?submitted=1`;
+                  return;
+                }
+                const locationHeader = response.headers.get('Location');
+                if (locationHeader) {
+                  try {
+                    const parsed = new URL(locationHeader, window.location.origin);
+                    parsed.protocol = 'http:';
+                    window.location.href = parsed.href;
+                  } catch (e) {
+                    if (locationHeader.startsWith('https://')) {
+                      window.location.href = 'http://' + locationHeader.slice('https://'.length);
+                    } else if (locationHeader.startsWith('http://')) {
+                      window.location.href = locationHeader;
+                    } else {
+                      window.location.href = `http://${locationHeader}`;
+                    }
+                  }
+                  return;
+                }
+                if (response.status >= 200 && response.status < 400) {
+                  window.location.href = historyUrl || `${form.action}?submitted=1`;
+                  return;
+                }
+                console.error('Make order submit failed', response.status);
+              })
+              .catch(error => {
+                console.error('Make order submit error', error);
+              });
           });
         }
       };
@@ -1218,6 +1303,7 @@
       const start = () => {
         adjustPhaseBannerPadding();
         initOrderSwitcher();
+        ensureMyWorkNav();
         if (setupObserver()) return;
 
         let attempts = 0;
@@ -1225,6 +1311,7 @@
           const observerReady = setupObserver();
           adjustPhaseBannerPadding();
           initOrderSwitcher();
+          ensureMyWorkNav();
           if (observerReady || attempts >= 50) {
             clearInterval(interval);
           }
