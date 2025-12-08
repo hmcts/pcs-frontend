@@ -908,7 +908,7 @@ describe('formBuilder', () => {
         expect(res.render).toHaveBeenCalledWith(
           'formBuilder.njk',
           expect.objectContaining({
-            error: { field: 'testField', text: 'This field is required' },
+            error: { field: 'testField', anchor: 'testField', text: 'This field is required' },
             ccdId: '123',
           })
         );
@@ -1015,7 +1015,7 @@ describe('formBuilder', () => {
         expect(res.render).toHaveBeenCalledWith(
           'formBuilder.njk',
           expect.objectContaining({
-            error: { field: 'testField', text: 'Error message' },
+            error: { field: 'testField', anchor: 'testField', text: 'Error message' },
             ccdId: '123',
           })
         );
