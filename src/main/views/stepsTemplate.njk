@@ -5,8 +5,8 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% block bodyAttributes %}
-  data-session-timeout="{{ sessionTimeout.totalIdleTime }}"
-  data-session-warning="{{ sessionTimeout.idleModalDisplayTime }}"
+  data-session-timeout="{{ sessionTimeout.sessionTimeoutMinutes }}"
+  data-session-warning="{{ sessionTimeout.sessionWarningMinutes }}"
 {% endblock %}
 
 {% block head %}

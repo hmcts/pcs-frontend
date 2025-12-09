@@ -1,7 +1,7 @@
 export function initSessionTimeout(): void {
   const body = document.body;
-  const totalIdleTime = parseInt(body.dataset.sessionTimeout || '6', 10);
-  const warningTime = parseInt(body.dataset.sessionWarning || '5', 10);
+  const sessionTimeoutMinutes = parseInt(body.dataset.sessionTimeout || '6', 10);
+  const sessionWarningMinutes = parseInt(body.dataset.sessionWarning || '5', 10);
 
   // modal elements
   const modalContainer = document.getElementById('timeout-modal-container');
@@ -15,7 +15,9 @@ export function initSessionTimeout(): void {
 
   // show modal
   const showModal = () => {
-    if (!modalContainer || !modal) {return;}
+    if (!modalContainer || !modal) {
+      return;
+    }
 
     modalContainer.removeAttribute('hidden');
     modal.focus();
@@ -27,7 +29,9 @@ export function initSessionTimeout(): void {
 
   // hide modal
   const hideModal = () => {
-    if (!modalContainer) {return;}
+    if (!modalContainer) {
+      return;
+    }
 
     modalContainer.setAttribute('hidden', 'hidden');
     warningShown = false;
@@ -36,9 +40,11 @@ export function initSessionTimeout(): void {
 
   // start countdown timer
   const startCountdown = () => {
-    if (!countdownElement) {return;}
+    if (!countdownElement) {
+      return;
+    }
 
-    const warningTimeSeconds = warningTime * 60;
+    const warningTimeSeconds = sessionWarningMinutes * 60;
     let secondsRemaining = warningTimeSeconds;
 
     const updateCountdown = () => {
@@ -87,7 +93,7 @@ export function initSessionTimeout(): void {
   // Check session status
   const checkSessionStatus = () => {
     const inactiveMinutes = (Date.now() - lastActivity) / (1000 * 60);
-    const timeUntilWarning = totalIdleTime - warningTime;
+    const timeUntilWarning = sessionTimeoutMinutes - sessionWarningMinutes;
 
     // warning
     if (inactiveMinutes >= timeUntilWarning && !warningShown) {
@@ -95,7 +101,7 @@ export function initSessionTimeout(): void {
     }
 
     // timeout
-    if (inactiveMinutes >= totalIdleTime) {
+    if (inactiveMinutes >= sessionTimeoutMinutes) {
       window.location.replace('/logout');
     }
   };
@@ -103,8 +109,19 @@ export function initSessionTimeout(): void {
   // stay signed in- button click
   if (continueButton) {
     continueButton.addEventListener('click', () => {
-      lastActivity = Date.now();
-      hideModal();
+      // backend to extend server session
+      fetch('/active')
+        .then(response => {
+          if (response.ok) {
+            lastActivity = Date.now();
+            hideModal();
+          }
+        })
+        .catch(() => {
+          // reset client timer
+          lastActivity = Date.now();
+          hideModal();
+        });
     });
   }
 
