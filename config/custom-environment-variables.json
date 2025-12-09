@@ -28,8 +28,8 @@
       "ttlInSeconds": "REDIS_TTL"
     },
     "timeout": {
-      "idleModalDisplayTime": "SESSION_IDLE_MODAL_DISPLAY_TIME",
-      "totalIdleTime": "SESSION_TOTAL_IDLE_TIME"
+      "sessionWarningMinutes": "SESSION_WARNING_MINUTES",
+      "sessionTimeoutMinutes": "SESSION_TIMEOUT_MINUTES"
     }
   },
   "s2s": {
