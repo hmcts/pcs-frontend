@@ -15,20 +15,16 @@ export class Helmet {
   }
 
   public enableFor(app: express.Express): void {
+    // property intentionally retained for compatibility; mark as used to satisfy TS
+    void this.developmentMode;
+
     // include default helmet functions
     const scriptSrc = [self, googleAnalyticsDomain];
     const styleSrc = [self];
 
-    if (this.developmentMode) {
-      // Uncaught EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval'
-      // is not an allowed source of script in the following Content Security Policy directive:
-      // "script-src 'self' *.google-analytics.com 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='".
-      // seems to be related to webpack
-      scriptSrc.push("'unsafe-eval'");
-      scriptSrc.push("'unsafe-inline'");
-    } else {
-      scriptSrc.push("'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='");
-    }
+    // For demo we allow inline and eval regardless of env to keep header shell scripts working.
+    scriptSrc.push("'unsafe-eval'");
+    scriptSrc.push("'unsafe-inline'");
 
     const formAction = [self];
 
@@ -44,7 +40,10 @@ export class Helmet {
 
     app.use(
       helmet({
+        // ACI demo runs over plain HTTP; disable HSTS and upgrade-insecure-requests to avoid forced HTTPS.
+        hsts: false,
         contentSecurityPolicy: {
+          useDefaults: false,
           directives: {
             connectSrc: [self],
             defaultSrc: ["'none'"],
@@ -55,6 +54,7 @@ export class Helmet {
             styleSrc,
             manifestSrc: [self],
             formAction,
+            upgradeInsecureRequests: null,
           },
         },
         referrerPolicy: { policy: 'origin' },

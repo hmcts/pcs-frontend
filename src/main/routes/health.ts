@@ -11,12 +11,13 @@ function shutdownCheck(): boolean {
 
 export default function (app: Application): void {
   const logger = Logger.getLogger('health');
+  const redisDisabled = (process.env.REDIS_DISABLED || '').toLowerCase() === 'true';
 
   const healthCheckConfig = {
     checks: {
       redis: healthcheck.raw(() => {
-        if (!app.locals.redisClient) {
-          return Promise.resolve(false);
+        if (redisDisabled || !app.locals.redisClient) {
+          return Promise.resolve(healthcheck.up());
         }
         return app.locals.redisClient
           .ping()

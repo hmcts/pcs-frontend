@@ -8,6 +8,32 @@ import { Redis } from 'ioredis';
 export class Session {
   logger = Logger.getLogger('session');
   enableFor(app: Express): void {
+    const redisDisabled = (process.env.REDIS_DISABLED || '').toLowerCase() === 'true';
+
+    if (redisDisabled) {
+      this.logger.warn('Redis disabled via REDIS_DISABLED=true; using in-memory session store');
+
+      const memoryStore = new session.MemoryStore();
+      const secure = config.get<string>('node-env').toLowerCase() === 'production';
+
+      const sessionMiddleware: session.SessionOptions = {
+        secret: config.get<string>('secrets.pcs.pcs-session-secret'),
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          sameSite: secure ? 'strict' : 'lax',
+          secure,
+        },
+        name: config.get<string>('session.cookieName'),
+        store: memoryStore,
+      };
+
+      app.set('trust proxy', true);
+      app.use(session(sessionMiddleware));
+      this.logger.info('Session middleware configured with in-memory store');
+      return;
+    }
+
     const redisConnectionString = config.get<string>('secrets.pcs.redis-connection-string');
     this.logger.info('Connecting to Redis at:', redisConnectionString);
 

@@ -60,7 +60,7 @@
     "govuk-frontend": "5.11.2",
     "graphql": "^16.10.0",
     "helmet": "^8.0.0",
-    "hmcts-header-shell-demo": "file:../../rpx/to-replicate-cdx/hmcts-header-shell-demo-0.0.3.tgz",
+    "hmcts-header-shell-demo": "file:./hmcts-header-shell-demo-0.0.3.tgz",
     "http-status-codes": "^2.3.0",
     "http-terminator": "^3.2.0",
     "i18next": "^25.3.2",

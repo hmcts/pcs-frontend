@@ -16,6 +16,7 @@ USER hmcts
 
 COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
 COPY --chown=hmcts:hmcts .yarn ./.yarn
+COPY --chown=hmcts:hmcts hmcts-header-shell-demo-0.0.3.tgz ./hmcts-header-shell-demo-0.0.3.tgz
 
 # Install all dependencies
 RUN yarn install
@@ -70,6 +71,7 @@ USER hmcts
 # Copy package files
 COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
 COPY --chown=hmcts:hmcts .yarn ./.yarn
+COPY --chown=hmcts:hmcts hmcts-header-shell-demo-0.0.3.tgz ./hmcts-header-shell-demo-0.0.3.tgz
 
 # Install only production dependencies
 ENV NODE_ENV=production
@@ -83,8 +85,25 @@ COPY --from=build /app/config ./config
 
 RUN chmod +x /app/dist/main/server.js
 
-# Set environment variables
-ENV NODE_ENV=production
+# Default demo environment variables (can be overridden at runtime)
+ENV NODE_ENV=production \
+    AUTH_DISABLED=true \
+    S2S_DISABLED=true \
+    REDIS_DISABLED=true \
+    PCS_API_URL=http://localhost:3206 \
+    CCD_URL=http://localhost:4452 \
+    S2S_URL=http://localhost:8489 \
+    OIDC_ISSUER=http://localhost:5062/o \
+    OIDC_CLIENT_ID=pcs-frontend \
+    OIDC_REDIRECT_URI=http://localhost:3209/oauth2/callback \
+    IDAM_SYSTEM_USERNAME=pcs-system-user@localhost \
+    IDAM_SYSTEM_PASSWORD=password \
+    PCS_FRONTEND_IDAM_SECRET=dummy-frontend-secret \
+    OS_CLIENT_LOOKUP_SECRET=dummy-os-secret \
+    S2S_SECRET=JBSWY3DPEHPK3PXP \
+    REDIS_CONNECTION_STRING=redis://localhost:6379
 
 # Expose the application port
 EXPOSE 3209
+
+CMD ["node", "dist/main/server.js"]

@@ -18,3 +18,4 @@
 !webpack.config.js
 !src/types/**
 !bin/**
+!hmcts-header-shell-demo-0.0.3.tgz
