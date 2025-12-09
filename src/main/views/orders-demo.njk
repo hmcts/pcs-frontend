@@ -725,7 +725,7 @@
           </div>
         </div>
         <div class="orders-demo__footer-actions">
-          <button type="submit" class="govuk-button orders-demo__preview-submit">Make order</button>
+          <button type="button" class="govuk-button orders-demo__preview-submit">Make order</button>
         </div>
       </form>
     </div>
@@ -810,6 +810,49 @@
         if (!phaseText) return false;
 
         phaseText.style.paddingLeft = '0';
+        return true;
+      };
+
+      const syncArrearsFields = () => {
+        const arrearsAtHearing = document.querySelector('input[name="arrearsAtHearing"]');
+        const arrearsAmount = document.querySelector('input[name="arrearsAmount"]');
+        if (!(arrearsAtHearing instanceof HTMLInputElement) || !(arrearsAmount instanceof HTMLInputElement)) return false;
+
+        const syncValue = () => {
+          if (arrearsAmount.dataset.manual === 'true') return;
+          arrearsAmount.value = arrearsAtHearing.value;
+          if (typeof updatePreview === 'function') {
+            updatePreview();
+          }
+        };
+
+        const markManual = () => {
+          arrearsAmount.dataset.manual = 'true';
+        };
+
+        syncValue();
+        arrearsAtHearing.addEventListener('input', syncValue);
+        arrearsAtHearing.addEventListener('change', syncValue);
+        arrearsAmount.addEventListener('input', markManual);
+        arrearsAmount.addEventListener('change', markManual);
+        return true;
+      };
+
+      const disableHeaderLinks = () => {
+        const root = getShellRoot();
+        if (!root) return false;
+
+        root.querySelectorAll('a').forEach(anchor => {
+          if (!(anchor instanceof HTMLAnchorElement)) return;
+          if (anchor.getAttribute('data-link-disabled') === 'true') return;
+          if (!anchor.classList.length) {
+            anchor.classList.add('hmcts-header__link');
+          }
+          anchor.setAttribute('data-link-disabled', 'true');
+          anchor.addEventListener('click', event => event.preventDefault());
+          anchor.setAttribute('aria-disabled', 'true');
+          anchor.setAttribute('tabindex', '-1');
+        });
         return true;
       };
 
@@ -1237,65 +1280,6 @@
             if (generatedPreviewStatusInput instanceof HTMLInputElement) {
               generatedPreviewStatusInput.value = status || '';
             }
-
-            const formData = new FormData(form);
-            const urlEncoded = new URLSearchParams();
-            formData.forEach((value, key) => {
-              if (typeof value === 'string') {
-                urlEncoded.append(key, value);
-              }
-            });
-
-            const numericCaseRef = (() => {
-              try {
-                const url = new URL(form.action);
-                const match = url.pathname.match(/orders-demo\/([^/?#]+)/);
-                return (match?.[1] || '').replace(/\D/g, '');
-              } catch (e) {
-                return '';
-              }
-            })();
-            const historyUrl =
-              numericCaseRef &&
-              `http://localhost:3000/cases/case-details/PCS/PCS/${encodeURIComponent(numericCaseRef)}#History`;
-
-            fetch(form.action, {
-              method: 'POST',
-              body: urlEncoded,
-              redirect: 'manual',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
-              .then(response => {
-                if (response.type === 'opaqueredirect' || response.status === 0) {
-                  window.location.href = historyUrl || `${form.action}?submitted=1`;
-                  return;
-                }
-                const locationHeader = response.headers.get('Location');
-                if (locationHeader) {
-                  try {
-                    const parsed = new URL(locationHeader, window.location.origin);
-                    parsed.protocol = 'http:';
-                    window.location.href = parsed.href;
-                  } catch (e) {
-                    if (locationHeader.startsWith('https://')) {
-                      window.location.href = 'http://' + locationHeader.slice('https://'.length);
-                    } else if (locationHeader.startsWith('http://')) {
-                      window.location.href = locationHeader;
-                    } else {
-                      window.location.href = `http://${locationHeader}`;
-                    }
-                  }
-                  return;
-                }
-                if (response.status >= 200 && response.status < 400) {
-                  window.location.href = historyUrl || `${form.action}?submitted=1`;
-                  return;
-                }
-                console.error('Make order submit failed', response.status);
-              })
-              .catch(error => {
-                console.error('Make order submit error', error);
-              });
           });
         }
       };
@@ -1304,6 +1288,8 @@
         adjustPhaseBannerPadding();
         initOrderSwitcher();
         ensureMyWorkNav();
+        syncArrearsFields();
+        disableHeaderLinks();
         if (setupObserver()) return;
 
         let attempts = 0;
@@ -1312,6 +1298,7 @@
           adjustPhaseBannerPadding();
           initOrderSwitcher();
           ensureMyWorkNav();
+          disableHeaderLinks();
           if (observerReady || attempts >= 50) {
             clearInterval(interval);
           }
