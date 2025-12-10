@@ -6,8 +6,8 @@ import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formF
 import { stepNavigation } from '../flow';
 import { getRequestLanguage, getTranslationFunction, loadStepNamespace } from '../i18n';
 
-import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';
+import { renderWithErrors } from './errorHandling';
 import { getTranslationErrors, processFieldData, setFormData, validateForm } from './helpers';
 
 export function createPostHandler(
@@ -26,19 +26,15 @@ export function createPostHandler(
       const t: TFunction = getTranslationFunction(req, stepName, ['common']);
       const action = req.body.action as string | undefined;
 
-      const fieldsWithLabels = translateFields(fields, t, {}, undefined, false);
-      const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fieldsWithLabels));
+      const errors = validateForm(req, fields, getTranslationErrors(t, fields));
 
       // If there are validation errors, show them regardless of action
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
-        const fieldConfig = fields.find(f => f.name === firstField);
-        // For date fields, the error link should point to the day input
-        const errorAnchor = fieldConfig?.type === 'date' ? `${firstField}-day` : firstField;
-        const error = { field: firstField, anchor: errorAnchor, text: errors[firstField] };
-        const formContent = buildFormContent(fields, t, req.body, error, translationKeys);
+        const error = { field: firstField, text: errors[firstField] };
+        const formContent = buildFormContent(fields, t, req.body, error, translationKeys, errors);
 
-        return res.status(400).render(viewPath, {
+        const content = {
           ...formContent,
           error,
           stepName,

@@ -14,7 +14,7 @@ export interface FormFieldOption {
 export interface FormFieldConfig {
   name: string;
   type: FormFieldType;
-  required?: boolean;
+  required?: boolean | ((formData: Record<string, unknown>, allData: Record<string, unknown>) => boolean);
   pattern?: string;
   maxLength?: number;
   errorMessage?: string;
