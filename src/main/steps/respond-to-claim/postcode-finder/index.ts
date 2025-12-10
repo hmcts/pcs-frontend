@@ -1,23 +1,28 @@
 import type { Request, Response } from 'express';
 
-import { createGetController } from '../../../app/controller/controllerFactory';
-import { createGenerateContent } from '../../../app/utils/i18n';
-import { createStepNavigation } from '../../../app/utils/stepFlow';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { respondToClaimFlowConfig } from '../flow.config';
 
 const stepName = 'postcode-finder';
-const generateContent = createGenerateContent(stepName, 'respondToClaim');
 const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
 
 export const step: StepDefinition = {
   url: '/respond-to-claim/postcode-finder',
   name: stepName,
-  view: 'steps/respondToClaim/postcodeFinder.njk',
+  view: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
   stepDir: __dirname,
-  generateContent,
   getController: () => {
-    return createGetController('steps/respondToClaim/postcodeFinder.njk', stepName, generateContent);
+    return createGetController(
+      'respond-to-claim/postcode-finder/postcodeFinder.njk',
+      stepName,
+      (req: Request) => {
+        return {
+          url: req.originalUrl || '/respond-to-claim/postcode-finder',
+        };
+      },
+      'respondToClaim'
+    );
   },
   postController: {
     post: async (req: Request, res: Response) => {

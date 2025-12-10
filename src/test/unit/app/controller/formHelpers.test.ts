@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { getFormData, setFormData, validateForm } from '../../../../main/app/controller/formHelpers';
+import { getFormData, setFormData, validateForm } from '../../../../main/modules/steps';
 
 describe('formHelpers', () => {
   describe('getFormData', () => {
@@ -345,6 +345,332 @@ describe('formHelpers', () => {
 
       const result = validateForm(req, fields, translations);
       expect(result.field1).toBe('Translation pattern error');
+    });
+
+    it('should validate maxLength for text fields', () => {
+      const req = {
+        body: {
+          field1: 'a'.repeat(101),
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'field1',
+          type: 'text' as const,
+          required: false,
+          maxLength: 100,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toHaveProperty('field1');
+      expect(result.field1).toBe('Must be 100 characters or fewer');
+    });
+
+    it('should use translation for maxLength error', () => {
+      const req = {
+        body: {
+          field1: 'a'.repeat(101),
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'field1',
+          type: 'text' as const,
+          required: false,
+          maxLength: 100,
+        },
+      ];
+
+      const translations = {
+        defaultMaxLength: 'Must be {max} characters or fewer',
+      };
+
+      const result = validateForm(req, fields, translations);
+      expect(result.field1).toBe('Must be 100 characters or fewer');
+    });
+
+    it('should not validate maxLength for empty fields', () => {
+      const req = {
+        body: {
+          field1: '',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'field1',
+          type: 'text' as const,
+          required: false,
+          maxLength: 10,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toEqual({});
+    });
+
+    it('should validate date fields - missing day', () => {
+      const req = {
+        body: {
+          'dateField-day': '',
+          'dateField-month': '02',
+          'dateField-year': '2023',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toHaveProperty('dateField');
+      expect(result.dateField).toBe('Enter your date of birth');
+    });
+
+    it('should validate date fields - missing month', () => {
+      const req = {
+        body: {
+          'dateField-day': '01',
+          'dateField-month': '',
+          'dateField-year': '2023',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toHaveProperty('dateField');
+    });
+
+    it('should validate date fields - missing year', () => {
+      const req = {
+        body: {
+          'dateField-day': '01',
+          'dateField-month': '02',
+          'dateField-year': '',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toHaveProperty('dateField');
+    });
+
+    it('should validate date fields - non-numeric values', () => {
+      const req = {
+        body: {
+          'dateField-day': 'ab',
+          'dateField-month': 'cd',
+          'dateField-year': 'ef',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toHaveProperty('dateField');
+      expect(result.dateField).toBe('Enter a valid date');
+    });
+
+    it('should validate date fields - invalid day range', () => {
+      const req = {
+        body: {
+          'dateField-day': '32',
+          'dateField-month': '01',
+          'dateField-year': '2023',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toHaveProperty('dateField');
+      expect(result.dateField).toBe('Enter a valid date');
+    });
+
+    it('should validate date fields - invalid month range', () => {
+      const req = {
+        body: {
+          'dateField-day': '01',
+          'dateField-month': '13',
+          'dateField-year': '2023',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toHaveProperty('dateField');
+    });
+
+    it('should validate date fields - year too old', () => {
+      const req = {
+        body: {
+          'dateField-day': '01',
+          'dateField-month': '01',
+          'dateField-year': '1899',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toHaveProperty('dateField');
+    });
+
+    it('should validate date fields - year in future', () => {
+      const futureYear = new Date().getFullYear() + 1;
+      const req = {
+        body: {
+          'dateField-day': '01',
+          'dateField-month': '01',
+          'dateField-year': futureYear.toString(),
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toHaveProperty('dateField');
+    });
+
+    it('should pass validation for valid date', () => {
+      const req = {
+        body: {
+          'dateField-day': '15',
+          'dateField-month': '06',
+          'dateField-year': '2000',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toEqual({});
+    });
+
+    it('should not validate date fields when not required', () => {
+      const req = {
+        body: {
+          'dateField-day': '',
+          'dateField-month': '',
+          'dateField-year': '',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: false,
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result).toEqual({});
+    });
+
+    it('should use custom error message for date validation', () => {
+      const req = {
+        body: {
+          'dateField-day': '',
+          'dateField-month': '02',
+          'dateField-year': '2023',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+          errorMessage: 'Custom date error',
+        },
+      ];
+
+      const result = validateForm(req, fields);
+      expect(result.dateField).toBe('Custom date error');
+    });
+
+    it('should use translation error message for date validation', () => {
+      const req = {
+        body: {
+          'dateField-day': '',
+          'dateField-month': '02',
+          'dateField-year': '2023',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+          required: true,
+        },
+      ];
+
+      const translations = {
+        defaultRequired: 'Translation date error',
+      };
+
+      const result = validateForm(req, fields, translations);
+      expect(result.dateField).toBe('Translation date error');
     });
   });
 });

@@ -5,8 +5,10 @@
   "languageToggle": "<a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
   "logout": "cylogout",
   "contactUsForHelp": "cyContact us for help",
+  "contactUsForHelpText": "cyIf you need help using this service, contact us.",
   "buttons": {
-    "continue": "cyContinue",
+    "continue": "cySave and continue",
+    "saveForLater": "cySave for later",
     "back": "cyBack",
     "cancel": "cyCancel",
     "finish": "cyStart a new application",
@@ -14,8 +16,6 @@
     "submit": "cySubmit"
   },
   "change": "cyChange",
-  "defaultRequired": "cyThis field is required",
-  "defaultInvalid": "cyInvalid format",
   "chooseOption": "cyChoose an option",
   "back": "cyBack",
   "date": {
@@ -26,6 +26,9 @@
   "errors": {
     "title": "cyThere is a problem",
     "required": "cyEnter a value",
+    "defaultRequired": "cyThis field is required",
+    "defaultInvalid": "cyInvalid format",
+    "defaultMaxLength": "cyMust be {max} characters or fewer",
     "email": {
       "required": "cyEnter an email address",
       "invalid": "cyEnter a valid email address"
@@ -59,5 +62,30 @@
     "11": "cyNovember",
     "12": "cyDecember"
   },
-  "dateFormatLong": "{{day}} {{month}} {{year}}"
+  "dateFormatLong": "{{day}} {{month}} {{year}}",
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "cyYou have %{count} character remaining",
+      "other": "cyYou have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "cyYou have reached the limit",
+    "charactersOverLimitText": {
+      "one": "cyYou have %{count} character too many",
+      "other": "cyYou have %{count} characters too many"
+    }
+  },
+  "errorPages": {
+    "403": {
+      "title": "cyNot Authorised",
+      "paragraph": "cySorry you do not have access to this account."
+    },
+    "404": {
+      "title": "cyPage not found",
+      "paragraph": "cyThis could be because you’ve followed a broken or outdated link, or because there’s an error on our site. Use the browser back button to go to the previous page."
+    },
+    "500": {
+      "title": "cySorry, we’re having technical problems",
+      "paragraph": "cyPlease try again in a few minutes."
+    }
+  }
 }

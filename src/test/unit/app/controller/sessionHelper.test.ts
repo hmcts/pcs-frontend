@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-import { getFormData, setFormData } from '../../../../main/app/controller/formHelpers';
+import { getFormData, setFormData } from '../../../../main/modules/steps';
 
 describe('sessionHelper', () => {
   it('should return empty object if no formData is present', () => {
