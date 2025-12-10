@@ -54,7 +54,6 @@
 
       {% set excludedSteps = ['summary', 'ineligible', 'application-submitted'] %}
       {% set showSaveForLater = journeyFolder == 'userJourney' and stepName not in excludedSteps %}
-      {% set dashboardUrl = ccdId and (dashboardRoute + '/' + ccdId) or dashboardRoute %}
       
       <div class="govuk-button-group">
         {{ govukButton({ 
