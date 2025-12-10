@@ -81,10 +81,10 @@
     },
     "404": {
       "title": "Page not found",
-      "paragraph": "This could be because you've followed a broken or outdated link, or because there's an error on our site. Use the browser back button to go to the previous page."
+      "paragraph": "This could be because you’ve followed a broken or outdated link, or because there’s an error on our site. Use the browser back button to go to the previous page."
     },
     "500": {
-      "title": "Sorry, we're having technical problems",
+      "title": "Sorry, we’re having technical problems",
       "paragraph": "Please try again in a few minutes."
     }
   }
