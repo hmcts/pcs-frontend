@@ -84,7 +84,6 @@ export const createGetController = (
       ...stepTranslations,
     };
 
-    // contactUsForHelpText is optional - template handles it gracefully with fallback to empty string
     const contactUsForHelpText = t('contactUsForHelpText');
     if (contactUsForHelpText !== 'contactUsForHelpText') {
       baseContent.contactUsForHelpText = contactUsForHelpText;
