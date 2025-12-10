@@ -194,4 +194,66 @@ describe('initSessionTimeout', () => {
     // modal hidden
     expect(modalContainer.hasAttribute('hidden')).toBe(true);
   });
+
+  it('displays countdown with minutes and seconds', () => {
+    document.body.innerHTML = buildSessionTimeoutComponent();
+    document.body.dataset.sessionTimeout = '6';
+    document.body.dataset.sessionWarning = '5';
+
+    const countdownElement = document.getElementById('countdown-timer') as HTMLSpanElement;
+
+    initSessionTimeout();
+
+    // show modal
+    mockDateNow.mockReturnValue(60000);
+    jest.advanceTimersByTime(10000);
+
+    jest.advanceTimersByTime(30000);
+
+    // should show format like "4 minutes 30 seconds"
+    const text = countdownElement.textContent || '';
+    expect(text).toContain('minute');
+    expect(text).toContain('second');
+  });
+
+  it('displays countdown with minutes only', () => {
+    document.body.innerHTML = buildSessionTimeoutComponent();
+    document.body.dataset.sessionTimeout = '6';
+    document.body.dataset.sessionWarning = '5';
+
+    const countdownElement = document.getElementById('countdown-timer') as HTMLSpanElement;
+
+    initSessionTimeout();
+
+    // show modal - starts at 5 minutes exactly
+    mockDateNow.mockReturnValue(60000);
+    jest.advanceTimersByTime(10000);
+
+    // should show format like "5 minutes" (no seconds)
+    const text = countdownElement.textContent || '';
+    expect(text).toContain('minute');
+    expect(text).not.toContain('second');
+  });
+
+  it('displays countdown with seconds only', () => {
+    document.body.innerHTML = buildSessionTimeoutComponent();
+    document.body.dataset.sessionTimeout = '6';
+    document.body.dataset.sessionWarning = '1'; // 1 minute warning to get to seconds quickly
+
+    const countdownElement = document.getElementById('countdown-timer') as HTMLSpanElement;
+
+    initSessionTimeout();
+
+    // show modal
+    mockDateNow.mockReturnValue(300000); // 5 minutes = time until warning
+    jest.advanceTimersByTime(10000);
+
+    // advance countdown to less than 1 minute
+    jest.advanceTimersByTime(50000); // advance 50 seconds
+
+    // should show format like "10 seconds" (no minutes)
+    const text = countdownElement.textContent || '';
+    expect(text).not.toContain('minute');
+    expect(text).toContain('second');
+  });
 });
