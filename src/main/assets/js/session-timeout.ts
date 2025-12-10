@@ -2,6 +2,7 @@ export function initSessionTimeout(): void {
   const body = document.body;
   const sessionTimeoutMinutes = parseInt(body.dataset.sessionTimeout || '6', 10);
   const sessionWarningMinutes = parseInt(body.dataset.sessionWarning || '5', 10);
+  const sessionCheckIntervalSeconds = parseInt(body.dataset.sessionCheckInterval || '10', 10);
 
   // modal elements
   const modalContainer = document.getElementById('timeout-modal-container');
@@ -133,6 +134,6 @@ export function initSessionTimeout(): void {
   // first check immediately
   checkSessionStatus();
 
-  // check every 10 seconds
-  setInterval(checkSessionStatus, 10000);
+  // check at configurable interval
+  setInterval(checkSessionStatus, sessionCheckIntervalSeconds * 1000);
 }

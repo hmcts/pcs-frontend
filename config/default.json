@@ -13,7 +13,8 @@
     },
     "timeout": {
       "sessionWarningMinutes": 5,
-      "sessionTimeoutMinutes": 6
+      "sessionTimeoutMinutes": 6,
+      "checkIntervalSeconds": 10
     }
   },
   "health": {

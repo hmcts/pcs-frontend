@@ -7,6 +7,7 @@
 {% block bodyAttributes %}
   data-session-timeout="{{ sessionTimeout.sessionTimeoutMinutes }}"
   data-session-warning="{{ sessionTimeout.sessionWarningMinutes }}"
+  data-session-check-interval="{{ sessionTimeout.checkIntervalSeconds }}"
 {% endblock %}
 
 {% block head %}

@@ -29,7 +29,8 @@
     },
     "timeout": {
       "sessionWarningMinutes": "SESSION_WARNING_MINUTES",
-      "sessionTimeoutMinutes": "SESSION_TIMEOUT_MINUTES"
+      "sessionTimeoutMinutes": "SESSION_TIMEOUT_MINUTES",
+      "checkIntervalSeconds": "SESSION_CHECK_INTERVAL_SECONDS"
     }
   },
   "s2s": {
