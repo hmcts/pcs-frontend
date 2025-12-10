@@ -20,6 +20,7 @@ const ELEMENT_TYPES = [
   'TextLabel',
   'Paragraph',
   'List',
+  'Summary',
 ] as const;
 
 type ValidationResult = { element: string; expected: string; status: 'pass' | 'fail' };
@@ -47,7 +48,9 @@ export class PageContentValidation implements IValidation {
                     a.govuk-link:text("${value}"),
                     button.govuk-js-link:text("${value}"),
                     [role="link"]:text("${value}"),
-                    [aria-label*="${value}"]:text("${value}")`),
+                    [aria-label*="${value}"]:text("${value}"),
+                    summary:has-text("${value}"),
+                    summary .govuk-details__summary-text:text("${value}")`),
     Header: (page: Page, value: string) =>
       page.locator(`
                     h1:text("${value}"),
@@ -105,12 +108,19 @@ export class PageContentValidation implements IValidation {
                     .body:text("${value}"),
                     .text-content:text("${value}"),
                     .govuk-body:text("${value}"),
-                    .govuk-list:text("${value}")`),
+                    .govuk-list:text("${value}"),
+                    .govuk-details__text:text("${value}"),
+                    .govuk-details__text p:text("${value}")`),
     List: (page: Page, value: string) =>
       page.locator(`
                     li:text("${value}"),
                     ul li:text("${value}"),
                     ol li:text("${value}")`),
+    Summary: (page: Page, value: string) =>
+      page.locator(`
+                    summary:has-text("${value}"),
+                    summary .govuk-details__summary-text:text("${value}"),
+                    .govuk-details__summary-text:text("${value}")`),
     Text: (page: Page, value: string) => page.locator(`:text("${value}")`),
     Tab: (page: Page, value: string) => page.getByRole('tab', { name: value }),
   };
