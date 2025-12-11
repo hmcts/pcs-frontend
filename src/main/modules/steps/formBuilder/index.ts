@@ -2,7 +2,7 @@ import path from 'path';
 
 import type { TFunction } from 'i18next';
 
-import { DASHBOARD_ROUTE } from '../../../app/utils/routes';
+import { getDashboardUrl } from '../../../app/utils/routes';
 import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController } from '../controller';
@@ -45,7 +45,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         return {
           ...result,
           ccdId: req.session?.ccdCase?.id,
-          dashboardRoute: DASHBOARD_ROUTE,
+          dashboardUrl: getDashboardUrl(req.session?.ccdCase?.id),
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),

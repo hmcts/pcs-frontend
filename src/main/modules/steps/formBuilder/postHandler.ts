@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { DASHBOARD_ROUTE, getDashboardUrl } from '../../../app/utils/routes';
+import { getDashboardUrl } from '../../../app/utils/routes';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import { stepNavigation } from '../flow';
 import { getRequestLanguage, getTranslationFunction, loadStepNamespace } from '../i18n';
@@ -48,7 +48,7 @@ export function createPostHandler(
           pageUrl: req.originalUrl || '/',
           t,
           ccdId: req.session?.ccdCase?.id,
-          dashboardRoute: DASHBOARD_ROUTE,
+          dashboardUrl: getDashboardUrl(req.session?.ccdCase?.id),
           languageToggle: t('languageToggle'),
         });
       }
