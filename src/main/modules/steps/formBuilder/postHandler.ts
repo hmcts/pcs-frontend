@@ -46,7 +46,9 @@ export function createPostHandler(
           ccdId: req.session?.ccdCase?.id,
           dashboardUrl: getDashboardUrl(req.session?.ccdCase?.id),
           languageToggle: t('languageToggle'),
-        });
+        };
+
+        return renderWithErrors(req, res, errors, content, viewPath, fields, t);
       }
 
       // Handle saveForLater action after validation passes
