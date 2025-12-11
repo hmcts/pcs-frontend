@@ -1,8 +1,8 @@
 export function initSessionTimeout(): void {
   const body = document.body;
-  const sessionTimeoutMinutes = parseInt(body.dataset.sessionTimeout || '6', 10);
-  const sessionWarningMinutes = parseInt(body.dataset.sessionWarning || '5', 10);
-  const sessionCheckIntervalSeconds = parseInt(body.dataset.sessionCheckInterval || '10', 10);
+  const sessionTimeoutMinutes = parseInt(body.dataset.sessionTimeout!, 10);
+  const sessionWarningMinutes = parseInt(body.dataset.sessionWarning!, 10);
+  const sessionCheckIntervalSeconds = parseInt(body.dataset.sessionCheckInterval!, 10);
 
   // modal elements
   const modalContainer = document.getElementById('timeout-modal-container');

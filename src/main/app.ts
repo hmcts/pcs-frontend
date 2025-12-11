@@ -9,6 +9,7 @@ import favicon from 'serve-favicon';
 
 import { HTTPError } from './HttpError';
 import { setupDev } from './development';
+import { sessionTimeoutMiddleware } from './middleware';
 import * as modules from './modules';
 import registerSteps from './routes/registerSteps';
 
@@ -39,6 +40,9 @@ app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
   next();
 });
+
+// timeout config available to all templates
+app.use(sessionTimeoutMiddleware);
 
 registerSteps(app);
 

@@ -1,12 +1,11 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/header/macro.njk" import govukHeader %}
 
-
-{% block bodyAttributes %}
-  data-session-timeout="{{ sessionTimeout.sessionTimeoutMinutes }}"
-  data-session-warning="{{ sessionTimeout.sessionWarningMinutes }}"
-  data-session-check-interval="{{ sessionTimeout.checkIntervalSeconds }}"
-{% endblock %}
+{% set bodyAttributes = {
+  "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
+  "data-session-warning": sessionTimeout.sessionWarningMinutes,
+  "data-session-check-interval": sessionTimeout.checkIntervalSeconds
+} %}
 
 {% block head %}
   {% include "webpack/css.njk" %}

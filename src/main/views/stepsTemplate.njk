@@ -4,11 +4,11 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
-{% block bodyAttributes %}
-  data-session-timeout="{{ sessionTimeout.sessionTimeoutMinutes }}"
-  data-session-warning="{{ sessionTimeout.sessionWarningMinutes }}"
-  data-session-check-interval="{{ sessionTimeout.checkIntervalSeconds }}"
-{% endblock %}
+{% set bodyAttributes = {
+  "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
+  "data-session-warning": sessionTimeout.sessionWarningMinutes,
+  "data-session-check-interval": sessionTimeout.checkIntervalSeconds
+} %}
 
 {% block head %}
   <title>{% block pageTitle %}Possession claims{% endblock %} - GOV.UK</title>
