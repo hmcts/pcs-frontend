@@ -15,6 +15,7 @@ export interface ErrorSummary {
 
 export interface FieldError {
   field: string;
+  anchor?: string;
   text: string;
 }
 
@@ -80,14 +81,17 @@ export function renderWithErrors(
 ): Response {
   const errorSummary = buildErrorSummary(errors, fields, t);
 
-  // Get first error for backward compatibility (if needed)
+  // Use error from content if it exists (it may have anchor property), otherwise create one
+  const errorFromContent = content.error as FieldError | undefined;
   const firstField = Object.keys(errors)[0];
-  const firstError: FieldError | undefined = firstField
-    ? {
-        field: firstField,
-        text: errors[firstField],
-      }
-    : undefined;
+  const firstError: FieldError | undefined =
+    errorFromContent ||
+    (firstField
+      ? {
+          field: firstField,
+          text: errors[firstField],
+        }
+      : undefined);
 
   res.status(400).render(viewPath, {
     ...content,

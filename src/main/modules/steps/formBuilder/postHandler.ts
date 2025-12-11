@@ -31,7 +31,20 @@ export function createPostHandler(
       // If there are validation errors, show them regardless of action
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
-        const error = { field: firstField, text: errors[firstField] };
+        const field = fields.find(f => f.name === firstField);
+        let anchorId = firstField;
+
+        // Handle date fields - anchor to day field
+        if (field?.type === 'date') {
+          anchorId = `${firstField}-day`;
+        }
+
+        // Handle radio/checkbox fields - anchor to field name
+        if (field?.type === 'radio' || field?.type === 'checkbox') {
+          anchorId = firstField;
+        }
+
+        const error = { field: firstField, anchor: anchorId, text: errors[firstField] };
         const formContent = buildFormContent(fields, t, req.body, error, translationKeys, errors);
 
         const content = {

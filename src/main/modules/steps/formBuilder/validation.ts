@@ -11,7 +11,7 @@ export interface ValidationErrors {
  * Get all form data from session across all steps
  */
 export function getAllFormData(req: Request): Record<string, unknown> {
-  return req.session.formData || {};
+  return req.session?.formData || {};
 }
 
 /**
@@ -46,6 +46,7 @@ function createFieldSchema(
 
   switch (field.type) {
     case 'date': {
+      const required = isRequired();
       const dateSchema = z
         .object({
           day: z.string().trim(),
@@ -57,6 +58,11 @@ function createFieldSchema(
             const day = obj.day?.trim() || '';
             const month = obj.month?.trim() || '';
             const year = obj.year?.trim() || '';
+
+            // For optional fields, if all parts are empty, it's valid
+            if (!required && !day && !month && !year) {
+              return true;
+            }
 
             // Check all parts are present
             if (!day || !month || !year) {
@@ -96,7 +102,7 @@ function createFieldSchema(
           { message: field.errorMessage || 'Enter a valid date' }
         );
 
-      if (isRequired()) {
+      if (required) {
         schema = dateSchema;
       } else {
         schema = dateSchema.optional();
@@ -110,7 +116,8 @@ function createFieldSchema(
         .or(z.string())
         .transform(val => {
           if (typeof val === 'string') {
-            return [val];
+            // Empty string should be treated as empty array
+            return val === '' ? [] : [val];
           }
           return val;
         });
@@ -145,13 +152,21 @@ function createFieldSchema(
         });
       }
 
+      const required = isRequired();
       if (field.pattern) {
-        textSchema = textSchema.regex(new RegExp(field.pattern), {
-          message: field.errorMessage || 'Invalid format',
-        });
+        // For optional fields, only validate pattern if value is not empty
+        if (required) {
+          textSchema = textSchema.regex(new RegExp(field.pattern), {
+            message: field.errorMessage || 'Invalid format',
+          });
+        } else {
+          textSchema = textSchema.refine(val => !val || new RegExp(field.pattern!).test(val), {
+            message: field.errorMessage || 'Invalid format',
+          });
+        }
       }
 
-      if (isRequired()) {
+      if (required) {
         schema = textSchema.min(1, { message: field.errorMessage || 'This field is required' });
       } else {
         schema = textSchema.optional();
@@ -194,8 +209,9 @@ export function validateFormWithZod(
     } else if (field.type === 'checkbox') {
       // Normalize checkbox values
       const value = req.body[field.name];
-      if (value && typeof value === 'string') {
-        formData[field.name] = [value];
+      if (typeof value === 'string') {
+        // Empty string should be treated as empty array
+        formData[field.name] = value === '' ? [] : [value];
       } else {
         formData[field.name] = value;
       }
@@ -214,18 +230,41 @@ export function validateFormWithZod(
       const result = schema.safeParse(fieldValue);
       if (!result.success) {
         const firstError = result.error.issues[0];
-        errors[field.name] = firstError?.message || translations?.defaultInvalid || 'Enter a valid date';
+        // Prefer translation over Zod refine message for date validation
+        errors[field.name] =
+          translations?.defaultRequired || translations?.defaultInvalid || firstError?.message || 'Enter a valid date';
       }
     } else {
+      // Check if field is required
+      const fieldRequired =
+        typeof field.required === 'boolean'
+          ? field.required
+          : typeof field.required === 'function'
+            ? field.required(formData, allFormData)
+            : false;
+
       const result = schema.safeParse(fieldValue);
       if (!result.success) {
         const firstError = result.error.issues[0];
-        errors[field.name] =
-          firstError?.message ||
-          field.errorMessage ||
-          translations?.defaultRequired ||
-          translations?.defaultInvalid ||
-          'This field is required';
+        // For missing required fields, use required error message
+        const isMissingRequired = fieldValue === undefined && fieldRequired;
+        // For pattern validation errors, prefer translation over Zod default message
+        const isPatternError = field.pattern && firstError?.message === 'Invalid format';
+
+        let errorMessage: string;
+        if (isMissingRequired) {
+          errorMessage = field.errorMessage || translations?.defaultRequired || 'This field is required';
+        } else if (isPatternError && translations?.defaultInvalid) {
+          errorMessage = translations.defaultInvalid;
+        } else {
+          errorMessage =
+            firstError?.message ||
+            field.errorMessage ||
+            translations?.defaultRequired ||
+            translations?.defaultInvalid ||
+            'This field is required';
+        }
+        errors[field.name] = errorMessage;
       }
     }
   }
