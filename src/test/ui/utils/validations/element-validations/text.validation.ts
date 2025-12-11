@@ -23,7 +23,7 @@ export class TextValidation implements IValidation {
       case 'listItem':
         data.elementType = 'li';
         break;
-      case 'detailsText':
+      case 'summaryText':
         data.elementType = '.govuk-details__text';
         break;
     }

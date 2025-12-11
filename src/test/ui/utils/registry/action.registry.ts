@@ -2,8 +2,8 @@ import { CreateCaseAPIAction, LoginAction, NavigateToUrlAction } from '../action
 import {
   CheckAction,
   ClickButtonAction,
-  ClickDetailsAction,
   ClickRadioButtonAction,
+  ClickSummaryAction,
   ClickTabAction,
   InputTextAction,
   SelectAction,
@@ -17,7 +17,7 @@ export class ActionRegistry {
   private static actions: Map<string, IAction> = new Map([
     ['check', new CheckAction()],
     ['clickButton', new ClickButtonAction()],
-    ['clickDetails', new ClickDetailsAction()],
+    ['clickSummary', new ClickSummaryAction()],
     ['clickLink', new ClickLinkAction()],
     ['clickLinkAndVerifyNewTabTitle', new clickLinkAndVerifyNewTabTitleAction()],
     ['clickRadioButton', new ClickRadioButtonAction()],

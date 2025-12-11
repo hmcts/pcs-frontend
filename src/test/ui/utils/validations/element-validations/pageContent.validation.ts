@@ -20,6 +20,7 @@ const ELEMENT_TYPES = [
   'TextLabel',
   'Paragraph',
   'List',
+  'Summary',
 ] as const;
 
 type ValidationResult = { element: string; expected: string; status: 'pass' | 'fail' };
@@ -47,7 +48,9 @@ export class PageContentValidation implements IValidation {
                     a.govuk-link:text("${value}"),
                     button.govuk-js-link:text("${value}"),
                     [role="link"]:text("${value}"),
-                    [aria-label*="${value}"]:text("${value}"),
+                    [aria-label*="${value}"]:text("${value}")`),
+    Summary: (page: Page, value: string) =>
+      page.locator(`
                     summary:has-text("${value}"),
                     summary .govuk-details__summary-text:text("${value}")`),
     Header: (page: Page, value: string) =>

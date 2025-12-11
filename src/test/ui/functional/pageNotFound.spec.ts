@@ -20,9 +20,9 @@ test.afterEach(async () => {
 test.describe('Error page to indicate Page Not Found error @PR @nightly', async () => {
   test('Error page is displayed when invalid step URL is accessed', async () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
-    await performAction('clickDetails', pageNotFound.contactUsForHelpLink);
+    await performAction('clickSummary', pageNotFound.contactUsForHelpSummary);
     await performValidation('text', 'ifYouNeedHelpText', {
-      elementType: 'detailsText',
+      elementType: 'summaryText',
       text: pageNotFound.ifYouNeedHelpTextHidden,
     });
   });
