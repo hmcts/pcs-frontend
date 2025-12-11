@@ -38,6 +38,7 @@ export class Session {
 
     const sessionTimeoutMinutes = config.get<number>('session.timeout.sessionTimeoutMinutes');
     const sessionWarningMinutes = config.get<number>('session.timeout.sessionWarningMinutes');
+    const checkIntervalSeconds = config.get<number>('session.timeout.checkIntervalSeconds');
 
     const sessionMiddleware: session.SessionOptions = {
       secret: config.get<string>('secrets.pcs.pcs-session-secret'),
@@ -60,6 +61,7 @@ export class Session {
     app.locals.sessionTimeout = {
       sessionWarningMinutes,
       sessionTimeoutMinutes,
+      checkIntervalSeconds,
     };
 
     this.logger.info('Session middleware configured with Redis store');

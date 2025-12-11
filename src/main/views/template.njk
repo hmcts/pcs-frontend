@@ -1,6 +1,13 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/header/macro.njk" import govukHeader %}
 
+
+{% block bodyAttributes %}
+  data-session-timeout="{{ sessionTimeout.sessionTimeoutMinutes }}"
+  data-session-warning="{{ sessionTimeout.sessionWarningMinutes }}"
+  data-session-check-interval="{{ sessionTimeout.checkIntervalSeconds }}"
+{% endblock %}
+
 {% block head %}
   {% include "webpack/css.njk" %}
 {% endblock %}
@@ -15,6 +22,12 @@
     }
   ]
 }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {% block modal %}
+    {% include "components/timeout-modal.njk" %}
+  {% endblock %}
 {% endblock %}
 
 {% block bodyEnd %}
