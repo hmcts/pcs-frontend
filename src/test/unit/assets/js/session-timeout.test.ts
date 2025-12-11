@@ -225,11 +225,14 @@ describe('initSessionTimeout', () => {
 
     initSessionTimeout();
 
-    // show modal - starts at 5 minutes exactly
+    // show modal - starts at 5 minutes (300 seconds)
     mockDateNow.mockReturnValue(60000);
     jest.advanceTimersByTime(10000);
 
-    // should show format like "5 minutes" (no seconds)
+    // adjusted to get to exactly 180 seconds
+    jest.advanceTimersByTime(110000);
+
+    // should show format like "3 minutes" (no seconds)
     const text = countdownElement.textContent || '';
     expect(text).toContain('minute');
     expect(text).not.toContain('second');
