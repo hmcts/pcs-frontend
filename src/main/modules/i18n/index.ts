@@ -7,6 +7,7 @@ import i18next, { type TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 import { LanguageDetector, handle as i18nextHandle } from 'i18next-http-middleware';
 import { z } from 'zod/v4';
+
 import { makeZodI18nMap } from './zod-error-map';
 
 function firstExistingPath(paths: string[]): string | null {
@@ -43,7 +44,6 @@ function discoverNamespaces(localesDir: string, lang = 'en'): string[] {
     return ['common'];
   }
 }
-
 
 export class I18n {
   private readonly logger = Logger.getLogger('i18n');
@@ -125,14 +125,12 @@ export class I18n {
       }
 
       // Configure zod v4 with custom error map using i18next
-    const zodErrorMap = makeZodI18nMap({
-      t,
-    });
-    z.config({ customError: zodErrorMap });
+      const zodErrorMap = makeZodI18nMap({
+        t,
+      });
+      z.config({ customError: zodErrorMap });
 
       next();
     });
-
-    
   }
 }

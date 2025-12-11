@@ -6,8 +6,8 @@ import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formF
 import { stepNavigation } from '../flow';
 import { getRequestLanguage, getTranslationFunction, loadStepNamespace } from '../i18n';
 
-import { buildFormContent } from './formContent';
 import { renderWithErrors } from './errorHandling';
+import { buildFormContent } from './formContent';
 import { getTranslationErrors, processFieldData, setFormData, validateForm } from './helpers';
 
 export function createPostHandler(

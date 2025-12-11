@@ -1,26 +1,28 @@
 import i18next, { type i18n } from 'i18next';
-import type { $ZodRawIssue, $ZodErrorMap } from 'zod/v4/core/errors';
+import type { $ZodErrorMap, $ZodRawIssue } from 'zod/v4/core/errors';
 
 // Helper functions from zod-i18n-map library
 
-const jsonStringifyReplacer = (_: string, value: any): any => {
+const jsonStringifyReplacer = (_: string, value: unknown): unknown => {
   if (typeof value === 'bigint') {
     return value.toString();
   }
   return value;
 };
 
-function joinValues<T extends any[]>(array: T, separator = ' | '): string {
-  return array
-    .map((val) => (typeof val === 'string' ? `'${val}'` : val))
-    .join(separator);
+function joinValues<T extends readonly unknown[]>(array: T, separator = ' | '): string {
+  return array.map(val => (typeof val === 'string' ? `'${val}'` : val)).join(separator);
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
-  if (typeof value !== 'object' || value === null) return false;
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
 
   for (const key in value) {
-    if (!Object.prototype.hasOwnProperty.call(value, key)) return false;
+    if (!Object.prototype.hasOwnProperty.call(value, key)) {
+      return false;
+    }
   }
 
   return true;
@@ -33,13 +35,13 @@ const getKeyAndValues = (
   values: Record<string, unknown>;
   key: string;
 } => {
-  if (typeof param === 'string') return { key: param, values: {} };
+  if (typeof param === 'string') {
+    return { key: param, values: {} };
+  }
 
   if (isRecord(param)) {
-    const key =
-      'key' in param && typeof param.key === 'string' ? param.key : defaultKey;
-    const values =
-      'values' in param && isRecord(param.values) ? param.values : {};
+    const key = 'key' in param && typeof param.key === 'string' ? param.key : defaultKey;
+    const values = 'values' in param && isRecord(param.values) ? param.values : {};
 
     return { key, values };
   }
@@ -63,20 +65,44 @@ const defaultNs = 'zod';
 
 // Get parsed type from input (adapted from Zod v4)
 const getParsedType = (data: unknown): string => {
-  if (data === undefined) return 'undefined';
-  if (data === null) return 'null';
+  if (data === undefined) {
+    return 'undefined';
+  }
+  if (data === null) {
+    return 'null';
+  }
   const t = typeof data;
-  if (t === 'string') return 'string';
-  if (t === 'number') return Number.isNaN(data) ? 'nan' : 'number';
-  if (t === 'boolean') return 'boolean';
-  if (t === 'function') return 'function';
-  if (t === 'bigint') return 'bigint';
-  if (t === 'symbol') return 'symbol';
+  if (t === 'string') {
+    return 'string';
+  }
+  if (t === 'number') {
+    return Number.isNaN(data) ? 'nan' : 'number';
+  }
+  if (t === 'boolean') {
+    return 'boolean';
+  }
+  if (t === 'function') {
+    return 'function';
+  }
+  if (t === 'bigint') {
+    return 'bigint';
+  }
+  if (t === 'symbol') {
+    return 'symbol';
+  }
   if (t === 'object') {
-    if (Array.isArray(data)) return 'array';
-    if (data instanceof Date) return 'date';
-    if (data instanceof Map) return 'map';
-    if (data instanceof Set) return 'set';
+    if (Array.isArray(data)) {
+      return 'array';
+    }
+    if (data instanceof Date) {
+      return 'date';
+    }
+    if (data instanceof Map) {
+      return 'map';
+    }
+    if (data instanceof Set) {
+      return 'set';
+    }
     return 'object';
   }
   return 'unknown';
@@ -87,7 +113,7 @@ const getParsedType = (data: unknown): string => {
  * Based on zod-i18n-map library approach
  */
 export const makeZodI18nMap = (option?: ZodI18nMapOption): $ZodErrorMap => {
-  return (issue: $ZodRawIssue, ctx?: { data: unknown }): { message: string } | undefined => {
+  return (issue: $ZodRawIssue, _ctx?: { data: unknown }): { message: string } | undefined => {
     // Get translation function - i18next handles language detection automatically
     const { t, ns, handlePath } = {
       t: i18next.t,
@@ -116,15 +142,10 @@ export const makeZodI18nMap = (option?: ZodI18nMapOption): $ZodErrorMap => {
       pathArray.length > 0 && !!handlePath
         ? {
             context: handlePath.context,
-            path: t(
-              [handlePath.keyPrefix, pathArray.join('.')]
-                .filter(Boolean)
-                .join('.'),
-              {
-                ns: handlePath.ns,
-                defaultValue: pathArray.join('.'),
-              }
-            ),
+            path: t([handlePath.keyPrefix, pathArray.join('.')].filter(Boolean).join('.'), {
+              ns: handlePath.ns,
+              defaultValue: pathArray.join('.'),
+            }),
           }
         : {};
 
@@ -133,7 +154,7 @@ export const makeZodI18nMap = (option?: ZodI18nMapOption): $ZodErrorMap => {
     switch (issue.code as string) {
       case 'invalid_type': {
         const received = getParsedType(issue.input);
-        
+
         if (received === 'undefined') {
           message = t('errors.invalid_type_received_undefined', {
             ns,
@@ -200,7 +221,8 @@ export const makeZodI18nMap = (option?: ZodI18nMapOption): $ZodErrorMap => {
 
       case 'invalid_union_discriminator': {
         const issueWithOptions = issue as $ZodRawIssue & { options?: unknown[] };
-        const options = 'options' in issueWithOptions && Array.isArray(issueWithOptions.options) ? issueWithOptions.options : [];
+        const options =
+          'options' in issueWithOptions && Array.isArray(issueWithOptions.options) ? issueWithOptions.options : [];
         message = t('errors.invalid_union_discriminator', {
           options: joinValues(options),
           ns,
@@ -288,42 +310,60 @@ export const makeZodI18nMap = (option?: ZodI18nMapOption): $ZodErrorMap => {
       case 'too_small': {
         const origin = 'origin' in issue ? String(issue.origin) : 'string';
         const minimum = 'minimum' in issue ? issue.minimum : undefined;
-        const type = origin === 'date' ? 'date' : origin === 'array' ? 'array' : origin === 'number' || origin === 'int' ? 'number' : 'string';
-        const exact = 'exact' in issue && issue.exact ? 'exact' : 'inclusive' in issue && issue.inclusive ? 'inclusive' : 'not_inclusive';
-        
+        const type =
+          origin === 'date'
+            ? 'date'
+            : origin === 'array'
+              ? 'array'
+              : origin === 'number' || origin === 'int'
+                ? 'number'
+                : 'string';
+        const exact =
+          'exact' in issue && issue.exact
+            ? 'exact'
+            : 'inclusive' in issue && issue.inclusive
+              ? 'inclusive'
+              : 'not_inclusive';
+
         const minimumValue = type === 'date' && typeof minimum === 'number' ? new Date(minimum) : minimum;
-        
-        message = t(
-          `errors.too_small.${type}.${exact}`,
-          {
-            minimum: minimumValue,
-            count: typeof minimum === 'number' ? minimum : undefined,
-            ns,
-            defaultValue: message,
-            ...path,
-          }
-        );
+
+        message = t(`errors.too_small.${type}.${exact}`, {
+          minimum: minimumValue,
+          count: typeof minimum === 'number' ? minimum : undefined,
+          ns,
+          defaultValue: message,
+          ...path,
+        });
         break;
       }
 
       case 'too_big': {
         const origin = 'origin' in issue ? String(issue.origin) : 'string';
         const maximum = 'maximum' in issue ? issue.maximum : undefined;
-        const type = origin === 'date' ? 'date' : origin === 'array' ? 'array' : origin === 'number' || origin === 'int' ? 'number' : 'string';
-        const exact = 'exact' in issue && issue.exact ? 'exact' : 'inclusive' in issue && issue.inclusive ? 'inclusive' : 'not_inclusive';
-        
+        const type =
+          origin === 'date'
+            ? 'date'
+            : origin === 'array'
+              ? 'array'
+              : origin === 'number' || origin === 'int'
+                ? 'number'
+                : 'string';
+        const exact =
+          'exact' in issue && issue.exact
+            ? 'exact'
+            : 'inclusive' in issue && issue.inclusive
+              ? 'inclusive'
+              : 'not_inclusive';
+
         const maximumValue = type === 'date' && typeof maximum === 'number' ? new Date(maximum) : maximum;
-        
-        message = t(
-          `errors.too_big.${type}.${exact}`,
-          {
-            maximum: maximumValue,
-            count: typeof maximum === 'number' ? maximum : undefined,
-            ns,
-            defaultValue: message,
-            ...path,
-          }
-        );
+
+        message = t(`errors.too_big.${type}.${exact}`, {
+          maximum: maximumValue,
+          count: typeof maximum === 'number' ? maximum : undefined,
+          ns,
+          defaultValue: message,
+          ...path,
+        });
         break;
       }
 
@@ -385,4 +425,3 @@ export const makeZodI18nMap = (option?: ZodI18nMapOption): $ZodErrorMap => {
 
 // Export default instance
 export const zodI18nMap = makeZodI18nMap();
-

@@ -74,7 +74,14 @@ function createFieldSchema(
             const monthNum = parseInt(month, 10);
             const yearNum = parseInt(year, 10);
 
-            if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12 || yearNum < 1900 || yearNum > new Date().getFullYear()) {
+            if (
+              dayNum < 1 ||
+              dayNum > 31 ||
+              monthNum < 1 ||
+              monthNum > 12 ||
+              yearNum < 1900 ||
+              yearNum > new Date().getFullYear()
+            ) {
               return false;
             }
 
@@ -98,18 +105,20 @@ function createFieldSchema(
     }
 
     case 'checkbox': {
-      const checkboxSchema = z.array(z.string()).or(z.string()).transform(val => {
-        if (typeof val === 'string') {
-          return [val];
-        }
-        return val;
-      });
+      const checkboxSchema = z
+        .array(z.string())
+        .or(z.string())
+        .transform(val => {
+          if (typeof val === 'string') {
+            return [val];
+          }
+          return val;
+        });
 
       if (isRequired()) {
-        schema = checkboxSchema.refine(
-          val => Array.isArray(val) && val.length > 0,
-          { message: field.errorMessage || 'Select at least one option' }
-        );
+        schema = checkboxSchema.refine(val => Array.isArray(val) && val.length > 0, {
+          message: field.errorMessage || 'Select at least one option',
+        });
       } else {
         schema = checkboxSchema.optional();
       }
@@ -223,4 +232,3 @@ export function validateFormWithZod(
 
   return errors;
 }
-

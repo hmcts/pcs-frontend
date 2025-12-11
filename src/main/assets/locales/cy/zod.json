@@ -1,113 +1,113 @@
 {
-    "errors": {
-      "invalid_type": "cyExpected {{expected}}, received {{received}}",
-      "invalid_type_received_undefined": "cyRequired",
-      "invalid_type_received_null": "cyRequired",
-      "invalid_literal": "cyInvalid literal value, expected {{expected}}",
-      "unrecognized_keys": "cyUnrecognized key(s) in object: {{- keys}}",
-      "invalid_union": "cyInvalid input",
-      "invalid_union_discriminator": "cyInvalid discriminator value. Expected {{- options}}",
-      "invalid_enum_value": "cyInvalid enum value. Expected {{- options}}, received '{{received}}'",
-      "invalid_arguments": "cyInvalid function arguments",
-      "invalid_return_type": "cyInvalid function return type",
-      "invalid_date": "cyInvalid date",
-      "custom": "cyInvalid input",
-      "invalid_intersection_types": "cyIntersection results could not be merged",
-      "not_multiple_of": "cyNumber must be a multiple of {{multipleOf}}",
-      "not_finite": "cyNumber must be finite",
-      "invalid_string": {
-        "email": "cyInvalid {{validation}}",
-        "url": "cyInvalid {{validation}}",
-        "uuid": "cyInvalid {{validation}}",
-        "cuid": "cyInvalid {{validation}}",
-        "regex": "cyInvalid",
-        "datetime": "cyInvalid {{validation}}",
-        "startsWith": "cyInvalid input: must start with \"{{startsWith}}\"",
-        "endsWith": "cyInvalid input: must end with \"{{endsWith}}\""
+  "errors": {
+    "invalid_type": "cyExpected {{expected}}, received {{received}}",
+    "invalid_type_received_undefined": "cyRequired",
+    "invalid_type_received_null": "cyRequired",
+    "invalid_literal": "cyInvalid literal value, expected {{expected}}",
+    "unrecognized_keys": "cyUnrecognized key(s) in object: {{- keys}}",
+    "invalid_union": "cyInvalid input",
+    "invalid_union_discriminator": "cyInvalid discriminator value. Expected {{- options}}",
+    "invalid_enum_value": "cyInvalid enum value. Expected {{- options}}, received '{{received}}'",
+    "invalid_arguments": "cyInvalid function arguments",
+    "invalid_return_type": "cyInvalid function return type",
+    "invalid_date": "cyInvalid date",
+    "custom": "cyInvalid input",
+    "invalid_intersection_types": "cyIntersection results could not be merged",
+    "not_multiple_of": "cyNumber must be a multiple of {{multipleOf}}",
+    "not_finite": "cyNumber must be finite",
+    "invalid_string": {
+      "email": "cyInvalid {{validation}}",
+      "url": "cyInvalid {{validation}}",
+      "uuid": "cyInvalid {{validation}}",
+      "cuid": "cyInvalid {{validation}}",
+      "regex": "cyInvalid",
+      "datetime": "cyInvalid {{validation}}",
+      "startsWith": "cyInvalid input: must start with \"{{startsWith}}\"",
+      "endsWith": "cyInvalid input: must end with \"{{endsWith}}\""
+    },
+    "too_small": {
+      "array": {
+        "exact": "cyArray must contain exactly {{minimum}} element(s)",
+        "inclusive": "cyArray must contain at least {{minimum}} element(s)",
+        "not_inclusive": "cyArray must contain more than {{minimum}} element(s)"
       },
-      "too_small": {
-        "array": {
-          "exact": "cyArray must contain exactly {{minimum}} element(s)",
-          "inclusive": "cyArray must contain at least {{minimum}} element(s)",
-          "not_inclusive": "cyArray must contain more than {{minimum}} element(s)"
-        },
-        "string": {
-          "exact": "cyString must contain exactly {{minimum}} character(s)",
-          "inclusive": "cyString must contain at least {{minimum}} character(s)",
-          "not_inclusive": "cyString must contain over {{minimum}} character(s)"
-        },
-        "number": {
-          "exact": "cyNumber must be exactly {{minimum}}",
-          "inclusive": "cyNumber must be greater than or equal to {{minimum}}",
-          "not_inclusive": "cyNumber must be greater than {{minimum}}"
-        },
-        "set": {
-          "exact": "cyInvalid input",
-          "inclusive": "cyInvalid input",
-          "not_inclusive": "cyInvalid input"
-        },
-        "date": {
-          "exact": "cyDate must be exactly {{- minimum, datetime}}",
-          "inclusive": "cyDate must be greater than or equal to {{- minimum, datetime}}",
-          "not_inclusive": "cyDate must be greater than {{- minimum, datetime}}"
-        }
+      "string": {
+        "exact": "cyString must contain exactly {{minimum}} character(s)",
+        "inclusive": "cyString must contain at least {{minimum}} character(s)",
+        "not_inclusive": "cyString must contain over {{minimum}} character(s)"
       },
-      "too_big": {
-        "array": {
-          "exact": "cyArray must contain exactly {{maximum}} element(s)",
-          "inclusive": "cyArray must contain at most {{maximum}} element(s)",
-          "not_inclusive": "cyArray must contain less than {{maximum}} element(s)"
-        },
-        "string": {
-          "exact": "cyString must contain exactly {{maximum}} character(s)",
-          "inclusive": "cyString must contain at most {{maximum}} character(s)",
-          "not_inclusive": "cyString must contain under {{maximum}} character(s)"
-        },
-        "number": {
-          "exact": "cyNumber must be exactly {{maximum}}",
-          "inclusive": "cyNumber must be less than or equal to {{maximum}}",
-          "not_inclusive": "cyNumber must be less than {{maximum}}"
-        },
-        "set": {
-          "exact": "cyInvalid input",
-          "inclusive": "cyInvalid input",
-          "not_inclusive": "cyInvalid input"
-        },
-        "date": {
-          "exact": "cyDate must be exactly {{- maximum, datetime}}",
-          "inclusive": "cyDate must be smaller than or equal to {{- maximum, datetime}}",
-          "not_inclusive": "cyDate must be smaller than {{- maximum, datetime}}"
-        }
+      "number": {
+        "exact": "cyNumber must be exactly {{minimum}}",
+        "inclusive": "cyNumber must be greater than or equal to {{minimum}}",
+        "not_inclusive": "cyNumber must be greater than {{minimum}}"
+      },
+      "set": {
+        "exact": "cyInvalid input",
+        "inclusive": "cyInvalid input",
+        "not_inclusive": "cyInvalid input"
+      },
+      "date": {
+        "exact": "cyDate must be exactly {{- minimum, datetime}}",
+        "inclusive": "cyDate must be greater than or equal to {{- minimum, datetime}}",
+        "not_inclusive": "cyDate must be greater than {{- minimum, datetime}}"
       }
     },
-    "validations": {
-      "email": "email",
-      "url": "url",
-      "uuid": "uuid",
-      "cuid": "cuid",
-      "regex": "regex",
-      "datetime": "datetime"
-    },
-    "types": {
-      "function": "function",
-      "number": "number",
-      "string": "string",
-      "nan": "nan",
-      "integer": "integer",
-      "float": "float",
-      "boolean": "boolean",
-      "date": "date",
-      "bigint": "bigint",
-      "undefined": "undefined",
-      "symbol": "symbol",
-      "null": "null",
-      "array": "array",
-      "object": "object",
-      "unknown": "unknown",
-      "promise": "promise",
-      "void": "void",
-      "never": "never",
-      "map": "map",
-      "set": "set"
+    "too_big": {
+      "array": {
+        "exact": "cyArray must contain exactly {{maximum}} element(s)",
+        "inclusive": "cyArray must contain at most {{maximum}} element(s)",
+        "not_inclusive": "cyArray must contain less than {{maximum}} element(s)"
+      },
+      "string": {
+        "exact": "cyString must contain exactly {{maximum}} character(s)",
+        "inclusive": "cyString must contain at most {{maximum}} character(s)",
+        "not_inclusive": "cyString must contain under {{maximum}} character(s)"
+      },
+      "number": {
+        "exact": "cyNumber must be exactly {{maximum}}",
+        "inclusive": "cyNumber must be less than or equal to {{maximum}}",
+        "not_inclusive": "cyNumber must be less than {{maximum}}"
+      },
+      "set": {
+        "exact": "cyInvalid input",
+        "inclusive": "cyInvalid input",
+        "not_inclusive": "cyInvalid input"
+      },
+      "date": {
+        "exact": "cyDate must be exactly {{- maximum, datetime}}",
+        "inclusive": "cyDate must be smaller than or equal to {{- maximum, datetime}}",
+        "not_inclusive": "cyDate must be smaller than {{- maximum, datetime}}"
+      }
     }
+  },
+  "validations": {
+    "email": "email",
+    "url": "url",
+    "uuid": "uuid",
+    "cuid": "cuid",
+    "regex": "regex",
+    "datetime": "datetime"
+  },
+  "types": {
+    "function": "function",
+    "number": "number",
+    "string": "string",
+    "nan": "nan",
+    "integer": "integer",
+    "float": "float",
+    "boolean": "boolean",
+    "date": "date",
+    "bigint": "bigint",
+    "undefined": "undefined",
+    "symbol": "symbol",
+    "null": "null",
+    "array": "array",
+    "object": "object",
+    "unknown": "unknown",
+    "promise": "promise",
+    "void": "void",
+    "never": "never",
+    "map": "map",
+    "set": "set"
   }
+}
