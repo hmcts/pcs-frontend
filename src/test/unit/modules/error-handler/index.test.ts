@@ -255,5 +255,29 @@ describe('error-handler', () => {
       expect((next.mock.calls[0][0] as HTTPError).status).toBe(404);
       expect((next.mock.calls[0][0] as HTTPError).message).toBe('Page not found');
     });
+
+    it('should not create 404 error if headers are already sent', () => {
+      const notFoundHandler = createNotFoundHandler();
+      const req = {} as Request;
+      const res = { headersSent: true } as Response;
+      const next = jest.fn();
+
+      notFoundHandler(req, res, next as NextFunction);
+
+      expect(next).toHaveBeenCalledWith();
+      expect(next).not.toHaveBeenCalledWith(expect.any(HTTPError));
+    });
+
+    it('should not create 404 error if response is writableEnded', () => {
+      const notFoundHandler = createNotFoundHandler();
+      const req = {} as Request;
+      const res = { writableEnded: true } as Response & { writableEnded?: boolean };
+      const next = jest.fn();
+
+      notFoundHandler(req, res, next as NextFunction);
+
+      expect(next).toHaveBeenCalledWith();
+      expect(next).not.toHaveBeenCalledWith(expect.any(HTTPError));
+    });
   });
 });
