@@ -1,0 +1,24 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">{{ title }}</h1>
+
+    {% if description %}
+      <p class="govuk-body">{{ description }}</p>
+    {% endif %}
+
+    <p class="govuk-body">{{ changeAnswer }}</p>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: exit,
+        href: '/?lang=' ~ lang
+      }) }}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

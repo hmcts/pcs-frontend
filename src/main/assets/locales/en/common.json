@@ -6,7 +6,8 @@
   "logout": "logout",
   "contactUsForHelp": "Contact us for help",
   "buttons": {
-    "continue": "Continue",
+    "continue": "Save and continue",
+    "saveForLater": "Save for later",
     "back": "Back",
     "cancel": "Cancel",
     "finish": "Start a new application",
@@ -14,9 +15,6 @@
     "submit": "Submit"
   },
   "change": "Change",
-  "defaultRequired": "This field is required",
-  "defaultInvalid": "Invalid format",
-  "chooseOption": "Choose an option",
   "back": "Back",
   "date": {
     "day": "Day",
@@ -26,6 +24,10 @@
   "errors": {
     "title": "There is a problem",
     "required": "Enter a value",
+    "defaultRequired": "This field is required",
+    "defaultInvalid": "Invalid format",
+    "defaultMaxLength": "Must be {max} characters or fewer",
+    "chooseOption": "Choose an option",
     "email": {
       "required": "Enter an email address",
       "invalid": "Enter a valid email address"
@@ -66,5 +68,16 @@
     "part2": "Your previous answers have been saved.",
     "buttonText": "Stay signed in",
     "signOutLinkText": "Sign out"
+},
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "You have %{count} character remaining",
+      "other": "You have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "You have reached the limit",
+    "charactersOverLimitText": {
+      "one": "You have %{count} character too many",
+      "other": "You have %{count} characters too many"
+
   }
 }

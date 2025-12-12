@@ -6,7 +6,8 @@
   "logout": "cylogout",
   "contactUsForHelp": "cyContact us for help",
   "buttons": {
-    "continue": "cyContinue",
+    "continue": "cySave and continue",
+    "saveForLater": "cySave for later",
     "back": "cyBack",
     "cancel": "cyCancel",
     "finish": "cyStart a new application",
@@ -14,8 +15,6 @@
     "submit": "cySubmit"
   },
   "change": "cyChange",
-  "defaultRequired": "cyThis field is required",
-  "defaultInvalid": "cyInvalid format",
   "chooseOption": "cyChoose an option",
   "back": "cyBack",
   "date": {
@@ -26,6 +25,9 @@
   "errors": {
     "title": "cyThere is a problem",
     "required": "cyEnter a value",
+    "defaultRequired": "cyThis field is required",
+    "defaultInvalid": "cyInvalid format",
+    "defaultMaxLength": "cyMust be {max} characters or fewer",
     "email": {
       "required": "cyEnter an email address",
       "invalid": "cyEnter a valid email address"
@@ -60,11 +62,22 @@
     "12": "cyDecember"
   },
   "dateFormatLong": "{{day}} {{month}} {{year}}",
+
   "timeout": {
     "title": "cyYou'll be signed out soon",
     "part1": "cyFor your security, you'll be signed out in",
     "part2": "cyYour previous answers have been saved.",
     "buttonText": "cyStay signed in",
     "signOutLinkText": "cySign out"
+},
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "cyYou have %{count} character remaining",
+      "other": "cyYou have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "cyYou have reached the limit",
+    "charactersOverLimitText": {
+      "one": "cyYou have %{count} character too many",
+      "other": "cyYou have %{count} characters too many"
   }
 }

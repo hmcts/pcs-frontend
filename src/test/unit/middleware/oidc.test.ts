@@ -12,6 +12,17 @@ interface CustomSession extends Session {
   };
 }
 
+// Create a minimal mock i18n object to satisfy type requirements
+const createMockI18n = () => {
+  return {
+    language: 'en',
+    languages: ['en'],
+    changeLanguage: jest.fn(),
+    getFixedT: jest.fn(),
+    t: jest.fn(),
+  } as unknown as import('i18next').i18n;
+};
+
 describe('oidcMiddleware', () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
@@ -42,6 +53,9 @@ describe('oidcMiddleware', () => {
           },
         },
       } as unknown as Application,
+      i18n: createMockI18n(),
+      t: jest.fn((key: string) => key) as unknown as import('i18next').TFunction,
+      language: 'en',
     };
     mockResponse = {
       redirect: jest.fn(),
@@ -56,7 +70,11 @@ describe('oidcMiddleware', () => {
       idToken: 'id-token',
       refreshToken: 'refresh-token',
     };
-    oidcMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
+    oidcMiddleware(
+      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+      mockResponse as Response,
+      nextFunction
+    );
 
     expect(nextFunction).toHaveBeenCalled();
     expect(mockResponse.redirect).not.toHaveBeenCalled();
@@ -67,7 +85,11 @@ describe('oidcMiddleware', () => {
   });
 
   it('should redirect to /login when user is not present in session', () => {
-    oidcMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
+    oidcMiddleware(
+      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+      mockResponse as Response,
+      nextFunction
+    );
 
     expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
     expect(nextFunction).not.toHaveBeenCalled();
@@ -75,7 +97,11 @@ describe('oidcMiddleware', () => {
 
   it('should redirect to /login when session is undefined', () => {
     mockRequest.session = undefined;
-    oidcMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
+    oidcMiddleware(
+      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+      mockResponse as Response,
+      nextFunction
+    );
 
     expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
     expect(nextFunction).not.toHaveBeenCalled();
