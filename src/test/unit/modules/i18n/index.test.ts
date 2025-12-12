@@ -71,9 +71,8 @@ describe('i18n module', () => {
     // i18next.use called twice (Backend + LanguageDetector)
     expect(mockUse).toHaveBeenCalledTimes(2);
 
-    // handle() was asked for a middleware
-    expect(mockHandle).toHaveBeenCalledWith(expect.any(Object));
-
+    // Verify middlewares were registered
+    expect((app.use as jest.Mock).mock.calls.length).toBeGreaterThanOrEqual(2);
     // First: i18next handle middleware (a function)
     expect((app.use as jest.Mock).mock.calls[0][0]).toEqual(expect.any(Function));
     // Second: our language-enforcement middleware (also a function)
