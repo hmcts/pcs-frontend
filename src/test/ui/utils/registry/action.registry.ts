@@ -3,6 +3,7 @@ import {
   CheckAction,
   ClickButtonAction,
   ClickRadioButtonAction,
+  ClickSummaryAction,
   ClickTabAction,
   InputTextAction,
   SelectAction,
@@ -16,6 +17,7 @@ export class ActionRegistry {
   private static actions: Map<string, IAction> = new Map([
     ['check', new CheckAction()],
     ['clickButton', new ClickButtonAction()],
+    ['clickSummary', new ClickSummaryAction()],
     ['clickLink', new ClickLinkAction()],
     ['clickLinkAndVerifyNewTabTitle', new clickLinkAndVerifyNewTabTitleAction()],
     ['clickRadioButton', new ClickRadioButtonAction()],
