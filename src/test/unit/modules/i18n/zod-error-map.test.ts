@@ -1,9 +1,11 @@
 import type { $ZodRawIssue } from 'zod/v4/core/errors';
 
 // Mock i18next - must be declared before importing the SUT
-const mockT = jest.fn((key: string | string[], options?: { defaultValue?: string; ns?: string; [key: string]: unknown }) => {
-  return options?.defaultValue || (Array.isArray(key) ? key[0] : key);
-});
+const mockT = jest.fn(
+  (key: string | string[], options?: { defaultValue?: string; ns?: string; [key: string]: unknown }) => {
+    return options?.defaultValue || (Array.isArray(key) ? key[0] : key);
+  }
+);
 
 jest.mock('i18next', () => ({
   __esModule: true,
@@ -67,6 +69,7 @@ describe('zod-error-map', () => {
     });
 
     it('should use custom translation function when provided', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const customT = jest.fn((key: string) => `Custom: ${key}`) as any;
       const errorMap = makeZodI18nMap({ t: customT });
       const issue: $ZodRawIssue = {
@@ -201,6 +204,7 @@ describe('zod-error-map', () => {
       it('should handle invalid_literal error', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'invalid_literal' as any,
           message: 'Invalid literal',
           input: 'wrong',
@@ -220,6 +224,7 @@ describe('zod-error-map', () => {
       it('should handle invalid_literal with bigint', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'invalid_literal' as any,
           message: 'Invalid literal',
           input: BigInt(123),
@@ -303,6 +308,7 @@ describe('zod-error-map', () => {
       it('should handle invalid_union_discriminator error', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'invalid_union_discriminator' as any,
           message: 'Invalid discriminator',
           input: 'test',
@@ -324,6 +330,7 @@ describe('zod-error-map', () => {
       it('should handle invalid_enum_value error', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'invalid_enum_value' as any,
           message: 'Invalid enum',
           input: 'invalid',
@@ -347,6 +354,7 @@ describe('zod-error-map', () => {
       it('should handle invalid_arguments error', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'invalid_arguments' as any,
           message: 'Invalid arguments',
           input: {},
@@ -366,6 +374,7 @@ describe('zod-error-map', () => {
       it('should handle invalid_return_type error', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'invalid_return_type' as any,
           message: 'Invalid return type',
           input: {},
@@ -385,6 +394,7 @@ describe('zod-error-map', () => {
       it('should handle invalid_date error', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'invalid_date' as any,
           message: 'Invalid date',
           input: 'invalid',
@@ -731,6 +741,7 @@ describe('zod-error-map', () => {
       it('should handle invalid_intersection_types error', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'invalid_intersection_types' as any,
           message: 'Invalid intersection',
           input: {},
@@ -771,6 +782,7 @@ describe('zod-error-map', () => {
       it('should handle not_finite error', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'not_finite' as any,
           message: 'Not finite',
           input: Infinity,
@@ -873,6 +885,7 @@ describe('zod-error-map', () => {
       it('should return default message for unknown error codes', () => {
         const errorMap = makeZodI18nMap();
         const issue: $ZodRawIssue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'unknown_error' as any,
           message: 'Unknown error message',
           input: {},
@@ -887,7 +900,9 @@ describe('zod-error-map', () => {
       it('should return "Invalid input" when message is missing', () => {
         const errorMap = makeZodI18nMap();
         const issue: $ZodRawIssue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'unknown_error' as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           message: undefined as any,
           input: {},
           path: [],
@@ -903,6 +918,7 @@ describe('zod-error-map', () => {
       it('should handle issue without expected field', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'invalid_type' as any,
           message: 'Invalid type',
           input: 'test',
@@ -922,6 +938,7 @@ describe('zod-error-map', () => {
       it('should handle issue with missing optional fields', () => {
         const errorMap = makeZodI18nMap();
         const issue = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: 'unrecognized_keys' as any,
           message: 'Unrecognized keys',
           input: {},
@@ -1030,4 +1047,3 @@ describe('zod-error-map', () => {
     });
   });
 });
-
