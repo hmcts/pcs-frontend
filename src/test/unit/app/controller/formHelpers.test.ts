@@ -431,7 +431,7 @@ describe('formHelpers', () => {
 
       const result = validateForm(req, fields);
       expect(result).toHaveProperty('dateField');
-      expect(result.dateField).toBe('Enter your date of birth');
+      expect(result.dateField).toBe('Enter a valid date');
     });
 
     it('should validate date fields - missing month', () => {

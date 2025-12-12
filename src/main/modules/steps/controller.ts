@@ -6,9 +6,9 @@ import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
 
 import { stepNavigation } from './flow';
+import { renderWithErrors } from './formBuilder/errorHandling';
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
 import { getRequestLanguage, getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
-
 const logger = Logger.getLogger('controllerFactory');
 
 type PostControllerCallback = (req: Request, res: Response) => Promise<void> | void;
@@ -126,15 +126,15 @@ export const createPostController = (
       const errors = validateForm(req, fields);
 
       if (Object.keys(errors).length > 0) {
-        const firstField = Object.keys(errors)[0];
-        return res.status(400).render(view, {
+        const content = {
           ...req.body,
-          error: { field: firstField, text: errors[firstField] },
           lang: reqLang,
           pageUrl: req.originalUrl || '/',
           t,
           backUrl: stepNavigation.getBackUrl(req, stepName),
-        });
+        };
+
+        return renderWithErrors(req, res, errors, content, view, fields, t);
       }
 
       setFormData(req, stepName, req.body);

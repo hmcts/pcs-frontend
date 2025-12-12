@@ -59,7 +59,8 @@ export function translateFields(
   t: TFunction,
   fieldValues: Record<string, unknown>,
   error?: { field: string; text: string },
-  hasTitle = false
+  hasTitle = false,
+  errors?: Record<string, string>
 ): FormFieldConfig[] {
   return fields.map((field, index) => {
     let label = field.label;
@@ -83,7 +84,9 @@ export function translateFields(
       return { ...option, text };
     });
 
-    const hasError = error && error.field === field.name;
+    // Support multiple errors - prefer errors object, fall back to single error for backward compatibility
+    const fieldError = errors?.[field.name] || (error && error.field === field.name ? error.text : undefined);
+    const hasError = !!fieldError;
     const { component, componentType } = buildComponentConfig(
       field,
       label,
@@ -91,7 +94,7 @@ export function translateFields(
       fieldValues[field.name],
       translatedOptions,
       hasError || false,
-      error?.text,
+      fieldError,
       index,
       hasTitle,
       t

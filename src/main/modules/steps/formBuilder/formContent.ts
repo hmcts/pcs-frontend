@@ -9,12 +9,13 @@ export function buildFormContent(
   fields: FormFieldConfig[],
   t: TFunction,
   bodyData: Record<string, unknown> = {},
-  error?: { field: string; anchor?: string; text: string },
-  translationKeys?: TranslationKeys
+  error?: { field: string; text: string },
+  translationKeys?: TranslationKeys,
+  errors?: Record<string, string>
 ): Record<string, unknown> {
   const fieldValues = buildFieldValues(fields, bodyData);
   const pageTitle = getTranslation(t, 'title', undefined) || getTranslation(t, 'question', undefined);
-  const fieldsWithLabels = translateFields(fields, t, fieldValues, error, !!pageTitle);
+  const fieldsWithLabels = translateFields(fields, t, fieldValues, error, !!pageTitle, errors);
 
   return {
     ...bodyData,

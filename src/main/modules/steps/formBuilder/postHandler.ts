@@ -6,7 +6,7 @@ import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formF
 import { stepNavigation } from '../flow';
 import { getRequestLanguage, getTranslationFunction, loadStepNamespace } from '../i18n';
 
-import { translateFields } from './fieldTranslation';
+import { renderWithErrors } from './errorHandling';
 import { buildFormContent } from './formContent';
 import { getTranslationErrors, processFieldData, setFormData, validateForm } from './helpers';
 
@@ -26,19 +26,28 @@ export function createPostHandler(
       const t: TFunction = getTranslationFunction(req, stepName, ['common']);
       const action = req.body.action as string | undefined;
 
-      const fieldsWithLabels = translateFields(fields, t, {}, undefined, false);
-      const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fieldsWithLabels));
+      const errors = validateForm(req, fields, getTranslationErrors(t, fields));
 
       // If there are validation errors, show them regardless of action
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
-        const fieldConfig = fields.find(f => f.name === firstField);
-        // For date fields, the error link should point to the day input
-        const errorAnchor = fieldConfig?.type === 'date' ? `${firstField}-day` : firstField;
-        const error = { field: firstField, anchor: errorAnchor, text: errors[firstField] };
-        const formContent = buildFormContent(fields, t, req.body, error, translationKeys);
+        const field = fields.find(f => f.name === firstField);
+        let anchorId = firstField;
 
-        return res.status(400).render(viewPath, {
+        // Handle date fields - anchor to day field
+        if (field?.type === 'date') {
+          anchorId = `${firstField}-day`;
+        }
+
+        // Handle radio/checkbox fields - anchor to field name
+        if (field?.type === 'radio' || field?.type === 'checkbox') {
+          anchorId = firstField;
+        }
+
+        const error = { field: firstField, anchor: anchorId, text: errors[firstField] };
+        const formContent = buildFormContent(fields, t, req.body, error, translationKeys, errors);
+
+        const content = {
           ...formContent,
           error,
           stepName,
@@ -50,7 +59,9 @@ export function createPostHandler(
           ccdId: req.session?.ccdCase?.id,
           dashboardUrl: getDashboardUrl(req.session?.ccdCase?.id),
           languageToggle: t('languageToggle'),
-        });
+        };
+
+        return renderWithErrors(req, res, errors, content, viewPath, fields, t);
       }
 
       // Handle saveForLater action after validation passes
