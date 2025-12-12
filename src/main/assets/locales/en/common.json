@@ -68,7 +68,7 @@
     "part2": "Your previous answers have been saved.",
     "buttonText": "Stay signed in",
     "signOutLinkText": "Sign out"
-},
+  },
   "characterCount": {
     "charactersUnderLimitText": {
       "one": "You have %{count} character remaining",
@@ -78,6 +78,6 @@
     "charactersOverLimitText": {
       "one": "You have %{count} character too many",
       "other": "You have %{count} characters too many"
-
+    }
   }
 }
