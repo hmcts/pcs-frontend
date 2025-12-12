@@ -16,7 +16,6 @@ const logger = Logger.getLogger('i18n');
 
 export type TranslationContent = Record<string, unknown>;
 
-// Re-export AllowedLang for backward compatibility
 export type SupportedLang = AllowedLang;
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -55,9 +54,18 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
   const translationPath = getStepTranslationPath(stepName, folder);
   const filePath = path.join(localesDir, lang, `${translationPath}.json`);
 
+  const resolvedPath = path.resolve(filePath);
+  const resolvedLocalesDir = path.resolve(localesDir);
+  if (!resolvedPath.startsWith(resolvedLocalesDir)) {
+    if (isDevelopment) {
+      logger.warn(`Invalid translation path detected: ${translationPath}`);
+    }
+    return;
+  }
+
   try {
-    await fs.access(filePath);
-    const fileContent = await fs.readFile(filePath, 'utf8');
+    await fs.access(resolvedPath);
+    const fileContent = await fs.readFile(resolvedPath, 'utf8');
     const translations = JSON.parse(fileContent);
     req.i18n.addResourceBundle(lang, stepNamespace, translations, true, true);
 
@@ -68,7 +76,7 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
     if (isDevelopment) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       if (errorMessage.includes('ENOENT')) {
-        logger.warn(`Translation file not found: ${filePath}`);
+        logger.warn(`Translation file not found: ${resolvedPath}`);
       } else {
         logger.error(`Failed to load translation file for ${stepName}:`, error);
       }
@@ -86,10 +94,7 @@ export function getStepTranslations(req: Request, stepName: string): Translation
   return (resources as TranslationContent) || {};
 }
 
-/**
- * Gets the translation function for a request, with optional namespace support
- * Enhanced version that supports step namespaces
- */
+/** Gets the translation function for a request with step namespace support. */
 export function getTranslationFunction(req: Request, stepName?: string, namespaces: string[] = ['common']): TFunction {
   if (!req.i18n) {
     return getMainTranslationFunction(req, namespaces);
@@ -101,9 +106,7 @@ export function getTranslationFunction(req: Request, stepName?: string, namespac
   return fixedT || getMainTranslationFunction(req, namespaces);
 }
 
-/**
- * Validates and warns about missing translation keys in development mode
- */
+/** Validates and warns about missing translation keys in development. */
 export function validateTranslationKey(t: TFunction, key: string, context?: string): void {
   if (isDevelopment) {
     const translation = t(key);

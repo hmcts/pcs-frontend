@@ -21,9 +21,7 @@ function firstExistingPath(paths: string[]): string | null {
 }
 
 /**
- * Finds the locales directory asynchronously
- * Checks multiple candidate paths and returns the first existing one
- * Prioritizes public/locales for production, falls back to assets/locales for development
+ * Finds the locales directory. Prioritizes public/locales for production.
  */
 export async function findLocalesDir(): Promise<string | null> {
   const candidates = [
@@ -41,7 +39,7 @@ export async function findLocalesDir(): Promise<string | null> {
       await fsPromises.access(candidate);
       return candidate;
     } catch {
-      // Continue
+      // Path not found, try next
     }
   }
 
@@ -85,17 +83,13 @@ function discoverNamespaces(localesDir: string, lang = 'en'): string[] {
   }
 }
 
-/**
- * Creates a fallback translation function that returns the key or defaultValue
- */
+/** Creates a fallback translation function. */
 export function createFallbackTFunction(): TFunction {
   return ((key: string | string[], defaultValue?: string) =>
     Array.isArray(key) ? key[0] : (defaultValue ?? key)) as unknown as TFunction;
 }
 
-/**
- * Validates and returns the language from the request
- */
+/** Validates and returns the language from the request. */
 export function getValidatedLanguage(req: Request): AllowedLang {
   const i18nLang = req.language;
   if (i18nLang && allowedLanguages.includes(i18nLang.toLowerCase() as AllowedLang)) {
@@ -111,9 +105,7 @@ export function getValidatedLanguage(req: Request): AllowedLang {
   return allowedLanguages.includes(normalized as AllowedLang) ? (normalized as AllowedLang) : 'en';
 }
 
-/**
- * Gets the language from the request, falling back to validated language if not set
- */
+/** Gets the language from the request. */
 export function getRequestLanguage(req: Request): AllowedLang {
   const lang = req.language as string | undefined;
   if (lang && allowedLanguages.includes(lang as AllowedLang)) {
@@ -122,9 +114,7 @@ export function getRequestLanguage(req: Request): AllowedLang {
   return getValidatedLanguage(req);
 }
 
-/**
- * Gets the translation function for a request, with optional namespace support
- */
+/** Gets the translation function for a request. */
 export function getTranslationFunction(req: Request, namespaces: string[] = ['common']): TFunction {
   if (!req.i18n) {
     return createFallbackTFunction();
@@ -135,14 +125,11 @@ export function getTranslationFunction(req: Request, namespaces: string[] = ['co
   return fixedT || (req.t as TFunction) || createFallbackTFunction();
 }
 
-/**
- * Gets common translation keys as an object
- */
+/** Gets common translation keys as an object. */
 export function getCommonTranslations(t: TFunction): Record<string, unknown> {
   const translations: Record<string, unknown> = {};
   for (const key of COMMON_TRANSLATION_KEYS) {
     const value = t(key);
-    // Only include if translation exists (not just the key itself)
     if (value !== key) {
       translations[key] = value;
     }
@@ -150,10 +137,7 @@ export function getCommonTranslations(t: TFunction): Record<string, unknown> {
   return translations;
 }
 
-/**
- * Populates common translation keys into res.locals
- * Only sets keys that don't already exist to preserve step-specific translations
- */
+/** Populates common translation keys into res.locals. */
 export function populateCommonTranslations(req: Request, res: Response, t: TFunction): void {
   const translations = getCommonTranslations(t);
   for (const [key, value] of Object.entries(translations)) {
@@ -163,9 +147,7 @@ export function populateCommonTranslations(req: Request, res: Response, t: TFunc
   }
 }
 
-/**
- * Sets up Nunjucks globals for i18n
- */
+/** Sets up Nunjucks globals for i18n. */
 export function setupNunjucksGlobals(env: Environment | undefined, globals: Record<string, unknown>): void {
   if (!env) {
     return;
@@ -175,9 +157,7 @@ export function setupNunjucksGlobals(env: Environment | undefined, globals: Reco
   }
 }
 
-/**
- * Creates i18next configuration object
- */
+/** Creates i18next configuration. */
 function createI18nextConfig(localesDir: string, namespaces: string[]): InitOptions {
   return {
     fallbackLng: 'en',
