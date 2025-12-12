@@ -9,8 +9,14 @@ jest.mock('@hmcts/nodejs-logging', () => ({
   },
 }));
 
+const mockGetValidatedLanguage = jest.fn((_req: unknown) => 'en');
+
 jest.mock('../../../main/modules/steps/i18n', () => ({
-  getValidatedLanguage: jest.fn(() => 'en'),
+  getValidatedLanguage: jest.fn((req: unknown) => mockGetValidatedLanguage(req)),
+}));
+
+jest.mock('../../../main/modules/i18n', () => ({
+  getValidatedLanguage: jest.fn((req: unknown) => mockGetValidatedLanguage(req)),
 }));
 
 const mockStepDependencyCheck = jest.fn((req, res, next) => next());
@@ -113,7 +119,6 @@ const mockStepsData = {
 import { Application } from 'express';
 
 import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
-import { getValidatedLanguage } from '../../../main/modules/steps';
 import registerSteps from '../../../main/routes/registerSteps';
 
 describe('registerSteps', () => {
@@ -230,7 +235,7 @@ describe('registerSteps', () => {
 
     const { mockReq, mockRes } = executeHandler('/steps/unprotected', additionalProps);
 
-    expect(getValidatedLanguage).toHaveBeenCalledWith(mockReq);
+    expect(mockGetValidatedLanguage).toHaveBeenCalledWith(mockReq);
     expect(mockStepsData.unprotectedStep.getController.get).toHaveBeenCalledWith(mockReq, mockRes);
   });
 

@@ -4,10 +4,11 @@ import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
+import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
 import { stepNavigation } from './flow';
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
-import { getRequestLanguage, getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
+import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
 
 const logger = Logger.getLogger('controllerFactory');
 
@@ -64,6 +65,8 @@ export const createGetController = (
       }
     }
 
+    const commonI18nTranslations = getCommonTranslations(t);
+
     const baseContent: StepFormData = {
       ...formData,
       lang,
@@ -74,20 +77,10 @@ export const createGetController = (
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
       backUrl: stepNavigation.getBackUrl(req, stepName),
-      serviceName: t('serviceName'),
-      phase: t('phase'),
-      feedback: t('feedback'),
-      back: t('back'),
-      languageToggle: t('languageToggle'),
-      contactUsForHelp: t('contactUsForHelp'),
+      ...commonI18nTranslations,
       ...commonContent,
       ...stepTranslations,
     };
-
-    const contactUsForHelpText = t('contactUsForHelpText');
-    if (contactUsForHelpText !== 'contactUsForHelpText') {
-      baseContent.contactUsForHelpText = contactUsForHelpText;
-    }
 
     if (extendContent) {
       const extended = await extendContent(req);
