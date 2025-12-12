@@ -34,7 +34,41 @@ export function getNextStep(
   return null;
 }
 
-export function getPreviousStep(currentStepName: string, flowConfig: JourneyFlowConfig): string | null {
+export function getPreviousStep(
+  currentStepName: string,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown> = {}
+): string | null {
+  const stepConfig = flowConfig.steps[currentStepName];
+
+  // If step has explicit previousStep configuration, use it
+  if (stepConfig?.previousStep) {
+    if (typeof stepConfig.previousStep === 'function') {
+      return stepConfig.previousStep(formData);
+    }
+    return stepConfig.previousStep;
+  }
+
+  // For conditional steps, determine previous step based on actual path taken
+  // Check which step could have led to this step
+  for (const [stepName, config] of Object.entries(flowConfig.steps)) {
+    if (config.routes) {
+      for (const route of config.routes) {
+        if (route.nextStep === currentStepName) {
+          // If route has condition, check if it matches the form data
+          // If no condition, this route always leads to current step
+          if (!route.condition || route.condition(formData, {})) {
+            return stepName;
+          }
+        }
+      }
+    }
+    if (config.defaultNext === currentStepName) {
+      return stepName;
+    }
+  }
+
+  // Fallback to stepOrder array index
   const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
   if (currentIndex > 0) {
     return flowConfig.stepOrder[currentIndex - 1];
@@ -84,13 +118,14 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
       currentStepName: string,
       currentStepData: Record<string, unknown> = {}
     ): string | null => {
-      const formData = req.session.formData || {};
+      const formData = req.session?.formData || {};
       const nextStep = getNextStep(currentStepName, flowConfig, formData, currentStepData);
       return nextStep ? getStepUrl(nextStep, flowConfig) : null;
     },
 
     getBackUrl: (req: Request, currentStepName: string): string | null => {
-      const previousStep = getPreviousStep(currentStepName, flowConfig);
+      const formData = req.session?.formData || {};
+      const previousStep = getPreviousStep(currentStepName, flowConfig, formData);
       return previousStep ? getStepUrl(previousStep, flowConfig) : null;
     },
 
@@ -111,7 +146,7 @@ export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = us
       return next();
     }
 
-    const formData = req.session.formData || {};
+    const formData = req.session?.formData || {};
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
     if (missingDependency) {
