@@ -1,0 +1,12 @@
+{
+  "title": "What are your grounds for possession?",
+  "hint": "Select all grounds that apply to your case",
+  "errors": {
+    "grounds": "Select at least one option"
+  },
+  "options": {
+    "rentArrears": "Rent arrears (ground 8)",
+    "breachContract": "Breach of contract (ground 9)",
+    "other": "Other (ground 10)"
+  }
+}
