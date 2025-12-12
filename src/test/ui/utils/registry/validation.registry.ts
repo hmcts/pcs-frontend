@@ -30,7 +30,9 @@ export class ValidationRegistry {
     const validation = this.validations.get(validationType);
     if (!validation) {
       throw new Error(
-        `Validation '${validationType}' is not registered. Available validations: ${Array.from(this.validations.keys()).join(', ')}`
+        `Validation '${validationType}' is not registered. Available validations: ${Array.from(
+          this.validations.keys()
+        ).join(', ')}`
       );
     }
     return validation;
