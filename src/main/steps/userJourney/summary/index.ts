@@ -32,14 +32,9 @@ export const step: StepDefinition = {
     stepName,
     (_t: TFunction) => [], // No validation fields for summary
     'userJourney/summary/summary.njk',
-    async (req: Request, res: Response) => {
-      try {
-        if (req.session.ccdCase && req.session.user) {
-          await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
-        }
-      } catch {
-        res.status(500).send('There was an error submitting your application.');
-        return;
+    async (req: Request, _res: Response) => {
+      if (req.session.ccdCase && req.session.user) {
+        await ccdCaseService.submitCase(req.session.user?.accessToken, req.session.ccdCase);
       }
     },
     'userJourney'

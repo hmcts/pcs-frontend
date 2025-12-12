@@ -1,10 +1,11 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { getDashboardUrl } from '../../../app/utils/routes';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import { getRequestLanguage } from '../../i18n';
 import { stepNavigation } from '../flow';
-import { getRequestLanguage, getTranslationFunction, loadStepNamespace } from '../i18n';
+import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';
@@ -17,9 +18,9 @@ export function createPostHandler(
   journeyFolder: string,
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys
-): { post: (req: Request, res: Response) => Promise<void | Response> } {
+): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   return {
-    post: async (req: Request, res: Response) => {
+    post: async (req: Request, res: Response, next: NextFunction) => {
       await loadStepNamespace(req, stepName, journeyFolder);
 
       const lang = getRequestLanguage(req);
@@ -68,9 +69,13 @@ export function createPostHandler(
       setFormData(req, stepName, bodyWithoutAction);
 
       if (beforeRedirect) {
-        await beforeRedirect(req);
-        if (res.headersSent) {
-          return;
+        try {
+          await beforeRedirect(req);
+          if (res.headersSent) {
+            return;
+          }
+        } catch (error) {
+          return next(error);
         }
       }
 

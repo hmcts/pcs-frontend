@@ -11,6 +11,7 @@ import { DateTime } from 'luxon';
 import { oidcMiddleware } from '../../../middleware/oidc';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
 import { TTLCache } from '../../../utils/ttlCache';
+import { type I18nRequest, getRequestLanguage, getTranslationFunction, setupNunjucksGlobals } from '../../i18n';
 
 import { processErrorsForTemplate } from './errorUtils';
 import { FieldConfig, JourneyConfig, JourneyDraft, JourneySchema, StepConfig } from './schema';
@@ -1121,10 +1122,9 @@ export class WizardEngine {
     const router = Router();
 
     // Per-request language & namespace setup for this journey
-    router.use(async (req, res, next) => {
+    router.use(async (req: I18nRequest, res: Response, next: NextFunction) => {
       const ns = this.journey.config?.i18nNamespace ?? this.slug;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const lang = (req as any).language || 'en';
+      const lang = getRequestLanguage(req);
 
       try {
         // Ensure the namespace is loaded before use
@@ -1138,7 +1138,7 @@ export class WizardEngine {
         }
 
         // Translator bound to current lang + ns
-        const fixedT = req.i18n?.getFixedT?.(lang, ns) ?? (req.t as typeof req.t); // fallback to plain req.t
+        const fixedT = getTranslationFunction(req, [ns]);
 
         // Expose to locals (used in Nunjucks and templates)
         res.locals.lang = lang;
@@ -1147,13 +1147,8 @@ export class WizardEngine {
         res.locals.journey = this.journey;
         res.locals.slug = this.slug;
 
-        // Update Nunjucks globals too
-        const env = req.app.locals?.nunjucksEnv;
-        if (env) {
-          env.addGlobal('lang', lang);
-          env.addGlobal('ns', ns);
-          env.addGlobal('t', fixedT);
-        }
+        // Update Nunjucks globals
+        setupNunjucksGlobals(req.app.locals?.nunjucksEnv, { lang, ns, t: fixedT });
 
         this.logger.info(`[journey i18n] lang=${lang}, ns=${ns}`);
       } catch (e) {
