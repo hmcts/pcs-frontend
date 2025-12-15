@@ -12,9 +12,9 @@
       "ttlInSeconds": 5400
     },
     "timeout": {
-      "sessionWarningMinutes": 5,
-      "sessionTimeoutMinutes": 6,
-      "checkIntervalSeconds": 10
+      "sessionWarningMinutes": 2,
+      "sessionTimeoutMinutes": 3,
+      "checkIntervalSeconds": 5
     }
   },
   "health": {
