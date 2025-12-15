@@ -16,7 +16,11 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/contact-preferences-telephone/contactPreferencesTelephone.njk',
       stepName,
-      undefined,
+      (req: Request) => {
+        return {
+          url: req.originalUrl || '/respond-to-claim/contact-preferences-telephone',
+        };
+      },
       'respondToClaim'
     );
   },

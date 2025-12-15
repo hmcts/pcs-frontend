@@ -6,10 +6,7 @@ export const respondToClaimFlowConfig: JourneyFlowConfig = {
   stepOrder: ['start-now', 'postcode-finder', 'contact-preferences-telephone', 'free-legal-advice'],
   steps: {
     'start-now': {
-      defaultNext: 'free-legal-advice',
-    },
-    'free-legal-advice': {
-      defaultNext: 'legal-advice',
+      defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
       defaultNext: 'contact-preferences-telephone',
