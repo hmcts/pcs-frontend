@@ -1,5 +1,6 @@
 import config from 'config';
 
+import { HTTPError } from '../../../main/HttpError';
 import { CaseState } from '../../../main/interfaces/ccdCase.interface';
 import { http } from '../../../main/modules/http';
 import { ccdCaseService } from '../../../main/services/ccdCaseService';
@@ -60,10 +61,11 @@ describe('ccdCaseService', () => {
       expect(result).toBeNull();
     });
 
-    it('throws on unexpected error', async () => {
+    it('throws HTTPError on unexpected error', async () => {
       mockPost.mockRejectedValue(new Error('Unexpected'));
 
-      await expect(ccdCaseService.getCase(accessToken)).rejects.toThrow('Unexpected');
+      await expect(ccdCaseService.getCase(accessToken)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCase(accessToken)).rejects.toThrow('CCD case service error');
     });
   });
 
@@ -79,16 +81,18 @@ describe('ccdCaseService', () => {
   });
 
   describe('updateCase', () => {
-    it('throws if case id is missing', async () => {
-      await expect(ccdCaseService.updateCase(accessToken, { id: '', data: {} })).rejects.toEqual(
+    it('throws HTTPError if case id is missing', async () => {
+      await expect(ccdCaseService.updateCase(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.updateCase(accessToken, { id: '', data: {} })).rejects.toThrow(
         'Cannot UPDATE Case, CCD Case Not found'
       );
     });
   });
 
   describe('submitCase', () => {
-    it('throws if case id is missing', async () => {
-      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toEqual(
+    it('throws HTTPError if case id is missing', async () => {
+      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(
         'Cannot SUBMIT Case, CCD Case Not found'
       );
     });

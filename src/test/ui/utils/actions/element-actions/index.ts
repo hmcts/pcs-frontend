@@ -1,5 +1,6 @@
 export * from '../../../utils/actions/element-actions/check.action';
 export * from '../../../utils/actions/element-actions/clickButton.action';
+export * from '../../../utils/actions/element-actions/clickSummary.action';
 export * from '../../../utils/actions/element-actions/clickLinkAndVerifyNewTabTitle.action';
 export * from '../../../utils/actions/element-actions/clickRadioButton.action';
 export * from '../../../utils/actions/element-actions/clickTab.action';
