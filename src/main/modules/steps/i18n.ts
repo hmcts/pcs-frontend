@@ -75,9 +75,7 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
   } catch (error) {
     if (isDevelopment) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      if (errorMessage.includes('ENOENT')) {
-        logger.warn(`Translation file not found: ${resolvedPath}`);
-      } else {
+      if (!errorMessage.includes('ENOENT')) {
         logger.error(`Failed to load translation file for ${stepName}:`, error);
       }
     }

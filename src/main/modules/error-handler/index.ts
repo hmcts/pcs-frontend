@@ -1,11 +1,8 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Express, NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../../HttpError';
 import { getTranslationFunction, populateCommonTranslations } from '../i18n';
-
-const logger = Logger.getLogger('error-handler');
 
 function getErrorMessages(status: number, t: TFunction): { title: string; paragraph: string } {
   if (status === 400 || status === 403) {
@@ -41,8 +38,6 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
     if (res.headersSent) {
       return next(err);
     }
-
-    logger.error(`${err.stack || err}`);
 
     const httpError = err instanceof HTTPError ? err : new HTTPError(err.message || 'Internal server error', 500);
     const status = httpError.status || 500;

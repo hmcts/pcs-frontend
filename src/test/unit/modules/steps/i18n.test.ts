@@ -147,7 +147,7 @@ describe('steps/i18n', () => {
       jest.restoreAllMocks();
     });
 
-    it('should handle file not found error', async () => {
+    it('should handle file not found error silently', async () => {
       process.env.NODE_ENV = 'development';
       const mockLocalesDir = '/test/locales';
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
@@ -163,7 +163,9 @@ describe('steps/i18n', () => {
 
       await loadStepNamespace(req, 'test-step', 'folder');
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Translation file not found'));
+      // File not found errors should be handled silently (no warning)
+      expect(mockLogger.warn).not.toHaveBeenCalled();
+      expect(mockLogger.error).not.toHaveBeenCalled();
     });
 
     it('should handle other errors', async () => {
