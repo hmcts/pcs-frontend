@@ -44,7 +44,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
     return new HTTPError('Not authorised to access CCD case service', 403);
   }
 
-  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, 403);
+  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, 500);
 }
 
 async function getEventToken(userToken: string, url: string): Promise<string> {
