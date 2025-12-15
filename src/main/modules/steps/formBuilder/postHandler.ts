@@ -3,8 +3,9 @@ import type { TFunction } from 'i18next';
 
 import { getDashboardUrl } from '../../../app/utils/routes';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import { getRequestLanguage } from '../../i18n';
 import { stepNavigation } from '../flow';
-import { getRequestLanguage, getTranslationFunction, loadStepNamespace } from '../i18n';
+import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';

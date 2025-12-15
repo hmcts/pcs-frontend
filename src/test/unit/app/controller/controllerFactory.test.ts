@@ -51,12 +51,39 @@ describe('createGetController', () => {
     mockExtendContent.mockReturnValue(mockContent);
     mockGetRequestLanguage.mockImplementation((req: Request) => req.language || 'en');
     mockGetTranslationFunction.mockImplementation((req: Request) => {
-      return (req.t as TFunction) || (jest.fn((key: string) => key) as unknown as TFunction);
+      // Use req.t if available, otherwise create a mock that returns values different from keys
+      // so getCommonTranslations will include them
+      if (req.t) {
+        return req.t as TFunction;
+      }
+      return jest.fn((key: string) => {
+        // Return actual values for common translation keys (values must differ from keys)
+        const commonKeys: Record<string, string> = {
+          serviceName: 'Test Service',
+          phase: 'ALPHA', // Different from key
+          feedback: 'Feedback text', // Different from key
+          back: 'Back', // Different from key
+          languageToggle: 'Language toggle', // Different from key
+          contactUsForHelp: 'Contact us', // Different from key
+          contactUsForHelpText: 'Contact text', // Different from key
+        };
+        return commonKeys[key] || key;
+      }) as unknown as TFunction;
     });
   });
 
   it('should merge content with form data from session when available', async () => {
-    const mockT = jest.fn((key: string) => key);
+    const mockT = jest.fn((key: string) => {
+      // Return actual translation values for common keys
+      const translations: Record<string, string> = {
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      };
+      return translations[key] || key;
+    });
     const req = {
       body: {},
       originalUrl: '/',
@@ -87,16 +114,25 @@ describe('createGetController', () => {
         pageUrl: '/',
         backUrl: null,
         serviceName: 'Test Service',
-        phase: 'phase',
-        feedback: 'feedback',
-        back: 'back',
-        languageToggle: 'languageToggle',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
       })
     );
   });
 
   it('should prioritize post data over session data', async () => {
-    const mockT = jest.fn((key: string) => key);
+    const mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      };
+      return translations[key] || key;
+    }) as unknown as TFunction;
     const req = {
       body: { answer: 'postAnswer', error: 'Test error' },
       originalUrl: '/',
@@ -126,16 +162,25 @@ describe('createGetController', () => {
         pageUrl: '/',
         backUrl: null,
         serviceName: 'Test Service',
-        phase: 'phase',
-        feedback: 'feedback',
-        back: 'back',
-        languageToggle: 'languageToggle',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
       })
     );
   });
 
   it('should handle undefined req.body', async () => {
-    const mockT = jest.fn((key: string) => key);
+    const mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      };
+      return translations[key] || key;
+    }) as unknown as TFunction;
     const req = {
       originalUrl: '/',
       query: { lang: 'en' },
@@ -162,10 +207,10 @@ describe('createGetController', () => {
         pageUrl: '/',
         backUrl: null,
         serviceName: 'Test Service',
-        phase: 'phase',
-        feedback: 'feedback',
-        back: 'back',
-        languageToggle: 'languageToggle',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
       })
     );
   });
