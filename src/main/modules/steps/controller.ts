@@ -1,13 +1,14 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
+import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
 import { stepNavigation } from './flow';
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
-import { getRequestLanguage, getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
+import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
 
 const logger = Logger.getLogger('controllerFactory');
 
@@ -64,6 +65,8 @@ export const createGetController = (
       }
     }
 
+    const commonI18nTranslations = getCommonTranslations(t);
+
     const baseContent: StepFormData = {
       ...formData,
       lang,
@@ -74,11 +77,7 @@ export const createGetController = (
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
       backUrl: stepNavigation.getBackUrl(req, stepName),
-      serviceName: t('serviceName'),
-      phase: t('phase'),
-      feedback: t('feedback'),
-      back: t('back'),
-      languageToggle: t('languageToggle'),
+      ...commonI18nTranslations,
       ...commonContent,
       ...stepTranslations,
     };
@@ -106,9 +105,9 @@ export const createPostController = (
   view: string,
   beforeRedirect?: PostControllerCallback,
   journeyFolder?: string
-): { post: (req: Request, res: Response) => Promise<void | Response> } => {
+): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } => {
   return {
-    post: async (req: Request, res: Response) => {
+    post: async (req: Request, res: Response, next: NextFunction) => {
       if (journeyFolder && req.i18n) {
         try {
           await loadStepNamespace(req, stepName, journeyFolder);
@@ -140,9 +139,13 @@ export const createPostController = (
       setFormData(req, stepName, req.body);
 
       if (beforeRedirect) {
-        await beforeRedirect(req, res);
-        if (res.headersSent) {
-          return;
+        try {
+          await beforeRedirect(req, res);
+          if (res.headersSent) {
+            return;
+          }
+        } catch (error) {
+          return next(error);
         }
       }
 

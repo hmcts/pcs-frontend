@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import fs, { promises as fsPromises } from 'fs';
+
 import express, { Express } from 'express';
+import type { TFunction } from 'i18next';
 
 // ---- Mocks (must be declared before importing the SUT) ----
 const mockUse = jest.fn().mockReturnThis();
@@ -9,7 +13,6 @@ const mockI18n = {
   isInitialized: true,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockHandle = jest.fn(() => (req: any, _res: any, next: any) => next());
 const mockLogger = { info: jest.fn(), error: jest.fn() };
 
@@ -37,7 +40,15 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 }));
 
 // Import SUT AFTER mocks
-import { I18n } from '../../../../main/modules/i18n';
+import {
+  I18n,
+  createFallbackTFunction,
+  findLocalesDir,
+  getCommonTranslations,
+  getTranslationFunction,
+  populateCommonTranslations,
+  setupNunjucksGlobals,
+} from '../../../../main/modules/i18n';
 
 describe('i18n module', () => {
   let app: Express;
@@ -60,9 +71,8 @@ describe('i18n module', () => {
     // i18next.use called twice (Backend + LanguageDetector)
     expect(mockUse).toHaveBeenCalledTimes(2);
 
-    // handle() was asked for a middleware
-    expect(mockHandle).toHaveBeenCalledWith(expect.any(Object));
-
+    // Verify middlewares were registered
+    expect((app.use as jest.Mock).mock.calls.length).toBeGreaterThanOrEqual(2);
     // First: i18next handle middleware (a function)
     expect((app.use as jest.Mock).mock.calls[0][0]).toEqual(expect.any(Function));
     // Second: our language-enforcement middleware (also a function)
@@ -97,7 +107,6 @@ describe('i18n module', () => {
 
     await new Promise(r => setImmediate(r));
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => void;
 
     const changeLanguage = jest.fn();
@@ -111,7 +120,6 @@ describe('i18n module', () => {
       session: { user: { name: 'Alice' } },
     } as unknown as Parameters<typeof langMw>[0];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { locals: {} } as any;
     const next = jest.fn();
 
@@ -142,7 +150,6 @@ describe('i18n module', () => {
 
     await new Promise(r => setImmediate(r));
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => void;
 
     const changeLanguage = jest.fn();
@@ -179,5 +186,195 @@ describe('i18n module', () => {
     expect(addGlobal).not.toHaveBeenCalledWith('user', expect.anything());
 
     expect(next).toHaveBeenCalled();
+  });
+
+  describe('findLocalesDir', () => {
+    const originalEnv = process.env.LOCALES_DIR;
+
+    afterEach(() => {
+      process.env.LOCALES_DIR = originalEnv;
+      jest.restoreAllMocks();
+    });
+
+    it('should return first existing path', async () => {
+      const mockAccess = jest.spyOn(fsPromises, 'access').mockResolvedValue(undefined);
+
+      const result = await findLocalesDir();
+
+      expect(mockAccess).toHaveBeenCalled();
+      expect(result).toBeTruthy();
+    });
+
+    it('should return null if no paths exist', async () => {
+      jest.spyOn(fsPromises, 'access').mockRejectedValue(new Error('Not found'));
+
+      const result = await findLocalesDir();
+
+      expect(result).toBeNull();
+    });
+
+    it('should prioritize LOCALES_DIR env variable', async () => {
+      process.env.LOCALES_DIR = '/custom/locales';
+      const mockAccess = jest.spyOn(fsPromises, 'access').mockResolvedValue(undefined);
+
+      await findLocalesDir();
+
+      expect(mockAccess).toHaveBeenCalledWith('/custom/locales');
+    });
+  });
+
+  describe('createFallbackTFunction', () => {
+    it('should return key when no default value', () => {
+      const t = createFallbackTFunction();
+      expect(t('test.key')).toBe('test.key');
+    });
+
+    it('should return default value when provided', () => {
+      const t = createFallbackTFunction();
+      expect(t('test.key', 'Default')).toBe('Default');
+    });
+
+    it('should return first key when array provided', () => {
+      const t = createFallbackTFunction();
+      expect(t(['key1', 'key2'])).toBe('key1');
+    });
+  });
+
+  describe('getTranslationFunction', () => {
+    it('should return fallback when req.i18n is missing', () => {
+      const req = {} as any;
+      const t = getTranslationFunction(req);
+      expect(t('test.key', 'Default')).toBe('Default');
+    });
+
+    it('should return fixedT when available', () => {
+      const mockFixedT = jest.fn((key: string) => `translated:${key}`);
+      const req = {
+        i18n: { getFixedT: jest.fn(() => mockFixedT) },
+        language: 'en',
+      } as any;
+      const t = getTranslationFunction(req);
+      expect(t('test.key')).toBe('translated:test.key');
+    });
+  });
+
+  describe('getCommonTranslations', () => {
+    it('should return translations for common keys', () => {
+      const mockT = jest.fn((key: string) => {
+        const translations: Record<string, string> = {
+          serviceName: 'Test Service',
+          phase: 'BETA',
+          feedback: 'Feedback',
+          back: 'Back',
+          languageToggle: 'Language',
+          contactUsForHelp: 'Contact',
+          contactUsForHelpText: 'Contact text',
+        };
+        return translations[key] || key;
+      }) as unknown as TFunction;
+
+      const result = getCommonTranslations(mockT);
+
+      expect(result.serviceName).toBe('Test Service');
+      expect(result.phase).toBe('BETA');
+      expect(result.feedback).toBe('Feedback');
+    });
+
+    it('should exclude keys that return themselves', () => {
+      const mockT = jest.fn((key: string) => key) as unknown as TFunction;
+
+      const result = getCommonTranslations(mockT);
+
+      expect(Object.keys(result)).toHaveLength(0);
+    });
+  });
+
+  describe('populateCommonTranslations', () => {
+    it('should populate res.locals with common translations', () => {
+      const mockT = jest.fn((key: string) => {
+        const translations: Record<string, string> = {
+          serviceName: 'Test Service',
+          phase: 'BETA',
+        };
+        return translations[key] || key;
+      }) as unknown as TFunction;
+      const req = {} as any;
+      const res = { locals: {} } as any;
+
+      populateCommonTranslations(req, res, mockT);
+
+      expect(res.locals.serviceName).toBe('Test Service');
+      expect(res.locals.phase).toBe('BETA');
+    });
+
+    it('should not overwrite existing res.locals values', () => {
+      const mockT = jest.fn((key: string) => {
+        const translations: Record<string, string> = {
+          serviceName: 'New Service',
+        };
+        return translations[key] || key;
+      }) as unknown as TFunction;
+      const req = {} as any;
+      const res = { locals: { serviceName: 'Existing Service' } } as any;
+
+      populateCommonTranslations(req, res, mockT);
+
+      expect(res.locals.serviceName).toBe('Existing Service');
+    });
+  });
+
+  describe('setupNunjucksGlobals', () => {
+    it('should add globals to nunjucks environment', () => {
+      const addGlobal = jest.fn();
+      const env = { addGlobal } as any;
+      const globals = { lang: 'en', t: jest.fn() };
+
+      setupNunjucksGlobals(env, globals);
+
+      expect(addGlobal).toHaveBeenCalledWith('lang', 'en');
+      expect(addGlobal).toHaveBeenCalledWith('t', globals.t);
+    });
+
+    it('should return early if env is undefined', () => {
+      const globals = { lang: 'en', t: jest.fn() };
+
+      expect(() => setupNunjucksGlobals(undefined, globals)).not.toThrow();
+    });
+  });
+
+  describe('enableFor with no locales directory', () => {
+    it('should log error and continue when no locales directory found', async () => {
+      jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+
+      mockInit.mockImplementation((_opts: unknown, cb: (err: unknown) => void) => cb(null));
+
+      const i18n = new I18n();
+      i18n.enableFor(app);
+
+      await new Promise(r => setImmediate(r));
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        '[i18n] No locales directory found. Set LOCALES_DIR or create src/main/public/locales.'
+      );
+    });
+
+    it('should handle discoverNamespaces error gracefully', async () => {
+      jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+      jest.spyOn(fs, 'readdirSync').mockImplementation(() => {
+        throw new Error('Directory read failed');
+      });
+
+      mockInit.mockImplementation((_opts: unknown, cb: (err: unknown) => void) => cb(null));
+
+      const i18n = new I18n();
+      i18n.enableFor(app);
+
+      await new Promise(r => setImmediate(r));
+
+      expect(mockInit).toHaveBeenCalled();
+      expect(mockInit.mock.calls[0][0]).toMatchObject({
+        ns: ['common'],
+      });
+    });
   });
 });

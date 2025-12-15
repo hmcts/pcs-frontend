@@ -40,9 +40,10 @@ export {
   getStepTranslationPath,
   loadStepNamespace,
   getStepTranslations,
-  getValidatedLanguage,
-  getRequestLanguage,
   getTranslationFunction,
   validateTranslationKey,
 } from './i18n';
+
+// Re-export language utilities from main i18n module for convenience
+export { getRequestLanguage, getValidatedLanguage } from '../i18n';
 export type { SupportedLang, TranslationContent } from './i18n';
