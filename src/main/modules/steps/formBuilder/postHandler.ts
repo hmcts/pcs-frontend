@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { getDashboardUrl } from '../../../app/utils/routes';
+import { getDashboardUrl, isValidRedirectUrl } from '../../../app/utils/routes';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import { getRequestLanguage } from '../../i18n';
 import { stepNavigation } from '../flow';
@@ -80,7 +80,7 @@ export function createPostHandler(
       }
 
       const redirectPath = stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
-      if (!redirectPath) {
+      if (!redirectPath || !isValidRedirectUrl(redirectPath)) {
         return res.status(500).send('Unable to determine next step');
       }
 

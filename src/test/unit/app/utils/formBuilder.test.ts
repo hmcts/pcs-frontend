@@ -178,7 +178,7 @@ describe('formBuilder', () => {
           formData: {
             'test-step': { testField: 'saved value' },
           },
-          ccdCase: { id: '123' },
+          ccdCase: { id: '1765881343803991' },
         },
       } as unknown as Request);
       const res = {
@@ -197,7 +197,7 @@ describe('formBuilder', () => {
           fieldValues: { testField: 'saved value' },
           stepName: 'test-step',
           journeyFolder: 'testJourney',
-          ccdId: '123',
+          ccdId: '1765881343803991',
         })
       );
     });
@@ -207,7 +207,7 @@ describe('formBuilder', () => {
       const req = createMockRequest({
         session: {
           formData: {},
-          ccdCase: { id: '456' },
+          ccdCase: { id: '1765881343803992' },
         },
       } as unknown as Request);
       const res = {
@@ -223,7 +223,7 @@ describe('formBuilder', () => {
       expect(res.render).toHaveBeenCalledWith(
         'formBuilder.njk',
         expect.objectContaining({
-          ccdId: '456',
+          ccdId: '1765881343803992',
         })
       );
     });
@@ -835,7 +835,7 @@ describe('formBuilder', () => {
             testField: 'value',
           },
           session: {
-            ccdCase: { id: '123' },
+            ccdCase: { id: '1765881343803991' },
           },
         } as unknown as Request);
         const res = {
@@ -850,7 +850,7 @@ describe('formBuilder', () => {
         );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/123');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
       });
 
       it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
@@ -887,7 +887,7 @@ describe('formBuilder', () => {
             testField: '',
           },
           session: {
-            ccdCase: { id: '123' },
+            ccdCase: { id: '1765881343803991' },
           },
           originalUrl: '/test-url',
         } as unknown as Request);
@@ -909,7 +909,7 @@ describe('formBuilder', () => {
           'formBuilder.njk',
           expect.objectContaining({
             error: { field: 'testField', anchor: 'testField', text: 'This field is required' },
-            ccdId: '123',
+            ccdId: '1765881343803991',
           })
         );
         expect(res.redirect).not.toHaveBeenCalled();
@@ -995,7 +995,7 @@ describe('formBuilder', () => {
             testField: '',
           },
           session: {
-            ccdCase: { id: '123' },
+            ccdCase: { id: '1765881343803991' },
           },
           originalUrl: '/test-url',
         } as unknown as Request);
@@ -1016,7 +1016,7 @@ describe('formBuilder', () => {
           'formBuilder.njk',
           expect.objectContaining({
             error: { field: 'testField', anchor: 'testField', text: 'Error message' },
-            ccdId: '123',
+            ccdId: '1765881343803991',
           })
         );
       });
