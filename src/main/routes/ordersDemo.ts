@@ -31,7 +31,7 @@ interface OrdersDemoViewModel {
   arrearsAtNotice: string;
   arrearsAtHearing: string;
   currentRent: string;
-  currentRentFrequency: 'month' | 'quarter' | 'year';
+  currentRentFrequency: 'week' | 'month' | 'quarter' | 'year';
 }
 
 const logger = Logger.getLogger('ordersDemo');

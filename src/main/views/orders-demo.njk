@@ -27,7 +27,7 @@
             <p class="govuk-caption-l govuk-!-margin-bottom-1">Case</p>
             <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Make an order</h1>
             <p class="govuk-body govuk-!-margin-bottom-1 govuk-!-font-weight-bold">{{ caseReference | default('1234-5678-9101') }}</p>
-            <p class="govuk-body govuk-!-margin-bottom-4">{{ caseTitle | default('Smith v Jones') }}</p>
+            <p class="govuk-heading-m govuk-!-margin-bottom-4">{{ caseTitle | default('Smith v Jones') }}</p>
             {% if submitted %}
               <div class="govuk-inset-text govuk-!-margin-top-2 govuk-!-margin-bottom-2">
                 Order submitted to CCD.
@@ -104,6 +104,7 @@
               <div class="orders-demo__rent-frequency">
                 <label class="govuk-label govuk-label--s" for="currentRentFrequency">per</label>
                 <select class="govuk-select" id="currentRentFrequency" name="currentRentFrequency">
+                  <option value="week" {{ 'selected' if rentFrequency == 'week' }}>week</option>
                   <option value="month" {{ 'selected' if rentFrequency == 'month' }}>month</option>
                   <option value="quarter" {{ 'selected' if rentFrequency == 'quarter' }}>quarter</option>
                   <option value="year" {{ 'selected' if rentFrequency == 'year' }}>year</option>
