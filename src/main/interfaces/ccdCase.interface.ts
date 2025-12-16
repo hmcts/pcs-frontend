@@ -52,6 +52,7 @@ export interface OrdersDemoPayload {
   orderDetails?: {
     groundsMode?: string | null;
     mandatoryGroundsDetails?: string | null;
+    discretionaryGroundsDetails?: string | null;
     outright?: {
       timing?: string | null;
       possessionDate?: string | null;
@@ -72,6 +73,7 @@ export interface OrdersDemoPayload {
         enabled: boolean;
         amount?: string | null;
         frequency?: string | null;
+        frequencyOther?: string | null;
         dueBy?: string | null;
       };
     };

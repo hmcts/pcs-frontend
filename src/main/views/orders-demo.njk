@@ -386,17 +386,28 @@
                 <div class="orders-demo__order-grid-row">
                   <div>
                     <label class="govuk-label govuk-label--s">Grounds</label>
-                    {{ govukRadios({
-                      classes: "orders-demo__radios-inline",
-                      name: "grounds",
-                      fieldset: { legend: { text: "Grounds", classes: "govuk-visually-hidden" } },
-                      items: [
-                        { value: "discretionary", text: "Discretionary grounds" },
-                        {
-                          value: "mandatory",
-                          text: "Mandatory grounds",
-                          checked: true,
-                          conditional: {
+	                  {{ govukRadios({
+	                    classes: "orders-demo__radios-inline",
+	                    name: "grounds",
+	                    fieldset: { legend: { text: "Grounds", classes: "govuk-visually-hidden" } },
+	                    items: [
+	                      {
+	                        value: "discretionary",
+	                        text: "Discretionary grounds",
+	                        conditional: {
+	                          html: govukInput({
+	                            label: { text: "Specify discretionary grounds (optional)", classes: "govuk-visually-hidden" },
+	                            name: "discretionaryGroundsDetails",
+	                            classes: "govuk-input--width-20",
+	                            attributes: { placeholder: "Optional: specify discretionary grounds" }
+	                          })
+	                        }
+	                      },
+	                      {
+	                        value: "mandatory",
+	                        text: "Mandatory grounds",
+	                        checked: true,
+	                        conditional: {
                             html: govukInput({
                               label: { text: "Specify mandatory grounds", classes: "govuk-visually-hidden" },
                               name: "mandatoryGroundsDetails",
@@ -455,32 +466,25 @@
                     </div>
                   </div>
 
-                  <div class="orders-demo__suspended-row">
-                    <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="arrearsCheckbox" name="arrearsCheckbox" type="checkbox" value="arrears" checked>
-                        <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="arrearsCheckbox">Arrears checkbox</label>
-                      </div>
-                    </div>
-                    <span class="orders-demo__sentence-lead govuk-label">suspended on payment of arrears of</span>
-                    <div class="orders-demo__sentence-body">
-                      {{ govukInput({
-                        label: { text: "Arrears amount", classes: "govuk-visually-hidden" },
-                        name: "arrearsAmount",
-                        classes: "govuk-input--width-5 orders-demo__money-input",
-                        value: arrearsAtHearing | default('1250.00'),
-                        prefix: { text: "£" },
-                        attributes: { placeholder: "0.00" }
-                      }) }}
-                      <span class="orders-demo__sentence-label govuk-label">by</span>
-                      {{ govukInput({
-                        label: { text: "Arrears due by", classes: "govuk-visually-hidden" },
-                        name: "arrearsDueBy",
-                        classes: "govuk-input--width-10 orders-demo__date-input",
-                        attributes: { placeholder: "DD/MM/YYYY" }
-                      }) }}
-                    </div>
-                  </div>
+	                  <div class="orders-demo__suspended-row">
+	                    <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+	                      <div class="govuk-checkboxes__item">
+	                        <input class="govuk-checkboxes__input" id="arrearsCheckbox" name="arrearsCheckbox" type="checkbox" value="arrears" checked>
+	                        <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="arrearsCheckbox">Arrears checkbox</label>
+	                      </div>
+	                    </div>
+	                    <span class="orders-demo__sentence-lead govuk-label">suspended on payment of arrears of</span>
+	                    <div class="orders-demo__sentence-body">
+	                      {{ govukInput({
+	                        label: { text: "Arrears amount", classes: "govuk-visually-hidden" },
+	                        name: "arrearsAmount",
+	                        classes: "govuk-input--width-5 orders-demo__money-input",
+	                        value: arrearsAtHearing | default('1250.00'),
+	                        prefix: { text: "£" },
+	                        attributes: { placeholder: "0.00" }
+	                      }) }}
+	                    </div>
+	                  </div>
 
                   <div class="orders-demo__suspended-row">
                     <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
@@ -525,21 +529,26 @@
                         attributes: { placeholder: "0.00" }
                       }) }}
                       <span class="orders-demo__sentence-label govuk-label">per</span>
-                      <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select">
-                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequency">Instalment frequency</label>
-                        <select class="govuk-select" id="instalmentFrequency" name="instalmentFrequency">
-                          <option value="week">week</option>
-                          <option value="month" selected>month</option>
-                          <option value="year">year</option>
-                        </select>
-                      </div>
-                      <span class="orders-demo__sentence-label govuk-label">by</span>
-                      {{ govukInput({
-                        label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
-                        name: "instalmentDueBy",
-                        classes: "govuk-input--width-10 orders-demo__date-input",
-                        attributes: { placeholder: "DD/MM/YYYY" }
-                      }) }}
+	                      <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select">
+	                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequency">Instalment frequency</label>
+	                        <select class="govuk-select" id="instalmentFrequency" name="instalmentFrequency">
+	                          <option value="week">week</option>
+	                          <option value="month" selected>month</option>
+	                          <option value="year">year</option>
+	                          <option value="other">Other</option>
+	                        </select>
+	                      </div>
+	                      <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select" data-instalment-frequency-other hidden>
+	                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequencyOther">Other period</label>
+	                        <input class="govuk-input govuk-input--width-10" id="instalmentFrequencyOther" name="instalmentFrequencyOther" type="text" placeholder="e.g. 4 weeks">
+	                      </div>
+	                      <span class="orders-demo__sentence-label govuk-label">first payment by</span>
+	                      {{ govukInput({
+	                        label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
+	                        name: "instalmentDueBy",
+	                        classes: "govuk-input--width-10 orders-demo__date-input",
+	                        attributes: { placeholder: "DD/MM/YYYY" }
+	                      }) }}
                     </div>
                   </div>
                 </div>
@@ -1185,11 +1194,13 @@
           const possessionDate = orderType === 'suspended'
             ? getDateString('suspendedBy') || getDateString('outrightBy')
             : getDateString('outrightBy') || getDateString('suspendedBy');
-          const arrears = getMoneyValue('arrearsAmount', getMoneyValue('arrearsAtHearing', '0.00'));
-          const rent = getMoneyValue('currentRent', '0.00');
-          const instalment = getMoneyValue('instalmentAmount', '0.00');
-          const instalmentFreq = getInputValue('instalmentFrequency') || 'month';
-          const address = '12 High Street, Bristol';
+	          const arrears = getMoneyValue('arrearsAmount', getMoneyValue('arrearsAtHearing', '0.00'));
+	          const rent = getMoneyValue('currentRent', '0.00');
+	          const instalment = getMoneyValue('instalmentAmount', '0.00');
+	          const instalmentFreq = getInputValue('instalmentFrequency') || 'month';
+	          const instalmentFreqText =
+	            instalmentFreq === 'other' ? (getInputValue('instalmentFrequencyOther') || '[period]') : instalmentFreq;
+	          const address = '12 High Street, Bristol';
           const costsMode = document.querySelector('input[name="costsMode"]:checked')?.value || 'fixed';
           const payByCheckbox = document.getElementById('costsAddToDebt');
           const payByText = (() => {
@@ -1226,17 +1237,17 @@
               lines.push(`${reasonNumber}. REASONS: ${reason}`);
             }
             status = 'Adjournment draft generated';
-          } else if (orderType === 'suspended') {
-            const total = (moneyToNumber(arrears) + moneyToNumber(getMoneyValue('costsFixedAmount', '424.50'))).toFixed(2);
-            lines.push('Upon hearing the Solicitor for the Claimant and the Defendant in Person.');
-            lines.push('IT IS ORDERED THAT:');
-            lines.push(`1. The Defendant give the Claimant possession of ${address} on or before ${possessionDate || '[date]'}.`);
-            lines.push(`2. This order is not to be enforced so long as the Defendant pays the Claimant the current rent of £${rent} per ${instalmentFreq}, plus £${instalment} per ${instalmentFreq} towards the arrears.`);
-            lines.push(`3. The first payment to be made on or before ${possessionDate || '[date]'}.`);
-            const costsLine = buildCostsLine(costsMode, payByText);
-            if (costsLine) lines.push(`4. ${costsLine}`);
-            lines.push(`5. The Defendant pay the Claimant the total sum of £${total}.`);
-            status = 'Suspended order draft generated';
+	          } else if (orderType === 'suspended') {
+	            const total = (moneyToNumber(arrears) + moneyToNumber(getMoneyValue('costsFixedAmount', '424.50'))).toFixed(2);
+	            lines.push('Upon hearing the Solicitor for the Claimant and the Defendant in Person.');
+	            lines.push('IT IS ORDERED THAT:');
+	            lines.push(`1. The Defendant give the Claimant possession of ${address} on or before ${possessionDate || '[date]'}.`);
+	            lines.push(`2. This order is not to be enforced so long as the Defendant pays the Claimant the current rent of £${rent} per ${instalmentFreqText}, plus £${instalment} per ${instalmentFreqText} towards the arrears.`);
+	            lines.push(`3. The first payment to be made on or before ${possessionDate || '[date]'}.`);
+	            const costsLine = buildCostsLine(costsMode, payByText);
+	            if (costsLine) lines.push(`4. ${costsLine}`);
+	            lines.push(`5. The Defendant pay the Claimant the total sum of £${total}.`);
+	            status = 'Suspended order draft generated';
           } else {
             const costsAmount = costsMode === 'fixed' ? getMoneyValue('costsFixedAmount', '424.50') : getMoneyValue('costsAssessedAmount', '0.00');
             const total = (moneyToNumber(arrears) + moneyToNumber(costsAmount)).toFixed(2);
@@ -1285,7 +1296,7 @@
 	              const amount = getMoneyValue('judgmentInstalmentsAmount', '') || '[amount]';
 	              const frequency = getInputValue('judgmentInstalmentsFrequency') || 'month';
 	              const frequencyText =
-	                frequency === 'other' ? (getInputValue('judgmentInstalmentsFrequencyOther') || 'other') : frequency;
+	                frequency === 'other' ? (getInputValue('judgmentInstalmentsFrequencyOther') || '[period]') : frequency;
 	              const firstBy = getInputValue('judgmentInstalmentsFirstPaymentBy') || '[date]';
 	              terms.push(`by instalments of £${amount} per ${frequencyText}, first payment by ${firstBy}`);
 	            }
@@ -1498,6 +1509,25 @@
 	          apply();
 	        };
 
+	        const initSuspendedInstalmentFrequency = () => {
+	          const select = document.getElementById('instalmentFrequency');
+	          const otherWrapper = document.querySelector('[data-instalment-frequency-other]');
+	          const otherInput = document.getElementById('instalmentFrequencyOther');
+	          if (!(select instanceof HTMLSelectElement) || !otherWrapper || !(otherInput instanceof HTMLInputElement)) return;
+
+	          const apply = () => {
+	            const isOther = select.value === 'other';
+	            otherWrapper.hidden = !isOther;
+	            if (!isOther) otherInput.value = '';
+	          };
+
+	          select.addEventListener('change', () => {
+	            apply();
+	            updatePreview();
+	          });
+	          apply();
+	        };
+
 	        const setActive = value => {
 	          sections.forEach(section => {
 	            const isActive = section.dataset.orderType === value;
@@ -1541,6 +1571,7 @@
 	        initCostsRadios();
 	        initJudgmentSection();
 	        initJudgmentInstalmentFrequency();
+	        initSuspendedInstalmentFrequency();
 	        initPreview();
 
         const form = document.querySelector('.orders-demo__form');

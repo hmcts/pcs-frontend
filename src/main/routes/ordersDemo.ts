@@ -158,6 +158,8 @@ const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
     orderDetails: {
       groundsMode: typeof groundsMode === 'string' ? groundsMode : null,
       mandatoryGroundsDetails: typeof body.mandatoryGroundsDetails === 'string' ? body.mandatoryGroundsDetails : null,
+      discretionaryGroundsDetails:
+        typeof body.discretionaryGroundsDetails === 'string' ? body.discretionaryGroundsDetails : null,
       outright: {
         timing: typeof body.outrightTiming === 'string' ? body.outrightTiming : null,
         possessionDate: normaliseDate(body, 'outrightBy'),
@@ -178,6 +180,7 @@ const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
           enabled: isChecked(body.instalmentCheckbox),
           amount: typeof body.instalmentAmount === 'string' ? body.instalmentAmount : null,
           frequency: typeof body.instalmentFrequency === 'string' ? body.instalmentFrequency : null,
+          frequencyOther: typeof body.instalmentFrequencyOther === 'string' ? body.instalmentFrequencyOther : null,
           dueBy: typeof body.instalmentDueBy === 'string' ? body.instalmentDueBy : null,
         },
       },
