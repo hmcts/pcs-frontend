@@ -63,9 +63,9 @@ Source: `/Users/alex/Documents/context/possessions/designs/Order-drawing form no
 - [x] DoD: UI + order output follow optional/visibility rules; verified via MCP Playwright; commit `JF-06`.
 
 ### JF-07 Dismissed / struck out
-- [ ] Create section “Dismissed / struck out”.
-- [ ] Two mutually exclusive radio buttons: dismissed vs struck out.
-- [ ] DoD: selection reflected in order output; verified via MCP Playwright; commit `JF-07`.
+- [x] Create section “Dismissed / struck out”.
+- [x] Two mutually exclusive radio buttons: dismissed vs struck out.
+- [x] DoD: selection reflected in order output; verified via MCP Playwright; commit `JF-07`.
 
 ### JF-08 Directions (standard)
 - [ ] Add “Insert standard directions” button.
