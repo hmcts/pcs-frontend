@@ -924,58 +924,72 @@
 	          </div>
           <div class="orders-demo__costs-grid">
             <div class="orders-demo__costs-modes">
-              {{ govukRadios({
-                classes: "orders-demo__radios-inline",
-                name: "costsMode",
-                fieldset: {
-                  legend: { text: "Costs mode", classes: "govuk-fieldset__legend--s govuk-visually-hidden" }
-                },
-                items: [
-                  {
-                    value: "fixed",
-                    text: "Fixed costs (standard)",
-                    checked: true,
-                    conditional: {
-                      html: govukInput({
-                        label: { text: "Total costs to be paid by Defendant", classes: "govuk-label--s" },
-                        name: "costsFixedAmount",
-                        classes: "govuk-input--width-10 orders-demo__money-input",
-                        prefix: { text: "£" },
-                        value: "424.50"
-                      })
-                    }
-                  },
-                  {
-                    value: "assessed",
-                    text: "Summarily assessed",
-                    conditional: {
-                      html:
-                        govukInput({
-                          label: { text: "Assessed costs", classes: "govuk-label--s" },
-                          name: "costsAssessedAmount",
-                          classes: "govuk-input--width-10 orders-demo__money-input",
-                          prefix: { text: "£" },
-                          attributes: { placeholder: "0.00" }
-                        }) +
-                        govukInput({
-                          label: { text: "Basis of assessment (optional)", classes: "govuk-label--s" },
-                          name: "costsAssessedBasis",
-                          classes: "govuk-input--width-20",
-                          attributes: { placeholder: "e.g. Conduct of Defendant" }
-                        })
-                    }
-                  },
-                  { value: "reserved", text: "Costs reserved" },
-                  { value: "noOrder", text: "No order for costs" }
-                ]
-              }) }}
-            </div>
+	              {{ govukRadios({
+	                classes: "orders-demo__radios-inline",
+	                name: "costsMode",
+	                fieldset: {
+	                  legend: { text: "Costs mode", classes: "govuk-fieldset__legend--s govuk-visually-hidden" }
+	                },
+	                items: [
+	                  {
+	                    value: "fixed",
+	                    text: "Fixed costs (standard)",
+	                    checked: true,
+	                    conditional: {
+	                      html: govukInput({
+	                        label: { text: "Total costs to be paid by Defendant", classes: "govuk-label--s" },
+	                        name: "costsFixedAmount",
+	                        classes: "govuk-input--width-10 orders-demo__money-input",
+	                        prefix: { text: "£" },
+	                        value: "424.50"
+	                      })
+	                    }
+	                  },
+	                  {
+	                    value: "assessed",
+	                    text: "Summarily assessed",
+	                    conditional: {
+	                      html: govukInput({
+	                        label: { text: "Assessed costs", classes: "govuk-label--s" },
+	                        name: "costsAssessedAmount",
+	                        classes: "govuk-input--width-10 orders-demo__money-input",
+	                        prefix: { text: "£" },
+	                        attributes: { placeholder: "0.00" }
+	                      })
+	                    }
+	                  },
+	                  { value: "inTheCase", text: "Costs in the case" },
+	                  { value: "reserved", text: "Costs reserved" },
+	                  {
+	                    value: "other",
+	                    text: "Other",
+	                    conditional: {
+	                      html: govukTextarea({
+	                        name: "costsOtherText",
+	                        classes: "orders-demo__notes",
+	                        rows: 3,
+	                        label: { text: "Costs other", classes: "govuk-visually-hidden" }
+	                      })
+	                    }
+	                  },
+	                  { value: "silent", text: "[Silent]" }
+	                ]
+	              }) }}
+	            </div>
 
-            <div class="orders-demo__costs-payby" data-costs-payby>
-              <div class="orders-demo__costs-payby-date" data-payby-date>
-                <label class="govuk-label govuk-label--s orders-demo__costs-payby-label" for="costsPayBy">Pay by</label>
-                {{ govukInput({
-                  id: "costsPayBy",
+	            <div class="orders-demo__costs-payby" data-costs-payby>
+	              <div class="orders-demo__costs-add-debt" data-costs-same-terms hidden>
+	                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+	                  <div class="govuk-checkboxes__item">
+	                    <input class="govuk-checkboxes__input" id="costsSuspendedSameTerms" name="costsSuspendedSameTerms" type="checkbox" value="1">
+	                    <label class="govuk-label govuk-checkboxes__label" for="costsSuspendedSameTerms">Suspended on same terms</label>
+	                  </div>
+	                </div>
+	              </div>
+	              <div class="orders-demo__costs-payby-date" data-payby-date>
+	                <label class="govuk-label govuk-label--s orders-demo__costs-payby-label" for="costsPayBy">Pay by</label>
+	                {{ govukInput({
+	                  id: "costsPayBy",
                   label: { text: "Pay by", classes: "govuk-visually-hidden" },
                   name: "costsPayBy",
                   classes: "govuk-input--width-10 orders-demo__date-input",
@@ -1262,20 +1276,30 @@
 	        const buildCostsLine = (mode, payByText) => {
 	          const fixedAmount = getMoneyValue('costsFixedAmount', '424.50');
 	          const assessedAmount = getMoneyValue('costsAssessedAmount', '');
+	          const otherText = getInputValue('costsOtherText');
+	          const sameTerms = (() => {
+	            const checkbox = document.getElementById('costsSuspendedSameTerms');
+	            const wrapper = checkbox instanceof HTMLInputElement ? checkbox.closest('[data-costs-same-terms]') : null;
+	            return checkbox instanceof HTMLInputElement && !wrapper?.hidden && checkbox.checked;
+	          })();
+	          const sameTermsSuffix = sameTerms ? ' This order for costs is suspended on the same terms.' : '';
 
-          if (mode === 'fixed') {
-            return `The Defendant shall pay the Claimant's costs of this claim summarily assessed in the sum of £${fixedAmount}${payByText ? ` by ${payByText}` : ''}.`;
-          }
-          if (mode === 'assessed') {
-            if (!assessedAmount) return 'The Defendant shall pay the Claimant\'s costs of this claim, summarily assessed.';
-            const basis = getInputValue('costsAssessedBasis');
-            const basisText = basis ? ` (basis: ${basis})` : '';
-            return `The Defendant shall pay the Claimant's costs of this claim summarily assessed in the sum of £${assessedAmount}${basisText}${payByText ? ` by ${payByText}` : ''}.`;
-          }
-          if (mode === 'reserved') return 'The costs of this hearing are reserved.';
-          if (mode === 'noOrder') return 'No order as to costs.';
-          return '';
-        };
+	          if (mode === 'silent') return '';
+	          if (mode === 'inTheCase') return `Costs in the case.${sameTermsSuffix}`;
+	          if (mode === 'reserved') return `The costs of this hearing are reserved.${sameTermsSuffix}`;
+	          if (mode === 'other') {
+	            if (!otherText) return `Costs.${sameTermsSuffix}`;
+	            return `${otherText}${sameTermsSuffix}`;
+	          }
+	          if (mode === 'fixed') {
+	            return `The Defendant shall pay the Claimant's costs of this claim summarily assessed in the sum of £${fixedAmount}${payByText ? ` by ${payByText}` : ''}.${sameTermsSuffix}`;
+	          }
+	          if (mode === 'assessed') {
+	            if (!assessedAmount) return `The Defendant shall pay the Claimant's costs of this claim, summarily assessed.${sameTermsSuffix}`;
+	            return `The Defendant shall pay the Claimant's costs of this claim summarily assessed in the sum of £${assessedAmount}${payByText ? ` by ${payByText}` : ''}.${sameTermsSuffix}`;
+	          }
+	          return '';
+	        };
 
         const buildPreview = () => {
           const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'outright';
@@ -1364,7 +1388,12 @@
 	            if (costsLine) lines.push(`2. ${costsLine}`);
 	            status = 'Outcome draft generated';
 	          } else if (orderType === 'suspended') {
-	            const total = (moneyToNumber(arrears) + moneyToNumber(getMoneyValue('costsFixedAmount', '424.50'))).toFixed(2);
+	            const costsAmount = costsMode === 'fixed'
+	              ? getMoneyValue('costsFixedAmount', '424.50')
+	              : costsMode === 'assessed'
+	                  ? getMoneyValue('costsAssessedAmount', '0.00')
+	                  : '0.00';
+	            const total = (moneyToNumber(arrears) + moneyToNumber(costsAmount)).toFixed(2);
 	            lines.push('Upon hearing the Solicitor for the Claimant and the Defendant in Person.');
 	            lines.push('IT IS ORDERED THAT:');
 	            lines.push(`1. The Defendant give the Claimant possession of ${address} on or before ${possessionDate || '[date]'}.`);
@@ -1374,13 +1403,21 @@
 	            if (costsLine) lines.push(`4. ${costsLine}`);
 	            lines.push(`5. The Defendant pay the Claimant the total sum of £${total}.`);
 	            status = 'Suspended order draft generated';
-          } else {
-            const costsAmount = costsMode === 'fixed' ? getMoneyValue('costsFixedAmount', '424.50') : getMoneyValue('costsAssessedAmount', '0.00');
-            const total = (moneyToNumber(arrears) + moneyToNumber(costsAmount)).toFixed(2);
-            lines.push('Upon hearing the Solicitor for the Claimant and the Defendant in Person.');
-            lines.push('IT IS ORDERED THAT:');
-            lines.push(`1. The Defendant give the Claimant possession of ${address} on or before ${possessionDate || '[date]'}.`);
-            lines.push(`2. The Defendant pay the Claimant the total sum of £${total} (comprising arrears of £${arrears} and costs of £${costsAmount})${payByText ? ` by ${payByText}` : ''}.`);
+	          } else {
+	            const costsAmount = costsMode === 'fixed'
+	              ? getMoneyValue('costsFixedAmount', '424.50')
+	              : costsMode === 'assessed'
+	                  ? getMoneyValue('costsAssessedAmount', '0.00')
+	                  : '0.00';
+	            const total = (moneyToNumber(arrears) + moneyToNumber(costsAmount)).toFixed(2);
+	            lines.push('Upon hearing the Solicitor for the Claimant and the Defendant in Person.');
+	            lines.push('IT IS ORDERED THAT:');
+	            lines.push(`1. The Defendant give the Claimant possession of ${address} on or before ${possessionDate || '[date]'}.`);
+	            if (moneyToNumber(costsAmount) > 0) {
+	              lines.push(`2. The Defendant pay the Claimant the total sum of £${total} (comprising arrears of £${arrears} and costs of £${costsAmount})${payByText ? ` by ${payByText}` : ''}.`);
+	            } else {
+	              lines.push(`2. The Defendant pay the Claimant arrears of £${arrears}${payByText ? ` by ${payByText}` : ''}.`);
+	            }
 	            const costsLine = buildCostsLine(costsMode, payByText);
 	            if (costsLine && costsMode !== 'fixed') lines.push(`3. ${costsLine}`);
 	            status = 'Outright order draft generated';
@@ -1524,51 +1561,86 @@
           });
         };
 
-        const applyCostsModeDefaults = mode => {
-          if (mode === 'fixed') {
-            const fixed = document.querySelector('input[name="costsFixedAmount"]');
-            if (fixed instanceof HTMLInputElement && !fixed.value) {
-              fixed.value = '424.50';
-            }
-          }
-          if (mode === 'assessed') {
-            const assessed = document.querySelector('input[name="costsAssessedAmount"]');
-            const basis = document.querySelector('input[name="costsAssessedBasis"]');
-            if (assessed instanceof HTMLInputElement) {
-              assessed.value = '';
-              assessed.focus();
-            }
-            if (basis instanceof HTMLInputElement) {
-              basis.value = '';
-            }
-          }
-        };
+	        const applyCostsModeDefaults = mode => {
+	          if (mode === 'fixed') {
+	            const fixed = document.querySelector('input[name="costsFixedAmount"]');
+	            if (fixed instanceof HTMLInputElement && !fixed.value) {
+	              fixed.value = '424.50';
+	            }
+	          }
+	          if (mode === 'assessed') {
+	            const assessed = document.querySelector('input[name="costsAssessedAmount"]');
+	            if (assessed instanceof HTMLInputElement) {
+	              assessed.value = '';
+	              assessed.focus();
+	            }
+	          }
+	          if (mode === 'other') {
+	            const textarea = document.querySelector('textarea[name="costsOtherText"]');
+	            if (textarea instanceof HTMLTextAreaElement) {
+	              textarea.focus();
+	            }
+	          }
+	        };
 
-        const setCostsMode = mode => {
-          const radio = document.querySelector(`input[name="costsMode"][value="${mode}"]`);
-          if (!(radio instanceof HTMLInputElement)) return;
-          radio.checked = true;
-          radio.dispatchEvent(new Event('change', { bubbles: true }));
-          applyCostsModeDefaults(mode);
-        };
+	        const setCostsMode = mode => {
+	          const radio = document.querySelector(`input[name="costsMode"][value="${mode}"]`);
+	          if (!(radio instanceof HTMLInputElement)) return;
+	          radio.checked = true;
+	          radio.dispatchEvent(new Event('change', { bubbles: true }));
+	          applyCostsModeDefaults(mode);
+	        };
 
-        const setCostsPayBy = orderType => {
-          const payByWrapper = document.querySelector('[data-costs-payby]');
-          const payByDate = document.querySelector('[data-payby-date]');
-          const payByInput = document.getElementById('costsPayBy');
+	        const updateCostsSameTermsVisibility = orderType => {
+	          const wrapper = document.querySelector('[data-costs-same-terms]');
+	          const checkbox = document.getElementById('costsSuspendedSameTerms');
+	          if (!wrapper || !(checkbox instanceof HTMLInputElement)) return;
+
+	          const hasPaymentTerms = (() => {
+	            if (orderType === 'suspended') {
+	              const arrears = document.getElementById('arrearsCheckbox');
+	              const initial = document.getElementById('initialPaymentCheckbox');
+	              const instalments = document.getElementById('instalmentCheckbox');
+	              return (
+	                (arrears instanceof HTMLInputElement && arrears.checked) ||
+	                (initial instanceof HTMLInputElement && initial.checked) ||
+	                (instalments instanceof HTMLInputElement && instalments.checked)
+	              );
+	            }
+
+	            if (orderType === 'adjourn') {
+	              const adjMode = document.querySelector('input[name="adjournmentMode"]:checked')?.value;
+	              if (adjMode !== 'generally') return false;
+	              const enabled = document.getElementById('adjournGenerallyPaymentEnabled');
+	              if (!(enabled instanceof HTMLInputElement) || !enabled.checked) return false;
+	              return Boolean(getInputValue('adjournGenerallyPaymentAmount'));
+	            }
+
+	            return false;
+	          })();
+
+	          wrapper.hidden = !hasPaymentTerms;
+	          if (!hasPaymentTerms) checkbox.checked = false;
+	        };
+
+	        const setCostsPayBy = orderType => {
+	          const payByWrapper = document.querySelector('[data-costs-payby]');
+	          const payByDate = document.querySelector('[data-payby-date]');
+	          const payByInput = document.getElementById('costsPayBy');
           const addToDebt = document.querySelector('[data-payby-debt]');
           const debtCheckbox = document.getElementById('costsAddToDebt');
 
           if (!payByWrapper || !payByDate || !(payByInput instanceof HTMLInputElement) || !addToDebt) return;
 
-          const showDebt = orderType === 'suspended';
-          addToDebt.hidden = !showDebt;
-          payByDate.hidden = showDebt;
-          if (showDebt) {
-            if (debtCheckbox instanceof HTMLInputElement) debtCheckbox.checked = true;
-            updatePreview();
-            return;
-          }
+	          const showDebt = orderType === 'suspended';
+	          addToDebt.hidden = !showDebt;
+	          payByDate.hidden = showDebt;
+	          if (showDebt) {
+	            if (debtCheckbox instanceof HTMLInputElement) debtCheckbox.checked = true;
+	            updateCostsSameTermsVisibility(orderType);
+	            updatePreview();
+	            return;
+	          }
 
           const group = orderType === 'suspended' ? 'suspendedBy' : 'outrightBy';
           const dayInput = document.querySelector(`input[name="${group}-day"]`);
@@ -1578,9 +1650,10 @@
           const { day, month, year } = hasDate
             ? { day: dayInput.value.padStart(2, '0'), month: monthInput.value.padStart(2, '0'), year: yearInput.value }
             : offsetDate(14);
-          payByInput.value = `${day}/${month}/${year}`;
-          updatePreview();
-        };
+	          payByInput.value = `${day}/${month}/${year}`;
+	          updateCostsSameTermsVisibility(orderType);
+	          updatePreview();
+	        };
 
 	        const initCostsRadios = () => {
 	          const radios = Array.from(document.querySelectorAll('input[name="costsMode"]'));
@@ -1698,20 +1771,21 @@
 	            section.classList.toggle('orders-demo__order-section--inactive', !isActive);
 	          });
 
-          if (value === 'suspended') {
-            focusInstalmentAmount();
-            setCostsMode('fixed');
-          } else if (value === 'adjourn') {
-            focusAdjournDate();
-            setCostsMode('reserved');
-          } else if (value === 'outright') {
-            setCostsMode('fixed');
-          } else {
-            setCostsMode('noOrder');
-          }
+	          if (value === 'suspended') {
+	            focusInstalmentAmount();
+	            setCostsMode('fixed');
+	          } else if (value === 'adjourn') {
+	            focusAdjournDate();
+	            setCostsMode('reserved');
+	          } else if (value === 'outright') {
+	            setCostsMode('fixed');
+	          } else {
+	            setCostsMode('silent');
+	          }
 
 	          setCostsPayBy(value);
 	          setJudgmentSameTermsVisibility(value);
+	          updateCostsSameTermsVisibility(value);
 	          updatePreview();
 	        };
 
@@ -1741,12 +1815,17 @@
         const form = document.querySelector('.orders-demo__form');
         const generatedPreviewInput = document.querySelector('input[name="generatedPreviewText"]');
         const generatedPreviewStatusInput = document.querySelector('input[name="generatedPreviewStatus"]');
-        if (form) {
-          form.addEventListener('input', updatePreview);
-          form.addEventListener('change', updatePreview);
-          form.addEventListener('submit', event => {
-            event.preventDefault();
-            const { text, status } = buildPreview();
+	        if (form) {
+	          const handleChange = () => {
+	            const selectedOrderType = document.querySelector('input[name="orderType"]:checked')?.value || defaultValue;
+	            updateCostsSameTermsVisibility(selectedOrderType);
+	            updatePreview();
+	          };
+	          form.addEventListener('input', handleChange);
+	          form.addEventListener('change', handleChange);
+	          form.addEventListener('submit', event => {
+	            event.preventDefault();
+	            const { text, status } = buildPreview();
             const freeText = document.querySelector('[data-preview-textarea]');
             const editedText =
               freeText instanceof HTMLTextAreaElement && !freeText.hidden && freeText.value ? freeText.value : '';

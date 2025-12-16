@@ -128,9 +128,10 @@ export interface OrdersDemoPayload {
     mode?: string | null;
     fixedAmount?: number | null;
     assessedAmount?: number | null;
-    assessedBasis?: string | null;
     payBy?: string | null;
     addToDebt?: boolean;
+    otherText?: string | null;
+    suspendedOnSameTerms?: boolean;
   };
 }
 

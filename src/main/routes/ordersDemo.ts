@@ -242,9 +242,10 @@ const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
       mode: typeof body.costsMode === 'string' ? body.costsMode : null,
       fixedAmount: parseMoney(body.costsFixedAmount),
       assessedAmount: parseMoney(body.costsAssessedAmount),
-      assessedBasis: typeof body.costsAssessedBasis === 'string' ? body.costsAssessedBasis : null,
       payBy: typeof body.costsPayBy === 'string' ? body.costsPayBy : null,
       addToDebt: isChecked(body.costsAddToDebt),
+      otherText: typeof body.costsOtherText === 'string' ? body.costsOtherText : null,
+      suspendedOnSameTerms: isChecked(body.costsSuspendedSameTerms),
     },
   };
 };
