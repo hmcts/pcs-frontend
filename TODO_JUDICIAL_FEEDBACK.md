@@ -68,12 +68,12 @@ Source: `/Users/alex/Documents/context/possessions/designs/Order-drawing form no
 - [x] DoD: selection reflected in order output; verified via MCP Playwright; commit `JF-07`.
 
 ### JF-08 Directions (standard)
-- [ ] Add “Insert standard directions” button.
-- [ ] Insert text with dates calculated from **Order Date (today)**:
-  - [ ] Defence/Counterclaim by **4pm** on OrderDate + 14d
-  - [ ] Claimant reply by **4pm** on OrderDate + 28d
-- [ ] Inserted block must be fully editable.
-- [ ] DoD: defaults correct; verified via MCP Playwright; commit `JF-08`.
+- [x] Add “Insert standard directions” button.
+- [x] Insert text with dates calculated from **Order Date (today)**:
+  - [x] Defence/Counterclaim by **4pm** on OrderDate + 14d
+  - [x] Claimant reply by **4pm** on OrderDate + 28d
+- [x] Inserted block must be fully editable.
+- [x] DoD: defaults correct; verified via MCP Playwright; commit `JF-08`.
 
 ### JF-09 Costs
 - [ ] Remove “basis of assessment” under “summarily assessed”.
