@@ -28,16 +28,16 @@ Source: `/Users/alex/Documents/context/possessions/designs/Order-drawing form no
 - [x] DoD: UI + generated order behavior correct; verified via MCP Playwright; commit `JF-02`.
 
 ### JF-03 New section: Judgment
-- [ ] Add a checkbox section “Judgment” after “Suspended possession order”.
-- [ ] Defendant selection checkboxes (First/Second Defendant labels from case data).
-- [ ] Monetary heads:
-  - [ ] Arrears £
-  - [ ] Interest £
-  - [ ] Use & occupation daily rate £ from date until possession given up
-- [ ] Add checkbox “Suspended on the same terms” (only available if Suspended Possession selected).
-- [ ] Add instalments option: “by instalments of £ per (Week/Month/Year/Other)” + “first payment by [date]”.
-  - [ ] If “Other”, show free-text period input (e.g., “4 weeks”).
-- [ ] DoD: data captured + reflected in order output as required; verified via MCP Playwright; commit `JF-03`.
+- [x] Add a checkbox section “Judgment” after “Suspended possession order”.
+- [x] Defendant selection checkboxes (First/Second Defendant labels from case data).
+- [x] Monetary heads:
+  - [x] Arrears £
+  - [x] Interest £
+  - [x] Use & occupation daily rate £ from date until possession given up
+- [x] Add checkbox “Suspended on the same terms” (only available if Suspended Possession selected).
+- [x] Add instalments option: “by instalments of £ per (Week/Month/Year/Other)” + “first payment by [date]”.
+  - [x] If “Other”, show free-text period input (e.g., “4 weeks”).
+- [x] DoD: data captured + reflected in order output as required; verified via MCP Playwright; commit `JF-03`.
 
 ### JF-04 Possession grounds
 - [ ] Add mechanism to indicate Mandatory vs Discretionary.
