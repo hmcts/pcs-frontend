@@ -1245,20 +1245,19 @@
 
         const formatDate = ({ day, month, year }) => `${day}/${month}/${year}`;
 
-        const initStandardDirections = () => {
-          const button = document.querySelector('.orders-demo__adjourn-insert');
-          const textarea = document.querySelector('textarea[name="adjournDirections"]');
-          if (!button || !textarea) return;
+	        const initStandardDirections = () => {
+	          const button = document.querySelector('.orders-demo__adjourn-insert');
+	          const textarea = document.querySelector('textarea[name="adjournDirections"]');
+	          if (!button || !textarea) return;
 
-          button.addEventListener('click', () => {
-            const line1 = `1. The Defendant shall file and serve a Defence and Witness Statement by 4pm on ${formatDate(offsetDate(14))}.`;
-            const line2 = `2. The Claimant shall file and serve a Reply by 4pm on ${formatDate(offsetDate(28))}.`;
-            const line3 = `3. The case be listed for a Review Hearing on the first open date after ${formatDate(offsetDate(35))}.`;
-            textarea.value = `${line1}\n${line2}\n${line3}`;
-            textarea.focus();
-            updatePreview();
-          });
-        };
+	          button.addEventListener('click', () => {
+	            const line1 = `1. The Defendant shall file and serve a Defence and any Counterclaim by 4pm on ${formatDate(offsetDate(14))}.`;
+	            const line2 = `2. The Claimant shall file and serve a Reply by 4pm on ${formatDate(offsetDate(28))}.`;
+	            textarea.value = `${line1}\n${line2}`;
+	            textarea.focus();
+	            updatePreview();
+	          });
+	        };
 
 	        const buildCostsLine = (mode, payByText) => {
 	          const fixedAmount = getMoneyValue('costsFixedAmount', '424.50');
