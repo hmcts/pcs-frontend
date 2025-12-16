@@ -17,15 +17,15 @@ Source: `/Users/alex/Documents/context/possessions/designs/Order-drawing form no
 ## Stories (prioritised)
 
 ### JF-01 Header & case information
-- [ ] Make party names (Claimant/Defendant) bolder and bigger.
-- [ ] Add “per week” to Current Rent frequency dropdown.
-- [ ] DoD: UI matches AC; verified via MCP Playwright; commit `JF-01`.
+- [x] Make party names (Claimant/Defendant) bolder and bigger.
+- [x] Add “per week” to Current Rent frequency dropdown.
+- [x] DoD: UI matches AC; verified via MCP Playwright; commit `JF-01`.
 
 ### JF-02 Recording attendance
-- [ ] Reorder attendance radio options: `Csl`, `Sol`, `S/A`, `H/O`, `Duty`, `LiP`, `Not present`.
-- [ ] Reduce radio button size/spacing to use less screen space.
-- [ ] Ensure “Name” fields are saved/recorded but **not** pulled into generated Order text.
-- [ ] DoD: UI + generated order behavior correct; verified via MCP Playwright; commit `JF-02`.
+- [x] Reorder attendance radio options: `Csl`, `Sol`, `S/A`, `H/O`, `Duty`, `LiP`, `Not present`.
+- [x] Reduce radio button size/spacing to use less screen space.
+- [x] Ensure “Name” fields are saved/recorded but **not** pulled into generated Order text.
+- [x] DoD: UI + generated order behavior correct; verified via MCP Playwright; commit `JF-02`.
 
 ### JF-03 New section: Judgment
 - [ ] Add a checkbox section “Judgment” after “Suspended possession order”.
@@ -83,4 +83,3 @@ Source: `/Users/alex/Documents/context/possessions/designs/Order-drawing form no
   - [ ] [Silent] (no order on costs)
   - [ ] Other (shows free text area)
 - [ ] DoD: options rendered + output correct; verified via MCP Playwright; commit `JF-09`.
-
