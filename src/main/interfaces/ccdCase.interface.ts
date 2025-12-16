@@ -77,6 +77,9 @@ export interface OrdersDemoPayload {
         dueBy?: string | null;
       };
     };
+    dismissal?: {
+      outcome?: string | null;
+    };
     adjournment?: {
       mode?: string | null;
       nextHearingMode?: string | null;

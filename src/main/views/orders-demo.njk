@@ -884,13 +884,44 @@
 	                </div>
 	              </div>
             </div>
-          </div>
-        </div>
+	          </div>
+	        </div>
 
-        <div class="orders-demo__section orders-demo__costs">
-          <div class="orders-demo__section-header">
-            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Costs</h3>
-          </div>
+	        <div class="orders-demo__section orders-demo__order-section" data-order-type="dismissed">
+	          <div class="orders-demo__order-grid">
+	            <div class="orders-demo__order-chooser">
+	              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+	                <div class="govuk-radios__item">
+	                  <input class="govuk-radios__input" id="order-dismissed" name="orderType" type="radio" value="dismissed">
+	                  <label class="govuk-label govuk-radios__label orders-demo__radio-label" for="order-dismissed">Select</label>
+	                </div>
+	              </div>
+	            </div>
+
+	            <div class="orders-demo__order-content">
+	              <div class="orders-demo__section-header orders-demo__order-header">
+	                <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Dismissed / struck out</h2>
+	              </div>
+
+	              <div class="orders-demo__order-body">
+	                {{ govukRadios({
+	                  classes: "orders-demo__radios-inline",
+	                  name: "dismissalOutcome",
+	                  fieldset: { legend: { text: "Dismissed / struck out", classes: "govuk-visually-hidden" } },
+	                  items: [
+	                    { value: "dismissed", text: "The claim is dismissed", checked: true },
+	                    { value: "struckOut", text: "The claim is struck out" }
+	                  ]
+	                }) }}
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+
+	        <div class="orders-demo__section orders-demo__costs">
+	          <div class="orders-demo__section-header">
+	            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Costs</h3>
+	          </div>
           <div class="orders-demo__costs-grid">
             <div class="orders-demo__costs-modes">
               {{ govukRadios({
@@ -1326,6 +1357,13 @@
 	              if (costsLine) lines.push(`${number}. ${costsLine}`);
 	            }
 	            status = 'Adjournment draft generated';
+	          } else if (orderType === 'dismissed') {
+	            const outcome = document.querySelector('input[name="dismissalOutcome"]:checked')?.value || 'dismissed';
+	            lines.push('IT IS ORDERED THAT:');
+	            lines.push(`1. The claim is ${outcome === 'struckOut' ? 'struck out' : 'dismissed'}.`);
+	            const costsLine = buildCostsLine(costsMode, payByText);
+	            if (costsLine) lines.push(`2. ${costsLine}`);
+	            status = 'Outcome draft generated';
 	          } else if (orderType === 'suspended') {
 	            const total = (moneyToNumber(arrears) + moneyToNumber(getMoneyValue('costsFixedAmount', '424.50'))).toFixed(2);
 	            lines.push('Upon hearing the Solicitor for the Claimant and the Defendant in Person.');

@@ -184,6 +184,9 @@ const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
           dueBy: typeof body.instalmentDueBy === 'string' ? body.instalmentDueBy : null,
         },
       },
+      dismissal: {
+        outcome: typeof body.dismissalOutcome === 'string' ? body.dismissalOutcome : null,
+      },
       adjournment: {
         mode: typeof body.adjournmentMode === 'string' ? body.adjournmentMode : null,
         nextHearingMode: typeof body.adjournNextHearingMode === 'string' ? body.adjournNextHearingMode : null,
