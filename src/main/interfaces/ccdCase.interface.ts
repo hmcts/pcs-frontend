@@ -78,13 +78,22 @@ export interface OrdersDemoPayload {
       };
     };
     adjournment?: {
-      nextHearingDate?: string | null;
+      mode?: string | null;
+      nextHearingMode?: string | null;
+      firstAvailableAfter?: string | null;
+      onDate?: string | null;
       timeEstimate?: string | null;
-      time?: string | null;
-      hearingType?: string | null;
-      location?: string | null;
+      listingNotes?: string | null;
       directions?: string | null;
-      reason?: string | null;
+      generally?: {
+        paymentEnabled: boolean;
+        paymentAmount?: string | null;
+        paymentFrequency?: string | null;
+        paymentFrequencyOther?: string | null;
+        firstPaymentBy?: string | null;
+        strikeOutEnabled: boolean;
+        strikeOutBy?: string | null;
+      };
     };
   };
   judgment?: {

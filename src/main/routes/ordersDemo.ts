@@ -185,13 +185,27 @@ const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
         },
       },
       adjournment: {
-        nextHearingDate: normaliseDate(body, 'adjournNextHearing'),
+        mode: typeof body.adjournmentMode === 'string' ? body.adjournmentMode : null,
+        nextHearingMode: typeof body.adjournNextHearingMode === 'string' ? body.adjournNextHearingMode : null,
+        firstAvailableAfter: normaliseDate(body, 'adjournFirstAvailableAfter'),
+        onDate: normaliseDate(body, 'adjournOnDate'),
         timeEstimate: typeof body.adjournTimeEstimate === 'string' ? body.adjournTimeEstimate : null,
-        time: typeof body.adjournTime === 'string' ? body.adjournTime : null,
-        hearingType: typeof body.adjournHearingType === 'string' ? body.adjournHearingType : null,
-        location: typeof body.adjournLocation === 'string' ? body.adjournLocation : null,
+        listingNotes: typeof body.adjournListingNotes === 'string' ? body.adjournListingNotes : null,
         directions: typeof body.adjournDirections === 'string' ? body.adjournDirections : null,
-        reason: typeof body.adjournReason === 'string' ? body.adjournReason : null,
+        generally: {
+          paymentEnabled: isChecked(body.adjournGenerallyPaymentEnabled),
+          paymentAmount: typeof body.adjournGenerallyPaymentAmount === 'string' ? body.adjournGenerallyPaymentAmount : null,
+          paymentFrequency:
+            typeof body.adjournGenerallyPaymentFrequency === 'string' ? body.adjournGenerallyPaymentFrequency : null,
+          paymentFrequencyOther:
+            typeof body.adjournGenerallyPaymentFrequencyOther === 'string'
+              ? body.adjournGenerallyPaymentFrequencyOther
+              : null,
+          firstPaymentBy:
+            typeof body.adjournGenerallyFirstPaymentBy === 'string' ? body.adjournGenerallyFirstPaymentBy : null,
+          strikeOutEnabled: isChecked(body.adjournGenerallyStrikeOutEnabled),
+          strikeOutBy: typeof body.adjournGenerallyStrikeOutBy === 'string' ? body.adjournGenerallyStrikeOutBy : null,
+        },
       },
     },
     judgment: {
