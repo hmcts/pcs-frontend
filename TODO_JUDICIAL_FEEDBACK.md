@@ -51,16 +51,16 @@ Source: `/Users/alex/Documents/context/possessions/designs/Order-drawing form no
 - [x] DoD: UI matches PDF wording; verified via MCP Playwright; commit `JF-05`.
 
 ### JF-06 Adjournment configuration + “adjourned generally”
-- [ ] Make next hearing date explicitly optional, with choice:
-  - [ ] “First available date after …” (date/period widget)
-  - [ ] “On …” (fixed date)
-- [ ] Provide time estimate input (supports blank free text).
-- [ ] Add “Notes for listing officer” free text (not shown in generated order text).
-- [ ] Remove from judge UI: hearing type, location, time of day, reason for adjournment.
-- [ ] Add radio option: “Adjourned generally with permission to restore”.
-  - [ ] Optional payment terms (current rent + £X per period, first payment by date; period supports Other + free text)
-  - [ ] Optional strike-out clause with date/time (“4pm on …”)
-- [ ] DoD: UI + order output follow optional/visibility rules; verified via MCP Playwright; commit `JF-06`.
+- [x] Make next hearing date explicitly optional, with choice:
+  - [x] “First available date after …” (date/period widget)
+  - [x] “On …” (fixed date)
+- [x] Provide time estimate input (supports blank free text).
+- [x] Add “Notes for listing officer” free text (not shown in generated order text).
+- [x] Remove from judge UI: hearing type, location, time of day, reason for adjournment.
+- [x] Add radio option: “Adjourned generally with permission to restore”.
+  - [x] Optional payment terms (current rent + £X per period, first payment by date; period supports Other + free text)
+  - [x] Optional strike-out clause with date/time (“4pm on …”)
+- [x] DoD: UI + order output follow optional/visibility rules; verified via MCP Playwright; commit `JF-06`.
 
 ### JF-07 Dismissed / struck out
 - [ ] Create section “Dismissed / struck out”.
