@@ -40,15 +40,15 @@ Source: `/Users/alex/Documents/context/possessions/designs/Order-drawing form no
 - [x] DoD: data captured + reflected in order output as required; verified via MCP Playwright; commit `JF-03`.
 
 ### JF-04 Possession grounds
-- [ ] Add mechanism to indicate Mandatory vs Discretionary.
-- [ ] If Discretionary selected, allow optional grounds input.
-- [ ] DoD: UI + generated order reflect selection; verified via MCP Playwright; commit `JF-04`.
+- [x] Add mechanism to indicate Mandatory vs Discretionary.
+- [x] If Discretionary selected, allow optional grounds input.
+- [x] DoD: UI + generated order reflect selection; verified via MCP Playwright; commit `JF-04`.
 
 ### JF-05 Suspended possession order refinements
-- [ ] Remove date box from “suspended on payment of arrears of …” row.
-- [ ] Change label in instalments row from “by” to “first payment by”.
-- [ ] Add “Other” to frequency dropdown; when selected, show free-text period input.
-- [ ] DoD: UI matches PDF wording; verified via MCP Playwright; commit `JF-05`.
+- [x] Remove date box from “suspended on payment of arrears of …” row.
+- [x] Change label in instalments row from “by” to “first payment by”.
+- [x] Add “Other” to frequency dropdown; when selected, show free-text period input.
+- [x] DoD: UI matches PDF wording; verified via MCP Playwright; commit `JF-05`.
 
 ### JF-06 Adjournment configuration + “adjourned generally”
 - [ ] Make next hearing date explicitly optional, with choice:
