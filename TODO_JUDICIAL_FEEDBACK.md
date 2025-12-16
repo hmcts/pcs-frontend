@@ -76,10 +76,10 @@ Source: `/Users/alex/Documents/context/possessions/designs/Order-drawing form no
 - [x] DoD: defaults correct; verified via MCP Playwright; commit `JF-08`.
 
 ### JF-09 Costs
-- [ ] Remove “basis of assessment” under “summarily assessed”.
-- [ ] Add options:
-  - [ ] Costs in the case
-  - [ ] Suspended on same terms (conditional; see Global decisions)
-  - [ ] [Silent] (no order on costs)
-  - [ ] Other (shows free text area)
-- [ ] DoD: options rendered + output correct; verified via MCP Playwright; commit `JF-09`.
+- [x] Remove “basis of assessment” under “summarily assessed”.
+- [x] Add options:
+  - [x] Costs in the case
+  - [x] Suspended on same terms (conditional; see Global decisions)
+  - [x] [Silent] (no order on costs)
+  - [x] Other (shows free text area)
+- [x] DoD: options rendered + output correct; verified via MCP Playwright; commit `JF-09`.
