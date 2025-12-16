@@ -1,4 +1,5 @@
 export const DASHBOARD_ROUTE = '/dashboard';
+const DEFAULT_DASHBOARD_URL = `${DASHBOARD_ROUTE}/1`; // TODO: remove the hardcoded 1 when we had real CCD backend setup
 
 /**
  * Validates a redirect URL to prevent open redirect vulnerabilities.
@@ -36,16 +37,15 @@ function sanitizeCaseReference(caseReference: string | number): string | null {
 }
 
 export function getDashboardUrl(caseReference?: string | number): string {
-  if (caseReference) {
-    const sanitized = sanitizeCaseReference(caseReference);
-    if (!sanitized) {
-      return `${DASHBOARD_ROUTE}/1`;
-    }
-    const url = `${DASHBOARD_ROUTE}/${sanitized}`;
-    if (!isValidRedirectUrl(url)) {
-      return `${DASHBOARD_ROUTE}/1`;
-    }
-    return url;
+  if (!caseReference) {
+    return DEFAULT_DASHBOARD_URL;
   }
-  return `${DASHBOARD_ROUTE}/1`; // TODO: remove the hardcoded 1 when we had real CCD backend setup
+
+  const sanitized = sanitizeCaseReference(caseReference);
+  if (!sanitized) {
+    return DEFAULT_DASHBOARD_URL;
+  }
+
+  const url = `${DASHBOARD_ROUTE}/${sanitized}`;
+  return isValidRedirectUrl(url) ? url : DEFAULT_DASHBOARD_URL;
 }
