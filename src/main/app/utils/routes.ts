@@ -28,7 +28,7 @@ export function isValidRedirectUrl(url: string | null): boolean {
   return true;
 }
 
-function sanitizeCaseReference(caseReference: string | number): string | null {
+function sanitiseCaseReference(caseReference: string | number): string | null {
   const caseRefStr = String(caseReference);
   if (!/^\d{16}$/.test(caseRefStr)) {
     return null;
@@ -41,11 +41,11 @@ export function getDashboardUrl(caseReference?: string | number): string {
     return DEFAULT_DASHBOARD_URL;
   }
 
-  const sanitized = sanitizeCaseReference(caseReference);
-  if (!sanitized) {
+  const sanitised = sanitiseCaseReference(caseReference);
+  if (!sanitised) {
     return DEFAULT_DASHBOARD_URL;
   }
 
-  const url = `${DASHBOARD_ROUTE}/${sanitized}`;
+  const url = `${DASHBOARD_ROUTE}/${sanitised}`;
   return isValidRedirectUrl(url) ? url : DEFAULT_DASHBOARD_URL;
 }
