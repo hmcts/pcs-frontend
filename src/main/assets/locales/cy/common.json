@@ -5,6 +5,7 @@
   "languageToggle": "<a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
   "logout": "cylogout",
   "contactUsForHelp": "cyContact us for help",
+  "contactUsForHelpText": "cyIf you need help using this service, contact us.",
   "buttons": {
     "continue": "cySave and continue",
     "saveForLater": "cySave for later",
@@ -79,6 +80,20 @@
     "charactersOverLimitText": {
       "one": "cyYou have %{count} character too many",
       "other": "cyYou have %{count} characters too many"
+    }
+  },
+  "errorPages": {
+    "403": {
+      "title": "cyNot Authorised",
+      "paragraph": "cySorry you do not have access to this account."
+    },
+    "404": {
+      "title": "cyPage not found",
+      "paragraph": "cyThis could be because you’ve followed a broken or outdated link, or because there’s an error on our site. Use the browser back button to go to the previous page."
+    },
+    "500": {
+      "title": "cySorry, we’re having technical problems",
+      "paragraph": "cyPlease try again in a few minutes."
     }
   }
 }
