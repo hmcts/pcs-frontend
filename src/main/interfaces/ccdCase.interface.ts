@@ -85,6 +85,31 @@ export interface OrdersDemoPayload {
       reason?: string | null;
     };
   };
+  judgment?: {
+    enabled?: boolean;
+    defendants?: string[];
+    arrears?: {
+      enabled: boolean;
+      amount?: string | null;
+    };
+    interest?: {
+      enabled: boolean;
+      amount?: string | null;
+    };
+    useAndOccupation?: {
+      enabled: boolean;
+      dailyRate?: string | null;
+      from?: string | null;
+    };
+    suspendedOnSameTerms?: boolean;
+    instalments?: {
+      enabled: boolean;
+      amount?: string | null;
+      frequency?: string | null;
+      frequencyOther?: string | null;
+      firstPaymentBy?: string | null;
+    };
+  };
   costs?: {
     mode?: string | null;
     fixedAmount?: number | null;

@@ -415,8 +415,8 @@
           </div>
         </div>
 
-        <div class="orders-demo__section orders-demo__order-section" data-order-type="suspended">
-          <div class="orders-demo__order-grid">
+	        <div class="orders-demo__section orders-demo__order-section" data-order-type="suspended">
+	          <div class="orders-demo__order-grid">
             <div class="orders-demo__order-chooser">
               <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                 <div class="govuk-radios__item">
@@ -545,13 +545,169 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+	          </div>
+	        </div>
 
-        <div class="orders-demo__section orders-demo__order-section" data-order-type="adjourn">
-          <div class="orders-demo__order-grid">
-            <div class="orders-demo__order-chooser">
-              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+	        <div class="orders-demo__section orders-demo__judgment">
+	          <div class="orders-demo__section-header">
+	            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Judgment</h2>
+	          </div>
+
+	          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+	            <div class="govuk-checkboxes__item">
+	              <input class="govuk-checkboxes__input" id="judgmentEnabled" name="judgmentEnabled" type="checkbox" value="1">
+	              <label class="govuk-label govuk-checkboxes__label" for="judgmentEnabled">Include judgment</label>
+	            </div>
+	          </div>
+
+	          <div class="orders-demo__judgment-body" data-judgment-body hidden>
+	            {% set judgmentDefendantList = defendants | default([]) %}
+	            {% if judgmentDefendantList | length == 0 %}
+	              {% set judgmentDefendantList = [defendantName | default('Jones'), 'Taylor', 'Patel'] %}
+	            {% endif %}
+	            {% set judgmentOrdinals = ['First', 'Second', 'Third', 'Fourth', 'Fifth'] %}
+
+	            <h3 class="govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">Judgment against</h3>
+	            <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__judgment-defendants" data-module="govuk-checkboxes">
+	              {% for defendant in judgmentDefendantList %}
+	                {% set ordinal = judgmentOrdinals[loop.index0] | default('Defendant ' ~ loop.index) %}
+	                <div class="govuk-checkboxes__item">
+	                  <input class="govuk-checkboxes__input" id="judgmentDefendant{{ loop.index }}" name="judgmentDefendants" type="checkbox" value="{{ defendant }}">
+	                  <label class="govuk-label govuk-checkboxes__label" for="judgmentDefendant{{ loop.index }}">{{ ordinal }} Defendant ({{ defendant }})</label>
+	                </div>
+	              {% endfor %}
+	            </div>
+
+	            <h3 class="govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">For</h3>
+	            <div class="orders-demo__suspended-rows orders-demo__judgment-rows">
+	              <div class="orders-demo__suspended-row">
+	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+	                  <div class="govuk-checkboxes__item">
+	                    <input class="govuk-checkboxes__input" id="judgmentArrearsEnabled" name="judgmentArrearsEnabled" type="checkbox" value="1">
+	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentArrearsEnabled">Arrears</label>
+	                  </div>
+	                </div>
+	                <span class="orders-demo__sentence-lead govuk-label">arrears of</span>
+	                <div class="orders-demo__sentence-body">
+	                  {{ govukInput({
+	                    label: { text: "Judgment arrears amount", classes: "govuk-visually-hidden" },
+	                    name: "judgmentArrearsAmount",
+	                    classes: "govuk-input--width-5 orders-demo__money-input",
+	                    prefix: { text: "£" },
+	                    attributes: { placeholder: "0.00" }
+	                  }) }}
+	                </div>
+	              </div>
+
+	              <div class="orders-demo__suspended-row">
+	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+	                  <div class="govuk-checkboxes__item">
+	                    <input class="govuk-checkboxes__input" id="judgmentInterestEnabled" name="judgmentInterestEnabled" type="checkbox" value="1">
+	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentInterestEnabled">Interest</label>
+	                  </div>
+	                </div>
+	                <span class="orders-demo__sentence-lead govuk-label">interest of</span>
+	                <div class="orders-demo__sentence-body">
+	                  {{ govukInput({
+	                    label: { text: "Judgment interest amount", classes: "govuk-visually-hidden" },
+	                    name: "judgmentInterestAmount",
+	                    classes: "govuk-input--width-5 orders-demo__money-input",
+	                    prefix: { text: "£" },
+	                    attributes: { placeholder: "0.00" }
+	                  }) }}
+	                </div>
+	              </div>
+
+	              <div class="orders-demo__suspended-row orders-demo__suspended-row--date">
+	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+	                  <div class="govuk-checkboxes__item">
+	                    <input class="govuk-checkboxes__input" id="judgmentUseOccupationEnabled" name="judgmentUseOccupationEnabled" type="checkbox" value="1">
+	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentUseOccupationEnabled">Use and occupation</label>
+	                  </div>
+	                </div>
+	                <span class="orders-demo__sentence-lead govuk-label">use and occupation at a daily rate of</span>
+	                <div class="orders-demo__sentence-body">
+	                  {{ govukInput({
+	                    label: { text: "Use and occupation daily rate", classes: "govuk-visually-hidden" },
+	                    name: "judgmentUseOccupationDailyRate",
+	                    classes: "govuk-input--width-5 orders-demo__money-input",
+	                    prefix: { text: "£" },
+	                    attributes: { placeholder: "0.00" }
+	                  }) }}
+	                  <span class="orders-demo__sentence-label govuk-label">from</span>
+	                  {{ govukInput({
+	                    label: { text: "Use and occupation from date", classes: "govuk-visually-hidden" },
+	                    name: "judgmentUseOccupationFrom",
+	                    classes: "govuk-input--width-10 orders-demo__date-input",
+	                    attributes: { placeholder: "DD/MM/YYYY" }
+	                  }) }}
+	                  <span class="orders-demo__sentence-label govuk-label">until possession is given up</span>
+	                </div>
+	              </div>
+	            </div>
+
+	            <h3 class="govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">And such judgment is</h3>
+	            <div class="orders-demo__suspended-rows orders-demo__judgment-rows">
+	              <div data-judgment-same-terms hidden>
+	                <div class="orders-demo__suspended-row">
+	                  <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+	                    <div class="govuk-checkboxes__item">
+	                      <input class="govuk-checkboxes__input" id="judgmentSuspendedSameTerms" name="judgmentSuspendedSameTerms" type="checkbox" value="1">
+	                      <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentSuspendedSameTerms">Suspended on the same terms</label>
+	                    </div>
+	                  </div>
+	                  <span class="orders-demo__sentence-lead govuk-label">suspended on the same terms</span>
+	                  <div class="orders-demo__sentence-body"></div>
+	                </div>
+	              </div>
+
+	              <div class="orders-demo__suspended-row">
+	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+	                  <div class="govuk-checkboxes__item">
+	                    <input class="govuk-checkboxes__input" id="judgmentInstalmentsEnabled" name="judgmentInstalmentsEnabled" type="checkbox" value="1">
+	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentInstalmentsEnabled">By instalments</label>
+	                  </div>
+	                </div>
+	                <span class="orders-demo__sentence-lead govuk-label">by instalments of</span>
+	                <div class="orders-demo__sentence-body orders-demo__sentence-body--spread">
+	                  {{ govukInput({
+	                    label: { text: "Judgment instalment amount", classes: "govuk-visually-hidden" },
+	                    name: "judgmentInstalmentsAmount",
+	                    classes: "govuk-input--width-5 orders-demo__money-input",
+	                    prefix: { text: "£" },
+	                    attributes: { placeholder: "0.00" }
+	                  }) }}
+	                  <span class="orders-demo__sentence-label govuk-label">per</span>
+	                  <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select">
+	                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequency">Judgment instalment frequency</label>
+	                    <select class="govuk-select" id="judgmentInstalmentsFrequency" name="judgmentInstalmentsFrequency">
+	                      <option value="week">week</option>
+	                      <option value="month" selected>month</option>
+	                      <option value="year">year</option>
+	                      <option value="other">Other</option>
+	                    </select>
+	                  </div>
+	                  <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select" data-judgment-instalments-other hidden>
+	                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequencyOther">Other period</label>
+	                    <input class="govuk-input govuk-input--width-10" id="judgmentInstalmentsFrequencyOther" name="judgmentInstalmentsFrequencyOther" type="text" placeholder="e.g. 4 weeks">
+	                  </div>
+	                  <span class="orders-demo__sentence-label govuk-label">first payment by</span>
+	                  {{ govukInput({
+	                    label: { text: "Judgment instalments first payment by", classes: "govuk-visually-hidden" },
+	                    name: "judgmentInstalmentsFirstPaymentBy",
+	                    classes: "govuk-input--width-10 orders-demo__date-input",
+	                    attributes: { placeholder: "DD/MM/YYYY" }
+	                  }) }}
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+
+	        <div class="orders-demo__section orders-demo__order-section" data-order-type="adjourn">
+	          <div class="orders-demo__order-grid">
+	            <div class="orders-demo__order-chooser">
+	              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" id="order-adjourn" name="orderType" type="radio" value="adjourn">
                   <label class="govuk-label govuk-radios__label orders-demo__radio-label" for="order-adjourn">Select</label>
@@ -894,16 +1050,21 @@
         return num.toFixed(2);
       };
 
-      const getDateString = prefix => {
-        const day = getInputValue(`${prefix}-day`).padStart(2, '0');
-        const month = getInputValue(`${prefix}-month`).padStart(2, '0');
-        const year = getInputValue(`${prefix}-year`);
-        if (!day || !month || !year) return '';
-        return `${day}/${month}/${year}`;
-      };
+	      const getDateString = prefix => {
+	        const day = getInputValue(`${prefix}-day`).padStart(2, '0');
+	        const month = getInputValue(`${prefix}-month`).padStart(2, '0');
+	        const year = getInputValue(`${prefix}-year`);
+	        if (!day || !month || !year) return '';
+	        return `${day}/${month}/${year}`;
+	      };
 
-      const initOrderSwitcher = () => {
-        if (orderSwitcherInitialised) return;
+	      const getCheckedValues = name =>
+	        Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+	          .map(el => (el instanceof HTMLInputElement ? el.value : ''))
+	          .filter(Boolean);
+
+	      const initOrderSwitcher = () => {
+	        if (orderSwitcherInitialised) return;
 
         const sections = Array.from(document.querySelectorAll('.orders-demo__order-section'));
         if (!sections.length) return;
@@ -1083,13 +1244,64 @@
             lines.push('IT IS ORDERED THAT:');
             lines.push(`1. The Defendant give the Claimant possession of ${address} on or before ${possessionDate || '[date]'}.`);
             lines.push(`2. The Defendant pay the Claimant the total sum of £${total} (comprising arrears of £${arrears} and costs of £${costsAmount})${payByText ? ` by ${payByText}` : ''}.`);
-            const costsLine = buildCostsLine(costsMode, payByText);
-            if (costsLine && costsMode !== 'fixed') lines.push(`3. ${costsLine}`);
-            status = 'Outright order draft generated';
-          }
+	            const costsLine = buildCostsLine(costsMode, payByText);
+	            if (costsLine && costsMode !== 'fixed') lines.push(`3. ${costsLine}`);
+	            status = 'Outright order draft generated';
+	          }
 
-          return { text: lines.join('\n\n'), status };
-        };
+	          const judgmentToggle = document.getElementById('judgmentEnabled');
+	          const judgmentEnabled = judgmentToggle instanceof HTMLInputElement && judgmentToggle.checked;
+	          if (judgmentEnabled) {
+	            const judgmentLines = [];
+	            const against = getCheckedValues('judgmentDefendants');
+	            const againstText = against.length ? against.join(', ') : 'the Defendant';
+
+	            const heads = [];
+	            const arrearsEnabled = document.getElementById('judgmentArrearsEnabled');
+	            if (arrearsEnabled instanceof HTMLInputElement && arrearsEnabled.checked) {
+	              const amount = getMoneyValue('judgmentArrearsAmount', '') || '[amount]';
+	              heads.push(`arrears of £${amount}`);
+	            }
+	            const interestEnabled = document.getElementById('judgmentInterestEnabled');
+	            if (interestEnabled instanceof HTMLInputElement && interestEnabled.checked) {
+	              const amount = getMoneyValue('judgmentInterestAmount', '') || '[amount]';
+	              heads.push(`interest of £${amount}`);
+	            }
+	            const uoEnabled = document.getElementById('judgmentUseOccupationEnabled');
+	            if (uoEnabled instanceof HTMLInputElement && uoEnabled.checked) {
+	              const rate = getMoneyValue('judgmentUseOccupationDailyRate', '') || '[amount]';
+	              const from = getInputValue('judgmentUseOccupationFrom') || '[date]';
+	              heads.push(`use and occupation at a daily rate of £${rate} from ${from} until possession is given up`);
+	            }
+
+	            const terms = [];
+	            const sameTermsEnabled = document.getElementById('judgmentSuspendedSameTerms');
+	            if (orderType === 'suspended' && sameTermsEnabled instanceof HTMLInputElement && sameTermsEnabled.checked) {
+	              terms.push('suspended on the same terms');
+	            }
+
+	            const instalmentsEnabled = document.getElementById('judgmentInstalmentsEnabled');
+	            if (instalmentsEnabled instanceof HTMLInputElement && instalmentsEnabled.checked) {
+	              const amount = getMoneyValue('judgmentInstalmentsAmount', '') || '[amount]';
+	              const frequency = getInputValue('judgmentInstalmentsFrequency') || 'month';
+	              const frequencyText =
+	                frequency === 'other' ? (getInputValue('judgmentInstalmentsFrequencyOther') || 'other') : frequency;
+	              const firstBy = getInputValue('judgmentInstalmentsFirstPaymentBy') || '[date]';
+	              terms.push(`by instalments of £${amount} per ${frequencyText}, first payment by ${firstBy}`);
+	            }
+
+	            judgmentLines.push('JUDGMENT');
+	            judgmentLines.push(`Judgment against ${againstText}${heads.length ? ' for:' : '.'}`);
+	            heads.forEach(item => judgmentLines.push(`- ${item}`));
+	            if (terms.length) {
+	              judgmentLines.push('And such judgment is:');
+	              terms.forEach(item => judgmentLines.push(`- ${item}`));
+	            }
+	            lines.push(judgmentLines.join('\n'));
+	          }
+
+	          return { text: lines.join('\n\n'), status };
+	        };
 
         const initPreview = () => {
           const toggle = document.querySelector('[data-preview-toggle]');
@@ -1233,20 +1445,65 @@
           updatePreview();
         };
 
-        const initCostsRadios = () => {
-          const radios = Array.from(document.querySelectorAll('input[name="costsMode"]'));
-          radios.forEach(radio => {
-            radio.addEventListener('change', () => applyCostsModeDefaults(radio.value));
-            radio.addEventListener('change', updatePreview);
-          });
-        };
+	        const initCostsRadios = () => {
+	          const radios = Array.from(document.querySelectorAll('input[name="costsMode"]'));
+	          radios.forEach(radio => {
+	            radio.addEventListener('change', () => applyCostsModeDefaults(radio.value));
+	            radio.addEventListener('change', updatePreview);
+	          });
+	        };
 
-        const setActive = value => {
-          sections.forEach(section => {
-            const isActive = section.dataset.orderType === value;
-            section.classList.toggle('orders-demo__order-section--active', isActive);
-            section.classList.toggle('orders-demo__order-section--inactive', !isActive);
-          });
+	        const initJudgmentSection = () => {
+	          const enabled = document.getElementById('judgmentEnabled');
+	          const body = document.querySelector('[data-judgment-body]');
+	          if (!(enabled instanceof HTMLInputElement) || !body) return;
+
+	          const apply = () => {
+	            body.hidden = !enabled.checked;
+	            updatePreview();
+	          };
+
+	          enabled.addEventListener('change', apply);
+	          apply();
+	        };
+
+	        const setJudgmentSameTermsVisibility = orderType => {
+	          const wrapper = document.querySelector('[data-judgment-same-terms]');
+	          if (!wrapper) return;
+	          const shouldShow = orderType === 'suspended';
+	          wrapper.hidden = !shouldShow;
+
+	          if (!shouldShow) {
+	            const checkbox = wrapper.querySelector('input[type="checkbox"]');
+	            if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
+	          }
+	        };
+
+	        const initJudgmentInstalmentFrequency = () => {
+	          const select = document.getElementById('judgmentInstalmentsFrequency');
+	          const otherWrapper = document.querySelector('[data-judgment-instalments-other]');
+	          const otherInput = document.getElementById('judgmentInstalmentsFrequencyOther');
+	          if (!(select instanceof HTMLSelectElement) || !otherWrapper || !(otherInput instanceof HTMLInputElement)) return;
+
+	          const apply = () => {
+	            const isOther = select.value === 'other';
+	            otherWrapper.hidden = !isOther;
+	            if (!isOther) otherInput.value = '';
+	          };
+
+	          select.addEventListener('change', () => {
+	            apply();
+	            updatePreview();
+	          });
+	          apply();
+	        };
+
+	        const setActive = value => {
+	          sections.forEach(section => {
+	            const isActive = section.dataset.orderType === value;
+	            section.classList.toggle('orders-demo__order-section--active', isActive);
+	            section.classList.toggle('orders-demo__order-section--inactive', !isActive);
+	          });
 
           if (value === 'suspended') {
             focusInstalmentAmount();
@@ -1260,9 +1517,10 @@
             setCostsMode('noOrder');
           }
 
-          setCostsPayBy(value);
-          updatePreview();
-        };
+	          setCostsPayBy(value);
+	          setJudgmentSameTermsVisibility(value);
+	          updatePreview();
+	        };
 
         const defaultValue = document.querySelector('input[name="orderType"]:checked')?.value
           || sections[0]?.dataset.orderType;
@@ -1273,15 +1531,17 @@
           radio.addEventListener('change', () => setActive(radio.value));
         });
 
-        setActive(defaultValue);
-        setDefaultDate('outrightBy');
-        setDefaultDate('suspendedBy');
-        initDateShortcuts();
-        initOrderClickTargets();
-        initStandardDirections();
-        initQuickReasons();
-        initCostsRadios();
-        initPreview();
+	        setActive(defaultValue);
+	        setDefaultDate('outrightBy');
+	        setDefaultDate('suspendedBy');
+	        initDateShortcuts();
+	        initOrderClickTargets();
+	        initStandardDirections();
+	        initQuickReasons();
+	        initCostsRadios();
+	        initJudgmentSection();
+	        initJudgmentInstalmentFrequency();
+	        initPreview();
 
         const form = document.querySelector('.orders-demo__form');
         const generatedPreviewInput = document.querySelector('input[name="generatedPreviewText"]');

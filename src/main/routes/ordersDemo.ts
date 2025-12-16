@@ -191,6 +191,33 @@ const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
         reason: typeof body.adjournReason === 'string' ? body.adjournReason : null,
       },
     },
+    judgment: {
+      enabled: isChecked(body.judgmentEnabled),
+      defendants: asArray(body.judgmentDefendants),
+      arrears: {
+        enabled: isChecked(body.judgmentArrearsEnabled),
+        amount: typeof body.judgmentArrearsAmount === 'string' ? body.judgmentArrearsAmount : null,
+      },
+      interest: {
+        enabled: isChecked(body.judgmentInterestEnabled),
+        amount: typeof body.judgmentInterestAmount === 'string' ? body.judgmentInterestAmount : null,
+      },
+      useAndOccupation: {
+        enabled: isChecked(body.judgmentUseOccupationEnabled),
+        dailyRate: typeof body.judgmentUseOccupationDailyRate === 'string' ? body.judgmentUseOccupationDailyRate : null,
+        from: typeof body.judgmentUseOccupationFrom === 'string' ? body.judgmentUseOccupationFrom : null,
+      },
+      suspendedOnSameTerms: isChecked(body.judgmentSuspendedSameTerms),
+      instalments: {
+        enabled: isChecked(body.judgmentInstalmentsEnabled),
+        amount: typeof body.judgmentInstalmentsAmount === 'string' ? body.judgmentInstalmentsAmount : null,
+        frequency: typeof body.judgmentInstalmentsFrequency === 'string' ? body.judgmentInstalmentsFrequency : null,
+        frequencyOther:
+          typeof body.judgmentInstalmentsFrequencyOther === 'string' ? body.judgmentInstalmentsFrequencyOther : null,
+        firstPaymentBy:
+          typeof body.judgmentInstalmentsFirstPaymentBy === 'string' ? body.judgmentInstalmentsFirstPaymentBy : null,
+      },
+    },
     costs: {
       mode: typeof body.costsMode === 'string' ? body.costsMode : null,
       fixedAmount: parseMoney(body.costsFixedAmount),
