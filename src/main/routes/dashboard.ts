@@ -34,11 +34,6 @@ function sanitiseCaseReference(caseReference: string | number): string | null {
   return /^\d{16}$/.test(caseRefStr) ? caseRefStr : null;
 }
 
-/**
- * Builds a dashboard URL for a given case reference using a strict allowlist pattern:
- * - Only allows /dashboard/{16-digit-number}
- * - Falls back to DEFAULT_DASHBOARD_URL otherwise
- */
 function getDashboardUrl(caseReference?: string | number): string {
   if (!caseReference) {
     return DEFAULT_DASHBOARD_URL;
@@ -50,8 +45,6 @@ function getDashboardUrl(caseReference?: string | number): string {
   }
 
   const url = `${DASHBOARD_ROUTE}/${sanitised}`;
-
-  // Final allowlist check (defence-in-depth)
   return /^\/dashboard\/\d{16}$/.test(url) ? url : DEFAULT_DASHBOARD_URL;
 }
 
@@ -108,13 +101,15 @@ function mapTaskGroups(app: Application, caseReference: string) {
 export default function dashboardRoutes(app: Application): void {
   const logger = Logger.getLogger('dashboard');
 
-  /**
-   * Safe entrypoint: other controllers can redirect to `/dashboard` (constant)
-   * and we resolve the real dashboard URL from validated server-side session state.
-   */
   app.get('/dashboard', oidcMiddleware, (req: Request, res: Response) => {
     const caseId = req.session?.ccdCase?.id;
-    return res.redirect(303, getDashboardUrl(caseId));
+    const validatedCaseId = caseId ? sanitiseCaseReference(caseId) : null;
+    const redirectUrl = getDashboardUrl(validatedCaseId ?? undefined);
+    const allowedPattern = /^\/dashboard(\/\d{16})?$/;
+    if (!allowedPattern.test(redirectUrl)) {
+      return res.redirect(303, DEFAULT_DASHBOARD_URL);
+    }
+    return res.redirect(303, redirectUrl);
   });
 
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
