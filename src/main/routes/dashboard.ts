@@ -48,10 +48,6 @@ function getDashboardUrl(caseReference?: string | number): string {
   return /^\/dashboard\/\d{16}$/.test(url) ? url : DEFAULT_DASHBOARD_URL;
 }
 
-function isValidCaseReferenceParam(param: unknown): param is string {
-  return typeof param === 'string' && /^\d{16}$/.test(param);
-}
-
 function mapTaskGroups(app: Application, caseReference: string) {
   return (taskGroups: DashboardTaskGroup[]): MappedTaskGroup[] => {
     return taskGroups.map(taskGroup => {
@@ -115,16 +111,17 @@ export default function dashboardRoutes(app: Application): void {
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
     const { caseReference } = req.params;
 
-    if (!isValidCaseReferenceParam(caseReference)) {
+    const sanitisedCaseReference = sanitiseCaseReference(caseReference);
+    if (!sanitisedCaseReference) {
       return res.status(400).send('Invalid case reference');
     }
 
-    const caseReferenceNumber = Number(caseReference);
+    const caseReferenceNumber = Number(sanitisedCaseReference);
 
     try {
       const [notifications, taskGroups] = await Promise.all([
         getDashboardNotifications(caseReferenceNumber),
-        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, caseReference)),
+        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, sanitisedCaseReference)),
       ]);
 
       return res.render('dashboard', {
@@ -132,7 +129,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
       });
     } catch (e) {
-      logger.error(`Failed to fetch dashboard data for case ${caseReference}. Error was: ${String(e)}`);
+      logger.error(`Failed to fetch dashboard data for case ${sanitisedCaseReference}. Error was: ${String(e)}`);
       throw e;
     }
   });
