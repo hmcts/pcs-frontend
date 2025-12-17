@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { getDashboardUrl, isValidRedirectUrl } from '../../../app/utils/routes';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { getRequestLanguage } from '../../i18n';
 import { stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
@@ -49,7 +49,7 @@ export function createPostHandler(
           pageUrl: req.originalUrl || '/',
           t,
           ccdId: req.session?.ccdCase?.id,
-          dashboardUrl: getDashboardUrl(req.session?.ccdCase?.id),
+          dashboardUrl: DASHBOARD_ROUTE,
           languageToggle: t('languageToggle'),
         });
       }
@@ -60,7 +60,7 @@ export function createPostHandler(
         const bodyWithoutAction = { ...req.body };
         delete bodyWithoutAction.action;
         setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, getDashboardUrl(req.session?.ccdCase?.id));
+        return res.redirect(303, DASHBOARD_ROUTE);
       }
 
       processFieldData(req, fields);
@@ -80,7 +80,7 @@ export function createPostHandler(
       }
 
       const redirectPath = stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
-      if (!redirectPath || !isValidRedirectUrl(redirectPath)) {
+      if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }
 
