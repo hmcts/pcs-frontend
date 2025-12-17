@@ -113,7 +113,7 @@ export default function dashboardRoutes(app: Application): void {
 
     const sanitisedCaseReference = sanitiseCaseReference(caseReference);
     if (!sanitisedCaseReference) {
-      return res.status(400).send('Invalid case reference');
+      return res.status(404).render('not-found');
     }
 
     const caseReferenceNumber = Number(sanitisedCaseReference);
