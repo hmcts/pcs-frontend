@@ -62,13 +62,17 @@
     "12": "cyDecember"
   },
   "dateFormatLong": "{{day}} {{month}} {{year}}",
-
   "timeout": {
     "title": "cyYou'll be signed out soon",
     "part1": "cyFor your security, you'll be signed out in",
     "part2": "cyYour previous answers have been saved.",
     "buttonText": "cyStay signed in",
-    "signOutLinkText": "cySign out"
+    "signOutLinkText": "cySign out",
+    "srWarning": "cyWarning: You will be signed out soon due to inactivity.",
+    "srMinutesRemaining": {
+      "one": "cy%{count} minute remaining until sign out.",
+      "other": "cy%{count} minutes remaining until sign out."
+    }
   },
   "characterCount": {
     "charactersUnderLimitText": {

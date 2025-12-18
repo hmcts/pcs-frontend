@@ -67,7 +67,12 @@
     "part1": "For your security, you'll be signed out in",
     "part2": "Your previous answers have been saved.",
     "buttonText": "Stay signed in",
-    "signOutLinkText": "Sign out"
+    "signOutLinkText": "Sign out",
+    "srWarning": "Warning: You will be signed out soon due to inactivity.",
+    "srMinutesRemaining": {
+      "one": "%{count} minute remaining until sign out.",
+      "other": "%{count} minutes remaining until sign out."
+    }
   },
   "characterCount": {
     "charactersUnderLimitText": {

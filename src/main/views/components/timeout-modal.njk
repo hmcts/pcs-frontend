@@ -1,14 +1,20 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-<div id="timeout-modal-container" class="modal" hidden>
-  <div id="timeout-modal" class="modal-content govuk-width-container" tabindex="0" role="dialog" aria-labelledby="timeout-modal-heading">
+<div id="timeout-modal-container" class="modal" hidden data-inert-container=".govuk-modal-dialogue-inert-container" data-sr-warning="{{ t('timeout.srWarning') }}" data-sr-minute-singular="{{ t('timeout.srMinutesRemaining.one') }}" data-sr-minute-plural="{{ t('timeout.srMinutesRemaining.other') }}">
+  <dialog id="timeout-modal" class="modal-content govuk-width-container" tabindex="0" aria-labelledby="timeout-modal-heading" aria-describedby="timeout-modal-description">
     <h2 id="timeout-modal-heading" class="govuk-heading-m">{{ t('timeout.title') }}</h2>
-    <p class="govuk-body">
-      {{ t('timeout.part1') }}&nbsp;<span id="countdown-timer"></span>&period;
-    </p>
-    <p class="govuk-body">
-    {{ t('timeout.part2') }}
-    </p>
+    <div id="timeout-modal-description">
+      <p class="govuk-body">
+        {{ t('timeout.part1') }}&nbsp;<span id="countdown-timer" aria-live="off"></span>&period;
+      </p>
+      <p class="govuk-body">
+        {{ t('timeout.part2') }}
+      </p>
+    </div>
+    
+    {# Screen reader announcements - inside modal for better VoiceOver support #}
+    <div id="timeout-modal-announcer" class="govuk-visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+    
     <div class="govuk-form-group">
       <div class="timeout-modal-actions">
         {{ govukButton({
@@ -18,5 +24,5 @@
         <a href="/logout" class="govuk-link timeout-modal-signout-link">{{ t('timeout.signOutLinkText') }}</a>
       </div>
     </div>
-  </div>
+  </dialog>
 </div>

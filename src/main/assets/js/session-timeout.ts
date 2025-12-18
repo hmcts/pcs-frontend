@@ -6,13 +6,25 @@ export function initSessionTimeout(): void {
 
   // modal elements
   const modalContainer = document.getElementById('timeout-modal-container');
-  const modal = document.getElementById('timeout-modal');
+  const modal = document.getElementById('timeout-modal') as HTMLDialogElement;
   const countdownElement = document.getElementById('countdown-timer');
   const continueButton = document.getElementById('timeout-modal-close-button');
+  const announcer = document.getElementById('timeout-modal-announcer');
+
+  // inert container for background content
+  const inertSelector = modalContainer?.dataset.inertContainer;
+  const inertContainer = inertSelector ? (document.querySelector(inertSelector) as HTMLElement) : null;
+
+  // translations from data attributes
+  const srWarning = modalContainer?.dataset.srWarning;
+  const srMinuteSingular = modalContainer?.dataset.srMinuteSingular;
+  const srMinutePlural = modalContainer?.dataset.srMinutePlural;
 
   let lastActivity = Date.now();
   let warningShown = false;
   let countdownInterval: number | null = null;
+  let lastFocusedElement: HTMLElement | null = null;
+  let lastAnnouncedMinute = -1;
 
   // show modal
   const showModal = () => {
@@ -20,9 +32,32 @@ export function initSessionTimeout(): void {
       return;
     }
 
+    lastFocusedElement = document.activeElement as HTMLElement;
+
+    // disable background content
+    if (inertContainer) {
+      (inertContainer as HTMLElement & { inert: boolean }).inert = true;
+    }
+
+    // prevent body scroll
+    body.classList.add('modal-open');
+
+    // show modal container and dialog element
     modalContainer.removeAttribute('hidden');
+
+    if (modal.showModal) {
+      modal.showModal();
+    } else {
+      modal.setAttribute('open', '');
+    }
+
     modal.focus();
     warningShown = true;
+
+    // announce to screen readers
+    if (announcer && srWarning) {
+      announcer.textContent = srWarning;
+    }
 
     // start countdown
     startCountdown();
@@ -30,12 +65,40 @@ export function initSessionTimeout(): void {
 
   // hide modal
   const hideModal = () => {
-    if (!modalContainer) {
+    if (!modalContainer || !modal) {
       return;
     }
 
+    // hide modal dialog and container
+    if (modal.close) {
+      modal.close();
+    } else {
+      modal.removeAttribute('open');
+    }
+
     modalContainer.setAttribute('hidden', 'hidden');
+
+    // restore background content
+    if (inertContainer) {
+      (inertContainer as HTMLElement & { inert: boolean }).inert = false;
+    }
+
+    // restore body scroll
+    body.classList.remove('modal-open');
+
+    // restore focus to previous element
+    if (lastFocusedElement) {
+      lastFocusedElement.focus();
+      lastFocusedElement = null;
+    }
+
+    // clear screen reader announcer
+    if (announcer) {
+      announcer.textContent = '';
+    }
+
     warningShown = false;
+    lastAnnouncedMinute = -1;
     stopCountdown();
   };
 
@@ -63,6 +126,15 @@ export function initSessionTimeout(): void {
         countdownElement.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
       } else {
         countdownElement.textContent = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+      }
+
+      // announce minute changes to screen readers
+      if (minutes !== lastAnnouncedMinute && secondsRemaining % 60 === 0 && announcer) {
+        lastAnnouncedMinute = minutes;
+        const template = minutes === 1 ? srMinuteSingular : srMinutePlural;
+        if (template) {
+          announcer.textContent = template.replace('%{count}', minutes.toString());
+        }
       }
 
       secondsRemaining--;
@@ -125,6 +197,16 @@ export function initSessionTimeout(): void {
         });
     });
   }
+
+  // escape key closes modal
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && warningShown) {
+      e.preventDefault();
+      if (continueButton) {
+        continueButton.click();
+      }
+    }
+  });
 
   // track activity
   ['mousemove', 'keydown', 'scroll', 'click'].forEach(event => {
