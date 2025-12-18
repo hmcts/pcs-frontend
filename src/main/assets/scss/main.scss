@@ -706,6 +706,16 @@
   }
 }
 
+.orders-demo__other-period {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.orders-demo__other-period-unit {
+  min-width: 120px;
+}
+
 .orders-demo__instalments-first-label {
   grid-row: 2;
   grid-column: 1 / 3;

@@ -74,6 +74,8 @@ export interface OrdersDemoPayload {
         amount?: string | null;
         frequency?: string | null;
         frequencyOther?: string | null;
+        frequencyOtherValue?: string | null;
+        frequencyOtherUnit?: string | null;
         dueBy?: string | null;
       };
     };
@@ -127,6 +129,8 @@ export interface OrdersDemoPayload {
       amount?: string | null;
       frequency?: string | null;
       frequencyOther?: string | null;
+      frequencyOtherValue?: string | null;
+      frequencyOtherUnit?: string | null;
       firstPaymentBy?: string | null;
     };
   };

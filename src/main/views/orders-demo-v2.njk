@@ -547,12 +547,18 @@
 	                          <option value="month" selected>month</option>
 	                          <option value="year">year</option>
 	                          <option value="other">Other</option>
-	                        </select>
-	                      </div>
-		                      <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select" data-instalment-frequency-other hidden>
-		                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequencyOther">Other period</label>
-		                        <input class="govuk-input govuk-input--width-10" id="instalmentFrequencyOther" name="instalmentFrequencyOther" type="text" placeholder="e.g. 4 weeks">
+		                        </select>
 		                      </div>
+			                      <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select orders-demo__other-period" data-instalment-frequency-other hidden>
+			                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequencyOtherValue">Other period</label>
+			                        <input class="govuk-input govuk-input--width-3 orders-demo__other-period-count" id="instalmentFrequencyOtherValue" name="instalmentFrequencyOtherValue" type="number" min="1" step="1" placeholder="4">
+			                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequencyOtherUnit">Other period unit</label>
+			                        <select class="govuk-select orders-demo__other-period-unit" id="instalmentFrequencyOtherUnit" name="instalmentFrequencyOtherUnit">
+			                          <option value="day">day</option>
+			                          <option value="week" selected>week</option>
+			                          <option value="month">month</option>
+			                        </select>
+			                      </div>
 		                      <span class="orders-demo__sentence-label govuk-label orders-demo__instalments-first-label">first payment by</span>
 		                      {{ govukInput({
 		                        label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
@@ -911,9 +917,15 @@
 		                      <option value="other">Other</option>
 		                    </select>
 		                  </div>
-		                  <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select" data-judgment-instalments-other hidden>
-		                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequencyOther">Other period</label>
-		                    <input class="govuk-input govuk-input--width-10" id="judgmentInstalmentsFrequencyOther" name="judgmentInstalmentsFrequencyOther" type="text" placeholder="e.g. 4 weeks">
+		                  <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select orders-demo__other-period" data-judgment-instalments-other hidden>
+		                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequencyOtherValue">Other period</label>
+		                    <input class="govuk-input govuk-input--width-3 orders-demo__other-period-count" id="judgmentInstalmentsFrequencyOtherValue" name="judgmentInstalmentsFrequencyOtherValue" type="number" min="1" step="1" placeholder="4">
+		                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequencyOtherUnit">Other period unit</label>
+		                    <select class="govuk-select orders-demo__other-period-unit" id="judgmentInstalmentsFrequencyOtherUnit" name="judgmentInstalmentsFrequencyOtherUnit">
+		                      <option value="day">day</option>
+		                      <option value="week" selected>week</option>
+		                      <option value="month">month</option>
+		                    </select>
 		                  </div>
 		                  <span class="orders-demo__sentence-label govuk-label orders-demo__instalments-first-label">first payment by</span>
 		                  {{ govukInput({
@@ -1178,13 +1190,28 @@
         return '';
       };
 
-      const getMoneyValue = (name, fallback = '0.00') => {
-        const raw = getInputValue(name);
-        const cleaned = raw.replace(/[^0-9.\\-]/g, '');
-        const num = Number.parseFloat(cleaned);
-        if (Number.isNaN(num)) return fallback;
-        return num.toFixed(2);
-      };
+	      const getMoneyValue = (name, fallback = '0.00') => {
+	        const raw = getInputValue(name);
+	        const cleaned = raw.replace(/[^0-9.\\-]/g, '');
+	        const num = Number.parseFloat(cleaned);
+	        if (Number.isNaN(num)) return fallback;
+	        return num.toFixed(2);
+	      };
+
+	      const pluraliseUnit = (unit, count) => {
+	        const plural = count === 1 ? unit : `${unit}s`;
+	        return plural;
+	      };
+
+	      const getStructuredPeriodText = (valueName, unitName, placeholder = '[period]') => {
+	        const valueRaw = getInputValue(valueName);
+	        const unitRaw = getInputValue(unitName) || 'week';
+	        const count = Number.parseInt(valueRaw, 10);
+	        const unit = unitRaw === 'day' || unitRaw === 'week' || unitRaw === 'month' ? unitRaw : 'week';
+	        if (!valueRaw) return placeholder;
+	        if (Number.isNaN(count)) return `${valueRaw} ${unit}s`;
+	        return `${valueRaw} ${pluraliseUnit(unit, count)}`;
+	      };
 
 	      const getDateString = prefix => {
 	        const day = getInputValue(`${prefix}-day`).padStart(2, '0');
@@ -1320,9 +1347,11 @@
 	          const arrears = getMoneyValue('arrearsAmount', getMoneyValue('arrearsAtHearing', '0.00'));
 	          const rent = getMoneyValue('currentRent', '0.00');
 	          const instalment = getMoneyValue('instalmentAmount', '0.00');
-	          const instalmentFreq = getInputValue('instalmentFrequency') || 'month';
-	          const instalmentFreqText =
-	            instalmentFreq === 'other' ? (getInputValue('instalmentFrequencyOther') || '[period]') : instalmentFreq;
+		          const instalmentFreq = getInputValue('instalmentFrequency') || 'month';
+		          const instalmentFreqText =
+		            instalmentFreq === 'other'
+		              ? getStructuredPeriodText('instalmentFrequencyOtherValue', 'instalmentFrequencyOtherUnit')
+		              : instalmentFreq;
 	          const address = '12 High Street, Bristol';
           const costsMode = document.querySelector('input[name="costsMode"]:checked')?.value || 'fixed';
           const payByCheckbox = document.getElementById('costsAddToDebt');
@@ -1468,9 +1497,14 @@
 	            const instalmentsEnabled = document.getElementById('judgmentInstalmentsEnabled');
 	            if (instalmentsEnabled instanceof HTMLInputElement && instalmentsEnabled.checked) {
 	              const amount = getMoneyValue('judgmentInstalmentsAmount', '') || '[amount]';
-	              const frequency = getInputValue('judgmentInstalmentsFrequency') || 'month';
-	              const frequencyText =
-	                frequency === 'other' ? (getInputValue('judgmentInstalmentsFrequencyOther') || '[period]') : frequency;
+		              const frequency = getInputValue('judgmentInstalmentsFrequency') || 'month';
+		              const frequencyText =
+		                frequency === 'other'
+		                  ? getStructuredPeriodText(
+		                      'judgmentInstalmentsFrequencyOtherValue',
+		                      'judgmentInstalmentsFrequencyOtherUnit'
+		                    )
+		                  : frequency;
 	              const firstBy = getInputValue('judgmentInstalmentsFirstPaymentBy') || '[date]';
 	              terms.push(`by instalments of £${amount} per ${frequencyText}, first payment by ${firstBy}`);
 	            }
@@ -1859,12 +1893,13 @@
 	          toggleFieldGroup('judgmentArrearsEnabled', ['judgmentArrearsAmount']);
 	          toggleFieldGroup('judgmentInterestEnabled', ['judgmentInterestAmount']);
 	          toggleFieldGroup('judgmentUseOccupationEnabled', ['judgmentUseOccupationDailyRate', 'judgmentUseOccupationFrom']);
-	          toggleFieldGroup('judgmentInstalmentsEnabled', [
-	            'judgmentInstalmentsAmount',
-	            'judgmentInstalmentsFrequency',
-	            'judgmentInstalmentsFrequencyOther',
-	            'judgmentInstalmentsFirstPaymentBy',
-	          ]);
+		          toggleFieldGroup('judgmentInstalmentsEnabled', [
+		            'judgmentInstalmentsAmount',
+		            'judgmentInstalmentsFrequency',
+		            'judgmentInstalmentsFrequencyOtherValue',
+		            'judgmentInstalmentsFrequencyOtherUnit',
+		            'judgmentInstalmentsFirstPaymentBy',
+		          ]);
 
 	          const applyCollapsed = () => {
 	            body.hidden = !enabled.checked;
@@ -1898,36 +1933,58 @@
 		        const initJudgmentInstalmentFrequency = () => {
 		          const select = document.getElementById('judgmentInstalmentsFrequency');
 		          const otherWrapper = document.querySelector('[data-judgment-instalments-other]');
-		          const otherInput = document.getElementById('judgmentInstalmentsFrequencyOther');
-		          if (!(select instanceof HTMLSelectElement) || !otherWrapper || !(otherInput instanceof HTMLInputElement)) return;
+		          const otherValue = document.getElementById('judgmentInstalmentsFrequencyOtherValue');
+		          const otherUnit = document.getElementById('judgmentInstalmentsFrequencyOtherUnit');
+		          if (
+		            !(select instanceof HTMLSelectElement) ||
+		            !otherWrapper ||
+		            !(otherValue instanceof HTMLInputElement) ||
+		            !(otherUnit instanceof HTMLSelectElement)
+		          ) {
+		            return;
+		          }
 
 		          const apply = () => {
 		            const isOther = select.value === 'other';
 		            otherWrapper.hidden = !isOther;
-		            if (!isOther) otherInput.value = '';
+		            if (!isOther) {
+		              otherValue.value = '';
+		              otherUnit.value = 'week';
+		            }
 		          };
 
-	          select.addEventListener('change', () => {
-	            apply();
-	            updatePreview();
-	          });
-	          apply();
-	        };
+		          select.addEventListener('change', () => {
+		            apply();
+		            updatePreview();
+		          });
+		          apply();
+		        };
 
 		        const initSuspendedInstalmentFrequency = () => {
 		          const select = document.getElementById('instalmentFrequency');
 		          const otherWrapper = document.querySelector('[data-instalment-frequency-other]');
-		          const otherInput = document.getElementById('instalmentFrequencyOther');
-		          if (!(select instanceof HTMLSelectElement) || !otherWrapper || !(otherInput instanceof HTMLInputElement)) return;
+		          const otherValue = document.getElementById('instalmentFrequencyOtherValue');
+		          const otherUnit = document.getElementById('instalmentFrequencyOtherUnit');
+		          if (
+		            !(select instanceof HTMLSelectElement) ||
+		            !otherWrapper ||
+		            !(otherValue instanceof HTMLInputElement) ||
+		            !(otherUnit instanceof HTMLSelectElement)
+		          ) {
+		            return;
+		          }
 
 		          const apply = () => {
 		            const isOther = select.value === 'other';
 		            otherWrapper.hidden = !isOther;
-		            if (!isOther) otherInput.value = '';
+		            if (!isOther) {
+		              otherValue.value = '';
+		              otherUnit.value = 'week';
+		            }
 		          };
 
-	          select.addEventListener('change', () => {
-	            apply();
+		          select.addEventListener('change', () => {
+		            apply();
 	            updatePreview();
 	          });
 	          apply();

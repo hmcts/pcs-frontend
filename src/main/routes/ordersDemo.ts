@@ -90,6 +90,27 @@ const parseMoney = (value: unknown): number | null => {
   return Number.isNaN(parsed) ? null : Number(parsed.toFixed(2));
 };
 
+const formatOtherPeriod = (
+  value: unknown,
+  unit: unknown
+): { text: string | null; value: string | null; unit: string | null } => {
+  const rawValue = typeof value === 'string' ? value.trim() : '';
+  const rawUnit = typeof unit === 'string' ? unit.trim() : '';
+  const normalisedUnit = rawUnit === 'day' || rawUnit === 'week' || rawUnit === 'month' ? rawUnit : null;
+  if (!rawValue && !normalisedUnit) {
+    return { text: null, value: null, unit: null };
+  }
+
+  const unitText = normalisedUnit || 'week';
+  const count = Number.parseInt(rawValue, 10);
+  if (!rawValue || Number.isNaN(count)) {
+    return { text: rawValue ? `${rawValue} ${unitText}s` : null, value: rawValue || null, unit: normalisedUnit };
+  }
+
+  const plural = count === 1 ? unitText : `${unitText}s`;
+  return { text: `${count} ${plural}`, value: rawValue, unit: normalisedUnit };
+};
+
 const calculateDailyRateFromRent = (rent: string, frequency: OrdersDemoViewModel['currentRentFrequency']): string => {
   const rentValue = parseMoney(rent);
   if (rentValue === null) return '0.00';
@@ -182,6 +203,12 @@ const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
     (typeof body.generatedPreviewText === 'string' && body.generatedPreviewText.trim()) ||
     '';
 
+  const suspendedInstalmentsOther = formatOtherPeriod(body.instalmentFrequencyOtherValue, body.instalmentFrequencyOtherUnit);
+  const judgmentInstalmentsOther = formatOtherPeriod(
+    body.judgmentInstalmentsFrequencyOtherValue,
+    body.judgmentInstalmentsFrequencyOtherUnit
+  );
+
   return {
     orderType: typeof body.orderType === 'string' ? body.orderType : 'outright',
     previewText,
@@ -220,14 +247,16 @@ const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
           amount: typeof body.initialPayment === 'string' ? body.initialPayment : null,
           dueBy: typeof body.initialPaymentBy === 'string' ? body.initialPaymentBy : null,
         },
-        instalments: {
-          enabled: isChecked(body.instalmentCheckbox),
-          amount: typeof body.instalmentAmount === 'string' ? body.instalmentAmount : null,
-          frequency: typeof body.instalmentFrequency === 'string' ? body.instalmentFrequency : null,
-          frequencyOther: typeof body.instalmentFrequencyOther === 'string' ? body.instalmentFrequencyOther : null,
-          dueBy: typeof body.instalmentDueBy === 'string' ? body.instalmentDueBy : null,
-        },
-      },
+	        instalments: {
+	          enabled: isChecked(body.instalmentCheckbox),
+	          amount: typeof body.instalmentAmount === 'string' ? body.instalmentAmount : null,
+	          frequency: typeof body.instalmentFrequency === 'string' ? body.instalmentFrequency : null,
+	          frequencyOther: suspendedInstalmentsOther.text,
+	          frequencyOtherValue: suspendedInstalmentsOther.value,
+	          frequencyOtherUnit: suspendedInstalmentsOther.unit,
+	          dueBy: typeof body.instalmentDueBy === 'string' ? body.instalmentDueBy : null,
+	        },
+	      },
       dismissal: {
         outcome: typeof body.dismissalOutcome === 'string' ? body.dismissalOutcome : null,
       },
@@ -272,16 +301,17 @@ const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
         from: typeof body.judgmentUseOccupationFrom === 'string' ? body.judgmentUseOccupationFrom : null,
       },
       suspendedOnSameTerms: isChecked(body.judgmentSuspendedSameTerms),
-      instalments: {
-        enabled: isChecked(body.judgmentInstalmentsEnabled),
-        amount: typeof body.judgmentInstalmentsAmount === 'string' ? body.judgmentInstalmentsAmount : null,
-        frequency: typeof body.judgmentInstalmentsFrequency === 'string' ? body.judgmentInstalmentsFrequency : null,
-        frequencyOther:
-          typeof body.judgmentInstalmentsFrequencyOther === 'string' ? body.judgmentInstalmentsFrequencyOther : null,
-        firstPaymentBy:
-          typeof body.judgmentInstalmentsFirstPaymentBy === 'string' ? body.judgmentInstalmentsFirstPaymentBy : null,
-      },
-    },
+	      instalments: {
+	        enabled: isChecked(body.judgmentInstalmentsEnabled),
+	        amount: typeof body.judgmentInstalmentsAmount === 'string' ? body.judgmentInstalmentsAmount : null,
+	        frequency: typeof body.judgmentInstalmentsFrequency === 'string' ? body.judgmentInstalmentsFrequency : null,
+	        frequencyOther: judgmentInstalmentsOther.text,
+	        frequencyOtherValue: judgmentInstalmentsOther.value,
+	        frequencyOtherUnit: judgmentInstalmentsOther.unit,
+	        firstPaymentBy:
+	          typeof body.judgmentInstalmentsFirstPaymentBy === 'string' ? body.judgmentInstalmentsFirstPaymentBy : null,
+	      },
+	    },
     costs: {
       mode: typeof body.costsMode === 'string' ? body.costsMode : null,
       fixedAmount: parseMoney(body.costsFixedAmount),
