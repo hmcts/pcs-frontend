@@ -2,7 +2,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { NextFunction, Request, Response } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import { userJourneyFlowConfig } from '../../steps/userJourney/flow.config';
+import { flowConfig as userJourneyFlowConfig } from '../../steps/userJourney/flow.config';
 
 const logger = Logger.getLogger('stepDependencyCheck');
 
