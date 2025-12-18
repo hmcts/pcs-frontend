@@ -119,6 +119,14 @@
                   <option value="year" {{ 'selected' if rentFrequency == 'year' }}>year</option>
                 </select>
               </div>
+              {{ govukInput({
+                label: { text: "Daily rate", classes: "govuk-label--s" },
+                classes: "govuk-input--width-10",
+                name: "dailyRate",
+                value: dailyRate | default('10.50'),
+                prefix: { text: "£" },
+                attributes: { placeholder: "0.00" }
+              }) }}
             </div>
           </div>
 

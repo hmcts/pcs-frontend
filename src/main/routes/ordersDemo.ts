@@ -32,6 +32,7 @@ interface OrdersDemoViewModel {
   arrearsAtHearing: string;
   currentRent: string;
   currentRentFrequency: 'week' | 'month' | 'quarter' | 'year';
+  dailyRate: string;
   demoVersion: 'v2';
   otherVersionUrl: string;
 }
@@ -328,6 +329,7 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
     arrearsAtHearing: '1250.00',
     currentRent: '550.00',
     currentRentFrequency: 'month',
+    dailyRate: '10.50',
     demoVersion: 'v2',
     otherVersionUrl: `/orders-demo/${encodedReference}${queryString}`,
   };
