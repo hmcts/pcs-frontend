@@ -2,10 +2,10 @@ import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { respondToClaimFlowConfig } from '../flow.config';
+import { flowConfig } from '../flow.config';
 
 const stepName = 'postcode-finder';
-const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
+const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
   url: '/respond-to-claim/postcode-finder',
