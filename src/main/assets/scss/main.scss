@@ -716,6 +716,25 @@
   min-width: 120px;
 }
 
+.orders-demo__time-estimate-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.orders-demo__time-shortcuts {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  .govuk-button {
+    padding: 3px 10px;
+    min-width: 44px;
+    font-size: 14px;
+  }
+}
+
 .orders-demo__instalments-first-label {
   grid-row: 2;
   grid-column: 1 / 3;

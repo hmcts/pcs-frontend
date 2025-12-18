@@ -641,32 +641,39 @@
 	                      }) }}
 	                    {% endset %}
 
-	                    <div class="orders-demo__inline-group">
-	                      {{ govukRadios({
-	                        classes: "govuk-radios--inline orders-demo__radios-slim",
-	                        name: "adjournNextHearingMode",
-	                        fieldset: { legend: { text: "Next hearing date", classes: "govuk-visually-hidden" } },
-	                        items: [
-	                          { value: "firstAvailableAfter", text: "First available date after", checked: true, conditional: { html: firstAvailableHtml } },
-	                          { value: "onDate", text: "On", conditional: { html: onDateHtml } }
-	                        ]
-	                      }) }}
+		                    <div class="orders-demo__inline-group">
+		                      {{ govukRadios({
+		                        classes: "govuk-radios--inline orders-demo__radios-slim",
+		                        name: "adjournNextHearingMode",
+		                        fieldset: { legend: { text: "Next hearing date", classes: "govuk-visually-hidden" } },
+		                        items: [
+		                          { value: "firstAvailableAfter", text: "First available date after", checked: true, conditional: { html: firstAvailableHtml } },
+		                          { value: "onDate", text: "On", conditional: { html: onDateHtml } }
+		                        ]
+		                      }) }}
+		                    </div>
 
-	                      {{ govukInput({
-	                        label: { text: "Time estimate", classes: "govuk-label--s" },
-	                        classes: "govuk-input--width-10",
-	                        name: "adjournTimeEstimate",
-	                        attributes: { placeholder: "e.g. 30 minutes" }
-	                      }) }}
-	                    </div>
+		                    <div class="govuk-form-group govuk-!-margin-bottom-2 orders-demo__time-estimate">
+		                      <label class="govuk-label govuk-label--s" for="adjournTimeEstimate">Time estimate</label>
+		                      <div class="orders-demo__time-estimate-row">
+		                        <input class="govuk-input govuk-input--width-10" id="adjournTimeEstimate" name="adjournTimeEstimate" type="text" placeholder="e.g. 30 minutes">
+		                        <div class="orders-demo__time-shortcuts">
+		                          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__time-shortcut" data-minutes="10" aria-label="Set time estimate to 10 minutes">10</button>
+		                          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__time-shortcut" data-minutes="20" aria-label="Set time estimate to 20 minutes">20</button>
+		                          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__time-shortcut" data-minutes="30" aria-label="Set time estimate to 30 minutes">30</button>
+		                          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__time-shortcut" data-minutes="45" aria-label="Set time estimate to 45 minutes">45</button>
+		                          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 orders-demo__time-shortcut" data-minutes="60" aria-label="Set time estimate to 60 minutes">60</button>
+		                        </div>
+		                      </div>
+		                    </div>
 
-	                    {{ govukTextarea({
-	                      name: "adjournListingNotes",
-	                      classes: "orders-demo__notes",
-	                      rows: 3,
-	                      label: { text: "Notes for listing officer", classes: "govuk-label--s" }
-	                    }) }}
-	                  </div>
+		                    {{ govukTextarea({
+		                      name: "adjournListingNotes",
+		                      classes: "orders-demo__notes",
+		                      rows: 3,
+		                      label: { text: "Notes for listing officer", classes: "govuk-label--s" }
+		                    }) }}
+		                  </div>
 
 	                  <div class="orders-demo__adjourn-zone">
 	                    <div class="orders-demo__adjourn-zone__header">
@@ -1229,62 +1236,82 @@
 	      const initOrderSwitcher = () => {
 	        if (orderSwitcherInitialised) return;
 
-        const sections = Array.from(document.querySelectorAll('.orders-demo__order-section'));
-        if (!sections.length) return;
+	        const sections = Array.from(document.querySelectorAll('.orders-demo__order-section'));
+	        if (!sections.length) return;
 
-        orderSwitcherInitialised = true;
+	        orderSwitcherInitialised = true;
 
-        const offsetDate = offset => {
-          const date = new Date();
-          date.setDate(date.getDate() + offset);
-          return {
-            day: String(date.getDate()).padStart(2, '0'),
-            month: String(date.getMonth() + 1).padStart(2, '0'),
-            year: String(date.getFullYear())
-          };
-        };
+	        const offsetDate = offset => {
+	          const date = new Date();
+	          date.setDate(date.getDate() + offset);
+	          return {
+	            day: String(date.getDate()).padStart(2, '0'),
+	            month: String(date.getMonth() + 1).padStart(2, '0'),
+	            year: String(date.getFullYear())
+	          };
+	        };
 
-        const setDefaultDate = (groupName, offsetDays = 14) => {
-          const dayInput = document.querySelector(`input[name="${groupName}-day"]`);
-          const monthInput = document.querySelector(`input[name="${groupName}-month"]`);
-          const yearInput = document.querySelector(`input[name="${groupName}-year"]`);
-          if (!dayInput || !monthInput || !yearInput) return;
+	        const setDefaultDate = (groupName, offsetDays = 14) => {
+	          const dayInput = document.querySelector(`input[name="${groupName}-day"]`);
+	          const monthInput = document.querySelector(`input[name="${groupName}-month"]`);
+	          const yearInput = document.querySelector(`input[name="${groupName}-year"]`);
+	          if (!dayInput || !monthInput || !yearInput) return;
 
-          if (dayInput.value || monthInput.value || yearInput.value) return;
+	          if (dayInput.value || monthInput.value || yearInput.value) return;
 
-          const { day, month, year } = offsetDate(offsetDays);
-          dayInput.value = day;
-          monthInput.value = month;
-          yearInput.value = year;
-        };
+	          const { day, month, year } = offsetDate(offsetDays);
+	          dayInput.value = day;
+	          monthInput.value = month;
+	          yearInput.value = year;
+	        };
 
-        const initDateShortcuts = () => {
-          const groups = Array.from(document.querySelectorAll('.orders-demo__date-inline--with-buttons'));
-          groups.forEach(group => {
-            const dayInput = group.querySelector('input[name$="-day"]');
-            const monthInput = group.querySelector('input[name$="-month"]');
-            const yearInput = group.querySelector('input[name$="-year"]');
-            if (!dayInput || !monthInput || !yearInput) return;
+	        const initDateShortcuts = () => {
+	          const groups = Array.from(document.querySelectorAll('.orders-demo__date-inline--with-buttons'));
+	          groups.forEach(group => {
+	            const dayInput = group.querySelector('input[name$="-day"]');
+	            const monthInput = group.querySelector('input[name$="-month"]');
+	            const yearInput = group.querySelector('input[name$="-year"]');
+	            if (!dayInput || !monthInput || !yearInput) return;
 
-            group.querySelectorAll('.orders-demo__date-shortcut').forEach(button => {
-              const offset = Number(button.dataset.offset || 0);
-              button.addEventListener('click', () => {
-                const { day, month, year } = offsetDate(offset);
-                dayInput.value = day;
-                monthInput.value = month;
-                yearInput.value = year;
-                updatePreview();
-              });
-            });
-          });
-        };
+	            group.querySelectorAll('.orders-demo__date-shortcut').forEach(button => {
+	              const offset = Number(button.dataset.offset || 0);
+	              button.addEventListener('click', () => {
+	                const { day, month, year } = offsetDate(offset);
+	                dayInput.value = day;
+	                monthInput.value = month;
+	                yearInput.value = year;
+	                updatePreview();
+	              });
+	            });
+	          });
+	        };
 
-        const focusInstalmentAmount = () => {
-          const instalmentInput = document.querySelector('input[name="instalmentAmount"]');
-          if (instalmentInput instanceof HTMLInputElement) {
-            instalmentInput.focus();
-          }
-        };
+	        const initTimeShortcuts = () => {
+	          const input = document.getElementById('adjournTimeEstimate');
+	          if (!(input instanceof HTMLInputElement)) return;
+
+	          const buttons = Array.from(document.querySelectorAll('.orders-demo__time-shortcut'));
+	          buttons.forEach(button => {
+	            if (!(button instanceof HTMLButtonElement)) return;
+	            button.addEventListener('click', () => {
+	              const minutesRaw = button.getAttribute('data-minutes') || '';
+	              const minutes = Number.parseInt(minutesRaw, 10);
+	              if (Number.isNaN(minutes)) return;
+	              const label = minutes === 1 ? 'minute' : 'minutes';
+	              input.value = `${minutes} ${label}`;
+	              input.dispatchEvent(new Event('input', { bubbles: true }));
+	              updatePreview();
+	              input.focus();
+	            });
+	          });
+	        };
+
+	        const focusInstalmentAmount = () => {
+	          const instalmentInput = document.querySelector('input[name="instalmentAmount"]');
+	          if (instalmentInput instanceof HTMLInputElement) {
+	            instalmentInput.focus();
+	          }
+	        };
 
 	        const focusAdjournDate = () => {
 	          const mode = document.querySelector('input[name="adjournNextHearingMode"]:checked')?.value;
@@ -1295,7 +1322,7 @@
 	          }
 	        };
 
-        const formatDate = ({ day, month, year }) => `${day}/${month}/${year}`;
+	        const formatDate = ({ day, month, year }) => `${day}/${month}/${year}`;
 
 	        const initStandardDirections = () => {
 	          const button = document.querySelector('.orders-demo__adjourn-insert');
@@ -2068,6 +2095,7 @@
 	        setDefaultDate('outrightBy');
 	        setDefaultDate('suspendedBy');
 	        initDateShortcuts();
+	        initTimeShortcuts();
 	        initOrderClickTargets();
 	        initStandardDirections();
 	        initCostsRadios();
