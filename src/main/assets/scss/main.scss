@@ -319,6 +319,95 @@
     opacity: 0.55;
   }
 
+  .orders-demo__section {
+    padding-top: 10px;
+    margin-top: 10px;
+  }
+
+  .orders-demo__inline-group {
+    margin-bottom: 6px;
+    gap: 10px;
+  }
+
+  .orders-demo__notes {
+    min-height: 120px;
+  }
+
+  .orders-demo__adjourn-grid {
+    gap: 12px;
+  }
+
+  .orders-demo__adjourn-zone {
+    padding: 10px;
+  }
+
+  .orders-demo__adjourn-zone__header {
+    gap: 8px;
+  }
+
+  .orders-demo__adjourn-textarea {
+    min-height: 140px;
+  }
+
+  .orders-demo__chip {
+    padding: 4px 8px;
+  }
+
+  .orders-demo__suspended-rows {
+    gap: 8px;
+  }
+
+  .orders-demo__suspended-row {
+    grid-template-columns: 28px 220px 1fr;
+    column-gap: 12px;
+    row-gap: 4px;
+  }
+
+  .orders-demo__suspended-row--date {
+    row-gap: 6px;
+  }
+
+  .orders-demo__costs {
+    padding-top: 10px;
+    margin-top: 10px;
+
+    .orders-demo__costs-grid {
+      gap: 10px;
+    }
+
+    .orders-demo__costs-payby {
+      min-width: 240px;
+    }
+  }
+
+  .orders-demo__preview {
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+
+  .orders-demo__preview-toggle {
+    padding: 8px 10px;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 6px;
+  }
+
+  .govuk-radios__item,
+  .govuk-checkboxes__item {
+    min-height: 0;
+    margin-bottom: 2px;
+  }
+
+  .govuk-label {
+    margin-bottom: 2px;
+  }
+
+  .govuk-radios__conditional,
+  .govuk-checkboxes__conditional {
+    margin-top: 6px;
+  }
+
   .orders-demo__party-table {
     font-size: 14px;
 

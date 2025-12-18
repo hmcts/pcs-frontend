@@ -373,13 +373,13 @@
                   </div>
                 {% endset %}
 
-                <div class="orders-demo__inline-group orders-demo__order-inline">
-                  {{ govukRadios({
-                    classes: "govuk-radios--inline orders-demo__radios-slim",
-                    name: "outrightTiming",
-                    fieldset: {
-                      legend: { text: "Outright possession timing", classes: "govuk-visually-hidden" }
-                    },
+	                <div class="orders-demo__inline-group orders-demo__order-inline">
+	                  {{ govukRadios({
+	                    classes: "govuk-radios--small govuk-radios--inline orders-demo__radios-inline",
+	                    name: "outrightTiming",
+	                    fieldset: {
+	                      legend: { text: "Outright possession timing", classes: "govuk-visually-hidden" }
+	                    },
                     items: [
                       { value: "forthwith", text: "Outright possession (forthwith)" },
                       {
@@ -394,14 +394,14 @@
                   }) }}
                 </div>
 
-                <div class="orders-demo__order-grid-row">
-                  <div>
-                    <label class="govuk-label govuk-label--s">Grounds</label>
-	                  {{ govukRadios({
-	                    classes: "orders-demo__radios-inline",
-	                    name: "grounds",
-	                    fieldset: { legend: { text: "Grounds", classes: "govuk-visually-hidden" } },
-	                    items: [
+	                <div class="orders-demo__order-grid-row">
+	                  <div>
+	                    <label class="govuk-label govuk-label--s">Grounds</label>
+		                  {{ govukRadios({
+		                    classes: "govuk-radios--small govuk-radios--inline orders-demo__radios-inline",
+		                    name: "grounds",
+		                    fieldset: { legend: { text: "Grounds", classes: "govuk-visually-hidden" } },
+		                    items: [
 	                      {
 	                        value: "discretionary",
 	                        text: "Discretionary grounds",
@@ -591,12 +591,12 @@
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Adjournment</h2>
               </div>
 
-	              <div class="orders-demo__order-body orders-demo__adjourn-grid">
-	                {{ govukRadios({
-	                  classes: "orders-demo__radios-inline",
-	                  name: "adjournmentMode",
-	                  fieldset: { legend: { text: "Adjournment type", classes: "govuk-visually-hidden" } },
-	                  items: [
+		              <div class="orders-demo__order-body orders-demo__adjourn-grid">
+		                {{ govukRadios({
+		                  classes: "govuk-radios--small govuk-radios--inline orders-demo__radios-inline",
+		                  name: "adjournmentMode",
+		                  fieldset: { legend: { text: "Adjournment type", classes: "govuk-visually-hidden" } },
+		                  items: [
 	                    { value: "nextHearing", text: "Adjournment (next hearing)", checked: true },
 	                    { value: "generally", text: "Adjourned generally with permission to restore" }
 	                  ]
@@ -643,7 +643,7 @@
 
 		                    <div class="orders-demo__inline-group">
 		                      {{ govukRadios({
-		                        classes: "govuk-radios--inline orders-demo__radios-slim",
+		                        classes: "govuk-radios--small govuk-radios--inline orders-demo__radios-inline",
 		                        name: "adjournNextHearingMode",
 		                        fieldset: { legend: { text: "Next hearing date", classes: "govuk-visually-hidden" } },
 		                        items: [
@@ -772,12 +772,12 @@
 	                <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Dismissed / struck out</h2>
 	              </div>
 
-	              <div class="orders-demo__order-body">
-	                {{ govukRadios({
-	                  classes: "orders-demo__radios-inline",
-	                  name: "dismissalOutcome",
-	                  fieldset: { legend: { text: "Dismissed / struck out", classes: "govuk-visually-hidden" } },
-	                  items: [
+		              <div class="orders-demo__order-body">
+		                {{ govukRadios({
+		                  classes: "govuk-radios--small govuk-radios--inline orders-demo__radios-inline",
+		                  name: "dismissalOutcome",
+		                  fieldset: { legend: { text: "Dismissed / struck out", classes: "govuk-visually-hidden" } },
+		                  items: [
 	                    { value: "dismissed", text: "The claim is dismissed", checked: true },
 	                    { value: "struckOut", text: "The claim is struck out" }
 	                  ]
@@ -954,12 +954,12 @@
 		          </div>
           <div class="orders-demo__costs-grid">
             <div class="orders-demo__costs-modes">
-	              {{ govukRadios({
-	                classes: "orders-demo__radios-inline",
-	                name: "costsMode",
-	                fieldset: {
-	                  legend: { text: "Costs mode", classes: "govuk-fieldset__legend--s govuk-visually-hidden" }
-	                },
+		              {{ govukRadios({
+		                classes: "govuk-radios--small",
+		                name: "costsMode",
+		                fieldset: {
+		                  legend: { text: "Costs mode", classes: "govuk-fieldset__legend--s govuk-visually-hidden" }
+		                },
 	                items: [
 	                  {
 	                    value: "fixed",
