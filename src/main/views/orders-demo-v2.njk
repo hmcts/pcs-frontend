@@ -576,31 +576,27 @@
 	          </div>
 	        </div>
 
-	        <div class="orders-demo__section orders-demo__judgment">
-	          <div class="orders-demo__section-header">
-	            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Judgment</h2>
-	          </div>
-
+	        <div class="orders-demo__section orders-demo__judgment" data-judgment-section>
 	          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
 	            <div class="govuk-checkboxes__item">
-	              <input class="govuk-checkboxes__input" id="judgmentEnabled" name="judgmentEnabled" type="checkbox" value="1">
-	              <label class="govuk-label govuk-checkboxes__label" for="judgmentEnabled">Include judgment</label>
+	              <input class="govuk-checkboxes__input" id="judgmentEnabled" name="judgmentEnabled" type="checkbox" value="1" checked>
+	              <label class="govuk-label govuk-checkboxes__label govuk-heading-m govuk-!-margin-bottom-2" for="judgmentEnabled">Money judgment</label>
 	            </div>
 	          </div>
 
-	          <div class="orders-demo__judgment-body" data-judgment-body hidden>
+	          <div class="orders-demo__judgment-body" data-judgment-body>
 	            {% set judgmentDefendantList = defendants | default([]) %}
 	            {% if judgmentDefendantList | length == 0 %}
 	              {% set judgmentDefendantList = [defendantName | default('Jones'), 'Taylor', 'Patel'] %}
 	            {% endif %}
 	            {% set judgmentOrdinals = ['First', 'Second', 'Third', 'Fourth', 'Fifth'] %}
 
-	            <h3 class="govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">Judgment against</h3>
+	            <h3 class="govuk-heading-s govuk-!-margin-top-1 govuk-!-margin-bottom-2">Judgment against</h3>
 	            <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__judgment-defendants" data-module="govuk-checkboxes">
 	              {% for defendant in judgmentDefendantList %}
 	                {% set ordinal = judgmentOrdinals[loop.index0] | default('Defendant ' ~ loop.index) %}
 	                <div class="govuk-checkboxes__item">
-	                  <input class="govuk-checkboxes__input" id="judgmentDefendant{{ loop.index }}" name="judgmentDefendants" type="checkbox" value="{{ defendant }}">
+	                  <input class="govuk-checkboxes__input" id="judgmentDefendant{{ loop.index }}" name="judgmentDefendants" type="checkbox" value="{{ defendant }}" checked>
 	                  <label class="govuk-label govuk-checkboxes__label" for="judgmentDefendant{{ loop.index }}">{{ ordinal }} Defendant ({{ defendant }})</label>
 	                </div>
 	              {% endfor %}
@@ -611,7 +607,7 @@
 	              <div class="orders-demo__suspended-row">
 	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
 	                  <div class="govuk-checkboxes__item">
-	                    <input class="govuk-checkboxes__input" id="judgmentArrearsEnabled" name="judgmentArrearsEnabled" type="checkbox" value="1">
+	                    <input class="govuk-checkboxes__input" id="judgmentArrearsEnabled" name="judgmentArrearsEnabled" type="checkbox" value="1" checked>
 	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentArrearsEnabled">Arrears</label>
 	                  </div>
 	                </div>
@@ -621,6 +617,7 @@
 	                    label: { text: "Judgment arrears amount", classes: "govuk-visually-hidden" },
 	                    name: "judgmentArrearsAmount",
 	                    classes: "govuk-input--width-5 orders-demo__money-input",
+	                    value: arrearsAtHearing | default('1250.00'),
 	                    prefix: { text: "£" },
 	                    attributes: { placeholder: "0.00" }
 	                  }) }}
@@ -640,6 +637,7 @@
 	                    label: { text: "Judgment interest amount", classes: "govuk-visually-hidden" },
 	                    name: "judgmentInterestAmount",
 	                    classes: "govuk-input--width-5 orders-demo__money-input",
+	                    value: '0.00',
 	                    prefix: { text: "£" },
 	                    attributes: { placeholder: "0.00" }
 	                  }) }}
@@ -649,7 +647,7 @@
 	              <div class="orders-demo__suspended-row orders-demo__suspended-row--date">
 	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
 	                  <div class="govuk-checkboxes__item">
-	                    <input class="govuk-checkboxes__input" id="judgmentUseOccupationEnabled" name="judgmentUseOccupationEnabled" type="checkbox" value="1">
+	                    <input class="govuk-checkboxes__input" id="judgmentUseOccupationEnabled" name="judgmentUseOccupationEnabled" type="checkbox" value="1" checked>
 	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentUseOccupationEnabled">Use and occupation</label>
 	                  </div>
 	                </div>
@@ -659,6 +657,7 @@
 	                    label: { text: "Use and occupation daily rate", classes: "govuk-visually-hidden" },
 	                    name: "judgmentUseOccupationDailyRate",
 	                    classes: "govuk-input--width-5 orders-demo__money-input",
+	                    value: dailyRate | default('10.50'),
 	                    prefix: { text: "£" },
 	                    attributes: { placeholder: "0.00" }
 	                  }) }}
@@ -667,6 +666,7 @@
 	                    label: { text: "Use and occupation from date", classes: "govuk-visually-hidden" },
 	                    name: "judgmentUseOccupationFrom",
 	                    classes: "govuk-input--width-10 orders-demo__date-input",
+	                    value: lastUpdated,
 	                    attributes: { placeholder: "DD/MM/YYYY" }
 	                  }) }}
 	                  <span class="orders-demo__sentence-label govuk-label">until possession is given up</span>
@@ -676,20 +676,18 @@
 
 	            <h3 class="govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">And such judgment is</h3>
 	            <div class="orders-demo__suspended-rows orders-demo__judgment-rows">
-	              <div data-judgment-same-terms hidden>
-	                <div class="orders-demo__suspended-row">
-	                  <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
-	                    <div class="govuk-checkboxes__item">
-	                      <input class="govuk-checkboxes__input" id="judgmentSuspendedSameTerms" name="judgmentSuspendedSameTerms" type="checkbox" value="1">
-	                      <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentSuspendedSameTerms">Suspended on the same terms</label>
-	                    </div>
+	              <div class="orders-demo__suspended-row" data-judgment-same-terms-row>
+	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+	                  <div class="govuk-checkboxes__item">
+	                    <input class="govuk-checkboxes__input" id="judgmentSuspendedSameTerms" name="judgmentSuspendedSameTerms" type="checkbox" value="1">
+	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentSuspendedSameTerms">Suspended on the same terms</label>
 	                  </div>
-	                  <span class="orders-demo__sentence-lead govuk-label">suspended on the same terms</span>
-	                  <div class="orders-demo__sentence-body"></div>
 	                </div>
+	                <span class="orders-demo__sentence-lead govuk-label">suspended on the same terms</span>
+	                <div class="orders-demo__sentence-body"></div>
 	              </div>
 
-	              <div class="orders-demo__suspended-row">
+	              <div class="orders-demo__suspended-row" data-judgment-instalments-row>
 	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
 	                  <div class="govuk-checkboxes__item">
 	                    <input class="govuk-checkboxes__input" id="judgmentInstalmentsEnabled" name="judgmentInstalmentsEnabled" type="checkbox" value="1">
@@ -1444,7 +1442,7 @@
 
 	          const judgmentToggle = document.getElementById('judgmentEnabled');
 	          const judgmentEnabled = judgmentToggle instanceof HTMLInputElement && judgmentToggle.checked;
-	          if (judgmentEnabled) {
+	          if (judgmentEnabled && (orderType === 'outright' || orderType === 'suspended')) {
 	            const judgmentLines = [];
 	            const against = getCheckedValues('judgmentDefendants');
 	            const againstText = against.length ? against.join(', ') : 'the Defendant';
@@ -1684,28 +1682,163 @@
 
 	        const initJudgmentSection = () => {
 	          const enabled = document.getElementById('judgmentEnabled');
+	          const section = document.querySelector('[data-judgment-section]');
 	          const body = document.querySelector('[data-judgment-body]');
-	          if (!(enabled instanceof HTMLInputElement) || !body) return;
+	          if (!(enabled instanceof HTMLInputElement) || !section || !body) return null;
 
-	          const apply = () => {
+	          const toggleFieldGroup = (toggleId, fieldIds) => {
+	            const toggle = document.getElementById(toggleId);
+	            if (!(toggle instanceof HTMLInputElement)) return;
+
+	            const apply = () => {
+	              fieldIds.forEach(id => {
+	                const field = document.getElementById(id);
+	                if (
+	                  field instanceof HTMLInputElement ||
+	                  field instanceof HTMLSelectElement ||
+	                  field instanceof HTMLTextAreaElement
+	                ) {
+	                  field.disabled = !toggle.checked;
+	                }
+	              });
+	            };
+
+	            toggle.addEventListener('change', () => {
+	              apply();
+	              updatePreview();
+	            });
+	            apply();
+	          };
+
+	          const bindStickyPrefill = (sourceName, targetId) => {
+	            const source = document.querySelector(`input[name=\"${sourceName}\"]`);
+	            const target = document.getElementById(targetId);
+	            if (!(source instanceof HTMLInputElement) || !(target instanceof HTMLInputElement)) return;
+
+	            const dirtyKey = `data-dirty-${targetId}`;
+	            target.addEventListener('input', () => {
+	              target.setAttribute(dirtyKey, '1');
+	            });
+
+	            const apply = () => {
+	              const isDirty = target.getAttribute(dirtyKey) === '1';
+	              if (isDirty) return;
+	              if (source.value && target.value !== source.value) target.value = source.value;
+	            };
+
+	            source.addEventListener('input', () => {
+	              apply();
+	              updatePreview();
+	            });
+	            apply();
+	          };
+
+	          const setJudgmentVisibility = orderType => {
+	            const shouldShow = orderType === 'outright' || orderType === 'suspended';
+	            section.hidden = !shouldShow;
+	          };
+
+	          const setJudgmentPaymentControls = orderType => {
+	            const sameTermsRow = document.querySelector('[data-judgment-same-terms-row]');
+	            const instalmentsRow = document.querySelector('[data-judgment-instalments-row]');
+	            const sameTerms = document.getElementById('judgmentSuspendedSameTerms');
+	            const instalmentsEnabled = document.getElementById('judgmentInstalmentsEnabled');
+	            const instalmentAmount = document.getElementById('judgmentInstalmentsAmount');
+	            const instalmentFrequency = document.getElementById('judgmentInstalmentsFrequency');
+	            const instalmentFirstBy = document.getElementById('judgmentInstalmentsFirstPaymentBy');
+
+	            if (
+	              !sameTermsRow ||
+	              !instalmentsRow ||
+	              !(sameTerms instanceof HTMLInputElement) ||
+	              !(instalmentsEnabled instanceof HTMLInputElement)
+	            ) {
+	              return;
+	            }
+
+	            if (orderType === 'suspended') {
+	              sameTerms.disabled = false;
+	              sameTerms.checked = true;
+	              sameTermsRow.classList.remove('orders-demo__disabled');
+
+	              instalmentsRow.hidden = true;
+	              instalmentsEnabled.disabled = true;
+	              instalmentsEnabled.checked = false;
+	            } else {
+	              instalmentsRow.hidden = false;
+	              instalmentsEnabled.disabled = false;
+	              sameTerms.checked = false;
+	              sameTerms.disabled = true;
+	              sameTermsRow.classList.add('orders-demo__disabled');
+
+	              if (instalmentsEnabled.checked) {
+	                if (instalmentFrequency instanceof HTMLSelectElement) instalmentFrequency.value = 'month';
+	                if (instalmentFirstBy instanceof HTMLInputElement && !instalmentFirstBy.value) {
+	                  const { day, month, year } = offsetDate(14);
+	                  instalmentFirstBy.value = `${day}/${month}/${year}`;
+	                }
+	                if (instalmentAmount instanceof HTMLInputElement) instalmentAmount.focus();
+	              }
+	            }
+	          };
+
+	          const initDefaultsOnce = () => {
+	            const defendants = Array.from(document.querySelectorAll('input[name=\"judgmentDefendants\"]'));
+	            defendants.forEach(input => {
+	              if (input instanceof HTMLInputElement && !input.disabled) input.checked = true;
+	            });
+
+	            const arrearsEnabled = document.getElementById('judgmentArrearsEnabled');
+	            if (arrearsEnabled instanceof HTMLInputElement) arrearsEnabled.checked = true;
+
+	            const useOccEnabled = document.getElementById('judgmentUseOccupationEnabled');
+	            if (useOccEnabled instanceof HTMLInputElement) useOccEnabled.checked = true;
+
+	            const interestEnabled = document.getElementById('judgmentInterestEnabled');
+	            if (interestEnabled instanceof HTMLInputElement) interestEnabled.checked = false;
+	          };
+
+	          initDefaultsOnce();
+	          bindStickyPrefill('arrearsAtHearing', 'judgmentArrearsAmount');
+	          bindStickyPrefill('dailyRate', 'judgmentUseOccupationDailyRate');
+
+	          toggleFieldGroup('judgmentArrearsEnabled', ['judgmentArrearsAmount']);
+	          toggleFieldGroup('judgmentInterestEnabled', ['judgmentInterestAmount']);
+	          toggleFieldGroup('judgmentUseOccupationEnabled', ['judgmentUseOccupationDailyRate', 'judgmentUseOccupationFrom']);
+	          toggleFieldGroup('judgmentInstalmentsEnabled', [
+	            'judgmentInstalmentsAmount',
+	            'judgmentInstalmentsFrequency',
+	            'judgmentInstalmentsFrequencyOther',
+	            'judgmentInstalmentsFirstPaymentBy',
+	          ]);
+
+	          const applyCollapsed = () => {
 	            body.hidden = !enabled.checked;
 	            updatePreview();
 	          };
+	          enabled.addEventListener('change', applyCollapsed);
+	          applyCollapsed();
 
-	          enabled.addEventListener('change', apply);
-	          apply();
-	        };
+	          enabled.addEventListener('change', () => {
+	            const currentOrderType = document.querySelector('input[name=\"orderType\"]:checked')?.value || 'outright';
+	            setJudgmentVisibility(currentOrderType);
+	            setJudgmentPaymentControls(currentOrderType);
+	          });
 
-	        const setJudgmentSameTermsVisibility = orderType => {
-	          const wrapper = document.querySelector('[data-judgment-same-terms]');
-	          if (!wrapper) return;
-	          const shouldShow = orderType === 'suspended';
-	          wrapper.hidden = !shouldShow;
+	          const currentOrderType = document.querySelector('input[name=\"orderType\"]:checked')?.value || 'outright';
+	          setJudgmentVisibility(currentOrderType);
+	          setJudgmentPaymentControls(currentOrderType);
 
-	          if (!shouldShow) {
-	            const checkbox = wrapper.querySelector('input[type="checkbox"]');
-	            if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
+	          const instalmentsEnabled = document.getElementById('judgmentInstalmentsEnabled');
+	          if (instalmentsEnabled instanceof HTMLInputElement) {
+	            instalmentsEnabled.addEventListener('change', () => {
+	              const current = document.querySelector('input[name=\"orderType\"]:checked')?.value || 'outright';
+	              setJudgmentPaymentControls(current);
+	              updatePreview();
+	            });
 	          }
+
+	          return { setJudgmentVisibility, setJudgmentPaymentControls };
 	        };
 
 	        const initJudgmentInstalmentFrequency = () => {
@@ -1783,6 +1916,8 @@
 	          apply();
 	        };
 
+	        let judgmentApi = null;
+
 	        const setActive = value => {
 	          sections.forEach(section => {
 	            const isActive = section.dataset.orderType === value;
@@ -1803,7 +1938,8 @@
 	          }
 
 	          setCostsPayBy(value);
-	          setJudgmentSameTermsVisibility(value);
+	          if (judgmentApi?.setJudgmentVisibility) judgmentApi.setJudgmentVisibility(value);
+	          if (judgmentApi?.setJudgmentPaymentControls) judgmentApi.setJudgmentPaymentControls(value);
 	          updateCostsSameTermsVisibility(value);
 	          updatePreview();
 	        };
@@ -1824,7 +1960,7 @@
 	        initOrderClickTargets();
 	        initStandardDirections();
 	        initCostsRadios();
-	        initJudgmentSection();
+	        judgmentApi = initJudgmentSection();
 	        initJudgmentInstalmentFrequency();
 	        initSuspendedInstalmentFrequency();
 	        initAdjournmentMode();

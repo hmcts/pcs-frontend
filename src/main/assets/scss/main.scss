@@ -311,6 +311,14 @@
 }
 
 .orders-demo--v2 {
+  [hidden] {
+    display: none !important;
+  }
+
+  .orders-demo__disabled {
+    opacity: 0.55;
+  }
+
   .orders-demo__party-table {
     font-size: 14px;
 
