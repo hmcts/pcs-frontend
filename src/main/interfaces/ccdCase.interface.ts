@@ -97,6 +97,12 @@ export interface OrdersDemoPayload {
         strikeOutEnabled: boolean;
         strikeOutBy?: string | null;
       };
+      // Legacy v1 fields used by `/orders-demo-v1`.
+      nextHearingDate?: string | null;
+      time?: string | null;
+      hearingType?: string | null;
+      location?: string | null;
+      reason?: string | null;
     };
   };
   judgment?: {
@@ -128,6 +134,8 @@ export interface OrdersDemoPayload {
     mode?: string | null;
     fixedAmount?: number | null;
     assessedAmount?: number | null;
+    // Legacy v1 field used by `/orders-demo-v1`.
+    assessedBasis?: string | null;
     payBy?: string | null;
     addToDebt?: boolean;
     otherText?: string | null;
