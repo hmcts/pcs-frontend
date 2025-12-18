@@ -316,6 +316,19 @@
 
     .govuk-table__header,
     .govuk-table__cell {
+      padding: 2px 4px;
+    }
+
+    .govuk-radios {
+      margin-bottom: 0;
+    }
+
+    .govuk-radios__item {
+      min-height: 0;
+    }
+
+    .orders-demo__party-name-input--compact {
+      height: 34px;
       padding: 4px 6px;
     }
   }

@@ -226,13 +226,14 @@
                   </div>
                 </td>
                 <td class="govuk-table__cell orders-demo__party-cell">
-                  {{ govukInput({
-                    label: { text: "Claimant name", classes: "govuk-visually-hidden" },
-                    classes: "govuk-input--width-40 orders-demo__party-name-input",
-                    name: "claimantAttendanceName",
-                    value: 'A. Solicitor',
-                    attributes: { placeholder: "Name" }
-                  }) }}
+                  <input
+                    class="govuk-input govuk-input--width-40 orders-demo__party-name-input orders-demo__party-name-input--compact"
+                    name="claimantAttendanceName"
+                    type="text"
+                    value="A. Solicitor"
+                    placeholder="Name"
+                    aria-label="Claimant name"
+                  >
                 </td>
               </tr>
               {% set defendantList = defendants | default([]) %}
@@ -316,13 +317,14 @@
 	                    </div>
 	                  </td>
 	                  <td class="govuk-table__cell orders-demo__party-cell">
-	                    {{ govukInput({
-	                      label: { text: "Defendant name", classes: "govuk-visually-hidden" },
-                      classes: "govuk-input--width-40 orders-demo__party-name-input",
-                      name: idPrefix ~ '-attendance-name',
-                      value: defendant,
-                      attributes: { placeholder: "Name" }
-                    }) }}
+	                    <input
+	                      class="govuk-input govuk-input--width-40 orders-demo__party-name-input orders-demo__party-name-input--compact"
+	                      name="{{ idPrefix ~ '-attendance-name' }}"
+	                      type="text"
+	                      value="{{ defendant }}"
+	                      placeholder="Name"
+	                      aria-label="Defendant name"
+	                    >
                   </td>
                 </tr>
               {% endfor %}
