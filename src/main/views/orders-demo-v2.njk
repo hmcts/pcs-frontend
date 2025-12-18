@@ -549,14 +549,15 @@
 	                          <option value="other">Other</option>
 	                        </select>
 	                      </div>
-	                      <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select" data-instalment-frequency-other hidden>
-	                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequencyOther">Other period</label>
-	                        <input class="govuk-input govuk-input--width-10" id="instalmentFrequencyOther" name="instalmentFrequencyOther" type="text" placeholder="e.g. 4 weeks">
-	                      </div>
-	                      <span class="orders-demo__sentence-label govuk-label">first payment by</span>
-	                      {{ govukInput({
-	                        label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
-	                        name: "instalmentDueBy",
+		                      <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select" data-instalment-frequency-other hidden>
+		                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequencyOther">Other period</label>
+		                        <input class="govuk-input govuk-input--width-10" id="instalmentFrequencyOther" name="instalmentFrequencyOther" type="text" placeholder="e.g. 4 weeks">
+		                      </div>
+		                      <span class="orders-demo__sentence-break" aria-hidden="true" data-instalment-frequency-break hidden></span>
+		                      <span class="orders-demo__sentence-label govuk-label">first payment by</span>
+		                      {{ govukInput({
+		                        label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
+		                        name: "instalmentDueBy",
 	                        classes: "govuk-input--width-10 orders-demo__date-input",
 	                        attributes: { placeholder: "DD/MM/YYYY" }
 	                      }) }}
@@ -914,6 +915,7 @@
 		                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequencyOther">Other period</label>
 		                    <input class="govuk-input govuk-input--width-10" id="judgmentInstalmentsFrequencyOther" name="judgmentInstalmentsFrequencyOther" type="text" placeholder="e.g. 4 weeks">
 		                  </div>
+		                  <span class="orders-demo__sentence-break" aria-hidden="true" data-judgment-instalments-break hidden></span>
 		                  <span class="orders-demo__sentence-label govuk-label">first payment by</span>
 		                  {{ govukInput({
 		                    label: { text: "Judgment instalments first payment by", classes: "govuk-visually-hidden" },
@@ -1893,17 +1895,19 @@
 	          return { setJudgmentVisibility, setJudgmentPaymentControls };
 	        };
 
-	        const initJudgmentInstalmentFrequency = () => {
-	          const select = document.getElementById('judgmentInstalmentsFrequency');
-	          const otherWrapper = document.querySelector('[data-judgment-instalments-other]');
-	          const otherInput = document.getElementById('judgmentInstalmentsFrequencyOther');
-	          if (!(select instanceof HTMLSelectElement) || !otherWrapper || !(otherInput instanceof HTMLInputElement)) return;
+		        const initJudgmentInstalmentFrequency = () => {
+		          const select = document.getElementById('judgmentInstalmentsFrequency');
+		          const otherWrapper = document.querySelector('[data-judgment-instalments-other]');
+		          const breakEl = document.querySelector('[data-judgment-instalments-break]');
+		          const otherInput = document.getElementById('judgmentInstalmentsFrequencyOther');
+		          if (!(select instanceof HTMLSelectElement) || !otherWrapper || !(otherInput instanceof HTMLInputElement)) return;
 
-	          const apply = () => {
-	            const isOther = select.value === 'other';
-	            otherWrapper.hidden = !isOther;
-	            if (!isOther) otherInput.value = '';
-	          };
+		          const apply = () => {
+		            const isOther = select.value === 'other';
+		            otherWrapper.hidden = !isOther;
+		            if (breakEl) breakEl.hidden = !isOther;
+		            if (!isOther) otherInput.value = '';
+		          };
 
 	          select.addEventListener('change', () => {
 	            apply();
@@ -1912,17 +1916,19 @@
 	          apply();
 	        };
 
-	        const initSuspendedInstalmentFrequency = () => {
-	          const select = document.getElementById('instalmentFrequency');
-	          const otherWrapper = document.querySelector('[data-instalment-frequency-other]');
-	          const otherInput = document.getElementById('instalmentFrequencyOther');
-	          if (!(select instanceof HTMLSelectElement) || !otherWrapper || !(otherInput instanceof HTMLInputElement)) return;
+		        const initSuspendedInstalmentFrequency = () => {
+		          const select = document.getElementById('instalmentFrequency');
+		          const otherWrapper = document.querySelector('[data-instalment-frequency-other]');
+		          const breakEl = document.querySelector('[data-instalment-frequency-break]');
+		          const otherInput = document.getElementById('instalmentFrequencyOther');
+		          if (!(select instanceof HTMLSelectElement) || !otherWrapper || !(otherInput instanceof HTMLInputElement)) return;
 
-	          const apply = () => {
-	            const isOther = select.value === 'other';
-	            otherWrapper.hidden = !isOther;
-	            if (!isOther) otherInput.value = '';
-	          };
+		          const apply = () => {
+		            const isOther = select.value === 'other';
+		            otherWrapper.hidden = !isOther;
+		            if (breakEl) breakEl.hidden = !isOther;
+		            if (!isOther) otherInput.value = '';
+		          };
 
 	          select.addEventListener('change', () => {
 	            apply();
