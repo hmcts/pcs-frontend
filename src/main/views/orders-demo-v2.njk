@@ -531,11 +531,11 @@
 	                      </div>
 	                    </div>
                     <span class="orders-demo__sentence-lead govuk-label">instalments of</span>
-                    <div class="orders-demo__sentence-body orders-demo__sentence-body--spread">
-                      {{ govukInput({
-                        label: { text: "Instalment amount", classes: "govuk-visually-hidden" },
-                        name: "instalmentAmount",
-                        classes: "govuk-input--width-5 orders-demo__money-input",
+		                    <div class="orders-demo__sentence-body orders-demo__sentence-body--spread orders-demo__sentence-body--instalments">
+		                      {{ govukInput({
+		                        label: { text: "Instalment amount", classes: "govuk-visually-hidden" },
+		                        name: "instalmentAmount",
+		                        classes: "govuk-input--width-5 orders-demo__money-input",
                         prefix: { text: "£" },
                         attributes: { placeholder: "0.00" }
                       }) }}
@@ -553,15 +553,14 @@
 		                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequencyOther">Other period</label>
 		                        <input class="govuk-input govuk-input--width-10" id="instalmentFrequencyOther" name="instalmentFrequencyOther" type="text" placeholder="e.g. 4 weeks">
 		                      </div>
-		                      <div class="orders-demo__sentence-subline">
-		                        <span class="orders-demo__sentence-label govuk-label">first payment by</span>
-		                        {{ govukInput({
-		                          label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
-		                          name: "instalmentDueBy",
-		                          classes: "govuk-input--width-10 orders-demo__date-input",
-		                          attributes: { placeholder: "DD/MM/YYYY" }
-		                        }) }}
-		                      </div>
+		                      <span class="orders-demo__sentence-label govuk-label orders-demo__instalments-first-label">first payment by</span>
+		                      {{ govukInput({
+		                        label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
+		                        name: "instalmentDueBy",
+		                        classes: "govuk-input--width-10 orders-demo__date-input",
+		                        formGroup: { classes: "govuk-!-margin-bottom-0 orders-demo__instalments-first-date" },
+		                        attributes: { placeholder: "DD/MM/YYYY" }
+		                      }) }}
 		                    </div>
 		                  </div>
 	                    </div>
@@ -894,7 +893,7 @@
 		                  </div>
 		                </div>
 		                <span class="orders-demo__sentence-lead govuk-label">by instalments of</span>
-		                <div class="orders-demo__sentence-body orders-demo__sentence-body--spread">
+		                <div class="orders-demo__sentence-body orders-demo__sentence-body--spread orders-demo__sentence-body--instalments">
 		                  {{ govukInput({
 		                    label: { text: "Judgment instalment amount", classes: "govuk-visually-hidden" },
 		                    name: "judgmentInstalmentsAmount",
@@ -916,15 +915,14 @@
 		                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequencyOther">Other period</label>
 		                    <input class="govuk-input govuk-input--width-10" id="judgmentInstalmentsFrequencyOther" name="judgmentInstalmentsFrequencyOther" type="text" placeholder="e.g. 4 weeks">
 		                  </div>
-		                  <div class="orders-demo__sentence-subline">
-		                    <span class="orders-demo__sentence-label govuk-label">first payment by</span>
-		                    {{ govukInput({
-		                      label: { text: "Judgment instalments first payment by", classes: "govuk-visually-hidden" },
-		                      name: "judgmentInstalmentsFirstPaymentBy",
-		                      classes: "govuk-input--width-10 orders-demo__date-input",
-		                      attributes: { placeholder: "DD/MM/YYYY" }
-		                    }) }}
-		                  </div>
+		                  <span class="orders-demo__sentence-label govuk-label orders-demo__instalments-first-label">first payment by</span>
+		                  {{ govukInput({
+		                    label: { text: "Judgment instalments first payment by", classes: "govuk-visually-hidden" },
+		                    name: "judgmentInstalmentsFirstPaymentBy",
+		                    classes: "govuk-input--width-10 orders-demo__date-input",
+		                    formGroup: { classes: "govuk-!-margin-bottom-0 orders-demo__instalments-first-date" },
+		                    attributes: { placeholder: "DD/MM/YYYY" }
+		                  }) }}
 		                </div>
 		              </div>
 		            </div>
