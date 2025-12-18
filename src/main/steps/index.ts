@@ -1,6 +1,7 @@
 import type { JourneyFlowConfig } from '../interfaces/stepFlow.interface';
 
 import type { StepDefinition } from './../interfaces/stepFormData.interface';
+import { step as contactPreferencesTelephone } from './respond-to-claim/contact-preferences-telephone';
 import { respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { step as freeLegalAdvice } from './respond-to-claim/free-legal-advice';
 import { step as postcodeFinder } from './respond-to-claim/postcode-finder';
@@ -39,6 +40,7 @@ const userJourneyStepRegistry: Record<string, StepDefinition> = {
 const respondToClaimStepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
   'postcode-finder': postcodeFinder,
+  'contact-preferences-telephone': contactPreferencesTelephone,
   'free-legal-advice': freeLegalAdvice,
 };
 
