@@ -110,25 +110,17 @@
                 attributes: { placeholder: "0.00" }
               }) }}
               {% set rentFrequency = currentRentFrequency | default('month') %}
-              <div class="orders-demo__rent-frequency">
-                <label class="govuk-label govuk-label--s" for="currentRentFrequency">per</label>
-                <select class="govuk-select" id="currentRentFrequency" name="currentRentFrequency">
-                  <option value="week" {{ 'selected' if rentFrequency == 'week' }}>week</option>
-                  <option value="month" {{ 'selected' if rentFrequency == 'month' }}>month</option>
-                  <option value="quarter" {{ 'selected' if rentFrequency == 'quarter' }}>quarter</option>
-                  <option value="year" {{ 'selected' if rentFrequency == 'year' }}>year</option>
-                </select>
-              </div>
-              {{ govukInput({
-                label: { text: "Daily rate", classes: "govuk-label--s" },
-                classes: "govuk-input--width-10",
-                name: "dailyRate",
-                value: dailyRate | default('10.50'),
-                prefix: { text: "£" },
-                attributes: { placeholder: "0.00" }
-              }) }}
-            </div>
-          </div>
+	              <div class="orders-demo__rent-frequency">
+	                <label class="govuk-label govuk-label--s" for="currentRentFrequency">per</label>
+	                <select class="govuk-select" id="currentRentFrequency" name="currentRentFrequency">
+	                  <option value="week" {{ 'selected' if rentFrequency == 'week' }}>week</option>
+	                  <option value="month" {{ 'selected' if rentFrequency == 'month' }}>month</option>
+	                  <option value="quarter" {{ 'selected' if rentFrequency == 'quarter' }}>quarter</option>
+	                  <option value="year" {{ 'selected' if rentFrequency == 'year' }}>year</option>
+	                </select>
+	              </div>
+	            </div>
+	          </div>
 
           <div class="orders-demo__hearing">
             <div class="orders-demo__section-header">
@@ -862,7 +854,7 @@
 		                    label: { text: "Use and occupation daily rate", classes: "govuk-visually-hidden" },
 		                    name: "judgmentUseOccupationDailyRate",
 		                    classes: "govuk-input--width-5 orders-demo__money-input",
-		                    value: dailyRate | default('10.50'),
+		                    value: calculatedDailyRate | default('0.00'),
 		                    prefix: { text: "£" },
 		                    attributes: { placeholder: "0.00" }
 		                  }) }}
@@ -1710,10 +1702,10 @@
 	            apply();
 	          };
 
-	          const bindStickyPrefill = (sourceName, targetId) => {
-	            const source = document.querySelector(`input[name=\"${sourceName}\"]`);
-	            const target = document.getElementById(targetId);
-	            if (!(source instanceof HTMLInputElement) || !(target instanceof HTMLInputElement)) return;
+		          const bindStickyPrefill = (sourceName, targetId) => {
+		            const source = document.querySelector(`input[name=\"${sourceName}\"]`);
+		            const target = document.getElementById(targetId);
+		            if (!(source instanceof HTMLInputElement) || !(target instanceof HTMLInputElement)) return;
 
 	            const dirtyKey = `data-dirty-${targetId}`;
 	            target.addEventListener('input', () => {
@@ -1726,17 +1718,77 @@
 	              if (source.value && target.value !== source.value) target.value = source.value;
 	            };
 
-	            source.addEventListener('input', () => {
-	              apply();
-	              updatePreview();
-	            });
-	            apply();
-	          };
+		            source.addEventListener('input', () => {
+		              apply();
+		              updatePreview();
+		            });
+		            apply();
+		          };
 
-	          const setJudgmentVisibility = orderType => {
-	            const shouldShow = orderType === 'outright' || orderType === 'suspended';
-	            section.hidden = !shouldShow;
-	          };
+		          const bindCalculatedDailyRate = targetId => {
+		            const target = document.getElementById(targetId);
+		            if (!(target instanceof HTMLInputElement)) return;
+
+		            if (target.getAttribute('data-calculated-daily-rate-bound') === '1') return;
+		            target.setAttribute('data-calculated-daily-rate-bound', '1');
+
+		            const dirtyKey = `data-dirty-${targetId}`;
+		            target.addEventListener('input', () => {
+		              target.setAttribute(dirtyKey, '1');
+		            });
+
+		            const compute = () => {
+		              const rent = Number.parseFloat(getMoneyValue('currentRent', '0.00'));
+		              const frequency = getInputValue('currentRentFrequency') || 'month';
+		              if (Number.isNaN(rent) || rent <= 0) return '0.00';
+
+		              const annualised = (() => {
+		                switch (frequency) {
+		                  case 'week':
+		                    return rent * 52;
+		                  case 'month':
+		                    return rent * 12;
+		                  case 'quarter':
+		                    return rent * 4;
+		                  case 'year':
+		                    return rent;
+		                  default:
+		                    return rent * 12;
+		                }
+		              })();
+
+		              return (annualised / 365).toFixed(2);
+		            };
+
+		            const apply = () => {
+		              const isDirty = target.getAttribute(dirtyKey) === '1';
+		              if (isDirty) return;
+		              const next = compute();
+		              if (target.value !== next) target.value = next;
+		            };
+
+		            const rentInput = document.querySelector('input[name="currentRent"]');
+		            const frequencySelect = document.querySelector('select[name="currentRentFrequency"]');
+		            if (rentInput instanceof HTMLInputElement) {
+		              rentInput.addEventListener('input', () => {
+		                apply();
+		                updatePreview();
+		              });
+		            }
+		            if (frequencySelect instanceof HTMLSelectElement) {
+		              frequencySelect.addEventListener('change', () => {
+		                apply();
+		                updatePreview();
+		              });
+		            }
+
+		            apply();
+		          };
+
+		          const setJudgmentVisibility = orderType => {
+		            const shouldShow = orderType === 'outright' || orderType === 'suspended';
+		            section.hidden = !shouldShow;
+		          };
 
 	          const setJudgmentPaymentControls = orderType => {
 	            const sameTermsRow = document.querySelector('[data-judgment-same-terms-row]');
@@ -1798,9 +1850,9 @@
 	            if (interestEnabled instanceof HTMLInputElement) interestEnabled.checked = false;
 	          };
 
-	          initDefaultsOnce();
-	          bindStickyPrefill('arrearsAtHearing', 'judgmentArrearsAmount');
-	          bindStickyPrefill('dailyRate', 'judgmentUseOccupationDailyRate');
+		          initDefaultsOnce();
+		          bindStickyPrefill('arrearsAtHearing', 'judgmentArrearsAmount');
+		          bindCalculatedDailyRate('judgmentUseOccupationDailyRate');
 
 	          toggleFieldGroup('judgmentArrearsEnabled', ['judgmentArrearsAmount']);
 	          toggleFieldGroup('judgmentInterestEnabled', ['judgmentInterestAmount']);
@@ -1819,11 +1871,11 @@
 	          enabled.addEventListener('change', applyCollapsed);
 	          applyCollapsed();
 
-	          enabled.addEventListener('change', () => {
-	            const currentOrderType = document.querySelector('input[name=\"orderType\"]:checked')?.value || 'outright';
-	            setJudgmentVisibility(currentOrderType);
-	            setJudgmentPaymentControls(currentOrderType);
-	          });
+		          enabled.addEventListener('change', () => {
+		            const currentOrderType = document.querySelector('input[name=\"orderType\"]:checked')?.value || 'outright';
+		            setJudgmentVisibility(currentOrderType);
+		            setJudgmentPaymentControls(currentOrderType);
+		          });
 
 	          const currentOrderType = document.querySelector('input[name=\"orderType\"]:checked')?.value || 'outright';
 	          setJudgmentVisibility(currentOrderType);

@@ -32,7 +32,7 @@ interface OrdersDemoViewModel {
   arrearsAtHearing: string;
   currentRent: string;
   currentRentFrequency: 'week' | 'month' | 'quarter' | 'year';
-  dailyRate: string;
+  calculatedDailyRate: string;
   demoVersion: 'v2';
   otherVersionUrl: string;
 }
@@ -88,6 +88,28 @@ const parseMoney = (value: unknown): number | null => {
   const cleaned = value.replace(/[^0-9.-]/g, '');
   const parsed = Number.parseFloat(cleaned);
   return Number.isNaN(parsed) ? null : Number(parsed.toFixed(2));
+};
+
+const calculateDailyRateFromRent = (rent: string, frequency: OrdersDemoViewModel['currentRentFrequency']): string => {
+  const rentValue = parseMoney(rent);
+  if (rentValue === null) return '0.00';
+
+  const annualised = (() => {
+    switch (frequency) {
+      case 'week':
+        return rentValue * 52;
+      case 'month':
+        return rentValue * 12;
+      case 'quarter':
+        return rentValue * 4;
+      case 'year':
+        return rentValue;
+      default:
+        return rentValue * 12;
+    }
+  })();
+
+  return (annualised / 365).toFixed(2);
 };
 
 const buildQueryString = (query: Request['query']): string => {
@@ -308,6 +330,9 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
     return `${day}/${month}/${year}`;
   })();
 
+  const currentRent = '550.00';
+  const currentRentFrequency: OrdersDemoViewModel['currentRentFrequency'] = 'month';
+
   return {
     themeName,
     headerShell,
@@ -327,9 +352,9 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
     arrearsOnIssue: '825.00',
     arrearsAtNotice: '1100.00',
     arrearsAtHearing: '1250.00',
-    currentRent: '550.00',
-    currentRentFrequency: 'month',
-    dailyRate: '10.50',
+    currentRent,
+    currentRentFrequency,
+    calculatedDailyRate: calculateDailyRateFromRent(currentRent, currentRentFrequency),
     demoVersion: 'v2',
     otherVersionUrl: `/orders-demo/${encodedReference}${queryString}`,
   };
