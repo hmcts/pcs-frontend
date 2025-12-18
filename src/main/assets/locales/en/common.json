@@ -63,6 +63,13 @@
     "12": "December"
   },
   "dateFormatLong": "{{day}} {{month}} {{year}}",
+  "timeout": {
+    "title": "You'll be signed out soon",
+    "part1": "For your security, you'll be signed out in",
+    "part2": "Your previous answers have been saved.",
+    "buttonText": "Stay signed in",
+    "signOutLinkText": "Sign out"
+  },
   "characterCount": {
     "charactersUnderLimitText": {
       "one": "You have %{count} character remaining",
