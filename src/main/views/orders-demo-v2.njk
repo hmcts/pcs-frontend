@@ -573,167 +573,13 @@
                 </div>
               </div>
             </div>
-	          </div>
-	        </div>
+		          </div>
+		        </div>
 
-	        <div class="orders-demo__section orders-demo__judgment" data-judgment-section>
-	          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-	            <div class="govuk-checkboxes__item">
-	              <input class="govuk-checkboxes__input" id="judgmentEnabled" name="judgmentEnabled" type="checkbox" value="1" checked>
-	              <label class="govuk-label govuk-checkboxes__label govuk-heading-m govuk-!-margin-bottom-2" for="judgmentEnabled">Money judgment</label>
-	            </div>
-	          </div>
-
-	          <div class="orders-demo__judgment-body" data-judgment-body>
-	            {% set judgmentDefendantList = defendants | default([]) %}
-	            {% if judgmentDefendantList | length == 0 %}
-	              {% set judgmentDefendantList = [defendantName | default('Jones'), 'Taylor', 'Patel'] %}
-	            {% endif %}
-	            {% set judgmentOrdinals = ['First', 'Second', 'Third', 'Fourth', 'Fifth'] %}
-
-	            <h3 class="govuk-heading-s govuk-!-margin-top-1 govuk-!-margin-bottom-2">Judgment against</h3>
-	            <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__judgment-defendants" data-module="govuk-checkboxes">
-	              {% for defendant in judgmentDefendantList %}
-	                {% set ordinal = judgmentOrdinals[loop.index0] | default('Defendant ' ~ loop.index) %}
-	                <div class="govuk-checkboxes__item">
-	                  <input class="govuk-checkboxes__input" id="judgmentDefendant{{ loop.index }}" name="judgmentDefendants" type="checkbox" value="{{ defendant }}" checked>
-	                  <label class="govuk-label govuk-checkboxes__label" for="judgmentDefendant{{ loop.index }}">{{ ordinal }} Defendant ({{ defendant }})</label>
-	                </div>
-	              {% endfor %}
-	            </div>
-
-	            <h3 class="govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">For</h3>
-	            <div class="orders-demo__suspended-rows orders-demo__judgment-rows">
-	              <div class="orders-demo__suspended-row">
-	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
-	                  <div class="govuk-checkboxes__item">
-	                    <input class="govuk-checkboxes__input" id="judgmentArrearsEnabled" name="judgmentArrearsEnabled" type="checkbox" value="1" checked>
-	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentArrearsEnabled">Arrears</label>
-	                  </div>
-	                </div>
-	                <span class="orders-demo__sentence-lead govuk-label">arrears of</span>
-	                <div class="orders-demo__sentence-body">
-	                  {{ govukInput({
-	                    label: { text: "Judgment arrears amount", classes: "govuk-visually-hidden" },
-	                    name: "judgmentArrearsAmount",
-	                    classes: "govuk-input--width-5 orders-demo__money-input",
-	                    value: arrearsAtHearing | default('1250.00'),
-	                    prefix: { text: "£" },
-	                    attributes: { placeholder: "0.00" }
-	                  }) }}
-	                </div>
-	              </div>
-
-	              <div class="orders-demo__suspended-row">
-	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
-	                  <div class="govuk-checkboxes__item">
-	                    <input class="govuk-checkboxes__input" id="judgmentInterestEnabled" name="judgmentInterestEnabled" type="checkbox" value="1">
-	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentInterestEnabled">Interest</label>
-	                  </div>
-	                </div>
-	                <span class="orders-demo__sentence-lead govuk-label">interest of</span>
-	                <div class="orders-demo__sentence-body">
-	                  {{ govukInput({
-	                    label: { text: "Judgment interest amount", classes: "govuk-visually-hidden" },
-	                    name: "judgmentInterestAmount",
-	                    classes: "govuk-input--width-5 orders-demo__money-input",
-	                    value: '0.00',
-	                    prefix: { text: "£" },
-	                    attributes: { placeholder: "0.00" }
-	                  }) }}
-	                </div>
-	              </div>
-
-	              <div class="orders-demo__suspended-row orders-demo__suspended-row--date">
-	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
-	                  <div class="govuk-checkboxes__item">
-	                    <input class="govuk-checkboxes__input" id="judgmentUseOccupationEnabled" name="judgmentUseOccupationEnabled" type="checkbox" value="1" checked>
-	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentUseOccupationEnabled">Use and occupation</label>
-	                  </div>
-	                </div>
-	                <span class="orders-demo__sentence-lead govuk-label">use and occupation at a daily rate of</span>
-	                <div class="orders-demo__sentence-body">
-	                  {{ govukInput({
-	                    label: { text: "Use and occupation daily rate", classes: "govuk-visually-hidden" },
-	                    name: "judgmentUseOccupationDailyRate",
-	                    classes: "govuk-input--width-5 orders-demo__money-input",
-	                    value: dailyRate | default('10.50'),
-	                    prefix: { text: "£" },
-	                    attributes: { placeholder: "0.00" }
-	                  }) }}
-	                  <span class="orders-demo__sentence-label govuk-label">from</span>
-	                  {{ govukInput({
-	                    label: { text: "Use and occupation from date", classes: "govuk-visually-hidden" },
-	                    name: "judgmentUseOccupationFrom",
-	                    classes: "govuk-input--width-10 orders-demo__date-input",
-	                    value: lastUpdated,
-	                    attributes: { placeholder: "DD/MM/YYYY" }
-	                  }) }}
-	                  <span class="orders-demo__sentence-label govuk-label">until possession is given up</span>
-	                </div>
-	              </div>
-	            </div>
-
-	            <h3 class="govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">And such judgment is</h3>
-	            <div class="orders-demo__suspended-rows orders-demo__judgment-rows">
-	              <div class="orders-demo__suspended-row" data-judgment-same-terms-row>
-	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
-	                  <div class="govuk-checkboxes__item">
-	                    <input class="govuk-checkboxes__input" id="judgmentSuspendedSameTerms" name="judgmentSuspendedSameTerms" type="checkbox" value="1">
-	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentSuspendedSameTerms">Suspended on the same terms</label>
-	                  </div>
-	                </div>
-	                <span class="orders-demo__sentence-lead govuk-label">suspended on the same terms</span>
-	                <div class="orders-demo__sentence-body"></div>
-	              </div>
-
-	              <div class="orders-demo__suspended-row" data-judgment-instalments-row>
-	                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
-	                  <div class="govuk-checkboxes__item">
-	                    <input class="govuk-checkboxes__input" id="judgmentInstalmentsEnabled" name="judgmentInstalmentsEnabled" type="checkbox" value="1">
-	                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentInstalmentsEnabled">By instalments</label>
-	                  </div>
-	                </div>
-	                <span class="orders-demo__sentence-lead govuk-label">by instalments of</span>
-	                <div class="orders-demo__sentence-body orders-demo__sentence-body--spread">
-	                  {{ govukInput({
-	                    label: { text: "Judgment instalment amount", classes: "govuk-visually-hidden" },
-	                    name: "judgmentInstalmentsAmount",
-	                    classes: "govuk-input--width-5 orders-demo__money-input",
-	                    prefix: { text: "£" },
-	                    attributes: { placeholder: "0.00" }
-	                  }) }}
-	                  <span class="orders-demo__sentence-label govuk-label">per</span>
-	                  <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select">
-	                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequency">Judgment instalment frequency</label>
-	                    <select class="govuk-select" id="judgmentInstalmentsFrequency" name="judgmentInstalmentsFrequency">
-	                      <option value="week">week</option>
-	                      <option value="month" selected>month</option>
-	                      <option value="year">year</option>
-	                      <option value="other">Other</option>
-	                    </select>
-	                  </div>
-	                  <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select" data-judgment-instalments-other hidden>
-	                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequencyOther">Other period</label>
-	                    <input class="govuk-input govuk-input--width-10" id="judgmentInstalmentsFrequencyOther" name="judgmentInstalmentsFrequencyOther" type="text" placeholder="e.g. 4 weeks">
-	                  </div>
-	                  <span class="orders-demo__sentence-label govuk-label">first payment by</span>
-	                  {{ govukInput({
-	                    label: { text: "Judgment instalments first payment by", classes: "govuk-visually-hidden" },
-	                    name: "judgmentInstalmentsFirstPaymentBy",
-	                    classes: "govuk-input--width-10 orders-demo__date-input",
-	                    attributes: { placeholder: "DD/MM/YYYY" }
-	                  }) }}
-	                </div>
-	              </div>
-	            </div>
-	          </div>
-	        </div>
-
-	        <div class="orders-demo__section orders-demo__order-section" data-order-type="adjourn">
-	          <div class="orders-demo__order-grid">
-	            <div class="orders-demo__order-chooser">
-	              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+		        <div class="orders-demo__section orders-demo__order-section" data-order-type="adjourn">
+		          <div class="orders-demo__order-grid">
+		            <div class="orders-demo__order-chooser">
+		              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" id="order-adjourn" name="orderType" type="radio" value="adjourn">
                   <label class="govuk-label govuk-radios__label orders-demo__radio-label" for="order-adjourn">Select</label>
@@ -931,14 +777,168 @@
 	                  ]
 	                }) }}
 	              </div>
-	            </div>
-	          </div>
-	        </div>
+		            </div>
+		          </div>
+		        </div>
 
-	        <div class="orders-demo__section orders-demo__costs">
-	          <div class="orders-demo__section-header">
-	            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Costs</h3>
-	          </div>
+		        <div class="orders-demo__section orders-demo__judgment" data-judgment-section>
+		          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+		            <div class="govuk-checkboxes__item">
+		              <input class="govuk-checkboxes__input" id="judgmentEnabled" name="judgmentEnabled" type="checkbox" value="1" checked>
+		              <label class="govuk-label govuk-checkboxes__label govuk-heading-m govuk-!-margin-bottom-2" for="judgmentEnabled">Money judgment</label>
+		            </div>
+		          </div>
+
+		          <div class="orders-demo__judgment-body" data-judgment-body>
+		            {% set judgmentDefendantList = defendants | default([]) %}
+		            {% if judgmentDefendantList | length == 0 %}
+		              {% set judgmentDefendantList = [defendantName | default('Jones'), 'Taylor', 'Patel'] %}
+		            {% endif %}
+		            {% set judgmentOrdinals = ['First', 'Second', 'Third', 'Fourth', 'Fifth'] %}
+
+		            <h3 class="govuk-heading-s govuk-!-margin-top-1 govuk-!-margin-bottom-2">Judgment against</h3>
+		            <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__judgment-defendants" data-module="govuk-checkboxes">
+		              {% for defendant in judgmentDefendantList %}
+		                {% set ordinal = judgmentOrdinals[loop.index0] | default('Defendant ' ~ loop.index) %}
+		                <div class="govuk-checkboxes__item">
+		                  <input class="govuk-checkboxes__input" id="judgmentDefendant{{ loop.index }}" name="judgmentDefendants" type="checkbox" value="{{ defendant }}" checked>
+		                  <label class="govuk-label govuk-checkboxes__label" for="judgmentDefendant{{ loop.index }}">{{ ordinal }} Defendant ({{ defendant }})</label>
+		                </div>
+		              {% endfor %}
+		            </div>
+
+		            <h3 class="govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">For</h3>
+		            <div class="orders-demo__suspended-rows orders-demo__judgment-rows">
+		              <div class="orders-demo__suspended-row">
+		                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+		                  <div class="govuk-checkboxes__item">
+		                    <input class="govuk-checkboxes__input" id="judgmentArrearsEnabled" name="judgmentArrearsEnabled" type="checkbox" value="1" checked>
+		                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentArrearsEnabled">Arrears</label>
+		                  </div>
+		                </div>
+		                <span class="orders-demo__sentence-lead govuk-label">arrears of</span>
+		                <div class="orders-demo__sentence-body">
+		                  {{ govukInput({
+		                    label: { text: "Judgment arrears amount", classes: "govuk-visually-hidden" },
+		                    name: "judgmentArrearsAmount",
+		                    classes: "govuk-input--width-5 orders-demo__money-input",
+		                    value: arrearsAtHearing | default('1250.00'),
+		                    prefix: { text: "£" },
+		                    attributes: { placeholder: "0.00" }
+		                  }) }}
+		                </div>
+		              </div>
+
+		              <div class="orders-demo__suspended-row">
+		                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+		                  <div class="govuk-checkboxes__item">
+		                    <input class="govuk-checkboxes__input" id="judgmentInterestEnabled" name="judgmentInterestEnabled" type="checkbox" value="1">
+		                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentInterestEnabled">Interest</label>
+		                  </div>
+		                </div>
+		                <span class="orders-demo__sentence-lead govuk-label">interest of</span>
+		                <div class="orders-demo__sentence-body">
+		                  {{ govukInput({
+		                    label: { text: "Judgment interest amount", classes: "govuk-visually-hidden" },
+		                    name: "judgmentInterestAmount",
+		                    classes: "govuk-input--width-5 orders-demo__money-input",
+		                    value: '0.00',
+		                    prefix: { text: "£" },
+		                    attributes: { placeholder: "0.00" }
+		                  }) }}
+		                </div>
+		              </div>
+
+		              <div class="orders-demo__suspended-row orders-demo__suspended-row--date">
+		                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+		                  <div class="govuk-checkboxes__item">
+		                    <input class="govuk-checkboxes__input" id="judgmentUseOccupationEnabled" name="judgmentUseOccupationEnabled" type="checkbox" value="1" checked>
+		                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentUseOccupationEnabled">Use and occupation</label>
+		                  </div>
+		                </div>
+		                <span class="orders-demo__sentence-lead govuk-label">use and occupation at a daily rate of</span>
+		                <div class="orders-demo__sentence-body">
+		                  {{ govukInput({
+		                    label: { text: "Use and occupation daily rate", classes: "govuk-visually-hidden" },
+		                    name: "judgmentUseOccupationDailyRate",
+		                    classes: "govuk-input--width-5 orders-demo__money-input",
+		                    value: dailyRate | default('10.50'),
+		                    prefix: { text: "£" },
+		                    attributes: { placeholder: "0.00" }
+		                  }) }}
+		                  <span class="orders-demo__sentence-label govuk-label">from</span>
+		                  {{ govukInput({
+		                    label: { text: "Use and occupation from date", classes: "govuk-visually-hidden" },
+		                    name: "judgmentUseOccupationFrom",
+		                    classes: "govuk-input--width-10 orders-demo__date-input",
+		                    value: lastUpdated,
+		                    attributes: { placeholder: "DD/MM/YYYY" }
+		                  }) }}
+		                  <span class="orders-demo__sentence-label govuk-label">until possession is given up</span>
+		                </div>
+		              </div>
+		            </div>
+
+		            <h3 class="govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">And such judgment is</h3>
+		            <div class="orders-demo__suspended-rows orders-demo__judgment-rows">
+		              <div class="orders-demo__suspended-row" data-judgment-same-terms-row>
+		                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+		                  <div class="govuk-checkboxes__item">
+		                    <input class="govuk-checkboxes__input" id="judgmentSuspendedSameTerms" name="judgmentSuspendedSameTerms" type="checkbox" value="1">
+		                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentSuspendedSameTerms">Suspended on the same terms</label>
+		                  </div>
+		                </div>
+		                <span class="orders-demo__sentence-lead govuk-label">suspended on the same terms</span>
+		                <div class="orders-demo__sentence-body"></div>
+		              </div>
+
+		              <div class="orders-demo__suspended-row" data-judgment-instalments-row>
+		                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+		                  <div class="govuk-checkboxes__item">
+		                    <input class="govuk-checkboxes__input" id="judgmentInstalmentsEnabled" name="judgmentInstalmentsEnabled" type="checkbox" value="1">
+		                    <label class="govuk-label govuk-checkboxes__label govuk-visually-hidden" for="judgmentInstalmentsEnabled">By instalments</label>
+		                  </div>
+		                </div>
+		                <span class="orders-demo__sentence-lead govuk-label">by instalments of</span>
+		                <div class="orders-demo__sentence-body orders-demo__sentence-body--spread">
+		                  {{ govukInput({
+		                    label: { text: "Judgment instalment amount", classes: "govuk-visually-hidden" },
+		                    name: "judgmentInstalmentsAmount",
+		                    classes: "govuk-input--width-5 orders-demo__money-input",
+		                    prefix: { text: "£" },
+		                    attributes: { placeholder: "0.00" }
+		                  }) }}
+		                  <span class="orders-demo__sentence-label govuk-label">per</span>
+		                  <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select">
+		                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequency">Judgment instalment frequency</label>
+		                    <select class="govuk-select" id="judgmentInstalmentsFrequency" name="judgmentInstalmentsFrequency">
+		                      <option value="week">week</option>
+		                      <option value="month" selected>month</option>
+		                      <option value="year">year</option>
+		                      <option value="other">Other</option>
+		                    </select>
+		                  </div>
+		                  <div class="govuk-form-group govuk-!-margin-bottom-0 orders-demo__compact-select" data-judgment-instalments-other hidden>
+		                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequencyOther">Other period</label>
+		                    <input class="govuk-input govuk-input--width-10" id="judgmentInstalmentsFrequencyOther" name="judgmentInstalmentsFrequencyOther" type="text" placeholder="e.g. 4 weeks">
+		                  </div>
+		                  <span class="orders-demo__sentence-label govuk-label">first payment by</span>
+		                  {{ govukInput({
+		                    label: { text: "Judgment instalments first payment by", classes: "govuk-visually-hidden" },
+		                    name: "judgmentInstalmentsFirstPaymentBy",
+		                    classes: "govuk-input--width-10 orders-demo__date-input",
+		                    attributes: { placeholder: "DD/MM/YYYY" }
+		                  }) }}
+		                </div>
+		              </div>
+		            </div>
+		          </div>
+		        </div>
+
+		        <div class="orders-demo__section orders-demo__costs">
+		          <div class="orders-demo__section-header">
+		            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Costs</h3>
+		          </div>
           <div class="orders-demo__costs-grid">
             <div class="orders-demo__costs-modes">
 	              {{ govukRadios({
