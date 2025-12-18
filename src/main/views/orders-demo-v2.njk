@@ -523,8 +523,8 @@
                     </div>
                   </div>
 
-                  <div class="orders-demo__suspended-row">
-                    <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+	                  <div class="orders-demo__suspended-row orders-demo__suspended-row--multiline">
+	                    <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
 	                      <div class="govuk-checkboxes__item">
 	                        <input class="govuk-checkboxes__input" id="instalmentCheckbox" name="instalmentCheckbox" type="checkbox" value="instalments">
 	                        <label class="govuk-label govuk-checkboxes__label" for="instalmentCheckbox"><span class="govuk-visually-hidden">Instalments checkbox</span></label>
@@ -553,18 +553,19 @@
 		                        <label class="govuk-label govuk-visually-hidden" for="instalmentFrequencyOther">Other period</label>
 		                        <input class="govuk-input govuk-input--width-10" id="instalmentFrequencyOther" name="instalmentFrequencyOther" type="text" placeholder="e.g. 4 weeks">
 		                      </div>
-		                      <span class="orders-demo__sentence-break" aria-hidden="true"></span>
-		                      <span class="orders-demo__sentence-label govuk-label">first payment by</span>
-		                      {{ govukInput({
-		                        label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
-		                        name: "instalmentDueBy",
-	                        classes: "govuk-input--width-10 orders-demo__date-input",
-	                        attributes: { placeholder: "DD/MM/YYYY" }
-	                      }) }}
-                    </div>
-                  </div>
-                </div>
-              </div>
+		                      <div class="orders-demo__sentence-subline">
+		                        <span class="orders-demo__sentence-label govuk-label">first payment by</span>
+		                        {{ govukInput({
+		                          label: { text: "Instalments due by", classes: "govuk-visually-hidden" },
+		                          name: "instalmentDueBy",
+		                          classes: "govuk-input--width-10 orders-demo__date-input",
+		                          attributes: { placeholder: "DD/MM/YYYY" }
+		                        }) }}
+		                      </div>
+		                    </div>
+		                  </div>
+	                    </div>
+	                  </div>
             </div>
 		          </div>
 		        </div>
@@ -885,11 +886,11 @@
 		                <div class="orders-demo__sentence-body"></div>
 		              </div>
 
-		              <div class="orders-demo__suspended-row" data-judgment-instalments-row>
-		                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
-		                  <div class="govuk-checkboxes__item">
-		                    <input class="govuk-checkboxes__input" id="judgmentInstalmentsEnabled" name="judgmentInstalmentsEnabled" type="checkbox" value="1">
-		                    <label class="govuk-label govuk-checkboxes__label" for="judgmentInstalmentsEnabled"><span class="govuk-visually-hidden">By instalments</span></label>
+			              <div class="orders-demo__suspended-row orders-demo__suspended-row--multiline" data-judgment-instalments-row>
+			                <div class="govuk-checkboxes govuk-checkboxes--small orders-demo__checkbox-single" data-module="govuk-checkboxes">
+			                  <div class="govuk-checkboxes__item">
+			                    <input class="govuk-checkboxes__input" id="judgmentInstalmentsEnabled" name="judgmentInstalmentsEnabled" type="checkbox" value="1">
+			                    <label class="govuk-label govuk-checkboxes__label" for="judgmentInstalmentsEnabled"><span class="govuk-visually-hidden">By instalments</span></label>
 		                  </div>
 		                </div>
 		                <span class="orders-demo__sentence-lead govuk-label">by instalments of</span>
@@ -915,14 +916,15 @@
 		                    <label class="govuk-label govuk-visually-hidden" for="judgmentInstalmentsFrequencyOther">Other period</label>
 		                    <input class="govuk-input govuk-input--width-10" id="judgmentInstalmentsFrequencyOther" name="judgmentInstalmentsFrequencyOther" type="text" placeholder="e.g. 4 weeks">
 		                  </div>
-		                  <span class="orders-demo__sentence-break" aria-hidden="true"></span>
-		                  <span class="orders-demo__sentence-label govuk-label">first payment by</span>
-		                  {{ govukInput({
-		                    label: { text: "Judgment instalments first payment by", classes: "govuk-visually-hidden" },
-		                    name: "judgmentInstalmentsFirstPaymentBy",
-		                    classes: "govuk-input--width-10 orders-demo__date-input",
-		                    attributes: { placeholder: "DD/MM/YYYY" }
-		                  }) }}
+		                  <div class="orders-demo__sentence-subline">
+		                    <span class="orders-demo__sentence-label govuk-label">first payment by</span>
+		                    {{ govukInput({
+		                      label: { text: "Judgment instalments first payment by", classes: "govuk-visually-hidden" },
+		                      name: "judgmentInstalmentsFirstPaymentBy",
+		                      classes: "govuk-input--width-10 orders-demo__date-input",
+		                      attributes: { placeholder: "DD/MM/YYYY" }
+		                    }) }}
+		                  </div>
 		                </div>
 		              </div>
 		            </div>
