@@ -373,6 +373,21 @@
       padding: 4px 6px;
     }
 
+    .govuk-input__wrapper {
+      align-items: stretch;
+    }
+
+    .govuk-input__prefix,
+    .govuk-input__suffix {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 34px;
+      padding: 0 8px;
+      box-sizing: border-box;
+      white-space: nowrap;
+    }
+
     .orders-demo__date-inline .govuk-date-input {
       gap: 8px;
     }
