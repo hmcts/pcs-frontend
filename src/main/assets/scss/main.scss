@@ -282,13 +282,13 @@
 .orders-demo__party-table {
   width: 100%;
   max-width: 1100px;
-  font-size: 14px;
+  font-size: 15px;
   margin-left: 0;
 
   .govuk-table__header,
   .govuk-table__cell {
     vertical-align: middle;
-    padding: 4px 6px;
+    padding: 6px 8px;
   }
 
   .orders-demo__party-cell {
@@ -307,6 +307,17 @@
   .orders-demo__party-name-input {
     max-width: none;
     width: 100%;
+  }
+}
+
+.orders-demo--v2 {
+  .orders-demo__party-table {
+    font-size: 14px;
+
+    .govuk-table__header,
+    .govuk-table__cell {
+      padding: 4px 6px;
+    }
   }
 }
 
