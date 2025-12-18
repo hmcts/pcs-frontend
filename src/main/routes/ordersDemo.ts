@@ -277,7 +277,7 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
   const themeName = allowedThemes.has(theme as DemoTheme) ? (theme as DemoTheme) : 'judicial';
   const caseReference = caseReferenceParam && caseReferenceParam.trim() ? caseReferenceParam : defaultCaseReference;
   const encodedReference = encodeURIComponent(caseReference);
-  const basePath = `/orders-demo/${encodedReference}`;
+  const basePath = `/orders-demo-v2/${encodedReference}`;
   const queryString = buildQueryString(req.query);
 
   const headerShell = (() => {
@@ -329,23 +329,23 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
     currentRent: '550.00',
     currentRentFrequency: 'month',
     demoVersion: 'v2',
-    otherVersionUrl: `/orders-demo-v1/${encodedReference}${queryString}`,
+    otherVersionUrl: `/orders-demo/${encodedReference}${queryString}`,
   };
 };
 
 export default function (app: Application): void {
-  app.get('/orders-demo/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
+  app.get('/orders-demo-v2/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
     try {
       const viewModel = buildViewModel(req, req.params.caseReference);
 
       const submitted = req.query.submitted === '1';
-      res.render('orders-demo', { ...viewModel, submitted });
+      res.render('orders-demo-v2', { ...viewModel, submitted });
     } catch (error) {
       next(error);
     }
   });
 
-  app.post('/orders-demo/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
+  app.post('/orders-demo-v2/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
     const caseReference = req.params.caseReference?.trim();
 
     if (!caseReference) {
@@ -372,9 +372,9 @@ export default function (app: Application): void {
     }
   });
 
-  app.get('/orders-demo', oidcMiddleware, (req: Request, res: Response) => {
+  app.get('/orders-demo-v2', oidcMiddleware, (req: Request, res: Response) => {
     res.redirect(
-      `/orders-demo/${defaultCaseReference}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`
+      `/orders-demo-v2/${defaultCaseReference}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`
     );
   });
 }

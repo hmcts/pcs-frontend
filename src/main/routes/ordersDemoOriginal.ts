@@ -11,7 +11,7 @@ const { renderHeaderShell, renderFooterShell } = require('hmcts-header-shell-dem
 
 type DemoTheme = 'judicial' | 'case-manager' | 'default';
 
-interface OrdersDemoViewModelV1 {
+interface OrdersDemoViewModel {
   themeName: DemoTheme;
   headerShell: unknown;
   footerShell: unknown;
@@ -32,11 +32,10 @@ interface OrdersDemoViewModelV1 {
   arrearsAtHearing: string;
   currentRent: string;
   currentRentFrequency: 'month' | 'quarter' | 'year';
-  demoVersion: 'v1';
   otherVersionUrl: string;
 }
 
-const logger = Logger.getLogger('ordersDemoV1');
+const logger = Logger.getLogger('ordersDemo');
 
 const keepOnlyCreateCaseNav = (html: string): string => {
   const listMatch = html.match(/(<ul class="hmcts-primary-navigation__list">)([\s\S]*?)(<\/ul>)/);
@@ -89,7 +88,26 @@ const parseMoney = (value: unknown): number | null => {
   return Number.isNaN(parsed) ? null : Number(parsed.toFixed(2));
 };
 
-const buildOrdersPayloadV1 = (rawBody: Request['body']): OrdersDemoPayload => {
+const buildQueryString = (query: Request['query']): string => {
+  const params = new URLSearchParams();
+  Object.entries(query).forEach(([key, value]) => {
+    if (typeof value === 'string') {
+      params.append(key, value);
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach(entry => {
+        if (typeof entry === 'string') {
+          params.append(key, entry);
+        }
+      });
+    }
+  });
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
+};
+
+const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
   const body = (rawBody || {}) as Record<string, unknown>;
   const asArray = (value: unknown): string[] => {
     if (Array.isArray(value)) {
@@ -204,32 +222,13 @@ const buildOrdersPayloadV1 = (rawBody: Request['body']): OrdersDemoPayload => {
   };
 };
 
-const buildQueryString = (query: Request['query']): string => {
-  const params = new URLSearchParams();
-  Object.entries(query).forEach(([key, value]) => {
-    if (typeof value === 'string') {
-      params.append(key, value);
-      return;
-    }
-    if (Array.isArray(value)) {
-      value.forEach(entry => {
-        if (typeof entry === 'string') {
-          params.append(key, entry);
-        }
-      });
-    }
-  });
-  const qs = params.toString();
-  return qs ? `?${qs}` : '';
-};
-
-const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoViewModelV1 => {
+const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoViewModel => {
   const theme = typeof req.query.theme === 'string' ? req.query.theme : 'judicial';
   const allowedThemes = new Set<DemoTheme>(['judicial', 'case-manager', 'default']);
   const themeName = allowedThemes.has(theme as DemoTheme) ? (theme as DemoTheme) : 'judicial';
   const caseReference = caseReferenceParam && caseReferenceParam.trim() ? caseReferenceParam : defaultCaseReference;
   const encodedReference = encodeURIComponent(caseReference);
-  const basePath = `/orders-demo-v1/${encodedReference}`;
+  const basePath = `/orders-demo/${encodedReference}`;
   const queryString = buildQueryString(req.query);
 
   const headerShell = (() => {
@@ -280,24 +279,23 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
     arrearsAtHearing: '1250.00',
     currentRent: '550.00',
     currentRentFrequency: 'month',
-    demoVersion: 'v1',
-    otherVersionUrl: `/orders-demo/${encodedReference}${queryString}`,
+    otherVersionUrl: `/orders-demo-v2/${encodedReference}${queryString}`,
   };
 };
 
 export default function (app: Application): void {
-  app.get('/orders-demo-v1/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
+  app.get('/orders-demo/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
     try {
       const viewModel = buildViewModel(req, req.params.caseReference);
 
       const submitted = req.query.submitted === '1';
-      res.render('orders-demo-v1', { ...viewModel, submitted });
+      res.render('orders-demo', { ...viewModel, submitted });
     } catch (error) {
       next(error);
     }
   });
 
-  app.post('/orders-demo-v1/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
+  app.post('/orders-demo/:caseReference', oidcMiddleware, async (req: Request, res: Response, next) => {
     const caseReference = req.params.caseReference?.trim();
 
     if (!caseReference) {
@@ -313,21 +311,20 @@ export default function (app: Application): void {
           ? (config.get('secrets.pcs.pcs-judge-token') as string)
           : undefined);
       req.session.user = { ...(req.session.user || {}), accessToken } as Request['session']['user'];
-      const caseData = { ordersDemoPayload: buildOrdersPayloadV1(req.body) };
+      const caseData = { ordersDemoPayload: buildOrdersPayload(req.body) };
       await ccdCaseService.createOrder(caseReference, caseData, accessToken);
       const targetReference = caseReference.replace(/\D/g, '') || caseReference;
       const redirectUrl = `http://localhost:3000/cases/case-details/PCS/PCS/${encodeURIComponent(targetReference)}#History`;
       return res.redirect(303, redirectUrl);
     } catch (error) {
-      logger.error(`[ordersDemoV1] Failed to submit createOrder event: ${(error as Error).message}`);
+      logger.error(`[ordersDemo] Failed to submit createOrder event: ${(error as Error).message}`);
       return next(error);
     }
   });
 
-  app.get('/orders-demo-v1', oidcMiddleware, (req: Request, res: Response) => {
+  app.get('/orders-demo', oidcMiddleware, (req: Request, res: Response) => {
     res.redirect(
-      `/orders-demo-v1/${defaultCaseReference}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`
+      `/orders-demo/${defaultCaseReference}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`
     );
   });
 }
-
