@@ -32,6 +32,8 @@ interface OrdersDemoViewModel {
   arrearsAtHearing: string;
   currentRent: string;
   currentRentFrequency: 'week' | 'month' | 'quarter' | 'year';
+  demoVersion: 'v2';
+  otherVersionUrl: string;
 }
 
 const logger = Logger.getLogger('ordersDemo');
@@ -85,6 +87,25 @@ const parseMoney = (value: unknown): number | null => {
   const cleaned = value.replace(/[^0-9.-]/g, '');
   const parsed = Number.parseFloat(cleaned);
   return Number.isNaN(parsed) ? null : Number(parsed.toFixed(2));
+};
+
+const buildQueryString = (query: Request['query']): string => {
+  const params = new URLSearchParams();
+  Object.entries(query).forEach(([key, value]) => {
+    if (typeof value === 'string') {
+      params.append(key, value);
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach(entry => {
+        if (typeof entry === 'string') {
+          params.append(key, entry);
+        }
+      });
+    }
+  });
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
 };
 
 const buildOrdersPayload = (rawBody: Request['body']): OrdersDemoPayload => {
@@ -255,7 +276,9 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
   const allowedThemes = new Set<DemoTheme>(['judicial', 'case-manager', 'default']);
   const themeName = allowedThemes.has(theme as DemoTheme) ? (theme as DemoTheme) : 'judicial';
   const caseReference = caseReferenceParam && caseReferenceParam.trim() ? caseReferenceParam : defaultCaseReference;
-  const basePath = `/orders-demo/${encodeURIComponent(caseReference)}`;
+  const encodedReference = encodeURIComponent(caseReference);
+  const basePath = `/orders-demo/${encodedReference}`;
+  const queryString = buildQueryString(req.query);
 
   const headerShell = (() => {
     const roles = themeName === 'judicial' ? ['pui-judicial'] : ['pui-case-manager'];
@@ -305,6 +328,8 @@ const buildViewModel = (req: Request, caseReferenceParam?: string): OrdersDemoVi
     arrearsAtHearing: '1250.00',
     currentRent: '550.00',
     currentRentFrequency: 'month',
+    demoVersion: 'v2',
+    otherVersionUrl: `/orders-demo-v1/${encodedReference}${queryString}`,
   };
 };
 
