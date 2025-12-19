@@ -696,4 +696,3 @@ describe('subFieldsRenderer', () => {
     });
   });
 });
-
