@@ -1,6 +1,6 @@
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 
-export const userJourneyFlowConfig: JourneyFlowConfig = {
+export const flowConfig: JourneyFlowConfig = {
   basePath: '/steps/user-journey',
   stepOrder: [
     'enter-age',
