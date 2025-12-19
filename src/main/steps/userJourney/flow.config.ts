@@ -8,6 +8,7 @@ export const flowConfig: JourneyFlowConfig = {
     'enter-ground',
     'enter-other-reason',
     'ineligible',
+    'enter-contact-preferences',
     'enter-user-details',
     'enter-address',
     'summary',
@@ -44,17 +45,22 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'enter-other-reason': {
       dependencies: ['enter-ground'],
-      defaultNext: 'enter-user-details',
+      defaultNext: 'enter-contact-preferences',
       previousStep: 'enter-ground',
     },
     ineligible: {
       dependencies: ['enter-age'],
       previousStep: 'enter-age',
     },
-    'enter-user-details': {
+    'enter-contact-preferences': {
       dependencies: ['enter-other-reason'],
-      defaultNext: 'enter-address',
+      defaultNext: 'enter-user-details',
       previousStep: 'enter-other-reason',
+    },
+    'enter-user-details': {
+      dependencies: ['enter-contact-preferences'],
+      defaultNext: 'enter-address',
+      previousStep: 'enter-contact-preferences',
     },
     'enter-address': {
       dependencies: ['enter-user-details'],
