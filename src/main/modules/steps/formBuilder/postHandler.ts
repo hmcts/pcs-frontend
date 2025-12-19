@@ -3,13 +3,14 @@ import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
-import { getRequestLanguage } from '../../i18n';
 import { stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
+import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';
 import { getTranslationErrors, processFieldData, setFormData, validateForm } from './helpers';
+import { validateConfigInDevelopment } from './schema';
 
 export function createPostHandler(
   fields: FormFieldConfig[],
@@ -19,39 +20,38 @@ export function createPostHandler(
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
+  // Validate config in development mode
+  if (process.env.NODE_ENV !== 'production') {
+    validateConfigInDevelopment({
+      stepName,
+      journeyFolder,
+      fields,
+      beforeRedirect,
+      stepDir: '',
+      translationKeys,
+    });
+  }
+
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
       await loadStepNamespace(req, stepName, journeyFolder);
 
-      const lang = getRequestLanguage(req);
       const t: TFunction = getTranslationFunction(req, stepName, ['common']);
       const action = req.body.action as string | undefined;
 
-      const fieldsWithLabels = translateFields(fields, t, {}, undefined, false);
-      const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fieldsWithLabels));
+      // Get all form data from session for cross-field validation
+      const allFormData = req.session.formData
+        ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
+        : {};
+
+      const fieldsWithLabels = translateFields(fields, t, {}, {}, false);
+      const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fieldsWithLabels), allFormData);
 
       // If there are validation errors, show them regardless of action
       if (Object.keys(errors).length > 0) {
-        const firstField = Object.keys(errors)[0];
-        const fieldConfig = fields.find(f => f.name === firstField);
-        // For date fields, the error link should point to the day input
-        const errorAnchor = fieldConfig?.type === 'date' ? `${firstField}-day` : firstField;
-        const error = { field: firstField, anchor: errorAnchor, text: errors[firstField] };
-        const formContent = buildFormContent(fields, t, req.body, error, translationKeys);
-
-        return res.status(400).render(viewPath, {
-          ...formContent,
-          error,
-          stepName,
-          journeyFolder,
-          backUrl: stepNavigation.getBackUrl(req, stepName),
-          lang,
-          pageUrl: req.originalUrl || '/',
-          t,
-          ccdId: req.session?.ccdCase?.id,
-          dashboardUrl: DASHBOARD_ROUTE,
-          languageToggle: t('languageToggle'),
-        });
+        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys);
+        renderWithErrors(req, res, viewPath, errors, fields, formContent, stepName, journeyFolder, translationKeys);
+        return; // renderWithErrors sends the response, so we return early
       }
 
       // Handle saveForLater action after validation passes
