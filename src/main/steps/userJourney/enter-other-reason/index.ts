@@ -11,8 +11,8 @@ export const step: StepDefinition = createFormStep({
       type: 'character-count',
       // Only required if "other" option was selected in enter-ground step
       required: (formData: Record<string, unknown>, allData: Record<string, unknown>) => {
-        const enterGroundData = allData['enter-ground'] as { grounds?: string[] } | undefined;
-        return Array.isArray(enterGroundData?.grounds) && enterGroundData.grounds.includes('other-10');
+        const enterGroundData = allData['grounds'] as { grounds?: string[] } | undefined;
+        return Array.isArray(enterGroundData) && enterGroundData.includes('other-10');
       },
       maxLength: 250,
       translationKey: {

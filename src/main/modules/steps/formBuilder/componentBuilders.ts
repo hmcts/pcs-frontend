@@ -7,6 +7,8 @@ import type {
   FormFieldOption,
 } from '../../../interfaces/formFieldConfig.interface';
 
+import { buildSubFieldsHTML } from './subFieldsRenderer';
+
 function createFieldsetLegend(
   label: string,
   isFirstField: boolean
@@ -101,16 +103,27 @@ export function buildComponentConfig(
             checked: radioValue === option.value,
           };
 
-          // Add conditional content if provided (already processed in fieldTranslation)
+          // Build conditional HTML from conditionalText and subFields
+          const conditionalParts: string[] = [];
+
+          // Add conditional text if provided (already processed in fieldTranslation)
           if (option.conditionalText && typeof option.conditionalText === 'string') {
-            item.conditional = {
-              html: option.conditionalText,
-            };
+            conditionalParts.push(option.conditionalText);
           }
 
-          // Add subFields configuration for template rendering
+          // Build and add subFields HTML
           if (option.subFields) {
-            item.subFields = option.subFields;
+            const subFieldsHTML = buildSubFieldsHTML(option.subFields);
+            if (subFieldsHTML) {
+              conditionalParts.push(subFieldsHTML);
+            }
+          }
+
+          // Set conditional HTML if we have any content
+          if (conditionalParts.length > 0) {
+            item.conditional = {
+              html: conditionalParts.join('\n'),
+            };
           }
 
           return item;
@@ -138,16 +151,27 @@ export function buildComponentConfig(
             checked: checkboxArray.includes(option.value),
           };
 
-          // Add conditional content if provided (already processed in fieldTranslation)
+          // Build conditional HTML from conditionalText and subFields
+          const conditionalParts: string[] = [];
+
+          // Add conditional text if provided (already processed in fieldTranslation)
           if (option.conditionalText && typeof option.conditionalText === 'string') {
-            item.conditional = {
-              html: option.conditionalText,
-            };
+            conditionalParts.push(option.conditionalText);
           }
 
-          // Add subFields configuration for template rendering
+          // Build and add subFields HTML
           if (option.subFields) {
-            item.subFields = option.subFields;
+            const subFieldsHTML = buildSubFieldsHTML(option.subFields);
+            if (subFieldsHTML) {
+              conditionalParts.push(subFieldsHTML);
+            }
+          }
+
+          // Set conditional HTML if we have any content
+          if (conditionalParts.length > 0) {
+            item.conditional = {
+              html: conditionalParts.join('\n'),
+            };
           }
 
           return item;

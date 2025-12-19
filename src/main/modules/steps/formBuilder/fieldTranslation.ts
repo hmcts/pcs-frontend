@@ -8,14 +8,17 @@ import { getTranslation } from './helpers';
 
 export function buildFieldValues(
   fields: FormFieldConfig[],
-  savedData: Record<string, unknown>
+  savedData: Record<string, unknown>,
+  fieldPrefix = ''
 ): Record<string, unknown> {
   const fieldValues: Record<string, unknown> = {};
 
   for (const field of fields) {
+    const fullFieldName = fieldPrefix ? `${fieldPrefix}.${field.name}` : field.name;
+
     if (field.type === 'checkbox') {
-      if (savedData?.[field.name]) {
-        const value = savedData[field.name];
+      if (savedData?.[fullFieldName]) {
+        const value = savedData[fullFieldName];
         if (typeof value === 'string') {
           fieldValues[field.name] = [value];
         } else if (Array.isArray(value)) {
@@ -27,29 +30,36 @@ export function buildFieldValues(
         fieldValues[field.name] = [];
       }
     } else if (field.type === 'date') {
-      if (savedData?.[field.name] && typeof savedData[field.name] === 'object') {
-        const dateValue = savedData[field.name] as { day?: string; month?: string; year?: string };
+      if (savedData?.[fullFieldName] && typeof savedData[fullFieldName] === 'object') {
+        const dateValue = savedData[fullFieldName] as { day?: string; month?: string; year?: string };
         fieldValues[field.name] = {
           day: dateValue.day || '',
           month: dateValue.month || '',
           year: dateValue.year || '',
         };
       } else if (
-        savedData?.[`${field.name}-day`] ||
-        savedData?.[`${field.name}-month`] ||
-        savedData?.[`${field.name}-year`]
+        savedData?.[`${fullFieldName}-day`] ||
+        savedData?.[`${fullFieldName}-month`] ||
+        savedData?.[`${fullFieldName}-year`]
       ) {
         fieldValues[field.name] = {
-          day: (savedData[`${field.name}-day`] as string) || '',
-          month: (savedData[`${field.name}-month`] as string) || '',
-          year: (savedData[`${field.name}-year`] as string) || '',
+          day: (savedData[`${fullFieldName}-day`] as string) || '',
+          month: (savedData[`${fullFieldName}-month`] as string) || '',
+          year: (savedData[`${fullFieldName}-year`] as string) || '',
         };
       } else {
         fieldValues[field.name] = { day: '', month: '', year: '' };
       }
     } else {
-      fieldValues[field.name] = savedData?.[field.name] ?? '';
+      // For regular fields, check both the full nested name and the simple name
+      fieldValues[field.name] = savedData?.[fullFieldName] ?? savedData?.[field.name] ?? '';
     }
+
+    // Note: subFields are handled separately in translateFields by extracting nested field values
+    // from originalData. We don't merge subFields data into parent field values here because:
+    // - Radio fields store a string value (the selected option)
+    // - Checkbox fields store an array of selected values
+    // - SubFields are extracted separately when processing options in translateFields
   }
 
   return fieldValues;
@@ -202,9 +212,12 @@ export function translateFields(
   fieldValues: Record<string, unknown>,
   errors: Record<string, string> = {},
   hasTitle = false,
-  fieldPrefix = ''
+  fieldPrefix = '',
+  originalData?: Record<string, unknown>
 ): FormFieldConfig[] {
   const translations = buildTranslationsObject(t);
+  // Use originalData if provided, otherwise fall back to fieldValues
+  const dataSource = originalData || fieldValues;
 
   return fields.map((field, index) => {
     // Process field (handles label functions)
@@ -215,9 +228,18 @@ export function translateFields(
     if (processedField.options) {
       processedOptionsWithSubFields = processedField.options.map(option => {
         if (option.subFields) {
-          // Get field values for subFields (nested under parent field name)
-          const parentFieldValue = fieldValues[field.name] as Record<string, unknown> | undefined;
-          const subFieldValues = parentFieldValue || {};
+          // Extract nested field values for subFields from originalData
+          // Look for fields with pattern "parentField.subField" in the saved data
+          const subFieldValues: Record<string, unknown> = {};
+          const parentFieldName = fieldPrefix ? `${fieldPrefix}.${field.name}` : field.name;
+
+          for (const [subFieldName] of Object.entries(option.subFields)) {
+            const nestedFieldName = `${parentFieldName}.${subFieldName}`;
+            // Check for nested field name in originalData
+            if (dataSource?.[nestedFieldName] !== undefined) {
+              subFieldValues[subFieldName] = dataSource[nestedFieldName];
+            }
+          }
 
           // Recursively process subFields with proper field prefix
           const processedSubFieldsArray = translateFields(
@@ -226,7 +248,8 @@ export function translateFields(
             subFieldValues,
             errors,
             false,
-            field.name // Pass parent field name as prefix
+            parentFieldName, // Pass full parent field name as prefix
+            originalData // Pass originalData down for nested subFields
           );
 
           // Convert back to Record format with original subField names as keys
@@ -254,15 +277,20 @@ export function translateFields(
       text: option.text || option.value,
     }));
 
-    const hasError = errors[field.name] !== undefined;
-    const errorText = errors[field.name];
+    // For nested fields (subFields), extract simple name to look up values
+    // field.name might be nested (e.g., "parent.subField") but fieldValues is keyed by simple names
+    const fieldNameForValueLookup =
+      fieldPrefix && field.name.includes('.') ? field.name.split('.').pop() || field.name : field.name;
+
+    const hasError = errors[processedField.name] !== undefined;
+    const errorText = errors[processedField.name];
     // processedField.label is already resolved to a string by processField
-    const resolvedLabel = typeof processedField.label === 'string' ? processedField.label : field.name;
+    const resolvedLabel = typeof processedField.label === 'string' ? processedField.label : processedField.name;
     const { component, componentType } = buildComponentConfig(
       { ...processedField, options: processedOptionsWithSubFields },
       resolvedLabel,
       processedField.hint,
-      fieldValues[field.name],
+      fieldValues[fieldNameForValueLookup] ?? fieldValues[processedField.name],
       translatedOptions,
       hasError || false,
       errorText,

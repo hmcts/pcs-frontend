@@ -8,6 +8,7 @@ import { step as startNow } from './respond-to-claim/start-now';
 import { step as applicationSubmitted } from './userJourney/application-submitted';
 import { step as enterAddress } from './userJourney/enter-address';
 import { step as enterAge } from './userJourney/enter-age';
+import { step as enterContactPreferences } from './userJourney/enter-contact-preferences';
 import { step as enterDob } from './userJourney/enter-dob';
 import { step as enterGround } from './userJourney/enter-ground';
 import { step as enterOtherReason } from './userJourney/enter-other-reason';
@@ -29,6 +30,7 @@ const userJourneyStepRegistry: Record<string, StepDefinition> = {
   'enter-ground': enterGround,
   'enter-other-reason': enterOtherReason,
   ineligible,
+  'enter-contact-preferences': enterContactPreferences,
   'enter-user-details': enterUserDetails,
   'enter-address': enterAddress,
   summary,

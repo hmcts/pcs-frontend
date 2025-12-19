@@ -15,7 +15,8 @@ export function buildFormContent(
 ): Record<string, unknown> {
   const fieldValues = buildFieldValues(fields, bodyData);
   const pageTitle = getTranslation(t, 'title', undefined) || getTranslation(t, 'question', undefined);
-  const fieldsWithLabels = translateFields(fields, t, fieldValues, errors, !!pageTitle);
+  // Pass bodyData as originalData so translateFields can extract nested field values
+  const fieldsWithLabels = translateFields(fields, t, fieldValues, errors, !!pageTitle, '', bodyData);
 
   // Build error summary
   const errorSummary = buildErrorSummary(errors, fields, t);
