@@ -52,7 +52,8 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      expect(req.session.formData).toEqual({
+      const session = req.session as { formData?: Record<string, unknown> };
+      expect(session.formData).toEqual({
         'test-step': {
           field1: 'value1',
         },
@@ -72,7 +73,8 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'new-value', field2: 'value2' });
 
-      expect(req.session.formData).toEqual({
+      const session = req.session as { formData?: Record<string, unknown> };
+      expect(session.formData).toEqual({
         'test-step': {
           field1: 'new-value',
           field2: 'value2',
@@ -87,8 +89,9 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      expect(req.session.formData).toBeDefined();
-      expect(req.session.formData?.['test-step']).toEqual({ field1: 'value1' });
+      const session = req.session as { formData?: Record<string, unknown> };
+      expect(session.formData).toBeDefined();
+      expect(session.formData?.['test-step']).toEqual({ field1: 'value1' });
     });
   });
 
@@ -99,6 +102,7 @@ describe('formHelpers', () => {
           field1: 'value1',
           field2: 'value2',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -115,6 +119,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'value1',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -130,6 +135,7 @@ describe('formHelpers', () => {
     it('should use custom error message when provided', () => {
       const req = {
         body: {},
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -148,6 +154,7 @@ describe('formHelpers', () => {
     it('should use translation error message when provided', () => {
       const req = {
         body: {},
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -171,6 +178,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'invalid-email',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -192,6 +200,7 @@ describe('formHelpers', () => {
         body: {
           field1: '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -212,6 +221,7 @@ describe('formHelpers', () => {
         body: {
           field1: [],
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -231,6 +241,7 @@ describe('formHelpers', () => {
         body: {
           field1: '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -250,6 +261,7 @@ describe('formHelpers', () => {
         body: {
           field1: ['value1', 'value2'],
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -269,6 +281,7 @@ describe('formHelpers', () => {
         body: {
           field1: undefined,
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -288,6 +301,7 @@ describe('formHelpers', () => {
         body: {
           field1: null,
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -307,6 +321,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'invalid',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -328,6 +343,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'invalid',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -352,6 +368,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'a'.repeat(101),
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -373,6 +390,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'a'.repeat(101),
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -397,6 +415,7 @@ describe('formHelpers', () => {
         body: {
           field1: '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -419,6 +438,7 @@ describe('formHelpers', () => {
           'dateField-month': '02',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -441,6 +461,7 @@ describe('formHelpers', () => {
           'dateField-month': '',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -462,6 +483,7 @@ describe('formHelpers', () => {
           'dateField-month': '02',
           'dateField-year': '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -483,6 +505,7 @@ describe('formHelpers', () => {
           'dateField-month': 'cd',
           'dateField-year': 'ef',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -505,6 +528,7 @@ describe('formHelpers', () => {
           'dateField-month': '01',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -527,6 +551,7 @@ describe('formHelpers', () => {
           'dateField-month': '13',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -548,6 +573,7 @@ describe('formHelpers', () => {
           'dateField-month': '01',
           'dateField-year': '1899',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -570,6 +596,7 @@ describe('formHelpers', () => {
           'dateField-month': '01',
           'dateField-year': futureYear.toString(),
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -591,6 +618,7 @@ describe('formHelpers', () => {
           'dateField-month': '06',
           'dateField-year': '2000',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -612,6 +640,7 @@ describe('formHelpers', () => {
           'dateField-month': '',
           'dateField-year': '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -633,6 +662,7 @@ describe('formHelpers', () => {
           'dateField-month': '02',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -655,6 +685,7 @@ describe('formHelpers', () => {
           'dateField-month': '02',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -1043,7 +1074,7 @@ describe('formHelpers', () => {
       it('should collect errors from required and validate functions', () => {
         const req = {
           body: {
-            field1: 'value1',
+            field1: '', // Empty value so required function will trigger error
           },
           session: {},
         } as unknown as Request;

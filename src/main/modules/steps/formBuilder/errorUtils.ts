@@ -58,8 +58,12 @@ export function buildErrorSummary(
     return null;
   }
 
+  const titleTranslation = t('errors.title');
+  // Check if translation exists (not just the key itself)
+  const titleText = titleTranslation && titleTranslation !== 'errors.title' ? titleTranslation : 'There is a problem';
+
   return {
-    titleText: t('errors.title') || 'There is a problem',
+    titleText,
     errorList,
   };
 }
