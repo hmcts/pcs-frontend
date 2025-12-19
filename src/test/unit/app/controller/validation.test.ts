@@ -9,7 +9,7 @@ describe('validateForm', () => {
       { name: 'answer', type: 'radio', required: true, errorMessage: 'Please choose an option' },
     ];
 
-    const req = { body: {} } as Partial<Request>;
+    const req = { body: {}, session: {} } as Partial<Request>;
     const errors = validateForm(req as Request, fields);
 
     expect(errors.answer).toBe('Please choose an option');
@@ -20,7 +20,7 @@ describe('validateForm', () => {
       { name: 'choices', type: 'checkbox', required: true, errorMessage: 'Please select at least one' },
     ];
 
-    const req = { body: { choices: [] } } as Partial<Request>;
+    const req = { body: { choices: [] }, session: {} } as Partial<Request>;
     const errors = validateForm(req as Request, fields);
 
     expect(errors.choices).toBe('Please select at least one');
@@ -37,6 +37,7 @@ describe('validateForm', () => {
         answer: 'Yes',
         choices: ['option1'],
       },
+      session: {},
     } as Partial<Request>;
 
     const errors = validateForm(req as Request, fields);
