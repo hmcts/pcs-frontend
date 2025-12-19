@@ -9,12 +9,14 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block mainContent %}
-  {% if error %}
+  {% if errorSummary %}
     <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-      <h2 class="govuk-error-summary__title" id="error-summary-title">{{ errorSummaryTitle }}</h2>
+      <h2 class="govuk-error-summary__title" id="error-summary-title">{{ errorSummary.titleText }}</h2>
       <div class="govuk-error-summary__body">
         <ul class="govuk-list govuk-error-summary__list">
-          <li><a href="#{{ error.anchor or error.field }}">{{ error.text }}</a></li>
+          {% for error in errorSummary.errorList %}
+            <li><a href="{{ error.href }}">{{ error.text }}</a></li>
+          {% endfor %}
         </ul>
       </div>
     </div>
@@ -41,8 +43,63 @@
           {{ govukCharacterCount(field.component) }}
         {% elif field.componentType == 'radios' %}
           {{ govukRadios(field.component) }}
+          {# Render subFields for radio options - GOV.UK handles conditional reveal automatically #}
+          {# SubFields are rendered after the radios component, within conditional divs #}
+          {% if field.options %}
+            {% for option in field.options %}
+              {% if option.subFields %}
+                {% for subFieldName, subField in option.subFields %}
+                  {% if subField.component and subField.componentType %}
+                    {# GOV.UK conditional div - ID matches the pattern used by GOV.UK macros #}
+                    <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-{{ field.name }}-{{ loop.index0 }}">
+                      {% if subField.componentType == 'input' %}
+                        {{ govukInput(subField.component) }}
+                      {% elif subField.componentType == 'textarea' %}
+                        {{ govukTextarea(subField.component) }}
+                      {% elif subField.componentType == 'characterCount' %}
+                        {{ govukCharacterCount(subField.component) }}
+                      {% elif subField.componentType == 'radios' %}
+                        {{ govukRadios(subField.component) }}
+                      {% elif subField.componentType == 'checkboxes' %}
+                        {{ govukCheckboxes(subField.component) }}
+                      {% elif subField.componentType == 'dateInput' %}
+                        {{ govukDateInput(subField.component) }}
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
         {% elif field.componentType == 'checkboxes' %}
           {{ govukCheckboxes(field.component) }}
+          {# Render subFields for checkbox options - GOV.UK handles conditional reveal automatically #}
+          {% if field.options %}
+            {% for option in field.options %}
+              {% if option.subFields %}
+                {% for subFieldName, subField in option.subFields %}
+                  {% if subField.component and subField.componentType %}
+                    {# GOV.UK conditional div - ID matches the pattern used by GOV.UK macros #}
+                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-{{ field.name }}-{{ loop.index0 }}">
+                      {% if subField.componentType == 'input' %}
+                        {{ govukInput(subField.component) }}
+                      {% elif subField.componentType == 'textarea' %}
+                        {{ govukTextarea(subField.component) }}
+                      {% elif subField.componentType == 'characterCount' %}
+                        {{ govukCharacterCount(subField.component) }}
+                      {% elif subField.componentType == 'radios' %}
+                        {{ govukRadios(subField.component) }}
+                      {% elif subField.componentType == 'checkboxes' %}
+                        {{ govukCheckboxes(subField.component) }}
+                      {% elif subField.componentType == 'dateInput' %}
+                        {{ govukDateInput(subField.component) }}
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
         {% elif field.componentType == 'dateInput' %}
           {{ govukDateInput(field.component) }}
         {% endif %}

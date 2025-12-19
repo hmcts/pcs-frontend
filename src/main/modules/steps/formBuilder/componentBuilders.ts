@@ -1,6 +1,11 @@
 import type { TFunction } from 'i18next';
 
-import type { ComponentConfig, ComponentType, FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
+import type {
+  ComponentConfig,
+  ComponentType,
+  FormFieldConfig,
+  FormFieldOption,
+} from '../../../interfaces/formFieldConfig.interface';
 
 function createFieldsetLegend(
   label: string,
@@ -86,12 +91,31 @@ export function buildComponentConfig(
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
       component.fieldset = createFieldsetLegend(label, isFirstField);
+
+      // Build items with conditional content and subFields support
       component.items =
-        translatedOptions?.map(option => ({
-          value: option.value,
-          text: option.text,
-          checked: radioValue === option.value,
-        })) || [];
+        field.options?.map((option: FormFieldOption, optionIndex: number) => {
+          const item: Record<string, unknown> = {
+            value: option.value,
+            text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
+            checked: radioValue === option.value,
+          };
+
+          // Add conditional content if provided (already processed in fieldTranslation)
+          if (option.conditionalText && typeof option.conditionalText === 'string') {
+            item.conditional = {
+              html: option.conditionalText,
+            };
+          }
+
+          // Add subFields configuration for template rendering
+          if (option.subFields) {
+            item.subFields = option.subFields;
+          }
+
+          return item;
+        }) || [];
+
       componentType = 'radios';
       break;
     }
@@ -104,12 +128,31 @@ export function buildComponentConfig(
             ? [checkboxValue]
             : [];
       component.fieldset = createFieldsetLegend(label, isFirstField);
+
+      // Build items with conditional content and subFields support
       component.items =
-        translatedOptions?.map(option => ({
-          value: option.value,
-          text: option.text,
-          checked: checkboxArray.includes(option.value),
-        })) || [];
+        field.options?.map((option: FormFieldOption, optionIndex: number) => {
+          const item: Record<string, unknown> = {
+            value: option.value,
+            text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
+            checked: checkboxArray.includes(option.value),
+          };
+
+          // Add conditional content if provided (already processed in fieldTranslation)
+          if (option.conditionalText && typeof option.conditionalText === 'string') {
+            item.conditional = {
+              html: option.conditionalText,
+            };
+          }
+
+          // Add subFields configuration for template rendering
+          if (option.subFields) {
+            item.subFields = option.subFields;
+          }
+
+          return item;
+        }) || [];
+
       componentType = 'checkboxes';
       break;
     }

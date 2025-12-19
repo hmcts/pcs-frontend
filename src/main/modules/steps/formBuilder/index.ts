@@ -12,6 +12,7 @@ import { getTranslationFunction, loadStepNamespace } from '../i18n';
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
+import { validateConfigInDevelopment } from './schema';
 
 export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 
@@ -23,6 +24,9 @@ function camelToKebabCase(str: string): string {
 }
 
 export function createFormStep(config: FormBuilderConfig): StepDefinition {
+  // Validate config in development mode
+  validateConfigInDevelopment(config);
+
   const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
@@ -39,7 +43,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
 
         const t: TFunction = getTranslationFunction(req, stepName, ['common']);
 
-        const formContent = buildFormContent(fields, t, getFormData(req, stepName), undefined, translationKeys);
+        const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys);
         const result = extendGetContent ? { ...formContent, ...extendGetContent(req, {}) } : formContent;
 
         return {
