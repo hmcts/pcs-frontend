@@ -45,7 +45,14 @@
       "invalidDay": "Enter a valid day",
       "invalidMonth": "Enter a valid month",
       "invalidYear": "Enter a valid year",
-      "invalidValue": "Enter a valid value"
+      "invalidValue": "Enter a valid value",
+      "missingDay": "Date must include a day",
+      "missingMonth": "Date must include a month",
+      "missingYear": "Date must include a year",
+      "missingDayAndMonth": "Date must include a day and month",
+      "missingDayAndYear": "Date must include a day and year",
+      "missingMonthAndYear": "Date must include a month and year",
+      "missingTwo": "Date must include a [missing field] and [missing field]"
     }
   },
   "months": {

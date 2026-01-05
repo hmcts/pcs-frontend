@@ -1,6 +1,15 @@
 {
   "question": "Enter your date of birth",
   "errors": {
-    "dateOfBirth": "Enter your date of birth"
+    "dateOfBirth": {
+      "required": "Enter your date of birth",
+      "missingDay": "Your date of birth must include a day",
+      "missingMonth": "Your date of birth must include a month",
+      "missingYear": "Your date of birth must include a year",
+      "missingDayAndMonth": "Your date of birth must include a day and month",
+      "missingDayAndYear": "Your date of birth must include a day and year",
+      "missingMonthAndYear": "Your date of birth must include a month and year",
+      "custom": "You must be at least 18 years old"
+    }
   }
 }
