@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { getDashboardUrl } from '../../../app/utils/routes';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -60,7 +60,7 @@ export function createPostHandler(
         const bodyWithoutAction = { ...req.body };
         delete bodyWithoutAction.action;
         setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, getDashboardUrl(req.session?.ccdCase?.id));
+        return res.redirect(303, DASHBOARD_ROUTE);
       }
 
       processFieldData(req, fields);
