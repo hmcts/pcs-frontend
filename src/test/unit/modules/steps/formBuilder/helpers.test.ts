@@ -2,7 +2,6 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
-
 import {
   getFormData,
   getTranslation,
@@ -360,7 +359,7 @@ describe('formBuilder helpers', () => {
       const req = {
         session: {
           formData: {
-            'step1': {
+            step1: {
               field1: 'value1',
             },
           },
@@ -427,7 +426,7 @@ describe('formBuilder helpers', () => {
       const req = {
         session: {
           formData: {
-            'step1': {
+            step1: {
               field1: 'oldValue',
             },
           },
@@ -589,7 +588,7 @@ describe('formBuilder helpers', () => {
           {
             name: 'parentName',
             type: 'text',
-            required: (formData) => {
+            required: formData => {
               return parseInt(formData.age as string, 10) < 18;
             },
           },
@@ -607,7 +606,7 @@ describe('formBuilder helpers', () => {
           {
             name: 'parentName',
             type: 'text',
-            required: (formData) => {
+            required: formData => {
               return parseInt(formData.age as string, 10) < 18;
             },
           },
@@ -787,7 +786,7 @@ describe('formBuilder helpers', () => {
             name: 'birthDate',
             type: 'date',
             required: true,
-            validator: (dateValue) => {
+            validator: dateValue => {
               const date = new Date(
                 parseInt((dateValue as { year: string }).year, 10),
                 parseInt((dateValue as { month: string }).month, 10) - 1,
@@ -814,7 +813,7 @@ describe('formBuilder helpers', () => {
             name: 'birthDate',
             type: 'date',
             required: true,
-            validator: (dateValue) => {
+            validator: dateValue => {
               const year = parseInt((dateValue as { year: string }).year, 10);
               // Custom validation: reject years before 2000
               if (year < 2000) {
@@ -840,7 +839,7 @@ describe('formBuilder helpers', () => {
             name: 'birthDate',
             type: 'date',
             required: true,
-            validate: (dateValue) => {
+            validate: dateValue => {
               const year = parseInt((dateValue as { year: string }).year, 10);
               if (year < 1900) {
                 return 'Year must be 1900 or later';
@@ -865,7 +864,7 @@ describe('formBuilder helpers', () => {
             name: 'birthDate',
             type: 'date',
             required: true,
-            validate: (dateValue) => {
+            validate: dateValue => {
               const year = parseInt((dateValue as { year: string }).year, 10);
               if (year < 2010) {
                 return 'Year must be 2010 or later';
@@ -993,7 +992,7 @@ describe('formBuilder helpers', () => {
           {
             name: 'age',
             type: 'text',
-            validator: (value) => {
+            validator: value => {
               return parseInt(value as string, 10) >= 18;
             },
           },
@@ -1011,7 +1010,7 @@ describe('formBuilder helpers', () => {
           {
             name: 'age',
             type: 'text',
-            validator: (value) => {
+            validator: value => {
               return parseInt(value as string, 10) >= 18 ? true : 'Must be 18 or older';
             },
           },
@@ -1029,7 +1028,7 @@ describe('formBuilder helpers', () => {
           {
             name: 'age',
             type: 'text',
-            validator: (value) => {
+            validator: value => {
               return parseInt(value as string, 10) >= 18;
             },
           },
@@ -1126,7 +1125,7 @@ describe('formBuilder helpers', () => {
             name: 'email',
             type: 'text',
             required: false,
-            validate: (value) => {
+            validate: value => {
               return value === '' ? 'Email cannot be empty' : undefined;
             },
           },
@@ -1350,4 +1349,3 @@ describe('formBuilder helpers', () => {
     });
   });
 });
-
