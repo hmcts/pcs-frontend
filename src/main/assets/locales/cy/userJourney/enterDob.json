@@ -3,13 +3,8 @@
   "errors": {
     "dateOfBirth": {
       "required": "cyEnter your date of birth",
-      "missingDay": "cyYour date of birth must include a day",
-      "missingMonth": "cyYour date of birth must include a month",
-      "missingYear": "cyYour date of birth must include a year",
-      "missingDayAndMonth": "cyYour date of birth must include a day and month",
-      "missingDayAndYear": "cyYour date of birth must include a day and year",
-      "missingMonthAndYear": "cyYour date of birth must include a month and year",
-      "custom": "cyYou must be at least 18 years old"
+      "missingOne": "cyYour date of birth must include a {{missingField}}",
+      "missingTwo": "cyYour date of birth must include a {{first}} and {{second}}"
     }
   }
 }

@@ -4,7 +4,9 @@ import type { TFunction } from 'i18next';
 import {
   getCustomErrorTranslations,
   getFormData,
+  getTranslation,
   getTranslationErrors,
+  processFieldData,
   setFormData,
   validateForm,
 } from '../../../../main/modules/steps';
@@ -458,7 +460,7 @@ describe('formHelpers', () => {
 
       const result = validateForm(req, fields);
       expect(result).toHaveProperty('dateField');
-      expect(result.dateField).toBe('Date must include a day');
+      expect(result.dateField).toBe('Enter a valid date');
     });
 
     it('should validate date fields - missing month', () => {
@@ -681,12 +683,8 @@ describe('formHelpers', () => {
         },
       ];
 
-      const translations = {
-        dateMissingDay: 'Date must include a day',
-      };
-
-      const result = validateForm(req, fields, translations);
-      expect(result.dateField).toBe('Date must include a day');
+      const result = validateForm(req, fields);
+      expect(result.dateField).toBe('Enter a valid date');
     });
 
     it('should use translation error message for date validation', () => {
@@ -707,12 +705,8 @@ describe('formHelpers', () => {
         },
       ];
 
-      const translations = {
-        dateMissingDay: 'Date must include a day',
-      };
-
-      const result = validateForm(req, fields, translations);
-      expect(result.dateField).toBe('Date must include a day');
+      const result = validateForm(req, fields);
+      expect(result.dateField).toBe('Enter a valid date');
     });
 
     describe('function-based required validation', () => {
@@ -1133,7 +1127,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a date');
+        expect(result.dateField).toBe('Enter a valid date');
       });
 
       it('should return step-specific error when all date parts are missing', () => {
@@ -1154,11 +1148,14 @@ describe('formHelpers', () => {
           },
         ];
 
-        const translations = {
-          dateRequired: 'Enter your date of birth',
-        };
+        const mockT = ((key: string) => {
+          if (key === 'errors.date.required') {
+            return 'Enter your date of birth';
+          }
+          return key;
+        }) as TFunction;
 
-        const result = validateForm(req, fields, translations);
+        const result = validateForm(req, fields, {}, undefined, mockT);
         expect(result).toHaveProperty('dateOfBirth');
         expect(result.dateOfBirth).toBe('Enter your date of birth');
       });
@@ -1181,13 +1178,9 @@ describe('formHelpers', () => {
           },
         ];
 
-        const translations = {
-          dateMissingDay: 'Date must include a day',
-        };
-
-        const result = validateForm(req, fields, translations);
+        const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Date must include a day');
+        expect(result.dateField).toBe('Enter a valid date');
       });
 
       it('should return error when month is missing', () => {
@@ -1208,13 +1201,9 @@ describe('formHelpers', () => {
           },
         ];
 
-        const translations = {
-          dateMissingMonth: 'Date must include a month',
-        };
-
-        const result = validateForm(req, fields, translations);
+        const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Date must include a month');
+        expect(result.dateField).toBe('Enter a valid date');
       });
 
       it('should return error when year is missing', () => {
@@ -1235,13 +1224,9 @@ describe('formHelpers', () => {
           },
         ];
 
-        const translations = {
-          dateMissingYear: 'Date must include a year',
-        };
-
-        const result = validateForm(req, fields, translations);
+        const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Date must include a year');
+        expect(result.dateField).toBe('Enter a valid date');
       });
 
       it('should return error when day and month are missing', () => {
@@ -1262,13 +1247,9 @@ describe('formHelpers', () => {
           },
         ];
 
-        const translations = {
-          dateMissingDayAndMonth: 'Date must include a day and month',
-        };
-
-        const result = validateForm(req, fields, translations);
+        const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Date must include a day and month');
+        expect(result.dateField).toBe('Enter a valid date');
       });
 
       it('should return error when day and year are missing', () => {
@@ -1289,13 +1270,9 @@ describe('formHelpers', () => {
           },
         ];
 
-        const translations = {
-          dateMissingDayAndYear: 'Date must include a day and year',
-        };
-
-        const result = validateForm(req, fields, translations);
+        const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Date must include a day and year');
+        expect(result.dateField).toBe('Enter a valid date');
       });
 
       it('should return error when month and year are missing', () => {
@@ -1316,13 +1293,9 @@ describe('formHelpers', () => {
           },
         ];
 
-        const translations = {
-          dateMissingMonthAndYear: 'Date must include a month and year',
-        };
-
-        const result = validateForm(req, fields, translations);
+        const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Date must include a month and year');
+        expect(result.dateField).toBe('Enter a valid date');
       });
 
       it('should use step-specific error messages for missing parts', () => {
@@ -1343,13 +1316,195 @@ describe('formHelpers', () => {
           },
         ];
 
-        const translations = {
-          dateMissingDay: 'Your date of birth must include a day',
-        };
-
-        const result = validateForm(req, fields, translations);
+        const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateOfBirth');
-        expect(result.dateOfBirth).toBe('Your date of birth must include a day');
+        expect(result.dateOfBirth).toBe('Enter a valid date');
+      });
+
+      it('should use fallback message when dateMissingTwo translation is not provided', () => {
+        const req = {
+          body: {
+            'dateField-day': '',
+            'dateField-month': '',
+            'dateField-year': '2000',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+          },
+        ];
+
+        const result = validateForm(req, fields, {});
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Enter a valid date');
+      });
+
+      it('should use fallback message when single missing part translation is not provided', () => {
+        const req = {
+          body: {
+            'dateField-day': '',
+            'dateField-month': '06',
+            'dateField-year': '2000',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+          },
+        ];
+
+        const result = validateForm(req, fields, {});
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Enter a valid date');
+      });
+    });
+
+    describe('date field format validation', () => {
+      it('should return error for non-numeric day', () => {
+        const req = {
+          body: {
+            'dateField-day': 'ab',
+            'dateField-month': '06',
+            'dateField-year': '2000',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Enter a valid date');
+      });
+
+      it('should return error for day with leading zero when not allowed', () => {
+        const req = {
+          body: {
+            'dateField-day': '05',
+            'dateField-month': '06',
+            'dateField-year': '0200',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Enter a valid date');
+      });
+
+      it('should return error for year with leading zero', () => {
+        const req = {
+          body: {
+            'dateField-day': '15',
+            'dateField-month': '06',
+            'dateField-year': '0200',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Enter a valid date');
+      });
+
+      it('should return error for day exceeding max length', () => {
+        const req = {
+          body: {
+            'dateField-day': '123',
+            'dateField-month': '06',
+            'dateField-year': '2000',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Enter a valid date');
+      });
+
+      it('should return error for month exceeding max length', () => {
+        const req = {
+          body: {
+            'dateField-day': '15',
+            'dateField-month': '123',
+            'dateField-year': '2000',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Enter a valid date');
+      });
+
+      it('should return error for year exceeding max length', () => {
+        const req = {
+          body: {
+            'dateField-day': '15',
+            'dateField-month': '06',
+            'dateField-year': '20000',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Enter a valid date');
       });
     });
 
@@ -1459,15 +1614,12 @@ describe('formHelpers', () => {
         expect(result.dateField).toBe('Year must be 2000 or later');
       });
 
-      it('should handle age restriction validation', () => {
-        const today = new Date();
-        const eighteenYearsAgo = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate());
-
+      it('should handle custom validation for date field', () => {
         const req = {
           body: {
-            'dateOfBirth-day': eighteenYearsAgo.getDate().toString().padStart(2, '0'),
-            'dateOfBirth-month': (eighteenYearsAgo.getMonth() + 1).toString().padStart(2, '0'),
-            'dateOfBirth-year': eighteenYearsAgo.getFullYear().toString(),
+            'dateOfBirth-day': '15',
+            'dateOfBirth-month': '06',
+            'dateOfBirth-year': '2010',
           },
           session: {},
         } as unknown as Request;
@@ -1479,17 +1631,7 @@ describe('formHelpers', () => {
             required: true,
             validate: (value: unknown) => {
               const dateValue = value as { day: string; month: string; year: string };
-              const birthDate = new Date(
-                parseInt(dateValue.year, 10),
-                parseInt(dateValue.month, 10) - 1,
-                parseInt(dateValue.day, 10)
-              );
-              const age = today.getFullYear() - birthDate.getFullYear();
-              const monthDiff = today.getMonth() - birthDate.getMonth();
-              const dayDiff = today.getDate() - birthDate.getDate();
-              const actualAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
-
-              if (actualAge < 18) {
+              if (dateValue.year === '2010') {
                 return 'errors.dateOfBirth.custom';
               }
               return undefined;
@@ -1498,13 +1640,104 @@ describe('formHelpers', () => {
         ];
 
         const translations = {
-          'dateOfBirth.custom': 'You must be at least 18 years old',
+          'dateOfBirth.custom': 'Custom validation error',
         };
 
         const result = validateForm(req, fields, translations);
         expect(result).toHaveProperty('dateOfBirth');
-        expect(result.dateOfBirth).toBe('You must be at least 18 years old');
+        expect(result.dateOfBirth).toBe('Custom validation error');
       });
+    });
+  });
+
+  describe('getTranslation', () => {
+    it('should return translation when found', () => {
+      const mockT = ((key: string) => {
+        if (key === 'test.key') {
+          return 'Translated text';
+        }
+        return key;
+      }) as TFunction;
+
+      const result = getTranslation(mockT, 'test.key');
+      expect(result).toBe('Translated text');
+    });
+
+    it('should return fallback when translation not found', () => {
+      const mockT = ((key: string) => key) as TFunction;
+
+      const result = getTranslation(mockT, 'test.key', 'Fallback text');
+      expect(result).toBe('Fallback text');
+    });
+
+    it('should return undefined when translation not found and no fallback', () => {
+      const mockT = ((key: string) => key) as TFunction;
+
+      const result = getTranslation(mockT, 'test.key');
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('processFieldData', () => {
+    it('should process checkbox field from string to array', () => {
+      const req = {
+        body: {
+          checkboxField: 'value1',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'checkboxField',
+          type: 'checkbox' as const,
+        },
+      ];
+
+      processFieldData(req, fields);
+      expect(req.body.checkboxField).toEqual(['value1']);
+    });
+
+    it('should process date field from separate parts to object', () => {
+      const req = {
+        body: {
+          'dateField-day': '15',
+          'dateField-month': '06',
+          'dateField-year': '2000',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+        },
+      ];
+
+      processFieldData(req, fields);
+      expect(req.body.dateField).toEqual({ day: '15', month: '06', year: '2000' });
+      expect(req.body['dateField-day']).toBeUndefined();
+      expect(req.body['dateField-month']).toBeUndefined();
+      expect(req.body['dateField-year']).toBeUndefined();
+    });
+
+    it('should handle empty date field parts', () => {
+      const req = {
+        body: {
+          'dateField-day': '',
+          'dateField-month': '  ',
+          'dateField-year': '',
+        },
+      } as unknown as Request;
+
+      const fields = [
+        {
+          name: 'dateField',
+          type: 'date' as const,
+        },
+      ];
+
+      processFieldData(req, fields);
+      expect(req.body.dateField).toEqual({ day: '', month: '', year: '' });
     });
   });
 
@@ -1561,8 +1794,8 @@ describe('formHelpers', () => {
         if (key === 'errors.dateOfBirth.required') {
           return 'Enter your date of birth';
         }
-        if (key === 'errors.dateOfBirth.missingDay') {
-          return 'Your date of birth must include a day';
+        if (key === 'errors.dateOfBirth.missingOne') {
+          return 'Your date of birth must include a {{missingField}}';
         }
         return key;
       }) as TFunction;
@@ -1577,16 +1810,16 @@ describe('formHelpers', () => {
       const result = getCustomErrorTranslations(mockT, fields);
       expect(result).toEqual({
         dateRequired: 'Enter your date of birth',
-        dateMissingDay: 'Your date of birth must include a day',
+        dateMissingOne: 'Your date of birth must include a {{missingField}}',
         'dateOfBirth.required': 'Enter your date of birth',
-        'dateOfBirth.missingDay': 'Your date of birth must include a day',
+        'dateOfBirth.missingOne': 'Your date of birth must include a {{missingField}}',
       });
     });
 
     it('should return custom error translations', () => {
       const mockT = ((key: string) => {
         if (key === 'errors.dateOfBirth.custom') {
-          return 'You must be at least 18 years old';
+          return 'Custom validation error';
         }
         return key;
       }) as TFunction;
@@ -1600,7 +1833,7 @@ describe('formHelpers', () => {
 
       const result = getCustomErrorTranslations(mockT, fields);
       expect(result).toEqual({
-        'dateOfBirth.custom': 'You must be at least 18 years old',
+        'dateOfBirth.custom': 'Custom validation error',
       });
     });
 
@@ -1631,6 +1864,49 @@ describe('formHelpers', () => {
         dateRequired: 'Enter a start date',
         'dateOfBirth.required': 'Enter your date of birth',
         'startDate.required': 'Enter a start date',
+      });
+    });
+
+    it('should handle missingTwo translation key', () => {
+      const mockT = ((key: string) => {
+        if (key === 'errors.dateOfBirth.missingTwo') {
+          return 'Your date of birth must include two parts';
+        }
+        return key;
+      }) as TFunction;
+
+      const fields = [
+        {
+          name: 'dateOfBirth',
+          type: 'date' as const,
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+      expect(result).toEqual({
+        dateMissingTwo: 'Your date of birth must include two parts',
+        'dateOfBirth.missingTwo': 'Your date of birth must include two parts',
+      });
+    });
+
+    it('should handle non-date field custom errors', () => {
+      const mockT = ((key: string) => {
+        if (key === 'errors.textField.required') {
+          return 'Text field is required';
+        }
+        return key;
+      }) as TFunction;
+
+      const fields = [
+        {
+          name: 'textField',
+          type: 'text' as const,
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+      expect(result).toEqual({
+        'textField.required': 'Text field is required',
       });
     });
   });

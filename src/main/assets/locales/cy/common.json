@@ -46,13 +46,8 @@
       "invalidMonth": "cyEnter a valid month",
       "invalidYear": "cyEnter a valid year",
       "invalidValue": "cyEnter a valid value",
-      "missingDay": "cyDate must include a day",
-      "missingMonth": "cyDate must include a month",
-      "missingYear": "cyDate must include a year",
-      "missingDayAndMonth": "cyDate must include a day and month",
-      "missingDayAndYear": "cyDate must include a day and year",
-      "missingMonthAndYear": "cyDate must include a month and year",
-      "missingTwo": "cyDate must include a [missing field] and [missing field]"
+      "missingOne": "cyDate must include a {{missingField}}",
+      "missingTwo": "cyDate must include a {{first}} and {{second}}"
     }
   },
   "months": {

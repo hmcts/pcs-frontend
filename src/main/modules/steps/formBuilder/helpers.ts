@@ -28,57 +28,65 @@ function getDaysInMonth(month: number, year: number): number {
 }
 
 /**
- * Gets the appropriate date validation error message
- * Priority: dateInvalidDate > part-specific error > default message
- * @param translations - Optional translation object for error messages
- * @param partSpecificKey - Optional specific part error key (dateInvalidDay, dateInvalidMonth, dateInvalidYear)
+ * Gets the appropriate date validation error message using i18next
+ * @param t - Translation function from i18next
+ * @param partSpecificKey - Optional specific part error key (invalidDay, invalidMonth, invalidYear)
  * @returns Error message string
  */
-function getDateErrorMessage(
-  translations?: Record<string, string>,
-  partSpecificKey?: 'dateInvalidDay' | 'dateInvalidMonth' | 'dateInvalidYear'
-): string {
-  return translations?.dateInvalidDate || (partSpecificKey && translations?.[partSpecificKey]) || 'Enter a valid date';
+function getDateErrorMessage(t?: TFunction, partSpecificKey?: 'invalidDay' | 'invalidMonth' | 'invalidYear'): string {
+  if (t) {
+    const key = partSpecificKey ? `errors.date.${partSpecificKey}` : 'errors.date.notRealDate';
+    const translated = t(key);
+    if (translated !== key) {
+      return translated;
+    }
+  }
+  return 'Enter a valid date';
 }
 
 /**
- * Validates date field format and logical validity
- * Returns error message if invalid, null if valid
- * @param day - Day value (can be empty)
- * @param month - Month value (can be empty)
- * @param year - Year value (can be empty)
- * @param requireAllParts - If true, all parts must be provided
- * @param translations - Optional translation object for error messages
+ * Gets error message for missing date parts using i18next
+ * @param missingParts - Array of missing part names (e.g., ['day', 'month'])
+ * @param t - Translation function from i18next
+ * @returns Error message string
  */
-function capitalizeFirst(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function getMissingDatePartsError(missingParts: string[], translations?: Record<string, string>): string {
+function getMissingDatePartsError(missingParts: string[], t?: TFunction): string {
   if (missingParts.length === 3) {
-    return translations?.dateRequired || translations?.defaultRequired || 'Enter a date';
+    if (t) {
+      const translated = t('errors.date.required');
+      if (translated !== 'errors.date.required') {
+        return translated;
+      }
+    }
   }
 
   if (missingParts.length === 2) {
     const [first, second] = missingParts;
-    const key = `dateMissing${capitalizeFirst(first)}And${capitalizeFirst(second)}`;
-    if (translations?.[key]) {
-      return translations[key];
+    if (t) {
+      const translated = t('errors.date.missingTwo', { first, second });
+      if (translated !== 'errors.date.missingTwo') {
+        return translated;
+      }
     }
-    const fallbackKey = translations?.dateMissingTwo;
-    if (fallbackKey) {
-      return fallbackKey.replace('[missing field]', first).replace('[missing field]', second);
-    }
-    return `Date must include a ${first} and ${second}`;
   }
 
   if (missingParts.length === 1) {
     const part = missingParts[0];
-    const key = `dateMissing${capitalizeFirst(part)}`;
-    return translations?.[key] || `Date must include a ${part}`;
+    if (t) {
+      const translated = t('errors.date.missingOne', { missingField: part });
+      if (translated !== 'errors.date.missingOne') {
+        return translated;
+      }
+    }
   }
 
-  return translations?.dateRequired || 'Enter a date';
+  if (t) {
+    const translated = t('errors.date.required');
+    if (translated !== 'errors.date.required') {
+      return translated;
+    }
+  }
+  return 'Enter a valid date';
 }
 
 function validateDateField(
@@ -86,7 +94,7 @@ function validateDateField(
   month: string,
   year: string,
   requireAllParts: boolean,
-  translations?: Record<string, string>
+  t?: TFunction
 ): string | null {
   const isNumeric = (s: string) => /^\d+$/.test(s);
   const hasDay = !!day;
@@ -106,7 +114,7 @@ function validateDateField(
     if (!hasYear) {
       missingParts.push('year');
     }
-    return getMissingDatePartsError(missingParts, translations);
+    return getMissingDatePartsError(missingParts, t);
   }
 
   if (!requireAllParts && !hasAnyPart) {
@@ -118,33 +126,34 @@ function validateDateField(
     maxLength: number,
     min: number,
     max: number,
-    errorKey: 'dateInvalidDay' | 'dateInvalidMonth' | 'dateInvalidYear',
+    errorKey: 'invalidDay' | 'invalidMonth' | 'invalidYear',
     noLeadingZero = false
   ): string | null => {
     if (!value) {
       return null;
     }
-    if (!isNumeric(value) || value.length > maxLength || (noLeadingZero && value.startsWith('0'))) {
-      return getDateErrorMessage(translations, errorKey);
+    const isInvalidFormat = !isNumeric(value) || value.length > maxLength || (noLeadingZero && value.startsWith('0'));
+    if (isInvalidFormat) {
+      return getDateErrorMessage(t, errorKey);
     }
     const num = parseInt(value, 10);
     if (num < min || num > max) {
-      return getDateErrorMessage(translations, errorKey);
+      return getDateErrorMessage(t, errorKey);
     }
     return null;
   };
 
-  const dayError = validateDatePart(day, 2, 1, 31, 'dateInvalidDay');
+  const dayError = validateDatePart(day, 2, 1, 31, 'invalidDay');
   if (dayError) {
     return dayError;
   }
 
-  const monthError = validateDatePart(month, 2, 1, 12, 'dateInvalidMonth');
+  const monthError = validateDatePart(month, 2, 1, 12, 'invalidMonth');
   if (monthError) {
     return monthError;
   }
 
-  const yearError = validateDatePart(year, 4, 1, 9999, 'dateInvalidYear', true);
+  const yearError = validateDatePart(year, 4, 1, 9999, 'invalidYear', true);
   if (yearError) {
     return yearError;
   }
@@ -157,7 +166,7 @@ function validateDateField(
     if (!isNaN(dayNum) && !isNaN(monthNum) && !isNaN(yearNum)) {
       const maxDays = getDaysInMonth(monthNum, yearNum);
       if (dayNum > maxDays) {
-        return getDateErrorMessage(translations);
+        return getDateErrorMessage(t);
       }
     }
   }
@@ -202,27 +211,17 @@ export function getTranslationErrors(t: TFunction, fields: FormFieldConfig[]): R
 }
 
 function getDateTranslationKey(nestedKey: string): string | null {
-  if (nestedKey === 'required') {
-    return 'dateRequired';
-  }
-  if (nestedKey.startsWith('missing')) {
-    return `date${capitalizeFirst(nestedKey)}`;
-  }
-  return null;
+  const keyMap: Record<string, string> = {
+    required: 'dateRequired',
+    missingOne: 'dateMissingOne',
+    missingTwo: 'dateMissingTwo',
+  };
+  return keyMap[nestedKey] || null;
 }
 
 export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
   const stepSpecificErrors: Record<string, string> = {};
-  const nestedKeys = [
-    'required',
-    'custom',
-    'missingDay',
-    'missingMonth',
-    'missingYear',
-    'missingDayAndMonth',
-    'missingDayAndYear',
-    'missingMonthAndYear',
-  ];
+  const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo'];
 
   for (const field of fields) {
     for (const nestedKey of nestedKeys) {
@@ -258,7 +257,8 @@ export function validateForm(
   req: Request,
   fields: FormFieldConfig[],
   translations?: Record<string, string>,
-  allFormData?: Record<string, unknown>
+  allFormData?: Record<string, unknown>,
+  t?: TFunction
 ): Record<string, string> {
   const errors: Record<string, string> = {};
   const formData: Record<string, unknown> = { ...req.body };
@@ -317,7 +317,7 @@ export function validateForm(
       const month = req.body[monthKey]?.trim() || '';
       const year = req.body[yearKey]?.trim() || '';
 
-      const dateError = validateDateField(day, month, year, isRequired, translations);
+      const dateError = validateDateField(day, month, year, isRequired, t);
       if (dateError) {
         errors[fieldName] = dateError;
       }
@@ -337,16 +337,14 @@ export function validateForm(
         }
       }
 
-      if (field.validate && (!errors[fieldName] || Object.keys(errors).length === 0)) {
+      if (field.validate && !errors[fieldName]) {
         const dateValue = { day, month, year };
         try {
           const customError = field.validate(dateValue, formData, validationAllData);
           if (customError) {
-            let errorMessage = customError;
-            if (customError.startsWith('errors.')) {
-              const translationKey = customError.replace('errors.', '');
-              errorMessage = translations?.[translationKey] || customError;
-            }
+            const errorMessage = customError.startsWith('errors.')
+              ? translations?.[customError.replace('errors.', '')] || customError
+              : customError;
             errors[fieldName] = errorMessage;
           }
         } catch (err) {
@@ -356,7 +354,7 @@ export function validateForm(
     } else {
       const isMissing =
         field.type === 'checkbox'
-          ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && value.trim() === '')
+          ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())
           : value === undefined || value === null || value === '';
 
       if (isRequired && isMissing) {

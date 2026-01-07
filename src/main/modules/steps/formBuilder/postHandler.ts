@@ -50,31 +50,9 @@ export function createPostHandler(
 
       const fieldsWithLabels = translateFields(fields, t, {}, {}, false);
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
-      const dateErrorKeys = [
-        'required',
-        'notRealDate',
-        'invalidDay',
-        'invalidMonth',
-        'invalidYear',
-        'missingDay',
-        'missingMonth',
-        'missingYear',
-        'missingDayAndMonth',
-        'missingDayAndYear',
-        'missingMonthAndYear',
-        'missingTwo',
-      ];
-      const commonDateErrors = dateErrorKeys.reduce(
-        (acc, key) => {
-          const camelKey = `date${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, '$1')}`;
-          acc[camelKey] = t(`errors.date.${key}`);
-          return acc;
-        },
-        {} as Record<string, string>
-      );
       const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
-      const translations = { ...commonDateErrors, ...fieldErrors, ...stepSpecificErrors };
-      const errors = validateForm(req, fieldsWithLabels, translations, allFormData);
+      const translations = { ...fieldErrors, ...stepSpecificErrors };
+      const errors = validateForm(req, fieldsWithLabels, translations, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
         const formContent = buildFormContent(fields, t, req.body, errors, translationKeys);
