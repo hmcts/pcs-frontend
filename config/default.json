@@ -13,7 +13,7 @@
     },
     "timeout": {
       "sessionWarningMinutes": 5,
-      "sessionTimeoutMinutes": 6,
+      "sessionTimeoutMinutes": 90,
       "checkIntervalSeconds": 10
     }
   },
