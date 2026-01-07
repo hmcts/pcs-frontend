@@ -1368,6 +1368,166 @@ describe('formHelpers', () => {
       });
     });
 
+    describe('date field future date validation', () => {
+      it('should return error when date is in the future and noFutureDate is true', () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const req = {
+          body: {
+            'dateField-day': tomorrow.getDate().toString().padStart(2, '0'),
+            'dateField-month': (tomorrow.getMonth() + 1).toString().padStart(2, '0'),
+            'dateField-year': tomorrow.getFullYear().toString(),
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+            noFutureDate: true,
+          },
+        ];
+
+        const mockT = ((key: string) => {
+          if (key === 'errors.date.futureDate') {
+            return 'Date must be in the past';
+          }
+          return key;
+        }) as TFunction;
+
+        const result = validateForm(req, fields, {}, undefined, mockT);
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Date must be in the past');
+      });
+
+      it('should return error when date is today and noFutureDate is true', () => {
+        const today = new Date();
+
+        const req = {
+          body: {
+            'dateField-day': today.getDate().toString().padStart(2, '0'),
+            'dateField-month': (today.getMonth() + 1).toString().padStart(2, '0'),
+            'dateField-year': today.getFullYear().toString(),
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+            noFutureDate: true,
+          },
+        ];
+
+        const mockT = ((key: string) => {
+          if (key === 'errors.date.futureDate') {
+            return 'Date must be in the past';
+          }
+          return key;
+        }) as TFunction;
+
+        const result = validateForm(req, fields, {}, undefined, mockT);
+        expect(result).toHaveProperty('dateField');
+        expect(result.dateField).toBe('Date must be in the past');
+      });
+
+      it('should allow past date when noFutureDate is true', () => {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const req = {
+          body: {
+            'dateField-day': yesterday.getDate().toString().padStart(2, '0'),
+            'dateField-month': (yesterday.getMonth() + 1).toString().padStart(2, '0'),
+            'dateField-year': yesterday.getFullYear().toString(),
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+            noFutureDate: true,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).not.toHaveProperty('dateField');
+      });
+
+      it('should allow future date when noFutureDate is false or undefined', () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const req = {
+          body: {
+            'dateField-day': tomorrow.getDate().toString().padStart(2, '0'),
+            'dateField-month': (tomorrow.getMonth() + 1).toString().padStart(2, '0'),
+            'dateField-year': tomorrow.getFullYear().toString(),
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateField',
+            type: 'date' as const,
+            required: true,
+            noFutureDate: false,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).not.toHaveProperty('dateField');
+      });
+
+      it('should use step-specific error message for future date', () => {
+        const today = new Date();
+
+        const req = {
+          body: {
+            'dateOfBirth-day': today.getDate().toString().padStart(2, '0'),
+            'dateOfBirth-month': (today.getMonth() + 1).toString().padStart(2, '0'),
+            'dateOfBirth-year': today.getFullYear().toString(),
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'dateOfBirth',
+            type: 'date' as const,
+            required: true,
+            noFutureDate: true,
+          },
+        ];
+
+        const mockT = ((key: string) => {
+          if (key === 'errors.dateOfBirth.futureDate') {
+            return 'Your date of birth must be in the past';
+          }
+          if (key === 'errors.date.futureDate') {
+            return 'Date must be in the past';
+          }
+          return key;
+        }) as TFunction;
+
+        const stepSpecificErrors = getCustomErrorTranslations(mockT, fields);
+        const translations = { ...stepSpecificErrors };
+
+        const result = validateForm(req, fields, translations, undefined, mockT);
+        expect(result).toHaveProperty('dateOfBirth');
+        expect(result.dateOfBirth).toBe('Your date of birth must be in the past');
+      });
+    });
+
     describe('date field format validation', () => {
       it('should return error for non-numeric day', () => {
         const req = {

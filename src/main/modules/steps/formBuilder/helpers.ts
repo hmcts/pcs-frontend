@@ -21,7 +21,14 @@ function getDaysInMonth(month: number, year: number): number {
   return daysInMonth[month - 1] || 31;
 }
 
-function getDateErrorMessage(t?: TFunction, partSpecificKey?: 'invalidDay' | 'invalidMonth' | 'invalidYear'): string {
+function getDateErrorMessage(
+  t?: TFunction,
+  partSpecificKey?: 'invalidDay' | 'invalidMonth' | 'invalidYear' | 'futureDate',
+  translations?: Record<string, string>
+): string {
+  if (partSpecificKey === 'futureDate' && translations?.dateFutureDate) {
+    return translations.dateFutureDate;
+  }
   if (!t) {
     return 'Enter a valid date';
   }
@@ -35,25 +42,24 @@ function getMissingDatePartsError(missingParts: string[], t?: TFunction): string
     return 'Enter a valid date';
   }
 
+  const translate = (key: string, params?: Record<string, string>): string => {
+    const translated = params ? t(key, params) : t(key);
+    return translated !== key ? translated : 'Enter a valid date';
+  };
+
   if (missingParts.length === 3) {
-    const translated = t('errors.date.required');
-    return translated !== 'errors.date.required' ? translated : 'Enter a valid date';
+    return translate('errors.date.required');
   }
 
   if (missingParts.length === 2) {
-    const [first, second] = missingParts;
-    const translated = t('errors.date.missingTwo', { first, second });
-    return translated !== 'errors.date.missingTwo' ? translated : 'Enter a valid date';
+    return translate('errors.date.missingTwo', { first: missingParts[0], second: missingParts[1] });
   }
 
   if (missingParts.length === 1) {
-    const part = missingParts[0];
-    const translated = t('errors.date.missingOne', { missingField: part });
-    return translated !== 'errors.date.missingOne' ? translated : 'Enter a valid date';
+    return translate('errors.date.missingOne', { missingField: missingParts[0] });
   }
 
-  const translated = t('errors.date.required');
-  return translated !== 'errors.date.required' ? translated : 'Enter a valid date';
+  return translate('errors.date.required');
 }
 
 function validateDateField(
@@ -61,7 +67,9 @@ function validateDateField(
   month: string,
   year: string,
   requireAllParts: boolean,
-  t?: TFunction
+  t?: TFunction,
+  noFutureDate = false,
+  translations?: Record<string, string>
 ): string | null {
   const isNumeric = (s: string) => /^\d+$/.test(s);
   const hasDay = !!day;
@@ -70,16 +78,9 @@ function validateDateField(
   const hasAllParts = hasDay && hasMonth && hasYear;
 
   if (requireAllParts && !hasAllParts) {
-    const missingParts: string[] = [];
-    if (!hasDay) {
-      missingParts.push('day');
-    }
-    if (!hasMonth) {
-      missingParts.push('month');
-    }
-    if (!hasYear) {
-      missingParts.push('year');
-    }
+    const missingParts = ['day', 'month', 'year'].filter((part, idx) => {
+      return (idx === 0 && !hasDay) || (idx === 1 && !hasMonth) || (idx === 2 && !hasYear);
+    });
     return getMissingDatePartsError(missingParts, t);
   }
 
@@ -100,10 +101,10 @@ function validateDateField(
     }
     const isInvalidFormat = !isNumeric(value) || value.length > maxLength || (noLeadingZero && value.startsWith('0'));
     if (isInvalidFormat) {
-      return getDateErrorMessage(t, errorKey);
+      return getDateErrorMessage(t, errorKey, translations);
     }
     const num = parseInt(value, 10);
-    return num < min || num > max ? getDateErrorMessage(t, errorKey) : null;
+    return num < min || num > max ? getDateErrorMessage(t, errorKey, translations) : null;
   };
 
   const dayError = validateDatePart(day, 2, 1, 31, 'invalidDay');
@@ -121,16 +122,31 @@ function validateDateField(
     return yearError;
   }
 
-  if (hasAllParts) {
-    const dayNum = parseInt(day, 10);
-    const monthNum = parseInt(month, 10);
-    const yearNum = parseInt(year, 10);
+  if (!hasAllParts) {
+    return null;
+  }
 
-    if (!isNaN(dayNum) && !isNaN(monthNum) && !isNaN(yearNum)) {
-      const maxDays = getDaysInMonth(monthNum, yearNum);
-      if (dayNum > maxDays) {
-        return getDateErrorMessage(t);
-      }
+  const dayNum = parseInt(day, 10);
+  const monthNum = parseInt(month, 10);
+  const yearNum = parseInt(year, 10);
+
+  if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) {
+    return null;
+  }
+
+  const maxDays = getDaysInMonth(monthNum, yearNum);
+  if (dayNum > maxDays) {
+    return getDateErrorMessage(t, undefined, translations);
+  }
+
+  if (noFutureDate) {
+    const inputDate = new Date(yearNum, monthNum - 1, dayNum);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    inputDate.setHours(0, 0, 0, 0);
+
+    if (inputDate >= today) {
+      return getDateErrorMessage(t, 'futureDate', translations);
     }
   }
 
@@ -178,13 +194,14 @@ function getDateTranslationKey(nestedKey: string): string | null {
     required: 'dateRequired',
     missingOne: 'dateMissingOne',
     missingTwo: 'dateMissingTwo',
+    futureDate: 'dateFutureDate',
   };
   return keyMap[nestedKey] || null;
 }
 
 export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
   const stepSpecificErrors: Record<string, string> = {};
-  const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo'];
+  const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate'];
 
   for (const field of fields) {
     for (const nestedKey of nestedKeys) {
@@ -262,11 +279,10 @@ export function validateForm(
 
     if (parentFieldName) {
       const parentValue = formData[parentFieldName];
-      if (typeof parentValue === 'object' && parentValue !== null) {
-        value = (parentValue as Record<string, unknown>)[field.name];
-      } else {
-        value = req.body[fieldName] || formData[fieldName];
-      }
+      value =
+        typeof parentValue === 'object' && parentValue !== null
+          ? (parentValue as Record<string, unknown>)[field.name]
+          : req.body[fieldName] || formData[fieldName];
     } else {
       value = req.body[field.name];
     }
@@ -280,15 +296,17 @@ export function validateForm(
       const month = req.body[monthKey]?.trim() || '';
       const year = req.body[yearKey]?.trim() || '';
 
-      const dateError = validateDateField(day, month, year, isRequired, t);
+      const dateError = validateDateField(day, month, year, isRequired, t, field.noFutureDate, translations);
       if (dateError) {
         errors[fieldName] = dateError;
       }
 
-      if (field.validator && value !== undefined) {
+      const dateValue = { day, month, year };
+
+      if (field.validator && value !== undefined && !errors[fieldName]) {
         try {
-          const validatorResult = field.validator({ day, month, year }, formData, validationAllData);
-          if (validatorResult !== true && !errors[fieldName]) {
+          const validatorResult = field.validator(dateValue, formData, validationAllData);
+          if (validatorResult !== true) {
             errors[fieldName] = typeof validatorResult === 'string' ? validatorResult : 'Invalid date';
           }
         } catch (err) {
@@ -298,7 +316,7 @@ export function validateForm(
 
       if (field.validate && !errors[fieldName]) {
         try {
-          const customError = field.validate({ day, month, year }, formData, validationAllData);
+          const customError = field.validate(dateValue, formData, validationAllData);
           if (customError) {
             errors[fieldName] = customError.startsWith('errors.')
               ? translations?.[customError.replace('errors.', '')] || customError
@@ -369,24 +387,21 @@ export function validateForm(
     }
 
     if ((field.type === 'radio' || field.type === 'checkbox') && field.options) {
-      let fieldValue: unknown;
-      if (parentFieldName) {
-        const parentValue = formData[parentFieldName];
-        if (typeof parentValue === 'object' && parentValue !== null) {
-          fieldValue = (parentValue as Record<string, unknown>)[field.name];
-        }
-        if (fieldValue === undefined) {
-          fieldValue = formData[getNestedFieldName(parentFieldName, field.name)];
-        }
-      } else {
-        fieldValue = formData[field.name] || req.body[field.name];
-      }
+      const fieldValue = parentFieldName
+        ? (() => {
+            const parentValue = formData[parentFieldName];
+            const nestedValue =
+              typeof parentValue === 'object' && parentValue !== null
+                ? (parentValue as Record<string, unknown>)[field.name]
+                : undefined;
+            return nestedValue ?? formData[getNestedFieldName(parentFieldName, field.name)];
+          })()
+        : formData[field.name] || req.body[field.name];
 
       for (const option of field.options) {
         if (option.subFields && isOptionSelected(fieldValue, option.value, field.type)) {
           for (const [subFieldName, subField] of Object.entries(option.subFields)) {
-            const subFieldWithName = { ...subField, name: subFieldName };
-            validateField(subFieldWithName, field.name, option.value);
+            validateField({ ...subField, name: subFieldName }, field.name, option.value);
           }
         }
       }

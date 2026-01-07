@@ -10,6 +10,7 @@ export const step: StepDefinition = createFormStep({
       name: 'dateOfBirth',
       type: 'date',
       required: true,
+      noFutureDate: true,
       translationKey: {
         label: 'question',
       },

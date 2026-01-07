@@ -45,6 +45,7 @@
       "invalidDay": "Enter a valid day",
       "invalidMonth": "Enter a valid month",
       "invalidYear": "Enter a valid year",
+      "futureDate": "Date must be in the past",
       "invalidValue": "Enter a valid value",
       "missingOne": "Date must include a {{missingField}}",
       "missingTwo": "Date must include a {{first}} and {{second}}"

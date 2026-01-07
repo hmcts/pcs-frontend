@@ -51,8 +51,7 @@ export function createPostHandler(
       const fieldsWithLabels = translateFields(fields, t, {}, {}, false);
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
       const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
-      const translations = { ...fieldErrors, ...stepSpecificErrors };
-      const errors = validateForm(req, fieldsWithLabels, translations, allFormData, t);
+      const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
         const formContent = buildFormContent(fields, t, req.body, errors, translationKeys);
@@ -61,8 +60,7 @@ export function createPostHandler(
       }
 
       processFieldData(req, fields);
-      const bodyWithoutAction = { ...req.body };
-      delete bodyWithoutAction.action;
+      const { action: _, ...bodyWithoutAction } = req.body;
       setFormData(req, stepName, bodyWithoutAction);
 
       if (action === 'saveForLater') {
