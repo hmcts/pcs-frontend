@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as path from 'path';
 
 import * as nunjucks from 'nunjucks';
@@ -5,15 +6,41 @@ import * as nunjucks from 'nunjucks';
 import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
 import { buildSubFieldsHTML } from '../../../../../main/modules/steps/formBuilder/subFieldsRenderer';
 
+// Resolve paths using process.cwd() for better compatibility with different environments (local, CI, etc.)
+// In Jest, __dirname points to the compiled JS location, so we need to find the project root
+// by looking for package.json or using process.cwd()
+const findProjectRoot = (): string => {
+  let currentDir = __dirname;
+  while (currentDir !== path.dirname(currentDir)) {
+    const packageJsonPath = path.join(currentDir, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      return currentDir;
+    }
+    currentDir = path.dirname(currentDir);
+  }
+  // Fallback to process.cwd() if we can't find package.json
+  return process.cwd();
+};
+
+const projectRoot = findProjectRoot();
+const viewsPath = path.resolve(projectRoot, 'src/main/views');
+const stepsPath = path.resolve(projectRoot, 'src/main/steps');
+
 // Resolve GOV.UK frontend templates path for fallback (in case webpack build hasn't run)
 // The template references "govuk/components/input/macro.njk", so we need the dist directory
-const govukFrontendPath = path.resolve(require.resolve('govuk-frontend'), '../dist');
+let govukFrontendPath: string;
+try {
+  govukFrontendPath = path.resolve(require.resolve('govuk-frontend'), '../dist');
+} catch {
+  // Fallback if govuk-frontend is not found
+  govukFrontendPath = path.resolve(projectRoot, 'node_modules/govuk-frontend/dist');
+}
 
 // Create a nunjucks environment for testing
 const nunjucksEnv = nunjucks.configure(
   [
-    path.join(__dirname, '../../../../../main/views'),
-    path.join(__dirname, '../../../../../main/steps'),
+    viewsPath,
+    stepsPath,
     govukFrontendPath, // Fallback to node_modules for GOV.UK templates
   ],
   {
