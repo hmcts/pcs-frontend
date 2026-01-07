@@ -250,9 +250,10 @@ export function validateForm(
           : value === undefined || value === null || value === '';
 
       if (isRequired && isMissing) {
-        // Check translations first (which contains translated errorMessage), then defaults
-        // Don't use field.errorMessage directly as it's a translation key, not a translated message
-        errors[fieldName] = translations?.[fieldName] || translations?.defaultRequired || 'This field is required';
+        // Check translations first (which contains translated errorMessage), then field.errorMessage, then defaults
+        // field.errorMessage can be either a translation key or a direct message
+        errors[fieldName] =
+          translations?.[fieldName] || field.errorMessage || translations?.defaultRequired || 'This field is required';
       }
 
       // Run validator function if provided (field-level validation)
@@ -287,8 +288,9 @@ export function validateForm(
           const regex = new RegExp(field.pattern);
           if (!regex.test(value.trim())) {
             if (!errors[fieldName]) {
-              // Use translated error message if available, otherwise use default
-              errors[fieldName] = translations?.[fieldName] || translations?.defaultInvalid || 'Invalid format';
+              // Use translated error message if available, then field.errorMessage, then default
+              errors[fieldName] =
+                translations?.[fieldName] || field.errorMessage || translations?.defaultInvalid || 'Invalid format';
             }
           }
         }
