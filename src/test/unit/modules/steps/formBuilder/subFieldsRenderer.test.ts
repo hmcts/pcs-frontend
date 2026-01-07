@@ -5,23 +5,21 @@ import * as nunjucks from 'nunjucks';
 import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
 import { buildSubFieldsHTML } from '../../../../../main/modules/steps/formBuilder/subFieldsRenderer';
 
-// Resolve GOV.UK frontend templates path for fallback (in case webpack build hasn't run)
-// The template references "govuk/components/input/macro.njk", so we need the dist directory
-const govukFrontendPath = path.resolve(require.resolve('govuk-frontend'), '../dist');
-
 // Create a nunjucks environment for testing
-const nunjucksEnv = nunjucks.configure(
-  [
-    path.join(__dirname, '../../../../../main/views'),
-    path.join(__dirname, '../../../../../main/steps'),
-    govukFrontendPath, // Fallback to node_modules for GOV.UK templates
-  ],
-  {
-    autoescape: true,
-    watch: false,
-    noCache: true,
-  }
-);
+// Include both potential GOV.UK template locations - nunjucks will resolve from whichever exists
+// 1. Webpack-built location (if webpack has run)
+// 2. node_modules fallback (if yarn install has run but webpack hasn't)
+const templatePaths = [
+  path.join(__dirname, '../../../../../main/views'), // Webpack copies templates here
+  path.join(__dirname, '../../../../../main/steps'),
+  path.join(__dirname, '../../../../../node_modules/govuk-frontend/dist'), // Fallback from node_modules
+];
+
+const nunjucksEnv = nunjucks.configure(templatePaths, {
+  autoescape: true,
+  watch: false,
+  noCache: true,
+});
 
 describe('subFieldsRenderer', () => {
   describe('buildSubFieldsHTML', () => {
