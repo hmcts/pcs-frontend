@@ -18,7 +18,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'enter-other-reason': enterOtherReason,
   'enter-contact-preferences': enterContactPreferences,
   ineligible,
-  'enter-contact-preferences': enterContactPreferences,
   'enter-user-details': enterUserDetails,
   'enter-address': enterAddress,
   summary,

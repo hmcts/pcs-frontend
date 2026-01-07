@@ -280,7 +280,6 @@ export function translateFields(
       text: option.text || option.value,
     }));
     // For nested fields (subFields), extract simple name to look up values
-    // For nested fields (subFields), extract simple name to look up values
     // field.name might be nested (e.g., "parent.subField") but fieldValues is keyed by simple names
     const fieldNameForValueLookup =
       fieldPrefix && field.name.includes('.') ? field.name.split('.').pop() || field.name : field.name;
