@@ -1933,6 +1933,139 @@ describe('formHelpers', () => {
       const result = getTranslationErrors(mockT, fields);
       expect(result).toEqual({ testField: 'Test error message' });
     });
+
+    it('should handle errorMessage property on field', () => {
+      const mockT = ((key: string) => {
+        if (key === 'errors.customError') {
+          return 'Custom error from property';
+        }
+        return key;
+      }) as TFunction;
+
+      const fields = [
+        {
+          name: 'testField',
+          type: 'text' as const,
+          errorMessage: 'errors.customError',
+        },
+      ];
+
+      const result = getTranslationErrors(mockT, fields);
+      expect(result).toEqual({ testField: 'Custom error from property' });
+    });
+
+    it('should handle subFields with errorMessage', () => {
+      const mockT = ((key: string) => {
+        if (key === 'errors.emailAddress') {
+          return 'Email address error';
+        }
+        return key;
+      }) as TFunction;
+
+      const fields = [
+        {
+          name: 'contactMethod',
+          type: 'radio' as const,
+          options: [
+            {
+              value: 'email',
+              subFields: {
+                emailAddress: {
+                  name: 'emailAddress',
+                  type: 'text' as const,
+                  errorMessage: 'errors.emailAddress',
+                },
+              },
+            },
+          ],
+        },
+      ];
+
+      const result = getTranslationErrors(mockT, fields);
+      expect(result).toEqual({ 'contactMethod.emailAddress': 'Email address error' });
+    });
+
+    it('should handle nested subFields recursively', () => {
+      const mockT = ((key: string) => {
+        if (key === 'errors.nestedField') {
+          return 'Nested field error';
+        }
+        return key;
+      }) as TFunction;
+
+      const fields = [
+        {
+          name: 'parent',
+          type: 'radio' as const,
+          options: [
+            {
+              value: 'option1',
+              subFields: {
+                child: {
+                  name: 'child',
+                  type: 'radio' as const,
+                  options: [
+                    {
+                      value: 'nested',
+                      subFields: {
+                        nestedField: {
+                          name: 'nestedField',
+                          type: 'text' as const,
+                          errorMessage: 'errors.nestedField',
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      ];
+
+      const result = getTranslationErrors(mockT, fields);
+      // The function uses field.name (not nested name) as parent, so nestedField under child becomes child.nestedField
+      expect(result).toEqual({ 'child.nestedField': 'Nested field error' });
+    });
+
+    it('should not add translation when errorMessage does not start with errors.', () => {
+      const mockT = ((key: string) => key) as TFunction;
+
+      const fields = [
+        {
+          name: 'testField',
+          type: 'text' as const,
+          errorMessage: 'custom.error', // Doesn't start with 'errors.'
+        },
+      ];
+
+      const result = getTranslationErrors(mockT, fields);
+      expect(result).toEqual({});
+    });
+
+    it('should prioritize errorMessage property over field name translation', () => {
+      const mockT = ((key: string) => {
+        if (key === 'errors.testField') {
+          return 'Field name translation';
+        }
+        if (key === 'errors.customError') {
+          return 'Custom error message';
+        }
+        return key;
+      }) as TFunction;
+
+      const fields = [
+        {
+          name: 'testField',
+          type: 'text' as const,
+          errorMessage: 'errors.customError',
+        },
+      ];
+
+      const result = getTranslationErrors(mockT, fields);
+      // errorMessage property should take precedence
+      expect(result).toEqual({ testField: 'Custom error message' });
+    });
   });
 
   describe('getCustomErrorTranslations', () => {
@@ -2047,6 +2180,69 @@ describe('formHelpers', () => {
         dateMissingTwo: 'Your date of birth must include two parts',
         'dateOfBirth.missingTwo': 'Your date of birth must include two parts',
       });
+    });
+
+    it('should handle futureDate translation key for date fields', () => {
+      const mockT = ((key: string) => {
+        if (key === 'errors.dateOfBirth.futureDate') {
+          return 'Your date of birth must be in the past';
+        }
+        return key;
+      }) as TFunction;
+
+      const fields = [
+        {
+          name: 'dateOfBirth',
+          type: 'date' as const,
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+      expect(result).toEqual({
+        dateFutureDate: 'Your date of birth must be in the past',
+        'dateOfBirth.futureDate': 'Your date of birth must be in the past',
+      });
+    });
+
+    it('should not add date key for non-date fields', () => {
+      const mockT = ((key: string) => {
+        if (key === 'errors.textField.required') {
+          return 'Text field is required';
+        }
+        return key;
+      }) as TFunction;
+
+      const fields = [
+        {
+          name: 'textField',
+          type: 'text' as const,
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+      expect(result).toEqual({
+        'textField.required': 'Text field is required',
+      });
+    });
+
+    it('should handle nested keys that do not map to date keys', () => {
+      const mockT = ((key: string) => {
+        if (key === 'errors.dateOfBirth.unknownKey') {
+          return 'Unknown error';
+        }
+        return key;
+      }) as TFunction;
+
+      const fields = [
+        {
+          name: 'dateOfBirth',
+          type: 'date' as const,
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+      // unknownKey doesn't map to a date key, so it won't be in result
+      expect(result).toEqual({});
     });
 
     it('should handle non-date field custom errors', () => {
