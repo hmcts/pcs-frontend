@@ -123,7 +123,8 @@ export function validateDateField(
     return monthError;
   }
 
-  const yearError = validateDatePart(year, 4, 1, 9999, 'invalidYear', true);
+  // Minimum year is 1801: 1800 is considered too old, but 1899 and later are valid
+  const yearError = validateDatePart(year, 4, 1801, 9999, 'invalidYear', true);
   if (yearError) {
     return yearError;
   }
@@ -145,6 +146,7 @@ export function validateDateField(
     return getDateErrorMessage(t, undefined, translations);
   }
 
+  // Check for future dates if noFutureDate is true
   if (noFutureDate) {
     const inputDate = new Date(yearNum, monthNum - 1, dayNum);
     const today = new Date();
