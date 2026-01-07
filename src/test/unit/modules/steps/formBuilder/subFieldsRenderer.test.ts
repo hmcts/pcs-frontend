@@ -5,9 +5,17 @@ import * as nunjucks from 'nunjucks';
 import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
 import { buildSubFieldsHTML } from '../../../../../main/modules/steps/formBuilder/subFieldsRenderer';
 
+// Resolve GOV.UK frontend templates path for fallback (in case webpack build hasn't run)
+// The template references "govuk/components/input/macro.njk", so we need the dist directory
+const govukFrontendPath = path.resolve(require.resolve('govuk-frontend'), '../dist');
+
 // Create a nunjucks environment for testing
 const nunjucksEnv = nunjucks.configure(
-  [path.join(__dirname, '../../../../../main/views'), path.join(__dirname, '../../../../../main/steps')],
+  [
+    path.join(__dirname, '../../../../../main/views'),
+    path.join(__dirname, '../../../../../main/steps'),
+    govukFrontendPath, // Fallback to node_modules for GOV.UK templates
+  ],
   {
     autoescape: true,
     watch: false,
