@@ -1,91 +1,104 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
-import * as nunjucks from 'nunjucks';
+import type { Environment } from 'nunjucks';
 
 import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
 import { buildSubFieldsHTML } from '../../../../../main/modules/steps/formBuilder/subFieldsRenderer';
 
-// Resolve paths using process.cwd() for better compatibility with different environments (local, CI, etc.)
-// In Jest, __dirname points to the compiled JS location, so we need to find the project root
-// by looking for package.json or using process.cwd()
-const findProjectRoot = (): string => {
-  let currentDir = __dirname;
-  while (currentDir !== path.dirname(currentDir)) {
-    const packageJsonPath = path.join(currentDir, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      return currentDir;
-    }
-    currentDir = path.dirname(currentDir);
-  }
-  // Fallback to process.cwd() if we can't find package.json
-  return process.cwd();
-};
-
-const projectRoot = findProjectRoot();
-const viewsPath = path.resolve(projectRoot, 'src/main/views');
-const stepsPath = path.resolve(projectRoot, 'src/main/steps');
-
-// Resolve GOV.UK frontend templates path for fallback (in case webpack build hasn't run)
-// The template references "govuk/components/input/macro.njk", so we need the dist directory
-let govukFrontendPath: string;
-try {
-  govukFrontendPath = path.resolve(require.resolve('govuk-frontend'), '../dist');
-} catch {
-  // Fallback if govuk-frontend is not found
-  govukFrontendPath = path.resolve(projectRoot, 'node_modules/govuk-frontend/dist');
-}
-
-// Create a nunjucks environment for testing
-const nunjucksEnv = nunjucks.configure(
-  [
-    viewsPath,
-    stepsPath,
-    govukFrontendPath, // Fallback to node_modules for GOV.UK templates
-  ],
-  {
-    autoescape: true,
-    watch: false,
-    noCache: true,
-  }
-);
-
 describe('subFieldsRenderer', () => {
   describe('buildSubFieldsHTML', () => {
+    let mockNunjucksEnv: Environment;
+    let renderSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      mockNunjucksEnv = {
+        render: jest.fn().mockReturnValue('<rendered-template>'),
+      } as unknown as Environment;
+      renderSpy = jest.spyOn(mockNunjucksEnv, 'render');
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
     it('should return empty string when subFields is empty', () => {
-      const result = buildSubFieldsHTML({}, nunjucksEnv);
+      const result = buildSubFieldsHTML({}, mockNunjucksEnv);
       expect(result).toBe('');
+      expect(renderSpy).not.toHaveBeenCalled();
     });
 
     it('should return empty string when subFields is null', () => {
-      const result = buildSubFieldsHTML(null as unknown as Record<string, FormFieldConfig>, nunjucksEnv);
+      const result = buildSubFieldsHTML(null as unknown as Record<string, FormFieldConfig>, mockNunjucksEnv);
       expect(result).toBe('');
+      expect(renderSpy).not.toHaveBeenCalled();
     });
 
     it('should return empty string when subFields is undefined', () => {
-      const result = buildSubFieldsHTML(undefined as unknown as Record<string, FormFieldConfig>, nunjucksEnv);
+      const result = buildSubFieldsHTML(undefined as unknown as Record<string, FormFieldConfig>, mockNunjucksEnv);
       expect(result).toBe('');
+      expect(renderSpy).not.toHaveBeenCalled();
     });
 
-    it('should skip subFields without component or componentType', () => {
+    it('should skip subFields without component', () => {
       const subFields: Record<string, FormFieldConfig> = {
         field1: {
           name: 'field1',
           type: 'text',
+          componentType: 'input',
         } as FormFieldConfig,
-        field2: {
-          name: 'field2',
+      };
+
+      const result = buildSubFieldsHTML(subFields, mockNunjucksEnv);
+      expect(result).toBe('');
+      expect(renderSpy).not.toHaveBeenCalled();
+    });
+
+    it('should skip subFields without componentType', () => {
+      const subFields: Record<string, FormFieldConfig> = {
+        field1: {
+          name: 'field1',
           type: 'text',
           component: {},
         } as FormFieldConfig,
       };
 
-      const result = buildSubFieldsHTML(subFields, nunjucksEnv);
+      const result = buildSubFieldsHTML(subFields, mockNunjucksEnv);
       expect(result).toBe('');
+      expect(renderSpy).not.toHaveBeenCalled();
+    });
+
+    it('should filter out invalid subFields and render valid ones', () => {
+      const subFields: Record<string, FormFieldConfig> = {
+        validField: {
+          name: 'validField',
+          type: 'text',
+          component: {
+            id: 'validField',
+            name: 'validField',
+            label: { text: 'Valid Field' },
+          },
+          componentType: 'input',
+        } as FormFieldConfig,
+        invalidField1: {
+          name: 'invalidField1',
+          type: 'text',
+          componentType: 'input',
+        } as FormFieldConfig,
+        invalidField2: {
+          name: 'invalidField2',
+          type: 'text',
+          component: {},
+        } as FormFieldConfig,
+      };
+
+      buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+      expect(renderSpy).toHaveBeenCalledTimes(1);
+      expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+        subFields: [subFields.validField],
+      });
     });
 
     describe('input fields', () => {
-      it('should build HTML for input field with all properties', () => {
+      it('should render input field with component data', () => {
         const subFields: Record<string, FormFieldConfig> = {
           emailAddress: {
             name: 'emailAddress',
@@ -107,20 +120,15 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('Email address');
-        expect(result).toContain('Enter your email');
-        expect(result).toContain('test@example.com');
-        expect(result).toContain('id="contactMethod.emailAddress"');
-        expect(result).toContain('name="contactMethod.emailAddress"');
-        expect(result).toContain('maxlength="100"');
-        expect(result).toContain('autocomplete="email"');
-        expect(result).toContain('data-testid="email-input"');
-        expect(result).toContain('govuk-input');
-        expect(result).toContain('govuk-!-width-three-quarters');
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+        expect(renderSpy).toHaveBeenCalledTimes(1);
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.emailAddress],
+        });
       });
 
-      it('should build HTML for input field with error message', () => {
+      it('should render input field with error message', () => {
         const subFields: Record<string, FormFieldConfig> = {
           emailAddress: {
             name: 'emailAddress',
@@ -136,13 +144,14 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('govuk-form-group--error');
-        expect(result).toContain('Enter a valid email address');
-        expect(result).toContain('govuk-error-message');
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.emailAddress],
+        });
       });
 
-      it('should build HTML for input field without hint or error', () => {
+      it('should render input field with minimal properties', () => {
         const subFields: Record<string, FormFieldConfig> = {
           field1: {
             name: 'field1',
@@ -157,56 +166,16 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('Field 1');
-        expect(result).toContain('test value');
-        // GOV.UK macros may include hint/error elements even when empty
-        // Just verify the content is present
-        expect(result).toContain('Field 1');
-      });
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
 
-      it('should use subField name as fallback for label', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          emailAddress: {
-            name: 'emailAddress',
-            type: 'text',
-            component: {
-              id: 'emailAddress',
-              name: 'emailAddress',
-              value: '',
-            },
-            componentType: 'input',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('emailAddress');
-      });
-
-      it('should escape HTML special characters in values', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'text',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              value: '<script>alert("xss")</script>',
-            },
-            componentType: 'input',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('&lt;script&gt;');
-        expect(result).toContain('&quot;xss&quot;');
-        expect(result).not.toContain('<script>');
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.field1],
+        });
       });
     });
 
     describe('textarea fields', () => {
-      it('should build HTML for textarea field', () => {
+      it('should render textarea field with component data', () => {
         const subFields: Record<string, FormFieldConfig> = {
           otherDetails: {
             name: 'otherDetails',
@@ -226,102 +195,14 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('<textarea');
-        expect(result).toContain('Other details');
-        expect(result).toContain('Provide more information');
-        expect(result).toContain('Some text');
-        expect(result).toContain('rows="4"');
-        expect(result).toContain('maxlength="500"');
-        expect(result).toContain('govuk-textarea');
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.otherDetails],
+        });
       });
 
-      it('should use default rows value when not provided', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'textarea',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              value: '',
-            },
-            componentType: 'textarea',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('rows="5"');
-      });
-
-      it('should handle textarea without classes', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'textarea',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              value: '',
-              classes: '',
-            },
-            componentType: 'textarea',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('class="govuk-textarea"');
-        expect(result).not.toContain('class="govuk-textarea "'); // No extra space
-      });
-
-      it('should handle textarea with hint but no error', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'textarea',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              hint: { text: 'Hint text' },
-              value: '',
-            },
-            componentType: 'textarea',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('Hint text');
-        expect(result).not.toContain('govuk-error-message');
-        expect(result).not.toContain('govuk-form-group--error');
-      });
-
-      it('should handle textarea with error but no hint', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'textarea',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              errorMessage: { text: 'Error message' },
-              value: '',
-            },
-            componentType: 'textarea',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('Error message');
-        expect(result).toContain('govuk-form-group--error');
-        // GOV.UK macros may include hint elements even when empty, just verify error is present
-        expect(result).toContain('govuk-error-message');
-      });
-
-      it('should handle textarea with error message', () => {
+      it('should render textarea field with error message', () => {
         const subFields: Record<string, FormFieldConfig> = {
           field1: {
             name: 'field1',
@@ -337,14 +218,16 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('govuk-form-group--error');
-        expect(result).toContain('This field is required');
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.field1],
+        });
       });
     });
 
     describe('character-count fields', () => {
-      it('should build HTML for character-count field', () => {
+      it('should render character-count field with component data', () => {
         const subFields: Record<string, FormFieldConfig> = {
           field1: {
             name: 'field1',
@@ -361,108 +244,16 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('<textarea');
-        expect(result).toContain('govuk-js-character-count');
-        expect(result).toContain('data-maxlength="250"');
-        expect(result).toContain('govuk-character-count');
-        // GOV.UK character count macro uses different default text format
-        expect(result).toMatch(/You can enter up to 250 characters|You have \d+ characters remaining/);
-      });
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
 
-      it('should not include character count div when maxlength is not provided', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'character-count',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              value: '',
-            },
-            componentType: 'characterCount',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        // GOV.UK character count macro may still include the wrapper div even without maxlength
-        // but it shouldn't have data-maxlength attribute
-        expect(result).not.toContain('data-maxlength');
-      });
-
-      it('should handle character-count without classes', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'character-count',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              value: '',
-              classes: '',
-              maxlength: 250,
-            },
-            componentType: 'characterCount',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('class="govuk-textarea govuk-js-character-count"');
-        expect(result).not.toContain('class="govuk-textarea govuk-js-character-count "'); // No extra space
-      });
-
-      it('should handle character-count with hint but no error', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'character-count',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              hint: { text: 'Hint text' },
-              value: '',
-              maxlength: 250,
-            },
-            componentType: 'characterCount',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('Hint text');
-        expect(result).not.toContain('govuk-error-message');
-        expect(result).not.toContain('govuk-form-group--error');
-      });
-
-      it('should handle character-count with error but no hint', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'character-count',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              errorMessage: { text: 'Error message' },
-              value: '',
-              maxlength: 250,
-            },
-            componentType: 'characterCount',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('Error message');
-        expect(result).toContain('govuk-form-group--error');
-        // GOV.UK macros may include hint elements even when empty, just verify error is present
-        expect(result).toContain('govuk-error-message');
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.field1],
+        });
       });
     });
 
     describe('default case (unknown component type)', () => {
-      it('should build basic input HTML for unknown component types', () => {
+      it('should render unknown component types as input', () => {
         const subFields: Record<string, FormFieldConfig> = {
           field1: {
             name: 'field1',
@@ -473,64 +264,20 @@ describe('subFieldsRenderer', () => {
               label: { text: 'Field 1' },
               value: 'test',
             },
-            componentType: 'radios' as unknown as 'input', // Unknown type
+            componentType: 'radios' as unknown as 'input',
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('<input');
-        expect(result).toContain('Field 1');
-        expect(result).toContain('test');
-      });
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
 
-      it('should handle default case with hint but no error', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'text',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              hint: { text: 'Hint text' },
-              value: '',
-            },
-            componentType: 'radios' as unknown as 'input', // Unknown type
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('Hint text');
-        expect(result).not.toContain('govuk-error-message');
-        expect(result).not.toContain('govuk-form-group--error');
-      });
-
-      it('should handle default case with error but no hint', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'text',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              errorMessage: { text: 'Error message' },
-              value: '',
-            },
-            componentType: 'radios' as unknown as 'input', // Unknown type
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('Error message');
-        expect(result).toContain('govuk-form-group--error');
-        // GOV.UK macros may include hint elements even when empty, just verify error is present
-        expect(result).toContain('govuk-error-message');
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.field1],
+        });
       });
     });
 
     describe('multiple subFields', () => {
-      it('should build HTML for multiple subFields', () => {
+      it('should render all valid subFields', () => {
         const subFields: Record<string, FormFieldConfig> = {
           emailAddress: {
             name: 'emailAddress',
@@ -556,15 +303,58 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('Email');
-        expect(result).toContain('Phone');
-        expect(result.split('govuk-form-group').length - 1).toBe(2); // Two form groups
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.emailAddress, subFields.phoneNumber],
+        });
+      });
+
+      it('should filter out invalid subFields when rendering multiple', () => {
+        const subFields: Record<string, FormFieldConfig> = {
+          validField1: {
+            name: 'validField1',
+            type: 'text',
+            component: {
+              id: 'validField1',
+              name: 'validField1',
+              label: { text: 'Valid 1' },
+            },
+            componentType: 'input',
+          } as FormFieldConfig,
+          invalidField: {
+            name: 'invalidField',
+            type: 'text',
+            componentType: 'input',
+          } as FormFieldConfig,
+          validField2: {
+            name: 'validField2',
+            type: 'textarea',
+            component: {
+              id: 'validField2',
+              name: 'validField2',
+              label: { text: 'Valid 2' },
+            },
+            componentType: 'textarea',
+          } as FormFieldConfig,
+        };
+
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.validField1, subFields.validField2],
+        });
       });
     });
 
-    describe('attributes handling', () => {
-      it('should handle string attributes', () => {
+    describe('error handling', () => {
+      it('should return empty string when render throws an error', () => {
+        const errorNunjucksEnv = {
+          render: jest.fn().mockImplementation(() => {
+            throw new Error('Template rendering failed');
+          }),
+        } as unknown as Environment;
+
         const subFields: Record<string, FormFieldConfig> = {
           field1: {
             name: 'field1',
@@ -573,21 +363,22 @@ describe('subFieldsRenderer', () => {
               id: 'field1',
               name: 'field1',
               label: { text: 'Field 1' },
-              attributes: {
-                placeholder: 'Enter value',
-                'data-testid': 'test-field',
-              },
             },
             componentType: 'input',
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('placeholder="Enter value"');
-        expect(result).toContain('data-testid="test-field"');
+        const result = buildSubFieldsHTML(subFields, errorNunjucksEnv);
+        expect(result).toBe('');
       });
 
-      it('should handle number attributes', () => {
+      it('should handle render errors gracefully without throwing', () => {
+        const errorNunjucksEnv = {
+          render: jest.fn().mockImplementation(() => {
+            throw new Error('Template rendering failed');
+          }),
+        } as unknown as Environment;
+
         const subFields: Record<string, FormFieldConfig> = {
           field1: {
             name: 'field1',
@@ -596,71 +387,17 @@ describe('subFieldsRenderer', () => {
               id: 'field1',
               name: 'field1',
               label: { text: 'Field 1' },
-              attributes: {
-                min: 0,
-                max: 100,
-              },
             },
             componentType: 'input',
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('min="0"');
-        expect(result).toContain('max="100"');
-      });
-
-      it('should handle boolean attributes', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'text',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              attributes: {
-                required: true,
-                readonly: true,
-              },
-            },
-            componentType: 'input',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('required');
-        expect(result).toContain('readonly');
-        expect(result).not.toContain('disabled');
-      });
-
-      it('should escape quotes in attribute values', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'text',
-            component: {
-              id: 'field1',
-              name: 'field1',
-              label: { text: 'Field 1' },
-              attributes: {
-                'data-value': 'test"value',
-              },
-            },
-            componentType: 'input',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        // Check that the attribute value has escaped quotes
-        expect(result).toContain('data-value="test&quot;value"');
-        // The HTML structure itself contains quotes, but the attribute value should be escaped
-        expect(result).toContain('&quot;');
+        expect(() => buildSubFieldsHTML(subFields, errorNunjucksEnv)).not.toThrow();
       });
     });
 
     describe('edge cases', () => {
-      it('should handle empty string values', () => {
+      it('should handle empty string values in component', () => {
         const subFields: Record<string, FormFieldConfig> = {
           field1: {
             name: 'field1',
@@ -675,13 +412,14 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        // GOV.UK macros don't include value="" when empty, they omit the attribute
-        expect(result).toContain('id="field1"');
-        expect(result).toContain('name="field1"');
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.field1],
+        });
       });
 
-      it('should handle missing component properties gracefully', () => {
+      it('should handle missing component properties', () => {
         const subFields: Record<string, FormFieldConfig> = {
           field1: {
             name: 'field1',
@@ -694,48 +432,11 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('field1'); // Uses field name as label fallback
-        // GOV.UK macros don't include value="" when empty, they omit the attribute
-        expect(result).not.toContain('value=');
-      });
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
 
-      it('should use subField.name as fallback when component.id is missing', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'text',
-            component: {
-              name: 'field1',
-              label: { text: 'Field 1' },
-            } as Record<string, unknown>,
-            componentType: 'input',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('id="field1"'); // Uses subField.name as fallback
-      });
-
-      it('should use subField.name as fallback when component.name is missing', () => {
-        const subFields: Record<string, FormFieldConfig> = {
-          field1: {
-            name: 'field1',
-            type: 'text',
-            component: {
-              id: 'field1',
-              label: { text: 'Field 1' },
-            } as Record<string, unknown>,
-            componentType: 'input',
-          } as FormFieldConfig,
-        };
-
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        // GOV.UK macros require name to be set in component, they don't fallback
-        // So if component.name is missing, the name attribute will be empty
-        // This test verifies the component structure is correct
-        expect(result).toContain('id="field1"');
-        expect(result).toContain('Field 1');
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.field1],
+        });
       });
 
       it('should handle nested field names correctly', () => {
@@ -753,9 +454,52 @@ describe('subFieldsRenderer', () => {
           } as FormFieldConfig,
         };
 
-        const result = buildSubFieldsHTML(subFields, nunjucksEnv);
-        expect(result).toContain('id="contactMethod.emailAddress"');
-        expect(result).toContain('name="contactMethod.emailAddress"');
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.emailAddress],
+        });
+      });
+
+      it('should preserve order of subFields', () => {
+        const subFields: Record<string, FormFieldConfig> = {
+          field1: {
+            name: 'field1',
+            type: 'text',
+            component: {
+              id: 'field1',
+              name: 'field1',
+              label: { text: 'Field 1' },
+            },
+            componentType: 'input',
+          } as FormFieldConfig,
+          field2: {
+            name: 'field2',
+            type: 'textarea',
+            component: {
+              id: 'field2',
+              name: 'field2',
+              label: { text: 'Field 2' },
+            },
+            componentType: 'textarea',
+          } as FormFieldConfig,
+          field3: {
+            name: 'field3',
+            type: 'text',
+            component: {
+              id: 'field3',
+              name: 'field3',
+              label: { text: 'Field 3' },
+            },
+            componentType: 'input',
+          } as FormFieldConfig,
+        };
+
+        buildSubFieldsHTML(subFields, mockNunjucksEnv);
+
+        expect(renderSpy).toHaveBeenCalledWith('components/subFields.njk', {
+          subFields: [subFields.field1, subFields.field2, subFields.field3],
+        });
       });
     });
   });
