@@ -44,7 +44,6 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
     }
   }),
   getTranslationErrors: jest.fn(() => ({})),
-  getCustomErrorTranslations: jest.fn(() => ({})),
 }));
 
 const mockGetNextStepUrl = jest.fn();
@@ -124,10 +123,25 @@ describe('formBuilder', () => {
   const createMockRequest = (overrides: Partial<Request> = {}): Request => {
     const defaultT = createMockT();
     const defaultI18n = createMockI18n(defaultT);
+    const defaultApp = {
+      locals: {
+        nunjucksEnv: {
+          render: jest.fn((template: string) => `Rendered ${template}`),
+        },
+      },
+    };
     return {
       session: { formData: {} },
       language: 'en',
       t: defaultT,
+      app: {
+        ...defaultApp,
+        ...(overrides.app || {}),
+        locals: {
+          ...defaultApp.locals,
+          ...(overrides.app?.locals || {}),
+        },
+      },
       ...overrides,
       // Ensure i18n is always set even if overrides don't include it
       i18n: (overrides.i18n ?? defaultI18n) as import('i18next').i18n,
@@ -912,8 +926,8 @@ describe('formBuilder', () => {
             errorSummary: expect.objectContaining({
               errorList: expect.arrayContaining([
                 expect.objectContaining({
-                  text: 'This field is required',
                   href: '#testField',
+                  text: 'This field is required',
                 }),
               ]),
             }),
@@ -1026,8 +1040,8 @@ describe('formBuilder', () => {
             errorSummary: expect.objectContaining({
               errorList: expect.arrayContaining([
                 expect.objectContaining({
-                  text: 'Error message',
                   href: '#testField',
+                  text: 'Error message',
                 }),
               ]),
             }),

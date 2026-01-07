@@ -34,7 +34,7 @@ function sanitiseCaseReference(caseReference: string | number): string | null {
   return /^\d{16}$/.test(caseRefStr) ? caseRefStr : null;
 }
 
-export function getDashboardUrl(caseReference?: string | number): string {
+export const getDashboardUrl = (caseReference?: string | number): string => {
   if (!caseReference) {
     return DEFAULT_DASHBOARD_URL;
   }
@@ -46,7 +46,7 @@ export function getDashboardUrl(caseReference?: string | number): string {
 
   const url = `${DASHBOARD_ROUTE}/${sanitised}`;
   return /^\/dashboard\/\d{16}$/.test(url) ? url : DEFAULT_DASHBOARD_URL;
-}
+};
 
 function mapTaskGroups(app: Application, caseReference: string) {
   return (taskGroups: DashboardTaskGroup[]): MappedTaskGroup[] => {

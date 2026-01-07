@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import type { Environment } from 'nunjucks';
 
 import type { FormFieldConfig, FormFieldOption } from '../../../interfaces/formFieldConfig.interface';
 
@@ -213,7 +214,8 @@ export function translateFields(
   errors: Record<string, string> = {},
   hasTitle = false,
   fieldPrefix = '',
-  originalData?: Record<string, unknown>
+  originalData?: Record<string, unknown>,
+  nunjucksEnv?: Environment
 ): FormFieldConfig[] {
   const translations = buildTranslationsObject(t);
   // Use originalData if provided, otherwise fall back to fieldValues
@@ -249,7 +251,8 @@ export function translateFields(
             errors,
             false,
             parentFieldName, // Pass full parent field name as prefix
-            originalData // Pass originalData down for nested subFields
+            originalData, // Pass originalData down for nested subFields
+            nunjucksEnv // Pass nunjucksEnv down for nested subFields
           );
 
           // Convert back to Record format with original subField names as keys
@@ -276,7 +279,7 @@ export function translateFields(
       value: option.value,
       text: option.text || option.value,
     }));
-
+    // For nested fields (subFields), extract simple name to look up values
     // For nested fields (subFields), extract simple name to look up values
     // field.name might be nested (e.g., "parent.subField") but fieldValues is keyed by simple names
     const fieldNameForValueLookup =
@@ -286,6 +289,9 @@ export function translateFields(
     const errorText = errors[processedField.name];
     // processedField.label is already resolved to a string by processField
     const resolvedLabel = typeof processedField.label === 'string' ? processedField.label : processedField.name;
+    if (!nunjucksEnv) {
+      throw new Error('Nunjucks environment is required for building component config');
+    }
     const { component, componentType } = buildComponentConfig(
       { ...processedField, options: processedOptionsWithSubFields },
       resolvedLabel,
@@ -296,13 +302,14 @@ export function translateFields(
       errorText,
       index,
       hasTitle,
-      t
+      t,
+      nunjucksEnv
     );
 
     return {
       ...processedField,
       options: processedOptionsWithSubFields,
-      errorMessage: field.errorMessage || getTranslation(t, `errors.${field.name}`, undefined),
+      errorMessage: getTranslation(t, `errors.${field.name}`, field.errorMessage),
       component,
       componentType,
     };

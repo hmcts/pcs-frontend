@@ -7,6 +7,7 @@ export const flowConfig: JourneyFlowConfig = {
     'enter-dob',
     'enter-ground',
     'enter-other-reason',
+    'enter-contact-preferences',
     'ineligible',
     'enter-contact-preferences',
     'enter-user-details',

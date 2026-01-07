@@ -10,7 +10,8 @@ describe('validateForm', () => {
     ];
 
     const req = { body: {}, session: {} } as Partial<Request>;
-    const errors = validateForm(req as Request, fields);
+    // Pass empty translations object so field.errorMessage is used as fallback
+    const errors = validateForm(req as Request, fields, {});
 
     expect(errors.answer).toBe('Please choose an option');
   });
@@ -21,7 +22,8 @@ describe('validateForm', () => {
     ];
 
     const req = { body: { choices: [] }, session: {} } as Partial<Request>;
-    const errors = validateForm(req as Request, fields);
+    // Pass empty translations object so field.errorMessage is used as fallback
+    const errors = validateForm(req as Request, fields, {});
 
     expect(errors.choices).toBe('Please select at least one');
   });

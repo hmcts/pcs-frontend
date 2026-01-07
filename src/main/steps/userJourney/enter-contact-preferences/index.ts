@@ -1,3 +1,5 @@
+import { isEmail, isMobilePhone } from 'validator';
+
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 
@@ -28,8 +30,8 @@ export const step: StepDefinition = createFormStep({
                 label: 'emailAddressLabel',
                 hint: 'emailAddressHint',
               },
-              pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
-              errorMessage: 'Enter a valid email address',
+              validator: (value: unknown) => isEmail(value as string),
+              errorMessage: 'errors.emailAddress',
             },
           },
         },
@@ -46,8 +48,8 @@ export const step: StepDefinition = createFormStep({
                 label: 'phoneNumberLabel',
                 hint: 'phoneNumberHint',
               },
-              pattern: '^[0-9\\s\\+\\-\\(\\)]{10,}$',
-              errorMessage: 'Enter a valid phone number',
+              validator: (value: unknown) => isMobilePhone(value as string, ['en-GB', 'en-US']),
+              errorMessage: 'errors.phoneNumber',
             },
           },
         },

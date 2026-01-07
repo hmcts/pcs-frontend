@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import type { Environment } from 'nunjucks';
 
 import type {
   ComponentConfig,
@@ -32,7 +33,8 @@ export function buildComponentConfig(
   errorText: string | undefined,
   index: number,
   hasTitle: boolean,
-  t: TFunction
+  t: TFunction,
+  nunjucksEnv: Environment
 ): ComponentConfig {
   const isFirstField = index === 0 && !hasTitle;
   const component: Record<string, unknown> = {
@@ -113,7 +115,7 @@ export function buildComponentConfig(
 
           // Build and add subFields HTML
           if (option.subFields) {
-            const subFieldsHTML = buildSubFieldsHTML(option.subFields);
+            const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
             if (subFieldsHTML) {
               conditionalParts.push(subFieldsHTML);
             }
@@ -161,7 +163,7 @@ export function buildComponentConfig(
 
           // Build and add subFields HTML
           if (option.subFields) {
-            const subFieldsHTML = buildSubFieldsHTML(option.subFields);
+            const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
             if (subFieldsHTML) {
               conditionalParts.push(subFieldsHTML);
             }

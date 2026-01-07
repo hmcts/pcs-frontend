@@ -26,6 +26,7 @@ export function createPostHandler(
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
+  // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
     validateConfigInDevelopment({
       stepName,
@@ -44,28 +45,38 @@ export function createPostHandler(
       const t: TFunction = getTranslationFunction(req, stepName, ['common']);
       const action = req.body.action as string | undefined;
 
+      const nunjucksEnv = req.app.locals.nunjucksEnv;
+      if (!nunjucksEnv) {
+        throw new Error('Nunjucks environment not initialized');
+      }
+
+      // Get all form data from session for cross-field validation
       const allFormData = req.session.formData
         ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
         : {};
 
-      const fieldsWithLabels = translateFields(fields, t, {}, {}, false);
+      const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
       const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
-        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys);
+        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
         renderWithErrors(req, res, viewPath, errors, fields, formContent, stepName, journeyFolder, translationKeys);
-        return;
+        return; // renderWithErrors sends the response, so we return early
+      }
+
+      // Handle saveForLater action after validation passes
+      if (action === 'saveForLater') {
+        processFieldData(req, fields);
+        const { action: _, ...bodyWithoutAction } = req.body;
+        setFormData(req, stepName, bodyWithoutAction);
+        return res.redirect(303, DASHBOARD_ROUTE);
       }
 
       processFieldData(req, fields);
       const { action: _, ...bodyWithoutAction } = req.body;
       setFormData(req, stepName, bodyWithoutAction);
-
-      if (action === 'saveForLater') {
-        return res.redirect(303, DASHBOARD_ROUTE);
-      }
 
       if (beforeRedirect) {
         try {
