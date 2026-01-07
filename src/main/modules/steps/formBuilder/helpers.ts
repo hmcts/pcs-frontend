@@ -9,16 +9,10 @@ import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
-/**
- * Validates if a year is a leap year
- */
 function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
-/**
- * Gets the maximum number of days in a month for a given year
- */
 function getDaysInMonth(month: number, year: number): number {
   const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   if (month === 2 && isLeapYear(year)) {
@@ -27,66 +21,39 @@ function getDaysInMonth(month: number, year: number): number {
   return daysInMonth[month - 1] || 31;
 }
 
-/**
- * Gets the appropriate date validation error message using i18next
- * @param t - Translation function from i18next
- * @param partSpecificKey - Optional specific part error key (invalidDay, invalidMonth, invalidYear)
- * @returns Error message string
- */
 function getDateErrorMessage(t?: TFunction, partSpecificKey?: 'invalidDay' | 'invalidMonth' | 'invalidYear'): string {
-  if (t) {
-    const key = partSpecificKey ? `errors.date.${partSpecificKey}` : 'errors.date.notRealDate';
-    const translated = t(key);
-    if (translated !== key) {
-      return translated;
-    }
+  if (!t) {
+    return 'Enter a valid date';
   }
-  return 'Enter a valid date';
+  const key = partSpecificKey ? `errors.date.${partSpecificKey}` : 'errors.date.notRealDate';
+  const translated = t(key);
+  return translated !== key ? translated : 'Enter a valid date';
 }
 
-/**
- * Gets error message for missing date parts using i18next
- * @param missingParts - Array of missing part names (e.g., ['day', 'month'])
- * @param t - Translation function from i18next
- * @returns Error message string
- */
 function getMissingDatePartsError(missingParts: string[], t?: TFunction): string {
+  if (!t) {
+    return 'Enter a valid date';
+  }
+
   if (missingParts.length === 3) {
-    if (t) {
-      const translated = t('errors.date.required');
-      if (translated !== 'errors.date.required') {
-        return translated;
-      }
-    }
+    const translated = t('errors.date.required');
+    return translated !== 'errors.date.required' ? translated : 'Enter a valid date';
   }
 
   if (missingParts.length === 2) {
     const [first, second] = missingParts;
-    if (t) {
-      const translated = t('errors.date.missingTwo', { first, second });
-      if (translated !== 'errors.date.missingTwo') {
-        return translated;
-      }
-    }
+    const translated = t('errors.date.missingTwo', { first, second });
+    return translated !== 'errors.date.missingTwo' ? translated : 'Enter a valid date';
   }
 
   if (missingParts.length === 1) {
     const part = missingParts[0];
-    if (t) {
-      const translated = t('errors.date.missingOne', { missingField: part });
-      if (translated !== 'errors.date.missingOne') {
-        return translated;
-      }
-    }
+    const translated = t('errors.date.missingOne', { missingField: part });
+    return translated !== 'errors.date.missingOne' ? translated : 'Enter a valid date';
   }
 
-  if (t) {
-    const translated = t('errors.date.required');
-    if (translated !== 'errors.date.required') {
-      return translated;
-    }
-  }
-  return 'Enter a valid date';
+  const translated = t('errors.date.required');
+  return translated !== 'errors.date.required' ? translated : 'Enter a valid date';
 }
 
 function validateDateField(
@@ -100,7 +67,6 @@ function validateDateField(
   const hasDay = !!day;
   const hasMonth = !!month;
   const hasYear = !!year;
-  const hasAnyPart = hasDay || hasMonth || hasYear;
   const hasAllParts = hasDay && hasMonth && hasYear;
 
   if (requireAllParts && !hasAllParts) {
@@ -117,7 +83,7 @@ function validateDateField(
     return getMissingDatePartsError(missingParts, t);
   }
 
-  if (!requireAllParts && !hasAnyPart) {
+  if (!requireAllParts && !hasDay && !hasMonth && !hasYear) {
     return null;
   }
 
@@ -137,10 +103,7 @@ function validateDateField(
       return getDateErrorMessage(t, errorKey);
     }
     const num = parseInt(value, 10);
-    if (num < min || num > max) {
-      return getDateErrorMessage(t, errorKey);
-    }
-    return null;
+    return num < min || num > max ? getDateErrorMessage(t, errorKey) : null;
   };
 
   const dayError = validateDatePart(day, 2, 1, 31, 'invalidDay');
@@ -324,13 +287,9 @@ export function validateForm(
 
       if (field.validator && value !== undefined) {
         try {
-          const dateValue = { day, month, year };
-          const validatorResult = field.validator(dateValue, formData, validationAllData);
-          if (validatorResult !== true) {
-            const errorMsg = typeof validatorResult === 'string' ? validatorResult : 'Invalid date';
-            if (!errors[fieldName]) {
-              errors[fieldName] = errorMsg;
-            }
+          const validatorResult = field.validator({ day, month, year }, formData, validationAllData);
+          if (validatorResult !== true && !errors[fieldName]) {
+            errors[fieldName] = typeof validatorResult === 'string' ? validatorResult : 'Invalid date';
           }
         } catch (err) {
           logger.error(`Error running validator function for field ${field.name}:`, err);
@@ -338,14 +297,12 @@ export function validateForm(
       }
 
       if (field.validate && !errors[fieldName]) {
-        const dateValue = { day, month, year };
         try {
-          const customError = field.validate(dateValue, formData, validationAllData);
+          const customError = field.validate({ day, month, year }, formData, validationAllData);
           if (customError) {
-            const errorMessage = customError.startsWith('errors.')
+            errors[fieldName] = customError.startsWith('errors.')
               ? translations?.[customError.replace('errors.', '')] || customError
               : customError;
-            errors[fieldName] = errorMessage;
           }
         } catch (err) {
           logger.error(`Error running validate function for field ${field.name}:`, err);
@@ -364,11 +321,8 @@ export function validateForm(
       if (field.validator && value !== undefined && value !== null && value !== '') {
         try {
           const validatorResult = field.validator(value, formData, validationAllData);
-          if (validatorResult !== true) {
-            const errorMsg = typeof validatorResult === 'string' ? validatorResult : 'Invalid value';
-            if (!errors[fieldName]) {
-              errors[fieldName] = errorMsg;
-            }
+          if (validatorResult !== true && !errors[fieldName]) {
+            errors[fieldName] = typeof validatorResult === 'string' ? validatorResult : 'Invalid value';
           }
         } catch (err) {
           logger.error(`Error running validator function for field ${field.name}:`, err);
@@ -395,10 +349,8 @@ export function validateForm(
         if (field.validate) {
           try {
             const customError = field.validate(value, formData, validationAllData);
-            if (customError) {
-              if (!errors[fieldName]) {
-                errors[fieldName] = customError;
-              }
+            if (customError && !errors[fieldName]) {
+              errors[fieldName] = customError;
             }
           } catch (err) {
             logger.error(`Error running validate function for field ${field.name}:`, err);
@@ -407,10 +359,8 @@ export function validateForm(
       } else if (!isRequired && field.validate) {
         try {
           const customError = field.validate(value, formData, validationAllData);
-          if (customError) {
-            if (!errors[fieldName]) {
-              errors[fieldName] = customError;
-            }
+          if (customError && !errors[fieldName]) {
+            errors[fieldName] = customError;
           }
         } catch (err) {
           logger.error(`Error running validate function for field ${field.name}:`, err);
