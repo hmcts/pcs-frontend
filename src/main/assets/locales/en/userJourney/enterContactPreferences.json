@@ -31,8 +31,8 @@
   "errors": {
     "title": "There is a problem",
     "contactMethod": "Select how you would like to be contacted",
-    "emailAddress": "Enter your email address",
-    "phoneNumber": "Enter your phone number",
+    "emailAddress": "Enter a valid email address",
+    "phoneNumber": "Enter a valid phone number",
     "otherDetails": "Provide details of how you would like to be contacted",
     "eveningTime": "Enter a preferred evening time"
   }

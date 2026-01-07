@@ -39,17 +39,23 @@ export function createPostHandler(
       const t: TFunction = getTranslationFunction(req, stepName, ['common']);
       const action = req.body.action as string | undefined;
 
+      const nunjucksEnv = req.app.locals.nunjucksEnv;
+      if (!nunjucksEnv) {
+        throw new Error('Nunjucks environment not initialized');
+      }
+
       // Get all form data from session for cross-field validation
       const allFormData = req.session.formData
         ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
         : {};
 
-      const fieldsWithLabels = translateFields(fields, t, {}, {}, false);
-      const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fieldsWithLabels), allFormData);
+      const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
+      // Use original fields for getTranslationErrors to ensure we get the raw errorMessage keys from subFields
+      const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fields), allFormData);
 
       // If there are validation errors, show them regardless of action
       if (Object.keys(errors).length > 0) {
-        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys);
+        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
         renderWithErrors(req, res, viewPath, errors, fields, formContent, stepName, journeyFolder, translationKeys);
         return; // renderWithErrors sends the response, so we return early
       }

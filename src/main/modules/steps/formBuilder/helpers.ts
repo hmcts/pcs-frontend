@@ -33,15 +33,65 @@ export function processFieldData(req: Request, fields: FormFieldConfig[]): void 
   }
 }
 
-export function getTranslationErrors(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
+export function getTranslationErrors(
+  t: TFunction,
+  fields: FormFieldConfig[],
+  parentFieldName?: string
+): Record<string, string> {
   const translationErrors: Record<string, string> = {};
+
   for (const field of fields) {
-    const errorKey = `errors.${field.name}`;
-    const errorMsg = t(errorKey);
-    if (errorMsg && errorMsg !== errorKey) {
-      translationErrors[field.name] = errorMsg;
+    // Get the nested field name if this is a subField
+    const fieldName = parentFieldName ? getNestedFieldName(parentFieldName, field.name) : field.name;
+
+    // For subFields, prioritize field.errorMessage (which is usually 'errors.subFieldName')
+    // For top-level fields, check both the nested name and errorMessage property
+    if (parentFieldName && field.errorMessage) {
+      // If errorMessage is a translation key (starts with 'errors.'), translate it
+      if (typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
+        const subFieldErrorKey = field.errorMessage;
+        const subFieldErrorMsg = t(subFieldErrorKey);
+        if (subFieldErrorMsg && subFieldErrorMsg !== subFieldErrorKey) {
+          // Use nested field name as the key (e.g., 'contactMethod.emailAddress')
+          translationErrors[fieldName] = subFieldErrorMsg;
+        } else {
+          // Debug: translation not found
+          logger.debug(
+            `Translation not found for key "${subFieldErrorKey}" for subField "${fieldName}". Translation returned: "${subFieldErrorMsg}"`
+          );
+        }
+      }
+    } else {
+      // For top-level fields, check error message translation using the field name
+      const errorKey = `errors.${field.name}`;
+      const errorMsg = t(errorKey);
+      if (errorMsg && errorMsg !== errorKey) {
+        translationErrors[field.name] = errorMsg;
+      }
+
+      // Also check the errorMessage property if set
+      if (field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
+        const errorMsgFromProperty = t(field.errorMessage);
+        if (errorMsgFromProperty && errorMsgFromProperty !== field.errorMessage) {
+          translationErrors[field.name] = errorMsgFromProperty;
+        }
+      }
+    }
+
+    // Recursively process subFields if this is a radio/checkbox field
+    if ((field.type === 'radio' || field.type === 'checkbox') && field.options) {
+      for (const option of field.options) {
+        if (option.subFields) {
+          // Recursively collect error translations from subFields
+          // Pass the current fieldName (which may already be nested) as the parent
+          // But we need to use the simple field.name for the parent, not fieldName
+          const subFieldErrors = getTranslationErrors(t, Object.values(option.subFields), field.name);
+          Object.assign(translationErrors, subFieldErrors);
+        }
+      }
     }
   }
+
   return translationErrors;
 }
 
@@ -135,11 +185,16 @@ export function validateForm(
 
       if (isRequired) {
         if (!day || !month || !year) {
-          errors[fieldName] = field.errorMessage || translations?.defaultRequired || 'Enter your date of birth';
+          errors[fieldName] =
+            translations?.[fieldName] ||
+            field.errorMessage ||
+            translations?.defaultRequired ||
+            'Enter your date of birth';
         } else {
           const isNumeric = (s: string) => /^\d+$/.test(s);
           if (!isNumeric(day) || !isNumeric(month) || !isNumeric(year)) {
-            errors[fieldName] = field.errorMessage || translations?.defaultInvalid || 'Enter a valid date';
+            errors[fieldName] =
+              translations?.[fieldName] || field.errorMessage || translations?.defaultInvalid || 'Enter a valid date';
           } else {
             const dayNum = parseInt(day, 10);
             const monthNum = parseInt(month, 10);
@@ -153,7 +208,8 @@ export function validateForm(
               yearNum < 1900 ||
               yearNum > new Date().getFullYear()
             ) {
-              errors[fieldName] = field.errorMessage || translations?.defaultInvalid || 'Enter a valid date';
+              errors[fieldName] =
+                translations?.[fieldName] || field.errorMessage || translations?.defaultInvalid || 'Enter a valid date';
             }
           }
         }
@@ -194,7 +250,9 @@ export function validateForm(
           : value === undefined || value === null || value === '';
 
       if (isRequired && isMissing) {
-        errors[fieldName] = field.errorMessage || translations?.defaultRequired || 'This field is required';
+        // Check translations first (which contains translated errorMessage), then defaults
+        // Don't use field.errorMessage directly as it's a translation key, not a translated message
+        errors[fieldName] = translations?.[fieldName] || translations?.defaultRequired || 'This field is required';
       }
 
       // Run validator function if provided (field-level validation)
@@ -202,9 +260,19 @@ export function validateForm(
         try {
           const validatorResult = field.validator(value, formData, validationAllData);
           if (validatorResult !== true) {
-            const errorMsg = typeof validatorResult === 'string' ? validatorResult : 'Invalid value';
+            // Use translated error message if available, otherwise use validator result or default
+            // Don't use field.errorMessage directly as it's a translation key, not a translated message
+            const translatedMsg = translations?.[fieldName];
+            const errorMsg =
+              translatedMsg || (typeof validatorResult === 'string' ? validatorResult : undefined) || 'Invalid value';
             if (!errors[fieldName]) {
               errors[fieldName] = errorMsg;
+              // Debug logging
+              if (!translatedMsg && parentFieldName) {
+                logger.debug(
+                  `No translation found for subField ${fieldName}. Available keys: ${Object.keys(translations || {}).join(', ')}`
+                );
+              }
             }
           }
         } catch (err) {
@@ -219,7 +287,8 @@ export function validateForm(
           const regex = new RegExp(field.pattern);
           if (!regex.test(value.trim())) {
             if (!errors[fieldName]) {
-              errors[fieldName] = field.errorMessage || translations?.defaultInvalid || 'Invalid format';
+              // Use translated error message if available, otherwise use default
+              errors[fieldName] = translations?.[fieldName] || translations?.defaultInvalid || 'Invalid format';
             }
           }
         }
@@ -228,7 +297,7 @@ export function validateForm(
         if (field.maxLength && typeof value === 'string' && value.length > field.maxLength) {
           if (!errors[fieldName]) {
             const maxLengthMsg = translations?.defaultMaxLength?.replace('{max}', field.maxLength.toString());
-            errors[fieldName] = field.errorMessage || maxLengthMsg || `Must be ${field.maxLength} characters or fewer`;
+            errors[fieldName] = maxLengthMsg || `Must be ${field.maxLength} characters or fewer`;
           }
         }
 
