@@ -4,16 +4,24 @@ import type { TFunction } from 'i18next';
  * Date validation utilities for form fields
  */
 
+const DEFAULT_DATE_ERROR_MESSAGE = 'Enter a valid date';
+
 function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
 function getDaysInMonth(month: number, year: number): number {
+  // Month should be validated before calling this function (1-12)
+  // If invalid month is passed, return 0 to indicate invalid date
+  if (month < 1 || month > 12) {
+    return 0;
+  }
+
   const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   if (month === 2 && isLeapYear(year)) {
     return 29;
   }
-  return daysInMonth[month - 1] || 31;
+  return daysInMonth[month - 1];
 }
 
 function getDateErrorMessage(
@@ -25,21 +33,21 @@ function getDateErrorMessage(
     return translations.dateFutureDate;
   }
   if (!t) {
-    return 'Enter a valid date';
+    return DEFAULT_DATE_ERROR_MESSAGE;
   }
   const key = partSpecificKey ? `errors.date.${partSpecificKey}` : 'errors.date.notRealDate';
   const translated = t(key);
-  return translated !== key ? translated : 'Enter a valid date';
+  return translated !== key ? translated : DEFAULT_DATE_ERROR_MESSAGE;
 }
 
 function getMissingDatePartsError(missingParts: string[], t?: TFunction): string {
   if (!t) {
-    return 'Enter a valid date';
+    return DEFAULT_DATE_ERROR_MESSAGE;
   }
 
   const translate = (key: string, params?: Record<string, string>): string => {
     const translated = params ? t(key, params) : t(key);
-    return translated !== key ? translated : 'Enter a valid date';
+    return translated !== key ? translated : DEFAULT_DATE_ERROR_MESSAGE;
   };
 
   if (missingParts.length === 3) {
