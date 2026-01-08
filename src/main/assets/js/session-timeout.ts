@@ -1,3 +1,14 @@
+// Helper function to format time with proper pluralization
+function formatTime(minutes: number, seconds: number): string {
+  if (minutes > 0 && seconds > 0) {
+    return `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds} second${seconds !== 1 ? 's' : ''}`;
+  } else if (minutes > 0) {
+    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  } else {
+    return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+  }
+}
+
 export function initSessionTimeout(): void {
   const body = document.body;
   const sessionTimeoutMinutes = parseInt(body.dataset.sessionTimeout!, 10);
@@ -12,6 +23,10 @@ export function initSessionTimeout(): void {
   const timeoutAlert = document.getElementById('timeout-alert');
   const continueButton = document.getElementById('timeout-modal-close-button');
 
+  // inert container for background content
+  const inertSelector = modalContainer?.dataset.inertContainer;
+  const inertContainer = inertSelector ? (document.querySelector(inertSelector) as HTMLElement) : null;
+
   let lastActivity = Date.now();
   let warningShown = false;
   let countdownInterval: number | null = null;
@@ -21,6 +36,14 @@ export function initSessionTimeout(): void {
     if (!modalContainer || !modal) {
       return;
     }
+
+    // disable background content
+    if (inertContainer) {
+      (inertContainer as HTMLElement & { inert: boolean }).inert = true;
+    }
+
+    // prevent body scroll
+    body.classList.add('modal-open');
 
     // show modal container
     modalContainer.removeAttribute('hidden');
@@ -47,6 +70,14 @@ export function initSessionTimeout(): void {
       return;
     }
 
+    // restore background content
+    if (inertContainer) {
+      (inertContainer as HTMLElement & { inert: boolean }).inert = false;
+    }
+
+    // restore body scroll
+    body.classList.remove('modal-open');
+
     modalContainer.setAttribute('hidden', 'hidden');
 
     // clear the announcement region
@@ -66,14 +97,7 @@ export function initSessionTimeout(): void {
 
     const minutes = Math.floor(secondsRemaining / 60);
     const seconds = secondsRemaining % 60;
-
-    if (minutes > 0 && seconds > 0) {
-      countdownTime.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds} second${seconds !== 1 ? 's' : ''}`;
-    } else if (minutes > 0) {
-      countdownTime.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-    } else {
-      countdownTime.textContent = `${seconds} second${seconds !== 1 ? 's' : ''}`;
-    }
+    countdownTime.textContent = formatTime(minutes, seconds);
   };
 
   // update screen reader announcement (only at intervals)
@@ -111,7 +135,7 @@ export function initSessionTimeout(): void {
       //  "X minutes remaining"
       else if (secondsRemaining > 0 && secondsRemaining < warningTimeSeconds && secondsRemaining % 60 === 0) {
         const minutes = secondsRemaining / 60;
-        updateScreenReaderAnnouncement(`${minutes} minute${minutes !== 1 ? 's' : ''} remaining`);
+        updateScreenReaderAnnouncement(`${formatTime(minutes, 0)} remaining`);
       }
 
       secondsRemaining--;
