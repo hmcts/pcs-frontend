@@ -1,4 +1,4 @@
-// Helper function to format time with proper pluralization
+// format time helper
 function formatTime(minutes: number, seconds: number): string {
   if (minutes > 0 && seconds > 0) {
     return `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds} second${seconds !== 1 ? 's' : ''}`;
@@ -23,7 +23,6 @@ export function initSessionTimeout(): void {
   const timeoutAlert = document.getElementById('timeout-alert');
   const continueButton = document.getElementById('timeout-modal-close-button');
 
-  // inert container for background content
   const inertSelector = modalContainer?.dataset.inertContainer;
   const inertContainer = inertSelector ? (document.querySelector(inertSelector) as HTMLElement) : null;
 
@@ -31,36 +30,35 @@ export function initSessionTimeout(): void {
   let warningShown = false;
   let countdownInterval: number | null = null;
 
+  // translations from data attributes
+  const timeoutTitle = modalContainer?.dataset.timeoutTitle || '';
+  const timeoutSubtitle = modalContainer?.dataset.timeoutSubtitle || '';
+  const timeoutCaption = modalContainer?.dataset.timeoutCaption || '';
+
   // show modal
   const showModal = () => {
     if (!modalContainer || !modal) {
       return;
     }
 
-    // disable background content
     if (inertContainer) {
       (inertContainer as HTMLElement & { inert: boolean }).inert = true;
     }
 
-    // prevent body scroll
     body.classList.add('modal-open');
 
-    // show modal container
     modalContainer.removeAttribute('hidden');
 
-    // announce all content immediately via status region
     if (timeoutAlert) {
-      timeoutAlert.textContent = `You'll be signed out soon. For your security, you'll be signed out in ${sessionWarningMinutes} minutes. Your previous answers have been saved.`;
+      timeoutAlert.textContent = `${timeoutTitle}. ${timeoutSubtitle} ${sessionWarningMinutes} minutes. ${timeoutCaption}`;
     }
 
-    // focus modal after brief delay to allow announcement
     setTimeout(() => {
       modal.focus();
     }, 100);
 
     warningShown = true;
 
-    // start countdown
     startCountdown();
   };
 
@@ -70,17 +68,14 @@ export function initSessionTimeout(): void {
       return;
     }
 
-    // restore background content
     if (inertContainer) {
       (inertContainer as HTMLElement & { inert: boolean }).inert = false;
     }
 
-    // restore body scroll
     body.classList.remove('modal-open');
 
     modalContainer.setAttribute('hidden', 'hidden');
 
-    // clear the announcement region
     if (timeoutAlert) {
       timeoutAlert.textContent = '';
     }
@@ -122,18 +117,11 @@ export function initSessionTimeout(): void {
         return;
       }
 
-      // update visual countdown EVERY second
       updateVisualCountdown(secondsRemaining);
 
-      // announcements every minute
-      // first announcement at 5 minutes
       if (secondsRemaining === warningTimeSeconds) {
-        updateScreenReaderAnnouncement(
-          `For your security, you'll be signed out in ${warningTimeSeconds / 60} minutes.`
-        );
-      }
-      //  "X minutes remaining"
-      else if (secondsRemaining > 0 && secondsRemaining < warningTimeSeconds && secondsRemaining % 60 === 0) {
+        updateScreenReaderAnnouncement(`${timeoutSubtitle} ${warningTimeSeconds / 60} minutes.`);
+      } else if (secondsRemaining > 0 && secondsRemaining < warningTimeSeconds && secondsRemaining % 60 === 0) {
         const minutes = secondsRemaining / 60;
         updateScreenReaderAnnouncement(`${formatTime(minutes, 0)} remaining`);
       }
@@ -143,7 +131,6 @@ export function initSessionTimeout(): void {
 
     updateCountdown();
 
-    // update every second
     countdownInterval = window.setInterval(updateCountdown, 1000);
   };
 
@@ -157,7 +144,6 @@ export function initSessionTimeout(): void {
 
   // reset - user must click button
   const resetActivity = () => {
-    // reset timer if modal is NOT shown
     if (!warningShown) {
       lastActivity = Date.now();
     }
@@ -168,12 +154,10 @@ export function initSessionTimeout(): void {
     const inactiveMinutes = (Date.now() - lastActivity) / (1000 * 60);
     const timeUntilWarning = sessionTimeoutMinutes - sessionWarningMinutes;
 
-    // warning
     if (inactiveMinutes >= timeUntilWarning && !warningShown) {
       showModal();
     }
 
-    // timeout
     if (inactiveMinutes >= sessionTimeoutMinutes) {
       window.location.replace('/logout');
     }
@@ -182,7 +166,6 @@ export function initSessionTimeout(): void {
   // stay signed in- button click
   if (continueButton) {
     continueButton.addEventListener('click', () => {
-      // backend to extend server session
       fetch('/active')
         .then(response => {
           if (response.ok) {
@@ -191,7 +174,6 @@ export function initSessionTimeout(): void {
           }
         })
         .catch(() => {
-          // reset client timer
           lastActivity = Date.now();
           hideModal();
         });

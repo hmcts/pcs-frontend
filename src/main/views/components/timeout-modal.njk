@@ -2,17 +2,17 @@
 
 <div id="timeout-alert" role="status" aria-live="assertive" aria-atomic="true" class="govuk-visually-hidden"></div>
 
-<div id="timeout-modal-container" class="modal" hidden data-inert-container=".govuk-modal-dialogue-inert-container">
+<div id="timeout-modal-container" class="modal" hidden data-inert-container=".govuk-modal-dialogue-inert-container" data-timeout-title="{{ t('timeout.title') }}" data-timeout-subtitle="{{ t('timeout.subtitle') }}" data-timeout-caption="{{ t('timeout.caption') }}">
   <div id="timeout-modal" class="modal-content govuk-width-container" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="timeout-modal-heading" aria-describedby="timeout-modal-description timeout-modal-saved">
     <h2 id="timeout-modal-heading" class="govuk-heading-m">{{ t('timeout.title') }}</h2>
     <p id="timeout-modal-description" class="govuk-body">
-      {{ t('timeout.part1') }} <strong id="countdown-time"></strong>.
+      {{ t('timeout.subtitle') }} <strong id="countdown-time"></strong>.
     </p>
     <p class="govuk-body govuk-visually-hidden" aria-live="polite" aria-atomic="true">
       <span id="countdown-message"></span>
     </p>
     <p id="timeout-modal-saved" class="govuk-body">
-      {{ t('timeout.part2') }}
+      {{ t('timeout.caption') }}
     </p>
     <div class="govuk-form-group">
       <div class="timeout-modal-actions">
