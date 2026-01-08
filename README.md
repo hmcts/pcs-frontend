@@ -25,10 +25,19 @@ You can take this a step further and integrate auto-detection directly into your
 
 ### Running the application
 
+Get the secret value from the azure keyvault and create .env file with the secrets
+
 Install dependencies by executing the following command:
 
 ```bash
 yarn install
+```
+
+Docker:
+make sure running the redis
+
+```bash
+docker run -d --name pcs-redis -p 6379:6379 redis
 ```
 
 #### Development
@@ -41,10 +50,8 @@ yarn build
 
 Run:
 
-Get the secret value from the azure keyvault
-
 ```bash
-PCS_FRONTEND_IDAM_SECRET=XXX S2S_SECRET=XXX OS_CLIENT_LOOKUP_SECRET=XXX yarn start:dev
+yarn start:dev
 ```
 
 #### Production

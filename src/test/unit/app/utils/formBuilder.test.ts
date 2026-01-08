@@ -44,6 +44,7 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
     }
   }),
   getTranslationErrors: jest.fn(() => ({})),
+  getCustomErrorTranslations: jest.fn(() => ({})),
 }));
 
 const mockGetNextStepUrl = jest.fn();

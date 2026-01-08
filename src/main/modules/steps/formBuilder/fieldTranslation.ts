@@ -279,7 +279,6 @@ export function translateFields(
       value: option.value,
       text: option.text || option.value,
     }));
-
     // For nested fields (subFields), extract simple name to look up values
     // field.name might be nested (e.g., "parent.subField") but fieldValues is keyed by simple names
     const fieldNameForValueLookup =
@@ -292,7 +291,6 @@ export function translateFields(
     if (!nunjucksEnv) {
       throw new Error('Nunjucks environment is required for building component config');
     }
-
     const { component, componentType } = buildComponentConfig(
       { ...processedField, options: processedOptionsWithSubFields },
       resolvedLabel,

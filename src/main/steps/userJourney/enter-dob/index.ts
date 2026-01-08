@@ -10,8 +10,9 @@ export const step: StepDefinition = createFormStep({
       name: 'dateOfBirth',
       type: 'date',
       required: true,
+      noFutureDate: true,
       translationKey: {
-        label: 'question', // Uses 'question' from enterDob.json
+        label: 'question',
       },
     },
   ],

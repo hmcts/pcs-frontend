@@ -20,6 +20,7 @@ export {
   validateForm,
   processFieldData,
   getTranslationErrors,
+  getCustomErrorTranslations,
   getTranslation,
 } from './formBuilder/helpers';
 

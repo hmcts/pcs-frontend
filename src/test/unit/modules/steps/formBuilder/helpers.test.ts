@@ -750,6 +750,7 @@ describe('formBuilder helpers', () => {
             name: 'birthDate',
             type: 'date',
             required: true,
+            noFutureDate: true, // Birth dates should not allow future dates
           },
         ];
 

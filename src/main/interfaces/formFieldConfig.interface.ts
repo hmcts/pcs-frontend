@@ -53,6 +53,8 @@ export interface FormFieldConfig {
     formData?: Record<string, unknown>,
     allData?: Record<string, unknown>
   ) => boolean | string;
+  // For date fields: if true, disallows future and current dates
+  noFutureDate?: boolean;
 }
 
 export interface TranslationKeys {
