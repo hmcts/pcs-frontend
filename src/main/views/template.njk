@@ -1,5 +1,7 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% set bodyAttributes = {
   "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
@@ -8,22 +10,54 @@
 } %}
 
 {% block head %}
+  <title>{% block pageTitle %}Possession claims{% endblock %} - GOV.UK</title>
   {% include "webpack/css.njk" %}
 {% endblock %}
 
 {% block header %}
-{{ govukHeader({
-  serviceName: serviceName or "Possession claims",
-  navigation: [
-    {
-      text: 'logout',
-      href: '/logout'
-    }
-  ]
-}) }}
+  {{ govukHeader({
+    containerClasses: "govuk-width-container"
+  }) }}
 {% endblock %}
 
 {% block beforeContent %}
+  <div class="govuk-service-navigation" data-module="govuk-service-navigation">
+    <div class="govuk-width-container">
+      <div class="govuk-service-navigation__container">
+        <nav aria-label="Service navigation" class="govuk-service-navigation__wrapper">
+          <ul class="govuk-service-navigation__list">
+            <li class="govuk-service-navigation__item">
+              <a id="service-navigation-home-link" class="govuk-service-navigation__link" href="/dashboard">Respond to a property possession claim</a>
+            </li>
+            <li class="govuk-service-navigation__item">
+              <a class="govuk-service-navigation__link" href="/logout">Log out</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div class="govuk-width-container">
+    {{ govukPhaseBanner({
+      tag: {
+        text: (phase or t('phase') or 'ALPHA') | safe
+      },
+      html: ((feedback or t('feedback') or '')) | safe
+    }) }}
+  </div>
+  {% if backUrl %}
+    {{ govukBackLink({
+      text: (back or t('back') or "Back"),
+      href: backUrl
+    }) }}
+  {% endif %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-language-toggle">
+      {{ (languageToggle or t('languageToggle') or '') | safe }}
+    </div>
+  </div>
   {% block modal %}
     {% include "components/timeout-modal.njk" %}
   {% endblock %}

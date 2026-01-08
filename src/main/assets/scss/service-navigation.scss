@@ -1,0 +1,19 @@
+.govuk-service-navigation {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+}
+
+.govuk-service-navigation__list {
+    display: flex;
+    justify-content: space-between;
+}
+
+#service-navigation-home-link {
+    color: govuk-colour('black');
+    font-weight: bold;
+}
+
+.govuk-language-toggle {
+    text-align: right;
+}

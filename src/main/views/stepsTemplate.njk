@@ -17,27 +17,36 @@
 
 {% block header %}
   {{ govukHeader({
-    containerClasses: "govuk-width-container",
-    serviceName: (serviceName or t('serviceName') or "Possession claims"),
-    serviceUrl: "/",
-    navigation: [
-    {
-      text: (t('logout') or 'logout'),
-      href: '/logout'
-    }
-  ]
+    containerClasses: "govuk-width-container"
   }) }}
 {% endblock %}
 
 
 {% block beforeContent %}
+  <div class="govuk-service-navigation" data-module="govuk-service-navigation">
     <div class="govuk-width-container">
-      {{ govukPhaseBanner({
-        tag: {
-          text: (phase or t('phase') or 'ALPHA') | safe
-        },
-        html: ((feedback or t('feedback') or '') + (languageToggle or t('languageToggle') or '')) | safe
-      }) }}
+      <div class="govuk-service-navigation__container">
+        <nav aria-label="Service navigation" class="govuk-service-navigation__wrapper">
+          <ul class="govuk-service-navigation__list">
+            <li class="govuk-service-navigation__item">
+              <a id="service-navigation-home-link" class="govuk-service-navigation__link" href="/dashboard">Respond to a property possession claim</a>
+            </li>
+            <li class="govuk-service-navigation__item">
+              <a class="govuk-service-navigation__link" href="/logout">Log out</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div class="govuk-width-container">
+    {{ govukPhaseBanner({
+      tag: {
+        text: (phase or t('phase') or 'ALPHA') | safe
+      },
+      html: ((feedback or t('feedback') or '')) | safe
+    }) }}
   </div>
   {% if backUrl %}
     {{ govukBackLink({
@@ -45,6 +54,12 @@
       href: backUrl
     }) }}
   {% endif %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-language-toggle">
+      {{ (languageToggle or t('languageToggle') or '') | safe }}
+    </div>
+  </div>
   {% block modal %}
     {% include "components/timeout-modal.njk" %}
   {% endblock %}

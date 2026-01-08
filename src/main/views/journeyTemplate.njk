@@ -10,28 +10,32 @@
 
 {% block header %}
   {{ govukHeader({
-    containerClasses: "govuk-width-container",
-    serviceName: t('serviceName', 'Possession claims'),
-    serviceUrl: '/?lang=' ~ lang,
-    navigation: [
-      { text: t('logout', 'Logout'), href: '/logout?lang=' ~ lang }
-    ]
+    containerClasses: "govuk-width-container"
   }) }}
 {% endblock %}
 
 {% block beforeContent %}
+  <div class="govuk-service-navigation" data-module="govuk-service-navigation">
+    <div class="govuk-width-container">
+      <div class="govuk-service-navigation__container">
+        <nav aria-label="Service navigation" class="govuk-service-navigation__wrapper">
+          <ul class="govuk-service-navigation__list">
+            <li class="govuk-service-navigation__item">
+              <a id="service-navigation-home-link" class="govuk-service-navigation__link" href="/dashboard?lang={{ lang }}">Respond to a property possession claim</a>
+            </li>
+            <li class="govuk-service-navigation__item">
+              <a class="govuk-service-navigation__link" href="/logout?lang={{ lang }}">Log out</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
   <div class="govuk-width-container">
-
-    {# Build a safe language toggle without inline ternary #}
-    {% if lang == 'cy' %}
-      {% set languageToggle = '<a href="?lang=en" class="govuk-link language">English</a>' %}
-    {% else %}
-      {% set languageToggle = '<a href="?lang=cy" class="govuk-link language">Cymraeg</a>' %}
-    {% endif %}
-
     {{ govukPhaseBanner({
       tag: { text: t('phase', 'Alpha') },
-      html: (t('feedback') | safe) ~ ' ' ~ (languageToggle | safe)
+      html: (t('feedback') | safe)
     }) }}
 
   </div>
@@ -42,6 +46,18 @@
       href: previousStepUrl
     }) }}
   {% endif %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-language-toggle">
+      {# Build a safe language toggle without inline ternary #}
+      {% if lang == 'cy' %}
+        {% set languageToggle = '<a href="?lang=en" class="govuk-link language">English</a>' %}
+      {% else %}
+        {% set languageToggle = '<a href="?lang=cy" class="govuk-link language">Cymraeg</a>' %}
+      {% endif %}
+      {{ languageToggle | safe }}
+    </div>
+  </div>
 {% endblock %}
 
 {% block bodyEnd %}
