@@ -7,7 +7,9 @@ export function initSessionTimeout(): void {
   // modal elements
   const modalContainer = document.getElementById('timeout-modal-container');
   const modal = document.getElementById('timeout-modal');
-  const countdownElement = document.getElementById('countdown-timer');
+  const countdownTime = document.getElementById('countdown-time');
+  const countdownMessage = document.getElementById('countdown-message');
+  const timeoutAlert = document.getElementById('timeout-alert');
   const continueButton = document.getElementById('timeout-modal-close-button');
 
   let lastActivity = Date.now();
@@ -20,8 +22,19 @@ export function initSessionTimeout(): void {
       return;
     }
 
+    // show modal container
     modalContainer.removeAttribute('hidden');
-    modal.focus();
+
+    // announce all content immediately via status region
+    if (timeoutAlert) {
+      timeoutAlert.textContent = `You'll be signed out soon. For your security, you'll be signed out in ${sessionWarningMinutes} minutes. Your previous answers have been saved.`;
+    }
+
+    // focus modal after brief delay to allow announcement
+    setTimeout(() => {
+      modal.focus();
+    }, 100);
+
     warningShown = true;
 
     // start countdown
@@ -35,13 +48,44 @@ export function initSessionTimeout(): void {
     }
 
     modalContainer.setAttribute('hidden', 'hidden');
+
+    // clear the announcement region
+    if (timeoutAlert) {
+      timeoutAlert.textContent = '';
+    }
+
     warningShown = false;
     stopCountdown();
   };
 
+  // update visual countdown display (every second)
+  const updateVisualCountdown = (secondsRemaining: number) => {
+    if (!countdownTime) {
+      return;
+    }
+
+    const minutes = Math.floor(secondsRemaining / 60);
+    const seconds = secondsRemaining % 60;
+
+    if (minutes > 0 && seconds > 0) {
+      countdownTime.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds} second${seconds !== 1 ? 's' : ''}`;
+    } else if (minutes > 0) {
+      countdownTime.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    } else {
+      countdownTime.textContent = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    }
+  };
+
+  // update screen reader announcement (only at intervals)
+  const updateScreenReaderAnnouncement = (text: string) => {
+    if (countdownMessage) {
+      countdownMessage.textContent = text;
+    }
+  };
+
   // start countdown timer
   const startCountdown = () => {
-    if (!countdownElement) {
+    if (!countdownTime || !countdownMessage) {
       return;
     }
 
@@ -54,21 +98,25 @@ export function initSessionTimeout(): void {
         return;
       }
 
-      const minutes = Math.floor(secondsRemaining / 60);
-      const seconds = secondsRemaining % 60;
+      // update visual countdown EVERY second
+      updateVisualCountdown(secondsRemaining);
 
-      if (minutes > 0 && seconds > 0) {
-        countdownElement.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds} second${seconds !== 1 ? 's' : ''}`;
-      } else if (minutes > 0) {
-        countdownElement.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-      } else {
-        countdownElement.textContent = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+      // announcements every minute
+      // first announcement at 5 minutes
+      if (secondsRemaining === warningTimeSeconds) {
+        updateScreenReaderAnnouncement(
+          `For your security, you'll be signed out in ${warningTimeSeconds / 60} minutes.`
+        );
+      }
+      //  "X minutes remaining"
+      else if (secondsRemaining > 0 && secondsRemaining < warningTimeSeconds && secondsRemaining % 60 === 0) {
+        const minutes = secondsRemaining / 60;
+        updateScreenReaderAnnouncement(`${minutes} minute${minutes !== 1 ? 's' : ''} remaining`);
       }
 
       secondsRemaining--;
     };
 
-    // update immediately
     updateCountdown();
 
     // update every second
@@ -91,7 +139,7 @@ export function initSessionTimeout(): void {
     }
   };
 
-  // Check session status
+  // check session status
   const checkSessionStatus = () => {
     const inactiveMinutes = (Date.now() - lastActivity) / (1000 * 60);
     const timeUntilWarning = sessionTimeoutMinutes - sessionWarningMinutes;

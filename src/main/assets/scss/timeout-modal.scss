@@ -66,7 +66,8 @@
   }
 }
 
-// Accessibility: prevent body scroll when modal is open
-body:has(.modal:not([hidden])) {
+body.modal-open {
   overflow: hidden;
+  position: fixed;
+  width: 100%;
 }
