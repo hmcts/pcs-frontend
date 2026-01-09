@@ -2,6 +2,7 @@
 {% from "govuk/components/header/macro.njk" import govukHeader %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
 {% set bodyAttributes = {
   "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
@@ -21,22 +22,17 @@
 {% endblock %}
 
 {% block beforeContent %}
-  <div class="govuk-service-navigation" data-module="govuk-service-navigation">
-    <div class="govuk-width-container">
-      <div class="govuk-service-navigation__container">
-        <nav aria-label="Service navigation" class="govuk-service-navigation__wrapper">
-          <ul class="govuk-service-navigation__list">
-            <li class="govuk-service-navigation__item">
-              <a id="service-navigation-home-link" class="govuk-service-navigation__link" href="/dashboard">Respond to a property possession claim</a>
-            </li>
-            <li class="govuk-service-navigation__item">
-              <a class="govuk-service-navigation__link" href="/logout">Log out</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-  </div>
+  {{ govukServiceNavigation({
+    serviceName: "Respond to a property possession claim",
+    serviceUrl: "/dashboard",
+    navigation: [
+      {
+        text: "Log out",
+        href: "/logout"
+      }
+    ],
+    navigationLabel: "Service navigation"
+  }) }}
 
   <div class="govuk-width-container">
     {{ govukPhaseBanner({

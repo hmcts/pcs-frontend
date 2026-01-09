@@ -4,12 +4,12 @@
   margin-right: calc(-50vw + 50%);
 }
 
-.govuk-service-navigation__list {
-  display: flex;
-  justify-content: space-between;
+.govuk-service-navigation__wrapper {
+  display: flex !important;
+  justify-content: flex-end !important;
 }
 
-#service-navigation-home-link {
+.govuk-service-navigation__service-name .govuk-service-navigation__link {
   color: govuk-colour('black');
   font-weight: bold;
 }
