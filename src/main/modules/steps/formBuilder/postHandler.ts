@@ -9,7 +9,7 @@ import { getTranslationFunction, loadStepNamespace } from '../i18n';
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';
-import { getTranslationErrors, processFieldData, setFormData, validateForm } from './helpers';
+import { getTranslationErrors, normalizeCheckboxFields, processFieldData, setFormData, validateForm } from './helpers';
 import { validateConfigInDevelopment } from './schema';
 
 export function createPostHandler(
@@ -49,6 +49,11 @@ export function createPostHandler(
         ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
         : {};
 
+      // Normalize checkbox fields BEFORE validation to ensure checkbox values are arrays
+      // This is critical because validation functions (like required functions) need normalized checkbox arrays
+      // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
+      normalizeCheckboxFields(req, fields);
+
       const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
       // Use original fields for getTranslationErrors to ensure we get the raw errorMessage keys from subFields
       const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fields), allFormData);
@@ -62,6 +67,7 @@ export function createPostHandler(
 
       // Handle saveForLater action after validation passes
       if (action === 'saveForLater') {
+        // Process field data (normalize checkboxes + consolidate date fields) before saving
         processFieldData(req, fields);
         const bodyWithoutAction = { ...req.body };
         delete bodyWithoutAction.action;
@@ -69,6 +75,7 @@ export function createPostHandler(
         return res.redirect(303, DASHBOARD_ROUTE);
       }
 
+      // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
       const bodyWithoutAction = { ...req.body };
       delete bodyWithoutAction.action;
