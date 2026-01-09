@@ -21,6 +21,9 @@ export class Nunjucks {
       }
     );
 
+    // Enable GOV.UK rebrand (blue header, refreshed logo, etc.)
+    app.locals.nunjucksEnv.addGlobal('govukRebrand', true);
+
     this.addCustomFilters(app.locals.nunjucksEnv);
 
     app.use((req, res, next) => {
