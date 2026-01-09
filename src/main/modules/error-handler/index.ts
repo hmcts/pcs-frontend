@@ -29,6 +29,7 @@ function getErrorMessages(status: number, t: TFunction): { title: string; paragr
 export function createNotFoundHandler(): (req: Request, res: Response, next: NextFunction) => void {
   return (_req: Request, res: Response, next: NextFunction) => {
     if (!res.headersSent && !(res as { writableEnded?: boolean }).writableEnded) {
+      logger.error('Page not found', _req.originalUrl || 'Unknown URL');
       next(new HTTPError('Page not found', 404));
     } else {
       next();

@@ -52,7 +52,8 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      expect(req.session.formData).toEqual({
+      const session = req.session as { formData?: Record<string, unknown> };
+      expect(session.formData).toEqual({
         'test-step': {
           field1: 'value1',
         },
@@ -72,7 +73,8 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'new-value', field2: 'value2' });
 
-      expect(req.session.formData).toEqual({
+      const session = req.session as { formData?: Record<string, unknown> };
+      expect(session.formData).toEqual({
         'test-step': {
           field1: 'new-value',
           field2: 'value2',
@@ -87,8 +89,9 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      expect(req.session.formData).toBeDefined();
-      expect(req.session.formData?.['test-step']).toEqual({ field1: 'value1' });
+      const session = req.session as { formData?: Record<string, unknown> };
+      expect(session.formData).toBeDefined();
+      expect(session.formData?.['test-step']).toEqual({ field1: 'value1' });
     });
   });
 
@@ -99,6 +102,7 @@ describe('formHelpers', () => {
           field1: 'value1',
           field2: 'value2',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -115,6 +119,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'value1',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -130,6 +135,7 @@ describe('formHelpers', () => {
     it('should use custom error message when provided', () => {
       const req = {
         body: {},
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -148,6 +154,7 @@ describe('formHelpers', () => {
     it('should use translation error message when provided', () => {
       const req = {
         body: {},
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -171,6 +178,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'invalid-email',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -192,6 +200,7 @@ describe('formHelpers', () => {
         body: {
           field1: '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -212,6 +221,7 @@ describe('formHelpers', () => {
         body: {
           field1: [],
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -231,6 +241,7 @@ describe('formHelpers', () => {
         body: {
           field1: '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -250,6 +261,7 @@ describe('formHelpers', () => {
         body: {
           field1: ['value1', 'value2'],
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -269,6 +281,7 @@ describe('formHelpers', () => {
         body: {
           field1: undefined,
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -288,6 +301,7 @@ describe('formHelpers', () => {
         body: {
           field1: null,
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -307,6 +321,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'invalid',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -328,6 +343,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'invalid',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -352,6 +368,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'a'.repeat(101),
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -373,6 +390,7 @@ describe('formHelpers', () => {
         body: {
           field1: 'a'.repeat(101),
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -397,6 +415,7 @@ describe('formHelpers', () => {
         body: {
           field1: '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -419,6 +438,7 @@ describe('formHelpers', () => {
           'dateField-month': '02',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -441,6 +461,7 @@ describe('formHelpers', () => {
           'dateField-month': '',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -462,6 +483,7 @@ describe('formHelpers', () => {
           'dateField-month': '02',
           'dateField-year': '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -483,6 +505,7 @@ describe('formHelpers', () => {
           'dateField-month': 'cd',
           'dateField-year': 'ef',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -505,6 +528,7 @@ describe('formHelpers', () => {
           'dateField-month': '01',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -527,6 +551,7 @@ describe('formHelpers', () => {
           'dateField-month': '13',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -548,6 +573,7 @@ describe('formHelpers', () => {
           'dateField-month': '01',
           'dateField-year': '1899',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -570,6 +596,7 @@ describe('formHelpers', () => {
           'dateField-month': '01',
           'dateField-year': futureYear.toString(),
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -591,6 +618,7 @@ describe('formHelpers', () => {
           'dateField-month': '06',
           'dateField-year': '2000',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -612,6 +640,7 @@ describe('formHelpers', () => {
           'dateField-month': '',
           'dateField-year': '',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -633,6 +662,7 @@ describe('formHelpers', () => {
           'dateField-month': '02',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -655,6 +685,7 @@ describe('formHelpers', () => {
           'dateField-month': '02',
           'dateField-year': '2023',
         },
+        session: {},
       } as unknown as Request;
 
       const fields = [
@@ -671,6 +702,403 @@ describe('formHelpers', () => {
 
       const result = validateForm(req, fields, translations);
       expect(result.dateField).toBe('Translation date error');
+    });
+
+    describe('function-based required validation', () => {
+      it('should evaluate required function returning true', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: true,
+          },
+          {
+            name: 'field2',
+            type: 'text' as const,
+            required: () => true,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('field2');
+        expect(result.field2).toBe('This field is required');
+      });
+
+      it('should evaluate required function returning false', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: () => false,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toEqual({});
+      });
+
+      it('should pass formData to required function', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+            field2: 'value2',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const requiredFn = jest.fn((formData: Record<string, unknown>) => {
+          return formData.field1 === 'value1';
+        });
+
+        const fields = [
+          {
+            name: 'field2',
+            type: 'text' as const,
+            required: requiredFn,
+          },
+        ];
+
+        validateForm(req, fields);
+        expect(requiredFn).toHaveBeenCalledWith(
+          expect.objectContaining({ field1: 'value1', field2: 'value2' }),
+          expect.objectContaining({ field1: 'value1', field2: 'value2' })
+        );
+      });
+
+      it('should pass allFormData to required function', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+          },
+          session: {
+            formData: {
+              step1: { previousField: 'previousValue' },
+              step2: { anotherField: 'anotherValue' },
+            },
+          },
+        } as unknown as Request;
+
+        const requiredFn = jest.fn((formData: Record<string, unknown>, allData: Record<string, unknown>) => {
+          return allData.previousField === 'previousValue';
+        });
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: requiredFn,
+          },
+        ];
+
+        validateForm(req, fields);
+        expect(requiredFn).toHaveBeenCalledWith(
+          expect.objectContaining({ field1: 'value1' }),
+          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' })
+        );
+      });
+
+      it('should handle required function throwing errors', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: () => {
+              throw new Error('Test error');
+            },
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        // Should default to false (not required) when function throws
+        expect(result).toEqual({});
+      });
+
+      it('should use allFormData parameter when provided', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const allFormData = { customData: 'customValue' };
+
+        const requiredFn = jest.fn((formData: Record<string, unknown>, allData: Record<string, unknown>) => {
+          return allData.customData === 'customValue';
+        });
+
+        const fields = [
+          {
+            name: 'field2',
+            type: 'text' as const,
+            required: requiredFn,
+          },
+        ];
+
+        validateForm(req, fields, undefined, allFormData);
+        expect(requiredFn).toHaveBeenCalledWith(
+          expect.objectContaining({ field1: 'value1' }),
+          expect.objectContaining({ customData: 'customValue', field1: 'value1' })
+        );
+      });
+    });
+
+    describe('validate function (cross-field validation)', () => {
+      it('should run validate function and return error message', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: false,
+            validate: (value: unknown) => {
+              if (value === 'value1') {
+                return 'Custom validation error';
+              }
+              return undefined;
+            },
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('field1');
+        expect(result.field1).toBe('Custom validation error');
+      });
+
+      it('should run validate function returning undefined for valid value', () => {
+        const req = {
+          body: {
+            field1: 'validValue',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: false,
+            validate: (value: unknown) => {
+              if (value === 'validValue') {
+                return undefined;
+              }
+              return 'Invalid';
+            },
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toEqual({});
+      });
+
+      it('should pass formData and allData to validate function', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+            field2: 'value2',
+          },
+          session: {
+            formData: {
+              step1: { previousField: 'previousValue' },
+            },
+          },
+        } as unknown as Request;
+
+        const validateFn = jest.fn(
+          (value: unknown, formData: Record<string, unknown>, allData: Record<string, unknown>) => {
+            return formData.field2 === 'value2' && allData.previousField === 'previousValue' ? undefined : 'Error';
+          }
+        );
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: false,
+            validate: validateFn,
+          },
+        ];
+
+        validateForm(req, fields);
+        expect(validateFn).toHaveBeenCalledWith(
+          'value1',
+          expect.objectContaining({ field1: 'value1', field2: 'value2' }),
+          expect.objectContaining({ previousField: 'previousValue', field1: 'value1', field2: 'value2' })
+        );
+      });
+
+      it('should handle validate function throwing errors', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: false,
+            validate: () => {
+              throw new Error('Test error');
+            },
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        // Should not add error when function throws
+        expect(result).toEqual({});
+      });
+
+      it('should run validate function even for empty values when field is not required', () => {
+        const req = {
+          body: {
+            field1: '',
+            field2: 'value2',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: false,
+            validate: (value: unknown, formData: Record<string, unknown>) => {
+              if (!value && formData.field2) {
+                return 'Field1 is required when field2 is set';
+              }
+              return undefined;
+            },
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('field1');
+        expect(result.field1).toBe('Field1 is required when field2 is set');
+      });
+    });
+
+    describe('multiple errors', () => {
+      it('should collect errors from multiple fields', () => {
+        const req = {
+          body: {
+            field1: 'value1',
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: true,
+          },
+          {
+            name: 'field2',
+            type: 'text' as const,
+            required: true,
+          },
+          {
+            name: 'field3',
+            type: 'text' as const,
+            required: true,
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('field2');
+        expect(result).toHaveProperty('field3');
+        expect(Object.keys(result)).toHaveLength(2);
+      });
+
+      it('should collect multiple validation errors on same field', () => {
+        const req = {
+          body: {
+            field1: 'a'.repeat(101), // Exceeds maxLength
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: false,
+            maxLength: 100,
+            pattern: '^[a-z]+$',
+            validate: (value: unknown) => {
+              if (typeof value === 'string' && value.length > 50) {
+                return 'Custom validation error';
+              }
+              return undefined;
+            },
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        // Should have at least one error (maxLength or pattern or validate)
+        expect(result).toHaveProperty('field1');
+        // The first error encountered should be set
+        expect(result.field1).toBeTruthy();
+      });
+
+      it('should collect errors from required and validate functions', () => {
+        const req = {
+          body: {
+            field1: '', // Empty value so required function will trigger error
+          },
+          session: {},
+        } as unknown as Request;
+
+        const fields = [
+          {
+            name: 'field1',
+            type: 'text' as const,
+            required: () => true,
+          },
+          {
+            name: 'field2',
+            type: 'text' as const,
+            required: false,
+            validate: () => 'Validation error',
+          },
+        ];
+
+        const result = validateForm(req, fields);
+        expect(result).toHaveProperty('field1');
+        expect(result).toHaveProperty('field2');
+        expect(result.field1).toBe('This field is required');
+        expect(result.field2).toBe('Validation error');
+      });
     });
   });
 });

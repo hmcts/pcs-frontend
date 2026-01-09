@@ -24,6 +24,21 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
     const translation = t(key);
     return translation !== key ? translation : fallback;
   }),
+  normalizeCheckboxFields: jest.fn((req: Request, fields: unknown[]) => {
+    const fieldsArray = fields as { name: string; type: string }[];
+    for (const field of fieldsArray) {
+      if (field.type === 'checkbox') {
+        const value = req.body[field.name];
+        if (value === undefined || value === null) {
+          req.body[field.name] = [];
+        } else if (typeof value === 'string') {
+          req.body[field.name] = [value];
+        } else if (!Array.isArray(value)) {
+          req.body[field.name] = [value as string];
+        }
+      }
+    }
+  }),
   processFieldData: jest.fn((req: Request, fields: unknown[]) => {
     const fieldsArray = fields as { name: string; type: string }[];
     for (const field of fieldsArray) {
@@ -123,10 +138,25 @@ describe('formBuilder', () => {
   const createMockRequest = (overrides: Partial<Request> = {}): Request => {
     const defaultT = createMockT();
     const defaultI18n = createMockI18n(defaultT);
+    const defaultApp = {
+      locals: {
+        nunjucksEnv: {
+          render: jest.fn((template: string) => `Rendered ${template}`),
+        },
+      },
+    };
     return {
       session: { formData: {} },
       language: 'en',
       t: defaultT,
+      app: {
+        ...defaultApp,
+        ...(overrides.app || {}),
+        locals: {
+          ...defaultApp.locals,
+          ...(overrides.app?.locals || {}),
+        },
+      },
       ...overrides,
       // Ensure i18n is always set even if overrides don't include it
       i18n: (overrides.i18n ?? defaultI18n) as import('i18next').i18n,
@@ -908,7 +938,14 @@ describe('formBuilder', () => {
         expect(res.render).toHaveBeenCalledWith(
           'formBuilder.njk',
           expect.objectContaining({
-            error: { field: 'testField', anchor: 'testField', text: 'This field is required' },
+            errorSummary: expect.objectContaining({
+              errorList: expect.arrayContaining([
+                expect.objectContaining({
+                  href: '#testField',
+                  text: 'This field is required',
+                }),
+              ]),
+            }),
             ccdId: '1765881343803991',
           })
         );
@@ -1015,7 +1052,14 @@ describe('formBuilder', () => {
         expect(res.render).toHaveBeenCalledWith(
           'formBuilder.njk',
           expect.objectContaining({
-            error: { field: 'testField', anchor: 'testField', text: 'Error message' },
+            errorSummary: expect.objectContaining({
+              errorList: expect.arrayContaining([
+                expect.objectContaining({
+                  href: '#testField',
+                  text: 'Error message',
+                }),
+              ]),
+            }),
             ccdId: '1765881343803991',
           })
         );

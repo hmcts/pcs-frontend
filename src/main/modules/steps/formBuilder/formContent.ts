@@ -1,7 +1,9 @@
 import type { TFunction } from 'i18next';
+import type { Environment } from 'nunjucks';
 
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 
+import { buildErrorSummary } from './errorUtils';
 import { buildFieldValues, translateFields } from './fieldTranslation';
 import { getTranslation } from './helpers';
 
@@ -9,12 +11,17 @@ export function buildFormContent(
   fields: FormFieldConfig[],
   t: TFunction,
   bodyData: Record<string, unknown> = {},
-  error?: { field: string; anchor?: string; text: string },
-  translationKeys?: TranslationKeys
+  errors: Record<string, string> = {},
+  translationKeys?: TranslationKeys,
+  nunjucksEnv?: Environment
 ): Record<string, unknown> {
   const fieldValues = buildFieldValues(fields, bodyData);
   const pageTitle = getTranslation(t, 'title', undefined) || getTranslation(t, 'question', undefined);
-  const fieldsWithLabels = translateFields(fields, t, fieldValues, error, !!pageTitle);
+  // Pass bodyData as originalData so translateFields can extract nested field values
+  const fieldsWithLabels = translateFields(fields, t, fieldValues, errors, !!pageTitle, '', bodyData, nunjucksEnv);
+
+  // Build error summary
+  const errorSummary = buildErrorSummary(errors, fields, t);
 
   return {
     ...bodyData,
@@ -27,6 +34,7 @@ export function buildFormContent(
     saveForLater: t('buttons.saveForLater'),
     cancel: t('buttons.cancel'),
     errorSummaryTitle: t('errors.title'),
+    errorSummary,
     serviceName: t('serviceName'),
     phase: t('phase'),
     feedback: t('feedback'),
