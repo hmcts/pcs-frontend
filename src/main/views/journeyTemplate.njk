@@ -25,7 +25,7 @@
         href: "/logout?lang=" ~ lang
       }
     ],
-    navigationLabel: "Service navigation",
+    navigationLabel: t('navigationLabel', 'Service navigation'),
     navigationClasses: "pcs-service-navigation-wrapper"
   }) }}
 
@@ -46,13 +46,7 @@
 
   <div class="govuk-width-container">
     <div class="govuk-language-toggle">
-      {# Build a safe language toggle without inline ternary #}
-      {% if lang == 'cy' %}
-        {% set languageToggle = '<a href="?lang=en" class="govuk-link language">English</a>' %}
-      {% else %}
-        {% set languageToggle = '<a href="?lang=cy" class="govuk-link language">Cymraeg</a>' %}
-      {% endif %}
-      {{ languageToggle | safe }}
+      {{ (languageToggle or t('languageToggle') or '') | safe }}
     </div>
   </div>
 {% endblock %}

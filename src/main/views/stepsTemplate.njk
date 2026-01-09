@@ -33,7 +33,7 @@
         href: "/logout"
       }
     ],
-    navigationLabel: "Service navigation",
+    navigationLabel: t('navigationLabel', 'Service navigation'),
     navigationClasses: "pcs-service-navigation-wrapper"
   }) }}
 
@@ -75,7 +75,7 @@
     {% if contactUsForHelp %}
       <div class="govuk-grid-column-one-third">
         <aside class="app-related-items" role="complementary">
-          <nav role="navigation" aria-label="Support and contact information">
+          <nav role="navigation" aria-label="{{ t('supportAndContactInformation', 'Support and contact information') }}">
             {{ govukDetails({
               summaryText: contactUsForHelp,
               text: contactUsForHelpText or t('contactUsForHelpText')
