@@ -164,10 +164,13 @@ export function validateForm(
     if (parentFieldName) {
       // For nested fields, check if parent field value contains subField data
       const parentValue = formData[parentFieldName];
-      if (typeof parentValue === 'object' && parentValue !== null) {
+      // Check if parentValue is a plain object (not an array) that might contain subField data
+      // Arrays are objects in JavaScript, so we need to exclude them explicitly
+      if (typeof parentValue === 'object' && parentValue !== null && !Array.isArray(parentValue)) {
         value = (parentValue as Record<string, unknown>)[field.name];
-      } else {
-        // Try direct access with nested name
+      }
+      // If value is still undefined, try direct access with nested name
+      if (value === undefined) {
         value = req.body[fieldName] || formData[fieldName];
       }
     } else {
