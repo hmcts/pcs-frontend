@@ -24,6 +24,21 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
     const translation = t(key);
     return translation !== key ? translation : fallback;
   }),
+  normalizeCheckboxFields: jest.fn((req: Request, fields: unknown[]) => {
+    const fieldsArray = fields as { name: string; type: string }[];
+    for (const field of fieldsArray) {
+      if (field.type === 'checkbox') {
+        const value = req.body[field.name];
+        if (value === undefined || value === null) {
+          req.body[field.name] = [];
+        } else if (typeof value === 'string') {
+          req.body[field.name] = [value];
+        } else if (!Array.isArray(value)) {
+          req.body[field.name] = [value as string];
+        }
+      }
+    }
+  }),
   processFieldData: jest.fn((req: Request, fields: unknown[]) => {
     const fieldsArray = fields as { name: string; type: string }[];
     for (const field of fieldsArray) {
