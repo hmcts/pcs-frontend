@@ -1,9 +1,9 @@
 {
-  "serviceName": "cyRespond to property possession claims",
+  "serviceName": "cyRespond to a property possession claim",
   "phase": "cyALPHA",
   "feedback": "cyThis is a new service – your <a href=\"#\" class=\"govuk-link\">feedback</a> will help us to improve it.",
   "languageToggle": "<a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
-  "logout": "cylogout",
+  "logout": "cyLog out",
   "contactUsForHelp": "cyContact us for help",
   "contactUsForHelpText": "cyIf you need help using this service, contact us.",
   "buttons": {
@@ -63,7 +63,6 @@
     "12": "cyDecember"
   },
   "dateFormatLong": "{{day}} {{month}} {{year}}",
-
   "timeout": {
     "title": "cyYou'll be signed out soon",
     "part1": "cyFor your security, you'll be signed out in",

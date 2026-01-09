@@ -25,7 +25,7 @@
 
 {% block beforeContent %}
   {{ govukServiceNavigation({
-    serviceName: t('serviceName', 'Respond to property possession claims'),
+    serviceName: t('serviceName', 'Respond to a property possession claim'),
     serviceUrl: "/dashboard",
     navigation: [
       {
@@ -33,7 +33,8 @@
         href: "/logout"
       }
     ],
-    navigationLabel: "Service navigation"
+    navigationLabel: "Service navigation",
+    navigationClasses: "pcs-service-navigation-wrapper"
   }) }}
 
   <div class="govuk-width-container">
