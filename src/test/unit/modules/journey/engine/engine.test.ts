@@ -1077,3 +1077,467 @@ describe('WizardEngine - conditional data cleanup', () => {
     expect(finalData.correspondenceAddress.isCorrespondenceAddress).toBe('yes'); // This should still exist
   });
 });
+
+describe('WizardEngine - constructor caching', () => {
+  const journeyConfig = {
+    meta: { name: 'Cache Test Journey', description: 'Test caching', version: '1.0.0' },
+    steps: {
+      start: { id: 'start', title: 'Start', type: 'form', fields: { field1: { type: 'text' } } },
+    },
+    config: { store: { type: 'memory' } },
+  };
+
+  beforeEach(() => {
+    // Clear the cache before each test
+    const { WizardEngine } = require('../../../../../main/modules/journey/engine/engine');
+    WizardEngine.validatedJourneys.clear();
+  });
+
+  it('should use cached journey when caching is enabled and same slug is used', () => {
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+
+    const engine1 = new WizardEngine(journeyConfig, 'cache-test');
+    const engine2 = new WizardEngine(journeyConfig, 'cache-test');
+
+    // Both should use the same cached journey
+    expect(engine1.journey).toBe(engine2.journey);
+
+    process.env.NODE_ENV = originalEnv;
+  });
+
+  it('should not cache when NODE_ENV is test', () => {
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'test';
+
+    const engine1 = new WizardEngine(journeyConfig, 'no-cache-test');
+    const engine2 = new WizardEngine(journeyConfig, 'no-cache-test');
+
+    // Should not use cache in test mode
+    expect(engine1.journey).not.toBe(engine2.journey);
+    expect(engine1.journey).toEqual(engine2.journey);
+
+    process.env.NODE_ENV = originalEnv;
+  });
+
+  it('should throw error with detailed message when journey validation fails', () => {
+    const invalidConfig = {
+      meta: { name: 'Invalid Journey' },
+      steps: {},
+    };
+
+    expect(() => {
+      new WizardEngine(invalidConfig, 'invalid-test');
+    }).toThrow(/Invalid journey configuration/);
+  });
+
+  it('should include sourcePath in error message when provided', () => {
+    const invalidConfig = {
+      meta: { name: 'Invalid Journey' },
+      steps: {},
+    };
+
+    expect(() => {
+      new WizardEngine(invalidConfig, 'invalid-test', '/path/to/journey.ts');
+    }).toThrow(/in file \/path\/to\/journey\.ts/);
+  });
+});
+
+describe('WizardEngine - setStore error handling', () => {
+  it('should throw error when store type is invalid', () => {
+    const journeyConfig = {
+      meta: { name: 'Test Journey', description: 'Test store', version: '1.0.0' },
+      steps: {
+        start: { id: 'start', title: 'Start', type: 'form', fields: {} },
+      },
+      config: { store: { type: 'invalid-store-type' } },
+    };
+
+    // The journey schema validation catches invalid store types before setStore is called
+    expect(() => {
+      new WizardEngine(journeyConfig, 'invalid-store-test');
+    }).toThrow(/Invalid option: expected one of "session"\|"database"\|"redis"\|"memory"\|"ccd"/);
+  });
+});
+
+describe('WizardEngine - resolveNext edge cases', () => {
+  const journeyConfig = {
+    meta: { name: 'Resolve Next Test', description: 'Test journey', version: '1.0.0' },
+    steps: {
+      start: {
+        id: 'start',
+        title: 'Start',
+        type: 'form',
+        fields: { field1: { type: 'text' } },
+        next: 'conditional',
+      },
+      conditional: {
+        id: 'conditional',
+        title: 'Conditional',
+        type: 'form',
+        fields: { choice: { type: 'text' } },
+        next: {
+          when: (stepData: Record<string, unknown>) => (stepData.choice as string) === 'yes',
+          goto: 'yesStep',
+          else: 'noStep',
+        },
+      },
+      yesStep: { id: 'yesStep', title: 'Yes', type: 'confirmation' },
+      noStep: { id: 'noStep', title: 'No', type: 'confirmation' },
+    },
+    config: { store: { type: 'memory' } },
+  };
+
+  const engine = new WizardEngine(journeyConfig, 'resolve-next-test');
+
+  it('should return step id when next is undefined', () => {
+    // Create a step config without next property
+    const stepWithoutNext: StepConfig = {
+      id: 'noNext',
+      title: 'No Next',
+      type: 'confirmation',
+    };
+    expect(engine['resolveNext'](stepWithoutNext, {})).toBe('noNext');
+  });
+
+  it('should return else or step id when stepData is missing', () => {
+    const conditionalStep = engine['journey'].steps.conditional;
+    expect(engine['resolveNext'](conditionalStep, {})).toBe('noStep');
+  });
+
+  it('should handle error in when function and return else', () => {
+    const conditionalStep = engine['journey'].steps.conditional;
+    const stepWithError = {
+      ...conditionalStep,
+      next: {
+        when: () => {
+          throw new Error('Test error');
+        },
+        goto: 'yesStep',
+        else: 'noStep',
+      },
+    };
+    expect(engine['resolveNext'](stepWithError, { conditional: { choice: 'yes' } })).toBe('noStep');
+  });
+});
+
+describe('WizardEngine - validateStepIdForRedirect', () => {
+  const journeyConfig = {
+    meta: { name: 'Validation Test', description: 'Test validation', version: '1.0.0' },
+    steps: {
+      validStep: {
+        id: 'validStep',
+        title: 'Valid',
+        type: 'form',
+        fields: {},
+        next: 'step-with-dash',
+      },
+      'step-with-dash': {
+        id: 'step-with-dash',
+        title: 'With Dash',
+        type: 'form',
+        fields: {},
+      },
+    },
+    config: { store: { type: 'memory' } },
+  };
+
+  const engine = new WizardEngine(journeyConfig, 'validation-test');
+
+  it('should return null for empty stepId', () => {
+    expect(engine['validateStepIdForRedirect']('')).toBeNull();
+  });
+
+  it('should return null for non-string stepId', () => {
+    expect(engine['validateStepIdForRedirect'](null as unknown as string)).toBeNull();
+    expect(engine['validateStepIdForRedirect'](undefined as unknown as string)).toBeNull();
+  });
+
+  it('should return null for stepId that does not exist', () => {
+    expect(engine['validateStepIdForRedirect']('nonexistent')).toBeNull();
+  });
+
+  it('should return null for stepId with unsafe characters', () => {
+    expect(engine['validateStepIdForRedirect']('step<script>')).toBeNull();
+    expect(engine['validateStepIdForRedirect']('step/../')).toBeNull();
+  });
+
+  it('should return sanitized stepId for valid step', () => {
+    expect(engine['validateStepIdForRedirect']('validStep')).toBe('validStep');
+    expect(engine['validateStepIdForRedirect']('step-with-dash')).toBe('step-with-dash');
+  });
+});
+
+describe('WizardEngine - resolveTemplatePath edge cases', () => {
+  const journeyConfig = {
+    meta: { name: 'Template Test', description: 'Test templates', version: '1.0.0' },
+    steps: {
+      withTemplate: {
+        id: 'withTemplate',
+        title: 'With Template',
+        type: 'form',
+        fields: {},
+        template: 'custom/template',
+        next: 'withoutTemplate',
+      },
+      withoutTemplate: {
+        id: 'withoutTemplate',
+        title: 'Without Template',
+        type: 'form',
+        fields: {},
+        next: 'nonexistent',
+      },
+      nonexistent: {
+        id: 'nonexistent',
+        title: 'Nonexistent',
+        type: 'form',
+        fields: {},
+        next: 'formStep',
+      },
+      formStep: {
+        id: 'formStep',
+        title: 'Form',
+        type: 'form',
+        fields: { field1: { type: 'text' } },
+        next: 'emptyStep',
+      },
+      emptyStep: {
+        id: 'emptyStep',
+        title: 'Empty',
+        type: 'form',
+        fields: {},
+        next: 'summaryStep',
+      },
+      summaryStep: {
+        id: 'summaryStep',
+        title: 'Summary',
+        type: 'summary',
+        fields: {},
+        next: 'confirmationStep',
+      },
+      confirmationStep: {
+        id: 'confirmationStep',
+        title: 'Confirmation',
+        type: 'confirmation',
+        fields: {},
+      },
+    },
+    config: { store: { type: 'memory' } },
+  };
+
+  const engine = new WizardEngine(journeyConfig, 'template-test');
+
+  it('should return cached template path when available', async () => {
+    const path1 = await engine['resolveTemplatePath']('withTemplate');
+    const path2 = await engine['resolveTemplatePath']('withTemplate');
+    expect(path1).toBe(path2);
+    expect(path1).toBe('custom/template');
+  });
+
+  it('should return stepId when step does not exist', async () => {
+    const path = await engine['resolveTemplatePath']('nonexistentStep');
+    expect(path).toBe('nonexistentStep');
+  });
+
+  it('should return explicit template when provided', async () => {
+    const path = await engine['resolveTemplatePath']('withTemplate');
+    expect(path).toBe('custom/template');
+  });
+
+  it('should return default template for summary type', async () => {
+    const path = await engine['resolveTemplatePath']('summaryStep');
+    expect(path).toBe('_defaults/summary');
+  });
+
+  it('should return form template for step with fields', async () => {
+    const path = await engine['resolveTemplatePath']('formStep');
+    expect(path).toBe('_defaults/form');
+  });
+
+  it('should return stepId as fallback for empty step', async () => {
+    const path = await engine['resolveTemplatePath']('emptyStep');
+    expect(path).toBe('emptyStep');
+  });
+});
+
+describe('WizardEngine - buildSummaryCards', () => {
+  const journeyConfig = {
+    meta: { name: 'Summary Cards Test', description: 'Test summary cards', version: '1.0.0' },
+    steps: {
+      step1: {
+        id: 'step1',
+        title: 'Step 1',
+        type: 'form',
+        fields: {
+          name: { type: 'text', label: 'Name' },
+          dateOfBirth: { type: 'date', label: 'Date of Birth' },
+          address: { type: 'address', label: 'Address' },
+          choice: {
+            type: 'radios',
+            label: 'Choice',
+            items: [
+              { value: 'yes', text: 'Yes' },
+              { value: 'no', text: 'No' },
+            ],
+          },
+        },
+        next: 'step2',
+      },
+      step2: {
+        id: 'step2',
+        title: 'Step 2',
+        type: 'form',
+        fields: {
+          field2: { type: 'text', label: 'Field 2' },
+        },
+        next: 'summary',
+      },
+      summary: {
+        id: 'summary',
+        title: 'Summary',
+        type: 'summary',
+        fields: {},
+        next: 'confirmation',
+      },
+      confirmation: {
+        id: 'confirmation',
+        title: 'Confirmation',
+        type: 'confirmation',
+        fields: {},
+      },
+    },
+    config: { store: { type: 'memory' } },
+  };
+
+  const engine = new WizardEngine(journeyConfig, 'summary-cards-test');
+  const t = makeNoopT();
+
+  it('should build summary cards with grouped rows', () => {
+    const allData = {
+      step1: {
+        name: 'John Doe',
+        dateOfBirth: { day: '01', month: '01', year: '1990' },
+        address: {
+          addressLine1: '123 Main St',
+          town: 'London',
+          postcode: 'SW1A 1AA',
+        },
+        choice: 'yes',
+      },
+      step2: {
+        field2: 'Value 2',
+      },
+    };
+
+    const cards = engine['buildSummaryCards'](allData, t, 'en');
+
+    expect(cards.length).toBeGreaterThan(0);
+    expect(cards[0].card.title.text).toBe('Step 1');
+    expect(cards[0].rows.length).toBeGreaterThan(0);
+  });
+
+  it('should skip steps with no data', () => {
+    const allData = {
+      step1: { name: 'John' },
+    };
+
+    const cards = engine['buildSummaryCards'](allData, t, 'en');
+    const step2Card = cards.find((card: { card: { title: { text: string } } }) => card.card.title.text === 'Step 2');
+    expect(step2Card).toBeUndefined();
+  });
+
+  it('should skip summary and confirmation step types', () => {
+    const allData = {
+      summary: {},
+    };
+
+    const cards = engine['buildSummaryCards'](allData, t, 'en');
+    const summaryCard = cards.find((card: { card: { title: { text: string } } }) => card.card.title.text === 'Summary');
+    expect(summaryCard).toBeUndefined();
+  });
+
+  it('should handle steps with empty fields', () => {
+    const allData = {
+      step1: {},
+    };
+
+    const cards = engine['buildSummaryCards'](allData, t, 'en');
+    const step1Card = cards.find((card: { card: { title: { text: string } } }) => card.card.title.text === 'Step 1');
+    expect(step1Card).toBeUndefined();
+  });
+});
+
+describe('WizardEngine - findPreviousStep', () => {
+  const journeyConfig = {
+    meta: { name: 'Previous Step Test', description: 'Test previous step', version: '1.0.0' },
+    steps: {
+      start: {
+        id: 'start',
+        title: 'Start',
+        type: 'form',
+        fields: {},
+        next: 'middle',
+      },
+      middle: {
+        id: 'middle',
+        title: 'Middle',
+        type: 'form',
+        fields: { choice: { type: 'text' } },
+        next: {
+          when: (stepData: Record<string, unknown>) => (stepData.choice as string) === 'yes',
+          goto: 'end',
+          else: 'other',
+        },
+      },
+      other: { id: 'other', title: 'Other', type: 'confirmation' },
+      end: { id: 'end', title: 'End', type: 'confirmation' },
+    },
+    config: { store: { type: 'memory' } },
+  };
+
+  const engine = new WizardEngine(journeyConfig, 'previous-step-test');
+
+  it('should find previous step with direct next', () => {
+    const previous = engine['findPreviousStep']('middle', {});
+    expect(previous).toBe('start');
+  });
+
+  it('should find previous step with conditional next (true branch)', () => {
+    const previous = engine['findPreviousStep']('end', {
+      middle: { choice: 'yes' },
+    });
+    expect(previous).toBe('middle');
+  });
+
+  it('should find previous step with conditional next (false branch)', () => {
+    const previous = engine['findPreviousStep']('other', {
+      middle: { choice: 'no' },
+    });
+    expect(previous).toBe('middle');
+  });
+
+  it('should return null when no previous step found', () => {
+    const previous = engine['findPreviousStep']('start', {});
+    expect(previous).toBeNull();
+  });
+
+  it('should handle step with no next property', () => {
+    // Since journey validation requires all steps to be reachable, we can't have
+    // a step with no next property in a valid journey. However, findPreviousStep
+    // logic skips steps without next properties when searching for previous steps.
+    // This test verifies that findPreviousStep correctly finds previous steps
+    // when they exist, even when some steps in the journey don't have next properties.
+    const journeyWithNoNext = {
+      meta: { name: 'No Next Test', description: 'Test no next', version: '1.0.0' },
+      steps: {
+        start: { id: 'start', title: 'Start', type: 'form', fields: {}, next: 'end' },
+        end: { id: 'end', title: 'End', type: 'confirmation' },
+      },
+      config: { store: { type: 'memory' } },
+    };
+    const engineNoNext = new WizardEngine(journeyWithNoNext, 'no-next-test');
+    // 'end' has 'start' as its previous step
+    const previous = engineNoNext['findPreviousStep']('end', {});
+    expect(previous).toBe('start');
+  });
+});
