@@ -35,7 +35,7 @@ function getDaysInMonth(month: number, year: number): number {
 
 function getDateErrorMessage(
   t?: TFunction,
-  partSpecificKey?: 'invalidDay' | 'invalidMonth' | 'invalidYear' | 'futureDate',
+  partSpecificKey?: 'futureDate',
   translations?: Record<string, string>
 ): string {
   if (partSpecificKey === 'futureDate' && translations?.dateFutureDate) {
@@ -44,7 +44,7 @@ function getDateErrorMessage(
   if (!t) {
     return DEFAULT_DATE_ERROR_MESSAGE;
   }
-  const key = partSpecificKey ? `errors.date.${partSpecificKey}` : 'errors.date.notRealDate';
+  const key = partSpecificKey === 'futureDate' ? 'errors.date.futureDate' : 'errors.date.notRealDate';
   const translated = t(key);
   return translated !== key ? translated : DEFAULT_DATE_ERROR_MESSAGE;
 }
@@ -101,11 +101,11 @@ function validateDatePart(
   const isInvalidFormat = !isNumeric(value) || value.length > maxLength || (noLeadingZero && value.startsWith('0'));
 
   if (isInvalidFormat) {
-    return getDateErrorMessage(t, errorKey, translations);
+    return getDateErrorMessage(t, undefined, translations);
   }
 
   const num = parseInt(value, 10);
-  return num < min || num > max ? getDateErrorMessage(t, errorKey, translations) : null;
+  return num < min || num > max ? getDateErrorMessage(t, undefined, translations) : null;
 }
 
 /**

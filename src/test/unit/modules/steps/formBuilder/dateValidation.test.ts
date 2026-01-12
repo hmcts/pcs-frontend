@@ -85,84 +85,84 @@ describe('dateValidation', () => {
 
     describe('format validation', () => {
       it('should return error for non-numeric day', () => {
-        const t = createMockT({ 'errors.date.invalidDay': 'Invalid day' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('ab', '06', '2000', true, t);
-        expect(result).toBe('Invalid day');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for non-numeric month', () => {
-        const t = createMockT({ 'errors.date.invalidMonth': 'Invalid month' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('15', 'ab', '2000', true, t);
-        expect(result).toBe('Invalid month');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for non-numeric year', () => {
-        const t = createMockT({ 'errors.date.invalidYear': 'Invalid year' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('15', '06', 'abcd', true, t);
-        expect(result).toBe('Invalid year');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for day with leading zero when not allowed', () => {
-        const t = createMockT({ 'errors.date.invalidDay': 'Invalid day' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('05', '06', '2000', true, t);
         // Day with leading zero is valid, so this should pass
         expect(result).toBeNull();
       });
 
       it('should return error for year with leading zero', () => {
-        const t = createMockT({ 'errors.date.invalidYear': 'Invalid year' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('15', '06', '0200', true, t);
-        expect(result).toBe('Invalid year');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for day exceeding max length', () => {
-        const t = createMockT({ 'errors.date.invalidDay': 'Invalid day' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('123', '06', '2000', true, t);
-        expect(result).toBe('Invalid day');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for month exceeding max length', () => {
-        const t = createMockT({ 'errors.date.invalidMonth': 'Invalid month' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('15', '123', '2000', true, t);
-        expect(result).toBe('Invalid month');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for year exceeding max length', () => {
-        const t = createMockT({ 'errors.date.invalidYear': 'Invalid year' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('15', '06', '12345', true, t);
-        expect(result).toBe('Invalid year');
+        expect(result).toBe('Date must be a real date');
       });
     });
 
     describe('range validation', () => {
       it('should return error for day less than 1', () => {
-        const t = createMockT({ 'errors.date.invalidDay': 'Invalid day' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('0', '06', '2000', true, t);
-        expect(result).toBe('Invalid day');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for day greater than 31', () => {
-        const t = createMockT({ 'errors.date.invalidDay': 'Invalid day' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('32', '06', '2000', true, t);
-        expect(result).toBe('Invalid day');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for month less than 1', () => {
-        const t = createMockT({ 'errors.date.invalidMonth': 'Invalid month' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('15', '0', '2000', true, t);
-        expect(result).toBe('Invalid month');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for month greater than 12', () => {
-        const t = createMockT({ 'errors.date.invalidMonth': 'Invalid month' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('15', '13', '2000', true, t);
-        expect(result).toBe('Invalid month');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should return error for year less than 1', () => {
-        const t = createMockT({ 'errors.date.invalidYear': 'Invalid year' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('15', '06', '0', true, t);
-        expect(result).toBe('Invalid year');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should accept year up to 9999', () => {
@@ -305,9 +305,9 @@ describe('dateValidation', () => {
       });
 
       it('should validate provided parts even when not all required', () => {
-        const t = createMockT({ 'errors.date.invalidDay': 'Invalid day' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField('32', '06', '', false, t);
-        expect(result).toBe('Invalid day');
+        expect(result).toBe('Date must be a real date');
       });
     });
 
@@ -331,10 +331,10 @@ describe('dateValidation', () => {
 
     describe('edge cases', () => {
       it('should return error for whitespace in date parts (not numeric)', () => {
-        const t = createMockT({ 'errors.date.invalidDay': 'Invalid day' });
+        const t = createMockT({ 'errors.date.notRealDate': 'Date must be a real date' });
         const result = validateDateField(' 15 ', ' 06 ', ' 2000 ', true, t);
         // Whitespace makes it non-numeric, so should return error
-        expect(result).toBe('Invalid day');
+        expect(result).toBe('Date must be a real date');
       });
 
       it('should handle NaN values gracefully', () => {
