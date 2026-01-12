@@ -6,14 +6,14 @@ export function initSessionTimeout(): void {
 
   // modal elements
   const modalContainer = document.getElementById('timeout-modal-container');
-  const modal = document.getElementById('timeout-modal');
-  const countdownTime = document.getElementById('countdown-time');
-  const countdownMessage = document.getElementById('countdown-message');
-  const timeoutAlert = document.getElementById('timeout-alert');
-  const continueButton = document.getElementById('timeout-modal-close-button');
+  const modal = modalContainer?.querySelector<HTMLElement>('#timeout-modal');
+  const countdownTime = modalContainer?.querySelector<HTMLElement>('#countdown-time');
+  const countdownMessage = modalContainer?.querySelector<HTMLElement>('#countdown-message');
+  const timeoutAlert = modalContainer?.querySelector<HTMLElement>('#timeout-alert');
+  const continueButton = modalContainer?.querySelector<HTMLElement>('#timeout-modal-close-button');
 
   const inertSelector = modalContainer?.dataset.inertContainer;
-  const inertContainer = inertSelector ? (document.querySelector(inertSelector) as HTMLElement) : null;
+  const inertContainer = inertSelector ? document.querySelector<HTMLElement>(inertSelector) : null;
 
   let lastActivity = Date.now();
   let warningShown = false;
@@ -50,7 +50,7 @@ export function initSessionTimeout(): void {
       (inertContainer as HTMLElement & { inert: boolean }).inert = true;
     }
 
-    body.classList.add('modal-open');
+    document.documentElement.classList.add('modal-open');
 
     modalContainer.removeAttribute('hidden');
 
@@ -77,7 +77,7 @@ export function initSessionTimeout(): void {
       (inertContainer as HTMLElement & { inert: boolean }).inert = false;
     }
 
-    body.classList.remove('modal-open');
+    document.documentElement.classList.remove('modal-open');
 
     modalContainer.setAttribute('hidden', 'hidden');
 

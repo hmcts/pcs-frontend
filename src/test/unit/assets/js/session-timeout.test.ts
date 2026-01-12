@@ -33,7 +33,14 @@ describe('initSessionTimeout', () => {
 
   const buildSessionTimeoutComponent = () => `
     <div id="timeout-alert" role="status" aria-live="assertive" aria-atomic="true" class="govuk-visually-hidden"></div>
-    <div id="timeout-modal-container" hidden>
+    <div id="timeout-modal-container" hidden
+         data-timeout-title="Session timeout"
+         data-timeout-subtitle="Your session will timeout in"
+         data-timeout-caption="Please click continue to stay signed in"
+         data-time-minute="minute"
+         data-time-minutes="minutes"
+         data-time-second="second"
+         data-time-seconds="seconds">
       <div id="timeout-modal" tabindex="-1">
         <p>Your session will expire in <span id="countdown-time"></span></p>
         <p class="govuk-visually-hidden" aria-live="polite" aria-atomic="true">
