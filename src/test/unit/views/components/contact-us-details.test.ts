@@ -11,7 +11,7 @@ describe('contact-us-details.njk', () => {
     const projectRoot = process.cwd();
     const viewsPath = path.join(projectRoot, 'src', 'main', 'views');
     const stepsPath = path.join(projectRoot, 'src', 'main', 'steps');
-    const govukPath = path.join(projectRoot, 'node_modules', 'govuk-frontend');
+    const govukPath = path.join(projectRoot, 'node_modules', 'govuk-frontend', 'dist');
 
     nunjucksEnv = nunjucks.configure([viewsPath, stepsPath, govukPath], {
       autoescape: true,
