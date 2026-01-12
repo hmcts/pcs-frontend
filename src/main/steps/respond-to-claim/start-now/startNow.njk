@@ -4,6 +4,10 @@
 
 {% block pageTitle %}Start now - Possession claims{% endblock %}
 
+{% block serviceNavigation %}
+  {# Service navigation hidden on start now page #}
+{% endblock %}
+
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
