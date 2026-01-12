@@ -1089,7 +1089,6 @@ describe('WizardEngine - constructor caching', () => {
 
   beforeEach(() => {
     // Clear the cache before each test
-    const { WizardEngine } = require('../../../../../main/modules/journey/engine/engine');
     WizardEngine.validatedJourneys.clear();
   });
 
@@ -1328,35 +1327,35 @@ describe('WizardEngine - resolveTemplatePath edge cases', () => {
   const engine = new WizardEngine(journeyConfig, 'template-test');
 
   it('should return cached template path when available', async () => {
-    const path1 = await engine['resolveTemplatePath']('withTemplate');
-    const path2 = await engine['resolveTemplatePath']('withTemplate');
-    expect(path1).toBe(path2);
-    expect(path1).toBe('custom/template');
+    const templatePath1 = await engine['resolveTemplatePath']('withTemplate');
+    const templatePath2 = await engine['resolveTemplatePath']('withTemplate');
+    expect(templatePath1).toBe(templatePath2);
+    expect(templatePath1).toBe('custom/template');
   });
 
   it('should return stepId when step does not exist', async () => {
-    const path = await engine['resolveTemplatePath']('nonexistentStep');
-    expect(path).toBe('nonexistentStep');
+    const templatePath = await engine['resolveTemplatePath']('nonexistentStep');
+    expect(templatePath).toBe('nonexistentStep');
   });
 
   it('should return explicit template when provided', async () => {
-    const path = await engine['resolveTemplatePath']('withTemplate');
-    expect(path).toBe('custom/template');
+    const templatePath = await engine['resolveTemplatePath']('withTemplate');
+    expect(templatePath).toBe('custom/template');
   });
 
   it('should return default template for summary type', async () => {
-    const path = await engine['resolveTemplatePath']('summaryStep');
-    expect(path).toBe('_defaults/summary');
+    const templatePath = await engine['resolveTemplatePath']('summaryStep');
+    expect(templatePath).toBe('_defaults/summary');
   });
 
   it('should return form template for step with fields', async () => {
-    const path = await engine['resolveTemplatePath']('formStep');
-    expect(path).toBe('_defaults/form');
+    const templatePath = await engine['resolveTemplatePath']('formStep');
+    expect(templatePath).toBe('_defaults/form');
   });
 
   it('should return stepId as fallback for empty step', async () => {
-    const path = await engine['resolveTemplatePath']('emptyStep');
-    expect(path).toBe('emptyStep');
+    const templatePath = await engine['resolveTemplatePath']('emptyStep');
+    expect(templatePath).toBe('emptyStep');
   });
 });
 
