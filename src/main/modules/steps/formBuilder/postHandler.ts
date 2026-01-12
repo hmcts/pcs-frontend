@@ -12,6 +12,7 @@ import { buildFormContent } from './formContent';
 import {
   getCustomErrorTranslations,
   getTranslationErrors,
+  normalizeCheckboxFields,
   processFieldData,
   setFormData,
   validateForm,
@@ -55,6 +56,11 @@ export function createPostHandler(
         ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
         : {};
 
+      // Normalize checkbox fields BEFORE validation to ensure checkbox values are arrays
+      // This is critical because validation functions (like required functions) need normalized checkbox arrays
+      // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
+      normalizeCheckboxFields(req, fields);
+
       const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
       const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
@@ -68,12 +74,14 @@ export function createPostHandler(
 
       // Handle saveForLater action after validation passes
       if (action === 'saveForLater') {
+        // Process field data (normalize checkboxes + consolidate date fields) before saving
         processFieldData(req, fields);
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
         return res.redirect(303, DASHBOARD_ROUTE);
       }
 
+      // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
       const { action: _, ...bodyWithoutAction } = req.body;
       setFormData(req, stepName, bodyWithoutAction);

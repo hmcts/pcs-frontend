@@ -15,12 +15,48 @@ export function getTranslation(t: TFunction, key: string, fallback?: string): st
   return translation !== key ? translation : fallback;
 }
 
+/**
+ * Normalizes a single checkbox field value to an array
+ * Handles string, array, and other value types consistently
+ */
+function normalizeCheckboxValue(value: unknown): string[] {
+  if (value === undefined || value === null) {
+    return [];
+  }
+  if (typeof value === 'string') {
+    return [value];
+  }
+  if (Array.isArray(value)) {
+    return value;
+  }
+  // Handle edge case where value exists but is not string or array
+  return [value as string];
+}
+
+/**
+ * Normalizes checkbox values to arrays before validation
+ * This must run before validation because validation functions (like required functions)
+ * need normalized checkbox arrays to work correctly
+ */
+export function normalizeCheckboxFields(req: Request, fields: FormFieldConfig[]): void {
+  for (const field of fields) {
+    if (field.type === 'checkbox') {
+      // Always normalize checkbox values to arrays, even if they don't exist yet
+      // This ensures consistent handling in production vs development
+      req.body[field.name] = normalizeCheckboxValue(req.body[field.name]);
+    }
+  }
+}
+
+/**
+ * Processes all field data (checkbox normalization + date field consolidation)
+ * This should run AFTER validation because date field validation expects individual day/month/year keys
+ */
 export function processFieldData(req: Request, fields: FormFieldConfig[]): void {
   for (const field of fields) {
-    if (field.type === 'checkbox' && req.body[field.name]) {
-      if (typeof req.body[field.name] === 'string') {
-        req.body[field.name] = [req.body[field.name]];
-      }
+    if (field.type === 'checkbox') {
+      // Normalize checkbox values (in case they weren't normalized before validation)
+      req.body[field.name] = normalizeCheckboxValue(req.body[field.name]);
     } else if (field.type === 'date') {
       const day = req.body[`${field.name}-day`]?.trim() || '';
       const month = req.body[`${field.name}-month`]?.trim() || '';
@@ -188,10 +224,13 @@ export function validateForm(
     if (parentFieldName) {
       // For nested fields, check if parent field value contains subField data
       const parentValue = formData[parentFieldName];
-      if (typeof parentValue === 'object' && parentValue !== null) {
+      // Check if parentValue is a plain object (not an array) that might contain subField data
+      // Arrays are objects in JavaScript, so we need to exclude them explicitly
+      if (typeof parentValue === 'object' && parentValue !== null && !Array.isArray(parentValue)) {
         value = (parentValue as Record<string, unknown>)[field.name];
-      } else {
-        // Try direct access with nested name
+      }
+      // If value is still undefined, try direct access with nested name
+      if (value === undefined) {
         value = req.body[fieldName] || formData[fieldName];
       }
     } else {
