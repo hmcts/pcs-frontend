@@ -11,7 +11,6 @@ import { sessionTimeoutMiddleware } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import registerSteps from './routes/registerSteps';
-import respondToClaimRoutes from './routes/respond-to-claim';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
