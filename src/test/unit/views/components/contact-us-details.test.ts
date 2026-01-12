@@ -34,6 +34,12 @@ describe('contact-us-details.njk', () => {
       expect(html).toContain('Contact us for help');
     });
 
+    it('should contain the help text "If you need help using this service, contact us."', () => {
+      const html = nunjucksEnv.render('components/contact-us-details.njk');
+
+      expect(html).toContain('If you need help using this service, contact us.');
+    });
+
     it('should contain email section heading', () => {
       const html = nunjucksEnv.render('components/contact-us-details.njk');
 

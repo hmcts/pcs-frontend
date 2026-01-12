@@ -4,6 +4,32 @@
 
 import { initSessionTimeout } from '../../../../main/assets/js/session-timeout';
 
+// Suppress jsdom navigation errors globally for this test file
+const originalConsoleError = console.error;
+beforeAll(() => {
+  console.error = jest.fn((message: unknown, ...args: unknown[]) => {
+    // Suppress jsdom navigation errors
+    const messageStr = String(message);
+    const hasNavigationError =
+      messageStr.includes('Not implemented: navigation') ||
+      (message instanceof Error && message.message.includes('Not implemented: navigation')) ||
+      args.some(
+        arg =>
+          (arg instanceof Error && arg.message.includes('Not implemented: navigation')) ||
+          (typeof arg === 'string' && arg.includes('Not implemented: navigation'))
+      );
+
+    if (hasNavigationError) {
+      return;
+    }
+    originalConsoleError(message, ...args);
+  });
+});
+
+afterAll(() => {
+  console.error = originalConsoleError;
+});
+
 describe('initSessionTimeout', () => {
   let mockDateNow: jest.SpyInstance;
   let mockFetch: jest.Mock;
