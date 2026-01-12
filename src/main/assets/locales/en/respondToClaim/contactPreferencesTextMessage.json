@@ -1,0 +1,14 @@
+{
+  "title": "Contact by text message",
+  "subtitle": "We might need to send updates about your case by text message.",
+  "labels": {
+    "question": "Are you happy to be contacted by text message?",
+    "yes": "Yes",
+    "no": "No",
+    "phoneNumberLabel": "UK telephone number"
+  },
+  "buttons": {
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  }
+}
