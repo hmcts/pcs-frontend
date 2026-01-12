@@ -11,16 +11,19 @@ import { sessionTimeoutMiddleware } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import registerSteps from './routes/registerSteps';
+import respondToClaimRoutes from './routes/respond-to-claim';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
 
 export const app = express();
+
 app.locals.ENV = env;
 
 setupDev(app, developmentMode);
 
 app.use(cookieParser());
+app.use(respondToClaimRoutes);
 
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
