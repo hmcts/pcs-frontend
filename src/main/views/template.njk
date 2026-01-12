@@ -22,18 +22,20 @@
 {% endblock %}
 
 {% block beforeContent %}
-  {{ govukServiceNavigation({
-    serviceName: t('serviceName', 'Respond to a property possession claim'),
-    serviceUrl: "/dashboard",
-    navigation: [
-      {
-        text: t('logout', 'Log out'),
-        href: "/logout"
-      }
-    ],
-    navigationLabel: t('navigationLabel', 'Service navigation'),
-    navigationClasses: "pcs-service-navigation-wrapper"
-  }) }}
+  {% block serviceNavigation %}
+    {{ govukServiceNavigation({
+      serviceName: t('serviceName', 'Respond to a property possession claim'),
+      serviceUrl: "/dashboard",
+      navigation: [
+        {
+          text: t('logout', 'Log out'),
+          href: "/logout"
+        }
+      ],
+      navigationLabel: t('navigationLabel', 'Service navigation'),
+      navigationClasses: "pcs-service-navigation-wrapper"
+    }) }}
+  {% endblock %}
 
   <div class="govuk-width-container">
     {{ govukPhaseBanner({
