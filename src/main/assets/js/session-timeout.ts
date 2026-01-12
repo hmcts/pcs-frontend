@@ -1,14 +1,3 @@
-// format time helper
-function formatTime(minutes: number, seconds: number): string {
-  if (minutes > 0 && seconds > 0) {
-    return `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds} second${seconds !== 1 ? 's' : ''}`;
-  } else if (minutes > 0) {
-    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-  } else {
-    return `${seconds} second${seconds !== 1 ? 's' : ''}`;
-  }
-}
-
 export function initSessionTimeout(): void {
   const body = document.body;
   const sessionTimeoutMinutes = parseInt(body.dataset.sessionTimeout!, 10);
@@ -31,9 +20,25 @@ export function initSessionTimeout(): void {
   let countdownInterval: number | null = null;
 
   // translations from data attributes
-  const timeoutTitle = modalContainer?.dataset.timeoutTitle || '';
-  const timeoutSubtitle = modalContainer?.dataset.timeoutSubtitle || '';
-  const timeoutCaption = modalContainer?.dataset.timeoutCaption || '';
+  const { timeoutTitle, timeoutSubtitle, timeoutCaption, timeMinute, timeMinutes, timeSecond, timeSeconds } =
+    modalContainer?.dataset ?? {};
+
+  // format time helper
+  const formatTime = (minutes: number, seconds: number): string => {
+    const parts: string[] = [];
+
+    if (minutes > 0) {
+      const minuteLabel = minutes === 1 ? timeMinute : timeMinutes;
+      parts.push(`${minutes} ${minuteLabel}`);
+    }
+
+    if (seconds > 0) {
+      const secondLabel = seconds === 1 ? timeSecond : timeSeconds;
+      parts.push(`${seconds} ${secondLabel}`);
+    }
+
+    return parts.join(' ');
+  };
 
   // show modal
   const showModal = () => {

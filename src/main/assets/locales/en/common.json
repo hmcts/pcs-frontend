@@ -70,6 +70,12 @@
     "buttonText": "Stay signed in",
     "signOutLinkText": "Sign out"
   },
+  "time": {
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "second",
+    "seconds": "seconds"
+  },
   "characterCount": {
     "charactersUnderLimitText": {
       "one": "You have %{count} character remaining",

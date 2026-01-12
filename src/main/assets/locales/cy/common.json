@@ -70,6 +70,12 @@
     "buttonText": "cyStay signed in",
     "signOutLinkText": "cySign out"
   },
+  "time": {
+    "minute": "cyminute",
+    "minutes": "cyminutes",
+    "second": "cysecond",
+    "seconds": "cyseconds"
+  },
   "characterCount": {
     "charactersUnderLimitText": {
       "one": "cyYou have %{count} character remaining",
