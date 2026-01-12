@@ -20,8 +20,16 @@ export function initSessionTimeout(): void {
   let countdownInterval: number | null = null;
 
   // translations from data attributes
-  const { timeoutTitle, timeoutSubtitle, timeoutCaption, timeMinute, timeMinutes, timeSecond, timeSeconds } =
-    modalContainer?.dataset ?? {};
+  const {
+    timeoutTitle,
+    timeoutSubtitle,
+    timeoutCaption,
+    timeMinute,
+    timeMinutes,
+    timeSecond,
+    timeSeconds,
+    timeRemaining,
+  } = modalContainer?.dataset ?? {};
 
   // format time helper
   const formatTime = (minutes: number, seconds: number): string => {
@@ -55,7 +63,7 @@ export function initSessionTimeout(): void {
     modalContainer.removeAttribute('hidden');
 
     if (timeoutAlert) {
-      timeoutAlert.textContent = `${timeoutTitle}. ${timeoutSubtitle} ${sessionWarningMinutes} minutes. ${timeoutCaption}`;
+      timeoutAlert.textContent = `${timeoutTitle}. ${timeoutSubtitle} ${sessionWarningMinutes} ${timeMinutes}. ${timeoutCaption}`;
     }
 
     setTimeout(() => {
@@ -125,10 +133,10 @@ export function initSessionTimeout(): void {
       updateVisualCountdown(secondsRemaining);
 
       if (secondsRemaining === warningTimeSeconds) {
-        updateScreenReaderAnnouncement(`${timeoutSubtitle} ${warningTimeSeconds / 60} minutes.`);
+        updateScreenReaderAnnouncement(`${timeoutSubtitle} ${warningTimeSeconds / 60} ${timeMinutes}.`);
       } else if (secondsRemaining > 0 && secondsRemaining < warningTimeSeconds && secondsRemaining % 60 === 0) {
         const minutes = secondsRemaining / 60;
-        updateScreenReaderAnnouncement(`${formatTime(minutes, 0)} remaining`);
+        updateScreenReaderAnnouncement(`${formatTime(minutes, 0)} ${timeRemaining}`);
       }
 
       secondsRemaining--;

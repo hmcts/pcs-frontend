@@ -40,7 +40,8 @@ describe('initSessionTimeout', () => {
          data-time-minute="minute"
          data-time-minutes="minutes"
          data-time-second="second"
-         data-time-seconds="seconds">
+         data-time-seconds="seconds"
+         data-time-remaining="remaining">
       <div id="timeout-modal" tabindex="-1">
         <p>Your session will expire in <span id="countdown-time"></span></p>
         <p class="govuk-visually-hidden" aria-live="polite" aria-atomic="true">
