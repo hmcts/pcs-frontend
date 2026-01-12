@@ -15,5 +15,14 @@ module.exports = {
   },
   testPathIgnorePatterns: ['/__mocks__/'],
   coverageProvider: 'v8',
+  collectCoverageFrom: [
+    'src/main/**/*.{ts,js}',
+    '!src/main/**/*.d.ts',
+    '!src/main/**/index.ts',
+    'src/main/modules/session/index.ts',
+    'src/main/modules/journey/engine/engine.ts',
+    '!src/main/**/*.test.ts',
+    '!src/main/**/*.spec.ts',
+  ],
   transformIgnorePatterns: ['node_modules/(?!(jose|@panva|oidc-token-hash)/)'],
 };
