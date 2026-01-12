@@ -22,7 +22,6 @@ app.locals.ENV = env;
 setupDev(app, developmentMode);
 
 app.use(cookieParser());
-app.use(respondToClaimRoutes);
 
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
