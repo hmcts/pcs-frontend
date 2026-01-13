@@ -1,36 +1,28 @@
-import type { Request, Response } from 'express';
-
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { flowConfig } from '../flow.config';
+import { createFormStep } from '../../../modules/steps';
 
-const stepName = 'free-legal-advice';
-const stepNavigation = createStepNavigation(flowConfig);
-
-export const step: StepDefinition = {
-  url: '/respond-to-claim/free-legal-advice',
-  name: stepName,
-  view: 'respond-to-claim/free-legal-advice/freeLegalAdvice.njk',
+export const step: StepDefinition = createFormStep({
+  stepName: 'free-legal-advice',
+  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  getController: () => {
-    return createGetController(
-      'respond-to-claim/free-legal-advice/freeLegalAdvice.njk',
-      stepName,
-      undefined,
-      'respondToClaim'
-    );
+  basePath: '/respond-to-claim',
+  translationKeys: {
+    pageTitle: 'title',
+    content: 'content',
   },
-  postController: {
-    post: async (req: Request, res: Response) => {
-      // Get next step URL and redirect
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
-
-      if (!redirectPath) {
-        // No next step defined - show not found page
-        return res.status(404).render('not-found');
-      }
-
-      res.redirect(303, redirectPath);
+  fields: [
+    {
+      name: 'hadLegalAdvice',
+      type: 'radio',
+      required: true,
+      translationKey: {
+        label: 'question',
+      },
+      options: [
+        { value: 'yes', translationKey: 'options.yes' },
+        { value: 'no', translationKey: 'options.no' },
+        { value: 'preferNotToSay', translationKey: 'options.preferNotToSay' },
+      ],
     },
-  },
-};
+  ],
+});

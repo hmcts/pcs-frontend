@@ -70,6 +70,7 @@ export interface FormBuilderConfig {
   extendGetContent?: (req: Request, content: TranslationContent) => Record<string, unknown>;
   stepDir: string;
   translationKeys?: TranslationKeys;
+  basePath?: string;
 }
 
 export interface ComponentConfig {
