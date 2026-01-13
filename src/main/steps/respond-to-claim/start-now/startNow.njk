@@ -65,13 +65,13 @@
   </p>
 
   <form method="post" action="{{ url }}" novalidate>
-      <div class="govuk-button-group">
-        {{ govukButton({
-          text: t('buttons.startNow', 'Start now'),
-          isStartButton: true,
-          attributes: { type: 'submit' }
-        }) }}
-      </div>
-    </form>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.startNow', 'Start now'),
+        isStartButton: true,
+        attributes: { type: 'submit' }
+      }) }}
+    </div>
+  </form>
 {% endblock %}
 
