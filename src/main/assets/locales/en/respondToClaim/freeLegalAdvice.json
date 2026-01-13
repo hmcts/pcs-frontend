@@ -1,4 +1,11 @@
 {
-  "title": "Free legal advice",
-  "secondaryHeading": "Respond to a property possession claim"
+  "title": "You're entitled to free legal advice before you submit your response",
+  "secondaryHeading": "Respond to a property possession claim",
+  "content": "<p class=\"govuk-body\">You can get free legal advice to help you understand your options and prepare your response.</p><p class=\"govuk-body\"><a href=\"https://www.gov.uk/find-legal-adviser\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find a legal adviser service (opens in new tab)</a></p>",
+  "question": "Have you had any free legal advice?",
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "preferNotToSay": "Prefer not to say"
+  }
 }
