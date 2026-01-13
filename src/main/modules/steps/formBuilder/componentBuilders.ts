@@ -29,7 +29,7 @@ export function buildComponentConfig(
   label: string,
   hint: string | undefined,
   fieldValue: unknown,
-  translatedOptions: { value: string; text: string }[] | undefined,
+  translatedOptions: { value?: string; text?: string; divider?: string }[] | undefined,
   hasError: boolean,
   errorText: string | undefined,
   index: number,

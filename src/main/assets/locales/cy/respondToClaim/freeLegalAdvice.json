@@ -6,6 +6,7 @@
   "options": {
     "yes": "cyYes",
     "no": "cyNo",
+    "or": "cyOr",
     "preferNotToSay": "cyPrefer not to say"
   }
 }
