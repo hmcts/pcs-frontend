@@ -48,6 +48,12 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    before('functionalTest:preview') {
+       if (env.RUN_FUNCTIONAL_TESTS != "true") {
+         echo "Skipping functionalTest:preview – label not present"
+         return
+       }
+     }
     afterAlways('functionalTest:preview') {
       try {
         publishHTML([
