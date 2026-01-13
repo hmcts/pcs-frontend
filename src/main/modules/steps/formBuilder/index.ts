@@ -23,14 +23,13 @@ function camelToKebabCase(str: string): string {
   return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
-export function createFormStep(config: FormBuilderConfig): StepDefinition {
+export function createFormStep(config: FormBuilderConfig, viewPath: string = 'formBuilder.njk'): StepDefinition {
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
   const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys, basePath } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
-  const viewPath = 'formBuilder.njk';
 
   return {
     url: basePath ? path.join(basePath, stepName) : path.join('/steps', journeyPath, stepName),
