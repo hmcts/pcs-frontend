@@ -6,6 +6,7 @@
   "options": {
     "yes": "Yes",
     "no": "No",
+    "or": "or",
     "preferNotToSay": "Prefer not to say"
   }
 }

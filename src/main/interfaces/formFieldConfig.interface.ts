@@ -10,6 +10,7 @@ export interface FormFieldOption {
   // Backward compatible: text property still supported
   text?: string;
   // Translation key for option text (backward compatible)
+  divider?: string;
   translationKey?: string;
   // Dynamic label function (takes translations object, returns string)
   label?: string | ((translations: Record<string, string>) => string);
