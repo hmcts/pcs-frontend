@@ -2,6 +2,7 @@ import { isEmail, isMobilePhone } from 'validator';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
+import { normalizeCheckboxValue } from '../../../modules/steps/formBuilder/helpers';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'enter-contact-preferences',
@@ -109,12 +110,12 @@ export const step: StepDefinition = createFormStep({
                 // Only required if 'evening' checkbox is selected
                 // Check current formData first, then fall back to allData
                 const currentData =
-                  (formData.preferredTimes as string[]) ||
-                  (allData['enter-contact-preferences'] as { preferredTimes?: string[] })?.preferredTimes;
-                return (
-                  (Array.isArray(currentData) && currentData.includes('evening')) ||
-                  String(currentData).includes('evening')
-                );
+                  formData.preferredTimes ||
+                  (allData['enter-contact-preferences'] as { preferredTimes?: unknown })?.preferredTimes;
+
+                // Normalize checkbox value to handle Docker edge case: [{ '0': 'evening' }]
+                const normalizedPreferredTimes = normalizeCheckboxValue(currentData);
+                return normalizedPreferredTimes.includes('evening');
               },
               translationKey: {
                 label: 'eveningTimeLabel',
