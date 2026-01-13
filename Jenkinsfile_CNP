@@ -40,7 +40,6 @@ withPipeline(type, product, component) {
         env.PCS_API_CHANGE_ID = labelName.replace("pcs-api-pr:", "")
         env.DATA_STORE_URL_BASE = "https://ccd-data-store-api-pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
     }
-    nonServiceApp()
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
