@@ -3,7 +3,13 @@ import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 export const flowConfig: JourneyFlowConfig = {
   basePath: '/respond-to-claim',
   journeyName: 'respondToClaim',
-  stepOrder: ['start-now', 'free-legal-advice', 'defendant-name-confirmation', 'defendant-name-capture', 'postcode-finder'],
+  stepOrder: [
+    'start-now',
+    'free-legal-advice',
+    'defendant-name-confirmation',
+    'defendant-name-capture',
+    'postcode-finder',
+  ],
   steps: {
     'start-now': {
       defaultNext: 'free-legal-advice',

@@ -269,7 +269,10 @@ export function translateFields(
     // Build translated options for component builder (backward compatible format)
     const translatedOptions = field.options?.map(option => {
       const text = option.text || (option.translationKey ? t(option.translationKey) : null) || option.value;
-      const translatedOption = { ...option, ...(option.divider ? { divider: t(option.divider, option.divider) } : { text }) };
+      const translatedOption = {
+        ...option,
+        ...(option.divider ? { divider: t(option.divider, option.divider) } : { text }),
+      };
       return translatedOption;
     });
     // For nested fields (subFields), extract simple name to look up values

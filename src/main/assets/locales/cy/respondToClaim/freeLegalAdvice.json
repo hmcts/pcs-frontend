@@ -3,6 +3,7 @@
   "secondaryHeading": "cyRespond to a property possession claim",
   "content": "<p class=\"govuk-body\">cyYou can get free legal advice to help you understand your options and prepare your response.</p><p class=\"govuk-body\"><a href=\"https://www.gov.uk/find-legal-adviser\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">cyFind a legal adviser service (opens in new tab)</a></p>",
   "question": "cyHave you had any free legal advice?",
+  "hadLegalAdviceHint": "cyWe're asking this question so we can check everyone is getting the free support they're entitled to. Your answer will not affect the outcome of the claim",
   "options": {
     "yes": "cyYes",
     "no": "cyNo",
