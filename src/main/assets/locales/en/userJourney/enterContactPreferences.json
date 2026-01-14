@@ -1,0 +1,39 @@
+{
+  "title": "How would you like to be contacted?",
+  "hint": "Select your preferred method of contact. We may need to get in touch with you about your application.",
+  "options": {
+    "email": "Email",
+    "phone": "Phone",
+    "post": "Post",
+    "other": "Other"
+  },
+  "emailAddressLabel": "Email address",
+  "emailAddressHint": "We'll use this to send you updates about your application",
+  "phoneNumberLabel": "Phone number",
+  "phoneNumberHint": "Include the country code if calling from outside the UK",
+  "otherDetailsLabel": "Please provide details",
+  "otherDetailsHint": "Tell us how you would like to be contacted",
+  "preferredTimesTitle": "When is the best time to contact you?",
+  "preferredTimesHint": "Select all that apply",
+  "preferredTimesOptions": {
+    "morning": "Morning (9am to 12pm)",
+    "afternoon": "Afternoon (12pm to 5pm)",
+    "evening": "Evening (5pm to 9pm)",
+    "anytime": "Anytime"
+  },
+  "eveningTimeLabel": "Preferred evening time",
+  "eveningTimeHint": "Enter a time in 24-hour format (e.g., 18:30)",
+  "buttons": {
+    "continue": "Continue",
+    "saveForLater": "Save for later",
+    "cancel": "Cancel"
+  },
+  "errors": {
+    "title": "There is a problem",
+    "contactMethod": "Select how you would like to be contacted",
+    "emailAddress": "Enter a valid email address",
+    "phoneNumber": "Enter a valid phone number",
+    "otherDetails": "Provide details of how you would like to be contacted",
+    "eveningTime": "Enter a preferred evening time"
+  }
+}

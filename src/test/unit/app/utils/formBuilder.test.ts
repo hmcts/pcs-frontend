@@ -16,35 +16,21 @@ jest.mock('../../../../main/modules/steps/controller', () => ({
   })),
 }));
 
-jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
-  getFormData: (...args: unknown[]) => mockGetFormData(...args),
-  setFormData: (...args: unknown[]) => mockSetFormData(...args),
-  validateForm: (...args: unknown[]) => mockValidateForm(...args),
-  getTranslation: jest.fn((t: (key: string) => string, key: string, fallback?: string) => {
-    const translation = t(key);
-    return translation !== key ? translation : fallback;
-  }),
-  processFieldData: jest.fn((req: Request, fields: unknown[]) => {
-    const fieldsArray = fields as { name: string; type: string }[];
-    for (const field of fieldsArray) {
-      if (field.type === 'checkbox' && req.body[field.name]) {
-        if (typeof req.body[field.name] === 'string') {
-          req.body[field.name] = [req.body[field.name]];
-        }
-      } else if (field.type === 'date') {
-        const day = req.body[`${field.name}-day`]?.trim() || '';
-        const month = req.body[`${field.name}-month`]?.trim() || '';
-        const year = req.body[`${field.name}-year`]?.trim() || '';
-
-        req.body[field.name] = { day, month, year };
-        delete req.body[`${field.name}-day`];
-        delete req.body[`${field.name}-month`];
-        delete req.body[`${field.name}-year`];
-      }
-    }
-  }),
-  getTranslationErrors: jest.fn(() => ({})),
-}));
+jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
+  const actual = jest.requireActual('../../../../main/modules/steps/formBuilder/helpers');
+  return {
+    ...actual,
+    getFormData: (...args: unknown[]) => mockGetFormData(...args),
+    setFormData: (...args: unknown[]) => mockSetFormData(...args),
+    validateForm: (...args: unknown[]) => mockValidateForm(...args),
+    getTranslation: jest.fn((t: (key: string) => string, key: string, fallback?: string) => {
+      const translation = t(key);
+      return translation !== key ? translation : fallback;
+    }),
+    getTranslationErrors: jest.fn(() => ({})),
+    getCustomErrorTranslations: jest.fn(() => ({})),
+  };
+});
 
 const mockGetNextStepUrl = jest.fn();
 const mockGetBackUrl = jest.fn();
@@ -123,10 +109,25 @@ describe('formBuilder', () => {
   const createMockRequest = (overrides: Partial<Request> = {}): Request => {
     const defaultT = createMockT();
     const defaultI18n = createMockI18n(defaultT);
+    const defaultApp = {
+      locals: {
+        nunjucksEnv: {
+          render: jest.fn((template: string) => `Rendered ${template}`),
+        },
+      },
+    };
     return {
       session: { formData: {} },
       language: 'en',
       t: defaultT,
+      app: {
+        ...defaultApp,
+        ...(overrides.app || {}),
+        locals: {
+          ...defaultApp.locals,
+          ...(overrides.app?.locals || {}),
+        },
+      },
       ...overrides,
       // Ensure i18n is always set even if overrides don't include it
       i18n: (overrides.i18n ?? defaultI18n) as import('i18next').i18n,
@@ -908,7 +909,14 @@ describe('formBuilder', () => {
         expect(res.render).toHaveBeenCalledWith(
           'formBuilder.njk',
           expect.objectContaining({
-            error: { field: 'testField', anchor: 'testField', text: 'This field is required' },
+            errorSummary: expect.objectContaining({
+              errorList: expect.arrayContaining([
+                expect.objectContaining({
+                  href: '#testField',
+                  text: 'This field is required',
+                }),
+              ]),
+            }),
             ccdId: '1765881343803991',
           })
         );
@@ -1002,6 +1010,7 @@ describe('formBuilder', () => {
         const res = {
           status: jest.fn().mockReturnThis(),
           render: jest.fn(),
+          redirect: jest.fn(), // Add redirect in case validation somehow passes
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1015,7 +1024,14 @@ describe('formBuilder', () => {
         expect(res.render).toHaveBeenCalledWith(
           'formBuilder.njk',
           expect.objectContaining({
-            error: { field: 'testField', anchor: 'testField', text: 'Error message' },
+            errorSummary: expect.objectContaining({
+              errorList: expect.arrayContaining([
+                expect.objectContaining({
+                  href: '#testField',
+                  text: 'Error message',
+                }),
+              ]),
+            }),
             ccdId: '1765881343803991',
           })
         );

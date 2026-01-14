@@ -1,9 +1,11 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, getFormData, setFormData, stepNavigation, validateForm } from '../../../modules/steps';
+import { renderWithErrors } from '../../../modules/steps/formBuilder/errorUtils';
+import { buildFormContent } from '../../../modules/steps/formBuilder/formContent';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
 
@@ -65,7 +67,7 @@ export const step: StepDefinition = {
     );
   },
   postController: {
-    post: async (req: Request, res: Response) => {
+    post: async (req: Request, res: Response, _next: NextFunction) => {
       const { action, lookupPostcode, selectedAddressIndex } = req.body;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const t: TFunction = (req as any).t || ((key: string) => key);
@@ -140,26 +142,35 @@ export const step: StepDefinition = {
             .trim();
         }
 
+        // Get all form data from session for cross-field validation
+        const allFormData = req.session.formData
+          ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
+          : {};
+
         const fields = getFields(t);
-        const errors = validateForm(req, fields);
+        const errors = validateForm(req, fields, undefined, allFormData);
 
         if (Object.keys(errors).length > 0) {
-          const firstField = Object.keys(errors)[0];
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const lang = (req as any).language || 'en';
-          return res.status(400).render('userJourney/enter-address/enterAddress.njk', {
-            ...req.body,
-            error: {
-              field: firstField,
-              text: errors[firstField],
-            },
-            errorSummaryTitle: t('errors.title'),
+          // Use new error handling utilities
+          const formContent = buildFormContent(fields, t, req.body, errors);
+          // Add address-specific data for template
+          const extendedContent = {
+            ...formContent,
             addressResults: req.session.postcodeLookupResult || null,
-            backUrl: '/steps/user-journey/enter-user-details',
-            lang,
-            pageUrl: req.originalUrl || '/',
-            t,
-          });
+            lookupPostcode: req.session.lookupPostcode || '',
+            selectedAddressIndex: getFormData(req, stepName)?.selectedAddressIndex || null,
+          };
+          renderWithErrors(
+            req,
+            res,
+            'userJourney/enter-address/enterAddress.njk',
+            errors,
+            fields,
+            extendedContent,
+            stepName,
+            'userJourney'
+          );
+          return; // renderWithErrors sends the response, so we return early
         }
 
         setFormData(req, stepName, req.body);

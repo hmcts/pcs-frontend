@@ -11,7 +11,6 @@ export interface JourneyConfig {
   flowConfig: JourneyFlowConfig;
   stepRegistry: Record<string, StepDefinition>;
 }
-
 // Journey registry - add new journeys here
 export const journeyRegistry: Record<string, JourneyConfig> = {
   userJourney: {
