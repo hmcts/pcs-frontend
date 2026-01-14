@@ -1,5 +1,7 @@
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 
+import { normalizeCheckboxValue } from './helpers';
+
 /**
  * Checks if an option is selected for a radio or checkbox field
  * @param fieldValue - The current value of the field
@@ -13,10 +15,9 @@ export function isOptionSelected(fieldValue: unknown, optionValue: string, field
   }
 
   if (fieldType === 'checkbox') {
-    if (Array.isArray(fieldValue)) {
-      return fieldValue.includes(optionValue);
-    }
-    return fieldValue === optionValue;
+    // Normalize checkbox value to handle edge case: [{ '0': 'value1', '1': 'value2' }]
+    const normalizedValue = normalizeCheckboxValue(fieldValue);
+    return normalizedValue.includes(optionValue);
   }
 
   return false;

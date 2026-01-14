@@ -18,8 +18,9 @@ export function getTranslation(t: TFunction, key: string, fallback?: string): st
 /**
  * Normalizes a single checkbox field value to an array
  * Handles string, array, and other value types consistently
+ * Also handles edge case where arrays contain objects with numeric keys: [{ '0': 'value1', '1': 'value2' }]
  */
-function normalizeCheckboxValue(value: unknown): string[] {
+export function normalizeCheckboxValue(value: unknown): string[] {
   if (value === undefined || value === null) {
     return [];
   }
@@ -27,7 +28,23 @@ function normalizeCheckboxValue(value: unknown): string[] {
     return [value];
   }
   if (Array.isArray(value)) {
-    return value;
+    // Handle edge case: array containing object(s) with numeric keys
+    // e.g., [{ '0': 'value1', '1': 'value2' }] or [{ '0': 'value1' }, { '0': 'value2' }]
+    if (value.length > 0 && typeof value[0] === 'object' && value[0] !== null && !Array.isArray(value[0])) {
+      const extractedValues: string[] = [];
+      for (const item of value) {
+        if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+          // Extract all values from object with numeric keys
+          const objValues = Object.values(item).filter(v => typeof v === 'string') as string[];
+          extractedValues.push(...objValues);
+        } else if (typeof item === 'string') {
+          extractedValues.push(item);
+        }
+      }
+      return extractedValues.length > 0 ? extractedValues : [];
+    }
+    // Normal array of strings
+    return value.filter(v => typeof v === 'string') as string[];
   }
   // Handle edge case where value exists but is not string or array
   return [value as string];
