@@ -17,7 +17,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Error page to indicate Page Not Found error @PR @nightly', () => {
-  test('Error page is displayed when invalid step URL is accessed', async () => {
+  test('Content Validation on Page not found page', async () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
   });
 });
