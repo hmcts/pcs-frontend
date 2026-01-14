@@ -1,6 +1,15 @@
 import type { TFunction } from 'i18next';
+import type { Environment } from 'nunjucks';
 
-import type { ComponentConfig, ComponentType, FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
+import type {
+  ComponentConfig,
+  ComponentType,
+  FormFieldConfig,
+  FormFieldOption,
+} from '../../../interfaces/formFieldConfig.interface';
+
+import { normalizeCheckboxValue } from './helpers';
+import { buildSubFieldsHTML } from './subFieldsRenderer';
 
 function createFieldsetLegend(
   label: string,
@@ -25,7 +34,8 @@ export function buildComponentConfig(
   errorText: string | undefined,
   index: number,
   hasTitle: boolean,
-  t: TFunction
+  t: TFunction,
+  nunjucksEnv: Environment
 ): ComponentConfig {
   const isFirstField = index === 0 && !hasTitle;
   const component: Record<string, unknown> = {
@@ -86,30 +96,86 @@ export function buildComponentConfig(
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
       component.fieldset = createFieldsetLegend(label, isFirstField);
+
+      // Build items with conditional content and subFields support
       component.items =
-        translatedOptions?.map(option => ({
-          value: option.value,
-          text: option.text,
-          checked: radioValue === option.value,
-        })) || [];
+        field.options?.map((option: FormFieldOption, optionIndex: number) => {
+          const item: Record<string, unknown> = {
+            value: option.value,
+            text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
+            checked: radioValue === option.value,
+          };
+
+          // Build conditional HTML from conditionalText and subFields
+          const conditionalParts: string[] = [];
+
+          // Add conditional text if provided (already processed in fieldTranslation)
+          if (option.conditionalText && typeof option.conditionalText === 'string') {
+            conditionalParts.push(option.conditionalText);
+          }
+
+          // Build and add subFields HTML
+          if (option.subFields) {
+            const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
+            if (subFieldsHTML) {
+              conditionalParts.push(subFieldsHTML);
+            }
+          }
+
+          // Set conditional HTML if we have any content
+          if (conditionalParts.length > 0) {
+            item.conditional = {
+              html: conditionalParts.join('\n'),
+            };
+          }
+
+          return item;
+        }) || [];
+
       componentType = 'radios';
       break;
     }
     case 'checkbox': {
-      const checkboxValue = (fieldValue as unknown) || [];
-      const checkboxArray =
-        Array.isArray(checkboxValue) && typeof checkboxValue !== 'string'
-          ? checkboxValue
-          : checkboxValue
-            ? [checkboxValue]
-            : [];
+      // Normalize checkbox value to handle edge case: [{ '0': 'value1', '1': 'value2' }]
+      // This ensures checkbox values are always in the correct format for rendering
+      const checkboxArray = normalizeCheckboxValue(fieldValue);
       component.fieldset = createFieldsetLegend(label, isFirstField);
+
+      // Build items with conditional content and subFields support
       component.items =
-        translatedOptions?.map(option => ({
-          value: option.value,
-          text: option.text,
-          checked: checkboxArray.includes(option.value),
-        })) || [];
+        field.options?.map((option: FormFieldOption, optionIndex: number) => {
+          const item: Record<string, unknown> = {
+            value: option.value,
+            text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
+            checked: checkboxArray.includes(option.value),
+          };
+
+          // Build conditional HTML from conditionalText and subFields
+          const conditionalParts: string[] = [];
+
+          // Add conditional text if provided (already processed in fieldTranslation)
+          if (option.conditionalText && typeof option.conditionalText === 'string') {
+            conditionalParts.push(option.conditionalText);
+          }
+
+          // Build and add subFields HTML
+          if (option.subFields) {
+            const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
+            if (subFieldsHTML) {
+              conditionalParts.push(subFieldsHTML);
+            }
+          }
+
+          // Set conditional HTML if we have any content
+          if (conditionalParts.length > 0) {
+            item.conditional = {
+              html: conditionalParts.join('\n'),
+            };
+          }
+
+          return item;
+        }) || [];
+
       componentType = 'checkboxes';
       break;
     }

@@ -1,6 +1,12 @@
 {
   "question": "cyEnter your date of birth",
   "errors": {
-    "dateOfBirth": "cyEnter your date of birth"
+    "dateOfBirth": {
+      "required": "cyEnter your date of birth",
+      "notRealDate": "cyYour date of birth must be a real date",
+      "missingOne": "cyYour date of birth must include a {{missingField}}",
+      "missingTwo": "cyYour date of birth must include a {{first}} and {{second}}",
+      "futureDate": "cyYour date of birth must be in the past"
+    }
   }
 }
