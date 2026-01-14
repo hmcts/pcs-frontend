@@ -29,6 +29,13 @@ function getErrorMessages(status: number, t: TFunction): { title: string; paragr
 export function createNotFoundHandler(): (req: Request, res: Response, next: NextFunction) => void {
   return (_req: Request, res: Response, next: NextFunction) => {
     if (!res.headersSent && !(res as { writableEnded?: boolean }).writableEnded) {
+      const url = _req.originalUrl || 'Unknown URL';
+      // Skip logging for common browser/dev tools requests that generate harmless 404s
+      const shouldSkipLogging = url.startsWith('/.well-known/') || url.startsWith('/favicon.ico');
+
+      if (!shouldSkipLogging) {
+        logger.error('Page not found', url);
+      }
       next(new HTTPError('Page not found', 404));
     } else {
       next();
@@ -46,7 +53,13 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
     const httpError = err instanceof HTTPError ? err : new HTTPError(err.message || 'Internal server error', 500);
     const status = httpError.status || 500;
 
-    logger.error(`${err.stack || err}`);
+    // Skip logging for common browser/dev tools requests that generate harmless 404s
+    const url = req.originalUrl || 'Unknown URL';
+    const shouldSkipLogging = status === 404 && (url.startsWith('/.well-known/') || url.startsWith('/favicon.ico'));
+
+    if (!shouldSkipLogging) {
+      logger.error(`${err.stack || err}`);
+    }
 
     const t = getTranslationFunction(req, ['common']);
     const { title: errorTitle, paragraph: errorParagraph } = getErrorMessages(status, t);
