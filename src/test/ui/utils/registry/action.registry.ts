@@ -29,7 +29,7 @@ export class ActionRegistry {
     ['createUserAndLogin', new LoginAction()],
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
-    ['submitCaseAPI', new CreateCaseAPIAction()]
+    ['submitCaseAPI', new CreateCaseAPIAction()],
   ]);
 
   static getAction(actionName: string): IAction {

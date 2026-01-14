@@ -161,8 +161,8 @@ export class PageContentValidation implements IValidation {
     PageContentValidation.pageToFileNameMap.set(page.url(), fileName);
 
     let pageData = this.loadPageDataFile(fileName);
-    const contactUsData = this.loadPageDataFile('contactUs',true);
-    if(this.getUrlSegment(page.url())!=='home') {
+    const contactUsData = this.loadPageDataFile('contactUs', true);
+    if (this.getUrlSegment(page.url()) !== 'home') {
       pageData = { ...pageData, ...contactUsData };
       await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
     }
@@ -236,7 +236,7 @@ export class PageContentValidation implements IValidation {
 
   private loadPageDataFile(fileName: string, sectionFile?: boolean): object | null {
     let filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
-    if(sectionFile){
+    if (sectionFile) {
       filePath = path.join(__dirname, '../../../data/section-data', `${fileName}.section.data.ts`);
     }
     if (!fs.existsSync(filePath)) {
