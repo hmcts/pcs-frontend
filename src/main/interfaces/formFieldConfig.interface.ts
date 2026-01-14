@@ -7,18 +7,27 @@ export type ComponentType = 'input' | 'textarea' | 'characterCount' | 'radios' |
 
 export interface FormFieldOption {
   value: string;
+  // Backward compatible: text property still supported
   text?: string;
+  // Translation key for option text (backward compatible)
   translationKey?: string;
+  // Dynamic label function (takes translations object, returns string)
+  label?: string | ((translations: Record<string, string>) => string);
+  // Conditional HTML/text to display when this option is selected
+  conditionalText?: string | ((translations: Record<string, string>) => string);
+  // Nested subFields that appear when this option is selected
+  subFields?: Record<string, FormFieldConfig>;
 }
 
 export interface FormFieldConfig {
   name: string;
   type: FormFieldType;
-  required?: boolean;
+  required?: boolean | ((formData: Record<string, unknown>, allData: Record<string, unknown>) => boolean);
   pattern?: string;
   maxLength?: number;
   errorMessage?: string;
-  label?: string;
+  // Label can be a string or a function that takes translations and returns a string
+  label?: string | ((translations: Record<string, string>) => string);
   hint?: string;
   translationKey?: {
     label?: string;
@@ -30,6 +39,22 @@ export interface FormFieldConfig {
   // Pre-processed component configuration for template rendering
   component?: Record<string, unknown>;
   componentType?: ComponentType;
+  // Cross-field validation function
+  // Returns error message string if validation fails, undefined if valid
+  validate?: (
+    value: unknown,
+    formData: Record<string, unknown>,
+    allData: Record<string, unknown>
+  ) => string | undefined;
+  // Field-level validator function (simpler than validate, returns boolean or error message string)
+  // Only validates when field is visible/shown
+  validator?: (
+    value: unknown,
+    formData?: Record<string, unknown>,
+    allData?: Record<string, unknown>
+  ) => boolean | string;
+  // For date fields: if true, disallows future and current dates
+  noFutureDate?: boolean;
 }
 
 export interface TranslationKeys {
