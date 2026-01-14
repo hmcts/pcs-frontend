@@ -45,18 +45,10 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
     afterAlways('functionalTest:preview') {
-      try {
-        publishHTML([
-          allowMissing         : true,
-          alwaysLinkToLastBuild: true,
-          keepAll              : true,
-          reportDir            : "allure-report",
-          reportFiles          : 'index.html',
-          reportName           : 'PCS Frontend Functional Test Report'
-        ])
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      }
+      archiveFunctionalTestReports()
+    }
+    afterAlways('fullFunctionalTest:preview') {
+      archiveFunctionalTestReports()
     }
   }
 
@@ -68,18 +60,22 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
     afterAlways('functionalTest:aat') {
-      try {
-        publishHTML([
-          allowMissing         : true,
-          alwaysLinkToLastBuild: true,
-          keepAll              : true,
-          reportDir            : "allure-report",
-          reportFiles          : 'index.html',
-          reportName           : 'PCS Frontend Functional Test Report'
-        ])
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      }
+      archiveFunctionalTestReports()
     }
+  }
+}
+
+def archiveFunctionalTestReports() {
+  try {
+    publishHTML([
+      allowMissing: true,
+      alwaysLinkToLastBuild: true,
+      keepAll: true,
+      reportDir: "allure-report",
+      reportFiles: 'index.html',
+      reportName: 'PCS Frontend Functional Test Report'
+    ])
+  } catch (Error) {
+      unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
   }
 }

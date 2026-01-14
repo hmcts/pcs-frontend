@@ -43,11 +43,11 @@
       "month": "Month",
       "year": "Year",
       "required": "Enter a date",
-      "notRealDate": "Enter a valid date",
-      "invalidDay": "Enter a valid day",
-      "invalidMonth": "Enter a valid month",
-      "invalidYear": "Enter a valid year",
-      "invalidValue": "Enter a valid value"
+      "notRealDate": "Date must be a real date",
+      "futureDate": "Date must be in the past",
+      "invalidValue": "Enter a valid value",
+      "missingOne": "Date must include a {{missingField}}",
+      "missingTwo": "Date must include a {{first}} and {{second}}"
     }
   },
   "months": {
