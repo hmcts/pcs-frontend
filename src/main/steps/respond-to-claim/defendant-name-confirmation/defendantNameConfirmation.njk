@@ -8,6 +8,18 @@
   
   <p class="govuk-body">This is a placeholder page for defendant name confirmation.</p>
 
+  {# Conditional content based on whether defendant name is known or not #}
+  {% if defendantName %}
+    <p class="govuk-body">
+      Content with defedant name known
+    </p>
+
+  {% else %}
+    <p class="govuk-body">
+      Content with defendant name unkown
+    </p>
+  {% endif %}
+
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">
       {{ govukButton({

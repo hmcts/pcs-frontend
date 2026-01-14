@@ -2,6 +2,8 @@ import type { Request } from 'express';
 
 import type { TranslationContent } from '../modules/steps';
 
+import type { JourneyFlowConfig } from './stepFlow.interface';
+
 export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count';
 export type ComponentType = 'input' | 'textarea' | 'characterCount' | 'radios' | 'checkboxes' | 'dateInput';
 
@@ -72,6 +74,7 @@ export interface FormBuilderConfig {
   stepDir: string;
   translationKeys?: TranslationKeys;
   basePath?: string;
+  flowConfig?: JourneyFlowConfig;
 }
 
 export interface ComponentConfig {

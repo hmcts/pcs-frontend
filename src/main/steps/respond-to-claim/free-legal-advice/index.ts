@@ -1,5 +1,6 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
+import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep(
   {
@@ -7,6 +8,7 @@ export const step: StepDefinition = createFormStep(
     journeyFolder: 'respondToClaim',
     stepDir: __dirname,
     basePath: '/respond-to-claim',
+    flowConfig,
     translationKeys: {
       pageTitle: 'title',
       content: 'content',

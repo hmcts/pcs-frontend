@@ -4,7 +4,6 @@ import type { TFunction } from 'i18next';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { getRequestLanguage } from '../../i18n';
-import { stepNavigation } from '../flow';
 import { getTranslationFunction } from '../i18n';
 
 export interface ErrorSummaryData {
@@ -90,6 +89,7 @@ export function renderWithErrors(
   formContent: Record<string, unknown>,
   stepName: string,
   journeyFolder: string,
+  navigation: { getBackUrl: (req: Request, currentStepName: string) => string | null },
   _translationKeys?: TranslationKeys
 ): void {
   const lang = getRequestLanguage(req);
@@ -104,7 +104,7 @@ export function renderWithErrors(
     errorSummary,
     stepName,
     journeyFolder,
-    backUrl: stepNavigation.getBackUrl(req, stepName),
+    backUrl: navigation.getBackUrl(req, stepName),
     lang,
     pageUrl: req.originalUrl || '/',
     t,
