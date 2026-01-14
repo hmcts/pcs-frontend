@@ -28,6 +28,7 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
       return translation !== key ? translation : fallback;
     }),
     getTranslationErrors: jest.fn(() => ({})),
+    getCustomErrorTranslations: jest.fn(() => ({})),
   };
 });
 

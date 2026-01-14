@@ -21,6 +21,7 @@ export {
   normalizeCheckboxFields,
   processFieldData,
   getTranslationErrors,
+  getCustomErrorTranslations,
   getTranslation,
 } from './formBuilder/helpers';
 

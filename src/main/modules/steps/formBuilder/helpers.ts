@@ -6,6 +6,7 @@ import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interf
 import type { StepFormData } from '../../../interfaces/stepFormData.interface';
 
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
+import { getDateTranslationKey, validateDateField } from './dateValidation';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
@@ -148,6 +149,29 @@ export function getTranslationErrors(
   return translationErrors;
 }
 
+export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
+  const stepSpecificErrors: Record<string, string> = {};
+  const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate'];
+
+  for (const field of fields) {
+    for (const nestedKey of nestedKeys) {
+      const nestedErrorKey = `errors.${field.name}.${nestedKey}`;
+      const nestedError = t(nestedErrorKey);
+      if (nestedError && nestedError !== nestedErrorKey) {
+        if (field.type === 'date') {
+          const dateKey = getDateTranslationKey(nestedKey);
+          if (dateKey) {
+            stepSpecificErrors[dateKey] = nestedError;
+          }
+        }
+        stepSpecificErrors[`${field.name}.${nestedKey}`] = nestedError;
+      }
+    }
+  }
+
+  return stepSpecificErrors;
+}
+
 export const getFormData = (req: Request, stepName: string): StepFormData => {
   return req.session.formData?.[stepName] || {};
 };
@@ -163,10 +187,10 @@ export function validateForm(
   req: Request,
   fields: FormFieldConfig[],
   translations?: Record<string, string>,
-  allFormData?: Record<string, unknown>
+  allFormData?: Record<string, unknown>,
+  t?: TFunction
 ): Record<string, string> {
   const errors: Record<string, string> = {};
-
   // Build formData from current request body (before processing date fields)
   const formData: Record<string, unknown> = { ...req.body };
 
@@ -239,42 +263,16 @@ export function validateForm(
       const month = req.body[monthKey]?.trim() || '';
       const year = req.body[yearKey]?.trim() || '';
 
-      if (isRequired) {
-        if (!day || !month || !year) {
-          errors[fieldName] =
-            translations?.[fieldName] ||
-            field.errorMessage ||
-            translations?.defaultRequired ||
-            'Enter your date of birth';
-        } else {
-          const isNumeric = (s: string) => /^\d+$/.test(s);
-          if (!isNumeric(day) || !isNumeric(month) || !isNumeric(year)) {
-            errors[fieldName] =
-              translations?.[fieldName] || field.errorMessage || translations?.defaultInvalid || 'Enter a valid date';
-          } else {
-            const dayNum = parseInt(day, 10);
-            const monthNum = parseInt(month, 10);
-            const yearNum = parseInt(year, 10);
-
-            if (
-              dayNum < 1 ||
-              dayNum > 31 ||
-              monthNum < 1 ||
-              monthNum > 12 ||
-              yearNum < 1900 ||
-              yearNum > new Date().getFullYear()
-            ) {
-              errors[fieldName] =
-                translations?.[fieldName] || field.errorMessage || translations?.defaultInvalid || 'Enter a valid date';
-            }
-          }
-        }
+      const dateError = validateDateField(day, month, year, isRequired, t, field.noFutureDate, translations);
+      if (dateError) {
+        errors[fieldName] = dateError;
       }
 
+      const dateValue = { day, month, year };
+
       // Run validator function if provided
-      if (field.validator && value !== undefined) {
+      if (field.validator && value !== undefined && !errors[fieldName]) {
         try {
-          const dateValue = { day, month, year };
           const validatorResult = field.validator(dateValue, formData, validationAllData);
           if (validatorResult !== true) {
             const errorMsg = typeof validatorResult === 'string' ? validatorResult : 'Invalid date';
@@ -288,12 +286,13 @@ export function validateForm(
       }
 
       // Run validate function if provided
-      if (field.validate && (!errors[fieldName] || Object.keys(errors).length === 0)) {
-        const dateValue = { day, month, year };
+      if (field.validate && !errors[fieldName]) {
         try {
           const customError = field.validate(dateValue, formData, validationAllData);
           if (customError) {
-            errors[fieldName] = customError;
+            errors[fieldName] = customError.startsWith('errors.')
+              ? translations?.[customError.replace('errors.', '')] || customError
+              : customError;
           }
         } catch (err) {
           logger.error(`Error running validate function for field ${field.name}:`, err);
@@ -302,7 +301,7 @@ export function validateForm(
     } else {
       const isMissing =
         field.type === 'checkbox'
-          ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && value.trim() === '')
+          ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())
           : value === undefined || value === null || value === '';
 
       if (isRequired && isMissing) {
