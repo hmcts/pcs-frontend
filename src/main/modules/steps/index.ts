@@ -18,8 +18,10 @@ export {
   getFormData,
   setFormData,
   validateForm,
+  normalizeCheckboxFields,
   processFieldData,
   getTranslationErrors,
+  getCustomErrorTranslations,
   getTranslation,
 } from './formBuilder/helpers';
 
