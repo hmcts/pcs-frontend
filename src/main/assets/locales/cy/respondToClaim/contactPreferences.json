@@ -17,6 +17,6 @@
 
   "errors": {
     "required": "cyPlease enter your UK mobile number before continuing.",
-    "invalid": "cyEnter a valid phone number"
+    "invalid": "cyyEnter a valid phone number"
   }
 }
