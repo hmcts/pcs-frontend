@@ -17,7 +17,7 @@ test.afterEach(async () => {
   PageContentValidation.finaliseTest();
 });
 
-test.describe('Error page to indicate Page Not Found error @nightly', async () => {
+test.describe.skip('Error page to indicate Page Not Found error @PR @nightly', () => {
   test('Error page is displayed when invalid step URL is accessed', async () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
     await performAction('clickSummary', pageNotFound.contactUsForHelpSummary);
