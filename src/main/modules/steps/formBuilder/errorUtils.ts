@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { getRequestLanguage } from '../../i18n';
-import { stepNavigation } from '../flow';
+import { getStepNavigation } from '../flow';
 import { getTranslationFunction } from '../i18n';
 
 export interface ErrorSummaryData {
@@ -97,6 +97,7 @@ export function renderWithErrors(
 
   // Build error summary
   const errorSummary = buildErrorSummary(errors, fields, t);
+  const stepNavigation = getStepNavigation(req);
 
   // res.render() sends the response directly and doesn't return a value
   res.status(400).render(viewPath, {

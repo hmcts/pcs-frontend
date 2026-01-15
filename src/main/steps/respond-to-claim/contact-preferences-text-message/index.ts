@@ -1,48 +1,54 @@
-import type { Request, Response } from 'express';
+import { isMobilePhone } from 'validator';
+
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { flowConfig } from '../flow.config';
+import { createFormStep } from '../../../modules/steps';
 
-const stepName = 'contact-preferences-text-message';
-const stepNavigation = createStepNavigation(flowConfig);
-
-export const step: StepDefinition = {
-  url: '/respond-to-claim/contact-preferences-text-message',
-  name: stepName,
-  view: 'respond-to-claim/contact-preferences-text-message/contactPreferencesTextMessage.njk',
+export const step: StepDefinition = createFormStep({
+  stepName: 'contact-preferences-text-message',
+  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
 
-getController: (lang?: 'en' | 'cy') => {
-  return createGetController(
-    'respond-to-claim/contact-preferences-text-message/contactPreferencesTextMessage.njk',
-    stepName,
-    (req: Request) => {
-
-    const content = require(
-          '../../../assets/locales/en/respondToClaim/contactPreferencesTextMessage.json'
-        );
-
-      return {
-        ...content,
-        url: req.originalUrl || '/respond-to-claim/contact-preferences-text-message',
-        contactByTextMessage: '',
-        phoneNumber: '',
-      };
-    },
-    'respondToClaim'
-  );
-},
-
-
-  postController: {
-    post: async (req: Request, res: Response) => {
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
-
-      if (!redirectPath) {
-        return res.status(404).render('not-found');
-      }
-
-      res.redirect(303, redirectPath);
-    },
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    content: 'subtitle',
   },
-};
+
+  fields: [
+    {
+      name: 'contactByTextMessage',
+      type: 'radio',
+      required: true,
+      legendClasses: 'govuk-!-font-weight-bold govuk-!-font-size-24',
+      translationKey: {
+        label: 'question',
+      },
+      options: [
+        {
+          value: 'yes',
+          translationKey: 'options.yes',
+
+          subFields: {
+            phoneNumber: {
+              name: 'phoneNumber',
+              type: 'text',
+              required: true,
+              translationKey: {
+                label: 'phoneNumberLabel',
+              },
+              attributes: {
+                type: 'tel',
+                autocomplete: 'tel',
+              },
+              validator: value => isMobilePhone(value as string, ['en-GB']),
+              errorMessage: 'errors.invalid',
+            },
+          },
+        },
+        {
+          value: 'no',
+          translationKey: 'options.no',
+        },
+      ],
+    },
+  ],
+});

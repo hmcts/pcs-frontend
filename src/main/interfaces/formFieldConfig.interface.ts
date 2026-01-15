@@ -23,6 +23,7 @@ export interface FormFieldConfig {
   name: string;
   type: FormFieldType;
   required?: boolean | ((formData: Record<string, unknown>, allData: Record<string, unknown>) => boolean);
+  legendClasses?: string;
   pattern?: string;
   maxLength?: number;
   errorMessage?: string;

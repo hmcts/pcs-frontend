@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, stepNavigation } from '../../../modules/steps';
+import { createGetController, getStepNavigation } from '../../../modules/steps';
 
 const stepName = 'application-submitted';
 
@@ -25,6 +25,8 @@ export const step: StepDefinition = {
       delete req.session.postcodeLookupResult;
 
       // Redirect to start of journey
+      const stepNavigation = getStepNavigation(req);
+
       const redirectPath = stepNavigation.getStepUrl('enter-user-details');
       res.redirect(303, redirectPath);
     },

@@ -1,9 +1,16 @@
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 
 export const flowConfig: JourneyFlowConfig = {
-  basePath: '/respond-to-claim',
+  basePath: '/steps/respond-to-claim',
   journeyName: 'respondToClaim',
-  stepOrder: ['start-now', 'postcode-finder', 'free-legal-advice', 'contact-preferences', 'contact-preferences-text-message'],
+  stepOrder: [
+    'start-now',
+    'postcode-finder',
+    'free-legal-advice',
+    'contact-preferences',
+    'contact-preferences-text-message',
+    'interstitial',
+  ],
   steps: {
     'start-now': {
       defaultNext: 'postcode-finder',
@@ -16,9 +23,12 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'contact-preferences': {
       defaultNext: 'contact-preferences-text-message',
-        },
+    },
     'contact-preferences-text-message': {
-      defaultNext: '',
-         }
+      defaultNext: 'interstitial',
+    },
+    interstitial: {
+      defaultNext: undefined,
+    },
   },
 };

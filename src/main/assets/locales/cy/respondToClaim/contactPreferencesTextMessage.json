@@ -1,15 +1,21 @@
 {
-  "title": "cyContact by text message",
+  "pageTitle": "cyContact by text message",
   "subtitle": "cyWe might need to send updates about your case by text message.",
-  "labels": {
-    "question": "cyAre you happy to be contacted by text message?",
+  "question": "cyAre you happy to be contacted by text message?",
+
+  "options": {
     "yes": "cyYes",
-    "no": "cyNo",
-    "phoneNumberLabel": "cyUK telephone number"
+    "no": "cyNo"
   },
+  "phoneNumberLabel": "cyUK telephone number",
   "buttons": {
     "saveAndContinue": "cySave and continue",
     "saveForLater": "cySave for later"
+  },
+  "requiredErrorMessage": "cyPlease enter your UK mobile number before continuing.",
+
+  "errors": {
+    "required": "cyPlease enter your UK mobile number before continuing.",
+    "invalid": "cyEnter a valid phone number"
   }
 }
-

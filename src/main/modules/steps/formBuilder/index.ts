@@ -6,7 +6,7 @@ import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.inte
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
-import { stepNavigation } from '../flow';
+import { getStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { buildFormContent } from './formContent';
@@ -49,6 +49,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         }
         const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv);
         const result = extendGetContent ? { ...formContent, ...extendGetContent(req, {}) } : formContent;
+        const stepNavigation = getStepNavigation(req);
 
         return {
           ...result,

@@ -31,7 +31,7 @@ export {
   getStepUrl,
   checkStepDependencies,
   createStepNavigation,
-  stepNavigation,
+  getStepNavigation,
   stepDependencyCheckMiddleware,
 } from './flow';
 

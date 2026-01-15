@@ -6,7 +6,7 @@ import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
 import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
-import { stepNavigation } from './flow';
+import { getStepNavigation } from './flow';
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
 import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
 
@@ -67,6 +67,8 @@ export const createGetController = (
 
     const commonI18nTranslations = getCommonTranslations(t);
 
+    const stepNavigation = getStepNavigation(req);
+
     const baseContent: StepFormData = {
       ...formData,
       lang,
@@ -123,6 +125,8 @@ export const createPostController = (
 
       const fields = getFields(t);
       const errors = validateForm(req, fields);
+
+      const stepNavigation = getStepNavigation(req);
 
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];

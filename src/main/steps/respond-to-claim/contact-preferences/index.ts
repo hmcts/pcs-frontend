@@ -1,36 +1,52 @@
-import type { Request, Response } from 'express';
+import { isMobilePhone } from 'validator';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { flowConfig } from '../flow.config';
+import { createFormStep } from '../../../modules/steps';
 
-const stepName = 'contact-preferences';
-const stepNavigation = createStepNavigation(flowConfig);
-
-export const step: StepDefinition = {
-  url: '/respond-to-claim/contact-preferences',
-  name: stepName,
-  view: 'respond-to-claim/contact-preferences/contactPreferences.njk',
+export const step: StepDefinition = createFormStep({
+  stepName: 'contact-preferences',
+  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  getController: () => {
-    return createGetController(
-      'respond-to-claim/contact-preferences/contactPreferences.njk',
-      stepName,
-      undefined,
-      'respondToClaim'
-    );
+
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    content: 'subtitle',
   },
-  postController: {
-    post: async (req: Request, res: Response) => {
-      // Get next step URL and redirect
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+  fields: [
+    {
+      name: 'contactByTextMessage',
+      type: 'radio',
+      required: true,
+      translationKey: {
+        label: 'labels.question',
+      },
+      options: [
+        {
+          value: 'yes',
+          translationKey: 'labels.options.yes',
 
-      if (!redirectPath) {
-        // No next step defined - show not found page
-        return res.status(404).render('not-found');
-      }
-
-      res.redirect(303, redirectPath);
+          subFields: {
+            phoneNumber: {
+              name: 'phoneNumber',
+              type: 'text',
+              required: true,
+              translationKey: {
+                label: 'labels.phoneNumberLabel',
+              },
+              attributes: {
+                type: 'tel',
+                autocomplete: 'tel',
+              },
+              validator: value => isMobilePhone(value as string, ['en-GB']),
+              errorMessage: 'errors.invalid',
+            },
+          },
+        },
+        {
+          value: 'no',
+          translationKey: 'labels.options.no',
+        },
+      ],
     },
-  },
-};
+  ],
+});

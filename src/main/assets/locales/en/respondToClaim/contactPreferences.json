@@ -1,4 +1,22 @@
 {
-  "title": "Contact preferences",
-  "secondaryHeading": "Respond to a property possession claim"
+  "pageTitle": "Contact preferences",
+  "subtitle": "Placeholder page",
+  "labels": {
+    "question": "Are you happy to be contacted by text message?",
+    "options": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "phoneNumberLabel": "UK telephone number"
+  },
+  "buttons": {
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  },
+  "requiredErrorMessage": "Please enter your UK mobile number before continuing.",
+
+  "errors": {
+    "required": "Please enter your UK mobile number before continuing.",
+    "invalid": "Enter a valid phone number"
+  }
 }
