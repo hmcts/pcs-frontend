@@ -58,12 +58,12 @@ describe('ccdCaseMiddleware', () => {
     await ccdCaseMiddleware(mockReq as Request, mockRes as Response, next);
 
     expect(ccdCaseService.getCase).toHaveBeenCalledWith('token');
-    expect(mockReq.session?.ccdCase).toEqual(mockCase);
+    expect((mockReq.session as CustomSession).ccdCase).toEqual(mockCase);
     expect(next).toHaveBeenCalledWith();
   });
 
   it('should call next with error if user not authenticated', async () => {
-    mockReq.session!.user = undefined;
+    (mockReq.session as CustomSession)!.user = undefined;
 
     await ccdCaseMiddleware(mockReq as Request, mockRes as Response, next);
 
