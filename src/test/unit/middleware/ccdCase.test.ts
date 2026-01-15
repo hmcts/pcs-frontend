@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { Session } from 'express-session';
 import { UserInfoResponse } from 'openid-client';
 
-import { mapCaseDataToFormData } from '../../../main/app/utils/sessionCaseMapper';
 import { CcdCase } from '../../../main/interfaces/ccdCase.interface';
 import { ccdCaseMiddleware } from '../../../main/middleware/ccdCase';
 import { ccdCaseService } from '../../../main/services/ccdCaseService';
@@ -18,7 +17,6 @@ interface CustomSession extends Session {
 }
 
 jest.mock('../../../main/services/ccdCaseService');
-jest.mock('../../../main/app/utils/sessionCaseMapper');
 
 describe('ccdCaseMiddleware', () => {
   let mockReq: Partial<Request>;
@@ -52,19 +50,15 @@ describe('ccdCaseMiddleware', () => {
     next = jest.fn();
   });
 
-  it('should fetch and set ccdCase and formData if no ccdCase in session', async () => {
+  it('should fetch and set ccdCase if no ccdCase in session', async () => {
     const mockCase = { id: 'case123', data: { some: 'data' } };
-    const mappedFormData = { 'enter-user-details': { name: 'John' } };
 
     (ccdCaseService.getCase as jest.Mock).mockResolvedValue(mockCase);
-    (mapCaseDataToFormData as jest.Mock).mockReturnValue(mappedFormData);
 
     await ccdCaseMiddleware(mockReq as Request, mockRes as Response, next);
 
     expect(ccdCaseService.getCase).toHaveBeenCalledWith('token');
-    expect(mapCaseDataToFormData).toHaveBeenCalledWith(mockCase);
     expect(mockReq.session?.ccdCase).toEqual(mockCase);
-    expect(mockReq.session?.formData).toEqual(mappedFormData);
     expect(next).toHaveBeenCalledWith();
   });
 
