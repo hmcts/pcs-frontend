@@ -4,22 +4,21 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
-const stepName = 'defendant-name-confirmation';
+const stepName = 'defendant-name-capture';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/defendant-name-confirmation',
+  url: '/respond-to-claim/defendant-name-capture',
   name: stepName,
-  view: 'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
+  view: 'respond-to-claim/defendant-name-capture/defendantNameCapture.njk',
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
+      'respond-to-claim/defendant-name-capture/defendantNameCapture.njk',
       stepName,
-      (_req: Request) => {
-        // TODO: Check defendant name from CCD case, currently hardcoded
+      (req: Request) => {
         return {
-          defendantName: 'John Smith', // Hardcoded for now
+          url: req.originalUrl || '/respond-to-claim/defendant-name-capture',
         };
       },
       'respondToClaim'
