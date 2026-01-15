@@ -9,7 +9,14 @@ import { getTranslationFunction, loadStepNamespace } from '../i18n';
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';
-import { getTranslationErrors, normalizeCheckboxFields, processFieldData, setFormData, validateForm } from './helpers';
+import {
+  getCustomErrorTranslations,
+  getTranslationErrors,
+  normalizeCheckboxFields,
+  processFieldData,
+  setFormData,
+  validateForm,
+} from './helpers';
 import { validateConfigInDevelopment } from './schema';
 
 export function createPostHandler(
@@ -55,10 +62,10 @@ export function createPostHandler(
       normalizeCheckboxFields(req, fields);
 
       const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
-      // Use original fields for getTranslationErrors to ensure we get the raw errorMessage keys from subFields
-      const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fields), allFormData);
+      const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
+      const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
+      const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
-      // If there are validation errors, show them regardless of action
       if (Object.keys(errors).length > 0) {
         const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
         renderWithErrors(req, res, viewPath, errors, fields, formContent, stepName, journeyFolder, translationKeys);
@@ -69,16 +76,14 @@ export function createPostHandler(
       if (action === 'saveForLater') {
         // Process field data (normalize checkboxes + consolidate date fields) before saving
         processFieldData(req, fields);
-        const bodyWithoutAction = { ...req.body };
-        delete bodyWithoutAction.action;
+        const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
         return res.redirect(303, DASHBOARD_ROUTE);
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
-      const bodyWithoutAction = { ...req.body };
-      delete bodyWithoutAction.action;
+      const { action: _, ...bodyWithoutAction } = req.body;
       setFormData(req, stepName, bodyWithoutAction);
 
       if (beforeRedirect) {

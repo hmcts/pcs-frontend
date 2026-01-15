@@ -5,7 +5,7 @@ import type { FormFieldConfig, FormFieldOption } from '../../../interfaces/formF
 
 import { buildComponentConfig } from './componentBuilders';
 import { buildConditionalContent, getNestedFieldName } from './conditionalFields';
-import { getTranslation } from './helpers';
+import { getTranslation, normalizeCheckboxValue } from './helpers';
 
 export function buildFieldValues(
   fields: FormFieldConfig[],
@@ -18,18 +18,10 @@ export function buildFieldValues(
     const fullFieldName = fieldPrefix ? `${fieldPrefix}.${field.name}` : field.name;
 
     if (field.type === 'checkbox') {
-      if (savedData?.[fullFieldName]) {
-        const value = savedData[fullFieldName];
-        if (typeof value === 'string') {
-          fieldValues[field.name] = [value];
-        } else if (Array.isArray(value)) {
-          fieldValues[field.name] = value;
-        } else {
-          fieldValues[field.name] = [];
-        }
-      } else {
-        fieldValues[field.name] = [];
-      }
+      // Normalize checkbox value to handle edge case: [{ '0': 'value1', '1': 'value2' }]
+      // This ensures checkbox values are always in the correct format for rendering
+      const value = savedData?.[fullFieldName];
+      fieldValues[field.name] = normalizeCheckboxValue(value);
     } else if (field.type === 'date') {
       if (savedData?.[fullFieldName] && typeof savedData[fullFieldName] === 'object') {
         const dateValue = savedData[fullFieldName] as { day?: string; month?: string; year?: string };
@@ -279,7 +271,6 @@ export function translateFields(
       value: option.value,
       text: option.text || option.value,
     }));
-
     // For nested fields (subFields), extract simple name to look up values
     // field.name might be nested (e.g., "parent.subField") but fieldValues is keyed by simple names
     const fieldNameForValueLookup =
@@ -292,7 +283,6 @@ export function translateFields(
     if (!nunjucksEnv) {
       throw new Error('Nunjucks environment is required for building component config');
     }
-
     const { component, componentType } = buildComponentConfig(
       { ...processedField, options: processedOptionsWithSubFields },
       resolvedLabel,

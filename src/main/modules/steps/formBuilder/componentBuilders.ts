@@ -8,6 +8,7 @@ import type {
   FormFieldOption,
 } from '../../../interfaces/formFieldConfig.interface';
 
+import { normalizeCheckboxValue } from './helpers';
 import { buildSubFieldsHTML } from './subFieldsRenderer';
 
 function createFieldsetLegend(
@@ -95,6 +96,8 @@ export function buildComponentConfig(
     }
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
+
+      // Build items with conditional content and subFields support
       component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
 
       // Build items with conditional content and subFields support
@@ -136,13 +139,9 @@ export function buildComponentConfig(
       break;
     }
     case 'checkbox': {
-      const checkboxValue = (fieldValue as unknown) || [];
-      const checkboxArray =
-        Array.isArray(checkboxValue) && typeof checkboxValue !== 'string'
-          ? checkboxValue
-          : checkboxValue
-            ? [checkboxValue]
-            : [];
+      // Normalize checkbox value to handle edge case: [{ '0': 'value1', '1': 'value2' }]
+      // This ensures checkbox values are always in the correct format for rendering
+      const checkboxArray = normalizeCheckboxValue(fieldValue);
       component.fieldset = createFieldsetLegend(label, isFirstField);
 
       // Build items with conditional content and subFields support

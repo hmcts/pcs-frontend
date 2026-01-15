@@ -80,6 +80,8 @@ export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
     validate: ValidateFunctionSchema.optional(),
     // Field-level validator function
     validator: ValidatorFunctionSchema,
+    // For date fields: if true, disallows future and current dates
+    noFutureDate: z.boolean().optional(),
   })
 );
 

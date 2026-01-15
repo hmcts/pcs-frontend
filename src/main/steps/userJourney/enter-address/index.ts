@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, getFormData, getStepNavigation, setFormData, validateForm } from '../../../modules/steps';
+import { createGetController, getFormData, setFormData, getStepNavigation, validateForm } from '../../../modules/steps';
 import { renderWithErrors } from '../../../modules/steps/formBuilder/errorUtils';
 import { buildFormContent } from '../../../modules/steps/formBuilder/formContent';
 import { ccdCaseService } from '../../../services/ccdCaseService';
@@ -196,7 +196,6 @@ export const step: StepDefinition = {
           });
         }
 
-        //const stepNavigation = getStepNavigation(req);
         const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
 
         if (!redirectPath) {
