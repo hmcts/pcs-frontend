@@ -402,7 +402,7 @@ export function validateForm(
       }
 
       for (const option of field.options) {
-        if (option.subFields && isOptionSelected(fieldValue, option.value, field.type)) {
+        if (option.subFields && option.value && isOptionSelected(fieldValue, option.value, field.type)) {
           // Validate each subField recursively
           for (const [subFieldName, subField] of Object.entries(option.subFields)) {
             // Set the name on the subField if not already set
