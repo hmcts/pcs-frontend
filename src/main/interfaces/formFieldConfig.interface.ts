@@ -8,7 +8,7 @@ export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' 
 export type ComponentType = 'input' | 'textarea' | 'characterCount' | 'radios' | 'checkboxes' | 'dateInput';
 
 export interface FormFieldOption {
-  value: string;
+  value?: string;
   // Backward compatible: text property still supported
   text?: string;
   // Translation key for option text (backward compatible)

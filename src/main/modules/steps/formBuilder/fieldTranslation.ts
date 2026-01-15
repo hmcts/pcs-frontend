@@ -118,11 +118,15 @@ function processOptions(
   }
 
   return options.map(option => {
+    if (option.divider) {
+      return option;
+    }
+
     // Resolve label (function or string)
     const optionLabel = resolveLabel(
       option.label,
       translations,
-      option.text || (option.translationKey ? t(option.translationKey) : option.value)
+      option.text || (option.translationKey ? t(option.translationKey) : (option.value ?? ''))
     );
 
     // Process conditionalText if provided
@@ -287,7 +291,6 @@ export function translateFields(
     if (!nunjucksEnv) {
       throw new Error('Nunjucks environment is required for building component config');
     }
-   
 
     const { component, componentType } = buildComponentConfig(
       { ...processedField, options: processedOptionsWithSubFields },

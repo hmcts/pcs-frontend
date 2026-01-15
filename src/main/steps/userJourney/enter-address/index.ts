@@ -1,13 +1,22 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, getFormData, setFormData, stepNavigation, validateForm } from '../../../modules/steps';
+import {
+  createGetController,
+  createStepNavigation,
+  getFormData,
+  setFormData,
+  stepNavigation,
+  validateForm,
+} from '../../../modules/steps';
 import { renderWithErrors } from '../../../modules/steps/formBuilder/errorUtils';
 import { buildFormContent } from '../../../modules/steps/formBuilder/formContent';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
+import { flowConfig } from '../flow.config';
 
 const stepName = 'enter-address';
 
@@ -72,7 +81,9 @@ export const step: StepDefinition = {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const t: TFunction = (req as any).t || ((key: string) => key);
 
-      const enterAddressPath = stepNavigation.getStepUrl(stepName);
+      const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
+
+      const enterAddressPath = navigation.getStepUrl(stepName);
 
       // 🔹 Handle Find Address
       if (action === 'find-address') {
@@ -168,7 +179,8 @@ export const step: StepDefinition = {
             fields,
             extendedContent,
             stepName,
-            'userJourney'
+            'userJourney',
+            navigation
           );
           return; // renderWithErrors sends the response, so we return early
         }

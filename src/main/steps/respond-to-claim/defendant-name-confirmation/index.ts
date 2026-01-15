@@ -17,7 +17,7 @@ export const step: StepDefinition = {
       'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
       stepName,
       (_req: Request) => {
-        // TODO: Check defendant name from CCD case, currently hardcoded 
+        // TODO: Check defendant name from CCD case, currently hardcoded
         return {
           defendantName: 'John Smith',
         };

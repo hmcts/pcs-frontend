@@ -4,7 +4,6 @@ import type { TFunction } from 'i18next';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
-import { getRequestLanguage } from '../../i18n';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -73,7 +72,18 @@ export function createPostHandler(
 
       if (Object.keys(errors).length > 0) {
         const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
-        renderWithErrors(req, res, viewPath, errors, fields, formContent, stepName, journeyFolder, navigation, translationKeys);
+        renderWithErrors(
+          req,
+          res,
+          viewPath,
+          errors,
+          fields,
+          formContent,
+          stepName,
+          journeyFolder,
+          navigation,
+          translationKeys
+        );
         return; // renderWithErrors sends the response, so we return early
       }
 
