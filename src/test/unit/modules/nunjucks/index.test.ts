@@ -36,6 +36,7 @@ describe('Nunjucks', () => {
 
     mockNunjucksEnv = {
       addFilter: jest.fn(),
+      addGlobal: jest.fn(),
     } as unknown as nunjucks.Environment;
 
     mockPathJoin = path.join as jest.Mock;
@@ -73,6 +74,8 @@ describe('Nunjucks', () => {
         watch: true,
         express: mockApp,
       });
+      expect(mockApp.locals.nunjucksEnv).toBe(mockNunjucksEnv);
+      expect(mockNunjucksEnv.addGlobal).toHaveBeenCalledWith('govukRebrand', true);
     });
 
     it('should add custom filters', () => {
