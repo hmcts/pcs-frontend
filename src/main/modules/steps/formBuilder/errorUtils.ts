@@ -80,7 +80,7 @@ export function buildErrorSummary(
  * @param translationKeys - Optional translation keys
  * @returns Response object
  */
-export function renderWithErrors(
+export async function renderWithErrors(
   req: Request,
   res: Response,
   viewPath: string,
@@ -89,9 +89,9 @@ export function renderWithErrors(
   formContent: Record<string, unknown>,
   stepName: string,
   journeyFolder: string,
-  navigation: { getBackUrl: (req: Request, currentStepName: string) => string | null },
+  navigation: { getBackUrl: (req: Request, currentStepName: string) => Promise<string | null> },
   _translationKeys?: TranslationKeys
-): void {
+): Promise<void> {
   const lang = getRequestLanguage(req);
   const t: TFunction = getTranslationFunction(req, stepName, ['common']);
 
@@ -104,7 +104,7 @@ export function renderWithErrors(
     errorSummary,
     stepName,
     journeyFolder,
-    backUrl: navigation.getBackUrl(req, stepName),
+    backUrl: await navigation.getBackUrl(req, stepName),
     lang,
     pageUrl: req.originalUrl || '/',
     t,

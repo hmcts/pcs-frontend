@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import {
@@ -207,7 +206,7 @@ export const step: StepDefinition = {
           });
         }
 
-        const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+        const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
 
         if (!redirectPath) {
           return res.status(500).send('Unable to determine next step');

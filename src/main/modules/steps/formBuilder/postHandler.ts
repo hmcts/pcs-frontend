@@ -72,7 +72,7 @@ export function createPostHandler(
 
       if (Object.keys(errors).length > 0) {
         const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
-        renderWithErrors(
+        await renderWithErrors(
           req,
           res,
           viewPath,
@@ -112,7 +112,7 @@ export function createPostHandler(
         }
       }
 
-      const redirectPath = navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
+      const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

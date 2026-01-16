@@ -148,8 +148,8 @@ describe('formBuilder', () => {
       session.formData[stepName] = data;
     });
     mockValidateForm.mockReturnValue({});
-    mockGetNextStepUrl.mockReturnValue('/steps/test-journey/next-step');
-    mockGetBackUrl.mockReturnValue('/steps/test-journey/previous-step');
+    mockGetNextStepUrl.mockResolvedValue('/steps/test-journey/next-step');
+    mockGetBackUrl.mockResolvedValue('/steps/test-journey/previous-step');
     mockGetValidatedLanguage.mockReturnValue('en' as const);
     mockGetRequestLanguage.mockImplementation((req: Request) => req.language || 'en');
     mockGetTranslationFunction.mockImplementation((req: Request) => {
@@ -1193,7 +1193,7 @@ describe('formBuilder', () => {
       });
 
       it('should return 500 when no redirect path available', async () => {
-        mockGetNextStepUrl.mockReturnValueOnce(null as unknown as string);
+        mockGetNextStepUrl.mockResolvedValueOnce(null);
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);

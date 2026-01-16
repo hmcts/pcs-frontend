@@ -68,7 +68,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),
-          backUrl: navigation.getBackUrl(req, stepName),
+          backUrl: await navigation.getBackUrl(req, stepName),
         };
       });
     },

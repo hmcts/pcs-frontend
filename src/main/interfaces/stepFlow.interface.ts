@@ -1,4 +1,7 @@
-export type StepCondition = (formData: Record<string, unknown>, currentStepData: Record<string, unknown>) => boolean;
+export type StepCondition = (
+  formData: Record<string, unknown>,
+  currentStepData: Record<string, unknown>
+) => Promise<boolean> | boolean;
 
 export interface StepRoute {
   condition?: StepCondition;

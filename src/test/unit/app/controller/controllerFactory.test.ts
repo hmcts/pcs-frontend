@@ -31,8 +31,8 @@ jest.mock('../../../../main/modules/steps/i18n', () => ({
 }));
 jest.mock('../../../../main/modules/steps/flow', () => ({
   stepNavigation: {
-    getBackUrl: jest.fn(() => null),
-    getNextStepUrl: jest.fn(() => '/next-step'),
+    getBackUrl: jest.fn(() => Promise.resolve(null)),
+    getNextStepUrl: jest.fn(() => Promise.resolve('/next-step')),
   },
 }));
 describe('createGetController', () => {
@@ -383,7 +383,7 @@ describe('createPostController', () => {
 
   it('should return 500 when next step cannot be determined', async () => {
     const { stepNavigation } = require('../../../../main/modules/steps/flow');
-    stepNavigation.getNextStepUrl.mockReturnValue(null);
+    stepNavigation.getNextStepUrl.mockResolvedValue(null);
     const mockT = jest.fn((key: string) => key);
 
     const controller = createPostController(stepName, mockGetFields, view);
