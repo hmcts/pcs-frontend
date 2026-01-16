@@ -1,30 +1,32 @@
 {% extends "stepsTemplate.njk" %}
-
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% block mainContent %}
-  {% if error %}
-    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-      <h2 class="govuk-error-summary__title" id="error-summary-title">{{ errorSummaryTitle }}</h2>
-      <div class="govuk-error-summary__body">
-        <ul class="govuk-list govuk-error-summary__list">
-          <li><a href="#{{ error.anchor or error.field }}">{{ error.text }}</a></li>
-        </ul>
-      </div>
-    </div>
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-
   {% if pageTitle %}
     <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
   {% elif title %}
     <h1 class="govuk-heading-l">{{ title }}</h1>
   {% endif %}
-
-  {% if content %}
-    <p class="govuk-body">{{ content | safe }}</p>
-  {% endif %}
-
+  <p><strong>{{ subHeading1 }}</strong></p>
+  <p>{{ paragraph1 }}</p>
+  <ol>
+    <li>{{ listItem1 | safe }}</li>
+    <li>{{ listItem2 }}</li>
+    <li>{{ listItem3 }}</li>
+    <li>{{ listItem4 }}</li>
+  </ol>
+  <p>{{ paragraph2 }}</p>
+  <ul>
+    <li>{{ bullet1 }}</li>
+    <li>{{ bullet2 }}</li>
+  </ul>
+  <p><strong>{{ subHeading2 }}</strong></p>
+  <p>{{ paragraph3 }}</p>
+  <p>{{ paragraph4 }}</p>
   <form method="post" action="{{ url }}">
     {% for field in fields %}
       {% if field.component and field.componentType %}
@@ -33,8 +35,6 @@
         {% endif %}
       {% endif %}
     {% endfor %}
-
-        
     <div class="govuk-button-group">
       {{ govukButton({ 
         text: continue,
@@ -46,10 +46,8 @@
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
-    
     <p class="govuk-body">
       <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
     </p>
   </form>
 {% endblock %}
-

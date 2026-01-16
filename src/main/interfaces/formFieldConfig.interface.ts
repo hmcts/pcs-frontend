@@ -63,6 +63,7 @@ export interface FormFieldConfig {
 export interface TranslationKeys {
   pageTitle?: string;
   content?: string;
+  [key: string]: string | undefined;
 }
 
 export interface FormBuilderConfig {
