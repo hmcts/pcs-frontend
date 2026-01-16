@@ -97,11 +97,9 @@ export function buildComponentConfig(
       const radioValue = (fieldValue as string) || '';
       component.fieldset = createFieldsetLegend(label, isFirstField);
 
-
       // Build items with conditional content and subFields support
       component.items =
         field.options?.map((option: FormFieldOption, optionIndex: number) => {
-
           if (option.divider) {
             return translatedOptions?.[optionIndex];
           }
@@ -150,7 +148,6 @@ export function buildComponentConfig(
       // Build items with conditional content and subFields support
       component.items =
         field.options?.map((option: FormFieldOption, optionIndex: number) => {
-
           if (option.divider) {
             return translatedOptions?.[optionIndex];
           }

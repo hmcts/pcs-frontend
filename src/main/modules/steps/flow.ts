@@ -6,17 +6,22 @@ import { flowConfig as userJourneyFlowConfig } from '../../steps/userJourney/flo
 
 const logger = Logger.getLogger('stepDependencyCheck');
 
-export function getNextStep(
+export async function getNextStep(
   currentStepName: string,
   flowConfig: JourneyFlowConfig,
   formData: Record<string, unknown>,
   currentStepData: Record<string, unknown> = {}
-): string | null {
+): Promise<string | null> {
   const stepConfig = flowConfig.steps[currentStepName];
 
   if (stepConfig?.routes) {
     for (const route of stepConfig.routes) {
-      if (!route.condition || route.condition(formData, currentStepData)) {
+      if (!route.condition) {
+        return route.nextStep;
+      }
+      const conditionResult = route.condition(formData, currentStepData);
+      const conditionMet = conditionResult instanceof Promise ? await conditionResult : conditionResult;
+      if (conditionMet) {
         return route.nextStep;
       }
     }
@@ -34,11 +39,11 @@ export function getNextStep(
   return null;
 }
 
-export function getPreviousStep(
+export async function getPreviousStep(
   currentStepName: string,
   flowConfig: JourneyFlowConfig,
   formData: Record<string, unknown> = {}
-): string | null {
+): Promise<string | null> {
   const stepConfig = flowConfig.steps[currentStepName];
 
   // If step has explicit previousStep configuration, use it
@@ -57,7 +62,12 @@ export function getPreviousStep(
         if (route.nextStep === currentStepName) {
           // If route has condition, check if it matches the form data
           // If no condition, this route always leads to current step
-          if (!route.condition || route.condition(formData, {})) {
+          if (!route.condition) {
+            return stepName;
+          }
+          const conditionResult = route.condition(formData, {});
+          const conditionMet = conditionResult instanceof Promise ? await conditionResult : conditionResult;
+          if (conditionMet) {
             return stepName;
           }
         }
@@ -108,24 +118,28 @@ export function checkStepDependencies(
 }
 
 export function createStepNavigation(flowConfig: JourneyFlowConfig): {
-  getNextStepUrl: (req: Request, currentStepName: string, currentStepData?: Record<string, unknown>) => string | null;
-  getBackUrl: (req: Request, currentStepName: string) => string | null;
+  getNextStepUrl: (
+    req: Request,
+    currentStepName: string,
+    currentStepData?: Record<string, unknown>
+  ) => Promise<string | null>;
+  getBackUrl: (req: Request, currentStepName: string) => Promise<string | null>;
   getStepUrl: (stepName: string) => string;
 } {
   return {
-    getNextStepUrl: (
+    getNextStepUrl: async (
       req: Request,
       currentStepName: string,
       currentStepData: Record<string, unknown> = {}
-    ): string | null => {
+    ): Promise<string | null> => {
       const formData = req.session?.formData || {};
-      const nextStep = getNextStep(currentStepName, flowConfig, formData, currentStepData);
+      const nextStep = await getNextStep(currentStepName, flowConfig, formData, currentStepData);
       return nextStep ? getStepUrl(nextStep, flowConfig) : null;
     },
 
-    getBackUrl: (req: Request, currentStepName: string): string | null => {
+    getBackUrl: async (req: Request, currentStepName: string): Promise<string | null> => {
       const formData = req.session?.formData || {};
-      const previousStep = getPreviousStep(currentStepName, flowConfig, formData);
+      const previousStep = await getPreviousStep(currentStepName, flowConfig, formData);
       return previousStep ? getStepUrl(previousStep, flowConfig) : null;
     },
 

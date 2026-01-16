@@ -1,10 +1,10 @@
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 
-
 //TODO need to add logic to check if defendant name is known from CCD case data
-const isDefendantNameKnown = (): boolean => {
-  return false;
+const isDefendantNameKnown = async (): Promise<boolean> => {
+  return Promise.resolve(true);
 };
+
 export const flowConfig: JourneyFlowConfig = {
   basePath: '/respond-to-claim',
   journeyName: 'respondToClaim',
@@ -23,12 +23,12 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           // Route to defendant name confirmation if defendant is known
-          condition: () => isDefendantNameKnown(),
+          condition: async () => isDefendantNameKnown(),
           nextStep: 'defendant-name-confirmation',
         },
         {
           // Route to defendant name capture if defendant is unknown
-          condition: () => !isDefendantNameKnown(),
+          condition: async () => !isDefendantNameKnown(),
           nextStep: 'defendant-name-capture',
         },
       ],
