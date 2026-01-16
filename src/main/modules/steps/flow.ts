@@ -3,16 +3,8 @@ import { NextFunction, Request, Response } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import { flowConfig as respondToClaimFlowConfig } from '../../steps/respond-to-claim/flow.config';
-import { flowConfig as userJourneyFlowConfig } from '../../steps/userJourney/flow.config';
 
 const logger = Logger.getLogger('stepDependencyCheck');
-
-function getFlowConfigFromRequest(req: Request): JourneyFlowConfig {
-  if (req.path.includes('/respond-to-claim')) {
-    return respondToClaimFlowConfig;
-  }
-  return userJourneyFlowConfig;
-}
 
 export function getNextStep(
   currentStepName: string,
@@ -143,13 +135,10 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
   };
 }
 
-export function getStepNavigation(req: Request): ReturnType<typeof createStepNavigation> {
-  return createStepNavigation(getFlowConfigFromRequest(req));
-}
+export const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
 
-export function stepDependencyCheckMiddleware() {
+export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = respondToClaimFlowConfig) {
   return (req: Request, res: Response, next: NextFunction): void => {
-    const flowConfig = getFlowConfigFromRequest(req);
 
     const urlParts = req.path.split('/');
     const stepName = urlParts[urlParts.length - 1];

@@ -29,7 +29,7 @@ export default function registerSteps(app: Application): void {
       const middlewares = requiresAuth ? [oidcMiddleware, ccdCaseMiddleware] : [];
 
       // Use journey-specific flow config for dependency checking
-      const dependencyCheck = stepDependencyCheckMiddleware();
+      const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
 
       const allGetMiddleware = step.middleware
         ? [...middlewares, dependencyCheck, ...step.middleware]

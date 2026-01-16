@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, getFormData, getStepNavigation, setFormData, validateForm } from '../../../modules/steps';
+import { createGetController, getFormData, stepNavigation, setFormData, validateForm } from '../../../modules/steps';
 import { renderWithErrors } from '../../../modules/steps/formBuilder/errorUtils';
 import { buildFormContent } from '../../../modules/steps/formBuilder/formContent';
 import { ccdCaseService } from '../../../services/ccdCaseService';
@@ -72,7 +72,6 @@ export const step: StepDefinition = {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const t: TFunction = (req as any).t || ((key: string) => key);
 
-      const stepNavigation = getStepNavigation(req);
       const enterAddressPath = stepNavigation.getStepUrl(stepName);
 
       // 🔹 Handle Find Address

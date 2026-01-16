@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
-import { getStepNavigation } from '../flow';
+import { stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
@@ -96,8 +96,6 @@ export function createPostHandler(
           return next(error);
         }
       }
-
-      const stepNavigation = getStepNavigation(req);
 
       const redirectPath = stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
       if (!redirectPath) {

@@ -6,9 +6,8 @@ import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.inte
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
-import { getStepNavigation } from '../flow';
+import { stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
-
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
@@ -17,7 +16,7 @@ import { validateConfigInDevelopment } from './schema';
 export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 
 /**
- * Converts camelCase to kebab-case (e.g., "userJourney" -> "user-journey")
+ * Converts camelCase to kebab-case (e.g., "respondToJourney" -> "respond-to-claim")
  */
 function camelToKebabCase(str: string): string {
   return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
@@ -49,7 +48,6 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         }
         const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv);
         const result = extendGetContent ? { ...formContent, ...extendGetContent(req, {}) } : formContent;
-        const stepNavigation = getStepNavigation(req);
 
         return {
           ...result,
