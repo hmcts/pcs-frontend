@@ -1,7 +1,9 @@
+import { type Request } from 'express';
 export type StepCondition = (
+  req: Request,
   formData: Record<string, unknown>,
   currentStepData: Record<string, unknown>
-) => Promise<boolean> | boolean;
+) => Promise<boolean>;
 
 export interface StepRoute {
   condition?: StepCondition;

@@ -38,8 +38,10 @@ describe('stepFlow', () => {
   };
 
   describe('getNextStep', () => {
+    const mockReq = {} as Request;
+
     it('should return defaultNext when step has defaultNext configured', async () => {
-      const result = await getNextStep('step1', mockFlowConfig, {});
+      const result = await getNextStep(mockReq, 'step1', mockFlowConfig, {});
       expect(result).toBe('step2');
     });
 
@@ -53,17 +55,17 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = await getNextStep('step1', config, {});
+      const result = await getNextStep(mockReq, 'step1', config, {});
       expect(result).toBe('step2');
     });
 
     it('should return null when at last step', async () => {
-      const result = await getNextStep('step3', mockFlowConfig, {});
+      const result = await getNextStep(mockReq, 'step3', mockFlowConfig, {});
       expect(result).toBeNull();
     });
 
     it('should return null when step not found in order', async () => {
-      const result = await getNextStep('unknown', mockFlowConfig, {});
+      const result = await getNextStep(mockReq, 'unknown', mockFlowConfig, {});
       expect(result).toBeNull();
     });
 
@@ -75,7 +77,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: formData => formData.condition === true,
+                condition: async (_req, formData) => formData.condition === true,
                 nextStep: 'step3',
               },
               {
@@ -85,7 +87,7 @@ describe('stepFlow', () => {
           },
         },
       };
-      const result = await getNextStep('step1', config, { condition: true }, {});
+      const result = await getNextStep(mockReq, 'step1', config, { condition: true }, {});
       expect(result).toBe('step3');
     });
 
@@ -97,7 +99,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: formData => formData.condition === true,
+                condition: async (_req, formData) => formData.condition === true,
                 nextStep: 'step3',
               },
               {
@@ -107,7 +109,7 @@ describe('stepFlow', () => {
           },
         },
       };
-      const result = await getNextStep('step1', config, { condition: false }, {});
+      const result = await getNextStep(mockReq, 'step1', config, { condition: false }, {});
       expect(result).toBe('step2');
     });
 
@@ -125,7 +127,7 @@ describe('stepFlow', () => {
           },
         },
       };
-      const result = await getNextStep('step1', config, {}, {});
+      const result = await getNextStep(mockReq, 'step1', config, {}, {});
       expect(result).toBe('step2');
     });
 
@@ -137,7 +139,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: async formData => {
+                condition: async (_req, formData) => {
                   await new Promise(resolve => setTimeout(resolve, 10));
                   return formData.condition === true;
                 },
@@ -150,24 +152,26 @@ describe('stepFlow', () => {
           },
         },
       };
-      const result = await getNextStep('step1', config, { condition: true }, {});
+      const result = await getNextStep(mockReq, 'step1', config, { condition: true }, {});
       expect(result).toBe('step3');
     });
   });
 
   describe('getPreviousStep', () => {
+    const mockReq = {} as Request;
+
     it('should return previous step in order', async () => {
-      const result = await getPreviousStep('step2', mockFlowConfig);
+      const result = await getPreviousStep(mockReq, 'step2', mockFlowConfig);
       expect(result).toBe('step1');
     });
 
     it('should return null when at first step', async () => {
-      const result = await getPreviousStep('step1', mockFlowConfig);
+      const result = await getPreviousStep(mockReq, 'step1', mockFlowConfig);
       expect(result).toBeNull();
     });
 
     it('should return null when step not found in order', async () => {
-      const result = await getPreviousStep('unknown', mockFlowConfig);
+      const result = await getPreviousStep(mockReq, 'unknown', mockFlowConfig);
       expect(result).toBeNull();
     });
 
@@ -183,7 +187,7 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = await getPreviousStep('step2', config);
+      const result = await getPreviousStep(mockReq, 'step2', config);
       expect(result).toBe('step1');
     });
 
@@ -201,7 +205,7 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = await getPreviousStep('step2', config, { condition: true });
+      const result = await getPreviousStep(mockReq, 'step2', config, { condition: true });
       expect(result).toBe('step1');
     });
 
@@ -213,7 +217,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: formData => formData.condition === true,
+                condition: async (_req, formData) => formData.condition === true,
                 nextStep: 'step2',
               },
             ],
@@ -222,7 +226,7 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = await getPreviousStep('step2', config, { condition: true });
+      const result = await getPreviousStep(mockReq, 'step2', config, { condition: true });
       expect(result).toBe('step1');
     });
 
@@ -238,7 +242,7 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = await getPreviousStep('step2', config);
+      const result = await getPreviousStep(mockReq, 'step2', config);
       expect(result).toBe('step1');
     });
 
@@ -250,7 +254,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: formData => formData.condition === true,
+                condition: async (_req, formData) => formData.condition === true,
                 nextStep: 'step2',
               },
             ],
@@ -259,7 +263,7 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = await getPreviousStep('step2', config, { condition: false });
+      const result = await getPreviousStep(mockReq, 'step2', config, { condition: false });
       expect(result).toBe('step1');
     });
 
@@ -271,7 +275,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: async formData => {
+                condition: async (_req, formData) => {
                   await new Promise(resolve => setTimeout(resolve, 10));
                   return formData.condition === true;
                 },
@@ -283,7 +287,7 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = await getPreviousStep('step2', config, { condition: true });
+      const result = await getPreviousStep(mockReq, 'step2', config, { condition: true });
       expect(result).toBe('step1');
     });
   });
