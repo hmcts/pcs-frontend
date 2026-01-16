@@ -42,5 +42,5 @@ export const step: StepDefinition = createFormStep(
       },
     ],
   },
-  `${__dirname}/free-legal-advice.njk`
+  `${__dirname}/freeLegalAdvice.njk`
 );
