@@ -3,6 +3,8 @@ import type { Request, Response } from 'express';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+import { ccdCaseService } from 'services/ccdCaseService';
+
 
 const stepName = 'postcode-finder';
 const stepNavigation = createStepNavigation(flowConfig);
@@ -16,9 +18,8 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/postcode-finder/postcodeFinder.njk',
       stepName,
-      (req: Request) => {
-            console.log(req.session.formattedAddress)
-            const prepopulateAddress = req.session.formattedAddress; 
+      async (req: Request) => {
+            const prepopulateAddress = await getExistingAddress(req.session.user?.accessToken || "");
         return {
           url: req.originalUrl || '/respond-to-claim/postcode-finder',
           prepopulateAddress: prepopulateAddress,
@@ -41,3 +42,29 @@ export const step: StepDefinition = {
     },
   },
 };
+
+async function getExistingAddress(accessToken : string): Promise<string>{
+   // Pull data from API
+        const response = await ccdCaseService.getExistingCaseData(accessToken, "1768559783943728");
+        const address = response.case_details.case_data.possessionClaimResponse?.party?.address
+        
+        if (address) {
+          const formattedAddress = [
+            address.AddressLine1,
+            address.AddressLine2,
+            address.AddressLine3,
+            address.PostTown,
+            address.County,
+            address.PostCode,
+            address.Country,
+          ].map(v => (v ?? "").trim())
+            .filter(Boolean)
+            .join(", ") + "?";
+            
+
+            console.log("Mapping addy", formattedAddress)
+            return formattedAddress;
+        }else {
+          return "No address"
+        }
+}
