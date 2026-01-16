@@ -25,6 +25,7 @@ export const step: StepDefinition = {
       delete req.session.postcodeLookupResult;
 
       // Redirect to start of journey
+
       const redirectPath = stepNavigation.getStepUrl('enter-user-details');
       res.redirect(303, redirectPath);
     },

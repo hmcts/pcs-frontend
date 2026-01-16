@@ -9,7 +9,7 @@ const stepName = 'start-now';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/start-now',
+  url: '/steps/respond-to-claim/start-now',
   name: stepName,
   view: 'respond-to-claim/start-now/startNow.njk',
   stepDir: __dirname,

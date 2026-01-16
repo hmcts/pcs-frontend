@@ -8,7 +8,7 @@ const stepName = 'free-legal-advice';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/free-legal-advice',
+  url: '/steps/respond-to-claim/free-legal-advice',
   name: stepName,
   view: 'respond-to-claim/free-legal-advice/freeLegalAdvice.njk',
   stepDir: __dirname,

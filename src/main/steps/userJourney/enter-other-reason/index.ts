@@ -9,7 +9,11 @@ export const step: StepDefinition = createFormStep({
     {
       name: 'otherReason',
       type: 'character-count',
-      required: true,
+      // Only required if "other" option was selected in enter-ground step
+      required: (formData: Record<string, unknown>, allData: Record<string, unknown>) => {
+        const enterGroundData = allData['grounds'] as { grounds?: string[] } | undefined;
+        return Array.isArray(enterGroundData) && enterGroundData.includes('other-10');
+      },
       maxLength: 250,
       translationKey: {
         label: 'title',

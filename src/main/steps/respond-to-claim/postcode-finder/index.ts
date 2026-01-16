@@ -8,7 +8,7 @@ const stepName = 'postcode-finder';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/postcode-finder',
+  url: '/steps/respond-to-claim/postcode-finder',
   name: stepName,
   view: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
   stepDir: __dirname,
@@ -18,7 +18,7 @@ export const step: StepDefinition = {
       stepName,
       (req: Request) => {
         return {
-          url: req.originalUrl || '/respond-to-claim/postcode-finder',
+          url: req.originalUrl || '/steps/respond-to-claim/postcode-finder',
         };
       },
       'respondToClaim'
