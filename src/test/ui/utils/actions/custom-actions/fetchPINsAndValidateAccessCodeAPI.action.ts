@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 // eslint-disable-next-line import/no-named-as-default
 import Axios from 'axios';
 
+import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
 import { fetchPINsApiData, validateAccessCodeApiData } from '../../../data/api-data';
 import { IAction } from '../../interfaces';
 
@@ -22,8 +23,8 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
 
   private async fetchPINsAPI(): Promise<void> {
     const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
-    const maxRetries = 5;
-    const delayMs = 2000;
+    const maxRetries = actionRetries;
+    const delayMs = VERY_SHORT_TIMEOUT;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       const response = await fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint());
       const fetchedPins = Object.keys(response.data);
