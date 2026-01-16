@@ -65,10 +65,7 @@
       <div class="govuk-grid-column-one-third">
         <aside class="app-related-items" role="complementary">
           <nav role="navigation" aria-label="Support and contact information">
-            {{ govukDetails({
-              summaryText: contactUsForHelp,
-              text: contactUsForHelpText or t('contactUsForHelpText')
-            }) }}
+              {% include "components/contact-us-details.njk" %}
           </nav>
         </aside>
       </div>
