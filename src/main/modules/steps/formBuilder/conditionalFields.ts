@@ -74,7 +74,7 @@ export function getVisibleSubFields(field: FormFieldConfig, fieldValue: unknown)
   }
 
   for (const option of field.options) {
-    if (option.subFields && isOptionSelected(fieldValue, option.value, field.type)) {
+    if (option.subFields && option.value && isOptionSelected(fieldValue, option.value, field.type)) {
       // Merge subFields into visibleSubFields
       // Note: If multiple options have subFields with same names, later ones will overwrite
       // This is expected behavior - only one option can be selected for radio

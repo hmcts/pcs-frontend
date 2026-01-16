@@ -4,21 +4,22 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
-const stepName = 'postcode-finder';
+const stepName = 'defendant-name-confirmation';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/postcode-finder',
+  url: '/respond-to-claim/defendant-name-confirmation',
   name: stepName,
-  view: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
+  view: 'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'respond-to-claim/postcode-finder/postcodeFinder.njk',
+      'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
       stepName,
       (req: Request) => {
         return {
-          url: req.originalUrl || '/respond-to-claim/postcode-finder',
+          //TODO: get defendant name from CCD case - currently served from LaunchDarkly flag
+          defendantName: req.session.defendantName ?? '',
         };
       },
       'respondToClaim'
@@ -26,11 +27,9 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
-      // Get next step URL and redirect
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
 
       if (!redirectPath) {
-        // No next step defined - show not found page
         return res.status(404).render('not-found');
       }
 
