@@ -32,7 +32,7 @@ async function detectPageNavigation(): Promise<boolean> {
 }
 
 async function validatePageIfNavigated(action: string): Promise<void> {
-  if (action.includes('click')) {
+  if (action.includes('click') || action.includes('navigate')) {
     const pageNavigated = await detectPageNavigation();
     if (pageNavigated) {
       await performValidation('autoValidatePageContent');

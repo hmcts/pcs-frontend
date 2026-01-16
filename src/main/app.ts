@@ -16,6 +16,7 @@ const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
 
 export const app = express();
+
 app.locals.ENV = env;
 
 setupDev(app, developmentMode);
