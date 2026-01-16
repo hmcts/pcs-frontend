@@ -16,10 +16,10 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
       stepName,
-      (_req: Request) => {
-        // TODO: Check defendant name from CCD case, currently hardcoded
+      (req: Request) => {
         return {
-          defendantName: 'John Smith', // Hardcoded for now
+          //TODO: get defendant name from CCD case - currently served from LaunchDarkly flag
+          defendantName: req.session.defendantName ?? '',
         };
       },
       'respondToClaim'

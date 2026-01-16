@@ -1,3 +1,5 @@
+import { type Request } from 'express';
+
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 
 export const flowConfig: JourneyFlowConfig = {
@@ -17,16 +19,24 @@ export const flowConfig: JourneyFlowConfig = {
     'enter-age': {
       routes: [
         {
-          condition: (formData: Record<string, unknown>, _currentStepData: Record<string, unknown>): boolean => {
+          condition: async (
+            req: Request,
+            formData: Record<string, unknown>,
+            _currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
             const enterAgeData = formData['enter-age'] as { age?: string } | undefined;
-            return enterAgeData?.age === 'yes';
+            return Promise.resolve(enterAgeData?.age === 'yes');
           },
           nextStep: 'enter-dob',
         },
         {
-          condition: (formData: Record<string, unknown>, _currentStepData: Record<string, unknown>): boolean => {
+          condition: async (
+            req: Request,
+            formData: Record<string, unknown>,
+            _currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
             const enterAgeData = formData['enter-age'] as { age?: string } | undefined;
-            return enterAgeData?.age === 'no';
+            return Promise.resolve(enterAgeData?.age === 'no');
           },
           nextStep: 'ineligible',
         },
