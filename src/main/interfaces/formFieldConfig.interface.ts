@@ -39,6 +39,8 @@ export interface FormFieldConfig {
   options?: FormFieldOption[];
   classes?: string;
   attributes?: Record<string, unknown>;
+  // Legend classes for radio/checkbox/date fieldsets
+  legendClasses?: string;
   // Pre-processed component configuration for template rendering
   component?: Record<string, unknown>;
   componentType?: ComponentType;
