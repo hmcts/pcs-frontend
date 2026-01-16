@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { mapCaseDataToFormData } from '../app/utils/sessionCaseMapper';
 import { CcdCase } from '../interfaces/ccdCase.interface';
 import { ccdCaseService } from '../services/ccdCaseService';
 
@@ -17,11 +16,6 @@ export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextF
 
       if (caseData && caseData.id) {
         req.session.ccdCase = caseData;
-        const mappedFormData = mapCaseDataToFormData(caseData);
-        req.session.formData = {
-          ...(req.session.formData || {}),
-          ...mappedFormData,
-        };
       }
     }
     next();

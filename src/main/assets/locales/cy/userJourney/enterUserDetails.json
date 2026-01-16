@@ -1,9 +1,0 @@
-{
-  "title": "cyEnter your details",
-  "firstNameLabel": "cyFirst name",
-  "lastNameLabel": "cyLast name",
-  "errors": {
-    "applicantForename": "cyEnter your first name",
-    "applicantSurname": "cyEnter your last name"
-  }
-}

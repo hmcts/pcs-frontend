@@ -167,9 +167,9 @@ describe('formBuilder', () => {
     });
 
     it('should handle journeyFolder with camelCase', () => {
-      const config = { ...baseConfig, journeyFolder: 'userJourney' };
+      const config = { ...baseConfig, journeyFolder: 'respondToClaim' };
       const step = createFormStep(config);
-      expect(step.url).toBe('/steps/user-journey/test-step');
+      expect(step.url).toBe('/steps/respond-to-claim/test-step');
     });
 
     it('should create getController that renders with form content', async () => {

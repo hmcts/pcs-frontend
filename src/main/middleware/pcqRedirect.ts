@@ -53,7 +53,8 @@ export function pcqRedirectMiddleware() {
     const pcqId = uuid();
 
     const partyId = encodeURIComponent(user.email || ''); //TODO: Might want to change partyId to IDAM ID instead.
-    const returnUrl = `${req.protocol}://${req.get('host')}/steps/user-journey/summary`;
+    // TODO: Update returnUrl to use the appropriate journey's summary step
+    const returnUrl = `${req.protocol}://${req.get('host')}/respond-to-claim/free-legal-advice`;
 
     const params = {
       serviceId,

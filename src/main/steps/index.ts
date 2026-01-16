@@ -3,8 +3,6 @@ import type { StepDefinition } from '../interfaces/stepFormData.interface';
 
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
-import { flowConfig as userJourneyFlowConfig } from './userJourney/flow.config';
-import { stepRegistry as userJourneyStepRegistry } from './userJourney/stepRegistry';
 
 export interface JourneyConfig {
   name: string;
@@ -13,11 +11,6 @@ export interface JourneyConfig {
 }
 // Journey registry - add new journeys here
 export const journeyRegistry: Record<string, JourneyConfig> = {
-  userJourney: {
-    name: 'userJourney',
-    flowConfig: userJourneyFlowConfig,
-    stepRegistry: userJourneyStepRegistry,
-  },
   respondToClaim: {
     name: 'respondToClaim',
     flowConfig: respondToClaimFlowConfig,
