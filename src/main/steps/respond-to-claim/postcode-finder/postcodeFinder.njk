@@ -5,6 +5,11 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% block mainContent %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <form method="post" action="{{ url }}" novalidate>
+        <h1 class="govuk-heading-l">{{title}}{{ prepopulateAddress }}</h1>
+        <p class="govuk-body">{{ subtitle }}</p>
 
   <form method="post" action="{{ url }}" novalidate>
     <h1 class="govuk-heading-l">{{ title }}</h1>

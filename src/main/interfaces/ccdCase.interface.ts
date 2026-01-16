@@ -22,6 +22,37 @@ export interface CcdCase {
   id: string;
   data: UserJourneyCaseData;
 }
+
+export interface DefendantResponse {
+  addressLine1: string;
+  addressLine2: string;
+  addressLine3: string;
+  town: string;
+  county: string;
+  postcode: string;
+  country: string;
+}
+
+export interface StartCallbackData {
+  case_details: {
+    case_data: {
+      possessionClaimResponse?: {
+        party?: {
+          address?: {
+            AddressLine1?: string,
+            AddressLine2?: string,
+            AddressLine3?: string,
+            PostTown?: string,
+            County?: string,
+            PostCode?: string,
+            Country?: string,
+          }
+        };
+      };
+    };
+  };
+};
+
 export interface UserJourneyFormDataMap {
   'enter-user-details'?: {
     applicantForename: string;

@@ -17,8 +17,11 @@ export const step: StepDefinition = {
       'respond-to-claim/postcode-finder/postcodeFinder.njk',
       stepName,
       (req: Request) => {
+            console.log(req.session.formattedAddress)
+            const prepopulateAddress = req.session.formattedAddress; 
         return {
           url: req.originalUrl || '/respond-to-claim/postcode-finder',
+          prepopulateAddress: prepopulateAddress,
         };
       },
       'respondToClaim'

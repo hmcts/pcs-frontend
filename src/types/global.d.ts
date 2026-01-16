@@ -27,10 +27,12 @@ interface CustomSessionData extends SessionData {
   returnTo?: string;
   formData?: Record<string, any>;
   ccdCase?: CcdCase;
+  defendantResponse?: DefendantResponse; 
   postcodeLookupResult?: any[];
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
   _addressLookup?: AddressLookupSessionData;
+  formattedAddress?: string;
   destroy(callback: (err?: Error) => void): void;
 }
 
