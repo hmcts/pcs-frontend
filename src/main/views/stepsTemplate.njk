@@ -15,6 +15,11 @@
   {% include "webpack/css.njk" %}
 {% endblock %}
 
+{% block bodyStart %}
+  {# Start inert container wrapper for all page content #}
+  <div class="govuk-modal-dialogue-inert-container">
+{% endblock %}
+
 {% block header %}
   {{ govukHeader({
     containerClasses: "govuk-width-container",
@@ -28,7 +33,6 @@
   ]
   }) }}
 {% endblock %}
-
 
 {% block beforeContent %}
     <div class="govuk-width-container">
@@ -45,9 +49,6 @@
       href: backUrl
     }) }}
   {% endif %}
-  {% block modal %}
-    {% include "components/timeout-modal.njk" %}
-  {% endblock %}
 {% endblock %}
 
 
@@ -64,10 +65,7 @@
       <div class="govuk-grid-column-one-third">
         <aside class="app-related-items" role="complementary">
           <nav role="navigation" aria-label="Support and contact information">
-            {{ govukDetails({
-              summaryText: contactUsForHelp,
-              text: contactUsForHelpText or t('contactUsForHelpText')
-            }) }}
+              {% include "components/contact-us-details.njk" %}
           </nav>
         </aside>
       </div>
@@ -76,6 +74,14 @@
 {% endblock %}
 
 {% block bodyEnd %}
+  {# Close inert container wrapper #}
+  </div>
+
+  {# Timeout modal - outside inert container #}
+  {% block modal %}
+    {% include "components/timeout-modal.njk" %}
+  {% endblock %}
+
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}
 {% endblock %}
