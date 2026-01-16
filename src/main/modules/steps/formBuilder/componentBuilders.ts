@@ -13,13 +13,14 @@ import { buildSubFieldsHTML } from './subFieldsRenderer';
 
 function createFieldsetLegend(
   label: string,
-  isFirstField: boolean
+  isFirstField: boolean,
+  legendClasses?: string
 ): { legend: { text: string; isPageHeading: boolean; classes: string } } {
   return {
     legend: {
       text: label,
       isPageHeading: isFirstField,
-      classes: isFirstField ? 'govuk-fieldset__legend--l' : '',
+      classes: legendClasses || (isFirstField ? 'govuk-fieldset__legend--l' : ''),
     },
   };
 }
@@ -95,7 +96,7 @@ export function buildComponentConfig(
     }
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
-      component.fieldset = createFieldsetLegend(label, isFirstField);
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
 
       // Build items with conditional content and subFields support
       component.items =
@@ -143,7 +144,7 @@ export function buildComponentConfig(
       // Normalize checkbox value to handle edge case: [{ '0': 'value1', '1': 'value2' }]
       // This ensures checkbox values are always in the correct format for rendering
       const checkboxArray = normalizeCheckboxValue(fieldValue);
-      component.fieldset = createFieldsetLegend(label, isFirstField);
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
 
       // Build items with conditional content and subFields support
       component.items =
@@ -195,7 +196,7 @@ export function buildComponentConfig(
       };
       component.namePrefix = field.name;
       component.idPrefix = field.name;
-      component.fieldset = createFieldsetLegend(label, isFirstField);
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
       component.items = [
         {
           name: 'day',

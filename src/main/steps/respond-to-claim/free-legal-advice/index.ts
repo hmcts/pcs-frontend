@@ -29,6 +29,7 @@ export const step: StepDefinition = createFormStep(
         name: 'hadLegalAdvice',
         type: 'radio',
         required: true,
+        legendClasses: 'govuk-fieldset__legend--m',
         translationKey: {
           label: 'question',
         },
