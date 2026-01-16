@@ -11,7 +11,18 @@ export const step: StepDefinition = createFormStep(
     flowConfig,
     translationKeys: {
       pageTitle: 'title',
-      content: 'content',
+      subHeading1: 'subHeading1',
+      paragraph1: 'paragraph1',
+      listItem1: 'listItem1',
+      listItem2: 'listItem2',
+      listItem3: 'listItem3',
+      listItem4: 'listItem4',
+      paragraph2: 'paragraph2',
+      bullet1: 'bullet1',
+      bullet2: 'bullet2',
+      subHeading2: 'subHeading2',
+      paragraph3: 'paragraph3',
+      paragraph4: 'paragraph4',
     },
     fields: [
       {

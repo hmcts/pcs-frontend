@@ -26,7 +26,6 @@ const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
 
     req.session.defendantName = result;
   } catch (err: unknown) {
-     
     // eslint-disable-next-line no-console
     console.error('LaunchDarkly evaluation failed', err);
   }
