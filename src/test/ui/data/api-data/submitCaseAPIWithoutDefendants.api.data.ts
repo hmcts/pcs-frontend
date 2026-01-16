@@ -1,4 +1,4 @@
-export const submitCaseApiData = {
+export const submitCaseApiDataWithoutDefendantsData = {
   submitCaseEventName: 'resumePossessionClaim',
   submitCasePayload: {
     legislativeCountry: 'England',
@@ -36,35 +36,11 @@ export const submitCaseApiData = {
     isCorrectClaimantContactAddress: 'YES',
     claimantProvidePhoneNumber: 'NO',
     defendant1: {
-      nameKnown: 'YES',
-      addressKnown: 'YES',
-      addressSameAsPossession: 'YES',
-      firstName: 'John',
-      lastName: 'Doe',
+      nameKnown: 'NO',
+      addressKnown: 'NO',
+      addressSameAsPossession: 'NO',
     },
-    addAnotherDefendant: 'YES',
-    additionalDefendants: [
-      {
-        value: {
-          nameKnown: 'YES',
-          firstName: 'Peter',
-          lastName: 'Parker',
-          addressKnown: 'YES',
-          addressSameAsPossession: 'YES'
-        },
-        id: null
-      },
-      {
-        value: {
-          nameKnown: 'YES',
-          firstName: 'Jen',
-          lastName: 'Parker',
-          addressKnown: 'YES',
-          addressSameAsPossession: 'YES'
-        },
-        id: null
-      },
-    ],
+    addAnotherDefendant: 'NO',
     tenancy_TypeOfTenancyLicence: 'DEMOTED_TENANCY',
     tenancy_TenancyLicenceDate: null,
     tenancy_TenancyLicenceDocuments: [],
@@ -93,5 +69,4 @@ export const submitCaseApiData = {
     languageUsed: 'ENGLISH',
     completionNextStep: 'SUBMIT_AND_PAY_NOW'
   },
-  submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };
