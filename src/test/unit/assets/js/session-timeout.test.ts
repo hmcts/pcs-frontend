@@ -19,6 +19,11 @@ describe('initSessionTimeout', () => {
     // mock fetch
     mockFetch = jest.fn().mockResolvedValue({ ok: true });
     global.fetch = mockFetch;
+
+    // set default dataset values
+    document.body.dataset.sessionTimeout = '6';
+    document.body.dataset.sessionWarning = '5';
+    document.body.dataset.sessionCheckInterval = '10';
   });
 
   afterEach(() => {
@@ -27,9 +32,21 @@ describe('initSessionTimeout', () => {
   });
 
   const buildSessionTimeoutComponent = () => `
-    <div id="timeout-modal-container" hidden>
+    <div id="timeout-alert" role="status" aria-live="assertive" aria-atomic="true" class="govuk-visually-hidden"></div>
+    <div id="timeout-modal-container" hidden
+         data-timeout-title="Session timeout"
+         data-timeout-subtitle="Your session will timeout in"
+         data-timeout-caption="Please click continue to stay signed in"
+         data-time-minute="minute"
+         data-time-minutes="minutes"
+         data-time-second="second"
+         data-time-seconds="seconds"
+         data-time-remaining="remaining">
       <div id="timeout-modal" tabindex="-1">
-        <p>Your session will expire in <span id="countdown-timer"></span></p>
+        <p>Your session will expire in <span id="countdown-time"></span></p>
+        <p class="govuk-visually-hidden" aria-live="polite" aria-atomic="true">
+          <span id="countdown-message"></span>
+        </p>
         <button id="timeout-modal-close-button">Continue</button>
       </div>
     </div>
@@ -67,6 +84,9 @@ describe('initSessionTimeout', () => {
 
     mockDateNow.mockReturnValue(60000);
     jest.advanceTimersByTime(10000);
+
+    // focus delay (100ms setTimeout)
+    jest.advanceTimersByTime(100);
 
     // modal visible
     expect(modalContainer.hasAttribute('hidden')).toBe(false);
@@ -128,7 +148,7 @@ describe('initSessionTimeout', () => {
     document.body.dataset.sessionTimeout = '6';
     document.body.dataset.sessionWarning = '5';
 
-    const countdownElement = document.getElementById('countdown-timer') as HTMLSpanElement;
+    const countdownElement = document.getElementById('countdown-time') as HTMLSpanElement;
 
     initSessionTimeout();
 
@@ -200,7 +220,7 @@ describe('initSessionTimeout', () => {
     document.body.dataset.sessionTimeout = '6';
     document.body.dataset.sessionWarning = '5';
 
-    const countdownElement = document.getElementById('countdown-timer') as HTMLSpanElement;
+    const countdownElement = document.getElementById('countdown-time') as HTMLSpanElement;
 
     initSessionTimeout();
 
@@ -221,16 +241,14 @@ describe('initSessionTimeout', () => {
     document.body.dataset.sessionTimeout = '6';
     document.body.dataset.sessionWarning = '5';
 
-    const countdownElement = document.getElementById('countdown-timer') as HTMLSpanElement;
+    const countdownElement = document.getElementById('countdown-time') as HTMLSpanElement;
 
     initSessionTimeout();
 
-    // show modal - starts at 5 minutes (300 seconds)
     mockDateNow.mockReturnValue(60000);
     jest.advanceTimersByTime(10000);
 
-    // adjusted to get to exactly 180 seconds
-    jest.advanceTimersByTime(110000);
+    jest.advanceTimersByTime(120000);
 
     // should show format like "3 minutes" (no seconds)
     const text = countdownElement.textContent || '';
@@ -241,18 +259,17 @@ describe('initSessionTimeout', () => {
   it('displays countdown with seconds only', () => {
     document.body.innerHTML = buildSessionTimeoutComponent();
     document.body.dataset.sessionTimeout = '6';
-    document.body.dataset.sessionWarning = '1'; // 1 minute warning to get to seconds quickly
+    document.body.dataset.sessionWarning = '1';
 
-    const countdownElement = document.getElementById('countdown-timer') as HTMLSpanElement;
+    const countdownElement = document.getElementById('countdown-time') as HTMLSpanElement;
 
     initSessionTimeout();
 
     // show modal
-    mockDateNow.mockReturnValue(300000); // 5 minutes = time until warning
+    mockDateNow.mockReturnValue(300000);
     jest.advanceTimersByTime(10000);
 
-    // advance countdown to less than 1 minute
-    jest.advanceTimersByTime(50000); // advance 50 seconds
+    jest.advanceTimersByTime(50000);
 
     // should show format like "10 seconds" (no minutes)
     const text = countdownElement.textContent || '';
