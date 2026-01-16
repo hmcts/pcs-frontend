@@ -6,13 +6,47 @@ export function initSessionTimeout(): void {
 
   // modal elements
   const modalContainer = document.getElementById('timeout-modal-container');
-  const modal = document.getElementById('timeout-modal');
-  const countdownElement = document.getElementById('countdown-timer');
-  const continueButton = document.getElementById('timeout-modal-close-button');
+  const modal = modalContainer?.querySelector<HTMLElement>('#timeout-modal');
+  const countdownTime = modalContainer?.querySelector<HTMLElement>('#countdown-time');
+  const countdownMessage = modalContainer?.querySelector<HTMLElement>('#countdown-message');
+  const timeoutAlert = modalContainer?.querySelector<HTMLElement>('#timeout-alert');
+  const continueButton = modalContainer?.querySelector<HTMLElement>('#timeout-modal-close-button');
+
+  const inertSelector = modalContainer?.dataset.inertContainer;
+  const inertContainer = inertSelector ? document.querySelector<HTMLElement>(inertSelector) : null;
 
   let lastActivity = Date.now();
   let warningShown = false;
   let countdownInterval: number | null = null;
+
+  // translations from data attributes
+  const {
+    timeoutTitle,
+    timeoutSubtitle,
+    timeoutCaption,
+    timeMinute,
+    timeMinutes,
+    timeSecond,
+    timeSeconds,
+    timeRemaining,
+  } = modalContainer?.dataset ?? {};
+
+  // format time helper
+  const formatTime = (minutes: number, seconds: number): string => {
+    const parts: string[] = [];
+
+    if (minutes > 0) {
+      const minuteLabel = minutes === 1 ? timeMinute : timeMinutes;
+      parts.push(`${minutes} ${minuteLabel}`);
+    }
+
+    if (seconds > 0) {
+      const secondLabel = seconds === 1 ? timeSecond : timeSeconds;
+      parts.push(`${seconds} ${secondLabel}`);
+    }
+
+    return parts.join(' ');
+  };
 
   // show modal
   const showModal = () => {
@@ -20,11 +54,24 @@ export function initSessionTimeout(): void {
       return;
     }
 
+    if (inertContainer) {
+      (inertContainer as HTMLElement & { inert: boolean }).inert = true;
+    }
+
+    document.documentElement.classList.add('modal-open');
+
     modalContainer.removeAttribute('hidden');
-    modal.focus();
+
+    if (timeoutAlert) {
+      timeoutAlert.textContent = `${timeoutTitle}. ${timeoutSubtitle} ${sessionWarningMinutes} ${timeMinutes}. ${timeoutCaption}`;
+    }
+
+    setTimeout(() => {
+      modal.focus();
+    }, 100);
+
     warningShown = true;
 
-    // start countdown
     startCountdown();
   };
 
@@ -34,14 +81,43 @@ export function initSessionTimeout(): void {
       return;
     }
 
+    if (inertContainer) {
+      (inertContainer as HTMLElement & { inert: boolean }).inert = false;
+    }
+
+    document.documentElement.classList.remove('modal-open');
+
     modalContainer.setAttribute('hidden', 'hidden');
+
+    if (timeoutAlert) {
+      timeoutAlert.textContent = '';
+    }
+
     warningShown = false;
     stopCountdown();
   };
 
+  // update visual countdown display (every second)
+  const updateVisualCountdown = (secondsRemaining: number) => {
+    if (!countdownTime) {
+      return;
+    }
+
+    const minutes = Math.floor(secondsRemaining / 60);
+    const seconds = secondsRemaining % 60;
+    countdownTime.textContent = formatTime(minutes, seconds);
+  };
+
+  // update screen reader announcement (only at intervals)
+  const updateScreenReaderAnnouncement = (text: string) => {
+    if (countdownMessage) {
+      countdownMessage.textContent = text;
+    }
+  };
+
   // start countdown timer
   const startCountdown = () => {
-    if (!countdownElement) {
+    if (!countdownTime || !countdownMessage) {
       return;
     }
 
@@ -54,24 +130,20 @@ export function initSessionTimeout(): void {
         return;
       }
 
-      const minutes = Math.floor(secondsRemaining / 60);
-      const seconds = secondsRemaining % 60;
+      updateVisualCountdown(secondsRemaining);
 
-      if (minutes > 0 && seconds > 0) {
-        countdownElement.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds} second${seconds !== 1 ? 's' : ''}`;
-      } else if (minutes > 0) {
-        countdownElement.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-      } else {
-        countdownElement.textContent = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+      if (secondsRemaining === warningTimeSeconds) {
+        updateScreenReaderAnnouncement(`${timeoutSubtitle} ${warningTimeSeconds / 60} ${timeMinutes}.`);
+      } else if (secondsRemaining > 0 && secondsRemaining < warningTimeSeconds && secondsRemaining % 60 === 0) {
+        const minutes = secondsRemaining / 60;
+        updateScreenReaderAnnouncement(`${formatTime(minutes, 0)} ${timeRemaining}`);
       }
 
       secondsRemaining--;
     };
 
-    // update immediately
     updateCountdown();
 
-    // update every second
     countdownInterval = window.setInterval(updateCountdown, 1000);
   };
 
@@ -85,23 +157,20 @@ export function initSessionTimeout(): void {
 
   // reset - user must click button
   const resetActivity = () => {
-    // reset timer if modal is NOT shown
     if (!warningShown) {
       lastActivity = Date.now();
     }
   };
 
-  // Check session status
+  // check session status
   const checkSessionStatus = () => {
     const inactiveMinutes = (Date.now() - lastActivity) / (1000 * 60);
     const timeUntilWarning = sessionTimeoutMinutes - sessionWarningMinutes;
 
-    // warning
     if (inactiveMinutes >= timeUntilWarning && !warningShown) {
       showModal();
     }
 
-    // timeout
     if (inactiveMinutes >= sessionTimeoutMinutes) {
       window.location.replace('/logout');
     }
@@ -110,7 +179,6 @@ export function initSessionTimeout(): void {
   // stay signed in- button click
   if (continueButton) {
     continueButton.addEventListener('click', () => {
-      // backend to extend server session
       fetch('/active')
         .then(response => {
           if (response.ok) {
@@ -119,7 +187,6 @@ export function initSessionTimeout(): void {
           }
         })
         .catch(() => {
-          // reset client timer
           lastActivity = Date.now();
           hideModal();
         });
