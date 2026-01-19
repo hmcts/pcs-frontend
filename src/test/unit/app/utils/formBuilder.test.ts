@@ -160,7 +160,7 @@ describe('formBuilder', () => {
   describe('createFormStep', () => {
     it('should create a step definition with correct URL', () => {
       const step = createFormStep(baseConfig);
-      expect(step.url).toBe('/steps/test-journey/test-step');
+      expect(step.url).toBe('/test-journey/test-step');
       expect(step.name).toBe('test-step');
       expect(step.view).toBe('formBuilder.njk');
       expect(step.stepDir).toBe(mockStepDir);
@@ -169,7 +169,7 @@ describe('formBuilder', () => {
     it('should handle journeyFolder with camelCase', () => {
       const config = { ...baseConfig, journeyFolder: 'respondToClaim' };
       const step = createFormStep(config);
-      expect(step.url).toBe('/steps/respond-to-claim/test-step');
+      expect(step.url).toBe('/respond-to-claim/test-step');
     });
 
     it('should create getController that renders with form content', async () => {
