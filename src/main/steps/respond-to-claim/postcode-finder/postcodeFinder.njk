@@ -3,42 +3,33 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
-
 {% block mainContent %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <form method="post" action="{{ url }}" novalidate>
-        <h1 class="govuk-heading-l">{{title}}{{ prepopulateAddress }}</h1>
-        <p class="govuk-body">{{ subtitle }}</p>
-
-  <form method="post" action="{{ url }}" novalidate>
-    <h1 class="govuk-heading-l">{{ title }}</h1>
-    <p class="govuk-body">{{ subtitle }}</p>
-
-    {% set postcodeFinderHtml %}
-      <div class="govuk-form-group postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
-        <h2 class="govuk-heading-m">{{ labels.enterAddress }}</h2>
-        <label class="govuk-label" for="correspondence-lookupPostcode">
-          {{ labels.enterPostcode }}
-        </label>
-        <p class="govuk-error-message govuk-visually-hidden" id="correspondence-postcode-error" role="alert">
-          <span class="govuk-visually-hidden">Error:</span> {{ errors.postcodeNotFound }}
-        </p>
-        <input class="govuk-input govuk-input--width-10" 
-                id="correspondence-lookupPostcode" 
-                name="lookupPostcode" 
-                type="text" 
-                autocomplete="postal-code"
-                aria-describedby="correspondence-postcode-error"/>
-        <button class="govuk-button" 
-                id="correspondence-findAddressBtn"
-                data-module="govuk-button" 
-                type="button">
-          {{ buttons.findAddress }}
-        </button>
-        
-        <div id="correspondence-addressSelectContainer" hidden>
-          {{ govukSelect({
+  {# Setup Address Entry #}
+  {% set postcodeFinderHtml %}
+  <div
+    class="govuk-form-group postcode-container govuk-!-margin-top-4"
+    data-address-component
+    data-name-prefix="correspondence">
+    <h2 class="govuk-heading-m">{{ labels.enterAddress }}</h2>
+    <label class="govuk-label" for="correspondence-lookupPostcode">
+      {{ labels.enterPostcode }}
+    </label>
+    <p class="govuk-error-message govuk-visually-hidden" id="correspondence-postcode-error" role="alert">
+      <span class="govuk-visually-hidden">Error:</span>
+      {{ errors.postcodeNotFound }}
+    </p>
+    <input
+      class="govuk-input govuk-input--width-10"
+      id="correspondence-lookupPostcode"
+      name="lookupPostcode"
+      type="text"
+      autocomplete="postal-code"
+      aria-describedby="correspondence-postcode-error"/>
+    <button class="govuk-button" id="correspondence-findAddressBtn" data-module="govuk-button" type="button">
+      {{ buttons.findAddress }}
+    </button>
+    <div id="correspondence-addressSelectContainer" hidden>
+      {{ govukSelect({
             id: 'correspondence-selectedAddress',
             name: "addressList",
             classes: 'addressList govuk-!-width-full',
@@ -54,75 +45,77 @@
               }
             ]
           }) }}
-        </div>
-        
-        {{ govukDetails({
+    </div>
+    {{ govukDetails({
           summaryText: labels.enterManually,
           text: labels.enterManuallySubText,
           id: "correspondence-enterManuallyDetails"
         }) }}
-        
-        <div class="govuk-visually-hidden address-form" id="correspondence-addressForm">
-          <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ labels.addressHeading }}</h2>
-          
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-addressLine1">
-              {{ labels.addressLine1 }}
-            </label>
-            <input class="govuk-input govuk-!-width-two-thirds" 
-                    id="correspondence-addressLine1" 
-                    name="addressLine1" 
-                    type="text" 
-                    autocomplete="address-line1"/>
-          </div>
-
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-addressLine2">
-              {{ labels.addressLine2 }}
-            </label>
-            <input class="govuk-input govuk-!-width-two-thirds" 
-                    id="correspondence-addressLine2" 
-                    name="addressLine2" 
-                    type="text" 
-                    autocomplete="address-line2"/>
-          </div>
-
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-town">
-              {{ labels.townOrCity }}
-            </label>
-            <input class="govuk-input govuk-!-width-two-thirds" 
-                    id="correspondence-town" 
-                    name="townOrCity" 
-                    type="text" 
-                    autocomplete="address-level2"/>
-          </div>
-
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-county">
-              {{ labels.county }}
-            </label>
-            <input class="govuk-input govuk-!-width-two-thirds" 
-                    id="correspondence-county" 
-                    name="county" 
-                    type="text"/>
-          </div>
-
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-postcode">
-              {{ labels.postcode }}
-            </label>
-            <input class="govuk-input govuk-!-width-one-third" 
-                    id="correspondence-postcode" 
-                    name="postcode" 
-                    type="text" 
-                    autocomplete="postal-code"/>
-          </div>
-        </div>
+    <div class="govuk-visually-hidden address-form" id="correspondence-addressForm">
+      <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ labels.addressHeading }}</h2>
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="correspondence-addressLine1">
+          {{ labels.addressLine1 }}
+        </label>
+        <input
+          class="govuk-input govuk-!-width-two-thirds"
+          id="correspondence-addressLine1"
+          name="addressLine1"
+          type="text"
+          autocomplete="address-line1"/>
       </div>
-    {% endset %}
-
-    {{ govukRadios({
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="correspondence-addressLine2">
+          {{ labels.addressLine2 }}
+        </label>
+        <input
+          class="govuk-input govuk-!-width-two-thirds"
+          id="correspondence-addressLine2"
+          name="addressLine2"
+          type="text"
+          autocomplete="address-line2"/>
+      </div>
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="correspondence-town">
+          {{ labels.townOrCity }}
+        </label>
+        <input
+          class="govuk-input govuk-!-width-two-thirds"
+          id="correspondence-town"
+          name="townOrCity"
+          type="text"
+          autocomplete="address-level2"/>
+      </div>
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="correspondence-county">
+          {{ labels.county }}
+        </label>
+        <input class="govuk-input govuk-!-width-two-thirds" id="correspondence-county" name="county" type="text"/>
+      </div>
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="correspondence-postcode">
+          {{ labels.postcode }}
+        </label>
+        <input
+          class="govuk-input govuk-!-width-one-third"
+          id="correspondence-postcode"
+          name="postcode"
+          type="text"
+          autocomplete="postal-code"/>
+      </div>
+    </div>
+  </div>
+  {% endset %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <form method="post" action="{{ url }}" novalidate>
+          <h2 class="govuk-heading-m govuk-!-margin-bottom-0 claim-journey-secondary-heading">{{secondaryHeading}}</h2>
+        {% if addressKnown %}
+          <h1 class="govuk-heading-l">{{ title }}{{ prepopulateAddress }}</h1>
+          <p class="govuk-body">{{ subtitle }}</p>
+          <h1 class="govuk-heading-l">{{ title }}</h1>
+          <p class="govuk-body">{{ subtitle }}</p>
+          {{ govukRadios({
       name: "correspondenceAddressConfirm",
       fieldset: {
         legend: {
@@ -145,17 +138,21 @@
         }
       ]
     }) }}
-
-    <div class="govuk-button-group">
-      {{ govukButton({
+        {% else %}
+          <h1 class="govuk-heading-l">{{ titleNa }}</h1>
+          <p class="govuk-body">{{ subtitleNa }}</p>
+          <div>
+            {{ postcodeFinderHtml | safe }}
+          </div>
+        {% endif %}
+        <div class="govuk-button-group">
+          {{ govukButton({
         text: buttons.saveAndContinue
       }) }}
-      {{ govukButton({
+          {{ govukButton({
         text: buttons.saveForLater,
         classes: "govuk-button--secondary"
       }) }}
-    </div>
-  </form>
-
-
-{% endblock %}
+        </div>
+      </form>
+    {% endblock %}
