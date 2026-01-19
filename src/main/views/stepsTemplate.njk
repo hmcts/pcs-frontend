@@ -15,39 +15,40 @@
   {% include "webpack/css.njk" %}
 {% endblock %}
 
+{% block bodyStart %}
+  {# Start inert container wrapper for all page content #}
+  <div class="govuk-modal-dialogue-inert-container">
+{% endblock %}
+
 {% block header %}
   {{ govukHeader({
     containerClasses: "govuk-width-container",
-    serviceName: serviceName or "Possession claims",
+    serviceName: (serviceName or t('serviceName') or "Possession claims"),
     serviceUrl: "/",
     navigation: [
     {
-      text: 'logout',
+      text: (t('logout') or 'logout'),
       href: '/logout'
     }
   ]
   }) }}
 {% endblock %}
 
-
 {% block beforeContent %}
     <div class="govuk-width-container">
       {{ govukPhaseBanner({
         tag: {
-          text: phase | safe
+          text: (phase or t('phase') or 'ALPHA') | safe
         },
-        html:(feedback + languageToggle) | safe
+        html: ((feedback or t('feedback') or '') + (languageToggle or t('languageToggle') or '')) | safe
       }) }}
   </div>
   {% if backUrl %}
     {{ govukBackLink({
-      text: back or "Back",
+      text: (back or t('back') or "Back"),
       href: backUrl
     }) }}
   {% endif %}
-  {% block modal %}
-    {% include "components/timeout-modal.njk" %}
-  {% endblock %}
 {% endblock %}
 
 
@@ -64,10 +65,7 @@
       <div class="govuk-grid-column-one-third">
         <aside class="app-related-items" role="complementary">
           <nav role="navigation" aria-label="Support and contact information">
-            {{ govukDetails({
-              summaryText: contactUsForHelp,
-              text: contactUsForHelpText or ""
-            }) }}
+              {% include "components/contact-us-details.njk" %}
           </nav>
         </aside>
       </div>
@@ -76,6 +74,14 @@
 {% endblock %}
 
 {% block bodyEnd %}
+  {# Close inert container wrapper #}
+  </div>
+
+  {# Timeout modal - outside inert container #}
+  {% block modal %}
+    {% include "components/timeout-modal.njk" %}
+  {% endblock %}
+
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}
 {% endblock %}

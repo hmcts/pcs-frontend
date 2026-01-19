@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
 
-import { getDashboardUrl } from '../../../app/utils/routes';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { respondToClaimFlowConfig } from '../flow.config';
+import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
+import { flowConfig } from '../flow.config';
 
 const stepName = 'start-now';
-const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
+const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
   url: '/respond-to-claim/start-now',
@@ -17,10 +17,9 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/start-now/startNow.njk',
       stepName,
-      (req: Request) => {
-        const ccdCaseId = req.session?.ccdCase?.id;
+      (_req: Request) => {
         return {
-          backUrl: getDashboardUrl(ccdCaseId),
+          backUrl: DASHBOARD_ROUTE,
         };
       },
       'respondToClaim'

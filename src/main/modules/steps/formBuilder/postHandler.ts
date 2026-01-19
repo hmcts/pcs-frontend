@@ -1,14 +1,23 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { getDashboardUrl } from '../../../app/utils/routes';
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { stepNavigation } from '../flow';
-import { getRequestLanguage, getTranslationFunction, loadStepNamespace } from '../i18n';
+import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
+import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
 import { buildFormContent } from './formContent';
-import { getTranslationErrors, processFieldData, setFormData, validateForm } from './helpers';
+import {
+  getCustomErrorTranslations,
+  getTranslationErrors,
+  normalizeCheckboxFields,
+  processFieldData,
+  setFormData,
+  validateForm,
+} from './helpers';
+import { validateConfigInDevelopment } from './schema';
 
 export function createPostHandler(
   fields: FormFieldConfig[],
@@ -17,60 +26,74 @@ export function createPostHandler(
   journeyFolder: string,
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys
-): { post: (req: Request, res: Response) => Promise<void | Response> } {
+): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
+  // Validate config in development mode
+  if (process.env.NODE_ENV !== 'production') {
+    validateConfigInDevelopment({
+      stepName,
+      journeyFolder,
+      fields,
+      beforeRedirect,
+      stepDir: '',
+      translationKeys,
+    });
+  }
+
   return {
-    post: async (req: Request, res: Response) => {
+    post: async (req: Request, res: Response, next: NextFunction) => {
       await loadStepNamespace(req, stepName, journeyFolder);
 
-      const lang = getRequestLanguage(req);
       const t: TFunction = getTranslationFunction(req, stepName, ['common']);
       const action = req.body.action as string | undefined;
 
-      const fieldsWithLabels = translateFields(fields, t, {}, undefined, false);
-      const errors = validateForm(req, fieldsWithLabels, getTranslationErrors(t, fieldsWithLabels));
+      const nunjucksEnv = req.app.locals.nunjucksEnv;
+      if (!nunjucksEnv) {
+        throw new Error('Nunjucks environment not initialized');
+      }
 
-      // If there are validation errors, show them regardless of action
+      // Get all form data from session for cross-field validation
+      const allFormData = req.session.formData
+        ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
+        : {};
+
+      // Normalize checkbox fields BEFORE validation to ensure checkbox values are arrays
+      // This is critical because validation functions (like required functions) need normalized checkbox arrays
+      // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
+      normalizeCheckboxFields(req, fields);
+
+      const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
+      const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
+      const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
+      const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
+
       if (Object.keys(errors).length > 0) {
-        const firstField = Object.keys(errors)[0];
-        const fieldConfig = fields.find(f => f.name === firstField);
-        // For date fields, the error link should point to the day input
-        const errorAnchor = fieldConfig?.type === 'date' ? `${firstField}-day` : firstField;
-        const error = { field: firstField, anchor: errorAnchor, text: errors[firstField] };
-        const formContent = buildFormContent(fields, t, req.body, error, translationKeys);
-
-        return res.status(400).render(viewPath, {
-          ...formContent,
-          error,
-          stepName,
-          journeyFolder,
-          backUrl: stepNavigation.getBackUrl(req, stepName),
-          lang,
-          pageUrl: req.originalUrl || '/',
-          t,
-          ccdId: req.session?.ccdCase?.id,
-          dashboardUrl: getDashboardUrl(req.session?.ccdCase?.id),
-          languageToggle: t('languageToggle'),
-        });
+        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
+        renderWithErrors(req, res, viewPath, errors, fields, formContent, stepName, journeyFolder, translationKeys);
+        return; // renderWithErrors sends the response, so we return early
       }
 
       // Handle saveForLater action after validation passes
       if (action === 'saveForLater') {
+        // Process field data (normalize checkboxes + consolidate date fields) before saving
         processFieldData(req, fields);
-        const bodyWithoutAction = { ...req.body };
-        delete bodyWithoutAction.action;
+        const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, getDashboardUrl(req.session?.ccdCase?.id));
+        return res.redirect(303, DASHBOARD_ROUTE);
       }
 
+      // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
-      const bodyWithoutAction = { ...req.body };
-      delete bodyWithoutAction.action;
+      const { action: _, ...bodyWithoutAction } = req.body;
       setFormData(req, stepName, bodyWithoutAction);
 
       if (beforeRedirect) {
-        await beforeRedirect(req);
-        if (res.headersSent) {
-          return;
+        try {
+          await beforeRedirect(req);
+          if (res.headersSent) {
+            return;
+          }
+        } catch (error) {
+          return next(error);
         }
       }
 

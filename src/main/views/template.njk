@@ -11,6 +11,11 @@
   {% include "webpack/css.njk" %}
 {% endblock %}
 
+{% block bodyStart %}
+  {# Start inert container wrapper for all page content #}
+  <div class="govuk-modal-dialogue-inert-container">
+{% endblock %}
+
 {% block header %}
 {{ govukHeader({
   serviceName: serviceName or "Possession claims",
@@ -24,12 +29,23 @@
 {% endblock %}
 
 {% block beforeContent %}
+{% endblock %}
+
+{% block beforeContent %}
   {% block modal %}
     {% include "components/timeout-modal.njk" %}
   {% endblock %}
 {% endblock %}
 
 {% block bodyEnd %}
+  {# Close inert container wrapper #}
+  </div>
+
+  {# Timeout modal - outside inert container #}
+  {% block modal %}
+    {% include "components/timeout-modal.njk" %}
+  {% endblock %}
+  
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}
 {% endblock %}

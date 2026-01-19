@@ -4,6 +4,8 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
+import { contactUs } from '../../../data/section-data/contactUs.section.data';
+import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
 const ELEMENT_TYPES = [
@@ -20,6 +22,7 @@ const ELEMENT_TYPES = [
   'TextLabel',
   'Paragraph',
   'List',
+  'Summary',
 ] as const;
 
 type ValidationResult = { element: string; expected: string; status: 'pass' | 'fail' };
@@ -48,6 +51,10 @@ export class PageContentValidation implements IValidation {
                     button.govuk-js-link:text("${value}"),
                     [role="link"]:text("${value}"),
                     [aria-label*="${value}"]:text("${value}")`),
+    Summary: (page: Page, value: string) =>
+      page.locator(`
+                    summary:has-text("${value}"),
+                    summary .govuk-details__summary-text:text("${value}")`),
     Header: (page: Page, value: string) =>
       page.locator(`
                     h1:text("${value}"),
@@ -97,7 +104,7 @@ export class PageContentValidation implements IValidation {
                     label:has-text("${value}"),
                     .label:has-text("${value}")`),
     Paragraph: (page: Page, value: string) =>
-      page.locator(`
+      page.locator(`span:text("${value}"),
                     .paragraph:text("${value}"),
                     p:text("${value}"),
                     markdown:text("${value}"),
@@ -142,7 +149,7 @@ export class PageContentValidation implements IValidation {
     PageContentValidation.validationResults.set(pageUrl, pageResults);
   }
 
-  private async getPageData(page: Page): Promise<null> {
+  private async getPageData(page: Page): Promise<object | null> {
     const urlSegment = this.getUrlSegment(page.url());
     const fileName = await this.getFileName(urlSegment, page);
 
@@ -153,7 +160,13 @@ export class PageContentValidation implements IValidation {
 
     PageContentValidation.pageToFileNameMap.set(page.url(), fileName);
 
-    return this.loadPageDataFile(fileName);
+    let pageData = this.loadPageDataFile(fileName);
+    const contactUsData = this.loadPageDataFile('contactUs', true);
+    if (this.getUrlSegment(page.url()) !== 'home') {
+      pageData = { ...pageData, ...contactUsData };
+      await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
+    }
+    return pageData;
   }
 
   private getUrlSegment(url: string): string {
@@ -221,8 +234,11 @@ export class PageContentValidation implements IValidation {
     }
   }
 
-  private async loadPageDataFile(fileName: string): Promise<null> {
-    const filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
+  private loadPageDataFile(fileName: string, sectionFile?: boolean): object | null {
+    let filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
+    if (sectionFile) {
+      filePath = path.join(__dirname, '../../../data/section-data', `${fileName}.section.data.ts`);
+    }
     if (!fs.existsSync(filePath)) {
       return null;
     }
