@@ -113,8 +113,6 @@
         {% if addressKnown %}
           <h1 class="govuk-heading-l">{{ title }}{{ prepopulateAddress }}</h1>
           <p class="govuk-body">{{ subtitle }}</p>
-          <h1 class="govuk-heading-l">{{ title }}</h1>
-          <p class="govuk-body">{{ subtitle }}</p>
           {{ govukRadios({
       name: "correspondenceAddressConfirm",
       fieldset: {
@@ -139,6 +137,7 @@
       ]
     }) }}
         {% else %}
+          <div class="govuk-inset-text">ELSE BRANCH</div>
           <h1 class="govuk-heading-l">{{ titleNa }}</h1>
           <p class="govuk-body">{{ subtitleNa }}</p>
           <div>
@@ -155,4 +154,6 @@
       }) }}
         </div>
       </form>
+      </div>
+      </div>
     {% endblock %}
