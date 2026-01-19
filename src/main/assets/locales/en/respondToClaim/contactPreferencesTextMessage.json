@@ -15,9 +15,6 @@
   "requiredErrorMessage": "Please enter your UK mobile number before continuing.",
 
   "errors": {
-    "phoneNumber": {
-      "required": "Please enter your UK mobile number before continuing.",
-      "invalid": "Enter a valid phone number"
-    }
+    "contactByTextMessage.phoneNumber": "Please enter your UK mobile number before continuing."
   }
 }

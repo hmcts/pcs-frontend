@@ -40,7 +40,7 @@ export const step: StepDefinition = createFormStep({
                 autocomplete: 'tel',
               },
               validator: value => isMobilePhone(value as string, ['en-GB']),
-              errorMessage: 'errors.phoneNumber.required',
+              errorMessage: 'errors.phoneNumber',
             },
           },
         },
