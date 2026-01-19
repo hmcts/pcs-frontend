@@ -42,7 +42,7 @@ export function buildComponentConfig(
   const component: Record<string, unknown> = {
     id: field.name,
     name: field.name,
-    label: { text: label },
+    label: { text: label, classes: field.labelClasses },
     hint: hint ? { text: hint } : null,
     errorMessage: hasError && errorText ? { text: errorText } : null,
     classes: field.classes || (field.type === 'text' ? 'govuk-!-width-three-quarters' : undefined),
