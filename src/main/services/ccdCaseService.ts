@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { HTTPError } from '../HttpError';
-import { CaseState, CcdCase, CcdUserCases, StartCallbackData, UserJourneyCaseData } from '../interfaces/ccdCase.interface';
+import { CaseState, CcdCase, CcdUserCases, StartCallbackData } from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
 
 const logger = Logger.getLogger('ccdCaseService');
@@ -63,7 +63,7 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: UserJourneyCaseData
+  data: Record<string, unknown>
 ): Promise<CcdCase> {
   const payload = {
     data,
@@ -134,7 +134,7 @@ export const ccdCaseService = {
     }
   },
 
-  async createCase(accessToken: string | undefined, data: UserJourneyCaseData): Promise<CcdCase> {
+  async createCase(accessToken: string | undefined, data: Record<string, unknown>): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/cases`;

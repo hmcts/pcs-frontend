@@ -4,6 +4,7 @@ import { type Redis } from 'ioredis';
 import { type Environment } from 'nunjucks';
 import { type CcdCase } from '../main/interfaces/ccdCase.interface';
 import { S2S } from '../main/modules/s2s';
+import { type i18n, type TFunction } from 'i18next';
 
 export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
@@ -43,8 +44,8 @@ declare module 'express-session' {
 declare module 'express' {
   interface Request {
     session: Session & CustomSessionData;
-    i18n?: import('i18next').i18n;
-    t?: import('i18next').TFunction;
+    i18n?: i18n;
+    t?: TFunction;
     language: string;
   }
 

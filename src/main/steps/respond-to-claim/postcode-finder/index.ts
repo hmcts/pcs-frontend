@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { flowConfig } from '../flow.config';
+import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 import { ccdCaseService } from 'services/ccdCaseService';
 
 
@@ -10,7 +10,7 @@ const stepName = 'postcode-finder';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/postcode-finder',
+  url: `${RESPOND_TO_CLAIM_ROUTE}/postcode-finder`,
   name: stepName,
   view: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
   stepDir: __dirname,
@@ -21,7 +21,7 @@ export const step: StepDefinition = {
       async (req: Request) => {
             const prepopulateAddress = await getExistingAddress(req.session.user?.accessToken || "");
         return {
-          url: req.originalUrl || '/respond-to-claim/postcode-finder',
+          backUrl: `${RESPOND_TO_CLAIM_ROUTE}/start-now`,
           prepopulateAddress: prepopulateAddress,
         };
       },

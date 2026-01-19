@@ -46,14 +46,14 @@ describe('steps/i18n', () => {
   describe('getStepNamespace', () => {
     it('should convert step name to namespace', () => {
       expect(getStepNamespace('enter-dob')).toBe('enterDob');
-      expect(getStepNamespace('user-journey-summary')).toBe('userJourneySummary');
+      expect(getStepNamespace('respond-to-claim-summary')).toBe('respondToClaimSummary');
       expect(getStepNamespace('single-word')).toBe('singleWord');
     });
   });
 
   describe('getStepTranslationPath', () => {
     it('should return correct translation path', () => {
-      expect(getStepTranslationPath('enter-dob', 'userJourney')).toBe('userJourney/enterDob');
+      expect(getStepTranslationPath('start-now', 'respondToClaim')).toBe('respondToClaim/startNow');
       expect(getStepTranslationPath('summary', 'common')).toBe('common/summary');
     });
   });
