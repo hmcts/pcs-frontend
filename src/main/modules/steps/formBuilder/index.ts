@@ -6,7 +6,7 @@ import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.inte
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
-import { stepNavigation } from '../flow';
+import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { buildFormContent } from './formContent';
@@ -23,17 +23,28 @@ function camelToKebabCase(str: string): string {
   return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
-export function createFormStep(config: FormBuilderConfig): StepDefinition {
+export function createFormStep(config: FormBuilderConfig, viewPath: string = 'formBuilder.njk'): StepDefinition {
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
-  const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys } = config;
+  const {
+    stepName,
+    journeyFolder,
+    fields,
+    beforeRedirect,
+    extendGetContent,
+    stepDir,
+    translationKeys,
+    basePath,
+    flowConfig,
+  } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
-  const viewPath = 'formBuilder.njk';
+  // Use provided flowConfig or fall back to default stepNavigation
+  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
   return {
-    url: path.join('/steps', journeyPath, stepName),
+    url: basePath ? path.join(basePath, stepName) : path.join('/steps', journeyPath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,
@@ -57,10 +68,18 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),
-          backUrl: stepNavigation.getBackUrl(req, stepName),
+          backUrl: await navigation.getBackUrl(req, stepName),
         };
       });
     },
-    postController: createPostHandler(fields, stepName, viewPath, journeyFolder, beforeRedirect, translationKeys),
+    postController: createPostHandler(
+      fields,
+      stepName,
+      viewPath,
+      journeyFolder,
+      beforeRedirect,
+      translationKeys,
+      flowConfig
+    ),
   };
 }
