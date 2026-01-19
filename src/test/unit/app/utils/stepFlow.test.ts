@@ -438,7 +438,7 @@ describe('stepFlow', () => {
     it('should use default flow config when not provided', () => {
       const middleware = stepDependencyCheckMiddleware();
       const req = {
-        path: '/steps/user-journey/enter-address',
+        path: '/respond-to-claim/postcode-finder',
         session: {
           formData: {},
         },
@@ -450,8 +450,9 @@ describe('stepFlow', () => {
 
       middleware(req, res, next);
 
-      expect(res.redirect).toHaveBeenCalled();
-      expect(next).not.toHaveBeenCalled();
+      // postcode-finder has no dependencies in respondToClaim flow, so next() should be called
+      expect(next).toHaveBeenCalled();
+      expect(res.redirect).not.toHaveBeenCalled();
     });
   });
 });
