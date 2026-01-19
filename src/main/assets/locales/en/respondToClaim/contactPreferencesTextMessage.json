@@ -12,8 +12,6 @@
     "saveAndContinue": "Save and continue",
     "saveForLater": "Save for later"
   },
-  "requiredErrorMessage": "Please enter your UK mobile number before continuing.",
-
   "errors": {
     "contactByTextMessage.phoneNumber": "Please enter your UK mobile number before continuing."
   }
