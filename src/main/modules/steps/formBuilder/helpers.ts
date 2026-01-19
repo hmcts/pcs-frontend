@@ -94,6 +94,12 @@ export function getTranslationErrors(
 ): Record<string, string> {
   const translationErrors: Record<string, string> = {};
 
+  const getStringTranslation = (key: string): string | undefined => {
+    // Ask for objects so we can detect object-valued keys safely
+    const result = t(key, { returnObjects: true }) as unknown;
+    return typeof result === 'string' && result !== key ? result : undefined;
+  };
+
   for (const field of fields) {
     // Get the nested field name if this is a subField
     const fieldName = parentFieldName ? getNestedFieldName(parentFieldName, field.name) : field.name;
@@ -117,10 +123,20 @@ export function getTranslationErrors(
       }
     } else {
       // For top-level fields, check error message translation using the field name
-      const errorKey = `errors.${field.name}`;
-      const errorMsg = t(errorKey);
-      if (errorMsg && errorMsg !== errorKey) {
-        translationErrors[field.name] = errorMsg;
+      // Prefer nested required key (matches GOV.UK/i18n structure used across the app)
+      const requiredKey = `errors.${field.name}.required`;
+      const requiredMsg = getStringTranslation(requiredKey);
+      if (requiredMsg) {
+        translationErrors[field.name] = requiredMsg;
+      } else {
+        // Backwards-compatible: allow errors.<field> when it's a string.
+        // If it's an object, i18next will return a "returned an object instead of string" message;
+        // we explicitly ignore that case to avoid leaking it into the UI.
+        const errorKey = `errors.${field.name}`;
+        const errorMsg = getStringTranslation(errorKey);
+        if (errorMsg && !errorMsg.includes('returned an object instead of string')) {
+          translationErrors[field.name] = errorMsg;
+        }
       }
 
       // Also check the errorMessage property if set
