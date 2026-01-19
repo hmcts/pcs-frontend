@@ -3,6 +3,8 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 
+export const RESPOND_TO_CLAIM_ROUTE = '/respond-to-claim';
+
 //TODO need to add logic to check if defendant name is known from CCD case data
 const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
   const ldClient = (req.app?.locals?.launchDarklyClient as LDClient.LDClient | undefined) ?? undefined;
@@ -34,7 +36,7 @@ const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
 };
 
 export const flowConfig: JourneyFlowConfig = {
-  basePath: '/respond-to-claim',
+  basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
   stepOrder: [
     'start-now',

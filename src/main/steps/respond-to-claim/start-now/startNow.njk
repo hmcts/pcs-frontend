@@ -4,6 +4,19 @@
 
 {% block pageTitle %}Start now - Possession claims{% endblock %}
 
+{% block serviceNavigation %}
+  {# Service navigation without serviceName on start now page - only logout button #}
+  {{ govukServiceNavigation({
+    navigation: [
+      {
+        text: t('logout', 'Log out'),
+        href: "/logout"
+      }
+    ],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
