@@ -56,8 +56,8 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
+import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
 
 describe('respond-to-claim defendant-name-capture step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -73,6 +73,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
       app: { locals: { nunjucksEnv } },
       i18n: { getResourceBundle: jest.fn(() => ({})) },
       ...overrides,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
 
   beforeEach(() => {
@@ -105,7 +106,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
       })
     );
 
-    const viewModel = res.render.mock.calls[0][1] as { fields: Array<Record<string, unknown>> };
+    const viewModel = res.render.mock.calls[0][1] as { fields: Record<string, unknown>[] };
     const firstNameField = viewModel.fields.find(f => f.name === 'firstName') as
       | { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } }
       | undefined;
@@ -136,7 +137,11 @@ describe('respond-to-claim defendant-name-capture step', () => {
     const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
     const next = jest.fn();
 
-    await step.postController!.post(createReq({ body: { action: 'continue', firstName: '', lastName: '' } }), res, next);
+    await step.postController!.post(
+      createReq({ body: { action: 'continue', firstName: '', lastName: '' } }),
+      res,
+      next
+    );
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
@@ -156,4 +161,3 @@ describe('respond-to-claim defendant-name-capture step', () => {
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 });
-
