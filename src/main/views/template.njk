@@ -1,5 +1,8 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
 {% set bodyAttributes = {
   "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
@@ -8,6 +11,7 @@
 } %}
 
 {% block head %}
+  <title>{% block pageTitle %}Possession claims{% endblock %} - GOV.UK</title>
   {% include "webpack/css.njk" %}
 {% endblock %}
 
@@ -17,18 +21,47 @@
 {% endblock %}
 
 {% block header %}
-{{ govukHeader({
-  serviceName: serviceName or "Possession claims",
-  navigation: [
-    {
-      text: 'logout',
-      href: '/logout'
-    }
-  ]
-}) }}
+  {{ govukHeader({
+    containerClasses: "govuk-width-container"
+  }) }}
 {% endblock %}
 
 {% block beforeContent %}
+  {% block serviceNavigation %}
+    {{ govukServiceNavigation({
+      serviceName: t('serviceName', 'Respond to a property possession claim'),
+      serviceUrl: "/dashboard",
+      navigation: [
+        {
+          text: t('logout', 'Log out'),
+          href: "/logout"
+        }
+      ],
+      navigationLabel: t('navigationLabel', 'Service navigation'),
+      navigationClasses: "pcs-service-navigation-wrapper"
+    }) }}
+  {% endblock %}
+
+  <div class="govuk-width-container">
+    {{ govukPhaseBanner({
+      tag: {
+        text: (phase or t('phase') or 'ALPHA') | safe
+      },
+      html: ((feedback or t('feedback') or '')) | safe
+    }) }}
+  </div>
+  {% if backUrl %}
+    {{ govukBackLink({
+      text: (back or t('back') or "Back"),
+      href: backUrl
+    }) }}
+  {% endif %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-language-toggle">
+      {{ (languageToggle or t('languageToggle') or '') | safe }}
+    </div>
+  </div>
 {% endblock %}
 
 {% block bodyEnd %}
@@ -36,9 +69,7 @@
   </div>
 
   {# Timeout modal - outside inert container #}
-  {% block modal %}
-    {% include "components/timeout-modal.njk" %}
-  {% endblock %}
+  {% include "components/timeout-modal.njk" %}
   
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}
