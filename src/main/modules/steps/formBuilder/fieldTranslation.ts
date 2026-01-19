@@ -309,12 +309,11 @@ export function translateFields(
     return {
       ...processedField,
       options: processedOptionsWithSubFields,
-      // Prefer nested error keys (e.g. errors.firstName.required) to avoid i18next
-      // complaining about object-valued keys (errors.firstName -> { required: ... })
+      // Prefer flat error keys (errors.<field>) used across the service; fall back to nested required.
       errorMessage: getTranslation(
         t,
-        `errors.${field.name}.required`,
-        getTranslation(t, `errors.${field.name}`, field.errorMessage)
+        `errors.${field.name}`,
+        getTranslation(t, `errors.${field.name}.required`, field.errorMessage)
       ),
       component,
       componentType,

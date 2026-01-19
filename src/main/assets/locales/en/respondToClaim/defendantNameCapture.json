@@ -6,11 +6,7 @@
   "lastNameLabel": "Last name",
   "contactUs": "Contact us for help",
   "errors": {
-    "firstName": {
-      "required": "Enter your first name"
-    },
-    "lastName": {
-      "required": "Enter your last name"
-    }
+    "firstName": "Enter your first name",
+    "lastName": "Enter your last name"
   }
 }

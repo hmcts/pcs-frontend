@@ -11,8 +11,12 @@ import { getDateTranslationKey, validateDateField } from './dateValidation';
 const logger = Logger.getLogger('form-builder-helpers');
 
 export function getTranslation(t: TFunction, key: string, fallback?: string): string | undefined {
-  const translation = t(key);
-  return translation !== key ? translation : fallback;
+  // Avoid leaking i18next "returned an object instead of string" messages into the UI.
+  const result = t(key, { returnObjects: true }) as unknown;
+  if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
+    return result;
+  }
+  return fallback;
 }
 
 /**
@@ -123,19 +127,17 @@ export function getTranslationErrors(
       }
     } else {
       // For top-level fields, check error message translation using the field name
-      // Prefer nested required key (matches GOV.UK/i18n structure used across the app)
-      const requiredKey = `errors.${field.name}.required`;
-      const requiredMsg = getStringTranslation(requiredKey);
-      if (requiredMsg) {
-        translationErrors[field.name] = requiredMsg;
+      // Prefer flat string keys (errors.<field>) used across the service.
+      const errorKey = `errors.${field.name}`;
+      const errorMsg = getStringTranslation(errorKey);
+      if (errorMsg) {
+        translationErrors[field.name] = errorMsg;
       } else {
-        // Backwards-compatible: allow errors.<field> when it's a string.
-        // If it's an object, i18next will return a "returned an object instead of string" message;
-        // we explicitly ignore that case to avoid leaking it into the UI.
-        const errorKey = `errors.${field.name}`;
-        const errorMsg = getStringTranslation(errorKey);
-        if (errorMsg && !errorMsg.includes('returned an object instead of string')) {
-          translationErrors[field.name] = errorMsg;
+        // Backwards compatible: allow nested required (errors.<field>.required)
+        const requiredKey = `errors.${field.name}.required`;
+        const requiredMsg = getStringTranslation(requiredKey);
+        if (requiredMsg) {
+          translationErrors[field.name] = requiredMsg;
         }
       }
 
