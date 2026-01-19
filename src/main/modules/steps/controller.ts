@@ -124,7 +124,6 @@ export const createPostController = (
       const fields = getFields(t);
       const errors = validateForm(req, fields);
 
-
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
         return res.status(400).render(view, {

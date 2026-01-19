@@ -1,7 +1,9 @@
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 
+export const RESPOND_TO_CLAIM_ROUTE = '/respond-to-claim';
+
 export const flowConfig: JourneyFlowConfig = {
-  basePath: '/steps/respond-to-claim',
+  basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
   stepOrder: [
     'start-now',

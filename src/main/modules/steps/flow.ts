@@ -139,7 +139,6 @@ export const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
 
 export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = respondToClaimFlowConfig) {
   return (req: Request, res: Response, next: NextFunction): void => {
-
     const urlParts = req.path.split('/');
     const stepName = urlParts[urlParts.length - 1];
 

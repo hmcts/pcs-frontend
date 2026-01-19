@@ -2,13 +2,13 @@ import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { flowConfig } from '../flow.config';
+import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
 const stepName = 'free-legal-advice';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/steps/respond-to-claim/free-legal-advice',
+  url: `${RESPOND_TO_CLAIM_ROUTE}/free-legal-advice`,
   name: stepName,
   view: 'respond-to-claim/free-legal-advice/freeLegalAdvice.njk',
   stepDir: __dirname,
@@ -16,7 +16,11 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/free-legal-advice/freeLegalAdvice.njk',
       stepName,
-      undefined,
+      (_req: Request) => {
+        return {
+          backUrl: `${RESPOND_TO_CLAIM_ROUTE}/postcode-finder`,
+        };
+      },
       'respondToClaim'
     );
   },

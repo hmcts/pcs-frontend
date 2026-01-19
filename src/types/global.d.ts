@@ -6,7 +6,6 @@ import { type CcdCase } from '../main/interfaces/ccdCase.interface';
 import { S2S } from '../main/modules/s2s';
 import { type i18n, type TFunction } from 'i18next';
 
-
 export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
   idToken: string;
