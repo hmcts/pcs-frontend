@@ -2,7 +2,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { NextFunction, Request, Response } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import { flowConfig as userJourneyFlowConfig } from '../../steps/userJourney/flow.config';
+import { flowConfig as respondToClaimFlowConfig } from '../../steps/respond-to-claim/flow.config';
 
 const logger = Logger.getLogger('stepDependencyCheck');
 
@@ -149,9 +149,9 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
   };
 }
 
-export const stepNavigation = createStepNavigation(userJourneyFlowConfig);
+export const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
 
-export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = userJourneyFlowConfig) {
+export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = respondToClaimFlowConfig) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const urlParts = req.path.split('/');
     const stepName = urlParts[urlParts.length - 1];
