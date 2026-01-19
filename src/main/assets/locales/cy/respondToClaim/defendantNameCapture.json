@@ -6,11 +6,7 @@
   "lastNameLabel": "cyLast name",
   "contactUs": "cyContact us for help",
   "errors": {
-    "firstName": {
-      "required": "cyEnter your first name"
-    },
-    "lastName": {
-      "required": "cyEnter your last name"
-    }
+    "firstName": "cyEnter your first name",
+    "lastName": "cyEnter your last name"
   }
 }
