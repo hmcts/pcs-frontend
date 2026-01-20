@@ -2,6 +2,7 @@
 {% from "govuk/components/header/macro.njk" import govukHeader %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
 {% block head %}
   <title>{% block pageTitle %}GOV.UK - {{ journey.meta.name }}{% endblock %}</title>
@@ -10,28 +11,30 @@
 
 {% block header %}
   {{ govukHeader({
-    containerClasses: "govuk-width-container",
-    serviceName: t('serviceName', 'Possession claims'),
-    serviceUrl: '/?lang=' ~ lang,
-    navigation: [
-      { text: t('logout', 'Logout'), href: '/logout?lang=' ~ lang }
-    ]
+    containerClasses: "govuk-width-container"
   }) }}
 {% endblock %}
 
 {% block beforeContent %}
+  {% block serviceNavigation %}
+    {{ govukServiceNavigation({
+      serviceName: t('serviceName', 'Respond to a property possession claim'),
+      serviceUrl: "/dashboard?lang=" ~ lang,
+      navigation: [
+        {
+          text: t('logout', 'Log out'),
+          href: "/logout?lang=" ~ lang
+        }
+      ],
+      navigationLabel: t('navigationLabel', 'Service navigation'),
+      navigationClasses: "pcs-service-navigation-wrapper"
+    }) }}
+  {% endblock %}
+
   <div class="govuk-width-container">
-
-    {# Build a safe language toggle without inline ternary #}
-    {% if lang == 'cy' %}
-      {% set languageToggle = '<a href="?lang=en" class="govuk-link language">English</a>' %}
-    {% else %}
-      {% set languageToggle = '<a href="?lang=cy" class="govuk-link language">Cymraeg</a>' %}
-    {% endif %}
-
     {{ govukPhaseBanner({
       tag: { text: t('phase', 'Alpha') },
-      html: (t('feedback') | safe) ~ ' ' ~ (languageToggle | safe)
+      html: (t('feedback') | safe)
     }) }}
 
   </div>
@@ -42,6 +45,12 @@
       href: previousStepUrl
     }) }}
   {% endif %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-language-toggle">
+      {{ (languageToggle or t('languageToggle') or '') | safe }}
+    </div>
+  </div>
 {% endblock %}
 
 {% block bodyEnd %}

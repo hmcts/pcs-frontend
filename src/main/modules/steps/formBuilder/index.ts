@@ -17,7 +17,7 @@ import { validateConfigInDevelopment } from './schema';
 export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 
 /**
- * Converts camelCase to kebab-case (e.g., "userJourney" -> "user-journey")
+ * Converts camelCase to kebab-case (e.g., "respondToClaim" -> "respond-to-claim")
  */
 function camelToKebabCase(str: string): string {
   return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
