@@ -96,7 +96,7 @@ export class PageContentValidation implements IValidation {
                     select option:text("${value}")`),
     HintText: (page: Page, value: string) =>
       page.locator(`
-                    .hint:text("${value}")`),
+                    .govuk-hint:text("${value}")`),
     TextLabel: (page: Page, value: string) =>
       page.locator(`
                     label:has-text("${value}"),
@@ -106,7 +106,7 @@ export class PageContentValidation implements IValidation {
                     .paragraph:text("${value}"),
                     p:text("${value}"),
                     markdown:text("${value}"),
-                    .content:text("${value}"),
+                    .govuk-caption-l:text("${value}"),
                     .body:text("${value}"),
                     .text-content:text("${value}"),
                     .govuk-body:text("${value}"),
