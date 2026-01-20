@@ -10,7 +10,9 @@ export const step: StepDefinition = createFormStep(
     basePath: '/respond-to-claim',
     flowConfig,
     translationKeys: {
-      pageTitle: 'title',
+      pageTitle: 'pageTitle',
+      heading: 'heading',
+      caption: 'caption',
       subHeading1: 'subHeading1',
       paragraph1: 'paragraph1',
       listItem1: 'listItem1',
