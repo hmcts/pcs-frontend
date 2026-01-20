@@ -132,13 +132,6 @@ export function getTranslationErrors(
       const errorMsg = getStringTranslation(errorKey);
       if (errorMsg) {
         translationErrors[field.name] = errorMsg;
-      } else {
-        // Backwards compatible: allow nested required (errors.<field>.required)
-        const requiredKey = `errors.${field.name}.required`;
-        const requiredMsg = getStringTranslation(requiredKey);
-        if (requiredMsg) {
-          translationErrors[field.name] = requiredMsg;
-        }
       }
 
       // Also check the errorMessage property if set
