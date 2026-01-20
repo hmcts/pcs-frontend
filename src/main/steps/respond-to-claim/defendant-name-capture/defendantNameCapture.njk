@@ -15,7 +15,7 @@
 
   {# Caption above heading #}
   {% if caption %}
-    <span class="govuk-caption-l">{{ caption }}</span>
+    <span class="govuk-caption-xl">{{ caption }}</span>
   {% endif %}
 
   {# Page heading (standard GOV.UK pattern) #}
@@ -71,12 +71,5 @@
         }
       }) }}
     </div>
-
-    {# Cancel (back to dashboard) #}
-    {% if dashboardUrl %}
-      <p class="govuk-body">
-        <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
-      </p>
-    {% endif %}
   </form>
 {% endblock %}
