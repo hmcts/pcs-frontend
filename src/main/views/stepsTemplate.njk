@@ -3,6 +3,7 @@
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
 {% set bodyAttributes = {
   "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
@@ -15,29 +16,40 @@
   {% include "webpack/css.njk" %}
 {% endblock %}
 
+{% block bodyStart %}
+  {# Start inert container wrapper for all page content #}
+  <div class="govuk-modal-dialogue-inert-container">
+{% endblock %}
+
 {% block header %}
   {{ govukHeader({
-    containerClasses: "govuk-width-container",
-    serviceName: (serviceName or t('serviceName') or "Possession claims"),
-    serviceUrl: "/",
-    navigation: [
-    {
-      text: (t('logout') or 'logout'),
-      href: '/logout'
-    }
-  ]
+    containerClasses: "govuk-width-container"
   }) }}
 {% endblock %}
 
-
 {% block beforeContent %}
-    <div class="govuk-width-container">
-      {{ govukPhaseBanner({
-        tag: {
-          text: (phase or t('phase') or 'ALPHA') | safe
-        },
-        html: ((feedback or t('feedback') or '') + (languageToggle or t('languageToggle') or '')) | safe
-      }) }}
+  {% block serviceNavigation %}
+    {{ govukServiceNavigation({
+      serviceName: t('serviceName', 'Respond to a property possession claim'),
+      serviceUrl: "/dashboard",
+      navigation: [
+        {
+          text: t('logout', 'Log out'),
+          href: "/logout"
+        }
+      ],
+      navigationLabel: t('navigationLabel', 'Service navigation'),
+      navigationClasses: "pcs-service-navigation-wrapper"
+    }) }}
+  {% endblock %}
+
+  <div class="govuk-width-container">
+    {{ govukPhaseBanner({
+      tag: {
+        text: (phase or t('phase') or 'ALPHA') | safe
+      },
+      html: ((feedback or t('feedback') or '')) | safe
+    }) }}
   </div>
   {% if backUrl %}
     {{ govukBackLink({
@@ -45,6 +57,12 @@
       href: backUrl
     }) }}
   {% endif %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-language-toggle">
+      {{ (languageToggle or t('languageToggle') or '') | safe }}
+    </div>
+  </div>
   {% block modal %}
     {% include "components/timeout-modal.njk" %}
   {% endblock %}
@@ -64,10 +82,7 @@
       <div class="govuk-grid-column-one-third">
         <aside class="app-related-items" role="complementary">
           <nav role="navigation" aria-label="Support and contact information">
-            {{ govukDetails({
-              summaryText: contactUsForHelp,
-              text: contactUsForHelpText or t('contactUsForHelpText')
-            }) }}
+              {% include "components/contact-us-details.njk" %}
           </nav>
         </aside>
       </div>
@@ -76,6 +91,12 @@
 {% endblock %}
 
 {% block bodyEnd %}
+  {# Close inert container wrapper #}
+  </div>
+
+  {# Timeout modal - outside inert container #}
+  {% include "components/timeout-modal.njk" %}
+
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}
 {% endblock %}
