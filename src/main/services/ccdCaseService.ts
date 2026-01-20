@@ -162,6 +162,28 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
   },
 
+  
+  async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+      if (!ccdCase.id) {
+        throw new HTTPError('Cannot SUBMIT Case, CCD Case Not found', 500);
+      }
+
+      console.log("Get Event URL");
+      const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
+      console.log(eventUrl);
+      
+      console.log("Get Event Token");
+      const eventToken = await getEventToken(accessToken || '', eventUrl);
+      console.log(eventToken);
+      
+      
+      console.log("Get URL");
+      const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
+      console.log(url);
+
+      return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
+    },
+
   async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {
     const eventUrl = `${getBaseUrl()}/cases/${ccdCaseId}/event-triggers/respondPossessionClaim?ignore-warning=false`;
     

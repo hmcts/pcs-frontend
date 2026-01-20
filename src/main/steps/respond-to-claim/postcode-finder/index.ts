@@ -4,6 +4,8 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 import { ccdCaseService } from 'services/ccdCaseService';
+import { CcdCase, PossessionClaimResponse} from '../../../interfaces/ccdCase.interface';
+
 
 
 const stepName = 'postcode-finder';
@@ -32,6 +34,31 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
+
+      console.log("Making API call to save draft data");
+
+      const possessionClaimResponse: PossessionClaimResponse = {
+        party: {
+          firstName: "eeeee",
+          lastName: "dddd",
+          address: {
+            AddressLine1: "addressLine1",
+            AddressLine2: "addressLine2",
+            PostCode: "SA11AD",
+            Country: "United Kingdom"
+          }
+        }
+      }
+
+      const responseToClaim: CcdCase = {id: "1768917305534047",
+        data:  {
+          possessionClaimResponse: possessionClaimResponse,
+          submitDraftAnswers: "No"
+        }
+      }
+  
+      ccdCaseService.submitResponseToClaim(req.session.user?.accessToken, responseToClaim)
+
       // Get next step URL and redirect
       const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
 
@@ -47,7 +74,7 @@ export const step: StepDefinition = {
 
 async function getExistingAddress(accessToken : string): Promise<string>{
    // Pull data from API
-        const response = await ccdCaseService.getExistingCaseData(accessToken, "1768839853089481");
+        const response = await ccdCaseService.getExistingCaseData(accessToken, "1768917305534047");
         const address = response.case_details.case_data.possessionClaimResponse?.party?.address
         
         if (address) {

@@ -23,14 +23,24 @@ export interface CcdCase {
   data: Record<string, unknown>;
 }
 
-export interface DefendantResponse {
-  addressLine1: string;
-  addressLine2: string;
-  addressLine3: string;
-  town: string;
-  county: string;
-  postcode: string;
-  country: string;
+// export interface PcsCase {
+//   possession_claim_response?: PossessionClaimResponse;
+// }
+
+export interface PossessionClaimResponse {
+  party: {
+    firstName?: string;
+    lastName?: string; 
+    address?:{
+      AddressLine1?: string,
+      AddressLine2?: string,
+      AddressLine3?: string,
+      PostTown?: string,
+      County?: string,
+      PostCode?: string,
+      Country?: string,        
+    }
+  }
 }
 
 export interface StartCallbackData {
