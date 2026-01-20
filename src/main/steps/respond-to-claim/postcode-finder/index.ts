@@ -39,13 +39,12 @@ export const step: StepDefinition = {
 
       const possessionClaimResponse: PossessionClaimResponse = {
         party: {
-          firstName: "eeeee",
-          lastName: "dddd",
           address: {
-            AddressLine1: "addressLine1",
-            AddressLine2: "addressLine2",
-            PostCode: "SA11AD",
-            Country: "United Kingdom"
+            AddressLine1: req.body.inputAddressLine1 as string | undefined,
+            AddressLine2: req.body.inputAddressLine2 as string | undefined,
+            PostTown: req.body.inputPostTown as string | undefined,
+            Country: req.body.inputCountry as string | undefined,
+            PostCode: req.body.inputPostcode as string | undefined,
           }
         }
       }
