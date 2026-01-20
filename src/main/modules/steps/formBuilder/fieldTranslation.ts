@@ -309,7 +309,6 @@ export function translateFields(
     return {
       ...processedField,
       options: processedOptionsWithSubFields,
-      // Prefer flat error keys (errors.<field>) used across the service.
       errorMessage: getTranslation(t, `errors.${field.name}`, field.errorMessage),
       component,
       componentType,
