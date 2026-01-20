@@ -1,0 +1,23 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}Defendant name unknown(placeholder){% endblock %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-l">Defendant name unknown(placeholder)</h1>
+  
+
+  <form method="post" action="{{ url }}" novalidate>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.continue', { ns: 'common' }),
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      {{ govukButton({
+        text: t('buttons.saveForLater', { ns: 'common' }),
+        classes: "govuk-button--secondary",
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
+  </form>
+{% endblock %}

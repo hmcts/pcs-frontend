@@ -38,12 +38,14 @@ describe('stepFlow', () => {
   };
 
   describe('getNextStep', () => {
-    it('should return defaultNext when step has defaultNext configured', () => {
-      const result = getNextStep('step1', mockFlowConfig, {});
+    const mockReq = {} as Request;
+
+    it('should return defaultNext when step has defaultNext configured', async () => {
+      const result = await getNextStep(mockReq, 'step1', mockFlowConfig, {});
       expect(result).toBe('step2');
     });
 
-    it('should return next step in order when no defaultNext is configured', () => {
+    it('should return next step in order when no defaultNext is configured', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
         stepOrder: ['step1', 'step2', 'step3'],
@@ -53,21 +55,21 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = getNextStep('step1', config, {});
+      const result = await getNextStep(mockReq, 'step1', config, {});
       expect(result).toBe('step2');
     });
 
-    it('should return null when at last step', () => {
-      const result = getNextStep('step3', mockFlowConfig, {});
+    it('should return null when at last step', async () => {
+      const result = await getNextStep(mockReq, 'step3', mockFlowConfig, {});
       expect(result).toBeNull();
     });
 
-    it('should return null when step not found in order', () => {
-      const result = getNextStep('unknown', mockFlowConfig, {});
+    it('should return null when step not found in order', async () => {
+      const result = await getNextStep(mockReq, 'unknown', mockFlowConfig, {});
       expect(result).toBeNull();
     });
 
-    it('should use conditional route when condition is true', () => {
+    it('should use conditional route when condition is true', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
         stepOrder: ['step1', 'step2', 'step3'],
@@ -75,7 +77,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: formData => formData.condition === true,
+                condition: async (_req, formData) => formData.condition === true,
                 nextStep: 'step3',
               },
               {
@@ -85,11 +87,11 @@ describe('stepFlow', () => {
           },
         },
       };
-      const result = getNextStep('step1', config, { condition: true }, {});
+      const result = await getNextStep(mockReq, 'step1', config, { condition: true }, {});
       expect(result).toBe('step3');
     });
 
-    it('should use fallback route when condition is false', () => {
+    it('should use fallback route when condition is false', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
         stepOrder: ['step1', 'step2', 'step3'],
@@ -97,7 +99,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: formData => formData.condition === true,
+                condition: async (_req, formData) => formData.condition === true,
                 nextStep: 'step3',
               },
               {
@@ -107,11 +109,11 @@ describe('stepFlow', () => {
           },
         },
       };
-      const result = getNextStep('step1', config, { condition: false }, {});
+      const result = await getNextStep(mockReq, 'step1', config, { condition: false }, {});
       expect(result).toBe('step2');
     });
 
-    it('should use route without condition when no condition provided', () => {
+    it('should use route without condition when no condition provided', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
         stepOrder: ['step1', 'step2'],
@@ -125,28 +127,55 @@ describe('stepFlow', () => {
           },
         },
       };
-      const result = getNextStep('step1', config, {}, {});
+      const result = await getNextStep(mockReq, 'step1', config, {}, {});
       expect(result).toBe('step2');
+    });
+
+    it('should handle Promise condition', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            routes: [
+              {
+                condition: async (_req, formData) => {
+                  await new Promise(resolve => setTimeout(resolve, 10));
+                  return formData.condition === true;
+                },
+                nextStep: 'step3',
+              },
+              {
+                nextStep: 'step2',
+              },
+            ],
+          },
+        },
+      };
+      const result = await getNextStep(mockReq, 'step1', config, { condition: true }, {});
+      expect(result).toBe('step3');
     });
   });
 
   describe('getPreviousStep', () => {
-    it('should return previous step in order', () => {
-      const result = getPreviousStep('step2', mockFlowConfig);
+    const mockReq = {} as Request;
+
+    it('should return previous step in order', async () => {
+      const result = await getPreviousStep(mockReq, 'step2', mockFlowConfig);
       expect(result).toBe('step1');
     });
 
-    it('should return null when at first step', () => {
-      const result = getPreviousStep('step1', mockFlowConfig);
+    it('should return null when at first step', async () => {
+      const result = await getPreviousStep(mockReq, 'step1', mockFlowConfig);
       expect(result).toBeNull();
     });
 
-    it('should return null when step not found in order', () => {
-      const result = getPreviousStep('unknown', mockFlowConfig);
+    it('should return null when step not found in order', async () => {
+      const result = await getPreviousStep(mockReq, 'unknown', mockFlowConfig);
       expect(result).toBeNull();
     });
 
-    it('should return explicit previousStep when configured', () => {
+    it('should return explicit previousStep when configured', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
         stepOrder: ['step1', 'step2', 'step3'],
@@ -158,11 +187,11 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = getPreviousStep('step2', config);
+      const result = await getPreviousStep(mockReq, 'step2', config);
       expect(result).toBe('step1');
     });
 
-    it('should return previousStep from function when configured', () => {
+    it('should return previousStep from function when configured', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
         stepOrder: ['step1', 'step2', 'step3'],
@@ -176,11 +205,11 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = getPreviousStep('step2', config, { condition: true });
+      const result = await getPreviousStep(mockReq, 'step2', config, { condition: true });
       expect(result).toBe('step1');
     });
 
-    it('should find previous step from conditional route', () => {
+    it('should find previous step from conditional route', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
         stepOrder: ['step1', 'step2', 'step3'],
@@ -188,7 +217,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: formData => formData.condition === true,
+                condition: async (_req, formData) => formData.condition === true,
                 nextStep: 'step2',
               },
             ],
@@ -197,11 +226,11 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = getPreviousStep('step2', config, { condition: true });
+      const result = await getPreviousStep(mockReq, 'step2', config, { condition: true });
       expect(result).toBe('step1');
     });
 
-    it('should find previous step from defaultNext', () => {
+    it('should find previous step from defaultNext', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
         stepOrder: ['step1', 'step2', 'step3'],
@@ -213,11 +242,11 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = getPreviousStep('step2', config);
+      const result = await getPreviousStep(mockReq, 'step2', config);
       expect(result).toBe('step1');
     });
 
-    it('should not find previous step when route condition is false', () => {
+    it('should not find previous step when route condition is false', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
         stepOrder: ['step1', 'step2', 'step3'],
@@ -225,7 +254,7 @@ describe('stepFlow', () => {
           step1: {
             routes: [
               {
-                condition: formData => formData.condition === true,
+                condition: async (_req, formData) => formData.condition === true,
                 nextStep: 'step2',
               },
             ],
@@ -234,7 +263,31 @@ describe('stepFlow', () => {
           step3: {},
         },
       };
-      const result = getPreviousStep('step2', config, { condition: false });
+      const result = await getPreviousStep(mockReq, 'step2', config, { condition: false });
+      expect(result).toBe('step1');
+    });
+
+    it('should handle Promise condition in getPreviousStep', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            routes: [
+              {
+                condition: async (_req, formData) => {
+                  await new Promise(resolve => setTimeout(resolve, 10));
+                  return formData.condition === true;
+                },
+                nextStep: 'step2',
+              },
+            ],
+          },
+          step2: {},
+          step3: {},
+        },
+      };
+      const result = await getPreviousStep(mockReq, 'step2', config, { condition: true });
       expect(result).toBe('step1');
     });
   });
@@ -302,7 +355,7 @@ describe('stepFlow', () => {
       expect(navigation).toHaveProperty('getStepUrl');
     });
 
-    it('getNextStepUrl should return correct URL', () => {
+    it('getNextStepUrl should return correct URL', async () => {
       const navigation = createStepNavigation(mockFlowConfig);
       const req = {
         session: {
@@ -310,11 +363,11 @@ describe('stepFlow', () => {
         },
       } as unknown as Request;
 
-      const result = navigation.getNextStepUrl(req, 'step1', {});
+      const result = await navigation.getNextStepUrl(req, 'step1', {});
       expect(result).toBe('/steps/test-journey/step2');
     });
 
-    it('getNextStepUrl should return null when no next step', () => {
+    it('getNextStepUrl should return null when no next step', async () => {
       const navigation = createStepNavigation(mockFlowConfig);
       const req = {
         session: {
@@ -322,23 +375,23 @@ describe('stepFlow', () => {
         },
       } as unknown as Request;
 
-      const result = navigation.getNextStepUrl(req, 'step3', {});
+      const result = await navigation.getNextStepUrl(req, 'step3', {});
       expect(result).toBeNull();
     });
 
-    it('getBackUrl should return correct URL', () => {
+    it('getBackUrl should return correct URL', async () => {
       const navigation = createStepNavigation(mockFlowConfig);
       const req = {} as Request;
 
-      const result = navigation.getBackUrl(req, 'step2');
+      const result = await navigation.getBackUrl(req, 'step2');
       expect(result).toBe('/steps/test-journey/step1');
     });
 
-    it('getBackUrl should return null when no previous step', () => {
+    it('getBackUrl should return null when no previous step', async () => {
       const navigation = createStepNavigation(mockFlowConfig);
       const req = {} as Request;
 
-      const result = navigation.getBackUrl(req, 'step1');
+      const result = await navigation.getBackUrl(req, 'step1');
       expect(result).toBeNull();
     });
 

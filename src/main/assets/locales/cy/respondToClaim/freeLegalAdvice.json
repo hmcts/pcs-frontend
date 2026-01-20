@@ -1,4 +1,26 @@
 {
-  "title": "cyFree legal advice",
-  "secondaryHeading": "cyRespond to a property possession claim"
+  "pageTitle": "cyFree legal advice before you submit your response",
+  "caption": "cyRespond to a property possession claim",
+  "heading": "cyYou’re entitled to free legal advice before you submit your response",
+  "secondaryHeading": "cyRespond to a property possession claim",
+  "question": "cyHave you had any free legal advice?",
+  "hadLegalAdviceHint": "cyWe’re asking this question so we can check everyone is getting the free support they’re entitled to. Your answer will not affect the outcome of the claim",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "preferNotToSay": "cyPrefer not to say"
+  },
+  "subHeading1": "cyHelp available now online",
+  "paragraph1": "cyHousing experts are ready and waiting to help you, and it takes just minutes to find one in your area.",
+  "listItem1": "cyVisit the find a legal adviser service <a href=\"https://find-legal-advice.justice.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find a legal adviser service (opens in new tab)</a>.",
+  "listItem2": "cyEnter your postcode and select the 'Housing Loss Prevention Advice Service' and ‘Housing’ options.",
+  "listItem3": "cyChoose a local expert.",
+  "listItem4": "cyCall them to discuss your options.",
+  "paragraph2": "cyCivil Legal Advice (CLA) can also put you in touch with a local expert. You can either:",
+  "bullet1": "cycall 0345 345 4345. Lines are open Monday to Friday, from 9am to 8pm and Saturday from 9am to 12.30pm",
+  "bullet2": "cytext ‘legalaid’ and your name to 80010 to ask CLA to call you back. This costs the same as a normal text message",
+  "subHeading2": "cyHelp that might be available at the hearing",
+  "paragraph3": "cyIf you do not have your own legal adviser, you might be able to speak to a duty adviser (a legal professional who helps people at court) on the day of your hearing. If they’re available, they can give you advice and represent you at the hearing for free.",
+  "paragraph4": "cyIf you want to speak to the duty adviser, arrive at least 45 minutes before your hearing."
 }

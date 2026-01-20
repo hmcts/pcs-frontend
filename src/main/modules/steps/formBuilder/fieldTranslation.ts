@@ -118,11 +118,15 @@ function processOptions(
   }
 
   return options.map(option => {
+    if (option.divider) {
+      return option;
+    }
+
     // Resolve label (function or string)
     const optionLabel = resolveLabel(
       option.label,
       translations,
-      option.text || (option.translationKey ? t(option.translationKey) : option.value)
+      option.text || (option.translationKey ? t(option.translationKey) : (option.value ?? ''))
     );
 
     // Process conditionalText if provided
@@ -267,10 +271,14 @@ export function translateFields(
     }
 
     // Build translated options for component builder (backward compatible format)
-    const translatedOptions = processedOptionsWithSubFields?.map(option => ({
-      value: option.value,
-      text: option.text || option.value,
-    }));
+    const translatedOptions = field.options?.map(option => {
+      const text = option.text || (option.translationKey ? t(option.translationKey) : null) || option.value;
+      const translatedOption = {
+        ...option,
+        ...(option.divider ? { divider: t(option.divider, option.divider) } : { text }),
+      };
+      return translatedOption;
+    });
     // For nested fields (subFields), extract simple name to look up values
     // field.name might be nested (e.g., "parent.subField") but fieldValues is keyed by simple names
     const fieldNameForValueLookup =
@@ -283,6 +291,7 @@ export function translateFields(
     if (!nunjucksEnv) {
       throw new Error('Nunjucks environment is required for building component config');
     }
+
     const { component, componentType } = buildComponentConfig(
       { ...processedField, options: processedOptionsWithSubFields },
       resolvedLabel,
