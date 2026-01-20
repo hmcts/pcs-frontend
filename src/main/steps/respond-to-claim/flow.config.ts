@@ -43,6 +43,7 @@ export const flowConfig: JourneyFlowConfig = {
     'free-legal-advice',
     'defendant-name-confirmation',
     'defendant-name-capture',
+    'defendant-date-of-birth',
     'postcode-finder',
   ],
   steps: {
@@ -65,10 +66,17 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-name-capture',
     },
     'defendant-name-confirmation': {
-      defaultNext: 'postcode-finder',
+      defaultNext: 'defendant-date-of-birth',
     },
     'defendant-name-capture': {
+      defaultNext: 'defendant-date-of-birth',
+    },
+    'defendant-date-of-birth': {
+      previousStep: 'defendant-name-capture',
       defaultNext: 'postcode-finder',
+    },
+    'postcode-finder': {
+      // Last step - no defaultNext
     },
   },
 };
