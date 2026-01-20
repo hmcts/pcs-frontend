@@ -23,10 +23,6 @@ export interface CcdCase {
   data: Record<string, unknown>;
 }
 
-// export interface PcsCase {
-//   possession_claim_response?: PossessionClaimResponse;
-// }
-
 export interface PossessionClaimResponse {
   party: {
     firstName?: string;
