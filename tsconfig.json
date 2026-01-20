@@ -15,8 +15,6 @@
     "experimentalDecorators": true,
     "useUnknownInCatchVariables": false,
     "skipLibCheck": true,
-    "sourceMap": true,
-    "inlineSources": true,
     "lib": ["es2020", "dom", "dom.iterable"],
     "baseUrl": "src/main",
     "paths": {
