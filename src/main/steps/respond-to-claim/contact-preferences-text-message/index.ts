@@ -26,7 +26,6 @@ export const step: StepDefinition = createFormStep({
         {
           value: 'yes',
           translationKey: 'options.yes',
-
           subFields: {
             phoneNumber: {
               name: 'phoneNumber',
@@ -39,8 +38,12 @@ export const step: StepDefinition = createFormStep({
                 type: 'tel',
                 autocomplete: 'tel',
               },
-              validator: value => isMobilePhone(value as string, ['en-GB']),
-              errorMessage: 'errors.phoneNumber',
+              validator: (value: unknown) => {
+                if (!isMobilePhone(value as string, 'en-GB')) {
+                  return 'errors.contactByTextMessage.phoneNumber.invalid';
+                }
+                return true;
+              },
             },
           },
         },

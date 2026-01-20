@@ -13,6 +13,7 @@
     "saveForLater": "Save for later"
   },
   "errors": {
-    "contactByTextMessage.phoneNumber": "Please enter your UK mobile number before continuing."
+    "contactByTextMessage.phoneNumber": "Please enter your UK mobile number before continuing.",
+    "contactByTextMessage.phoneNumber.invalid": "Enter a valid UK phone number."
   }
 }
