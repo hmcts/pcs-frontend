@@ -48,5 +48,7 @@ export function buildFormContent(
     phase: t('phase'),
     feedback: t('feedback'),
     back: t('back'),
+    contactUsForHelp: t('contactUsForHelp'),
+    contactUsForHelpText: t('contactUsForHelpText'),
   };
 }
