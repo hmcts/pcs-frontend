@@ -117,6 +117,7 @@ describe('formBuilder', () => {
       },
     };
     return {
+      params: {},
       session: { formData: {} },
       language: 'en',
       t: defaultT,
@@ -169,7 +170,7 @@ describe('formBuilder', () => {
     it('should handle journeyFolder with camelCase', () => {
       const config = { ...baseConfig, journeyFolder: 'respondToClaim' };
       const step = createFormStep(config);
-      expect(step.url).toBe('/steps/respond-to-claim/test-step');
+      expect(step.url).toBe('/case/:caseReference/respond-to-claim/test-step');
     });
 
     it('should create getController that renders with form content', async () => {

@@ -36,7 +36,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
 
   return {
-    url: path.join(basePath, journeyPath, stepName),
+    url: path.join(basePath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,
