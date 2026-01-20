@@ -9,6 +9,7 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '../services/pcsApi';
+import { sanitiseCaseReference } from '../utils/caseReference';
 
 interface MappedTask {
   title: { html: string };
@@ -28,11 +29,6 @@ interface MappedTaskGroup {
 
 export const DASHBOARD_ROUTE = '/dashboard';
 const DEFAULT_DASHBOARD_URL = `${DASHBOARD_ROUTE}/1234567890123456`; // TODO: remove hardcoded fake CCD caseId when CCD backend is setup
-
-function sanitiseCaseReference(caseReference: string | number): string | null {
-  const caseRefStr = String(caseReference);
-  return /^\d{16}$/.test(caseRefStr) ? caseRefStr : null;
-}
 
 export const getDashboardUrl = (caseReference?: string | number): string => {
   if (!caseReference) {

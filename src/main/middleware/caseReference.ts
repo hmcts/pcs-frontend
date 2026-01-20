@@ -1,6 +1,8 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { NextFunction, Request, Response } from 'express';
 
+import { sanitiseCaseReference } from '../utils/caseReference';
+
 const logger = Logger.getLogger('caseReferenceMiddleware');
 
 export function caseReferenceMiddleware(req: Request, res: Response, next: NextFunction): void {
@@ -14,7 +16,8 @@ export function caseReferenceMiddleware(req: Request, res: Response, next: NextF
   }
 
   // validate format - 16 digits
-  if (!/^\d{16}$/.test(caseReference)) {
+  const sanitisedCaseReference = sanitiseCaseReference(caseReference);
+  if (!sanitisedCaseReference) {
     logger.error('Invalid case reference format', { caseReference });
     return res.status(400).render('error', {
       error: 'Invalid case reference format',
@@ -23,9 +26,9 @@ export function caseReferenceMiddleware(req: Request, res: Response, next: NextF
 
   // store in session
   if (req.session) {
-    req.session.caseReference = caseReference;
+    req.session.caseReference = sanitisedCaseReference;
   }
 
-  logger.debug('Case reference validated', { caseReference });
+  logger.debug('Case reference validated', { caseReference: sanitisedCaseReference });
   next();
 }
