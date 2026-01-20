@@ -11,7 +11,6 @@ import { getDateTranslationKey, validateDateField } from './dateValidation';
 const logger = Logger.getLogger('form-builder-helpers');
 
 export function getTranslation(t: TFunction, key: string, fallback?: string): string | undefined {
-  // Avoid leaking i18next "returned an object instead of string" messages into the UI.
   const result = t(key, { returnObjects: true }) as unknown;
   if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
     return result;

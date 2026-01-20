@@ -32,10 +32,6 @@ export interface FormFieldConfig {
   errorMessage?: string;
   // Label can be a string or a function that takes translations and returns a string
   label?: string | ((translations: Record<string, string>) => string);
-  /**
-   * Optional GOV.UK label classes (e.g. "govuk-label--s", "govuk-label--m").
-   * Useful when services need explicit label styling.
-   */
   labelClasses?: string;
   hint?: string;
   translationKey?: {
