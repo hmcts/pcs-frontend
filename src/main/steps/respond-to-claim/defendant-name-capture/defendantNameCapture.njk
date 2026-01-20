@@ -5,7 +5,7 @@
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}{{ pageTitle or heading or title }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+{% block pageTitle %}{{ pageTitle }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
 
 {% block mainContent %}
   {# Error summary - GOV.UK pattern #}
@@ -19,18 +19,17 @@
   {% endif %}
 
   {# Page heading (standard GOV.UK pattern) #}
-  {% set questionText = heading or title or pageTitle %}
-  {% if questionText %}
-    <h1 class="govuk-heading-l">{{ questionText }}</h1>
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% endif %}
 
   {# Form #}
   <form method="post" action="{{ url }}" novalidate>
     {# Group related text inputs with a fieldset/legend (not the page heading) #}
-    {% if questionText %}
+    {% if heading %}
       {% call govukFieldset({
         legend: {
-          text: questionText,
+          text: heading,
           classes: "govuk-visually-hidden"
         }
       }) %}
