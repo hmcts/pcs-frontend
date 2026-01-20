@@ -2,7 +2,8 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% block pageTitle %}Start now - Possession claims{% endblock %}
+{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
+{% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
 
 {% block serviceNavigation %}
   {# Service navigation without serviceName on start now page - only logout button #}
