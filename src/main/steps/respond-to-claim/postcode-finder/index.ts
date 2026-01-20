@@ -1,11 +1,10 @@
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+import { createGetController, stepNavigation } from '../../../modules/steps';
+import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
 const stepName = 'postcode-finder';
-const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
   url: `${RESPOND_TO_CLAIM_ROUTE}/postcode-finder`,
@@ -16,9 +15,9 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/postcode-finder/postcodeFinder.njk',
       stepName,
-      (_req: Request) => {
+      (req: Request) => {
         return {
-          backUrl: `${RESPOND_TO_CLAIM_ROUTE}/start-now`,
+          backUrl: stepNavigation.getBackUrl(req, stepName),
         };
       },
       'respondToClaim'
