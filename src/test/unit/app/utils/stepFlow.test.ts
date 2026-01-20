@@ -263,6 +263,44 @@ describe('stepFlow', () => {
       const result = getStepUrl('step1', config);
       expect(result).toBe('/step1');
     });
+
+    it('should replace :caseReference with valid case reference', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/case/:caseReference/respond',
+        stepOrder: ['step1'],
+        steps: {},
+      };
+      const result = getStepUrl('step1', config, '1234567890123456');
+      expect(result).toBe('/case/1234567890123456/respond/step1');
+    });
+
+    it('should throw error for invalid case reference format', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/case/:caseReference/respond',
+        stepOrder: ['step1'],
+        steps: {},
+      };
+      expect(() => getStepUrl('step1', config, 'invalid')).toThrow('Invalid case reference format');
+    });
+
+    it('should throw error for malicious case reference', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/case/:caseReference/respond',
+        stepOrder: ['step1'],
+        steps: {},
+      };
+      expect(() => getStepUrl('step1', config, '../../../etc/passwd')).toThrow('Invalid case reference format');
+    });
+
+    it('should not replace caseReference when basePath does not contain placeholder', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/case/respond',
+        stepOrder: ['step1'],
+        steps: {},
+      };
+      const result = getStepUrl('step1', config, '1234567890123456');
+      expect(result).toBe('/case/respond/step1');
+    });
   });
 
   describe('checkStepDependencies', () => {

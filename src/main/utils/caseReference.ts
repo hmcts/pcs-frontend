@@ -1,6 +1,5 @@
 /**
  * valid case reference must be exactly 16 digits.
- *
  * @param caseReference - The case reference to validate (string or number)
  * @returns sanitised case reference as a string, or null if invalid
  */

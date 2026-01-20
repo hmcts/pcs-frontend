@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import { flowConfig as respondToClaimFlowConfig } from '../../steps/respond-to-claim/flow.config';
+import { sanitiseCaseReference } from '../../utils/caseReference';
 
 const logger = Logger.getLogger('stepDependencyCheck');
 
@@ -80,15 +81,12 @@ export function getStepUrl(stepName: string, flowConfig: JourneyFlowConfig, case
   let basePath = flowConfig.basePath || '';
 
   if (caseReference && basePath.includes(':caseReference')) {
-    basePath = basePath.replace(':caseReference', caseReference);
+    const sanitised = sanitiseCaseReference(caseReference);
+    if (!sanitised) {
+      throw new Error('Invalid case reference format');
+    }
+    basePath = basePath.replace(':caseReference', sanitised);
   }
-  // if (flowConfig.basePath) {
-  // return `${flowConfig.basePath}/${stepName}`;
-  // }
-
-  // if (flowConfig.journeyName) {
-  //   return `/steps/${flowConfig.journeyName}/${stepName}`;
-  // }
 
   return `${basePath}/${stepName}`;
 }
