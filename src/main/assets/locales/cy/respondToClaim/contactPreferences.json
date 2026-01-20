@@ -1,8 +1,8 @@
 {
-  "pageTitle": "cyContact preferences",
+  "pageTitle": "cyContact preferences telephone",
   "subtitle": "cyPlaceholder page",
   "labels": {
-    "question": "cyAre you happy to be contacted by text message?",
+    "question": "cyAre you happy to be contacted by telephone?",
     "options": {
       "yes": "cyYes",
       "no": "cyNo"
@@ -12,11 +12,5 @@
   "buttons": {
     "saveAndContinue": "cySave and continue",
     "saveForLater": "cySave for later"
-  },
-  "requiredErrorMessage": "cyPlease enter your UK mobile number before continuing.",
-
-  "errors": {
-    "required": "cyPlease enter your UK mobile number before continuing.",
-    "invalid": "cyEnter a valid phone number"
   }
 }

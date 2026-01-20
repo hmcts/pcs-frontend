@@ -1,8 +1,8 @@
 {
-  "pageTitle": "Contact preferences",
+  "pageTitle": "Contact preferences telephone",
   "subtitle": "Placeholder page",
   "labels": {
-    "question": "Are you happy to be contacted by text message?",
+    "question": "Are you happy to be contacted by telephone?",
     "options": {
       "yes": "Yes",
       "no": "No"
@@ -12,11 +12,5 @@
   "buttons": {
     "saveAndContinue": "Save and continue",
     "saveForLater": "Save for later"
-  },
-  "requiredErrorMessage": "Please enter your UK mobile number before continuing.",
-
-  "errors": {
-    "required": "Please enter your UK mobile number before continuing.",
-    "invalid": "Enter a valid phone number"
   }
 }

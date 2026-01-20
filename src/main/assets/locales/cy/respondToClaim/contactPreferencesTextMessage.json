@@ -12,10 +12,8 @@
     "saveAndContinue": "cySave and continue",
     "saveForLater": "cySave for later"
   },
-  "requiredErrorMessage": "cyPlease enter your UK mobile number before continuing.",
-
   "errors": {
-    "required": "cyPlease enter your UK mobile number before continuing.",
-    "invalid": "cyEnter a valid phone number"
+    "contactByTextMessage.phoneNumber": "cyPlease enter your UK mobile number before continuing.",
+    "contactByTextMessage.phoneNumber.invalid": "cyEnter a valid UK phone number."
   }
 }
