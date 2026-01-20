@@ -1,9 +1,11 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, stepNavigation } from '../../../modules/steps';
 import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
+const logger = Logger.getLogger('postcode-finder');
 const stepName = 'postcode-finder';
 
 export const step: StepDefinition = {
@@ -16,6 +18,9 @@ export const step: StepDefinition = {
       'respond-to-claim/postcode-finder/postcodeFinder.njk',
       stepName,
       (req: Request) => {
+        const caseReference = req.params.caseReference;
+        logger.info('Postcode page logged', { caseReference });
+
         return {
           backUrl: stepNavigation.getBackUrl(req, stepName),
         };

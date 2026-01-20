@@ -105,19 +105,13 @@ export default function dashboardRoutes(app: Application): void {
   });
 
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
-    const { caseReference } = req.params;
-
-    const sanitisedCaseReference = sanitiseCaseReference(caseReference);
-    if (!sanitisedCaseReference) {
-      return res.status(404).render('not-found');
-    }
-
-    const caseReferenceNumber = Number(sanitisedCaseReference);
+    const caseReference = req.params.caseReference;
+    const caseReferenceNumber = Number(caseReference);
 
     try {
       const [notifications, taskGroups] = await Promise.all([
         getDashboardNotifications(caseReferenceNumber),
-        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, sanitisedCaseReference)),
+        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, caseReference)),
       ]);
 
       return res.render('dashboard', {
@@ -125,7 +119,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
       });
     } catch (e) {
-      logger.error(`Failed to fetch dashboard data for case ${sanitisedCaseReference}. Error was: ${String(e)}`);
+      logger.error(`Failed to fetch dashboard data for case ${caseReference}. Error was: ${String(e)}`);
       throw e;
     }
   });

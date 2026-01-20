@@ -124,14 +124,14 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
       currentStepData: Record<string, unknown> = {}
     ): string | null => {
       const formData = req.session?.formData || {};
-      const caseReference = req.params.caseReference || req.session?.caseReference;
+      const caseReference = req.params.caseReference;
       const nextStep = getNextStep(currentStepName, flowConfig, formData, currentStepData);
       return nextStep ? getStepUrl(nextStep, flowConfig, caseReference) : null;
     },
 
     getBackUrl: (req: Request, currentStepName: string): string | null => {
       const formData = req.session?.formData || {};
-      const caseReference = req.params.caseReference || req.session?.caseReference;
+      const caseReference = req.params.caseReference;
       const previousStep = getPreviousStep(currentStepName, flowConfig, formData);
       return previousStep ? getStepUrl(previousStep, flowConfig, caseReference) : null;
     },

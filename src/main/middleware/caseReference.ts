@@ -5,16 +5,12 @@ import { sanitiseCaseReference } from '../utils/caseReference';
 
 const logger = Logger.getLogger('caseReferenceMiddleware');
 
-export function caseReferenceMiddleware(req: Request, res: Response, next: NextFunction): void {
-  const caseReference = req.params.caseReference;
-
-  if (!caseReference) {
-    logger.error('No case reference found in URL');
-    return res.status(400).render('error', {
-      error: 'Invalid case reference',
-    });
-  }
-
+export function caseReferenceParamMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  caseReference: string
+): void {
   // validate format - 16 digits
   const sanitisedCaseReference = sanitiseCaseReference(caseReference);
   if (!sanitisedCaseReference) {
@@ -24,10 +20,8 @@ export function caseReferenceMiddleware(req: Request, res: Response, next: NextF
     });
   }
 
-  // store in session
-  if (req.session) {
-    req.session.caseReference = sanitisedCaseReference;
-  }
+  // make available to views via res.locals
+  res.locals.caseReference = sanitisedCaseReference;
 
   logger.debug('Case reference validated', { caseReference: sanitisedCaseReference });
   next();
