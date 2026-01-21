@@ -117,7 +117,7 @@ describe('ccdCaseService', () => {
   describe('getExistingCaseData', () => {
     it('throws if case data errors', async () => {
       mockGet.mockRejectedValue({ response: { status: 400 } });
-      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getExistingCaseData(accessToken, '')).rejects.toThrow(HTTPError);
     });
   });
 });
