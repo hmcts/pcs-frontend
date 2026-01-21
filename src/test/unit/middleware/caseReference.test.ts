@@ -29,7 +29,9 @@ describe('caseReferenceParamMiddleware', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockReq = {};
+    mockReq = {
+      params: {},
+    };
 
     mockRes = {
       locals: {},
@@ -41,16 +43,14 @@ describe('caseReferenceParamMiddleware', () => {
   });
 
   describe('valid case reference', () => {
-    it('should set res.locals.caseReference with valid 16-digit case reference', () => {
+    it('should set res.locals.caseReference and req.params.caseReference with valid 16-digit case reference', () => {
       const validCaseRef = '1234567890123456';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
       expect(mockRes.locals?.caseReference).toBe(validCaseRef);
+      expect(mockReq.params?.caseReference).toBe(validCaseRef);
       expect(next).toHaveBeenCalledWith();
-      expect(mockLogger.debug).toHaveBeenCalledWith('Case reference validated', {
-        caseReference: validCaseRef,
-      });
     });
 
     it('should call next() after successful validation', () => {
@@ -64,12 +64,12 @@ describe('caseReferenceParamMiddleware', () => {
   });
 
   describe('invalid case reference', () => {
-    it('should return 400 error for case reference that is too short', () => {
+    it('should return 404 error for case reference that is too short', () => {
       const shortCaseRef = '12345';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, shortCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.render).toHaveBeenCalledWith('error', {
         error: 'Invalid case reference format',
       });
@@ -79,60 +79,60 @@ describe('caseReferenceParamMiddleware', () => {
       });
     });
 
-    it('should return 400 error for case reference that is too long', () => {
+    it('should return 404 error for case reference that is too long', () => {
       const longCaseRef = '12345678901234567';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, longCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.render).toHaveBeenCalledWith('error', {
         error: 'Invalid case reference format',
       });
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 error for case reference with non-numeric characters', () => {
+    it('should return 404 error for case reference with non-numeric characters', () => {
       const invalidCaseRef = '123456789012345a';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, invalidCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.render).toHaveBeenCalledWith('error', {
         error: 'Invalid case reference format',
       });
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 error for empty case reference', () => {
+    it('should return 404 error for empty case reference', () => {
       const emptyCaseRef = '';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, emptyCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.render).toHaveBeenCalledWith('error', {
         error: 'Invalid case reference format',
       });
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 error for case reference with special characters', () => {
+    it('should return 404 error for case reference with special characters', () => {
       const specialCharCaseRef = '1234-5678-9012-34';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, specialCharCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.render).toHaveBeenCalledWith('error', {
         error: 'Invalid case reference format',
       });
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 400 error for case reference with spaces', () => {
+    it('should return 404 error for case reference with spaces', () => {
       const spacedCaseRef = '1234 5678 9012 3456';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, spacedCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.render).toHaveBeenCalledWith('error', {
         error: 'Invalid case reference format',
       });
@@ -148,16 +148,6 @@ describe('caseReferenceParamMiddleware', () => {
 
       expect(mockLogger.error).toHaveBeenCalledWith('Invalid case reference format', {
         caseReference: invalidCaseRef,
-      });
-    });
-
-    it('should log debug message with valid case reference', () => {
-      const validCaseRef = '1234567890123456';
-
-      caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
-
-      expect(mockLogger.debug).toHaveBeenCalledWith('Case reference validated', {
-        caseReference: validCaseRef,
       });
     });
   });

@@ -105,14 +105,7 @@ export default function dashboardRoutes(app: Application): void {
   });
 
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
-    const caseReference = req.params.caseReference;
-
-    // validate case reference format
-    const sanitisedCaseReference = sanitiseCaseReference(caseReference);
-    if (!sanitisedCaseReference) {
-      return res.status(404).render('not-found');
-    }
-
+    const sanitisedCaseReference = req.params.caseReference;
     const caseReferenceNumber = Number(sanitisedCaseReference);
 
     try {

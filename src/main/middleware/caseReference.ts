@@ -13,13 +13,17 @@ export function caseReferenceParamMiddleware(
 ): void {
   // validate format - 16 digits
   const sanitisedCaseReference = sanitiseCaseReference(caseReference);
+
   if (!sanitisedCaseReference) {
     logger.error('Invalid case reference format', { caseReference });
-    return res.status(400).render('error', {
+    return res.status(404).render('error', {
       error: 'Invalid case reference format',
     });
   }
 
-  // make available to views via res.locals
+  // values in both
+  req.params.caseReference = sanitisedCaseReference;
   res.locals.caseReference = sanitisedCaseReference;
+
+  next();
 }
