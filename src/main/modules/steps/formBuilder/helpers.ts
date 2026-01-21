@@ -305,10 +305,18 @@ export function validateForm(
           : value === undefined || value === null || value === '';
 
       if (isRequired && isMissing) {
-        // Check translations first (which contains translated errorMessage), then field.errorMessage, then defaults
+        // Check translations first (which contains translated errorMessage), then try to translate field.errorMessage, then defaults
         // field.errorMessage can be either a translation key or a direct message
+        let translatedMsg = translations?.[fieldName];
+        // If translation not found and field.errorMessage is a translation key, try to translate it
+        if (!translatedMsg && field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.') && t) {
+          const translatedErrorMsg = t(field.errorMessage);
+          if (translatedErrorMsg && translatedErrorMsg !== field.errorMessage) {
+            translatedMsg = translatedErrorMsg;
+          }
+        }
         errors[fieldName] =
-          translations?.[fieldName] || field.errorMessage || translations?.defaultRequired || 'This field is required';
+          translatedMsg || field.errorMessage || translations?.defaultRequired || 'This field is required';
       }
 
       // Run validator function if provided (field-level validation)
@@ -316,9 +324,15 @@ export function validateForm(
         try {
           const validatorResult = field.validator(value, formData, validationAllData);
           if (validatorResult !== true) {
-            // Use translated error message if available, otherwise use validator result or default
-            // Don't use field.errorMessage directly as it's a translation key, not a translated message
-            const translatedMsg = translations?.[fieldName];
+            // Use translated error message if available, otherwise try to translate field.errorMessage, then validator result or default
+            let translatedMsg = translations?.[fieldName];
+            // If translation not found and field.errorMessage is a translation key, try to translate it
+            if (!translatedMsg && field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.') && t) {
+              const translatedErrorMsg = t(field.errorMessage);
+              if (translatedErrorMsg && translatedErrorMsg !== field.errorMessage) {
+                translatedMsg = translatedErrorMsg;
+              }
+            }
             const errorMsg =
               translatedMsg || (typeof validatorResult === 'string' ? validatorResult : undefined) || 'Invalid value';
             if (!errors[fieldName]) {
@@ -343,9 +357,17 @@ export function validateForm(
           const regex = new RegExp(field.pattern);
           if (!regex.test(value.trim())) {
             if (!errors[fieldName]) {
-              // Use translated error message if available, then field.errorMessage, then default
+              // Use translated error message if available, then try to translate field.errorMessage, then default
+              let translatedMsg = translations?.[fieldName];
+              // If translation not found and field.errorMessage is a translation key, try to translate it
+              if (!translatedMsg && field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.') && t) {
+                const translatedErrorMsg = t(field.errorMessage);
+                if (translatedErrorMsg && translatedErrorMsg !== field.errorMessage) {
+                  translatedMsg = translatedErrorMsg;
+                }
+              }
               errors[fieldName] =
-                translations?.[fieldName] || field.errorMessage || translations?.defaultInvalid || 'Invalid format';
+                translatedMsg || field.errorMessage || translations?.defaultInvalid || 'Invalid format';
             }
           }
         }
