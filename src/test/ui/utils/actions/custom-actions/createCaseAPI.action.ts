@@ -46,13 +46,32 @@ export class CreateCaseAPIAction implements IAction {
     const SUBMIT_EVENT_TOKEN = (await submitCaseApi.get(submitCaseEventTokenApiData.submitCaseEventTokenApiEndPoint()))
       .data.token;
     const submitCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
-    const submitResponse = await submitCaseApi.post(submitCaseApiData.submitCaseApiEndPoint(), {
-      data: submitCasePayloadData,
-      event: { id: submitCaseApiData.submitCaseEventName },
-      event_token: SUBMIT_EVENT_TOKEN,
-    });
-    caseInfo.id = submitResponse.data.id;
-    caseInfo.fid = submitResponse.data.id.replace(/(.{4})(?=.)/g, '$1-');
-    caseInfo.state = submitResponse.data.state;
+    try {
+      const submitResponse = await submitCaseApi.post(submitCaseApiData.submitCaseApiEndPoint(), {
+        data: submitCasePayloadData,
+        event: { id: submitCaseApiData.submitCaseEventName },
+        event_token: SUBMIT_EVENT_TOKEN,
+      });
+      caseInfo.id = submitResponse.data.id;
+      caseInfo.fid = submitResponse.data.id.replace(/(.{4})(?=.)/g, '$1-');
+      caseInfo.state = submitResponse.data.state;
+    } catch (error: unknown) {
+      if (Axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status === 404) {
+          /* eslint-disable no-console */
+          console.error(submitCaseApiData.submitCasePayload);
+          /* eslint-enable no-console */
+          throw new Error(
+            `Submission failed: endpoint not found (404). Please check the payload above.\n${error.message}`
+          );
+        }
+        if (!status) {
+          throw new Error('Submission failed: no response from server.');
+        }
+        throw new Error(`Submission failed with status ${status}.`);
+      }
+      throw new Error('Submission failed due to an unexpected error.');
+    }
   }
 }
