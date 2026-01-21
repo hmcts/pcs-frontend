@@ -5,7 +5,6 @@ import { defendantNameCapture } from '../../../data/page-data/defendantNameCaptu
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
-
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -60,7 +59,11 @@ export class RespondToClaimAction implements IAction {
 
         case 'checkBox':
           await performAction('clickButton', validationArr.button);
-          await performValidation('inputError', !validationArr?.label ? validationArr.question : validationArr.label, item.errMessage);
+          await performValidation(
+            'inputError',
+            !validationArr?.label ? validationArr.question : validationArr.label,
+            item.errMessage
+          );
           break;
 
         default:

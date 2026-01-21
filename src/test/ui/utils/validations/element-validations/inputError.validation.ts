@@ -20,7 +20,8 @@ export class InputErrorValidation implements IValidation {
       page.locator(`
   :is(
     .govuk-form-group:has(label:has-text("${fieldName}")),
-    fieldset:has(legend:has-text("${fieldName}"))) p.govuk-error-message`)];
+    fieldset:has(legend:has-text("${fieldName}"))) p.govuk-error-message`),
+    ];
     for (const locator of locators) {
       if (await locator.isVisible()) {
         return locator;

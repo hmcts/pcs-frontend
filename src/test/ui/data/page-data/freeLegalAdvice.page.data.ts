@@ -29,12 +29,10 @@ export const freeLegalAdvice = {
   saveForLaterButton: 'Save for later',
   cymraegLink: 'Cymraeg',
   backLink: 'Back',
-  errorValidation: 'YES',//set it to 'NO' before raising a PR
+  errorValidation: 'YES', //set it to 'NO' before raising a PR
   errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
   errorValidationHeader: 'There is a problem',
   errorValidationField: {
-    errorRadioMsg: [
-      { errMessage: 'You must say if you\'ve had any free legal advice' },
-    ]
-  }
+    errorRadioMsg: [{ errMessage: "You must say if you've had any free legal advice" }],
+  },
 };

@@ -16,6 +16,6 @@ export const defendantNameCapture = {
     errorTextField: [
       { type: 'empty', label: 'First name', errMessage: 'Enter your first name' },
       { type: 'empty', label: 'Last name', errMessage: 'Enter your last name' },
-    ]
-  }
+    ],
+  },
 };

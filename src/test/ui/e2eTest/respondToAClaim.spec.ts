@@ -26,7 +26,10 @@ test.describe('Respond to a claim @PR @nightly', async () => {
     await performAction('navigateToUrl', home_url + '/respond-to-claim/start-now');
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', { fName: defendantNameCapture.firstNameInputText, lName: defendantNameCapture.lastNameInputText });
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
     await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
   });
 });

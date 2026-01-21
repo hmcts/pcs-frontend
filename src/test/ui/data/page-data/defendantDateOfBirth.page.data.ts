@@ -1,3 +1,3 @@
 export const defendantDateOfBirth = {
-  mainHeader: 'Defendant date of birth (placeholder)'
+  mainHeader: 'Defendant date of birth (placeholder)',
 };
