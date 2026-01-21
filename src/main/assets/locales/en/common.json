@@ -1,9 +1,11 @@
 {
-  "serviceName": "Respond to property possession claims",
+  "serviceName": "Respond to a property possession claim",
   "phase": "ALPHA",
   "feedback": "This is a new service – your <a href=\"#\" class=\"govuk-link\">feedback</a> will help us to improve it.",
   "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link language\">Cymraeg</a>",
-  "logout": "logout",
+  "logout": "Log out",
+  "navigationLabel": "Service navigation",
+  "supportAndContactInformation": "Support and contact information",
   "contactUsForHelp": "Contact us for help",
   "contactUsForHelpText": "If you need help using this service, contact us.",
   "buttons": {
