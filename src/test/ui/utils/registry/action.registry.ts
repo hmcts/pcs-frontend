@@ -1,4 +1,5 @@
 import { CreateCaseAPIAction, LoginAction, NavigateToUrlAction } from '../actions/custom-actions';
+import { RespondToClaimAction } from '../actions/custom-actions/respondToClaim.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -30,6 +31,9 @@ export class ActionRegistry {
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['selectLegalAdvice', new RespondToClaimAction()],
+    ['inputDefendantDetails', new RespondToClaimAction()],
+    ['inputErrorValidation', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

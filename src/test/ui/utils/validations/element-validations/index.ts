@@ -1,6 +1,7 @@
 export * from '../../../utils/validations/element-validations/bannerAlert.validation';
 export * from '../../../utils/validations/element-validations/error-message.validation';
 export * from '../../../utils/validations/element-validations/formLabelValue.validation';
+export * from './inputError.validation';
 export * from '../../../utils/validations/element-validations/optionList.validation';
 export * from '../../../utils/validations/element-validations/pageHeader.validation';
 export * from '../../../utils/validations/element-validations/radioButton.validation';
