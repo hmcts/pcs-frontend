@@ -1,0 +1,31 @@
+{
+  "title": "cyHow would you like to be contacted?",
+  "hint": "cySelect your preferred method of contact. We'll use this to send you updates about your case.",
+  "options": {
+    "email": "cyEmail",
+    "phone": "cyPhone",
+    "post": "cyPost",
+    "other": "cyOther"
+  },
+  "emailAddressLabel": "cyEmail address",
+  "emailAddressHint": "cyWe'll use this to send you updates about your case.",
+  "phoneNumberLabel": "cyPhone number",
+  "phoneNumberHint": "cyEnter a UK mobile phone number.",
+  "otherDetailsLabel": "cyPlease provide details of your preferred contact method",
+  "otherDetailsHint": "cyTell us how you would like to be contacted if none of the options above apply.",
+  "preferredTimesTitle": "cyWhen is the best time to contact you?",
+  "preferredTimesHint": "cySelect all times that apply. You can select more than one option.",
+  "preferredTimesOptions": {
+    "morning": "cyMorning (9am to 12pm)",
+    "afternoon": "cyAfternoon (12pm to 5pm)",
+    "evening": "cyEvening (after 5pm)",
+    "anytime": "cyAnytime"
+  },
+  "eveningTimeLabel": "cyWhat time in the evening?",
+  "eveningTimeHint": "cyEnter a time in 24-hour format, for example 18:30.",
+  "errors": {
+    "emailAddress": "cyEnter a valid email address",
+    "phoneNumber": "cyEnter a valid UK mobile phone number",
+    "eveningTime": "cyEnter a valid time (e.g., 18:30)"
+  }
+}

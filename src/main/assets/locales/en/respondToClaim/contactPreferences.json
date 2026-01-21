@@ -1,0 +1,31 @@
+{
+  "title": "How would you like to be contacted?",
+  "hint": "Select your preferred method of contact. We'll use this to send you updates about your case.",
+  "options": {
+    "email": "Email",
+    "phone": "Phone",
+    "post": "Post",
+    "other": "Other"
+  },
+  "emailAddressLabel": "Email address",
+  "emailAddressHint": "We'll use this to send you updates about your case.",
+  "phoneNumberLabel": "Phone number",
+  "phoneNumberHint": "Enter a UK mobile phone number.",
+  "otherDetailsLabel": "Please provide details of your preferred contact method",
+  "otherDetailsHint": "Tell us how you would like to be contacted if none of the options above apply.",
+  "preferredTimesTitle": "When is the best time to contact you?",
+  "preferredTimesHint": "Select all times that apply. You can select more than one option.",
+  "preferredTimesOptions": {
+    "morning": "Morning (9am to 12pm)",
+    "afternoon": "Afternoon (12pm to 5pm)",
+    "evening": "Evening (after 5pm)",
+    "anytime": "Anytime"
+  },
+  "eveningTimeLabel": "What time in the evening?",
+  "eveningTimeHint": "Enter a time in 24-hour format, for example 18:30.",
+  "errors": {
+    "emailAddress": "Enter a valid email address",
+    "phoneNumber": "Enter a valid UK mobile phone number",
+    "eveningTime": "Enter a valid time (e.g., 18:30)"
+  }
+}
