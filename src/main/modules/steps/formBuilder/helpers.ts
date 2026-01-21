@@ -309,7 +309,13 @@ export function validateForm(
         // field.errorMessage can be either a translation key or a direct message
         let translatedMsg = translations?.[fieldName];
         // If translation not found and field.errorMessage is a translation key, try to translate it
-        if (!translatedMsg && field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.') && t) {
+        if (
+          !translatedMsg &&
+          field.errorMessage &&
+          typeof field.errorMessage === 'string' &&
+          field.errorMessage.startsWith('errors.') &&
+          t
+        ) {
           const translatedErrorMsg = t(field.errorMessage);
           if (translatedErrorMsg && translatedErrorMsg !== field.errorMessage) {
             translatedMsg = translatedErrorMsg;
@@ -327,7 +333,13 @@ export function validateForm(
             // Use translated error message if available, otherwise try to translate field.errorMessage, then validator result or default
             let translatedMsg = translations?.[fieldName];
             // If translation not found and field.errorMessage is a translation key, try to translate it
-            if (!translatedMsg && field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.') && t) {
+            if (
+              !translatedMsg &&
+              field.errorMessage &&
+              typeof field.errorMessage === 'string' &&
+              field.errorMessage.startsWith('errors.') &&
+              t
+            ) {
               const translatedErrorMsg = t(field.errorMessage);
               if (translatedErrorMsg && translatedErrorMsg !== field.errorMessage) {
                 translatedMsg = translatedErrorMsg;
@@ -360,7 +372,13 @@ export function validateForm(
               // Use translated error message if available, then try to translate field.errorMessage, then default
               let translatedMsg = translations?.[fieldName];
               // If translation not found and field.errorMessage is a translation key, try to translate it
-              if (!translatedMsg && field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.') && t) {
+              if (
+                !translatedMsg &&
+                field.errorMessage &&
+                typeof field.errorMessage === 'string' &&
+                field.errorMessage.startsWith('errors.') &&
+                t
+              ) {
                 const translatedErrorMsg = t(field.errorMessage);
                 if (translatedErrorMsg && translatedErrorMsg !== field.errorMessage) {
                   translatedMsg = translatedErrorMsg;
