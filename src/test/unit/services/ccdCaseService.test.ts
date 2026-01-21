@@ -61,6 +61,14 @@ describe('ccdCaseService', () => {
       expect(result).toBeNull();
     });
 
+    it('returns null on 400 error', async () => {
+      mockPost.mockRejectedValue({ response: { status: 400 } });
+
+      const result = await ccdCaseService.getCase(accessToken);
+      expect(result).toBeNull();
+    });
+
+
     it('throws HTTPError on unexpected error', async () => {
       mockPost.mockRejectedValue(new Error('Unexpected'));
 
@@ -90,11 +98,27 @@ describe('ccdCaseService', () => {
   });
 
   describe('submitCase', () => {
-    it('throws HTTPError if case id is missing', async () => {
+    it ('throws HTTPError if case id is missing', async () => {
       await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(
         'Cannot SUBMIT Case, CCD Case Not found'
       );
     });
   });
-});
+
+  describe('submitResponseToClaim', () => {
+    it('throws HTTPError if case id is missing', async () => {
+      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(
+        'Cannot Submit Response to Case, CCD Case Not found'
+      );
+    });
+  });
+  
+  describe('getExistingCaseData', () => {
+    it('throws if case data errors', async () => {
+        mockGet.mockRejectedValue({ response: { status: 400 } });
+        await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      });
+    });
+  });

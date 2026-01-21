@@ -49,7 +49,7 @@ export const step: StepDefinition = {
       };
 
       const responseToClaim: CcdCase = {
-        id: '1768917305534047',
+        id: '1769003060570085',
         data: {
           possessionClaimResponse,
           submitDraftAnswers: 'No',
@@ -73,7 +73,7 @@ export const step: StepDefinition = {
 
 async function getExistingAddress(accessToken: string): Promise<string> {
   // Pull data from API
-  const response = await ccdCaseService.getExistingCaseData(accessToken, '1768917305534047');
+  const response = await ccdCaseService.getExistingCaseData(accessToken, '1769003060570085');
   const address = response.case_details.case_data.possessionClaimResponse?.party?.address;
 
   if (address) {

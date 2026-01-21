@@ -164,20 +164,11 @@ export const ccdCaseService = {
 
   async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
     if (!ccdCase.id) {
-      throw new HTTPError('Cannot SUBMIT Case, CCD Case Not found', 500);
+      throw new HTTPError('Cannot Submit Response to Case, CCD Case Not found', 500);
     }
-
-    logger.info('Get Event URL');
     const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
-    logger.info(eventUrl);
-
-    logger.info('Get Event Token');
     const eventToken = await getEventToken(accessToken || '', eventUrl);
-    logger.info(eventToken);
-
-    logger.info('Get URL');
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-    logger.info(url);
 
     return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
   },
@@ -189,7 +180,7 @@ export const ccdCaseService = {
       const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
       return response.data;
     } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'submitEvent');
+      throw convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
     }
   },
 };
