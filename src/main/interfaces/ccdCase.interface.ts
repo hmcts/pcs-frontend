@@ -23,20 +23,22 @@ export interface CcdCase {
   data: Record<string, unknown>;
 }
 
+export interface Address {
+  AddressLine1?: string;
+  AddressLine2?: string;
+  AddressLine3?: string;
+  PostTown?: string;
+  County?: string;
+  PostCode?: string;
+  Country?: string;
+}
+
 export interface PossessionClaimResponse {
   party: {
     firstName?: string;
-    lastName?: string; 
-    address?:{
-      AddressLine1?: string,
-      AddressLine2?: string,
-      AddressLine3?: string,
-      PostTown?: string,
-      County?: string,
-      PostCode?: string,
-      Country?: string,        
-    }
-  }
+    lastName?: string;
+    address?: Address;
+  };
 }
 
 export interface StartCallbackData {
@@ -44,17 +46,9 @@ export interface StartCallbackData {
     case_data: {
       possessionClaimResponse?: {
         party?: {
-          address?: {
-            AddressLine1?: string,
-            AddressLine2?: string,
-            AddressLine3?: string,
-            PostTown?: string,
-            County?: string,
-            PostCode?: string,
-            Country?: string,
-          }
+          address?: Address;
         };
       };
     };
   };
-};
+}

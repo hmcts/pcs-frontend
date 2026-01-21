@@ -1,9 +1,10 @@
 {
   "title": "cyIs your correspondence address",
-  "titleNa": "cyWhat's your correspondence address?", 
+  "titleNa": "cyWhat's your correspondence address?",
   "subtitle": "cyThis is the address provided by Treetops Housing",
   "secondaryHeading": "cyRespond to a property possession claim",
-  "subtitleNa": "cyYour correspondence address is your postal address",   "legend": "cyIs this your correspondence address?",
+  "subtitleNa": "cyYour correspondence address is your postal address",
+  "legend": "cyIs this your correspondence address?",
   "labels": {
     "yes": "cyYes",
     "no": "cyNo",

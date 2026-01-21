@@ -1,12 +1,13 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import type { Request, Response } from 'express';
 
+import { CcdCase, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
+import { ccdCaseService } from '../../../services/ccdCaseService';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
-import { ccdCaseService } from 'services/ccdCaseService';
-import { CcdCase, PossessionClaimResponse} from '../../../interfaces/ccdCase.interface';
 
-
+const logger = Logger.getLogger('postcode-finder/inde.ts');
 
 const stepName = 'postcode-finder';
 const stepNavigation = createStepNavigation(flowConfig);
@@ -21,12 +22,11 @@ export const step: StepDefinition = {
       'respond-to-claim/postcode-finder/postcodeFinder.njk',
       stepName,
       async (req: Request) => {
-            const prepopulateAddress = await getExistingAddress(req.session.user?.accessToken || "");
-            // const prepopulateAddress = "No address";
+        const prepopulateAddress = await getExistingAddress(req.session.user?.accessToken || '');
         return {
           backUrl: `${RESPOND_TO_CLAIM_ROUTE}/start-now`,
-          prepopulateAddress: prepopulateAddress,
-          addressKnown: prepopulateAddress !== "No address"
+          prepopulateAddress,
+          addressKnown: prepopulateAddress !== '',
         };
       },
       'respondToClaim'
@@ -34,8 +34,7 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
-
-      console.log("Making API call to save draft data");
+      logger.info('Making API call to save draft data');
 
       const possessionClaimResponse: PossessionClaimResponse = {
         party: {
@@ -45,18 +44,19 @@ export const step: StepDefinition = {
             PostTown: req.body.inputPostTown as string | undefined,
             Country: req.body.inputCountry as string | undefined,
             PostCode: req.body.inputPostcode as string | undefined,
-          }
-        }
-      }
+          },
+        },
+      };
 
-      const responseToClaim: CcdCase = {id: "1768917305534047",
-        data:  {
-          possessionClaimResponse: possessionClaimResponse,
-          submitDraftAnswers: "No"
-        }
-      }
-  
-      ccdCaseService.submitResponseToClaim(req.session.user?.accessToken, responseToClaim)
+      const responseToClaim: CcdCase = {
+        id: '1768917305534047',
+        data: {
+          possessionClaimResponse,
+          submitDraftAnswers: 'No',
+        },
+      };
+
+      ccdCaseService.submitResponseToClaim(req.session.user?.accessToken, responseToClaim);
 
       // Get next step URL and redirect
       const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
@@ -71,28 +71,29 @@ export const step: StepDefinition = {
   },
 };
 
-async function getExistingAddress(accessToken : string): Promise<string>{
-   // Pull data from API
-        const response = await ccdCaseService.getExistingCaseData(accessToken, "1768917305534047");
-        const address = response.case_details.case_data.possessionClaimResponse?.party?.address
-        
-        if (address) {
-          const formattedAddress = [
-            address.AddressLine1,
-            address.AddressLine2,
-            address.AddressLine3,
-            address.PostTown,
-            address.County,
-            address.PostCode,
-            address.Country,
-          ].map(v => (v ?? "").trim())
-            .filter(Boolean)
-            .join(", ") + "?";
-            
+async function getExistingAddress(accessToken: string): Promise<string> {
+  // Pull data from API
+  const response = await ccdCaseService.getExistingCaseData(accessToken, '1768917305534047');
+  const address = response.case_details.case_data.possessionClaimResponse?.party?.address;
 
-            console.log("Mapping addy", formattedAddress)
-            return formattedAddress;
-        }else {
-          return "No address"
-        }
+  if (address) {
+    const formattedAddress =
+      [
+        address.AddressLine1,
+        address.AddressLine2,
+        address.AddressLine3,
+        address.PostTown,
+        address.County,
+        address.PostCode,
+        address.Country,
+      ]
+        .map(v => (v ?? '').trim())
+        .filter(Boolean)
+        .join(', ') + '?';
+
+    logger.info('Mapping addy', formattedAddress);
+    return formattedAddress;
+  } else {
+    return '';
+  }
 }
