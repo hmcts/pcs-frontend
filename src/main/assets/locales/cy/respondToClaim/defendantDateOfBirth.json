@@ -1,0 +1,13 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "heading": "cyWhat's your date of birth?",
+  "pageTitle": "cyYour date of birth",
+  "dateOfBirthLabel": "cyDate of birth",
+  "contactUs": "cyContact us for help",
+  "errors": {
+    "dateOfBirth": "cyEnter your date of birth",
+    "dateOfBirthRequired": "cyEnter your date of birth",
+    "dateOfBirthInvalid": "cyEnter a valid date of birth",
+    "dateOfBirthFuture": "cyDate of birth must be in the past"
+  }
+}
