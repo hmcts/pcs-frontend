@@ -22,7 +22,4 @@ export function caseReferenceParamMiddleware(
 
   // make available to views via res.locals
   res.locals.caseReference = sanitisedCaseReference;
-
-  logger.debug('Case reference validated', { caseReference: sanitisedCaseReference });
-  next();
 }
