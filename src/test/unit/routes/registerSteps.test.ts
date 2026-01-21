@@ -30,7 +30,7 @@ jest.mock('../../../main/middleware', () => ({
 }));
 
 const mockFlowConfig = {
-  basePath: '/steps/user-journey',
+  basePath: '/respond-to-claim',
   stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
   steps: {
     'protected-step': { requiresAuth: true },
@@ -40,8 +40,8 @@ const mockFlowConfig = {
   },
 };
 
-jest.mock('../../../main/steps/userJourney/flow.config', () => ({
-  userJourneyFlowConfig: mockFlowConfig,
+jest.mock('../../../main/steps/respond-to-claim/flow.config', () => ({
+  flowConfig: mockFlowConfig,
 }));
 
 // Create step objects that will be shared between mock and tests
@@ -79,10 +79,10 @@ const allSteps = [protectedStep, unprotectedStep, stepWithFunctionController, st
 
 jest.mock('../../../main/steps', () => ({
   journeyRegistry: {
-    userJourney: {
-      name: 'userJourney',
+    respondToClaim: {
+      name: 'respondToClaim',
       flowConfig: {
-        basePath: '/steps/user-journey',
+        basePath: '/respond-to-claim',
         stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
         steps: {
           'protected-step': { requiresAuth: true },
@@ -100,7 +100,7 @@ jest.mock('../../../main/steps', () => ({
     },
   },
   getStepsForJourney: jest.fn((journeyName: string) => {
-    if (journeyName === 'userJourney') {
+    if (journeyName === 'respondToClaim') {
       return allSteps;
     }
     return [];
@@ -251,7 +251,7 @@ describe('registerSteps', () => {
     expect(mockLogger.debug).toHaveBeenCalledWith('Language information', {
       url: '/steps/unprotected',
       step: 'unprotected-step',
-      journey: 'userJourney',
+      journey: 'respondToClaim',
       validatedLang: 'en',
       reqLanguage: 'en',
       langCookie: 'en',
@@ -285,10 +285,10 @@ describe('registerSteps', () => {
 
     jest.doMock('../../../main/steps', () => ({
       journeyRegistry: {
-        userJourney: {
-          name: 'userJourney',
+        respondToClaim: {
+          name: 'respondToClaim',
           flowConfig: {
-            basePath: '/steps/user-journey',
+            basePath: '/respond-to-claim',
             stepOrder: ['no-controllers'],
             steps: {
               'no-controllers': { requiresAuth: true },
