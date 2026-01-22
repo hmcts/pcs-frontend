@@ -24,12 +24,12 @@ export interface CcdCase {
 }
 
 export interface Address {
-  AddressLine1?: string;
+  AddressLine1: string;
   AddressLine2?: string;
   AddressLine3?: string;
-  PostTown?: string;
+  PostTown: string;
   County?: string;
-  PostCode?: string;
+  PostCode: string;
   Country?: string;
 }
 
