@@ -3,7 +3,7 @@ import {
   FetchPINsAndValidateAccessCodeAPIAction,
   LoginAction,
   NavigateToUrlAction,
-  respondToClaim
+  RespondToClaimAction,
 } from '../actions/custom-actions';
 import {
   CheckAction,

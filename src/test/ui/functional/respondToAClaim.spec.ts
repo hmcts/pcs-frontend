@@ -11,16 +11,15 @@ const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
- // await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+  //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   //await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
- // await performAction('fetchPINsAPI');
+  //await performAction('fetchPINsAPI');
+  //await performAction('validateAccessCodeAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-   await performAction('login');
- // await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
+  await performAction('login');
   await performAction('navigateToUrl', home_url + '/respond-to-claim/start-now');
   await performAction('clickButton', startNow.startNowButton);
- 
 });
 
 test.afterEach(async () => {
