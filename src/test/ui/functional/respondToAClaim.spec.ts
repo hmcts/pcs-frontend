@@ -25,7 +25,7 @@ test.afterEach(async () => {
 
 test.describe('Respond to a claim @nightly', async () => {
   test('Respond to a claim', async () => {
-    await performAction('navigateToUrl', home_url + '/case/1234567890123456/respond-to-claim/start-now');
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('clickButton', startNow.startNowButton);
   });
 });
