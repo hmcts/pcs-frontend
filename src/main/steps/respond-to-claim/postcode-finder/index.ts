@@ -7,7 +7,7 @@ import { createGetController, createStepNavigation } from '../../../modules/step
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
-const logger = Logger.getLogger('postcode-finder/inde.ts');
+const logger = Logger.getLogger('postcode-finder');
 
 const stepName = 'postcode-finder';
 const stepNavigation = createStepNavigation(flowConfig);
@@ -39,11 +39,11 @@ export const step: StepDefinition = {
       const possessionClaimResponse: PossessionClaimResponse = {
         party: {
           address: {
-            AddressLine1: req.body.inputAddressLine1 as string | undefined,
+            AddressLine1: req.body.inputAddressLine1 as string,
             AddressLine2: req.body.inputAddressLine2 as string | undefined,
-            PostTown: req.body.inputPostTown as string | undefined,
+            PostTown: req.body.inputPostTown as string,
             Country: req.body.inputCountry as string | undefined,
-            PostCode: req.body.inputPostcode as string | undefined,
+            PostCode: req.body.inputPostcode as string,
           },
         },
       };
