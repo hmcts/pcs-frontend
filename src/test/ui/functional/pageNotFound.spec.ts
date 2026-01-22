@@ -9,7 +9,8 @@ const home_url = config.get('e2e.testUrl') as string;
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   await performAction('navigateToUrl', home_url);
-  await performAction('createUserAndLogin', 'citizen', ['citizen']);
+  await performAction('createUser', 'citizen', ['citizen']);
+  await performAction('login');
 });
 
 test.afterEach(async () => {
