@@ -11,7 +11,9 @@ test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   //await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  //await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
+  //await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
 });
