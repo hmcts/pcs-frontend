@@ -5,3 +5,5 @@ export * from '../../data/api-data/createCase.api.data';
 export * from '../../data/api-data/submitCase.api.data';
 export * from './submitCaseAPIWithoutDefendants.api.data';
 export * from '../../data/api-data/submitCaseEventToken.api.data';
+export * from '../../data/api-data/fetchPINs.api.data';
+export * from '../../data/api-data/validateAccessCode.api.data';
