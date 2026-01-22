@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% block mainContent %}
 
@@ -60,59 +61,59 @@
         <div class="govuk-visually-hidden address-form" id="correspondence-addressForm">
           <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ labels.addressHeading }}</h2>
           
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-addressLine1">
-              {{ labels.addressLine1 }}
-            </label>
-            <input class="govuk-input govuk-!-width-two-thirds" 
-                    id="correspondence-addressLine1" 
-                    name="addressLine1" 
-                    type="text" 
-                    autocomplete="address-line1"/>
-          </div>
+          {{ govukInput({
+            id: 'correspondence-addressLine1',
+            name: 'addressLine1',
+            label: {
+              text: labels.addressLine1
+            },
+            classes: 'govuk-!-width-two-thirds',
+            autocomplete: 'address-line1',
+            value: fieldValues.addressLine1
+          }) }}
 
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-addressLine2">
-              {{ labels.addressLine2 }}
-            </label>
-            <input class="govuk-input govuk-!-width-two-thirds" 
-                    id="correspondence-addressLine2" 
-                    name="addressLine2" 
-                    type="text" 
-                    autocomplete="address-line2"/>
-          </div>
+          {{ govukInput({
+            id: 'correspondence-addressLine2',
+            name: 'addressLine2',
+            label: {
+              text: labels.addressLine2
+            },
+            classes: 'govuk-!-width-two-thirds',
+            autocomplete: 'address-line2',
+            value: fieldValues.addressLine2
+          }) }}
 
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-town">
-              {{ labels.townOrCity }}
-            </label>
-            <input class="govuk-input govuk-!-width-two-thirds" 
-                    id="correspondence-town" 
-                    name="townOrCity" 
-                    type="text" 
-                    autocomplete="address-level2"/>
-          </div>
+          {{ govukInput({
+            id: 'correspondence-town',
+            name: 'townOrCity',
+            label: {
+              text: labels.townOrCity
+            },
+            classes: 'govuk-!-width-two-thirds',
+            autocomplete: 'address-level2',
+            value: fieldValues.townOrCity
+          }) }}
 
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-county">
-              {{ labels.county }}
-            </label>
-            <input class="govuk-input govuk-!-width-two-thirds" 
-                    id="correspondence-county" 
-                    name="county" 
-                    type="text"/>
-          </div>
+          {{ govukInput({
+            id: 'correspondence-county',
+            name: 'county',
+            label: {
+              text: labels.county
+            },
+            classes: 'govuk-!-width-two-thirds',
+            value: fieldValues.county
+          }) }}
 
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="correspondence-postcode">
-              {{ labels.postcode }}
-            </label>
-            <input class="govuk-input govuk-!-width-one-third" 
-                    id="correspondence-postcode" 
-                    name="postcode" 
-                    type="text" 
-                    autocomplete="postal-code"/>
-          </div>
+          {{ govukInput({
+            id: 'correspondence-postcode',
+            name: 'postcode',
+            label: {
+              text: labels.postcode
+            },
+            classes: 'govuk-!-width-one-third',
+            autocomplete: 'postal-code',
+            value: fieldValues.postcode
+          }) }}
         </div>
       </div>
     {% endset %}
