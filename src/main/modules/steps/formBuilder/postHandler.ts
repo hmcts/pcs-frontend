@@ -25,7 +25,8 @@ export function createPostHandler(
   viewPath: string,
   journeyFolder: string,
   beforeRedirect?: (req: Request) => Promise<void> | void,
-  translationKeys?: TranslationKeys
+  translationKeys?: TranslationKeys,
+  extendGetContent?: (req: Request, content: Record<string, unknown>) => Record<string, unknown>
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -68,7 +69,10 @@ export function createPostHandler(
 
       if (Object.keys(errors).length > 0) {
         const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
-        renderWithErrors(req, res, viewPath, errors, fields, formContent, stepName, journeyFolder, translationKeys);
+        // Call extendGetContent to get additional translated content (buttons, labels, etc.)
+        const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
+        const fullContent = { ...formContent, ...extendedContent };
+        renderWithErrors(req, res, viewPath, errors, fields, fullContent, stepName, journeyFolder, translationKeys);
         return; // renderWithErrors sends the response, so we return early
       }
 

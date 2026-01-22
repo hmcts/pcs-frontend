@@ -4,8 +4,13 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block mainContent %}
+
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
     <h1 class="govuk-heading-l">{{ title }}</h1>
@@ -118,29 +123,31 @@
       </div>
     {% endset %}
 
-    {{ govukRadios({
-      name: "correspondenceAddressConfirm",
-      fieldset: {
-        legend: {
-          text: legend,
-          isPageHeading: false,
-          classes: "govuk-visually-hidden"
-        }
-      },
-      items: [
-        {
-          value: "yes",
-          text: labels.yes
-        },
-        {
-          value: "no",
-          text: labels.no,
-          conditional: {
-            html: postcodeFinderHtml
-          }
-        }
-      ]
-    }) }}
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {% set updatedItems = [] %}
+        {% for item in field.component.items %}
+          {% if item.value == 'no' %}
+            {% set updatedItems = (updatedItems.push({
+              value: item.value,
+              text: item.text,
+              checked: item.checked,
+              conditional: {
+                html: postcodeFinderHtml
+              }
+            }), updatedItems) %}
+          {% else %}
+            {% set updatedItems = (updatedItems.push(item), updatedItems) %}
+          {% endif %}
+        {% endfor %}
+        {{ govukRadios({
+          name: field.component.name,
+          fieldset: field.component.fieldset,
+          errorMessage: field.component.errorMessage,
+          items: updatedItems
+        }) }}
+      {% endif %}
+    {% endfor %}
 
     <div class="govuk-button-group">
       {{ govukButton({

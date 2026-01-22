@@ -1,103 +1,121 @@
-import type { Request, Response } from 'express';
-import type { TFunction } from 'i18next';
-
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { buildFormContent } from '../../../modules/steps/formBuilder/formContent';
-import { getTranslationFunction } from '../../../modules/steps/i18n';
-import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { flowConfig } from '../flow.config';
 
-const stepName = 'postcode-finder';
-const stepNavigation = createStepNavigation(flowConfig);
-
-const getFields = (t: TFunction): FormFieldConfig[] => {
-  return [
+export const step: StepDefinition = createFormStep({
+  stepName: 'postcode-finder',
+  journeyFolder: 'respondToClaim',
+  stepDir: __dirname,
+  basePath: '/respond-to-claim',
+  flowConfig,
+  customTemplate: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
+  translationKeys: {
+    pageTitle: 'title',
+  },
+  extendGetContent: req => {
+    const t = getTranslationFunction(req, 'postcode-finder', ['common']);
+    return {
+      title: t('title'),
+      subtitle: t('subtitle'),
+      legend: t('legend'),
+      labels: {
+        yes: t('labels.yes'),
+        no: t('labels.no'),
+        enterAddress: t('labels.enterAddress'),
+        enterPostcode: t('labels.enterPostcode'),
+        enterManually: t('labels.enterManually'),
+        enterManuallySubText: t('labels.enterManuallySubText'),
+        selectAddress: t('labels.selectAddress'),
+        addressHeading: t('labels.addressHeading'),
+        addressLine1: t('labels.addressLine1'),
+        addressLine2: t('labels.addressLine2'),
+        townOrCity: t('labels.townOrCity'),
+        county: t('labels.county'),
+        postcode: t('labels.postcode'),
+      },
+      buttons: {
+        findAddress: t('buttons.findAddress'),
+        saveAndContinue: t('buttons.saveAndContinue'),
+        saveForLater: t('buttons.saveForLater'),
+      },
+      errors: {
+        postcodeNotFound: t('errors.postcodeNotFound'),
+      },
+    };
+  },
+  fields: [
     {
       name: 'correspondenceAddressConfirm',
       type: 'radio',
-      required: false,
+      required: true,
+      translationKey: {
+        label: 'legend',
+      },
       options: [
         {
           value: 'yes',
-          label: t('labels.yes', 'Yes'),
+          translationKey: 'labels.yes',
         },
         {
           value: 'no',
-          label: t('labels.no', 'No'),
+          translationKey: 'labels.no',
           subFields: {
             addressLine1: {
               name: 'addressLine1',
               type: 'text',
-              required: false,
+              required: true,
+              translationKey: {
+                label: 'labels.addressLine1',
+              },
+              attributes: {
+                autocomplete: 'address-line1',
+              },
             },
             addressLine2: {
               name: 'addressLine2',
               type: 'text',
               required: false,
+              translationKey: {
+                label: 'labels.addressLine2',
+              },
+              attributes: {
+                autocomplete: 'address-line2',
+              },
             },
             townOrCity: {
               name: 'townOrCity',
               type: 'text',
-              required: false,
+              required: true,
+              translationKey: {
+                label: 'labels.townOrCity',
+              },
+              attributes: {
+                autocomplete: 'address-level2',
+              },
             },
             county: {
               name: 'county',
               type: 'text',
               required: false,
+              translationKey: {
+                label: 'labels.county',
+              },
             },
             postcode: {
               name: 'postcode',
               type: 'text',
-              required: false,
+              required: true,
+              translationKey: {
+                label: 'labels.postcode',
+              },
+              classes: 'govuk-input--width-10',
+              attributes: {
+                autocomplete: 'postal-code',
+              },
             },
           },
         },
       ],
     },
-  ];
-};
-
-export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/postcode-finder`,
-  name: stepName,
-  view: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
-  stepDir: __dirname,
-  getController: () => {
-    return createGetController(
-      'respond-to-claim/postcode-finder/postcodeFinder.njk',
-      stepName,
-      (req: Request) => {
-        const t: TFunction = getTranslationFunction(req, stepName, ['common']);
-        const fields = getFields(t);
-
-        const nunjucksEnv = req.app.locals.nunjucksEnv;
-        if (!nunjucksEnv) {
-          throw new Error('Nunjucks environment not initialized');
-        }
-
-        // Build form content without loading saved data (not persisting yet)
-        const formContent = buildFormContent(fields, t, {}, {}, undefined, nunjucksEnv);
-
-        return {
-          ...formContent,
-          backUrl: `${RESPOND_TO_CLAIM_ROUTE}/start-now`,
-        };
-      },
-      'respondToClaim'
-    );
-  },
-  postController: {
-    post: async (req: Request, res: Response) => {
-      // Get next step URL and redirect
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
-
-      if (!redirectPath) {
-        // No next step defined - show not found page
-        return res.status(404).render('not-found');
-      }
-
-      res.redirect(303, redirectPath);
-    },
-  },
-};
+  ],
+});

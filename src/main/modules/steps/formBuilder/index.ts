@@ -27,13 +27,24 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
-  const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys } = config;
+  const {
+    stepName,
+    journeyFolder,
+    fields,
+    beforeRedirect,
+    extendGetContent,
+    stepDir,
+    translationKeys,
+    customTemplate,
+    basePath,
+  } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
-  const viewPath = 'formBuilder.njk';
+  const viewPath = customTemplate || 'formBuilder.njk';
+  const urlBasePath = basePath || path.join('/steps', journeyPath);
 
   return {
-    url: path.join('/steps', journeyPath, stepName),
+    url: path.join(urlBasePath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,
@@ -61,6 +72,14 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         };
       });
     },
-    postController: createPostHandler(fields, stepName, viewPath, journeyFolder, beforeRedirect, translationKeys),
+    postController: createPostHandler(
+      fields,
+      stepName,
+      viewPath,
+      journeyFolder,
+      beforeRedirect,
+      translationKeys,
+      extendGetContent
+    ),
   };
 }
