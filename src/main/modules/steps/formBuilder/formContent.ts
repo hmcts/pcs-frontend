@@ -13,7 +13,8 @@ export function buildFormContent(
   bodyData: Record<string, unknown> = {},
   errors: Record<string, string> = {},
   translationKeys?: TranslationKeys,
-  nunjucksEnv?: Environment
+  nunjucksEnv?: Environment,
+  showCancelButton: boolean = true
 ): Record<string, unknown> {
   const fieldValues = buildFieldValues(fields, bodyData);
   const pageTitle = getTranslation(t, 'title', undefined) || getTranslation(t, 'question', undefined);
@@ -39,6 +40,7 @@ export function buildFormContent(
     fields: fieldsWithLabels,
     title: pageTitle,
     ...translatedContent,
+    showCancelButton,
     continue: t('buttons.continue'),
     saveForLater: t('buttons.saveForLater'),
     cancel: t('buttons.cancel'),

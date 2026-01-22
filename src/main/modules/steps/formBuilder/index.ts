@@ -37,6 +37,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
     translationKeys,
     basePath,
     flowConfig,
+    showCancelButton = true,
   } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
@@ -48,6 +49,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
     name: stepName,
     view: viewPath,
     stepDir,
+    showCancelButton,
     getController: () => {
       return createGetController(viewPath, stepName, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
@@ -58,7 +60,15 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
-        const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv);
+        const formContent = buildFormContent(
+          fields,
+          t,
+          getFormData(req, stepName),
+          {},
+          translationKeys,
+          nunjucksEnv,
+          showCancelButton
+        );
         const result = extendGetContent ? { ...formContent, ...extendGetContent(req, {}) } : formContent;
 
         return {
@@ -79,7 +89,8 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
       journeyFolder,
       beforeRedirect,
       translationKeys,
-      flowConfig
+      flowConfig,
+      showCancelButton
     ),
   };
 }

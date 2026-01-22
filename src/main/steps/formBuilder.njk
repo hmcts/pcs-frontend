@@ -7,24 +7,22 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% if pageTitle %}
+  {% block pageTitle %}{{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+{% endif %}
 
 {% block mainContent %}
   {% if errorSummary %}
-    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-      <h2 class="govuk-error-summary__title" id="error-summary-title">{{ errorSummary.titleText }}</h2>
-      <div class="govuk-error-summary__body">
-        <ul class="govuk-list govuk-error-summary__list">
-          {% for error in errorSummary.errorList %}
-            <li><a href="{{ error.href }}">{{ error.text }}</a></li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
+    {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if pageTitle %}
-    <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
-  {% elif title %}
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  {% if title %}
     <h1 class="govuk-heading-l">{{ title }}</h1>
   {% endif %}
 
@@ -66,9 +64,11 @@
       }) }}
     </div>
     
+    {% if showCancelButton is not defined or showCancelButton %}
     <p class="govuk-body">
       <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
     </p>
+    {% endif %}
   </form>
 {% endblock %}
 

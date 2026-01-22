@@ -1,13 +1,19 @@
 {
   "caption": "cyRespond to a property possession claim",
-  "heading": "cyWhat's your date of birth?",
   "pageTitle": "cyYour date of birth",
-  "dateOfBirthLabel": "cyDate of birth",
-  "contactUs": "cyContact us for help",
+  "dateOfBirthHint": "cyFor example, 31 3 1980",
+  "dateOfBirthLabel": "cyWhat's your date of birth?",
   "errors": {
-    "dateOfBirth": "cyEnter your date of birth",
-    "dateOfBirthRequired": "cyEnter your date of birth",
-    "dateOfBirthInvalid": "cyEnter a valid date of birth",
-    "dateOfBirthFuture": "cyDate of birth must be in the past"
+    "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
+      "required": "cyEnter your date of birth",
+      "notRealDate": "cyDate of birth must be a real date",
+      "futureDate": "cyDate of birth must be in the past",
+      "invalidValue": "cyDate of birth must be a real date",
+      "missingOne": "cyYour date of birth must include a {{missingField}}",
+      "missingTwo": "cyYour date of birth must include a {{first}} and {{second}}"
+    }
   }
 }
