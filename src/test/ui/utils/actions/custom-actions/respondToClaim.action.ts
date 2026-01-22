@@ -17,6 +17,7 @@ export class RespondToClaimAction implements IAction {
     }
     await actionToPerform();
   }
+
   private async selectLegalAdvice(legalAdviceData: actionData): Promise<void> {
     await performAction('clickRadioButton', {
       question: freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion,
