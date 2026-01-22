@@ -25,6 +25,7 @@ export class RespondToClaimAction implements IAction {
     });
     await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
   }
+
   private async inputDefendantDetails(defendantData: actionRecord): Promise<void> {
     await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantData.fName);
     await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantData.lName);
