@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { freeLegalAdvice } from '../../../data/page-data';
-import { defendantNameCapture } from '../../../data/page-data/defendantNameCapture.page.data';
+import { defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
