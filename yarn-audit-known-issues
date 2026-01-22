@@ -1,1 +1,0 @@
-{"value":"tar","children":{"ID":1112255,"Issue":"node-tar is Vulnerable to Arbitrary File Overwrite and Symlink Poisoning via Insufficient Path Sanitization","URL":"https://github.com/advisories/GHSA-8qq5-rm4j-mr97","Severity":"high","Vulnerable Versions":"<=7.5.2","Tree Versions":["7.5.2"],"Dependents":["node-gyp@npm:11.5.0"]}}

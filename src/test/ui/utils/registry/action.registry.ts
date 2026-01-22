@@ -1,4 +1,9 @@
-import { CreateCaseAPIAction, LoginAction, NavigateToUrlAction } from '../actions/custom-actions';
+import {
+  CreateCaseAPIAction,
+  FetchPINsAndValidateAccessCodeAPIAction,
+  LoginAction,
+  NavigateToUrlAction,
+} from '../actions/custom-actions';
 import {
   CheckAction,
   ClickButtonAction,
@@ -26,10 +31,12 @@ export class ActionRegistry {
     ['select', new SelectAction()],
     ['UploadFile', new UploadFileAction()],
     ['login', new LoginAction()],
-    ['createUserAndLogin', new LoginAction()],
+    ['createUser', new LoginAction()],
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
   ]);
 
   static getAction(actionName: string): IAction {
