@@ -33,7 +33,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const viewPath = 'formBuilder.njk';
 
   return {
-    url: path.join('/steps', journeyPath, stepName),
+    url: path.join('/', journeyPath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,

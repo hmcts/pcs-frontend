@@ -300,7 +300,7 @@ export function translateFields(
     return {
       ...processedField,
       options: processedOptionsWithSubFields,
-      errorMessage: getTranslation(t, `errors.${field.name}`, field.errorMessage),
+      errorMessage: errorText,
       component,
       componentType,
     };

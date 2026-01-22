@@ -13,13 +13,14 @@ import { buildSubFieldsHTML } from './subFieldsRenderer';
 
 function createFieldsetLegend(
   label: string,
-  isFirstField: boolean
+  isFirstField: boolean,
+  legendClasses?: string
 ): { legend: { text: string; isPageHeading: boolean; classes: string } } {
   return {
     legend: {
       text: label,
       isPageHeading: isFirstField,
-      classes: isFirstField ? 'govuk-fieldset__legend--l' : '',
+      classes: [isFirstField ? 'govuk-fieldset__legend--l' : '', legendClasses].filter(Boolean).join(' '),
     },
   };
 }
@@ -95,7 +96,9 @@ export function buildComponentConfig(
     }
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
-      component.fieldset = createFieldsetLegend(label, isFirstField);
+
+      // Build items with conditional content and subFields support
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
 
       // Build items with conditional content and subFields support
       component.items =
