@@ -19,7 +19,7 @@ export const freeLegalAdvice = {
     'If you do not have your own legal adviser, you might be able to speak to a duty adviser (a legal professional who helps people at court) on the day of your hearing. If they’re available, they can give you advice and represent you at the hearing for free.',
   ifYouWantToSpeakParagraph:
     'If you want to speak to the duty adviser, arrive at least 45 minutes before your hearing.',
-  haveYouHadAnyFreeLegalAdviceLabel: 'Have you had any free legal advice?',
+  haveYouHadAnyFreeLegalAdviceQuestion: 'Have you had any free legal advice?',
   weAreAskingThisHintText:
     'We’re asking this question so we can check everyone is getting the free support they’re entitled to. Your answer will not affect the outcome of the claim',
   yesRadioOption: 'Yes',

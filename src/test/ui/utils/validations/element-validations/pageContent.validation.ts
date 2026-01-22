@@ -81,6 +81,7 @@ export class PageContentValidation implements IValidation {
                     .radio:text("${value}") ~ input[type="radio"],
                     legend:text("${value}") ~ input[type="radio"],
                     .question:text("${value}") ~ input[type="radio"],
+                    legend:text("${value}"),
                     label >> text=${value} >> xpath=..//input[@type="radio"]`),
     RadioOption: (page: Page, value: string) =>
       page.locator(`
