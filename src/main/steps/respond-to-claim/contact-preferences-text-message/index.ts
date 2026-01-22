@@ -1,5 +1,3 @@
-import { isMobilePhone } from 'validator';
-
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 
@@ -26,27 +24,7 @@ export const step: StepDefinition = createFormStep({
         {
           value: 'yes',
           translationKey: 'options.yes',
-          subFields: {
-            phoneNumber: {
-              name: 'phoneNumber',
-              type: 'text',
-              required: true,
-              translationKey: {
-                label: 'phoneNumberLabel',
-              },
-              attributes: {
-                type: 'tel',
-                autocomplete: 'tel',
-              },
-              validator: (value: unknown) => {
-                if (!isMobilePhone(value as string, 'en-GB')) {
-                  return 'errors.contactByTextMessage.phoneNumber.invalid';
-                }
-                return true;
-              },
-            },
-          },
-        },
+         },
         {
           value: 'no',
           translationKey: 'options.no',

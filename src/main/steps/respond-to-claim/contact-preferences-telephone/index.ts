@@ -4,7 +4,7 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createFormStep } from '../../../modules/steps';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'contact-preferences',
+  stepName: 'contact-preferences-telephone',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
 
@@ -14,9 +14,10 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'contactByTextMessage',
+      name: 'contactByTelephone',
       type: 'radio',
       required: true,
+      legendClasses: 'govuk-!-font-weight-bold govuk-!-font-size-24',
       translationKey: {
         label: 'labels.question',
       },
@@ -37,8 +38,12 @@ export const step: StepDefinition = createFormStep({
                 type: 'tel',
                 autocomplete: 'tel',
               },
-              validator: value => isMobilePhone(value as string, ['en-GB']),
-              errorMessage: 'errors.invalid',
+              validator: (value: unknown) => {
+              if (!isMobilePhone(value as string, 'en-GB')) {
+                return 'errors.contactByTelephone.phoneNumber.invalid';
+              }
+              return true;
+              },
             },
           },
         },

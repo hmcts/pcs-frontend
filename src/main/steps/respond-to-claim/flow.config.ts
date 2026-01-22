@@ -9,7 +9,7 @@ export const flowConfig: JourneyFlowConfig = {
     'start-now',
     'postcode-finder',
     'free-legal-advice',
-    'contact-preferences',
+    'contact-preferences-telephone',
     'contact-preferences-text-message',
     'interstitial',
   ],
@@ -23,7 +23,7 @@ export const flowConfig: JourneyFlowConfig = {
     'free-legal-advice': {
       defaultNext: 'legal-advice',
     },
-    'contact-preferences': {
+    'contact-preferences-telephone': {
       defaultNext: 'contact-preferences-text-message',
     },
     'contact-preferences-text-message': {
