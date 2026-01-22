@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import config from 'config';
 
+//Below lines are commented to avoid API calls until data setup is integrated.
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';

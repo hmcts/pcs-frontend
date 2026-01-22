@@ -32,6 +32,7 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
+  // Below changes are temporary will be changed as part of HDPI-3596
   private async inputErrorValidation(validationArr: actionRecord) {
     if (!validationArr || validationArr.validationReq !== 'YES') {
       return;
