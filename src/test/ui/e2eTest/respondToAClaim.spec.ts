@@ -1,9 +1,7 @@
 import { test } from '@playwright/test';
 import config from 'config';
 
-import { freeLegalAdvice, startNow } from '../data/page-data';
-import { defendantDateOfBirth } from '../data/page-data/defendantDateOfBirth.page.data';
-import { defendantNameCapture } from '../data/page-data/defendantNameCapture.page.data';
+import { defendantDateOfBirth, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
