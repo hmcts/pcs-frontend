@@ -18,12 +18,15 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if caption %}
-    <span class="govuk-caption-xl">{{ caption }}</span>
-  {% endif %}
-
   {% if title %}
-    <h1 class="govuk-heading-l">{{ title }}</h1>
+    <h1 class="govuk-heading-l">
+      {% if caption %}
+        <span class="govuk-caption-xl">{{ caption }}</span>
+      {% endif %}
+      {{ title }}
+    </h1>
+  {% elif caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
   {% endif %}
 
   {% if content %}
