@@ -41,6 +41,10 @@ export const step: StepDefinition = createFormStep({
       errors: {
         postcodeNotFound: t('errors.postcodeNotFound'),
       },
+      // Extract nested field values for easy template access (only on POST with errors)
+      correspondenceAddressLine1: req.body?.['correspondenceAddressConfirm.addressLine1'] || '',
+      correspondenceTownOrCity: req.body?.['correspondenceAddressConfirm.townOrCity'] || '',
+      correspondencePostcode: req.body?.['correspondenceAddressConfirm.postcode'] || '',
     };
   },
   fields: [
@@ -67,6 +71,7 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'labels.addressLine1',
               },
+              errorMessage: 'errors.correspondenceAddressConfirm.addressLine1',
               attributes: {
                 autocomplete: 'address-line1',
               },
@@ -89,6 +94,7 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'labels.townOrCity',
               },
+              errorMessage: 'errors.correspondenceAddressConfirm.townOrCity',
               attributes: {
                 autocomplete: 'address-level2',
               },
@@ -108,6 +114,7 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'labels.postcode',
               },
+              errorMessage: 'errors.correspondenceAddressConfirm.postcode',
               classes: 'govuk-input--width-10',
               attributes: {
                 autocomplete: 'postal-code',

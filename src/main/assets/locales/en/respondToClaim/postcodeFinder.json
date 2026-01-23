@@ -23,6 +23,11 @@
     "saveForLater": "Save for later"
   },
   "errors": {
-    "postcodeNotFound": "Postcode not found. Please check and try again."
+    "postcodeNotFound": "Postcode not found. Please check and try again.",
+    "correspondenceAddressConfirm": {
+      "addressLine1": "Enter address line 1, typically the building and street",
+      "townOrCity": "Enter town or city",
+      "postcode": "Enter postcode"
+    }
   }
 }

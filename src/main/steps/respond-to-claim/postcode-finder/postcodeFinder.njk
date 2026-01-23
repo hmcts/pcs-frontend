@@ -63,18 +63,23 @@
           id: "correspondence-enterManuallyDetails"
         }) }}
         
-        <div class="govuk-visually-hidden address-form" id="correspondence-addressForm">
+        {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
+        {% set addressFormVisible = correspondenceAddressConfirm == 'no' or hasAddressErrors %}
+        <div class="address-form{% if not addressFormVisible %} govuk-visually-hidden{% endif %}" id="correspondence-addressForm">
           <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ labels.addressHeading }}</h2>
           
           {{ govukInput({
             id: 'correspondence-addressLine1',
-            name: 'addressLine1',
+            name: 'correspondenceAddressConfirm.addressLine1',
             label: {
               text: labels.addressLine1
             },
             classes: 'govuk-!-width-two-thirds',
             autocomplete: 'address-line1',
-            value: fieldValues.addressLine1
+            value: correspondenceAddressLine1 if correspondenceAddressLine1 else '',
+            errorMessage: {
+              text: errors['correspondenceAddressConfirm.addressLine1']
+            } if errors['correspondenceAddressConfirm.addressLine1']
           }) }}
 
           {{ govukInput({
@@ -85,18 +90,24 @@
             },
             classes: 'govuk-!-width-two-thirds',
             autocomplete: 'address-line2',
-            value: fieldValues.addressLine2
+            value: addressLine2 or fieldValues.addressLine2,
+            errorMessage: {
+              text: errors.addressLine2
+            } if errors.addressLine2
           }) }}
 
           {{ govukInput({
             id: 'correspondence-town',
-            name: 'townOrCity',
+            name: 'correspondenceAddressConfirm.townOrCity',
             label: {
               text: labels.townOrCity
             },
             classes: 'govuk-!-width-two-thirds',
             autocomplete: 'address-level2',
-            value: fieldValues.townOrCity
+            value: correspondenceTownOrCity if correspondenceTownOrCity else '',
+            errorMessage: {
+              text: errors['correspondenceAddressConfirm.townOrCity']
+            } if errors['correspondenceAddressConfirm.townOrCity']
           }) }}
 
           {{ govukInput({
@@ -106,18 +117,24 @@
               text: labels.county
             },
             classes: 'govuk-!-width-two-thirds',
-            value: fieldValues.county
+            value: county or fieldValues.county,
+            errorMessage: {
+              text: errors.county
+            } if errors.county
           }) }}
 
           {{ govukInput({
             id: 'correspondence-postcode',
-            name: 'postcode',
+            name: 'correspondenceAddressConfirm.postcode',
             label: {
               text: labels.postcode
             },
             classes: 'govuk-!-width-one-third',
             autocomplete: 'postal-code',
-            value: fieldValues.postcode
+            value: correspondencePostcode if correspondencePostcode else '',
+            errorMessage: {
+              text: errors['correspondenceAddressConfirm.postcode']
+            } if errors['correspondenceAddressConfirm.postcode']
           }) }}
         </div>
       </div>

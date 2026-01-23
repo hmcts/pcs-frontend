@@ -23,6 +23,11 @@
     "saveForLater": "cySave for later"
   },
   "errors": {
-    "postcodeNotFound": "cyPostcode not found. Please check and try again."
+    "postcodeNotFound": "cyPostcode not found. Please check and try again.",
+    "correspondenceAddressConfirm": {
+      "addressLine1": "cyEnter address line 1, typically the building and street",
+      "townOrCity": "cyEnter town or city",
+      "postcode": "cyEnter postcode"
+    }
   }
 }
