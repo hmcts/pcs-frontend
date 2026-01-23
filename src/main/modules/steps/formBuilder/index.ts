@@ -27,24 +27,15 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
-  const {
-    stepName,
-    journeyFolder,
-    fields,
-    beforeRedirect,
-    extendGetContent,
-    stepDir,
-    translationKeys,
-    customTemplate,
-    basePath,
-  } = config;
+  const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys, flowConfig } =
+    config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
-  const viewPath = customTemplate || 'formBuilder.njk';
-  const urlBasePath = basePath || path.join('/steps', journeyPath);
+  const viewPath = 'formBuilder.njk';
+  const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
 
   return {
-    url: path.join(urlBasePath, stepName),
+    url: path.join(basePath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,
@@ -64,6 +55,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         return {
           ...result,
           ccdId: req.session?.ccdCase?.id,
+          caseReference: req.params.caseReference,
           dashboardUrl: DASHBOARD_ROUTE,
           stepName,
           journeyFolder,

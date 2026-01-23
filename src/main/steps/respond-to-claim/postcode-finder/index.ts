@@ -6,7 +6,6 @@ export const step: StepDefinition = createFormStep({
   stepName: 'postcode-finder',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  basePath: '/respond-to-claim',
   flowConfig,
   customTemplate: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
   translationKeys: {
