@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next';
 import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
+import { journeyRegistry } from '../../../steps';
 import { createGetController } from '../controller';
 import { stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
@@ -31,9 +32,11 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
 
   const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath = 'formBuilder.njk';
+  const flowConfig = journeyRegistry[journeyFolder]?.flowConfig;
+  const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
 
   return {
-    url: path.join('/steps', journeyPath, stepName),
+    url: path.join(basePath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,
@@ -53,6 +56,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         return {
           ...result,
           ccdId: req.session?.ccdCase?.id,
+          caseReference: req.params.caseReference,
           dashboardUrl: DASHBOARD_ROUTE,
           stepName,
           journeyFolder,
