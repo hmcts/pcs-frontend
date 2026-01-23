@@ -3,7 +3,7 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 
-export const RESPOND_TO_CLAIM_ROUTE = '/respond-to-claim';
+export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
 //TODO need to add logic to check if defendant name is known from CCD case data
 const isDefendantNameKnown = async (req: Request): Promise<boolean> => {

@@ -1,14 +1,13 @@
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { flowConfig } from '../flow.config';
+import { createGetController, stepNavigation } from '../../../modules/steps';
+import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
 const stepName = 'defendant-name-confirmation';
-const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/defendant-name-confirmation',
+  url: `${RESPOND_TO_CLAIM_ROUTE}/defendant-name-confirmation`,
   name: stepName,
   view: 'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
   stepDir: __dirname,

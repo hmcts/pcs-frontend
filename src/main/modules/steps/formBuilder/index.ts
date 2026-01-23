@@ -35,16 +35,15 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
     extendGetContent,
     stepDir,
     translationKeys,
-    basePath,
     flowConfig,
   } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
-  // Use provided flowConfig or fall back to default stepNavigation
+  const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
   return {
-    url: basePath ? path.join(basePath, stepName) : path.join('/steps', journeyPath, stepName),
+    url: path.join(basePath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,
@@ -64,6 +63,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
         return {
           ...result,
           ccdId: req.session?.ccdCase?.id,
+          caseReference: req.params.caseReference,
           dashboardUrl: DASHBOARD_ROUTE,
           stepName,
           journeyFolder,

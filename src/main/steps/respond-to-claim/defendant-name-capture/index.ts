@@ -1,14 +1,13 @@
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { flowConfig } from '../flow.config';
+import { createGetController, stepNavigation } from '../../../modules/steps';
+import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
 const stepName = 'defendant-name-capture';
-const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/defendant-name-capture',
+  url: `${RESPOND_TO_CLAIM_ROUTE}/defendant-name-capture`,
   name: stepName,
   view: 'respond-to-claim/defendant-name-capture/defendantNameCapture.njk',
   stepDir: __dirname,
@@ -18,7 +17,7 @@ export const step: StepDefinition = {
       stepName,
       (req: Request) => {
         return {
-          url: req.originalUrl || '/respond-to-claim/defendant-name-capture',
+          url: req.originalUrl || `${RESPOND_TO_CLAIM_ROUTE}/defendant-name-capture`,
         };
       },
       'respondToClaim'

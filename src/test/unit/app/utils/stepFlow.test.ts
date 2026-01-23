@@ -298,14 +298,14 @@ describe('stepFlow', () => {
       expect(result).toBe('/steps/test-journey/step1');
     });
 
-    it('should use journeyName when basePath not provided', () => {
+    it('should return /stepName when basePath not provided', () => {
       const config: JourneyFlowConfig = {
         journeyName: 'test-journey',
         stepOrder: ['step1'],
         steps: {},
       };
       const result = getStepUrl('step1', config);
-      expect(result).toBe('/steps/test-journey/step1');
+      expect(result).toBe('/step1');
     });
 
     it('should use step name directly when neither basePath nor journeyName provided', () => {
@@ -315,6 +315,26 @@ describe('stepFlow', () => {
       };
       const result = getStepUrl('step1', config);
       expect(result).toBe('/step1');
+    });
+
+    it('should replace :caseReference with case reference', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/case/:caseReference/respond',
+        stepOrder: ['step1'],
+        steps: {},
+      };
+      const result = getStepUrl('step1', config, '1234567890123456');
+      expect(result).toBe('/case/1234567890123456/respond/step1');
+    });
+
+    it('should not replace caseReference when basePath does not contain placeholder', () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/case/respond',
+        stepOrder: ['step1'],
+        steps: {},
+      };
+      const result = getStepUrl('step1', config, '1234567890123456');
+      expect(result).toBe('/case/respond/step1');
     });
   });
 
@@ -358,6 +378,7 @@ describe('stepFlow', () => {
     it('getNextStepUrl should return correct URL', async () => {
       const navigation = createStepNavigation(mockFlowConfig);
       const req = {
+        params: {},
         session: {
           formData: {},
         },
@@ -370,6 +391,7 @@ describe('stepFlow', () => {
     it('getNextStepUrl should return null when no next step', async () => {
       const navigation = createStepNavigation(mockFlowConfig);
       const req = {
+        params: {},
         session: {
           formData: {},
         },
@@ -381,7 +403,9 @@ describe('stepFlow', () => {
 
     it('getBackUrl should return correct URL', async () => {
       const navigation = createStepNavigation(mockFlowConfig);
-      const req = {} as Request;
+      const req = {
+        params: {},
+      } as Request;
 
       const result = await navigation.getBackUrl(req, 'step2');
       expect(result).toBe('/steps/test-journey/step1');
@@ -389,7 +413,9 @@ describe('stepFlow', () => {
 
     it('getBackUrl should return null when no previous step', async () => {
       const navigation = createStepNavigation(mockFlowConfig);
-      const req = {} as Request;
+      const req = {
+        params: {},
+      } as Request;
 
       const result = await navigation.getBackUrl(req, 'step1');
       expect(result).toBeNull();
