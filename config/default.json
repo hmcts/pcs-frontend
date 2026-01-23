@@ -12,8 +12,8 @@
       "ttlInSeconds": 5400
     },
     "timeout": {
-      "sessionWarningMinutes": 10,
-      "sessionTimeoutMinutes": 60,
+      "sessionWarningMinutes": 5,
+      "sessionTimeoutMinutes": 6,
       "checkIntervalSeconds": 10
     }
   },
