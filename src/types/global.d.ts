@@ -33,6 +33,8 @@ interface CustomSessionData extends SessionData {
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
   _addressLookup?: AddressLookupSessionData;
+  //TODO: currently served from LaunchDarkly flag - remove this once CCD case is implemented
+  defendantName?: string;
   destroy(callback: (err?: Error) => void): void;
 }
 
