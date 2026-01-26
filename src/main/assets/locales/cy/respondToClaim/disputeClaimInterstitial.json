@@ -1,29 +1,15 @@
 {
-  "pageTitle": "Free legal advice before you submit your response",
-  "caption": "Respond to a property possession claim",
-  "heading": "You’re entitled to free legal advice before you submit your response",
-  "secondaryHeading": "Respond to a property possession claim",
-  "question": "Have you had any free legal advice?",
-  "hadLegalAdviceHint": "We’re asking this question so we can check everyone is getting the free support they’re entitled to. Your answer will not affect the outcome of the claim",
-  "options": {
-    "yes": "Yes",
-    "no": "No",
-    "or": "or",
-    "preferNotToSay": "Prefer not to say"
-  },
-  "subHeading1": "Help available now online",
-  "paragraph1": "Housing experts are ready and waiting to help you, and it takes just minutes to find one in your area.",
-  "listItem1": "Visit the <a href=\"https://find-legal-advice.justice.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">find a legal adviser service (opens in new tab)</a>.",
-  "listItem2": "Enter your postcode and select the 'Housing Loss Prevention Advice Service' and ‘Housing’ options.",
-  "listItem3": "Choose a local expert.",
-  "listItem4": "Call them to discuss your options.",
-  "paragraph2": "Civil Legal Advice (CLA) can also put you in touch with a local expert. You can either:",
-  "bullet1": "call 0345 345 4345. Lines are open Monday to Friday, from 9am to 8pm and Saturday from 9am to 12.30pm",
-  "bullet2": "text ‘legalaid’ and your name to 80010 to ask CLA to call you back. This costs the same as a normal text message",
-  "subHeading2": "Help that might be available at the hearing",
-  "paragraph3": "If you do not have your own legal adviser, you might be able to speak to a duty adviser (a legal professional who helps people at court) on the day of your hearing. If they’re available, they can give you advice and represent you at the hearing for free.",
-  "paragraph4": "If you want to speak to the duty adviser, arrive at least 45 minutes before your hearing.",
-  "errors": {
-    "hadLegalAdvice": "You must say if you've had any free legal advice"
-  }
+  "pageTitle": "cyThe claimant&rsquo;s claim",
+  "caption": "cyRespond to a property possession claim",
+  "heading": "cy{{ claimantName }}&rsquo;s claim",
+  "secondaryHeading": "cyRespond to a property possession claim",
+  "paragraph1": "cyWhen they made their claim, {{ claimantName }} had to give information about:",
+  "listItem1": "cythe tenancy, occupation contract or licence agreement",
+  "listItem2": "cythe notice of their intention to begin possession proceedings, if they served you with one",
+  "listItem3": "cytheir grounds for possession (their reasons for making the claim)",
+
+  "paragraph2": "cyIf any of the information is wrong, or you disagree with it, you can dispute their claim or parts of it. ",
+  "paragraph3": "cyThe claimant will be able to see your answers.",
+  "continue": "cyContinue",
+  "cancel": "cyCancel"
 }
