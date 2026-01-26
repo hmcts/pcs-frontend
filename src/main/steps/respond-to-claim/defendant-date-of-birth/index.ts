@@ -45,6 +45,12 @@ export const step: StepDefinition = {
         return res.status(404).render('not-found');
       }
 
+      // Validate redirect path to prevent open redirect vulnerability
+      // Ensure it's a relative path starting with /case/ (respond-to-claim journey)
+      if (!redirectPath.startsWith('/case/')) {
+        return res.status(404).render('not-found');
+      }
+
       res.redirect(303, redirectPath);
     },
   },
