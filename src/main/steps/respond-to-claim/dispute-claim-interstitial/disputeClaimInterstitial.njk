@@ -9,12 +9,12 @@
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  {% if caption %}
+  
+  <h1 class="govuk-heading-l">
     <span class="govuk-caption-xl">{{ caption }}</span>
-  {% endif %}
-  {% if heading %}
-    <h1 class="govuk-heading-l">{{ heading | safe }}</h1>
-  {% endif %}
+    {{ heading | safe }}
+  </h1>
+
 
   <p class="govuk-body">{{ paragraph1 }}</p>
   <ol class="govuk-list govuk-list--number govuk-!-margin-bottom-4">
