@@ -72,7 +72,6 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'labels.addressLine1',
               },
-              errorMessage: 'errors.correspondenceAddressConfirm.addressLine1',
               attributes: {
                 autocomplete: 'address-line1',
               },
@@ -95,7 +94,6 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'labels.townOrCity',
               },
-              errorMessage: 'errors.correspondenceAddressConfirm.townOrCity',
               attributes: {
                 autocomplete: 'address-level2',
               },
@@ -115,7 +113,6 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'labels.postcode',
               },
-              errorMessage: 'errors.correspondenceAddressConfirm.postcode',
               classes: 'govuk-input--width-10',
               attributes: {
                 autocomplete: 'postal-code',
