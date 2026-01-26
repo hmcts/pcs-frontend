@@ -1,16 +1,12 @@
 import { Page } from '@playwright/test';
 
-import { dateOfBirth, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
+import { defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName)],
-      ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
-      ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
-      ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
@@ -34,13 +30,6 @@ export class RespondToClaimAction implements IAction {
     await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantData.fName);
     await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantData.lName);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
-  }
-
-  private async enterDateOfBirthDetails(defendantData: actionRecord): Promise<void> {
-    await performAction('inputText', dateOfBirth.dayTextLabel, defendantData.dobDay);
-    await performAction('inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth);
-    await performAction('inputText', dateOfBirth.yearTextLabel, defendantData.dobYear);
-    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

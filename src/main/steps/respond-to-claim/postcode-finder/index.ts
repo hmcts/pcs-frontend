@@ -31,7 +31,7 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       // Get next step URL and redirect
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
 
       if (!redirectPath) {
         // No next step defined - show not found page

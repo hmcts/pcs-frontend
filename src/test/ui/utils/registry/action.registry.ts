@@ -3,6 +3,7 @@ import {
   FetchPINsAndValidateAccessCodeAPIAction,
   LoginAction,
   NavigateToUrlAction,
+  RespondToClaimAction,
 } from '../actions/custom-actions';
 import {
   CheckAction,
@@ -17,7 +18,6 @@ import {
 } from '../actions/element-actions';
 import { ClickLinkAction } from '../actions/element-actions/clickLink.action';
 import { IAction } from '../interfaces';
-import { RespondToClaimAction } from '../actions/custom-actions/respondToClaim.action';
 
 export class ActionRegistry {
   private static actions: Map<string, IAction> = new Map([
@@ -36,12 +36,12 @@ export class ActionRegistry {
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
-    ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
-    ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['inputErrorValidation', new RespondToClaimAction()],
-    ['enterDateOfBirthDetails', new RespondToClaimAction()],
+    ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['selectLegalAdvice', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

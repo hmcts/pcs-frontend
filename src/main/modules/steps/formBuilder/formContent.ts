@@ -23,13 +23,22 @@ export function buildFormContent(
   // Build error summary
   const errorSummary = buildErrorSummary(errors, fields, t);
 
+  // Process all translation keys dynamically
+  const translatedContent: Record<string, unknown> = {};
+  if (translationKeys) {
+    for (const [key, value] of Object.entries(translationKeys)) {
+      if (value) {
+        translatedContent[key] = t(value);
+      }
+    }
+  }
+
   return {
     ...bodyData,
     fieldValues,
     fields: fieldsWithLabels,
     title: pageTitle,
-    pageTitle: translationKeys?.pageTitle && t(translationKeys.pageTitle),
-    content: translationKeys?.content && t(translationKeys.content),
+    ...translatedContent,
     continue: t('buttons.continue'),
     saveForLater: t('buttons.saveForLater'),
     cancel: t('buttons.cancel'),
@@ -39,5 +48,7 @@ export function buildFormContent(
     phase: t('phase'),
     feedback: t('feedback'),
     back: t('back'),
+    contactUsForHelp: t('contactUsForHelp'),
+    contactUsForHelpText: t('contactUsForHelpText'),
   };
 }

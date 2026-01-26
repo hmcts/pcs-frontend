@@ -1,0 +1,75 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+
+{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
+{% block pageTitle %}{{ pageTitle }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+
+{% block mainContent %}
+  {# Error summary - GOV.UK pattern #}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {# Caption above heading #}
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  {# Page heading (standard GOV.UK pattern) #}
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% endif %}
+
+  {# Form #}
+  <form method="post" action="{{ url }}" novalidate>
+    {# Group related text inputs with a fieldset/legend (not the page heading) #}
+    {% if heading %}
+      {% call govukFieldset({
+        legend: {
+          text: heading,
+          classes: "govuk-visually-hidden"
+        }
+      }) %}
+        {% for field in fields %}
+          {% if field.component and field.componentType == 'input' %}
+            {{ govukInput(field.component) }}
+          {% endif %}
+        {% endfor %}
+      {% endcall %}
+    {% else %}
+      {# Fallback: render inputs without a legend #}
+      {% for field in fields %}
+        {% if field.component and field.componentType == 'input' %}
+          {{ govukInput(field.component) }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {# Button group #}
+    <div class="govuk-button-group">
+      {# Save and continue #}
+      {{ govukButton({
+        text: continue or t('buttons.continue', { ns: 'common' }),
+        attributes: {
+          type: 'submit',
+          name: 'action',
+          value: 'continue'
+        }
+      }) }}
+
+      {# Save for later #}
+      {{ govukButton({
+        text: saveForLater or t('buttons.saveForLater', { ns: 'common' }),
+        classes: 'govuk-button--secondary',
+        attributes: {
+          type: 'submit',
+          name: 'action',
+          value: 'saveForLater'
+        }
+      }) }}
+    </div>
+  </form>
+{% endblock %}
