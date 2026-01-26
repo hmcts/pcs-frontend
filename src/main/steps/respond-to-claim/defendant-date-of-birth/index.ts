@@ -3,13 +3,13 @@ import type { Request, Response } from 'express';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
-import { flowConfig } from '../flow.config';
+import { flowConfig, RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
 const stepName = 'defendant-date-of-birth';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: '/respond-to-claim/defendant-date-of-birth',
+  url: `${RESPOND_TO_CLAIM_ROUTE}/defendant-date-of-birth`,
   name: stepName,
   view: 'respond-to-claim/defendant-date-of-birth/defendantDateOfBirth.njk',
   stepDir: __dirname,
@@ -23,7 +23,7 @@ export const step: StepDefinition = {
         return {
           backUrl,
           nextStepUrl,
-          url: stepNavigation.getStepUrl(stepName),
+          url: req.originalUrl,
         };
       },
       'respondToClaim'
