@@ -168,7 +168,16 @@ describe('formBuilder', () => {
     });
 
     it('should handle journeyFolder with camelCase', () => {
-      const config = { ...baseConfig, journeyFolder: 'respondToClaim' };
+      const config = {
+        ...baseConfig,
+        journeyFolder: 'respondToClaim',
+        flowConfig: {
+          basePath: '/case/:caseReference/respond-to-claim',
+          journeyName: 'respondToClaim',
+          stepOrder: [],
+          steps: {},
+        },
+      };
       const step = createFormStep(config);
       expect(step.url).toBe('/case/:caseReference/respond-to-claim/test-step');
     });
