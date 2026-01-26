@@ -13,6 +13,7 @@
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "useUnknownInCatchVariables": false,
     "skipLibCheck": true,
     "lib": ["es2020", "dom", "dom.iterable"],

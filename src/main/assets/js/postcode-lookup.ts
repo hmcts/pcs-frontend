@@ -155,8 +155,12 @@ export function initPostcodeLookup(): void {
     button.disabled = true;
     hideError(errorMessage, input);
 
+    // Check for custom API endpoint (e.g., NestJS endpoint)
+    const container = button.closest('[data-address-component]') as HTMLElement | null;
+    const apiEndpoint = container?.dataset.apiEndpoint || '/api/postcode-lookup';
+
     try {
-      const resp = await fetch(`/api/postcode-lookup?postcode=${encodeURIComponent(postcode)}`, {
+      const resp = await fetch(`${apiEndpoint}?postcode=${encodeURIComponent(postcode)}`, {
         headers: { Accept: 'application/json' },
         credentials: 'same-origin',
       });
@@ -301,3 +305,5 @@ export function initPostcodeLookup(): void {
     }
   });
 }
+
+

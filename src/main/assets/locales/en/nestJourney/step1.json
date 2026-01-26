@@ -1,0 +1,31 @@
+{
+  "pageTitle": "Make a decision - Nest Journey",
+  "errorPageTitle": "Error: Make a decision - Nest Journey",
+  "heading": "Make a decision",
+  "description": "This is the first step of the Nest Journey proof of concept.",
+  "bulletPoints": {
+    "item1": "This demonstrates NestJS-based form handling",
+    "item2": "Validation is performed server-side using Zod schemas",
+    "item3": "Error messages follow GOV.UK Design System patterns"
+  },
+  "fieldset": {
+    "legend": "Do you want to proceed?",
+    "hint": "Select one option"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "maybe": "Maybe"
+  },
+  "errors": {
+    "decision": {
+      "required": "Select yes, no, or maybe"
+    }
+  },
+  "buttons": {
+    "continue": "Continue"
+  },
+  "errorSummary": {
+    "title": "There is a problem"
+  }
+}

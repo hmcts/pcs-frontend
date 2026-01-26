@@ -1,0 +1,43 @@
+# User Story
+
+**AS A** Frontend Engineer  
+**I WANT TO** implement NestJS as an abstraction layer above ExpressJS  
+**SO THAT** we have guard rails (structure, standards, and reusable patterns) for ongoing frontend-related backend/API development.
+
+## Context
+
+Matt H proposed adopting NestJS to sit on top of our existing ExpressJS application to provide a more opinionated framework (modules, controllers, dependency injection, testing patterns), reducing inconsistency and improving maintainability. This ticket covers introducing NestJS in a way that preserves the underlying Express runtime while adding NestJS structure and conventions.
+
+## Outcome
+
+NestJS is running as the primary application framework, using Express as the HTTP adapter, with a minimal but working vertical slice of the current API migrated or wrapped.
+
+## Deliverables
+
+### 1. NestJS bootstrapped over Express
+- Nest application created and configured to run with the Express adapter (i.e., still Express under the hood)
+- Local dev run instructions updated
+- Baseline structure + guard rails
+
+### 2. Standard module layout
+- AppModule, feature modules
+- Controllers/services pattern in place
+- Centralised configuration approach (env/config module)
+- Standard error handling + validation approach (e.g., global pipes/filters)
+- Interoperability with existing Express
+- One working "vertical slice" implemented
+
+### 3. Working vertical slice
+- At least one representative existing endpoint/route group migrated into Nest (controller + service) or wrapped cleanly
+- Includes request validation and consistent response shape (where applicable)
+- Testing + quality gates
+
+### 4. Documentation
+- Short README section describing:
+  - How to run the service
+  - How to add a new endpoint using Nest conventions
+  - Migration guidance (how to move Express routes into Nest modules incrementally)
+
+## Time Boxed
+
+**5 days**

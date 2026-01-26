@@ -1,0 +1,166 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% block pageTitle %}{{ t('step3:pageTitle', 'Your details - Nest Journey') }}{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ t('step3:heading', 'Your details') }}</h1>
+
+  <p class="govuk-body">{{ t('step3:description', 'This is the third and final step of the Nest Journey.') }}</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ t('step3:bulletPoints.item1', 'This page demonstrates multiple input fields') }}</li>
+    <li>{{ t('step3:bulletPoints.item2', 'Email validation uses Zod\'s built-in email validator') }}</li>
+    <li>{{ t('step3:bulletPoints.item3', 'Phone number is optional but validated if provided') }}</li>
+  </ul>
+
+  <form method="post" novalidate>
+    {{ govukInput({
+      name: "fullName",
+      id: "fullName",
+      label: {
+        text: t('step3:fields.fullName.label', 'Full name'),
+        classes: "govuk-label--m"
+      },
+      autocomplete: "name",
+      errorMessage: { text: errors.fullName } if errors.fullName else null,
+      value: formData.fullName
+    }) }}
+
+    {{ govukInput({
+      name: "email",
+      id: "email",
+      type: "email",
+      label: {
+        text: t('step3:fields.email.label', 'Email address'),
+        classes: "govuk-label--m"
+      },
+      hint: {
+        text: t('step3:fields.email.hint', 'We will use this to contact you about your submission')
+      },
+      autocomplete: "email",
+      errorMessage: { text: errors.email } if errors.email else null,
+      value: formData.email
+    }) }}
+
+    {{ govukInput({
+      name: "phoneNumber",
+      id: "phoneNumber",
+      type: "tel",
+      label: {
+        text: t('step3:fields.phoneNumber.label', 'Phone number (optional)'),
+        classes: "govuk-label--m"
+      },
+      autocomplete: "tel",
+      errorMessage: { text: errors.phoneNumber } if errors.phoneNumber else null,
+      value: formData.phoneNumber
+    }) }}
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ t('step3:address.heading', 'Your address') }}</h2>
+    <p class="govuk-body">{{ t('step3:address.description', 'This demonstrates the NestJS postcode lookup API.') }}</p>
+
+    <div class="govuk-form-group postcode-container" data-address-component data-name-prefix="address" data-api-endpoint="/api/postcode-lookup-nest">
+      <label class="govuk-label" for="address-lookupPostcode">
+        {{ t('step3:address.postcodeLabel', 'Postcode') }}
+      </label>
+      <p class="govuk-error-message govuk-visually-hidden" id="address-postcode-error" role="alert">
+        <span class="govuk-visually-hidden">Error:</span> {{ t('step3:address.errors.notFound', 'No addresses found for this postcode') }}
+      </p>
+      <input class="govuk-input govuk-input--width-10" 
+              id="address-lookupPostcode" 
+              name="lookupPostcode" 
+              type="text" 
+              autocomplete="postal-code"
+              value="{{ formData.lookupPostcode or '' }}"
+              aria-describedby="address-postcode-error"/>
+      <button class="govuk-button govuk-button--secondary govuk-!-margin-left-2" 
+              id="address-findAddressBtn"
+              data-module="govuk-button" 
+              type="button">
+        {{ t('step3:address.findButton', 'Find address') }}
+      </button>
+      
+      <div id="address-addressSelectContainer" class="govuk-!-margin-top-4" hidden>
+        {{ govukSelect({
+          id: 'address-selectedAddress',
+          name: "addressList",
+          classes: 'addressList govuk-!-width-full',
+          label: {
+            text: t('step3:address.selectLabel', 'Select an address'),
+            for: 'address-selectedAddress'
+          },
+          items: [
+            {
+              value: "",
+              text: t('step3:address.selectPlaceholder', 'Select an address'),
+              selected: true
+            }
+          ]
+        }) }}
+      </div>
+      
+      {{ govukDetails({
+        summaryText: t('step3:address.enterManually', 'Enter address manually'),
+        id: "address-enterManuallyDetails"
+      }) }}
+      
+      <div class="govuk-visually-hidden address-form" id="address-addressForm">
+        {{ govukInput({
+          id: 'address-addressLine1',
+          name: 'address[addressLine1]',
+          label: { text: t('step3:address.line1', 'Address line 1') },
+          value: formData.address.addressLine1 if formData.address else '',
+          classes: 'govuk-!-width-two-thirds',
+          errorMessage: { text: errors['address.addressLine1'] } if errors['address.addressLine1'] else null
+        }) }}
+
+        {{ govukInput({
+          id: 'address-addressLine2',
+          name: 'address[addressLine2]',
+          label: { text: t('step3:address.line2', 'Address line 2 (optional)') },
+          value: formData.address.addressLine2 if formData.address else '',
+          classes: 'govuk-!-width-two-thirds'
+        }) }}
+
+        {{ govukInput({
+          id: 'address-town',
+          name: 'address[town]',
+          label: { text: t('step3:address.town', 'Town or city') },
+          value: formData.address.town if formData.address else '',
+          classes: 'govuk-!-width-two-thirds',
+          errorMessage: { text: errors['address.town'] } if errors['address.town'] else null
+        }) }}
+
+        {{ govukInput({
+          id: 'address-county',
+          name: 'address[county]',
+          label: { text: t('step3:address.county', 'County (optional)') },
+          value: formData.address.county if formData.address else '',
+          classes: 'govuk-!-width-two-thirds'
+        }) }}
+
+        {{ govukInput({
+          id: 'address-postcode',
+          name: 'address[postcode]',
+          label: { text: t('step3:address.postcode', 'Postcode') },
+          value: formData.address.postcode if formData.address else '',
+          classes: 'govuk-!-width-one-third',
+          errorMessage: { text: errors['address.postcode'] } if errors['address.postcode'] else null
+        }) }}
+      </div>
+    </div>
+
+    {{ govukButton({
+      text: t('step3:buttons.submit', 'Submit')
+    }) }}
+  </form>
+{% endblock %}

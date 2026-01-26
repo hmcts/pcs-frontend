@@ -1,0 +1,61 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t('step1:pageTitle', 'Make a decision - Nest Journey') }}{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ t('step1:heading', 'Make a decision') }}</h1>
+
+  <p class="govuk-body">{{ t('step1:description', 'This is the first step of the Nest Journey proof of concept.') }}</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ t('step1:bulletPoints.item1', 'This demonstrates NestJS-based form handling') }}</li>
+    <li>{{ t('step1:bulletPoints.item2', 'Validation is performed server-side using Zod schemas') }}</li>
+    <li>{{ t('step1:bulletPoints.item3', 'Error messages follow GOV.UK Design System patterns') }}</li>
+  </ul>
+
+  <form method="post" novalidate>
+    {{ govukRadios({
+      name: "decision",
+      fieldset: {
+        legend: {
+          text: t('step1:fieldset.legend', 'Do you want to proceed?'),
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--m"
+        }
+      },
+      hint: {
+        text: t('step1:fieldset.hint', 'Select one option')
+      },
+      errorMessage: error if error else null,
+      items: [
+        {
+          value: "yes",
+          text: t('step1:options.yes', 'Yes'),
+          checked: formData.decision == "yes"
+        },
+        {
+          value: "no",
+          text: t('step1:options.no', 'No'),
+          checked: formData.decision == "no"
+        },
+        {
+          value: "maybe",
+          text: t('step1:options.maybe', 'Maybe'),
+          checked: formData.decision == "maybe"
+        }
+      ]
+    }) }}
+
+    {{ govukButton({
+      text: t('step1:buttons.continue', 'Continue')
+    }) }}
+  </form>
+{% endblock %}

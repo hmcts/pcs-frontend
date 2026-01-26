@@ -1,0 +1,62 @@
+# NestJS Spike Specifications
+
+## Must Haves
+
+### 1. HTML First and Progressive Enhancement
+- **Server rendered HTML as the primary contract**
+- JavaScript enhances, never replaces core journeys
+- All critical flows must work without JavaScript
+
+### 2. GOV.UK Frontend Integration
+- Use GOV.UK Frontend latest version
+- Compile GOV.UK Frontend from Sass down to CSS (rather than using the "dist" version)
+- Investigate how the JS from GOV.UK Frontend is compiled for browser use (rather than using the "dist" version)
+
+### 3. Architecture & Technology Stack
+- Use NestJS as an abstraction layer above Express
+- 100% TypeScript implementation
+- Leverage native language support that GOV.UK Frontend provides
+
+### 4. Testing & Quality Assurance
+- Write parity tests for the HTML against GOV.UK Frontend Test Fixtures
+- Automated accessibility checks (axe, pa11y)
+- Documented manual testing requirements (keyboard, screen reader smoke tests)
+
+### 5. Documentation & Maintenance
+- Provide extensive documentation for upgrading NestJS and GOV.UK Packages easily
+
+---
+
+## Nice to Haves
+
+### 1. Build & Dependency Management
+- **Reproducible builds and lockfile enforcement**
+  - Pin, SHA verify and constantly update NPM dependencies in CI/CD
+  - CI must refuse dependency drift
+  - Builds should be deterministic
+- **Automated dependency management**
+  - Renovatebot & Dependabot running in CI/CD
+- **Security scanning**
+  - Fortify + other security scans running daily
+
+### 2. Development Experience
+- **Maximise maintainability via best practices**
+  - Dotfiles: `.editorconfig`, `.npmrc`, `.nvmrc`, `.eslint`, `.prettier` etc
+- **Live reload for frontend development**
+  - Support both Docker and non-Docker setups
+
+### 3. Performance & Security Best Practices
+- **Asset optimization**
+  - Asset caching on a CDN (Make use of Front Door from HMCTS Azure Infrastructure)
+  - Asset compression using Brotli compression (build process or CDN)
+  - Minification of assets (CSS/JavaScript)
+  
+- **Comprehensive security response headers**
+  - Content Security Policy (CSP)
+  - Explicit threat model for the frontend
+  - Secure session cookie settings by default
+  - No third-party runtime dependencies without approval process
+    - Fonts, analytics, tag managers, error tracking should be explicitly governed and minimised
+  
+- **Modern HTTP protocols**
+  - Use HTTP/2 or HTTP/3

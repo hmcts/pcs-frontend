@@ -8,6 +8,8 @@ import config from 'config';
 import { type HttpTerminator, createHttpTerminator } from 'http-terminator';
 
 import { app } from './app';
+import { setupErrorHandlers } from './modules/error-handler';
+import { bootstrapNest } from './nest';
 
 const logger = Logger.getLogger('server');
 
@@ -19,23 +21,39 @@ app.locals.shutdown = false;
 // TODO: set the right port for your application
 const port: number = parseInt(process.env.PORT || '3209', 10);
 
-if (config.get<boolean>('use-ssl')) {
-  const sslDirectory = path.join(__dirname, 'resources', 'localhost-ssl');
-  const sslOptions = {
-    cert: fs.readFileSync(path.join(sslDirectory, 'localhost.crt')),
-    key: fs.readFileSync(path.join(sslDirectory, 'localhost.key')),
-  };
-  server = https.createServer(sslOptions, app);
-  server.listen(port, () => {
-    logger.info(`Application started: https://localhost:${port}`);
-  });
-} else {
-  server = app.listen(port, () => {
-    logger.info(`Application started: http://localhost:${port}`);
+async function startServer(): Promise<void> {
+  // Bootstrap NestJS with Express adapter
+  await bootstrapNest(app);
+  logger.info('NestJS bootstrapped successfully');
+
+  // Setup error handlers AFTER NestJS routes are registered
+  // This ensures the 404 catch-all doesn't intercept NestJS routes
+  setupErrorHandlers(app, app.locals.ENV);
+  logger.info('Error handlers configured');
+
+  if (config.get<boolean>('use-ssl')) {
+    const sslDirectory = path.join(__dirname, 'resources', 'localhost-ssl');
+    const sslOptions = {
+      cert: fs.readFileSync(path.join(sslDirectory, 'localhost.crt')),
+      key: fs.readFileSync(path.join(sslDirectory, 'localhost.key')),
+    };
+    server = https.createServer(sslOptions, app);
+    server.listen(port, () => {
+      logger.info(`Application started: https://localhost:${port}`);
+    });
+  } else {
+    server = app.listen(port, () => {
+      logger.info(`Application started: http://localhost:${port}`);
+    });
+  }
+  httpTerminator = createHttpTerminator({
+    server,
   });
 }
-httpTerminator = createHttpTerminator({
-  server,
+
+startServer().catch(err => {
+  logger.error('Failed to start server:', err);
+  process.exit(1);
 });
 
 function gracefulShutdownHandler(signal: string) {

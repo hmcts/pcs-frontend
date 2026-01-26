@@ -1,0 +1,47 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block pageTitle %}{{ t('confirmation:pageTitle', 'Journey complete - Nest Journey') }}{% endblock %}
+
+{% block mainContent %}
+  {{ govukPanel({
+    titleText: t('confirmation:panel.title', 'Journey complete'),
+    html: t('confirmation:panel.referenceLabel', 'Your reference number') + "<br><strong>" + referenceNumber + "</strong>"
+  }) }}
+
+  <h2 class="govuk-heading-m">{{ t('confirmation:whatHappensNext.heading', 'What happens next') }}</h2>
+
+  <p class="govuk-body">{{ t('confirmation:whatHappensNext.description', 'This is a proof of concept journey built with NestJS.') }}</p>
+
+  <h3 class="govuk-heading-s">{{ t('confirmation:summary.heading', 'Summary of your answers') }}</h3>
+
+  <dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">{{ t('confirmation:summary.decision', 'Decision') }}</dt>
+      <dd class="govuk-summary-list__value">{{ journeyData.step1.decision | capitalize }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">{{ t('confirmation:summary.feedback', 'Feedback') }}</dt>
+      <dd class="govuk-summary-list__value">{{ journeyData.step2.feedback }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">{{ t('confirmation:summary.fullName', 'Full name') }}</dt>
+      <dd class="govuk-summary-list__value">{{ journeyData.step3.fullName }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">{{ t('confirmation:summary.email', 'Email') }}</dt>
+      <dd class="govuk-summary-list__value">{{ journeyData.step3.email }}</dd>
+    </div>
+    {% if journeyData.step3.phoneNumber %}
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">{{ t('confirmation:summary.phoneNumber', 'Phone number') }}</dt>
+      <dd class="govuk-summary-list__value">{{ journeyData.step3.phoneNumber }}</dd>
+    </div>
+    {% endif %}
+  </dl>
+
+  <p class="govuk-body">
+    <a href="/dashboard" class="govuk-link">{{ t('confirmation:links.returnToDashboard', 'Return to dashboard') }}</a>
+  </p>
+{% endblock %}

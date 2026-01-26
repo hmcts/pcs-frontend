@@ -1,0 +1,27 @@
+{
+  "pageTitle": "cy-Provide feedback - Nest Journey",
+  "errorPageTitle": "cy-Error: Provide feedback - Nest Journey",
+  "heading": "cy-Provide feedback",
+  "description": "cy-This is the second step of the Nest Journey.",
+  "bulletPoints": {
+    "item1": "cy-This page demonstrates textarea input handling",
+    "item2": "cy-Character limits are validated server-side",
+    "item3": "cy-You cannot skip to this page without completing step 1"
+  },
+  "field": {
+    "label": "cy-Please provide your feedback",
+    "hint": "cy-Tell us more about your experience (maximum 2000 characters)"
+  },
+  "errors": {
+    "feedback": {
+      "required": "cy-Enter your feedback",
+      "maxLength": "cy-Feedback must be 2000 characters or fewer"
+    }
+  },
+  "buttons": {
+    "continue": "cy-Continue"
+  },
+  "errorSummary": {
+    "title": "cy-There is a problem"
+  }
+}

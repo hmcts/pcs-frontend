@@ -1,0 +1,22 @@
+{
+  "pageTitle": "Journey complete - Nest Journey",
+  "panel": {
+    "title": "Journey complete",
+    "referenceLabel": "Your reference number"
+  },
+  "whatHappensNext": {
+    "heading": "What happens next",
+    "description": "This is a proof of concept journey built with NestJS."
+  },
+  "summary": {
+    "heading": "Summary of your answers",
+    "decision": "Decision",
+    "feedback": "Feedback",
+    "fullName": "Full name",
+    "email": "Email",
+    "phoneNumber": "Phone number"
+  },
+  "links": {
+    "returnToDashboard": "Return to dashboard"
+  }
+}

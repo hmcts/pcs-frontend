@@ -9,7 +9,6 @@ import favicon from 'serve-favicon';
 import { setupDev } from './development';
 import { sessionTimeoutMiddleware } from './middleware';
 import * as modules from './modules';
-import { setupErrorHandlers } from './modules/error-handler';
 import registerSteps from './routes/registerSteps';
 
 const env = process.env.NODE_ENV || 'development';
@@ -49,4 +48,5 @@ glob
   .map(filename => require(filename))
   .forEach(route => route.default(app));
 
-setupErrorHandlers(app, env);
+// Note: Error handlers are set up in server.ts AFTER NestJS bootstrap
+// This ensures NestJS routes are registered before the 404 catch-all handler

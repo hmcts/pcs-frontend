@@ -1,0 +1,60 @@
+{
+  "pageTitle": "cy-Your details - Nest Journey",
+  "errorPageTitle": "cy-Error: Your details - Nest Journey",
+  "heading": "cy-Your details",
+  "description": "cy-This is the third and final step of the Nest Journey.",
+  "bulletPoints": {
+    "item1": "cy-This page demonstrates multiple input fields",
+    "item2": "cy-Email validation uses Zod's built-in email validator",
+    "item3": "cy-Phone number is optional but validated if provided",
+    "item4": "cy-Address lookup uses the NestJS postcode API"
+  },
+  "fields": {
+    "fullName": {
+      "label": "cy-Full name"
+    },
+    "email": {
+      "label": "cy-Email address",
+      "hint": "cy-We will use this to contact you about your submission"
+    },
+    "phoneNumber": {
+      "label": "cy-Phone number (optional)"
+    }
+  },
+  "address": {
+    "heading": "cy-Your address",
+    "description": "cy-This demonstrates the NestJS postcode lookup API.",
+    "postcodeLabel": "cy-Postcode",
+    "findButton": "cy-Find address",
+    "selectLabel": "cy-Select an address",
+    "selectPlaceholder": "cy-Select an address",
+    "enterManually": "cy-Enter address manually",
+    "line1": "cy-Address line 1",
+    "line2": "cy-Address line 2 (optional)",
+    "town": "cy-Town or city",
+    "county": "cy-County (optional)",
+    "postcode": "cy-Postcode",
+    "errors": {
+      "notFound": "cy-No addresses found for this postcode"
+    }
+  },
+  "errors": {
+    "fullName": {
+      "required": "cy-Enter your full name",
+      "maxLength": "cy-Full name must be 100 characters or fewer"
+    },
+    "email": {
+      "required": "cy-Enter your email address",
+      "invalid": "cy-Enter a valid email address"
+    },
+    "phoneNumber": {
+      "invalid": "cy-Enter a valid phone number"
+    }
+  },
+  "buttons": {
+    "submit": "cy-Submit"
+  },
+  "errorSummary": {
+    "title": "cy-There is a problem"
+  }
+}

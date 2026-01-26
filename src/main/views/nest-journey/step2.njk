@@ -1,0 +1,44 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t('step2:pageTitle', 'Provide feedback - Nest Journey') }}{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ t('step2:heading', 'Provide feedback') }}</h1>
+
+  <p class="govuk-body">{{ t('step2:description', 'This is the second step of the Nest Journey.') }}</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ t('step2:bulletPoints.item1', 'This page demonstrates textarea input handling') }}</li>
+    <li>{{ t('step2:bulletPoints.item2', 'Character limits are validated server-side') }}</li>
+    <li>{{ t('step2:bulletPoints.item3', 'You cannot skip to this page without completing step 1') }}</li>
+  </ul>
+
+  <form method="post" novalidate>
+    {{ govukTextarea({
+      name: "feedback",
+      id: "feedback",
+      label: {
+        text: t('step2:field.label', 'Please provide your feedback'),
+        classes: "govuk-label--m"
+      },
+      hint: {
+        text: t('step2:field.hint', 'Tell us more about your experience (maximum 2000 characters)')
+      },
+      errorMessage: error if error else null,
+      value: formData.feedback,
+      rows: 5
+    }) }}
+
+    {{ govukButton({
+      text: t('step2:buttons.continue', 'Continue')
+    }) }}
+  </form>
+{% endblock %}

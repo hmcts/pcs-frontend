@@ -1,0 +1,22 @@
+{
+  "pageTitle": "cy-Journey complete - Nest Journey",
+  "panel": {
+    "title": "cy-Journey complete",
+    "referenceLabel": "cy-Your reference number"
+  },
+  "whatHappensNext": {
+    "heading": "cy-What happens next",
+    "description": "cy-This is a proof of concept journey built with NestJS."
+  },
+  "summary": {
+    "heading": "cy-Summary of your answers",
+    "decision": "cy-Decision",
+    "feedback": "cy-Feedback",
+    "fullName": "cy-Full name",
+    "email": "cy-Email",
+    "phoneNumber": "cy-Phone number"
+  },
+  "links": {
+    "returnToDashboard": "cy-Return to dashboard"
+  }
+}
