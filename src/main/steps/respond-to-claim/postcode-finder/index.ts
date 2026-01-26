@@ -42,7 +42,9 @@ export const step: StepDefinition = createFormStep({
       },
       // Extract nested field values for easy template access (only on POST with errors)
       correspondenceAddressLine1: req.body?.['correspondenceAddressConfirm.addressLine1'] || '',
+      correspondenceAddressLine2: req.body?.['correspondenceAddressConfirm.addressLine2'] || '',
       correspondenceTownOrCity: req.body?.['correspondenceAddressConfirm.townOrCity'] || '',
+      correspondenceCounty: req.body?.['correspondenceAddressConfirm.county'] || '',
       correspondencePostcode: req.body?.['correspondenceAddressConfirm.postcode'] || '',
     };
   },

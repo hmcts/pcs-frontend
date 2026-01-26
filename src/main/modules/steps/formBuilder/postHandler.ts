@@ -2,8 +2,9 @@ import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
-import { stepNavigation } from '../flow';
+import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
@@ -26,6 +27,7 @@ export function createPostHandler(
   journeyFolder: string,
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
+  flowConfig?: JourneyFlowConfig,
   extendGetContent?: (req: Request, content: Record<string, unknown>) => Record<string, unknown>
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
@@ -39,6 +41,8 @@ export function createPostHandler(
       translationKeys,
     });
   }
+  // Use provided flowConfig or fall back to default stepNavigation
+  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
@@ -72,7 +76,18 @@ export function createPostHandler(
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
-        renderWithErrors(req, res, viewPath, errors, fields, fullContent, stepName, journeyFolder, translationKeys);
+        renderWithErrors(
+          req,
+          res,
+          viewPath,
+          errors,
+          fields,
+          fullContent,
+          stepName,
+          journeyFolder,
+          navigation,
+          translationKeys
+        );
         return; // renderWithErrors sends the response, so we return early
       }
 
@@ -101,7 +116,7 @@ export function createPostHandler(
         }
       }
 
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
+      const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

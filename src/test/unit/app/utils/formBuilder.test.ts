@@ -40,6 +40,10 @@ jest.mock('../../../../main/modules/steps/flow', () => ({
     getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
     getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
   },
+  createStepNavigation: jest.fn(() => ({
+    getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
+    getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
+  })),
 }));
 
 const mockGetValidatedLanguage = jest.fn();
@@ -149,8 +153,8 @@ describe('formBuilder', () => {
       session.formData[stepName] = data;
     });
     mockValidateForm.mockReturnValue({});
-    mockGetNextStepUrl.mockReturnValue('/steps/test-journey/next-step');
-    mockGetBackUrl.mockReturnValue('/steps/test-journey/previous-step');
+    mockGetNextStepUrl.mockResolvedValue('/steps/test-journey/next-step');
+    mockGetBackUrl.mockResolvedValue('/steps/test-journey/previous-step');
     mockGetValidatedLanguage.mockReturnValue('en' as const);
     mockGetRequestLanguage.mockImplementation((req: Request) => req.language || 'en');
     mockGetTranslationFunction.mockImplementation((req: Request) => {
@@ -180,6 +184,19 @@ describe('formBuilder', () => {
       };
       const step = createFormStep(config);
       expect(step.url).toBe('/case/:caseReference/respond-to-claim/test-step');
+    });
+
+    it('should fallback to default path when flowConfig.basePath is not provided', () => {
+      const config = {
+        ...baseConfig,
+        journeyFolder: 'testJourney',
+        flowConfig: {
+          stepOrder: [],
+          steps: {},
+        },
+      };
+      const step = createFormStep(config);
+      expect(step.url).toBe('/steps/test-journey/test-step');
     });
 
     it('should create getController that renders with form content', async () => {
@@ -1203,7 +1220,7 @@ describe('formBuilder', () => {
       });
 
       it('should return 500 when no redirect path available', async () => {
-        mockGetNextStepUrl.mockReturnValueOnce(null as unknown as string);
+        mockGetNextStepUrl.mockResolvedValueOnce(null);
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);

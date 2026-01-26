@@ -15,9 +15,10 @@ export type ComponentType =
   | 'postcodeLookup';
 
 export interface FormFieldOption {
-  value: string;
+  value?: string;
   // Backward compatible: text property still supported
   text?: string;
+  // Divider text for visual separation of options
   divider?: string;
   // Translation key for option text (backward compatible)
   translationKey?: string;
@@ -48,6 +49,7 @@ export interface FormFieldConfig {
   options?: FormFieldOption[];
   classes?: string;
   attributes?: Record<string, unknown>;
+  // Legend classes for radio/checkbox/date fieldsets
   legendClasses?: string;
   // Pre-processed component configuration for template rendering
   component?: Record<string, unknown>;

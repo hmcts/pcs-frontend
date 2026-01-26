@@ -6,7 +6,7 @@ import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.inte
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
-import { stepNavigation } from '../flow';
+import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { buildFormContent } from './formContent';
@@ -42,6 +42,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
+  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
   return {
     url: path.join(basePath, stepName),
@@ -69,7 +70,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),
-          backUrl: stepNavigation.getBackUrl(req, stepName),
+          backUrl: await navigation.getBackUrl(req, stepName),
         };
       });
     },
@@ -80,6 +81,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       journeyFolder,
       beforeRedirect,
       translationKeys,
+      flowConfig,
       extendGetContent
     ),
   };

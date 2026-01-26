@@ -90,7 +90,7 @@
             },
             classes: 'govuk-!-width-two-thirds',
             autocomplete: 'address-line2',
-            value: addressLine2 or fieldValues.addressLine2,
+            value: correspondenceAddressLine2 if correspondenceAddressLine2 else '',
             errorMessage: {
               text: errors['correspondenceAddressConfirm.addressLine2']
             } if errors['correspondenceAddressConfirm.addressLine2']
@@ -117,7 +117,7 @@
               text: labels.county
             },
             classes: 'govuk-!-width-two-thirds',
-            value: county or fieldValues.county,
+            value: correspondenceCounty if correspondenceCounty else '',
             errorMessage: {
               text: errors['correspondenceAddressConfirm.county']
             } if errors['correspondenceAddressConfirm.county']
