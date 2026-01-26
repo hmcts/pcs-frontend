@@ -1,9 +1,8 @@
 import { test } from '@playwright/test';
 import config from 'config';
 
-//import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import { defendantDateOfBirth, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
@@ -24,11 +23,15 @@ test.afterEach(async () => {
   PageContentValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim @nightly', async () => {
+test.describe('Respond to a claim @PR @nightly', async () => {
   test('Respond to a claim', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performValidation('mainHeader', defendantNameCapture.mainHeader);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
   });
 });

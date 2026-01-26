@@ -3,8 +3,8 @@ import {
   FetchPINsAndValidateAccessCodeAPIAction,
   LoginAction,
   NavigateToUrlAction,
+  RespondToClaimAction,
 } from '../actions/custom-actions';
-import { RespondToClaimAction } from '../actions/custom-actions/respondToClaim.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -36,6 +36,9 @@ export class ActionRegistry {
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['selectLegalAdvice', new RespondToClaimAction()],
+    ['inputDefendantDetails', new RespondToClaimAction()],
+    ['inputErrorValidation', new RespondToClaimAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
