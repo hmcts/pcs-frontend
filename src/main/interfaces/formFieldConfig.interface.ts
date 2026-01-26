@@ -32,6 +32,7 @@ export interface FormFieldConfig {
   errorMessage?: string;
   // Label can be a string or a function that takes translations and returns a string
   label?: string | ((translations: Record<string, string>) => string);
+  labelClasses?: string;
   hint?: string;
   translationKey?: {
     label?: string;
