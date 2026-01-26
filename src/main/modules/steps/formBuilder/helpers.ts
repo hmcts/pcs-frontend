@@ -11,8 +11,11 @@ import { getDateTranslationKey, validateDateField } from './dateValidation';
 const logger = Logger.getLogger('form-builder-helpers');
 
 export function getTranslation(t: TFunction, key: string, fallback?: string): string | undefined {
-  const translation = t(key);
-  return translation !== key ? translation : fallback;
+  const result = t(key, { returnObjects: true }) as unknown;
+  if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
+    return result;
+  }
+  return fallback;
 }
 
 /**
@@ -94,6 +97,12 @@ export function getTranslationErrors(
 ): Record<string, string> {
   const translationErrors: Record<string, string> = {};
 
+  const getStringTranslation = (key: string): string | undefined => {
+    // Ask for objects so we can detect object-valued keys safely
+    const result = t(key, { returnObjects: true }) as unknown;
+    return typeof result === 'string' && result !== key ? result : undefined;
+  };
+
   for (const field of fields) {
     // Get the nested field name if this is a subField
     const fieldName = parentFieldName ? getNestedFieldName(parentFieldName, field.name) : field.name;
@@ -117,9 +126,10 @@ export function getTranslationErrors(
       }
     } else {
       // For top-level fields, check error message translation using the field name
+      // Prefer flat string keys (errors.<field>) used across the service.
       const errorKey = `errors.${field.name}`;
-      const errorMsg = t(errorKey);
-      if (errorMsg && errorMsg !== errorKey) {
+      const errorMsg = getStringTranslation(errorKey);
+      if (errorMsg) {
         translationErrors[field.name] = errorMsg;
       }
 
