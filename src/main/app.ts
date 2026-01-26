@@ -7,7 +7,7 @@ import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
-import { sessionTimeoutMiddleware } from './middleware';
+import { caseReferenceParamMiddleware, sessionTimeoutMiddleware } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import registerSteps from './routes/registerSteps';
@@ -41,6 +41,9 @@ app.use((req, res, next) => {
 
 // timeout config available to all templates
 app.use(sessionTimeoutMiddleware);
+
+// param middleware for caseReference
+app.param('caseReference', caseReferenceParamMiddleware);
 
 registerSteps(app);
 
