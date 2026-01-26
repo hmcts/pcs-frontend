@@ -5,6 +5,7 @@ import {
   NavigateToUrlAction,
   RespondToClaimAction,
 } from '../actions/custom-actions';
+import { RespondToClaimAction } from '../actions/custom-actions/respondToClaim.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -41,6 +42,7 @@ export class ActionRegistry {
     ['inputErrorValidation', new RespondToClaimAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['selectLegalAdvice', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

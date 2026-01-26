@@ -7,7 +7,6 @@ export const step: StepDefinition = createFormStep(
     stepName: 'defendant-name-capture',
     journeyFolder: 'respondToClaim',
     stepDir: __dirname,
-    basePath: '/respond-to-claim',
     flowConfig,
     translationKeys: {
       // Browser/tab title
