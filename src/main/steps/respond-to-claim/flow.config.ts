@@ -45,6 +45,7 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'postcode-finder',
+    'dispute-claim-interstitial',
   ],
   steps: {
     'start-now': {
@@ -76,7 +77,10 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
-      // Last step - no defaultNext
+      defaultNext: 'dispute-claim-interstitial',
+    },
+    'dispute-claim-interstitial': {
+      // defaultNext: 'end-now',
     },
   },
 };
