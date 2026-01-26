@@ -1,28 +1,24 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, stepNavigation } from '../../../modules/steps';
 import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
-const logger = Logger.getLogger('postcode-finder');
-const stepName = 'postcode-finder';
+const stepName = 'defendant-name-confirmation';
 
 export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/postcode-finder`,
+  url: `${RESPOND_TO_CLAIM_ROUTE}/defendant-name-confirmation`,
   name: stepName,
-  view: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
+  view: 'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'respond-to-claim/postcode-finder/postcodeFinder.njk',
+      'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
       stepName,
       (req: Request) => {
-        const caseReference = req.params.caseReference;
-        logger.info('Postcode page logged', { caseReference });
-
         return {
-          backUrl: stepNavigation.getBackUrl(req, stepName),
+          //TODO: get defendant name from CCD case - currently served from LaunchDarkly flag
+          defendantName: req.session.defendantName ?? '',
         };
       },
       'respondToClaim'
@@ -30,11 +26,9 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
-      // Get next step URL and redirect
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
 
       if (!redirectPath) {
-        // No next step defined - show not found page
         return res.status(404).render('not-found');
       }
 

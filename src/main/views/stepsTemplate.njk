@@ -12,7 +12,7 @@
 } %}
 
 {% block head %}
-  <title>{% block pageTitle %}Possession claims{% endblock %} - GOV.UK</title>
+  {{super()}}
   {% include "webpack/css.njk" %}
 {% endblock %}
 
