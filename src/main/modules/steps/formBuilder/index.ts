@@ -27,11 +27,20 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
-  const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys, flowConfig } =
-    config;
+  const {
+    stepName,
+    journeyFolder,
+    fields,
+    beforeRedirect,
+    extendGetContent,
+    stepDir,
+    translationKeys,
+    flowConfig,
+    customTemplate,
+  } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
-  const viewPath = 'formBuilder.njk';
+  const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
 
   return {

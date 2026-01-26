@@ -15,6 +15,12 @@ export function initPostcodeLookup(): void {
   const getParts = (container: HTMLElement) => {
     const prefix = container.dataset.namePrefix || 'address';
     const byId = (id: string) => container.querySelector<HTMLElement>(`#${prefix}-${id}`);
+
+    // Find address fields container
+    const addressForm = byId('addressForm') as HTMLDivElement | null;
+    const addressFieldsContainer = document.querySelector<HTMLDivElement>('[data-address-fields]');
+    const fieldsContainer = addressFieldsContainer || addressForm;
+
     return {
       prefix,
       byId,
@@ -28,7 +34,7 @@ export function initPostcodeLookup(): void {
       town: byId('town') as HTMLInputElement | null,
       county: byId('county') as HTMLInputElement | null,
       postcodeOut: byId('postcode') as HTMLInputElement | null,
-      addressForm: byId('addressForm') as HTMLDivElement | null,
+      addressForm: fieldsContainer,
       enterManuallyDetails: byId('enterManuallyDetails') as HTMLDetailsElement | null,
     };
   };
@@ -84,11 +90,11 @@ export function initPostcodeLookup(): void {
     }
 
     const fieldMappings = [
-      { field: addressLine1, value: selected.dataset.line1 },
-      { field: addressLine2, value: selected.dataset.line2 },
-      { field: town, value: selected.dataset.town },
-      { field: county, value: selected.dataset.county },
-      { field: postcodeOut, value: selected.dataset.postcode },
+      { field: addressLine1, value: selected.dataset.line1, name: 'addressLine1' },
+      { field: addressLine2, value: selected.dataset.line2, name: 'addressLine2' },
+      { field: town, value: selected.dataset.town, name: 'town' },
+      { field: county, value: selected.dataset.county, name: 'county' },
+      { field: postcodeOut, value: selected.dataset.postcode, name: 'postcode' },
     ];
 
     fieldMappings.forEach(({ field, value }) => {

@@ -84,7 +84,7 @@
 
           {{ govukInput({
             id: 'correspondence-addressLine2',
-            name: 'addressLine2',
+            name: 'correspondenceAddressConfirm.addressLine2',
             label: {
               text: labels.addressLine2
             },
@@ -92,8 +92,8 @@
             autocomplete: 'address-line2',
             value: addressLine2 or fieldValues.addressLine2,
             errorMessage: {
-              text: errors.addressLine2
-            } if errors.addressLine2
+              text: errors['correspondenceAddressConfirm.addressLine2']
+            } if errors['correspondenceAddressConfirm.addressLine2']
           }) }}
 
           {{ govukInput({
@@ -112,15 +112,15 @@
 
           {{ govukInput({
             id: 'correspondence-county',
-            name: 'county',
+            name: 'correspondenceAddressConfirm.county',
             label: {
               text: labels.county
             },
             classes: 'govuk-!-width-two-thirds',
             value: county or fieldValues.county,
             errorMessage: {
-              text: errors.county
-            } if errors.county
+              text: errors['correspondenceAddressConfirm.county']
+            } if errors['correspondenceAddressConfirm.county']
           }) }}
 
           {{ govukInput({
