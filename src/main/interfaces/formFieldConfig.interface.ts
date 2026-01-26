@@ -2,13 +2,17 @@ import type { Request } from 'express';
 
 import type { TranslationContent } from '../modules/steps';
 
+import type { JourneyFlowConfig } from './stepFlow.interface';
+
 export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count';
 export type ComponentType = 'input' | 'textarea' | 'characterCount' | 'radios' | 'checkboxes' | 'dateInput';
 
 export interface FormFieldOption {
-  value: string;
+  value?: string;
   // Backward compatible: text property still supported
   text?: string;
+  // Divider text for visual separation of options
+  divider?: string;
   // Translation key for option text (backward compatible)
   translationKey?: string;
   // Dynamic label function (takes translations object, returns string)
@@ -36,6 +40,8 @@ export interface FormFieldConfig {
   options?: FormFieldOption[];
   classes?: string;
   attributes?: Record<string, unknown>;
+  // Legend classes for radio/checkbox/date fieldsets
+  legendClasses?: string;
   // Pre-processed component configuration for template rendering
   component?: Record<string, unknown>;
   componentType?: ComponentType;
@@ -60,6 +66,7 @@ export interface FormFieldConfig {
 export interface TranslationKeys {
   pageTitle?: string;
   content?: string;
+  [key: string]: string | undefined;
 }
 
 export interface FormBuilderConfig {
@@ -70,6 +77,8 @@ export interface FormBuilderConfig {
   extendGetContent?: (req: Request, content: TranslationContent) => Record<string, unknown>;
   stepDir: string;
   translationKeys?: TranslationKeys;
+  basePath?: string;
+  flowConfig?: JourneyFlowConfig;
 }
 
 export interface ComponentConfig {
