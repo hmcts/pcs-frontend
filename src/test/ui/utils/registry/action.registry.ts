@@ -5,7 +5,6 @@ import {
   NavigateToUrlAction,
   RespondToClaimAction,
 } from '../actions/custom-actions';
-import { RespondToClaimAction } from '../actions/custom-actions/respondToClaim.action';
 import {
   CheckAction,
   ClickButtonAction,
