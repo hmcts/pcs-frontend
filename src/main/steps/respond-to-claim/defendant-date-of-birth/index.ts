@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
-import { flowConfig, RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
+import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
 const stepName = 'defendant-date-of-birth';
 const stepNavigation = createStepNavigation(flowConfig);
