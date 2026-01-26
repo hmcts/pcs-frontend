@@ -1,16 +1,16 @@
 {
-  "caption": "Respond to a property possession claim",
-  "pageTitle": "Your Name",
-  "nameConfirmationLabel": "Is your name {{defendantName}}?",
-  "nameConfirmationHint": "This is the name provided by {{organisationName}}",
-  "yesOption": "Yes",
-  "noOption": "No",
-  "firstNameLabel": "First name",
-  "lastNameLabel": "Last name",
-  "contactUs": "Contact us for help",
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyYour Name",
+  "nameConfirmationLabel": "cyIs your name {{defendantName}}?",
+  "nameConfirmationHint": "cyThis is the name provided by {{organisationName}}",
+  "yesOption": "cyYes",
+  "noOption": "cyNo",
+  "firstNameLabel": "cyFirst name",
+  "lastNameLabel": "cyLast name",
+  "contactUs": "cyContact us for help",
   "errors": {
-    "nameConfirmation": "You must say if your name is {{defendantName}}",
-    "firstName": "Enter your first name",
-    "lastName": "Enter your last name"
+    "nameConfirmation": "cyYou must say if your name is {{defendantName}}",
+    "firstName": "cyEnter your first name",
+    "lastName": "cyEnter your last name"
   }
 }

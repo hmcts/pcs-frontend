@@ -22,5 +22,8 @@
   "bullet2": "cytext ‘legalaid’ and your name to 80010 to ask CLA to call you back. This costs the same as a normal text message",
   "subHeading2": "cyHelp that might be available at the hearing",
   "paragraph3": "cyIf you do not have your own legal adviser, you might be able to speak to a duty adviser (a legal professional who helps people at court) on the day of your hearing. If they’re available, they can give you advice and represent you at the hearing for free.",
-  "paragraph4": "cyIf you want to speak to the duty adviser, arrive at least 45 minutes before your hearing."
+  "paragraph4": "cyIf you want to speak to the duty adviser, arrive at least 45 minutes before your hearing.",
+   "errors": {
+    "hadLegalAdvice": "cyYou must say if you've had any free legal advice"
+  }
 }

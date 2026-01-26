@@ -67,7 +67,7 @@ export function createPostHandler(
 
       const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
-      const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
+      const fieldErrors = getTranslationErrors(t, fields);
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {

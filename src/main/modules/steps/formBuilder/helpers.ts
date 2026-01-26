@@ -113,7 +113,7 @@ export function getTranslationErrors(
       // If errorMessage is a translation key (starts with 'errors.'), translate it
       if (typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
         const subFieldErrorKey = field.errorMessage;
-        const subFieldErrorMsg = t(subFieldErrorKey);
+        const subFieldErrorMsg = getStringTranslation(field.errorMessage);
         if (subFieldErrorMsg && subFieldErrorMsg !== subFieldErrorKey) {
           // Use nested field name as the key (e.g., 'contactMethod.emailAddress')
           translationErrors[fieldName] = subFieldErrorMsg;
