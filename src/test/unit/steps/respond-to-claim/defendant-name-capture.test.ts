@@ -84,7 +84,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
   it('exposes correct step url and view', () => {
     expect(step.name).toBe('defendant-name-capture');
     expect(step.url).toBe('/case/:caseReference/respond-to-claim/defendant-name-capture');
-    expect(step.view).toContain('defendantNameCapture.njk');
+    expect(step.view).toContain('formBuilder.njk');
   });
 
   it('GET renders translated content and input attributes', async () => {
