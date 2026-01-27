@@ -42,7 +42,7 @@ export class ActionRegistry {
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
-    ['selectContactByPhone',new RespondToClaimAction()],
+    ['selectContactByPhone', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
