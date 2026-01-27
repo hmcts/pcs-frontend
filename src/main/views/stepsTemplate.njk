@@ -12,13 +12,11 @@
 } %}
 
 {% block head %}
-  {{ super() }}
+  {{super()}}
   {% include "webpack/css.njk" %}
 {% endblock %}
 
 {% block bodyStart %}
-  {# Start inert container wrapper for all page content #}
-  <div class="govuk-modal-dialogue-inert-container">
 {% endblock %}
 
 {% block header %}
@@ -91,11 +89,6 @@
 {% endblock %}
 
 {% block bodyEnd %}
-  {# Close inert container wrapper #}
-  </div>
-
-  {# Timeout modal - outside inert container #}
-  {% include "components/timeout-modal.njk" %}
 
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}

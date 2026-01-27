@@ -35,17 +35,16 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
     extendGetContent,
     stepDir,
     translationKeys,
-    basePath,
     flowConfig,
     showCancelButton = true,
   } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
-  // Use provided flowConfig or fall back to default stepNavigation
+  const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
   return {
-    url: basePath ? path.join(basePath, stepName) : path.join('/steps', journeyPath, stepName),
+    url: path.join(basePath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,
@@ -60,20 +59,13 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
-        const formContent = buildFormContent(
-          fields,
-          t,
-          getFormData(req, stepName),
-          {},
-          translationKeys,
-          nunjucksEnv,
-          showCancelButton
-        );
+        const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv);
         const result = extendGetContent ? { ...formContent, ...extendGetContent(req, {}) } : formContent;
 
         return {
           ...result,
           ccdId: req.session?.ccdCase?.id,
+          caseReference: req.params.caseReference,
           dashboardUrl: DASHBOARD_ROUTE,
           stepName,
           journeyFolder,
@@ -89,8 +81,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
       journeyFolder,
       beforeRedirect,
       translationKeys,
-      flowConfig,
-      showCancelButton
+      flowConfig
     ),
   };
 }
