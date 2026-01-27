@@ -3,6 +3,7 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { startNow } from '../data/page-data';
+import { disputeClaimInterstitial } from '../data/page-data';
 import { initializeExecutor, performAction } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
@@ -27,6 +28,8 @@ test.describe('Respond to a claim @nightly', async () => {
   test('Respond to a claim', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('clickButton', startNow.startNowButton);
-    //await performAction('clickButton', startNow.startNowButton);
+    //await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    //await performValidation('mainHeader', defendantNameCapture.mainHeader);
+    //await performAction('clickButton', disputeClaimInterstitial.continueButton);
   });
 });
