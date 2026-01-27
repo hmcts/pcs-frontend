@@ -55,6 +55,7 @@ export const step: StepDefinition = createFormStep(
                 name: 'firstName',
                 type: 'text',
                 required: true,
+                errorMessage: 'errors.firstName',
                 translationKey: {
                   label: 'firstNameLabel',
                 },
@@ -68,6 +69,7 @@ export const step: StepDefinition = createFormStep(
                 name: 'lastName',
                 type: 'text',
                 required: true,
+                errorMessage: 'errors.lastName',
                 translationKey: {
                   label: 'lastNameLabel',
                 },
