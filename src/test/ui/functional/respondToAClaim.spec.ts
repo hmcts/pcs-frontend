@@ -27,7 +27,7 @@ test.afterEach(async () => {
   PageContentValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim @PR @nightly', async () => {
+test.describe('Respond to a claim - functional @PR @nightly', async () => {
   test('Free legal advice - Error messages - Save for later Validations', async () => {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
     await performAction('inputErrorValidation', {
@@ -44,8 +44,6 @@ test.describe('Respond to a claim @PR @nightly', async () => {
 
   test('Defendant name capture - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputText', defendantNameCapture.firstNameLabelText, '');
-    await performAction('inputText', defendantNameCapture.lastNameLabelText, '');
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: defendantNameCapture.errorValidation,
