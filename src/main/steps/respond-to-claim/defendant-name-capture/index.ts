@@ -7,7 +7,6 @@ export const step: StepDefinition = createFormStep(
     stepName: 'defendant-name-capture',
     journeyFolder: 'respondToClaim',
     stepDir: __dirname,
-    basePath: '/respond-to-claim',
     flowConfig,
     translationKeys: {
       // Browser/tab title
@@ -38,7 +37,6 @@ export const step: StepDefinition = createFormStep(
         translationKey: {
           label: 'lastNameLabel',
         },
-        labelClasses: 'govuk-label--s',
         attributes: {
           autocomplete: 'family-name',
           spellcheck: false,

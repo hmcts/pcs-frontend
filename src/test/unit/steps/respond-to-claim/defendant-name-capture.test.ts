@@ -69,6 +69,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
       body: {},
       originalUrl: '/respond-to-claim/defendant-name-capture',
       query: { lang: 'en' },
+      params: {},
       session: { formData: {}, ccdCase: { id: '123' } },
       app: { locals: { nunjucksEnv } },
       i18n: { getResourceBundle: jest.fn(() => ({})) },
@@ -82,7 +83,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
   it('exposes correct step url and view', () => {
     expect(step.name).toBe('defendant-name-capture');
-    expect(step.url).toBe('/respond-to-claim/defendant-name-capture');
+    expect(step.url).toBe('/case/:caseReference/respond-to-claim/defendant-name-capture');
     expect(step.view).toContain('defendantNameCapture.njk');
   });
 
@@ -122,7 +123,6 @@ describe('respond-to-claim defendant-name-capture step', () => {
       })
     );
 
-    expect(lastNameField?.component?.label?.classes).toBe('govuk-label--s');
     expect(lastNameField?.component?.attributes).toEqual(
       expect.objectContaining({
         autocomplete: 'family-name',
