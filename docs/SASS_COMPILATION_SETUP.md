@@ -14,7 +14,7 @@ This document explains the current Sass compilation setup in the PCS Frontend ap
 
 The application uses **Dart Sass** (via the `sass` package) for compiling Sass to CSS.
 
-**Package Version:** `sass@^1.65.1` (see `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/package.json:157`)
+**Package Version:** `sass@^1.65.1` (see `/pcs-frontend/package.json:157`)
 
 **Why Dart Sass:**
 - Official Sass implementation (replaces deprecated LibSass/Node Sass)
@@ -30,7 +30,7 @@ The application uses **Dart Sass** (via the `sass` package) for compiling Sass t
 
 Sass compilation is configured in webpack using `sass-loader`:
 
-**Configuration File:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack/scss.js:1-45`
+**Configuration File:** `/pcs-frontend/webpack/scss.js:1-45`
 
 ```javascript
 {
@@ -92,7 +92,7 @@ The Sass files go through multiple loaders:
 
 ### Main Sass Entry Point
 
-**File:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/main/assets/scss/main.scss:1-47`
+**File:** `/pcs-frontend/src/main/assets/scss/main.scss:1-47`
 
 ```scss
 @import 'govuk-frontend';
@@ -488,9 +488,9 @@ yarn add -D postcss autoprefixer
 
 ### Webpack Configuration
 
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack.config.js` - Main webpack config
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack/scss.js` - Sass loader config
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack/govukFrontend.js` - GOV.UK Frontend config
+- `/pcs-frontend/webpack.config.js` - Main webpack config
+- `/pcs-frontend/webpack/scss.js` - Sass loader config
+- `/pcs-frontend/webpack/govukFrontend.js` - GOV.UK Frontend config
 
 ### Package Dependencies
 
@@ -585,6 +585,6 @@ Document why custom styles override GOV.UK Frontend:
 
 ## Related Documentation
 
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/GOVUK_FRONTEND_JS_COMPILATION.md` - JavaScript compilation
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/GOVUK_FRONTEND_BUILD_GUIDE.md` - Build process
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/GOVUK_FRONTEND_UPGRADE_GUIDE.md` - Upgrade guide
+- `/pcs-frontend/docs/GOVUK_FRONTEND_JS_COMPILATION.md` - JavaScript compilation
+- `/pcs-frontend/docs/GOVUK_FRONTEND_BUILD_GUIDE.md` - Build process
+- `/pcs-frontend/docs/GOVUK_FRONTEND_UPGRADE_GUIDE.md` - Upgrade guide

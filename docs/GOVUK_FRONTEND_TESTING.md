@@ -48,7 +48,7 @@ The existing Express-based journeys **do not** use GOV.UK Frontend test fixtures
 - No HTML output validation against GOV.UK standards
 - Tests focus on business logic, not component compliance
 
-**Example:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/test/unit/nest/postcode/postcode.controller.spec.ts`
+**Example:** `/pcs-frontend/src/test/unit/nest/postcode/postcode.controller.spec.ts`
 - Tests API logic only
 - No component HTML validation
 
@@ -56,7 +56,7 @@ The existing Express-based journeys **do not** use GOV.UK Frontend test fixtures
 
 The NestJS journey implementation **now includes** GOV.UK Frontend fixture testing:
 
-**Test File:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/test/unit/nest/journey/nest-journey.controller.spec.ts`
+**Test File:** `/pcs-frontend/src/test/unit/nest/journey/nest-journey.controller.spec.ts`
 
 ---
 
@@ -464,6 +464,6 @@ GOV.UK Frontend test fixtures provide a robust way to ensure your HTML output ma
 
 *Document created: January 23, 2026*  
 *Related files:*
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/test/unit/nest/journey/nest-journey.controller.spec.ts`
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_JOURNEY_COMPARISON.md`
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`
+- `/pcs-frontend/src/test/unit/nest/journey/nest-journey.controller.spec.ts`
+- `/pcs-frontend/docs/NESTJS_JOURNEY_COMPARISON.md`
+- `/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`

@@ -24,7 +24,7 @@
 
 The NestJS application is bootstrapped using the `ExpressAdapter`, which allows NestJS to run on top of the existing Express application without replacing it.
 
-**Key File:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/main/nest/index.ts`
+**Key File:** `/pcs-frontend/src/main/nest/index.ts`
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
@@ -46,7 +46,7 @@ export async function bootstrapNest(expressApp: Express): Promise<void> {
 }
 ```
 
-**Integration Point:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/main/server.ts`
+**Integration Point:** `/pcs-frontend/src/main/server.ts`
 
 ```typescript
 import { bootstrapNest } from './nest';
@@ -98,7 +98,7 @@ NestJS application initialized with Express adapter
 NestJS bootstrapped successfully
 ```
 
-**Documentation:** Full instructions are available in `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`
+**Documentation:** Full instructions are available in `/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`
 
 ---
 
@@ -144,7 +144,7 @@ src/main/nest/
 
 **Implementation Details:**
 
-**Root Module:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/main/nest/app.module.ts`
+**Root Module:** `/pcs-frontend/src/main/nest/app.module.ts`
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -181,7 +181,7 @@ export class AppModule {}
 
 Every feature module follows the controller/service pattern:
 
-**Controller Example:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/main/nest/postcode/postcode.controller.ts`
+**Controller Example:** `/pcs-frontend/src/main/nest/postcode/postcode.controller.ts`
 
 ```typescript
 @Controller('api')
@@ -198,7 +198,7 @@ export class PostcodeController {
 }
 ```
 
-**Service Example:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/main/nest/postcode/postcode.service.ts`
+**Service Example:** `/pcs-frontend/src/main/nest/postcode/postcode.service.ts`
 
 ```typescript
 @Injectable()
@@ -527,7 +527,7 @@ controller = module.get<PostcodeController>(PostcodeController);
 
 **Status:** Complete
 
-**Documentation Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`
+**Documentation Location:** `/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`
 
 **Quick Start:**
 
@@ -558,7 +558,7 @@ http://localhost:3000/nest-journey/step1
 
 **Status:** Complete
 
-**Documentation Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`
+**Documentation Location:** `/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`
 
 **Step-by-Step Guide:**
 
@@ -661,7 +661,7 @@ export class AppModule {}
 
 **Status:** Complete
 
-**Documentation Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`
+**Documentation Location:** `/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md`
 
 **Migration Strategy:**
 
@@ -735,7 +735,7 @@ Beyond the original ticket deliverables, the following additional work was compl
 **Status:** Complete  
 **Scope:** General frontend (not NestJS-specific)
 
-**Documentation Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/GOVUK_FRONTEND_JS_COMPILATION.md`
+**Documentation Location:** `/pcs-frontend/docs/GOVUK_FRONTEND_JS_COMPILATION.md`
 
 **What Was Documented:**
 - Complete webpack configuration for GOV.UK Frontend
@@ -760,7 +760,7 @@ Beyond the original ticket deliverables, the following additional work was compl
 
 #### Playwright + axe-core Tests
 
-**Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/test/ui/accessibility/nest-journey.a11y.spec.ts`
+**Location:** `/pcs-frontend/src/test/ui/accessibility/nest-journey.a11y.spec.ts`
 
 **Coverage:**
 - All NestJS journey pages (step1, step2, step3, confirmation)
@@ -776,7 +776,7 @@ yarn test:accessibility
 
 #### pa11y-ci Configuration
 
-**Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/pa11y.config.js`
+**Location:** `/pcs-frontend/pa11y.config.js`
 
 **Coverage:**
 - Home page
@@ -808,7 +808,7 @@ yarn test:a11y
 **Status:** Complete  
 **Scope:** General frontend (not NestJS-specific)
 
-**Documentation Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/MANUAL_ACCESSIBILITY_TESTING_CHECKLIST.md`
+**Documentation Location:** `/pcs-frontend/docs/MANUAL_ACCESSIBILITY_TESTING_CHECKLIST.md`
 
 **What Was Documented:**
 - Comprehensive keyboard navigation testing checklist
@@ -833,7 +833,7 @@ yarn test:a11y
 **Status:** Complete  
 **Scope:** NestJS-specific
 
-**Documentation Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_UPGRADE_GUIDE.md`
+**Documentation Location:** `/pcs-frontend/docs/NESTJS_UPGRADE_GUIDE.md`
 
 **What Was Documented:**
 - Pre-upgrade checklist
@@ -857,7 +857,7 @@ yarn test:a11y
 **Status:** Complete  
 **Scope:** General frontend (not NestJS-specific)
 
-**Documentation Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/GOVUK_FRONTEND_UPGRADE_GUIDE.md`
+**Documentation Location:** `/pcs-frontend/docs/GOVUK_FRONTEND_UPGRADE_GUIDE.md`
 
 **What Was Documented:**
 - Pre-upgrade checklist
@@ -882,7 +882,7 @@ yarn test:a11y
 **Status:** Complete  
 **Scope:** General frontend (not NestJS-specific)
 
-**Documentation Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/SASS_COMPILATION_SETUP.md`
+**Documentation Location:** `/pcs-frontend/docs/SASS_COMPILATION_SETUP.md`
 
 **What Was Documented:**
 - Dart Sass configuration
@@ -925,9 +925,9 @@ yarn test:a11y
 
 ## Related Documentation
 
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md` - Full spike results
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_JOURNEY_COMPARISON.md` - Express vs NestJS comparison
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/GOVUK_FRONTEND_TESTING.md` - GOV.UK fixture testing guide
+- `/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md` - Full spike results
+- `/pcs-frontend/docs/NESTJS_JOURNEY_COMPARISON.md` - Express vs NestJS comparison
+- `/pcs-frontend/docs/GOVUK_FRONTEND_TESTING.md` - GOV.UK fixture testing guide
 
 ---
 

@@ -34,7 +34,7 @@ src/main/assets/scss/main.scss
 | `webpack/scss.js` | Sass compilation configuration |
 | `webpack/govukFrontend.js` | GOV.UK Frontend asset paths |
 
-**Configuration:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack/scss.js`
+**Configuration:** `/pcs-frontend/webpack/scss.js`
 
 ```javascript
 {
@@ -81,7 +81,7 @@ GOV.UK Frontend v5.13.0 provides multiple JavaScript formats:
 
 #### Current Project Approach
 
-**File:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/src/main/assets/js/index.ts`
+**File:** `/pcs-frontend/src/main/assets/js/index.ts`
 
 The project currently imports GOV.UK Frontend JavaScript and initialises it:
 
@@ -172,7 +172,7 @@ accordions.forEach(el => new Accordion(el));
 
 ## Asset Copying
 
-**File:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack/govukFrontend.js`
+**File:** `/pcs-frontend/webpack/govukFrontend.js`
 
 GOV.UK Frontend assets are copied during build:
 
@@ -272,7 +272,7 @@ Then import in order:
 
 ## Upgrading GOV.UK Frontend
 
-See `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/UPGRADE_GUIDE.md` for detailed upgrade instructions.
+See `/pcs-frontend/docs/UPGRADE_GUIDE.md` for detailed upgrade instructions.
 
 **Quick Upgrade:**
 

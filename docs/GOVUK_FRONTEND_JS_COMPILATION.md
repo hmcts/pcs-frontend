@@ -15,10 +15,10 @@ This document explains how GOV.UK Frontend JavaScript is compiled and bundled in
 The application uses **Webpack 5** as the primary build tool for compiling and bundling both JavaScript and SCSS assets.
 
 **Configuration Files:**
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack.config.js:1-46` - Main webpack configuration
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack/govukFrontend.js:1-29` - GOV.UK Frontend specific config
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack/scss.js:1-45` - SCSS compilation config
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/webpack/htmlWebpack.js:1-23` - HTML template injection
+- `/pcs-frontend/webpack.config.js:1-46` - Main webpack configuration
+- `/pcs-frontend/webpack/govukFrontend.js:1-29` - GOV.UK Frontend specific config
+- `/pcs-frontend/webpack/scss.js:1-45` - SCSS compilation config
+- `/pcs-frontend/webpack/htmlWebpack.js:1-23` - HTML template injection
 
 ---
 
@@ -35,7 +35,7 @@ import { initAll } from 'govuk-frontend';
 initAll();
 ```
 
-**Package Version:** `govuk-frontend@5.13.0` (see `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/package.json:65`)
+**Package Version:** `govuk-frontend@5.13.0` (see `/pcs-frontend/package.json:65`)
 
 ### JavaScript Entry Point
 
@@ -81,7 +81,7 @@ Application TypeScript files are compiled using `ts-loader`:
 }
 ```
 
-**Configuration:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/tsconfig.json:1-1218`
+**Configuration:** `/pcs-frontend/tsconfig.json:1-1218`
 
 ### 2. JavaScript Bundling
 
@@ -366,7 +366,7 @@ When upgrading GOV.UK Frontend:
 
 ## Related Documentation
 
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/GOVUK_FRONTEND_BUILD_GUIDE.md` - Build process guide
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/GOVUK_FRONTEND_TESTING.md` - Testing GOV.UK components
+- `/pcs-frontend/docs/GOVUK_FRONTEND_BUILD_GUIDE.md` - Build process guide
+- `/pcs-frontend/docs/GOVUK_FRONTEND_TESTING.md` - Testing GOV.UK components
 - [GOV.UK Frontend Documentation](https://frontend.design-system.service.gov.uk/)
 - [Webpack Documentation](https://webpack.js.org/)

@@ -17,7 +17,7 @@ As of this document:
 - `@nestjs/config`: `^4.0.2`
 - `@nestjs/testing`: `^11.1.12` (dev)
 
-**Location:** `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/package.json`
+**Location:** `/pcs-frontend/package.json`
 
 ---
 
@@ -403,7 +403,7 @@ NestJS often requires recent TypeScript versions. Keep TypeScript updated to avo
 | v9.x | ≥14.0.0 | ≥4.3.5 | ≥4.17.1 | ≥7.2.0 |
 
 **Current Project Versions:**
-- Node.js: ≥18.0.0 (see `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/package.json:6`)
+- Node.js: ≥18.0.0 (see `/pcs-frontend/package.json:6`)
 - TypeScript: ≥4.7.4 <5.10.0
 - Express: ^5.2.1
 - RxJS: ^7.8.1
@@ -436,6 +436,6 @@ After successful upgrade:
 
 ## Related Documentation
 
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md` - NestJS implementation details
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/NESTJS_MIGRATION_GUIDE.md` - Migrating endpoints to NestJS
-- `@/Users/sdmiddleton/Documents/HTTPS/pcs-frontend/docs/UPGRADE_GUIDE.md` - General upgrade guide
+- `/pcs-frontend/docs/NESTJS_SPIKE_RESULTS.md` - NestJS implementation details
+- `/pcs-frontend/docs/NESTJS_MIGRATION_GUIDE.md` - Migrating endpoints to NestJS
+- `/pcs-frontend/docs/UPGRADE_GUIDE.md` - General upgrade guide
