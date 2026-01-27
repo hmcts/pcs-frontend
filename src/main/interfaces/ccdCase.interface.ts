@@ -22,3 +22,33 @@ export interface CcdCase {
   id: string;
   data: Record<string, unknown>;
 }
+
+export interface Address {
+  AddressLine1: string;
+  AddressLine2?: string;
+  AddressLine3?: string;
+  PostTown: string;
+  County?: string;
+  PostCode: string;
+  Country?: string;
+}
+
+export interface PossessionClaimResponse {
+  party: {
+    firstName?: string;
+    lastName?: string;
+    address?: Address;
+  };
+}
+
+export interface StartCallbackData {
+  case_details: {
+    case_data: {
+      possessionClaimResponse?: {
+        party?: {
+          address?: Address;
+        };
+      };
+    };
+  };
+}

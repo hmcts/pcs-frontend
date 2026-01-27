@@ -1,6 +1,10 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+import { ccdCaseService } from '../../../services/ccdCaseService';
+
+const logger = Logger.getLogger('postcode-finder');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'postcode-finder',
@@ -11,8 +15,12 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'title',
   },
-  extendGetContent: req => {
+    extendGetContent: req => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
+
+    const prepopulateAddress = await getExistingAddress(req.session.user?.accessToken || '', req.params.caseReference || '');
+    console.log(prepopulateAddress); 
+
     return {
       title: t('title'),
       subtitle: t('subtitle'),
@@ -21,7 +29,7 @@ export const step: StepDefinition = createFormStep({
         yes: t('labels.yes'),
         no: t('labels.no'),
         enterAddress: t('labels.enterAddress'),
-        enterPostcode: t('labels.enterPostcode'),
+        enterPostcode: prepopulateAddress,
         enterManually: t('labels.enterManually'),
         enterManuallySubText: t('labels.enterManuallySubText'),
         selectAddress: t('labels.selectAddress'),
@@ -47,6 +55,9 @@ export const step: StepDefinition = createFormStep({
       correspondenceCounty: req.body?.['correspondenceAddressConfirm.county'] || '',
       correspondencePostcode: req.body?.['correspondenceAddressConfirm.postcode'] || '',
     };
+  },
+  beforeRedirect(req) {
+    console.log("MADE IT HERE"); 
   },
   fields: [
     {
@@ -124,3 +135,30 @@ export const step: StepDefinition = createFormStep({
     },
   ],
 });
+
+async function getExistingAddress(accessToken: string, caseReference: string): Promise<string> {
+  // Pull data from API
+  const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
+  const address = response.case_details.case_data.possessionClaimResponse?.party?.address;
+
+  if (address) {
+    const formattedAddress =
+      [
+        address.AddressLine1,
+        address.AddressLine2,
+        address.AddressLine3,
+        address.PostTown,
+        address.County,
+        address.PostCode,
+        address.Country,
+      ]
+        .map(v => (v ?? '').trim())
+        .filter(Boolean)
+        .join(', ') + '?';
+
+    logger.info('Mapping addy', formattedAddress);
+    return formattedAddress;
+  } else {
+    return '';
+  }
+}
