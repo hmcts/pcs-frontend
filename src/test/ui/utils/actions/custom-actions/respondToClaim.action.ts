@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
+import { contactByPhone, defendantNameCapture , freeLegalAdvice } from '../../../data/page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -10,6 +10,7 @@ export class RespondToClaimAction implements IAction {
       ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
+      ['selectContactByPhone', () => this.selectContactByPhone(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -30,6 +31,14 @@ export class RespondToClaimAction implements IAction {
     await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantData.fName);
     await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantData.lName);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  }
+
+  private async selectContactByPhone(contactByPhoneData: actionData): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: contactByPhone.areYouHappyToContactQuestion,
+      option: contactByPhoneData,
+    });
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
