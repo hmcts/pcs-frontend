@@ -37,7 +37,6 @@ export const step: StepDefinition = createFormStep(
         translationKey: {
           label: 'lastNameLabel',
         },
-        labelClasses: 'govuk-label--s',
         attributes: {
           autocomplete: 'family-name',
           spellcheck: false,
