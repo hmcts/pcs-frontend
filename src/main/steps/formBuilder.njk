@@ -18,15 +18,16 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if title %}
-    <h1 class="govuk-heading-l">
-      {% if caption %}
-        <span class="govuk-caption-xl">{{ caption }}</span>
-      {% endif %}
-      {{ title }}
-    </h1>
-  {% elif caption %}
+  {% if caption %}
     <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% elif pageTitle %}
+    <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+  {% elif title %}
+    <h1 class="govuk-heading-l">{{ title }}</h1>
   {% endif %}
 
   {% if content %}
@@ -34,44 +35,75 @@
   {% endif %}
 
   <form method="post" action="{{ url }}">
-    {% for field in fields %}
-      {% if field.component and field.componentType %}
-        {% if field.componentType == 'input' %}
-          {{ govukInput(field.component) }}
-        {% elif field.componentType == 'textarea' %}
-          {{ govukTextarea(field.component) }}
-        {% elif field.componentType == 'characterCount' %}
-          {{ govukCharacterCount(field.component) }}
-        {% elif field.componentType == 'radios' %}
-          {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
-          {{ govukRadios(field.component) }}
-        {% elif field.componentType == 'checkboxes' %}
-          {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
-          {{ govukCheckboxes(field.component) }}
-        {% elif field.componentType == 'dateInput' %}
-          {{ govukDateInput(field.component) }}
+    {# Wrap fields in fieldset with visually-hidden legend for accessibility #}
+    {% if heading %}
+      {% call govukFieldset({
+        legend: {
+          text: heading,
+          classes: "govuk-visually-hidden"
+        }
+      }) %}
+        {% for field in fields %}
+          {% if field.component and field.componentType %}
+            {% if field.componentType == 'input' %}
+              {{ govukInput(field.component) }}
+            {% elif field.componentType == 'textarea' %}
+              {{ govukTextarea(field.component) }}
+            {% elif field.componentType == 'characterCount' %}
+              {{ govukCharacterCount(field.component) }}
+            {% elif field.componentType == 'radios' %}
+              {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
+              {{ govukRadios(field.component) }}
+            {% elif field.componentType == 'checkboxes' %}
+              {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
+              {{ govukCheckboxes(field.component) }}
+            {% elif field.componentType == 'dateInput' %}
+              {{ govukDateInput(field.component) }}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      {% endcall %}
+    {% else %}
+      {# Fallback: render fields without fieldset if no heading #}
+      {% for field in fields %}
+        {% if field.component and field.componentType %}
+          {% if field.componentType == 'input' %}
+            {{ govukInput(field.component) }}
+          {% elif field.componentType == 'textarea' %}
+            {{ govukTextarea(field.component) }}
+          {% elif field.componentType == 'characterCount' %}
+            {{ govukCharacterCount(field.component) }}
+          {% elif field.componentType == 'radios' %}
+            {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
+            {{ govukRadios(field.component) }}
+          {% elif field.componentType == 'checkboxes' %}
+            {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
+            {{ govukCheckboxes(field.component) }}
+          {% elif field.componentType == 'dateInput' %}
+            {{ govukDateInput(field.component) }}
+          {% endif %}
         {% endif %}
-      {% endif %}
-    {% endfor %}
+      {% endfor %}
+    {% endif %}
 
-        
+
     <div class="govuk-button-group">
-      {{ govukButton({ 
+      {{ govukButton({
         text: continue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
-      {{ govukButton({ 
+      {{ govukButton({
         text: saveForLater,
         classes: 'govuk-button--secondary',
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
-    
     {% if showCancelButton is not defined or showCancelButton %}
-    <p class="govuk-body">
-      <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
-    </p>
+        <p class="govuk-body">
+          <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+        </p>
     {% endif %}
+
   </form>
 {% endblock %}
 

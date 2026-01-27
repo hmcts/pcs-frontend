@@ -28,7 +28,7 @@ export function createPostHandler(
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
   flowConfig?: JourneyFlowConfig,
-  showCancelButton: boolean = true
+  showCancelButton?: boolean
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -91,7 +91,8 @@ export function createPostHandler(
           stepName,
           journeyFolder,
           navigation,
-          translationKeys
+          translationKeys,
+          showCancelButton
         );
         return; // renderWithErrors sends the response, so we return early
       }

@@ -36,7 +36,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
     stepDir,
     translationKeys,
     flowConfig,
-    showCancelButton = true,
+    showCancelButton,
   } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
@@ -71,6 +71,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
           journeyFolder,
           languageToggle: t('languageToggle'),
           backUrl: await navigation.getBackUrl(req, stepName),
+          showCancelButton,
         };
       });
     },
@@ -81,7 +82,8 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
       journeyFolder,
       beforeRedirect,
       translationKeys,
-      flowConfig
+      flowConfig,
+      showCancelButton
     ),
   };
 }
