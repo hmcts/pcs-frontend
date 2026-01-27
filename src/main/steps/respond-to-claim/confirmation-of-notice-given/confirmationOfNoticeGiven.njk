@@ -1,0 +1,62 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+
+{% block mainContent %}
+
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">{{ subTitle }}</h2>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {{ govukRadios({
+        name: 'confirmNoticeGiven',
+        fieldset: { 
+          legend: { 
+            text: '',
+            isPageHeading: true
+             } },
+        hint: {
+          text: hintText
+        },
+        items: [
+          { value: 'yes', 
+            text: options.yes 
+          },
+          { value: 'no',
+            text: options.no
+          },
+          {
+            divider: options.or
+          },
+          { value: 'imNotSure', 
+            text: options.imNotSure 
+          }
+        ]
+      }) 
+    }}
+
+    <div class="govuk-button-group govuk-!-margin-top-6">
+      {{ govukButton({ 
+        text: buttons.continue,
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      {{ govukButton({
+        text: buttons.saveForLater,
+        classes: 'govuk-button--secondary',
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
+  </form>
+
+{% endblock %}
