@@ -27,8 +27,17 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
-  const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys, flowConfig } =
-    config;
+  const {
+    stepName,
+    journeyFolder,
+    fields,
+    beforeRedirect,
+    extendGetContent,
+    stepDir,
+    translationKeys,
+    flowConfig,
+    showCancelButton,
+  } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
@@ -61,6 +70,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
           journeyFolder,
           languageToggle: t('languageToggle'),
           backUrl: await navigation.getBackUrl(req, stepName),
+          showCancelButton,
         };
       });
     },
@@ -71,7 +81,8 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
       journeyFolder,
       beforeRedirect,
       translationKeys,
-      flowConfig
+      flowConfig,
+      showCancelButton
     ),
   };
 }
