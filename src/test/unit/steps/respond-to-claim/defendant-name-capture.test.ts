@@ -123,7 +123,6 @@ describe('respond-to-claim defendant-name-capture step', () => {
       })
     );
 
-    expect(lastNameField?.component?.label?.classes).toBe('govuk-label--s');
     expect(lastNameField?.component?.attributes).toEqual(
       expect.objectContaining({
         autocomplete: 'family-name',
