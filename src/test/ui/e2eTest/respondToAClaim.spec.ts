@@ -7,12 +7,12 @@ import {
   defendantNameCapture,
   disputeClaimInterstitial,
   freeLegalAdvice,
-  startNow
+  startNow,
 } from '../data/page-data';
+import { registeredLandlord } from '../data/page-data/registeredLandlord.page.data';
+import { tenancyDetails } from '../data/page-data/tenancyDetails.page.data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
-import {tenancyDetails} from "../data/page-data/tenancyDetails.page.data";
-import {registeredLandlord} from "../data/page-data/registeredLandlord.page.data";
 
 const home_url = config.get('e2e.testUrl') as string;
 
