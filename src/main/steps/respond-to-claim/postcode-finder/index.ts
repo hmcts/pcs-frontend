@@ -17,12 +17,12 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/postcode-finder/postcodeFinder.njk',
       stepName,
-      (req: Request) => {
+      async (req: Request) => {
         const caseReference = req.params.caseReference;
         logger.info('Postcode page logged', { caseReference });
 
         return {
-          backUrl: stepNavigation.getBackUrl(req, stepName),
+          backUrl: await stepNavigation.getBackUrl(req, stepName),
         };
       },
       'respondToClaim'

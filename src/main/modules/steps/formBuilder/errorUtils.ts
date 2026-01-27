@@ -90,7 +90,8 @@ export async function renderWithErrors(
   stepName: string,
   journeyFolder: string,
   navigation: { getBackUrl: (req: Request, currentStepName: string) => Promise<string | null> },
-  _translationKeys?: TranslationKeys
+  _translationKeys?: TranslationKeys,
+  showCancelButton?: boolean
 ): Promise<void> {
   const lang = getRequestLanguage(req);
   const t: TFunction = getTranslationFunction(req, stepName, ['common']);
@@ -111,5 +112,6 @@ export async function renderWithErrors(
     ccdId: req.session?.ccdCase?.id,
     dashboardUrl: getDashboardUrl(req.session?.ccdCase?.id),
     languageToggle: t('languageToggle'),
+    showCancelButton,
   });
 }
