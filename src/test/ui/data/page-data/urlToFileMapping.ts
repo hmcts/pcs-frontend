@@ -4,4 +4,5 @@ export default {
   'dispute-claim-interstitial': 'disputeClaimInterstitial',
   home: 'home',
   'page-not-found': 'pageNotFound',
+  'defendant-name-capture': 'defendantNameCapture',
 };

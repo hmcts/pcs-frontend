@@ -2,14 +2,12 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}Defendant name confirmation - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+{% block pageTitle %}Defendant date of birth - HM Courts & Tribunals Service – GOV.UK{% endblock %}
 
 {% block mainContent %}
-  <h1 class="govuk-heading-l">Defendant name known (placeholder)</h1>
+  <h1 class="govuk-heading-l">Defendant date of birth (placeholder)</h1>
   
-  <div>
-    <strong>Defendant name:</strong> {{ defendantName }}
-  </div>
+  <p class="govuk-body">This is a placeholder page for defendant date of birth capture.</p>
 
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">
