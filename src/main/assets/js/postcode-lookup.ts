@@ -175,6 +175,11 @@ export function initPostcodeLookup(): void {
       if (addresses.length === 0) {
         showError(errorMessage, input);
         showEmptyDropdown(select, selectContainer);
+        // Open the "Enter manually" Details component when no addresses found
+        if (enterManuallyDetails) {
+          enterManuallyDetails.open = true;
+          enterManuallyDetails.style.display = '';
+        }
       } else {
         // Hide the "Enter manually" Details component when addresses are found
         if (enterManuallyDetails) {
@@ -185,6 +190,11 @@ export function initPostcodeLookup(): void {
     } catch {
       showError(errorMessage, input);
       showEmptyDropdown(select, selectContainer);
+      // Open the "Enter manually" Details component on error
+      if (enterManuallyDetails) {
+        enterManuallyDetails.open = true;
+        enterManuallyDetails.style.display = '';
+      }
     } finally {
       button.disabled = false;
     }

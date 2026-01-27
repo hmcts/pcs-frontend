@@ -19,6 +19,7 @@
     <h1 class="govuk-heading-l">{{ title }}</h1>
     <p class="govuk-body">{{ subtitle }}</p>
 
+    {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
     {% set postcodeFinderHtml %}
       <div class="govuk-form-group postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
         <h2 class="govuk-heading-m">{{ labels.enterAddress }}</h2>
@@ -63,10 +64,10 @@
         {{ govukDetails({
           summaryText: labels.enterManually,
           text: labels.enterManuallySubText,
-          id: "correspondence-enterManuallyDetails"
+          id: "correspondence-enterManuallyDetails",
+          open: hasAddressErrors
         }) }}
         
-        {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
         {% set addressFormVisible = correspondenceAddressConfirm == 'no' or hasAddressErrors %}
         <div class="address-form{% if not addressFormVisible %} govuk-visually-hidden{% endif %}" id="correspondence-addressForm">
           <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ labels.addressHeading }}</h2>
