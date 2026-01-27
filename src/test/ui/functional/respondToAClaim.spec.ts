@@ -3,9 +3,14 @@ import config from 'config';
 
 //Below lines are commented to avoid API calls until data setup is integrated.
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import {
+  correspondenceAddressKnown,
+  defendantDateOfBirth,
+  defendantNameCapture,
+  freeLegalAdvice,
+  startNow,
+} from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -20,10 +25,6 @@ test.beforeEach(async ({ page }) => {
   await performAction('login');
   await performAction('navigateToUrl', home_url + '/case/1234567891234567/respond-to-claim/start-now');
   await performAction('clickButton', startNow.startNowButton);
-});
-
-test.afterEach(async () => {
-  PageContentValidation.finaliseTest();
 });
 
 test.describe('Respond to a claim @nightly', async () => {
@@ -56,5 +57,25 @@ test.describe('Respond to a claim @nightly', async () => {
     await performAction('inputText', defendantNameCapture.lastNameLabelText, 'Doe');
     await performAction('clickButton', defendantNameCapture.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
+  });
+
+  test('Correspondent Address Known - Error messages - save for later Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
+    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
+    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.radio,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorRadioMsg,
+      question: correspondenceAddressKnown.isThisYourAddressQuestion,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', correspondenceAddressKnown.noRadioOption);
+    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
   });
 });

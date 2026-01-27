@@ -3,7 +3,7 @@ import config from 'config';
 
 //Below lines are commented to avoid API calls until data setup is integrated.
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { defendantDateOfBirth, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import { correspondenceAddressKnown, defendantDateOfBirth, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
@@ -34,5 +34,9 @@ test.describe('Respond to a claim @nightly', async () => {
       lName: defendantNameCapture.lastNameInputText,
     });
     await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
+    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption
+    });
   });
 });

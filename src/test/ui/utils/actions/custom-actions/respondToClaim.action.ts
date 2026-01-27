@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 
-import { defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
-import { performAction, performValidation } from '../../controller';
+import { correspondenceAddressKnown, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
+import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class RespondToClaimAction implements IAction {
@@ -10,6 +10,7 @@ export class RespondToClaimAction implements IAction {
       ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
+      ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -32,6 +33,22 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
+  private async selectCorrespondenceAddressKnown(addressData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: correspondenceAddressKnown.isThisYourAddressQuestion,
+      option: addressData.radioOption,
+    });
+    if (addressData.radioOption === correspondenceAddressKnown.noRadioOption) {
+      await performActions(
+        'Find Address based on postcode',
+        ['inputText', correspondenceAddressKnown.enterUKPostcodeTextLabel, addressData.postcode],
+        ['clickButton', correspondenceAddressKnown.findAddressButton],
+        ['select', correspondenceAddressKnown.addressSelectLabel, addressData.addressIndex]
+      );
+    }
+    await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  }
+
   // Below changes are temporary will be changed as part of HDPI-3596
   private async inputErrorValidation(validationArr: actionRecord) {
     if (!validationArr || validationArr.validationReq !== 'YES') {
@@ -40,7 +57,6 @@ export class RespondToClaimAction implements IAction {
     if (!Array.isArray(validationArr.inputArray)) {
       return;
     }
-
     for (const item of validationArr.inputArray) {
       switch (validationArr.validationType) {
         case 'radioOptions':
@@ -53,12 +69,10 @@ export class RespondToClaimAction implements IAction {
             await performAction('clickRadioButton', { question: validationArr.question, option: validationArr.option });
           }
           break;
-
         case 'textField':
           await performValidation('inputError', item.label, item.errMessage);
           await performValidation('errorMessage', { header: validationArr.header, message: item.errMessage });
           break;
-
         case 'checkBox':
           await performAction('clickButton', validationArr.button);
           await performValidation(
@@ -67,7 +81,6 @@ export class RespondToClaimAction implements IAction {
             item.errMessage
           );
           break;
-
         default:
           throw new Error(`Validation type :"${validationArr.validationType}" is not valid`);
       }
