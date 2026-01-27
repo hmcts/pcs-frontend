@@ -7,7 +7,6 @@ export const step: StepDefinition = createFormStep(
     stepName: 'free-legal-advice',
     journeyFolder: 'respondToClaim',
     stepDir: __dirname,
-    basePath: '/respond-to-claim',
     flowConfig,
     translationKeys: {
       pageTitle: 'pageTitle',

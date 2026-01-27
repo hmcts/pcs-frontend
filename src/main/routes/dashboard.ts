@@ -9,6 +9,7 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '../services/pcsApi';
+import { sanitiseCaseReference } from '../utils/caseReference';
 
 interface MappedTask {
   title: { html: string };
@@ -28,11 +29,6 @@ interface MappedTaskGroup {
 
 export const DASHBOARD_ROUTE = '/dashboard';
 const DEFAULT_DASHBOARD_URL = `${DASHBOARD_ROUTE}/1234567890123456`; // TODO: remove hardcoded fake CCD caseId when CCD backend is setup
-
-function sanitiseCaseReference(caseReference: string | number): string | null {
-  const caseRefStr = String(caseReference);
-  return /^\d{16}$/.test(caseRefStr) ? caseRefStr : null;
-}
 
 export const getDashboardUrl = (caseReference?: string | number): string => {
   if (!caseReference) {
@@ -109,13 +105,7 @@ export default function dashboardRoutes(app: Application): void {
   });
 
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
-    const { caseReference } = req.params;
-
-    const sanitisedCaseReference = sanitiseCaseReference(caseReference);
-    if (!sanitisedCaseReference) {
-      return res.status(404).render('not-found');
-    }
-
+    const sanitisedCaseReference = req.params.caseReference;
     const caseReferenceNumber = Number(sanitisedCaseReference);
 
     try {
