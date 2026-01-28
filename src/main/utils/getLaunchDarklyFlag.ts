@@ -25,7 +25,6 @@ export const getLaunchDarklyFlag = async <T>(req: Request, flagName: string, def
     // If LaunchDarkly client is not initialized or variation returns null/undefined, default to empty string.
     result = (await ldClient?.variation('defendant-name', context, '')) ?? '';
     logger.info('-------Defendant name from LaunchDarkly----------', { result, flagName });
-
   } catch (err: unknown) {
     logger.error('LaunchDarkly evaluation failed', err);
   }
