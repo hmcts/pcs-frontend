@@ -23,7 +23,7 @@ test.afterEach(async () => {
   PageContentValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim @PR @nightly', async () => {
+test.describe('Respond to a claim @nightly', async () => {
   test('Respond to a claim', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('clickButton', startNow.startNowButton);
