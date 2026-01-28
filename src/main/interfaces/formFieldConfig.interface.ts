@@ -80,6 +80,7 @@ export interface FormBuilderConfig {
   translationKeys?: TranslationKeys;
   basePath?: string;
   flowConfig?: JourneyFlowConfig;
+  showCancelButton?: boolean;
 }
 
 export interface ComponentConfig {
