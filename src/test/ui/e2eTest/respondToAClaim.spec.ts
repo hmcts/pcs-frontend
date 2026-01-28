@@ -23,8 +23,8 @@ test.afterEach(async () => {
   PageContentValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim @PR @nightly', async () => {
-  test('Respond to a claim - e2e Journey', async () => {
+test.describe('Respond to a claim - e2e Journey @nightly', async () => {
+  test('Respond to a claim', async () => {
     await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
