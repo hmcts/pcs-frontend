@@ -11,11 +11,6 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
- <h1 class="govuk-heading-l">
-    <span class="govuk-caption-xl">{{ caption }}</span>
-    {{ heading | safe }}
-  </h1>
-
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
   <form method="post" action="{{ url }}" novalidate>
