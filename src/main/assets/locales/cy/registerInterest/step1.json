@@ -1,0 +1,11 @@
+{
+  "title": "cyHow would you like to be contacted?",
+  "options": {
+    "email": "cy-Email",
+    "phone": "cy-Phone",
+    "post": "cy-Post"
+  },
+  "buttons": {
+    "continue": "cy-Continue"
+  }
+}

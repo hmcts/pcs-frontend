@@ -1,0 +1,78 @@
+{% extends "journeyTemplate.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block page_title %}{{ t('step2:title') }}{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary %}
+        {{ govukErrorSummary(errorSummary) }}
+      {% endif %}
+
+      <form action="/register-interest/step2" method="post" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        <h1 class="govuk-heading-l">{{ t('step2:title') }}</h1>
+
+        {# Full Name #}
+        <div class="govuk-form-group {% if errors.fullName %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="fullName">
+            {{ t('step2:fields.fullName.label') }}
+          </label>
+          {% if errors.fullName %}
+            <p id="fullName-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span>
+              {{ errors.fullName.text }}
+            </p>
+          {% endif %}
+          <input class="govuk-input {% if errors.fullName %}govuk-input--error{% endif %}"
+                 id="fullName" name="fullName" type="text" value="{{ form.fullName }}">
+        </div>
+
+        {# Email #}
+        <div class="govuk-form-group {% if errors.email %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="email">
+            {{ t('step2:fields.email.label') }}
+          </label>
+          <div class="govuk-hint">
+            {{ t('step2:fields.email.hint') }}
+          </div>
+          {% if errors.email %}
+            <p id="email-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span>
+              {{ errors.email.text }}
+            </p>
+          {% endif %}
+          <input class="govuk-input {% if errors.email %}govuk-input--error{% endif %}"
+                 id="email" name="email" type="email" value="{{ form.email }}"
+                 autocomplete="email">
+        </div>
+
+        {# Phone Number #}
+        <div class="govuk-form-group {% if errors.phoneNumber %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="phoneNumber">
+            {{ t('step2:fields.phoneNumber.label') }}
+          </label>
+          <div class="govuk-hint">
+            {{ t('step2:fields.phoneNumber.hint') }}
+          </div>
+          {% if errors.phoneNumber %}
+            <p id="phoneNumber-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span>
+              {{ errors.phoneNumber.text }}
+            </p>
+          {% endif %}
+          <input class="govuk-input govuk-input--width-20 {% if errors.phoneNumber %}govuk-input--error{% endif %}"
+                 id="phoneNumber" name="phoneNumber" type="tel" value="{{ form.phoneNumber }}"
+                 autocomplete="tel">
+        </div>
+
+        <button class="govuk-button" data-module="govuk-button">
+          {{ t('step2:buttons.continue') }}
+        </button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

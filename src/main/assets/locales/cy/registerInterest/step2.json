@@ -1,0 +1,19 @@
+{
+  "title": "cy-Your contact details",
+  "fields": {
+    "fullName": {
+      "label": "cy-Full name"
+    },
+    "email": {
+      "label": "cy-Email address",
+      "hint": "We will use this to send you updates"
+    },
+    "phoneNumber": {
+      "label": "cy-Phone number",
+      "hint": "Include the country code if outside the UK"
+    }
+  },
+  "buttons": {
+    "continue": "cy-Continue"
+  }
+}

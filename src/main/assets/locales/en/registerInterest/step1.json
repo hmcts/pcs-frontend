@@ -1,0 +1,11 @@
+{
+  "title": "How would you like to be contacted?",
+  "options": {
+    "email": "Email",
+    "phone": "Phone",
+    "post": "Post"
+  },
+  "buttons": {
+    "continue": "Continue"
+  }
+}

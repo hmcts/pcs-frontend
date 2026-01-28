@@ -1,0 +1,67 @@
+{% extends "journeyTemplate.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block page_title %}{{ t('step1:title') }}{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary %}
+        {{ govukErrorSummary(errorSummary) }}
+      {% endif %}
+
+      <form action="/register-interest/step1" method="post" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        <div class="govuk-form-group {% if error %}govuk-form-group--error{% endif %}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+              <h1 class="govuk-fieldset__heading">
+                {{ t('step1:title') }}
+              </h1>
+            </legend>
+
+            {% if error %}
+              <p id="contactPreference-error" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>
+                {{ error.text }}
+              </p>
+            {% endif %}
+
+            <div class="govuk-radios" data-module="govuk-radios">
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="contactPreference-email"
+                       name="contactPreference" type="radio" value="email"
+                       {{ 'checked' if form.contactPreference === 'email' }}>
+                <label class="govuk-label govuk-radios__label" for="contactPreference-email">
+                  {{ t('step1:options.email') }}
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="contactPreference-phone"
+                       name="contactPreference" type="radio" value="phone"
+                       {{ 'checked' if form.contactPreference === 'phone' }}>
+                <label class="govuk-label govuk-radios__label" for="contactPreference-phone">
+                  {{ t('step1:options.phone') }}
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="contactPreference-post"
+                       name="contactPreference" type="radio" value="post"
+                       {{ 'checked' if form.contactPreference === 'post' }}>
+                <label class="govuk-label govuk-radios__label" for="contactPreference-post">
+                  {{ t('step1:options.post') }}
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <button class="govuk-button" data-module="govuk-button">
+          {{ t('step1:buttons.continue') }}
+        </button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

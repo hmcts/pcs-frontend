@@ -1,0 +1,9 @@
+{
+  "title": "Registration complete",
+  "body": "Your reference number is your email address",
+  "whatHappensNext": {
+    "title": "What happens next",
+    "body": "We will contact you using your preferred method within 5 working days."
+  },
+  "returnToDashboard": "Return to dashboard"
+}

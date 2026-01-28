@@ -1,0 +1,20 @@
+{
+  "title": "Check your answers",
+  "summary": {
+    "contactPreference": {
+      "label": "Contact preference",
+      "changeLink": "/register-interest/step1"
+    },
+    "contactDetails": {
+      "label": "Contact details",
+      "changeLink": "/register-interest/step2"
+    }
+  },
+  "declaration": {
+    "title": "Declaration",
+    "checkbox": "I confirm that the information I have provided is accurate"
+  },
+  "buttons": {
+    "submit": "Submit registration"
+  }
+}
