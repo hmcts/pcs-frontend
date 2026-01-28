@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+
 {% block pageTitle %}{{ pageTitle }}{% endblock %}
 
 {% block mainContent %}
@@ -11,31 +12,28 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
- <h1 class="govuk-heading-l">
-    <span class="govuk-caption-xl">{{ caption }}</span>
-    {{ heading | safe }}
-  </h1>
-
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {{ govukInsetText({text: hintText}) }}
+  {{ govukInsetText({ text: hintText | replace("{{claimantName}}", claimantName) }) }}
 
-  <h3 class="govuk-heading-s">{{ bulletPointLabel }}</h3>
+  <h3 class="govuk-heading-s">
+    {{ bulletPointLabel | replace("{{claimantName}}", claimantName) }}
+  </h3>
 
   <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
-    <li>{{ listItem1 }}</li>
+    <li>{{ listItem1 | replace("{{noticeDate}}", noticeDate) }}</li>
   </ul>
 
   <form method="post" action="{{ url }}" novalidate>
 
     {{ govukDateInput({
         id: "notice-date",
-        namePrefix: "notice-date",
+        namePrefix: "noticeDate",
         fieldset: {
             legend: {
-            text:noticeDateLabel,
-            isPageHeading: true,
-            classes: "govuk-fieldset__legend--m"
+                text: noticeDateLabel | replace("{{claimantName}}", claimantName),
+                isPageHeading: true,
+                classes: "govuk-fieldset__legend--m"
             }
         },
         hint: {
@@ -43,7 +41,7 @@
         }
     }) }}
 
-       <div class="govuk-button-group">
+    <div class="govuk-button-group">
       {{ govukButton({ 
         text: continue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
@@ -57,3 +55,4 @@
   </form>
 
 {% endblock %}
+
