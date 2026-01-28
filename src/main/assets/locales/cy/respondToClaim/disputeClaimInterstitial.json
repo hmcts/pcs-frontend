@@ -1,9 +1,9 @@
 {
-  "pageTitle": "cyThe claimant’s claim",
+  "pageTitle": "cyThe claimant's claim",
   "caption": "cyRespond to a property possession claim",
-  "heading": "cy{{ claimantName }}’s claim",
+  "heading": "cy{{claimantName, pluralPossessive}} claim",
   "secondaryHeading": "cyRespond to a property possession claim",
-  "paragraph1": "cyWhen they made their claim, {{ claimantName }} had to give information about:",
+  "paragraph1": "cyWhen they made their claim, {{claimantName}} had to give information about:",
   "listItem1": "cythe tenancy, occupation contract or licence agreement",
   "listItem2": "cythe notice of their intention to begin possession proceedings, if they served you with one",
   "listItem3": "cytheir grounds for possession (their reasons for making the claim)",
