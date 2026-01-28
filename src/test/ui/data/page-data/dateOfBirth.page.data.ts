@@ -15,8 +15,7 @@ export const dateOfBirth = {
   errorValidationHeader: 'There is a problem',
   errorValidationField: {
     errorTextField: [
-      { type: 'empty', label: 'First name', errMessage: 'Enter your first name' },
-      { type: 'empty', label: 'Last name', errMessage: 'Enter your last name' },
+      { type: 'empty', label: '', errMessage: 'Enter your date of birth' }
     ],
   },
 };

@@ -65,10 +65,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('clickButton', dateOfBirth.saveAndContinueButton);
     await performAction('inputErrorValidation', {
-      validationReq: defendantNameCapture.errorValidation,
-      validationType: defendantNameCapture.errorValidationType.input,
-      inputArray: defendantNameCapture.errorValidationField.errorTextField,
-      header: defendantNameCapture.errorValidationHeader,
+      validationReq: dateOfBirth.errorValidation,
+      validationType: dateOfBirth.errorValidationType.input,
+      inputArray: dateOfBirth.errorValidationField.errorTextField,
+      header: dateOfBirth.errorValidationHeader,
     });
   });
 });
