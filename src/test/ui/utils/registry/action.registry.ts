@@ -43,7 +43,7 @@ export class ActionRegistry {
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
-    ['enterDateOfBirthDetails', new RespondToClaimAction()]
+    ['enterDateOfBirthDetails', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

@@ -32,6 +32,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
     });
-    await performAction('enterDateOfBirthDetails', { dobDay: dateOfBirth.dayInputText, dobMonth: dateOfBirth.monthInputText, dobYear: dateOfBirth.yearInputText });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
   });
 });

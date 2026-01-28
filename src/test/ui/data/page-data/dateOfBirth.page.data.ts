@@ -1,5 +1,5 @@
 export const dateOfBirth = {
-  mainHeader: 'What\'s your date of birth?',
+  mainHeader: "What's your date of birth?",
   respondToClaimParagraph: 'Respond to a property possession claim',
   forExampleParagraph: 'For example, 27 9 2022',
   dayTextLabel: 'Day',
@@ -14,9 +14,6 @@ export const dateOfBirth = {
   errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox', date: 'dateField' },
   errorValidationHeader: 'There is a problem',
   errorValidationField: {
-    errorTextField: [
-      { type: 'empty', label: '', errMessage: 'Enter your date of birth' }
-    ],
+    errorTextField: [{ type: 'empty', label: '', errMessage: 'Enter your date of birth' }],
   },
 };
-
