@@ -10,8 +10,14 @@ import { getDateTranslationKey, validateDateField } from './dateValidation';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
-export function getTranslation(t: TFunction, key: string, fallback?: string): string | undefined {
-  const result = t(key, { returnObjects: true }) as unknown;
+export function getTranslation(
+  t: TFunction,
+  key: string,
+  fallback?: string,
+  interpolation?: Record<string, unknown>
+): string | undefined {
+  const options = { returnObjects: true, ...interpolation };
+  const result = t(key, options) as unknown;
   if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
     return result;
   }
@@ -93,13 +99,16 @@ export function processFieldData(req: Request, fields: FormFieldConfig[]): void 
 export function getTranslationErrors(
   t: TFunction,
   fields: FormFieldConfig[],
-  parentFieldName?: string
+  parentFieldName?: string,
+  interpolation?: Record<string, unknown>
 ): Record<string, string> {
   const translationErrors: Record<string, string> = {};
 
   const getStringTranslation = (key: string): string | undefined => {
     // Ask for objects so we can detect object-valued keys safely
-    const result = t(key, { returnObjects: true }) as unknown;
+    // Pass interpolation values if provided
+    const options = { returnObjects: true, ...interpolation };
+    const result = t(key, options) as unknown;
     return typeof result === 'string' && result !== key ? result : undefined;
   };
 
@@ -135,7 +144,9 @@ export function getTranslationErrors(
 
       // Also check the errorMessage property if set
       if (field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
-        const errorMsgFromProperty = t(field.errorMessage);
+        const errorMsgFromProperty = interpolation
+          ? t(field.errorMessage, interpolation)
+          : t(field.errorMessage);
         if (errorMsgFromProperty && errorMsgFromProperty !== field.errorMessage) {
           translationErrors[field.name] = errorMsgFromProperty;
         }
@@ -149,7 +160,7 @@ export function getTranslationErrors(
           // Recursively collect error translations from subFields
           // Pass the current fieldName (which may already be nested) as the parent
           // But we need to use the simple field.name for the parent, not fieldName
-          const subFieldErrors = getTranslationErrors(t, Object.values(option.subFields), field.name);
+          const subFieldErrors = getTranslationErrors(t, Object.values(option.subFields), field.name, interpolation);
           Object.assign(translationErrors, subFieldErrors);
         }
       }

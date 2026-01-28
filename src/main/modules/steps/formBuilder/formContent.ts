@@ -13,12 +13,13 @@ export function buildFormContent(
   bodyData: Record<string, unknown> = {},
   errors: Record<string, string> = {},
   translationKeys?: TranslationKeys,
-  nunjucksEnv?: Environment
+  nunjucksEnv?: Environment,
+  interpolation?: Record<string, unknown>
 ): Record<string, unknown> {
   const fieldValues = buildFieldValues(fields, bodyData);
-  const pageTitle = getTranslation(t, 'title', undefined) || getTranslation(t, 'question', undefined);
+  const pageTitle = getTranslation(t, 'title', undefined, interpolation) || getTranslation(t, 'question', undefined, interpolation);
   // Pass bodyData as originalData so translateFields can extract nested field values
-  const fieldsWithLabels = translateFields(fields, t, fieldValues, errors, !!pageTitle, '', bodyData, nunjucksEnv);
+  const fieldsWithLabels = translateFields(fields, t, fieldValues, errors, !!pageTitle, '', bodyData, nunjucksEnv, interpolation);
 
   // Build error summary
   const errorSummary = buildErrorSummary(errors, fields, t);
