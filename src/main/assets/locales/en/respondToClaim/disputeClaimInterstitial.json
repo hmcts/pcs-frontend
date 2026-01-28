@@ -1,7 +1,7 @@
 {
-  "pageTitle": "The claimant&rsquo;s claim",
+  "pageTitle": "The claimant’s claim",
   "caption": "Respond to a property possession claim",
-  "heading": "{{ claimantName }}&rsquo;s claim",
+  "heading": "{{ claimantName }}’s claim",
   "secondaryHeading": "Respond to a property possession claim",
   "paragraph1": "When they made their claim, {{ claimantName }} had to give information about:",
   "listItem1": "the tenancy, occupation contract or licence agreement",

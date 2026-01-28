@@ -1,7 +1,7 @@
 {
-  "pageTitle": "cyThe claimant&rsquo;s claim",
+  "pageTitle": "cyThe claimant’s claim",
   "caption": "cyRespond to a property possession claim",
-  "heading": "cy{{ claimantName }}&rsquo;s claim",
+  "heading": "cy{{ claimantName }}’s claim",
   "secondaryHeading": "cyRespond to a property possession claim",
   "paragraph1": "cyWhen they made their claim, {{ claimantName }} had to give information about:",
   "listItem1": "cythe tenancy, occupation contract or licence agreement",
