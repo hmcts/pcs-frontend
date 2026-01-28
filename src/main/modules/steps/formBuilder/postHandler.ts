@@ -71,13 +71,31 @@ export function createPostHandler(
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
       const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
 
-      const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv, interpolationValues);
+      const fieldsWithLabels = translateFields(
+        fields,
+        t,
+        {},
+        {},
+        false,
+        '',
+        undefined,
+        nunjucksEnv,
+        interpolationValues
+      );
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
       const fieldErrors = getTranslationErrors(t, fields, undefined, interpolationValues);
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
-        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv, interpolationValues);
+        const formContent = buildFormContent(
+          fields,
+          t,
+          req.body,
+          errors,
+          translationKeys,
+          nunjucksEnv,
+          interpolationValues
+        );
         await renderWithErrors(
           req,
           res,

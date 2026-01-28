@@ -17,9 +17,20 @@ export function buildFormContent(
   interpolation?: Record<string, unknown>
 ): Record<string, unknown> {
   const fieldValues = buildFieldValues(fields, bodyData);
-  const pageTitle = getTranslation(t, 'title', undefined, interpolation) || getTranslation(t, 'question', undefined, interpolation);
+  const pageTitle =
+    getTranslation(t, 'title', undefined, interpolation) || getTranslation(t, 'question', undefined, interpolation);
   // Pass bodyData as originalData so translateFields can extract nested field values
-  const fieldsWithLabels = translateFields(fields, t, fieldValues, errors, !!pageTitle, '', bodyData, nunjucksEnv, interpolation);
+  const fieldsWithLabels = translateFields(
+    fields,
+    t,
+    fieldValues,
+    errors,
+    !!pageTitle,
+    '',
+    bodyData,
+    nunjucksEnv,
+    interpolation
+  );
 
   // Build error summary
   const errorSummary = buildErrorSummary(errors, fields, t);

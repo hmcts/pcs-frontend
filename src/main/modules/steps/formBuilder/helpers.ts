@@ -144,9 +144,7 @@ export function getTranslationErrors(
 
       // Also check the errorMessage property if set
       if (field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
-        const errorMsgFromProperty = interpolation
-          ? t(field.errorMessage, interpolation)
-          : t(field.errorMessage);
+        const errorMsgFromProperty = interpolation ? t(field.errorMessage, interpolation) : t(field.errorMessage);
         if (errorMsgFromProperty && errorMsgFromProperty !== field.errorMessage) {
           translationErrors[field.name] = errorMsgFromProperty;
         }

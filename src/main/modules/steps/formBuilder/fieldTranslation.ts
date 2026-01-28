@@ -132,7 +132,7 @@ function processOptions(
           ? interpolation
             ? t(option.translationKey, interpolation)
             : t(option.translationKey)
-          : option.value ?? '')
+          : (option.value ?? ''))
     );
 
     // Process conditionalText if provided
@@ -149,7 +149,14 @@ function processOptions(
       for (const [subFieldName, subField] of Object.entries(option.subFields)) {
         // Create nested field name: parentField.subField
         const nestedFieldName = getNestedFieldName(parentFieldName, subFieldName);
-        const processedSubField = processField(subField, t, translations, nestedFieldName, parentFieldName, interpolation);
+        const processedSubField = processField(
+          subField,
+          t,
+          translations,
+          nestedFieldName,
+          parentFieldName,
+          interpolation
+        );
         // Store with original subFieldName as key for template access, but field has nested name
         processedSubFields[subFieldName] = processedSubField;
       }
