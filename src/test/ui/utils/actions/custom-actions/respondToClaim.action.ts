@@ -45,6 +45,13 @@ export class RespondToClaimAction implements IAction {
     if (!validationArr || validationArr.validationReq !== 'YES') {
       return;
     }
+
+    // Handle date field validation
+    if (validationArr.validationType === 'dateField') {
+      await this.validateDateField(validationArr);
+      return;
+    }
+
     if (!Array.isArray(validationArr.inputArray)) {
       return;
     }
@@ -79,6 +86,57 @@ export class RespondToClaimAction implements IAction {
         default:
           throw new Error(`Validation type :"${validationArr.validationType}" is not valid`);
       }
+    }
+  }
+
+  /**
+   * Validates date field inputs and determines appropriate error message
+   * Handles scenarios:
+   * - All fields blank → "Enter your date of birth"
+   * - Day missing → "Your date of birth must include a day"
+   * - Month missing → "Your date of birth must include a month"
+   * - Year missing → "Your date of birth must include a year"
+   */
+  private async validateDateField(validationArr: actionRecord): Promise<void> {
+    const day = (validationArr.dobDay as string || '').trim();
+    const month = (validationArr.dobMonth as string || '').trim();
+    const year = (validationArr.dobYear as string || '').trim();
+    const fieldName = (validationArr.fieldName as string) || 'date of birth';
+    const header = (validationArr.header as string) || 'There is a problem';
+
+    let errorMessage = '';
+    let fieldLabel = fieldName;
+
+    // Scenario 1: No entry made (All fields blank)
+    if (!day && !month && !year) {
+      errorMessage = `Enter your ${fieldName}`;
+      fieldLabel = fieldName;
+    }
+    // Scenario 2: Day missing
+    else if (!day && month && year) {
+      errorMessage = `Your ${fieldName} must include a day`;
+      fieldLabel = dateOfBirth.dayTextLabel;
+    }
+    // Scenario 3: Month missing
+    else if (day && !month && year) {
+      errorMessage = `Your ${fieldName} must include a month`;
+      fieldLabel = dateOfBirth.monthTextLabel;
+    }
+    // Scenario 4: Year missing
+    else if (day && month && !year) {
+      errorMessage = `Your ${fieldName} must include a year`;
+      fieldLabel = dateOfBirth.yearTextLabel;
+    }
+
+    if (errorMessage) {
+      // Validate error message is displayed in the error summary
+      await performValidation('errorMessage', {
+        header: header,
+        message: errorMessage,
+      });
+
+      // Validate error is associated with the specific date field
+      await performValidation('inputError', fieldLabel, errorMessage);
     }
   }
 }
