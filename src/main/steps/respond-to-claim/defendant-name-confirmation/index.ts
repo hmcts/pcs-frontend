@@ -2,8 +2,7 @@ import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { flowConfig } from '../flow.config';
-import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
+import { RESPOND_TO_CLAIM_ROUTE , flowConfig } from '../flow.config';
 
 const stepName = 'defendant-name-confirmation';
 const stepNavigation = createStepNavigation(flowConfig);

@@ -1,8 +1,8 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import { Logger } from '@hmcts/nodejs-logging';
 
 const logger = Logger.getLogger('respond-to-claim-flow');
 
