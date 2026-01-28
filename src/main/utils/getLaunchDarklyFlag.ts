@@ -1,5 +1,8 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import type { Request } from 'express';
+
+const logger = Logger.getLogger('getLaunchDarklyFlag');
 
 export const getLaunchDarklyFlag = async <T>(req: Request, flagName: string, defaultValue: T): Promise<T> => {
   const ldClient = (req.app?.locals?.launchDarklyClient as LDClient.LDClient | undefined) ?? undefined;
@@ -18,10 +21,13 @@ export const getLaunchDarklyFlag = async <T>(req: Request, flagName: string, def
       },
     };
 
-    result = await ldClient?.variation(flagName, context, defaultValue);
+    // If the flag does not exist LD will return the default (empty string) so we route to capture.
+    // If LaunchDarkly client is not initialized or variation returns null/undefined, default to empty string.
+    result = (await ldClient?.variation('defendant-name', context, '')) ?? '';
+    logger.info('-------Defendant name from LaunchDarkly----------', { result, flagName });
+
   } catch (err: unknown) {
-    // eslint-disable-next-line no-console
-    console.error('LaunchDarkly evaluation failed', err);
+    logger.error('LaunchDarkly evaluation failed', err);
   }
 
   return result;
