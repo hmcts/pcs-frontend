@@ -1,7 +1,10 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
+
+const logger = Logger.getLogger('respond-to-claim-flow');
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -23,8 +26,11 @@ const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
       },
     };
 
-    // If the flag does not exist LD will return the default (true) so UI remains visible by default.
-    result = await ldClient?.variation('defendant-name', context, '');
+    // If the flag does not exist LD will return the default (empty string) so we route to capture.
+    // If LaunchDarkly client is not initialized or variation returns null/undefined, default to empty string.
+    result = (await ldClient?.variation('defendant-name', context, '')) ?? '';
+    logger.info('-------Defendant name from LaunchDarkly----------', { result });
+    logger.info('--------ldClient instance------', { ldClient });
 
     req.session.defendantName = result;
   } catch (err: unknown) {
