@@ -25,7 +25,7 @@ test.afterEach(async () => {
   PageContentValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim @PR @nightly', async () => {
+test.describe('Respond to a claim @nightly', async () => {
   test('Free legal advice - Error messages - Save for later Validations', async () => {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
     await performAction('inputErrorValidation', {

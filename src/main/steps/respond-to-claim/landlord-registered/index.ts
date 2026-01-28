@@ -2,24 +2,25 @@ import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
+import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
-const stepName = 'defendant-name-confirmation';
+const stepName = 'landlord-registered';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/defendant-name-confirmation`,
+  url: `${RESPOND_TO_CLAIM_ROUTE}/landlord-registered`,
   name: stepName,
-  view: 'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
+  view: 'respond-to-claim/landlord-registered/landlordRegistered.njk',
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk',
+      'respond-to-claim/landlord-registered/landlordRegistered.njk',
       stepName,
-      (req: Request) => {
+      async (req: Request) => {
         return {
-          //TODO: get defendant name from CCD case - currently served from LaunchDarkly flag
-          defendantName: req.session.defendantName ?? '',
+          backUrl: await stepNavigation.getBackUrl(req, stepName),
+          dashboardUrl: DASHBOARD_ROUTE,
         };
       },
       'respondToClaim'
@@ -27,9 +28,11 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
+      // Get next step URL and redirect
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
 
       if (!redirectPath) {
+        // No next step defined - show not found page
         return res.status(404).render('not-found');
       }
 

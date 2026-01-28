@@ -27,7 +27,8 @@ export function createPostHandler(
   journeyFolder: string,
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
-  flowConfig?: JourneyFlowConfig
+  flowConfig?: JourneyFlowConfig,
+  showCancelButton?: boolean
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -71,7 +72,15 @@ export function createPostHandler(
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
-        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
+        const formContent = buildFormContent(
+          fields,
+          t,
+          req.body,
+          errors,
+          translationKeys,
+          nunjucksEnv,
+          showCancelButton
+        );
         await renderWithErrors(
           req,
           res,
@@ -82,7 +91,8 @@ export function createPostHandler(
           stepName,
           journeyFolder,
           navigation,
-          translationKeys
+          translationKeys,
+          showCancelButton
         );
         return; // renderWithErrors sends the response, so we return early
       }
