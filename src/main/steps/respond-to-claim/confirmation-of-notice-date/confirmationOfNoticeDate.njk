@@ -1,8 +1,8 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% block pageTitle %}{{ pageTitle }}{% endblock %}
 
 {% block mainContent %}
@@ -18,14 +18,32 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  <form method="post" action="{{ url }}" novalidate>
-    {% for field in fields %}
-      {% if field.componentType == 'radios' %}
-        {{ govukRadios(field.component) }}
-      {% endif %}
-    {% endfor %}
+  {{ govukInsetText({text: hintText}) }}
 
-    <div class="govuk-button-group">
+  <h3 class="govuk-heading-s">{{ bulletPointLabel }}</h3>
+
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
+    <li>{{ listItem1 }}</li>
+  </ul>
+
+  <form method="post" action="{{ url }}" novalidate>
+
+    {{ govukDateInput({
+        id: "notice-date",
+        namePrefix: "notice-date",
+        fieldset: {
+            legend: {
+            text:noticeDateLabel,
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--m"
+            }
+        },
+        hint: {
+            text: noticeDateHint
+        }
+    }) }}
+
+       <div class="govuk-button-group">
       {{ govukButton({ 
         text: continue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }

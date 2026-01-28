@@ -7,6 +7,7 @@ import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as postcodeFinder } from './postcode-finder';
 import { step as startNow } from './start-now';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
+import { step as confirmationOfNoticeDate } from './confirmation-of-notice-date';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -15,5 +16,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
-  'confirmation-of-notice-given': confirmationOfNoticeGiven
+  'confirmation-of-notice-given': confirmationOfNoticeGiven,
+  'confirmation-of-notice-date': confirmationOfNoticeDate,
 };
