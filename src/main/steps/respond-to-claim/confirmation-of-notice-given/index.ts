@@ -2,7 +2,6 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
-
 export const step: StepDefinition = createFormStep(
   {
     stepName: 'confirmation-of-notice-given',
@@ -18,7 +17,7 @@ export const step: StepDefinition = createFormStep(
       {
         name: 'confirmNoticeGiven',
         type: 'radio',
-        required: true, 
+        required: true,
         translationKey: { label: 'subTitle', hint: 'hintText' },
         legendClasses: 'govuk-fieldset__legend--m',
         options: [
@@ -29,7 +28,7 @@ export const step: StepDefinition = createFormStep(
         ],
       },
     ],
-    extendGetContent: (req) => ({
+    extendGetContent: req => ({
       claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
     }),
   },
