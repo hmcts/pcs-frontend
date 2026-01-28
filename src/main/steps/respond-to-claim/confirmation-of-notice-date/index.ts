@@ -2,7 +2,6 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
-
 export const step: StepDefinition = createFormStep(
   {
     stepName: 'confirmation-of-notice-date',
@@ -19,14 +18,14 @@ export const step: StepDefinition = createFormStep(
     },
     fields: [
       {
-        name: 'noticeDate1',
+        name: 'noticeDate',
         type: 'date',
         required: true,
-        noFutureDate: true, 
+        noFutureDate: true,
         legendClasses: 'govuk-fieldset__legend--m govuk-!-margin-bottom-9',
       },
     ],
-    extendGetContent: (req) => ({
+    extendGetContent: req => ({
       claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
       noticeDate: req.session?.ccdCase?.data?.noticeDate || '1st January 2025',
     }),

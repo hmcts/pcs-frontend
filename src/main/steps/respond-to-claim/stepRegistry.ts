@@ -1,13 +1,13 @@
 import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 
+import { step as confirmationOfNoticeDate } from './confirmation-of-notice-date';
+import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as postcodeFinder } from './postcode-finder';
 import { step as startNow } from './start-now';
-import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
-import { step as confirmationOfNoticeDate } from './confirmation-of-notice-date';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,

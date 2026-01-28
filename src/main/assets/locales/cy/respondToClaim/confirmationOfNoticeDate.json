@@ -6,7 +6,7 @@
   "noticeDateLabel": "cyWhen did you recieve notice from {{claimantName}}? (Optional)",
   "noticeDateHint": "cyFor example, 27 9 2022",
   "errors": {
-      "date": {
+    "date": {
       "day": "cyDay",
       "month": "cyMonth",
       "year": "cyYear",
