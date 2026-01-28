@@ -27,6 +27,10 @@ test.beforeEach(async ({ page }) => {
   await performAction('clickButton', startNow.startNowButton);
 });
 
+test.afterEach(async () => {
+  PageContentValidation.finaliseTest();
+});
+
 test.describe('Respond to a claim @nightly', async () => {
   test('Free legal advice - Error messages - Save for later Validations', async () => {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
