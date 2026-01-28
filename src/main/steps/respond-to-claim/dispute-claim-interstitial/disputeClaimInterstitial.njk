@@ -10,15 +10,13 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
   
-  <h1 class="govuk-heading-l">
-    <span class="govuk-caption-xl">{{ caption }}</span>
-    {{ heading | safe }}
-  </h1>
+  <span class="govuk-caption-xl">{{ caption }}</span>
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
 
 
   <p class="govuk-body">{{ paragraph1 }}</p>
   <ol class="govuk-list govuk-list--number govuk-!-margin-bottom-4">
-    <li>{{ listItem1 | safe }}</li>
+    <li>{{ listItem1 }}</li>
     <li>{{ listItem2 }}</li>
     <li>{{ listItem3 }}</li>
   </ol>
