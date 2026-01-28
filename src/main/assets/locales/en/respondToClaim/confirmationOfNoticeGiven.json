@@ -1,6 +1,6 @@
 {
   "pageTitle": "Notice Details",
-  "subTitle": "Did Treetops Housing give you notice of their intention to begin possession proceedings?",
+  "subTitle": "Did {{claimantName}} give you notice of their intention to begin possession proceedings?",
   "hintText": "A notice is a formal document from your landlord or mortgage provider saying they plan to take legal action to repossess the property, which must follow certain legal requirements",
   "options": {
     "yes": "Yes",

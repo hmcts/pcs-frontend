@@ -52,6 +52,7 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-date-of-birth',
     'postcode-finder',
     'confirmation-of-notice-given',
+    'confirmation-of-notice-date'
   ],
   steps: {
     'start-now': {
@@ -84,9 +85,25 @@ export const flowConfig: JourneyFlowConfig = {
     'postcode-finder': {
       defaultNext: 'confirmation-of-notice-given', 
     },
-    'confirmation-of-notice-given': {
+     'confirmation-of-notice-given': {
+      routes: [
+        {
+          condition: async (req: Request) =>
+            req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes',
+            nextStep: 'confirmation-of-notice-date',
+        },
+        {
+          condition: async (req: Request) =>
+            req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven !== 'yes',
+            nextStep: '',
+        },
+      ],
+        defaultNext: '',
+      },
+     'confirmation-of-notice-date': {
+      previousStep: 'confirmation-of-notice-given',
       defaultNext: '', 
-  },
+     },
 
   },
 };

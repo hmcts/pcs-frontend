@@ -5,7 +5,7 @@ import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep(
   {
-    stepName: 'confirmation-of-notice-given',
+    stepName: 'confirmation-of-notice-date',
     journeyFolder: 'respondToClaim',
     stepDir: __dirname,
     flowConfig,
@@ -13,25 +13,23 @@ export const step: StepDefinition = createFormStep(
       pageTitle: 'pageTitle',
       subTitle: 'subTitle',
       hintText: 'hintText',
+      listItem1: 'listItem1',
+      noticeDateHint: 'noticeDateHint',
+      noticeDateLabel: 'noticeDateLabel',
     },
     fields: [
       {
-        name: 'confirmNoticeGiven',
-        type: 'radio',
-        required: true, 
-        translationKey: { label: 'subTitle', hint: 'hintText' },
-        legendClasses: 'govuk-fieldset__legend--m',
-        options: [
-          { value: 'yes', translationKey: 'options.yes' },
-          { value: 'no', translationKey: 'options.no' },
-          { divider: 'options.or' },
-          { value: 'imNotSure', translationKey: 'options.imNotSure' },
-        ],
+        name: 'noticeDate1',
+        type: 'date',
+        required: true,
+        noFutureDate: true, 
+        legendClasses: 'govuk-fieldset__legend--m govuk-!-margin-bottom-9',
       },
     ],
     extendGetContent: (req) => ({
       claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
+      noticeDate: req.session?.ccdCase?.data?.noticeDate || '1st January 2025',
     }),
   },
-  `${__dirname}/confirmationOfNoticeGiven.njk`
+  `${__dirname}/confirmationOfNoticeDate.njk`
 );

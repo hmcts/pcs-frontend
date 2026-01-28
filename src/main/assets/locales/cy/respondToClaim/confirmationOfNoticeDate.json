@@ -1,0 +1,21 @@
+{
+  "pageTitle": "cyNotice Date",
+  "bulletPointLabel": "cyNotice details given by {{claimantName}}:",
+  "hintText": "cyWhen making the claim, {{claimantName}} had to say the date they gave you notice (the date of service). If you're not sure of the exact date, you can find it on the notice ",
+  "listItem1": "cyThey served you with the notice seeking possession on {{noticeDate}}",
+  "noticeDateLabel": "cyWhen did you recieve notice from {{claimantName}}? (Optional)",
+  "noticeDateHint": "cyFor example, 27 9 2022",
+  "errors": {
+      "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
+      "required": "cyPlease enter the date of notice",
+      "notRealDate": "cyDate of notice must be a real date",
+      "futureDate": "cyDate of notice must be in the past",
+      "invalidValue": "cyDate of notice must be a real date",
+      "missingOne": "cyYour date of notice must include a {{missingField}}",
+      "missingTwo": "cyYour date of notice must include a {{first}} and {{second}}"
+    }
+  }
+}
