@@ -176,7 +176,8 @@
       }) }}
       {{ govukButton({
         text: buttons.saveForLater,
-        classes: "govuk-button--secondary"
+        classes: "govuk-button--secondary",
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
   </form>

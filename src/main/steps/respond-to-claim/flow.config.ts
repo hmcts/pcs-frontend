@@ -81,8 +81,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'contact-preferences-telephone',
     },
     'contact-preferences-telephone': {
-      previousStep: 'postcode-finder',
-      // next step
+      // no default next
     },
   },
 };
