@@ -9,14 +9,12 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
   translationKeys: {
-    pageTitle: 'title',
+    pageTitle: 'pageTitle',
   },
   extendGetContent: req => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
     return {
-      title: t('title'),
-      subtitle: t('subtitle'),
-      legend: t('legend'),
+      caption: t('caption'),
       labels: {
         yes: t('labels.yes'),
         no: t('labels.no'),
@@ -55,6 +53,7 @@ export const step: StepDefinition = createFormStep({
       required: true,
       translationKey: {
         label: 'legend',
+        hint: 'legend.hint',
       },
       options: [
         {

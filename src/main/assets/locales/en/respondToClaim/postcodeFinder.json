@@ -1,8 +1,8 @@
 {
-  "pageTitle": "Your correspondence address",
-  "title": "Is your correspondence address 15 Garden Drive, Luton, Bedfordshire, LU1 1AB?",
-  "subtitle": "This is the address provided by Treetops Housing",
-  "legend": "Is this your correspondence address?",
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Address Confirmation",
+  "legend": "Is your correspondence address 15 Garden Drive, Luton, Bedfordshire, LU1 1AB?",
+  "legend.hint": "This is the address provided by Treetops Housing",
   "labels": {
     "yes": "Yes",
     "no": "No",
