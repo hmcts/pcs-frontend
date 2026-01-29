@@ -12,34 +12,27 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ serviceName }}</span>
+  {% endif %}
+
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {{ govukInsetText({ text: hintText | replace("{{claimantName}}", claimantName) }) }}
+  {{ govukInsetText({ text: hintText }) }}
 
-  <h3 class="govuk-heading-s">
-    {{ bulletPointLabel | replace("{{claimantName}}", claimantName) }}
-  </h3>
+  <h3 class="govuk-heading-s">{{ bulletPointLabel }}</h3>
 
   <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
-    <li>{{ listItem1 | replace("{{noticeDate}}", noticeDate) }}</li>
+    <li>{{ listItem1 }}</li>
   </ul>
 
   <form method="post" action="{{ url }}" novalidate>
 
-    {{ govukDateInput({
-        id: "notice-date",
-        namePrefix: "noticeDate",
-        fieldset: {
-            legend: {
-                text: noticeDateLabel | replace("{{claimantName}}", claimantName),
-                isPageHeading: true,
-                classes: "govuk-fieldset__legend--m"
-            }
-        },
-        hint: {
-            text: noticeDateHint
-        }
-    }) }}
+    {% for field in fields %}
+      {% if field.componentType == 'dateInput' %}
+        {{ govukDateInput(field.component) }}
+      {% endif %}
+    {% endfor %}
 
     <div class="govuk-button-group">
       {{ govukButton({ 

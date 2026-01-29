@@ -15,14 +15,19 @@ export const step: StepDefinition = createFormStep(
       listItem1: 'listItem1',
       noticeDateHint: 'noticeDateHint',
       noticeDateLabel: 'noticeDateLabel',
+      caption: 'caption',
     },
     fields: [
       {
         name: 'noticeDate',
         type: 'date',
-        required: true,
+        required: false,
         noFutureDate: true,
-        legendClasses: 'govuk-fieldset__legend--m govuk-!-margin-bottom-9',
+        legendClasses: 'govuk-fieldset__legend--m',
+        translationKey: {
+          label: 'noticeDateLabel',
+          hint: 'noticeDateHint',
+        },
       },
     ],
     extendGetContent: req => ({

@@ -10,7 +10,6 @@
       "day": "Day",
       "month": "Month",
       "year": "Year",
-      "required": "Please enter the date of notice",
       "notRealDate": "Date of notice must be a real date",
       "futureDate": "Date of notice must be in the past",
       "invalidValue": "Date of notice must be a real date",
