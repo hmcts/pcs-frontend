@@ -4,7 +4,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}Defendant name confirmation - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 {% block mainContent %}
     {% if errorSummary %}
       {{ govukErrorSummary(errorSummary) }}
@@ -12,8 +12,6 @@
     {% if caption %}
       <span class="govuk-caption-xl">{{ caption }}</span>
     {% endif %}
-
-     {# <h1 class="govuk-heading-l"> {{ defendantName }}?</h1> #}
    
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
