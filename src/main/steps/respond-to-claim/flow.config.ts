@@ -98,6 +98,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: '',
         },
       ],
+      previousStep: 'postcode-finder',
     },
     'confirmation-of-notice-date': {
       previousStep: 'confirmation-of-notice-given',

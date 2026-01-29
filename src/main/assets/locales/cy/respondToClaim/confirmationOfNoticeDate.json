@@ -10,7 +10,6 @@
       "day": "cyDay",
       "month": "cyMonth",
       "year": "cyYear",
-      "required": "cyPlease enter the date of notice",
       "notRealDate": "cyDate of notice must be a real date",
       "futureDate": "cyDate of notice must be in the past",
       "invalidValue": "cyDate of notice must be a real date",
