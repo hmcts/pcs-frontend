@@ -577,6 +577,353 @@ describe('initPostcodeLookup', () => {
       expect(() => button.click()).not.toThrow();
       expect(global.fetch).not.toHaveBeenCalled();
     });
+
+    it('handles input events to clear lookup error via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" class="govuk-input--error" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <p class="govuk-error-message" id="home-lookup-postcode-error">Error message</p>
+          <select id="home-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+      `;
+
+      initPostcodeLookup();
+
+      const homeInput = document.getElementById('home-lookupPostcode') as HTMLInputElement;
+      const homeError = document.getElementById('home-lookup-postcode-error') as HTMLParagraphElement;
+
+      expect(homeInput.classList.contains('govuk-input--error')).toBe(true);
+      expect(homeError.classList.contains('govuk-visually-hidden')).toBe(false);
+
+      homeInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+      expect(homeInput.classList.contains('govuk-input--error')).toBe(false);
+      expect(homeError.classList.contains('govuk-visually-hidden')).toBe(true);
+    });
+
+    it('handles input events on non-matching elements via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" class="govuk-input--error" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <p class="govuk-error-message" id="home-lookup-postcode-error">Error message</p>
+          <select id="home-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+        <input id="other-input" />
+      `;
+
+      initPostcodeLookup();
+
+      const otherInput = document.getElementById('other-input') as HTMLInputElement;
+      expect(() => {
+        otherInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }).not.toThrow();
+    });
+
+    it('handles input event with missing container via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <select id="home-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+        <input id="orphan-lookupPostcode" />
+      `;
+
+      initPostcodeLookup();
+
+      const orphanInput = document.getElementById('orphan-lookupPostcode') as HTMLInputElement;
+      expect(() => {
+        orphanInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }).not.toThrow();
+    });
+
+    it('handles change events to populate address fields via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <select id="home-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+          <details id="home-enterManuallyDetails"></details>
+          <div id="home-addressForm" class="govuk-visually-hidden">
+            <input id="home-addressLine1" />
+            <input id="home-addressLine2" />
+            <input id="home-town" />
+            <input id="home-county" />
+            <input id="home-postcode" />
+          </div>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+      `;
+
+      initPostcodeLookup();
+
+      const homeSelect = document.getElementById('home-selectedAddress') as HTMLSelectElement;
+      const homeAddressForm = document.getElementById('home-addressForm') as HTMLDivElement;
+      const homeEnterManuallyDetails = document.getElementById('home-enterManuallyDetails') as HTMLDetailsElement;
+      const homeLine1 = document.getElementById('home-addressLine1') as HTMLInputElement;
+      const homeLine1FocusSpy = jest.spyOn(homeLine1, 'focus');
+
+      // Add an address option
+      const opt = document.createElement('option');
+      opt.value = '0';
+      opt.textContent = '123 Main St';
+      opt.dataset.line1 = '123 Main St';
+      opt.dataset.line2 = 'Suite 100';
+      opt.dataset.town = 'London';
+      opt.dataset.county = 'Greater London';
+      opt.dataset.postcode = 'SW1A 1AA';
+      homeSelect.appendChild(opt);
+
+      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(true);
+
+      homeSelect.selectedIndex = 1;
+      homeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+      expect(homeLine1.value).toBe('123 Main St');
+      expect((document.getElementById('home-addressLine2') as HTMLInputElement).value).toBe('Suite 100');
+      expect((document.getElementById('home-town') as HTMLInputElement).value).toBe('London');
+      expect((document.getElementById('home-county') as HTMLInputElement).value).toBe('Greater London');
+      expect((document.getElementById('home-postcode') as HTMLInputElement).value).toBe('SW1A 1AA');
+      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(false);
+      expect(homeEnterManuallyDetails.style.display).toBe('none');
+      expect(homeLine1FocusSpy).toHaveBeenCalled();
+    });
+
+    it('handles change event with empty value via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <select id="home-selectedAddress">
+            <option value="">Select an address</option>
+          </select>
+          <div id="home-addressForm" class="govuk-visually-hidden">
+            <input id="home-addressLine1" />
+          </div>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+      `;
+
+      initPostcodeLookup();
+
+      const homeSelect = document.getElementById('home-selectedAddress') as HTMLSelectElement;
+      const homeLine1 = document.getElementById('home-addressLine1') as HTMLInputElement;
+
+      expect(() => {
+        homeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }).not.toThrow();
+
+      expect(homeLine1.value).toBe('');
+    });
+
+    it('handles toggle events to show address form via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <select id="home-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+          <details id="home-enterManuallyDetails">
+            <summary>Enter manually</summary>
+          </details>
+          <div id="home-addressForm" class="govuk-visually-hidden">
+            <input id="home-addressLine1" />
+          </div>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+      `;
+
+      initPostcodeLookup();
+
+      const homeDetails = document.getElementById('home-enterManuallyDetails') as HTMLDetailsElement;
+      const homeAddressForm = document.getElementById('home-addressForm') as HTMLDivElement;
+
+      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(true);
+
+      homeDetails.open = true;
+      homeDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
+
+      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(false);
+    });
+
+    it('handles toggle event when Details is closed via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <select id="home-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+          <details id="home-enterManuallyDetails" open>
+            <summary>Enter manually</summary>
+          </details>
+          <div id="home-addressForm">
+            <input id="home-addressLine1" />
+          </div>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+      `;
+
+      initPostcodeLookup();
+
+      const homeDetails = document.getElementById('home-enterManuallyDetails') as HTMLDetailsElement;
+      const homeAddressForm = document.getElementById('home-addressForm') as HTMLDivElement;
+
+      homeDetails.open = false;
+      homeDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
+
+      // Should not add govuk-visually-hidden when closing
+      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(false);
+    });
+
+    it('handles toggle events on non-matching elements via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <select id="home-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+          <details id="home-enterManuallyDetails">
+            <summary>Enter manually</summary>
+          </details>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+        <details id="other-details">
+          <summary>Other</summary>
+        </details>
+      `;
+
+      initPostcodeLookup();
+
+      const otherDetails = document.getElementById('other-details') as HTMLDetailsElement;
+      expect(() => {
+        otherDetails.open = true;
+        otherDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
+      }).not.toThrow();
+    });
+
+    it('handles toggle event with missing container via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <select id="home-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+        <details id="orphan-enterManuallyDetails">
+          <summary>Orphan</summary>
+        </details>
+      `;
+
+      initPostcodeLookup();
+
+      const orphanDetails = document.getElementById('orphan-enterManuallyDetails') as HTMLDetailsElement;
+      expect(() => {
+        orphanDetails.open = true;
+        orphanDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
+      }).not.toThrow();
+    });
+
+    it('handles toggle event with missing addressForm via event delegation', () => {
+      document.body.innerHTML = `
+        <div data-address-component data-name-prefix="home">
+          <input id="home-lookupPostcode" />
+          <button id="home-findAddressBtn" type="button">Find</button>
+          <select id="home-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+          <details id="home-enterManuallyDetails">
+            <summary>Enter manually</summary>
+          </details>
+        </div>
+        <div data-address-component data-name-prefix="work">
+          <input id="work-lookupPostcode" />
+          <button id="work-findAddressBtn" type="button">Find</button>
+          <select id="work-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+        </div>
+      `;
+
+      initPostcodeLookup();
+
+      const homeDetails = document.getElementById('home-enterManuallyDetails') as HTMLDetailsElement;
+      expect(() => {
+        homeDetails.open = true;
+        homeDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
+      }).not.toThrow();
+    });
   });
 });
 
