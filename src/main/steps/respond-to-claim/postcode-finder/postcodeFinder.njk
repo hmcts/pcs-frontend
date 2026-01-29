@@ -27,6 +27,9 @@
         <label class="govuk-label" for="correspondence-lookupPostcode">
           {{ labels.enterPostcode }}
         </label>
+        <p class="govuk-error-message govuk-visually-hidden" id="correspondence-lookup-postcode-error" role="alert">
+          <span class="govuk-visually-hidden">Error:</span> {{ errors.lookupPostcode }}
+        </p>
         <p class="govuk-error-message govuk-visually-hidden" id="correspondence-postcode-error" role="alert">
           <span class="govuk-visually-hidden">Error:</span> {{ errors.postcodeNotFound }}
         </p>
@@ -35,7 +38,7 @@
                 name="lookupPostcode" 
                 type="text" 
                 autocomplete="postal-code"
-                aria-describedby="correspondence-postcode-error"/>
+                aria-describedby="correspondence-lookup-postcode-error correspondence-postcode-error"/>
         <button class="govuk-button" 
                 id="correspondence-findAddressBtn"
                 data-module="govuk-button" 

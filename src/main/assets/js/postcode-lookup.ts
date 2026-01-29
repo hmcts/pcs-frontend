@@ -28,6 +28,7 @@ export function initPostcodeLookup(): void {
       findBtn: byId('findAddressBtn') as HTMLButtonElement | null,
       select: byId('selectedAddress') as HTMLSelectElement | null,
       selectContainer: byId('addressSelectContainer') as HTMLDivElement | null,
+      lookupErrorMessage: byId('lookup-postcode-error') as HTMLParagraphElement | null,
       errorMessage: byId('postcode-error') as HTMLParagraphElement | null,
       addressLine1: byId('addressLine1') as HTMLInputElement | null,
       addressLine2: byId('addressLine2') as HTMLInputElement | null,
@@ -220,15 +221,21 @@ export function initPostcodeLookup(): void {
       if (!container) {
         return;
       }
-      const { postcodeInput, select, selectContainer, errorMessage, enterManuallyDetails } = getParts(container);
+      const { postcodeInput, select, selectContainer, lookupErrorMessage, errorMessage, enterManuallyDetails } =
+        getParts(container);
       if (!postcodeInput || !select) {
         return;
       }
 
       const value = postcodeInput.value?.trim();
       if (!value) {
+        // Show blank field validation error
+        showError(lookupErrorMessage, postcodeInput);
+        hideError(errorMessage, null);
         return;
       }
+      // Hide blank field error before lookup
+      hideError(lookupErrorMessage, null);
       await performPostcodeLookup(
         value,
         select,
@@ -238,6 +245,23 @@ export function initPostcodeLookup(): void {
         postcodeInput,
         enterManuallyDetails
       );
+    });
+
+    document.addEventListener('input', evt => {
+      const target = evt.target as Element | null;
+      if (!target) {
+        return;
+      }
+      const input = target.closest('input[id$="-lookupPostcode"]') as HTMLInputElement;
+      if (!input) {
+        return;
+      }
+      const container = input.closest('[data-address-component]') as HTMLElement;
+      if (!container) {
+        return;
+      }
+      const { lookupErrorMessage } = getParts(container);
+      hideError(lookupErrorMessage, input);
     });
 
     document.addEventListener('change', evt => {
@@ -280,7 +304,8 @@ export function initPostcodeLookup(): void {
   }
 
   containers.forEach(container => {
-    const { postcodeInput, findBtn, select, selectContainer, errorMessage, enterManuallyDetails } = getParts(container);
+    const { postcodeInput, findBtn, select, selectContainer, lookupErrorMessage, errorMessage, enterManuallyDetails } =
+      getParts(container);
     if (!postcodeInput || !findBtn || !select) {
       return;
     }
@@ -291,8 +316,13 @@ export function initPostcodeLookup(): void {
     findBtn.addEventListener('click', async () => {
       const value = postcodeInput.value?.trim();
       if (!value) {
+        // Show blank field validation error
+        showError(lookupErrorMessage, postcodeInput);
+        hideError(errorMessage, null);
         return;
       }
+      // Hide blank field error before lookup
+      hideError(lookupErrorMessage, null);
       await performPostcodeLookup(
         value,
         select,
@@ -302,6 +332,11 @@ export function initPostcodeLookup(): void {
         postcodeInput,
         enterManuallyDetails
       );
+    });
+
+    // Clear error when user starts typing
+    postcodeInput.addEventListener('input', () => {
+      hideError(lookupErrorMessage, postcodeInput);
     });
 
     // Handle Details component toggle to show address form

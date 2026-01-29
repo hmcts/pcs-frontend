@@ -5,7 +5,6 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
-
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -140,6 +139,7 @@ export const step: StepDefinition = createFormStep({
         saveForLater: t('buttons.saveForLater'),
       },
       errors: {
+        lookupPostcode: t('errors.lookupPostcode'),
         postcodeNotFound: t('errors.postcodeNotFound'),
       },
       // Extract nested field values for easy template access (only on POST with errors)

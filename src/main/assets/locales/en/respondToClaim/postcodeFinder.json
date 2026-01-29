@@ -24,6 +24,7 @@
     "saveForLater": "Save for later"
   },
   "errors": {
+    "lookupPostcode": "Enter a valid UK postcode",
     "postcodeNotFound": "Postcode not found. Please check and try again.",
     "correspondenceAddressConfirm": "Please confirm your address by selecting the options below",
     "correspondenceAddressConfirm.addressLine1": "Enter address line 1, typically the building and street",
