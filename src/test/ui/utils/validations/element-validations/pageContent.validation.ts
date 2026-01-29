@@ -137,7 +137,12 @@ export class PageContentValidation implements IValidation {
     }
 
     for (const [key, value] of Object.entries(pageData)) {
-      if (key.includes('Input') || key.includes('Hidden') || key.includes('Validation') || key.includes('ErrorMessage')) {
+      if (
+        key.includes('Input') ||
+        key.includes('Hidden') ||
+        key.includes('Validation') ||
+        key.includes('ErrorMessage')
+      ) {
         continue;
       }
       if (typeof value === 'string' && value.trim() !== '') {
