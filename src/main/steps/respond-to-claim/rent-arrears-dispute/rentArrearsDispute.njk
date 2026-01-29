@@ -1,0 +1,30 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+
+{% block mainContent %}
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+
+  <form method="post" action="{{ url }}" novalidate>
+
+    <div class="govuk-button-group">
+      {{ govukButton({ 
+        text: continue,
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      {{ govukButton({ 
+        text: saveForLater,
+        classes: 'govuk-button--secondary',
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
+  </form>
+
+{% endblock %}

@@ -53,6 +53,8 @@ export const flowConfig: JourneyFlowConfig = {
     'postcode-finder',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date',
+    'rent-arrears-dispute',
+    'non-rent-arrears-dispute',
   ],
   steps: {
     'start-now': {
@@ -95,13 +97,19 @@ export const flowConfig: JourneyFlowConfig = {
         {
           condition: async (req: Request) =>
             req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven !== 'yes',
-          nextStep: '',
+          nextStep: 'rent-arrears-dispute',
         },
       ],
       previousStep: 'postcode-finder',
     },
     'confirmation-of-notice-date': {
       previousStep: 'confirmation-of-notice-given',
+      defaultNext: 'rent-arrears-dispute',
+    },
+    'rent-arrears-dispute': {
+      defaultNext: 'non-rent-arrears-dispute',
+    },
+    'non-rent-arrears-dispute': {
       defaultNext: '',
     },
   },

@@ -6,7 +6,9 @@ import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
 import { step as freeLegalAdvice } from './free-legal-advice';
+import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as postcodeFinder } from './postcode-finder';
+import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as startNow } from './start-now';
 
 export const stepRegistry: Record<string, StepDefinition> = {
@@ -18,4 +20,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-date-of-birth': defendantDateOfBirth,
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
   'confirmation-of-notice-date': confirmationOfNoticeDate,
+  'rent-arrears-dispute': rentArrearsDispute,
+  'non-rent-arrears-dispute': nonRentArrearsDispute,
 };
