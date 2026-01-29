@@ -13,9 +13,8 @@ export const step: StepDefinition = createFormStep(
       subTitle: 'subTitle',
       hintText: 'hintText',
       listItem1: 'listItem1',
-      noticeDateHint: 'noticeDateHint',
-      noticeDateLabel: 'noticeDateLabel',
       caption: 'caption',
+      bulletPointLabel: 'bulletPointLabel',
     },
     fields: [
       {

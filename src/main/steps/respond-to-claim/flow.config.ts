@@ -102,7 +102,7 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'confirmation-of-notice-date': {
       previousStep: 'confirmation-of-notice-given',
+      defaultNext: '',
     },
-
   },
 };
