@@ -24,6 +24,8 @@ export const step: StepDefinition = {
           throw new Error('Translation function not available');
         }
 
+        console.log('req.session.ccdCase', req.session?.ccdCase);
+
         // TODO:Retrieve claimantName dynamically from CCD case data and remove hardcoded default value
         const claimantName = (req.session?.ccdCase?.data?.claimantName as string) || 'Treetops Housing';
 
