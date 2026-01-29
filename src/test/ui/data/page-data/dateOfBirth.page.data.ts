@@ -5,9 +5,9 @@ export const dateOfBirth = {
   dayTextLabel: 'Day',
   monthTextLabel: 'Month',
   yearTextLabel: 'Year',
-  dayInputText: '27',
-  monthInputText: '9',
-  yearInputText: '1985',
+  dayInputText: getRandomInt(1, 31).toString(),
+  monthInputText: getRandomInt(1, 12).toString(),
+  yearInputText: getRandomInt(1950, 2005).toString(),
   saveAndContinueButton: 'Save and continue',
   saveForLater: 'Save for later',
   errorValidation: 'YES',
@@ -17,3 +17,6 @@ export const dateOfBirth = {
     errorTextField: [{ type: 'empty', label: '', errMessage: 'Enter your date of birth' }],
   },
 };
+function getRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
