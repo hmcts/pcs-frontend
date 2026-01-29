@@ -138,7 +138,7 @@ export const step: StepDefinition = createFormStep({
         saveAndContinue: t('buttons.saveAndContinue'),
         saveForLater: t('buttons.saveForLater'),
       },
-      errors: {
+      clientErrors: {
         lookupPostcode: t('errors.lookupPostcode'),
         postcodeNotFound: t('errors.postcodeNotFound'),
       },

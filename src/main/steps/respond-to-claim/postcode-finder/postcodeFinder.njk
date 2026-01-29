@@ -22,29 +22,33 @@
   
     {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
     {% set postcodeFinderHtml %}
-      <div class="govuk-form-group postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
+      <div class="postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
         <h2 class="govuk-heading-m">{{ labels.enterAddress }}</h2>
-        <label class="govuk-label" for="correspondence-lookupPostcode">
-          {{ labels.enterPostcode }}
-        </label>
-        <p class="govuk-error-message govuk-visually-hidden" id="correspondence-lookup-postcode-error" role="alert">
-          <span class="govuk-visually-hidden">Error:</span> {{ errors.lookupPostcode }}
-        </p>
-        <p class="govuk-error-message govuk-visually-hidden" id="correspondence-postcode-error" role="alert">
-          <span class="govuk-visually-hidden">Error:</span> {{ errors.postcodeNotFound }}
-        </p>
-        <input class="govuk-input govuk-input--width-10" 
-                id="correspondence-lookupPostcode" 
-                name="lookupPostcode" 
-                type="text" 
-                autocomplete="postal-code"
-                aria-describedby="correspondence-lookup-postcode-error correspondence-postcode-error"/>
-        <button class="govuk-button" 
-                id="correspondence-findAddressBtn"
-                data-module="govuk-button" 
-                type="button">
-          {{ buttons.findAddress }}
-        </button>
+        <div class="govuk-form-group" id="correspondence-postcode-form-group">
+          <label class="govuk-label" for="correspondence-lookupPostcode">
+            {{ labels.enterPostcode }}
+          </label>
+          <p class="govuk-error-message govuk-!-display-none" id="correspondence-lookup-postcode-error">
+            <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.lookupPostcode }}
+          </p>
+          <p class="govuk-error-message govuk-!-display-none" id="correspondence-postcode-error">
+            <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.postcodeNotFound }}
+          </p>
+          <div class="govuk-input__wrapper">
+            <input class="govuk-input govuk-input--width-10" 
+                    id="correspondence-lookupPostcode" 
+                    name="lookupPostcode" 
+                    type="text" 
+                    autocomplete="postal-code"
+                    aria-describedby="correspondence-lookup-postcode-error correspondence-postcode-error"/>
+            <button class="govuk-button govuk-!-margin-left-2" 
+                    id="correspondence-findAddressBtn"
+                    data-module="govuk-button" 
+                    type="button">
+              {{ buttons.findAddress }}
+            </button>
+          </div>
+        </div>
         
         <div id="correspondence-addressSelectContainer" hidden>
           {{ govukSelect({

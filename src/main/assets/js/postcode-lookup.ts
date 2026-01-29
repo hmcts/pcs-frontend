@@ -30,6 +30,7 @@ export function initPostcodeLookup(): void {
       selectContainer: byId('addressSelectContainer') as HTMLDivElement | null,
       lookupErrorMessage: byId('lookup-postcode-error') as HTMLParagraphElement | null,
       errorMessage: byId('postcode-error') as HTMLParagraphElement | null,
+      postcodeFormGroup: byId('postcode-form-group') as HTMLDivElement | null,
       addressLine1: byId('addressLine1') as HTMLInputElement | null,
       addressLine2: byId('addressLine2') as HTMLInputElement | null,
       town: byId('town') as HTMLInputElement | null,
@@ -117,7 +118,8 @@ export function initPostcodeLookup(): void {
 
   const showError = (errorMessage: HTMLParagraphElement | null, input: HTMLInputElement | null) => {
     if (errorMessage) {
-      errorMessage.classList.remove('govuk-visually-hidden');
+      // Show the error message by removing the GOV.UK display-none class
+      errorMessage.classList.remove('govuk-!-display-none');
     }
     if (input) {
       input.classList.add('govuk-input--error');
@@ -126,7 +128,8 @@ export function initPostcodeLookup(): void {
 
   const hideError = (errorMessage: HTMLParagraphElement | null, input: HTMLInputElement | null) => {
     if (errorMessage) {
-      errorMessage.classList.add('govuk-visually-hidden');
+      // Hide the error message by adding the GOV.UK display-none class
+      errorMessage.classList.add('govuk-!-display-none');
     }
     if (input) {
       input.classList.remove('govuk-input--error');
@@ -201,6 +204,13 @@ export function initPostcodeLookup(): void {
     }
   };
 
+  // Initialize all containers: ensure error messages are hidden on load
+  containers.forEach(container => {
+    const { lookupErrorMessage, errorMessage } = getParts(container);
+    hideError(lookupErrorMessage, null);
+    hideError(errorMessage, null);
+  });
+
   // If more than one component, use event delegation to avoid multiple handlers
   if (containers.length > 1) {
     if (postcodeLookupDelegatedBound) {
@@ -221,8 +231,15 @@ export function initPostcodeLookup(): void {
       if (!container) {
         return;
       }
-      const { postcodeInput, select, selectContainer, lookupErrorMessage, errorMessage, enterManuallyDetails } =
-        getParts(container);
+      const {
+        postcodeInput,
+        select,
+        selectContainer,
+        lookupErrorMessage,
+        errorMessage,
+        enterManuallyDetails,
+        postcodeFormGroup,
+      } = getParts(container);
       if (!postcodeInput || !select) {
         return;
       }
@@ -232,10 +249,16 @@ export function initPostcodeLookup(): void {
         // Show blank field validation error
         showError(lookupErrorMessage, postcodeInput);
         hideError(errorMessage, null);
+        if (postcodeFormGroup) {
+          postcodeFormGroup.classList.add('govuk-form-group--error');
+        }
         return;
       }
       // Hide blank field error before lookup
-      hideError(lookupErrorMessage, null);
+      hideError(lookupErrorMessage, postcodeInput);
+      if (postcodeFormGroup) {
+        postcodeFormGroup.classList.remove('govuk-form-group--error');
+      }
       await performPostcodeLookup(
         value,
         select,
@@ -310,6 +333,10 @@ export function initPostcodeLookup(): void {
       return;
     }
 
+    // Initialize: ensure error messages are hidden on load
+    hideError(lookupErrorMessage, null);
+    hideError(errorMessage, null);
+
     // Selection behaviour for single component
     select.addEventListener('change', () => handleSelectionChange(container, select));
 
@@ -322,7 +349,7 @@ export function initPostcodeLookup(): void {
         return;
       }
       // Hide blank field error before lookup
-      hideError(lookupErrorMessage, null);
+      hideError(lookupErrorMessage, postcodeInput);
       await performPostcodeLookup(
         value,
         select,
