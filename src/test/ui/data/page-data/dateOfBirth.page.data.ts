@@ -31,4 +31,3 @@ export const dateOfBirth = {
     errorTextField: [{ type: 'empty', label: '', errMessage: 'Enter your date of birth' }],
   },
 };
-
