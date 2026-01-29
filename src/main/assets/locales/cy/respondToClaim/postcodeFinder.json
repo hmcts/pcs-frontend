@@ -28,6 +28,6 @@
     "correspondenceAddressConfirm": "cyPlease confirm your address by selecting the options below",
     "correspondenceAddressConfirm.addressLine1": "cyEnter address line 1, typically the building and street",
     "correspondenceAddressConfirm.townOrCity": "cyEnter town or city",
-    "correspondenceAddressConfirm.postcode": "cyEnter postcode"
+    "correspondenceAddressConfirm.postcode": "cyEnter a valid UK postcode"
   }
 }

@@ -28,6 +28,6 @@
     "correspondenceAddressConfirm": "Please confirm your address by selecting the options below",
     "correspondenceAddressConfirm.addressLine1": "Enter address line 1, typically the building and street",
     "correspondenceAddressConfirm.townOrCity": "Enter town or city",
-    "correspondenceAddressConfirm.postcode": "Enter postcode"
+    "correspondenceAddressConfirm.postcode": "Enter a valid UK postcode"
   }
 }
