@@ -9,17 +9,17 @@ export const step: StepDefinition = createFormStep(
     stepDir: __dirname,
     flowConfig,
     translationKeys: {
-      pageTitle: 'pageTitle',
-      subTitle: 'subTitle',
-      hintText: 'hintText',
       caption: 'caption',
+      pageTitle: 'pageTitle',
+      question: 'question',
+      hintText: 'hintText',
     },
     fields: [
       {
         name: 'confirmNoticeGiven',
         type: 'radio',
         required: true,
-        translationKey: { label: 'subTitle', hint: 'hintText' },
+        translationKey: { label: 'question', hint: 'hintText' },
         legendClasses: 'govuk-fieldset__legend--m',
         options: [
           { value: 'yes', translationKey: 'options.yes' },
@@ -29,9 +29,13 @@ export const step: StepDefinition = createFormStep(
         ],
       },
     ],
-    extendGetContent: req => ({
-      claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
-    }),
+    extendGetContent: req => {
+      const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
+
+      return {
+        claimantName,
+      };
+    },
   },
   `${__dirname}/confirmationOfNoticeGiven.njk`
 );

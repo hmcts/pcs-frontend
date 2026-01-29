@@ -13,17 +13,17 @@
   {% endif %}
 
   {% if caption %}
-    <span class="govuk-caption-xl">{{ serviceName }}</span>
+    <span class="govuk-caption-xl">{{ caption }}</span>
   {% endif %}
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {{ govukInsetText({ text: hintText }) }}
+  {{ govukInsetText({ text: hintText | replace("{{claimantName}}", claimantName)  }) }}
 
-  <h3 class="govuk-heading-s">{{ bulletPointLabel }}</h3>
+  <h3 class="govuk-heading-s">{{ bulletPointLabel | replace("{{claimantName}}", claimantName) }}</h3>
 
   <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
-    <li>{{ listItem1 }}</li>
+    <li>{{ listItem1 | replace("{{noticeDate}}", noticeDate) }}</li>
   </ul>
 
   <form method="post" action="{{ url }}" novalidate>
