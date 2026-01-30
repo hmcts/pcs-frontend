@@ -1,6 +1,6 @@
 {
   "caption": "Respond to a property possession claim",
-  "pageTitle": "Notice Date",
+  "pageTitle": "Notice date",
   "bulletPointLabel": "Notice details given by {{claimantName}}:",
   "hintText": "When making the claim, {{claimantName}} had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.",
   "listItem1": "They served you with a notice seeking possession on {{noticeDate}}",
