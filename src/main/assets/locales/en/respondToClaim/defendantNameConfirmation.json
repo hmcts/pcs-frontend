@@ -1,0 +1,16 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Your name",
+  "nameConfirmationLabel": "Is your name {{defendantName}}?",
+  "nameConfirmationHint": "This is the name provided by {{organisationName}}",
+  "yesOption": "Yes",
+  "noOption": "No",
+  "firstNameLabel": "First name",
+  "lastNameLabel": "Last name",
+  "contactUs": "Contact us for help",
+  "errors": {
+    "nameConfirmation": "You must say if your name is {{defendantName}}",
+    "firstName": "Enter your first name",
+    "lastName": "Enter your last name"
+  }
+}
