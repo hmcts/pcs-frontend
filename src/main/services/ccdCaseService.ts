@@ -123,11 +123,7 @@ export const ccdCaseService = {
       }
       if (axiosError.response?.status === 400) {
         logger.warn(
-          `Bad request (400) when searching for cases. Response: ${JSON.stringify(
-            axiosError.response?.data,
-            null,
-            2
-          )}`
+          `Bad request (400) when searching for cases. Response: ${JSON.stringify(axiosError.response?.data, null, 2)}`
         );
         return null;
       }
