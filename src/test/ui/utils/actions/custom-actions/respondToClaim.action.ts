@@ -35,15 +35,15 @@ export class RespondToClaimAction implements IAction {
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: correspondenceAddressKnown.isThisYourAddressQuestion,
+      question: correspondenceAddressKnown.correspondenceAddressConfirmHintText,
       option: addressData.radioOption,
     });
     if (addressData.radioOption === correspondenceAddressKnown.noRadioOption) {
       await performActions(
         'Find Address based on postcode',
-        ['inputText', correspondenceAddressKnown.enterUKPostcodeTextLabel, addressData.postcode],
-        ['clickButton', correspondenceAddressKnown.findAddressButton],
-        ['select', correspondenceAddressKnown.addressSelectLabel, addressData.addressIndex]
+        ['inputText', correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel, addressData.postcode],
+        ['clickButton', correspondenceAddressKnown.findAddressHiddenButton],
+        ['select', correspondenceAddressKnown.addressSelectHiddenLabel, addressData.addressIndex]
       );
     }
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);

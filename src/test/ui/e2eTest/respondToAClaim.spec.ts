@@ -3,7 +3,14 @@ import config from 'config';
 
 //Below lines are commented to avoid API calls until data setup is integrated.
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { correspondenceAddressKnown, defendantDateOfBirth, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import {
+  contactPreference,
+  correspondenceAddressKnown,
+  defendantDateOfBirth,
+  defendantNameCapture,
+  freeLegalAdvice,
+  startNow,
+} from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
@@ -18,16 +25,16 @@ test.beforeEach(async ({ page }) => {
   //await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + '/case/1234567891234567/respond-to-claim/start-now');
+  await performAction('clickButton', startNow.startNowButton);
 });
 
 test.afterEach(async () => {
   PageContentValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim @nightly', async () => {
-  test('Respond to a claim', async () => {
-    await performAction('navigateToUrl', home_url + '/case/1234567891234567/respond-to-claim/start-now');
-    await performAction('clickButton', startNow.startNowButton);
+test.describe('Respond to a claim - e2e Journey @nightly', async () => {
+  test('Correspondence address known- Yes ', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
@@ -36,7 +43,24 @@ test.describe('Respond to a claim @nightly', async () => {
     await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
     await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.yesRadioOption
+      radioOption: correspondenceAddressKnown.yesRadioOption,
     });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+  });
+
+  test('Correspondence address known - No ', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
+    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.noRadioOption,
+      postcode: correspondenceAddressKnown.englandPostcodeTextInput,
+      addressIndex: correspondenceAddressKnown.addressIndex,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
   });
 });

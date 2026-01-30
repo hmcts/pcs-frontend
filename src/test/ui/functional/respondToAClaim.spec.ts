@@ -27,11 +27,7 @@ test.beforeEach(async ({ page }) => {
   await performAction('clickButton', startNow.startNowButton);
 });
 
-test.afterEach(async () => {
-  PageContentValidation.finaliseTest();
-});
-
-test.describe('Respond to a claim @nightly', async () => {
+test.describe('Respond to a claim - functional @nightly', async () => {
   test('Free legal advice - Error messages - Save for later Validations', async () => {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
     await performAction('inputErrorValidation', {
@@ -42,7 +38,7 @@ test.describe('Respond to a claim @nightly', async () => {
       header: freeLegalAdvice.errorValidationHeader,
     });
     await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
-    await performAction('clickButton', defendantNameCapture.saveForLaterButton);
+    await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
 
@@ -69,17 +65,79 @@ test.describe('Respond to a claim @nightly', async () => {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
     });
-    await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
     await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
     await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddressKnown.errorValidation,
       validationType: correspondenceAddressKnown.errorValidationType.radio,
       inputArray: correspondenceAddressKnown.errorValidationField.errorRadioMsg,
-      question: correspondenceAddressKnown.isThisYourAddressQuestion,
+      question: correspondenceAddressKnown.mainHeader,
       header: correspondenceAddressKnown.errorValidationHeader,
     });
     await performAction('clickRadioButton', correspondenceAddressKnown.noRadioOption);
+    await performAction('clickButton', correspondenceAddressKnown.findAddressHiddenButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField1,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction('inputText', correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel, '12345');
+    await performAction('clickButton', correspondenceAddressKnown.findAddressHiddenButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField2,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction(
+      'inputText',
+      correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel,
+      correspondenceAddressKnown.englandPostcodeTextInput
+    );
+    await performAction('clickButton', correspondenceAddressKnown.findAddressHiddenButton);
     await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField3,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction(
+      'select',
+      correspondenceAddressKnown.addressSelectHiddenLabel,
+      correspondenceAddressKnown.addressIndex
+    );
+    await performAction('inputText', correspondenceAddressKnown.addressLine1HiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddressKnown.townOrCityHiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddressKnown.postcodeHiddenTextLabel, '');
+    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField4,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction(
+      'inputText',
+      correspondenceAddressKnown.addressLine1HiddenTextLabel,
+      correspondenceAddressKnown.englandAddressLine1TextInput
+    );
+    await performAction(
+      'inputText',
+      correspondenceAddressKnown.townOrCityHiddenTextLabel,
+      correspondenceAddressKnown.englandTownOrCityTextInput
+    );
+    await performAction('inputText', correspondenceAddressKnown.postcodeHiddenTextLabel, 'ABED');
+    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField1,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', correspondenceAddressKnown.yesRadioOption);
+    await performAction('clickButton', correspondenceAddressKnown.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
   });
 });
