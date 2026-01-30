@@ -23,7 +23,7 @@ function camelToKebabCase(str: string): string {
   return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
-export function createFormStep(config: FormBuilderConfig, viewPath: string = 'formBuilder.njk'): StepDefinition {
+export function createFormStep(config: FormBuilderConfig): StepDefinition {
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
@@ -37,9 +37,11 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
     translationKeys,
     flowConfig,
     showCancelButton,
+    customTemplate,
   } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
+  const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
@@ -82,7 +84,8 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
       beforeRedirect,
       translationKeys,
       flowConfig,
-      showCancelButton
+      showCancelButton,
+      extendGetContent
     ),
   };
 }

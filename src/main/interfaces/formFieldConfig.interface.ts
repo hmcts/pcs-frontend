@@ -4,8 +4,15 @@ import type { TranslationContent } from '../modules/steps';
 
 import type { JourneyFlowConfig } from './stepFlow.interface';
 
-export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count';
-export type ComponentType = 'input' | 'textarea' | 'characterCount' | 'radios' | 'checkboxes' | 'dateInput';
+export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup';
+export type ComponentType =
+  | 'input'
+  | 'textarea'
+  | 'characterCount'
+  | 'radios'
+  | 'checkboxes'
+  | 'dateInput'
+  | 'postcodeLookup';
 
 export interface FormFieldOption {
   value?: string;
@@ -26,6 +33,7 @@ export interface FormFieldOption {
 export interface FormFieldConfig {
   name: string;
   type: FormFieldType;
+  id?: string;
   required?: boolean | ((formData: Record<string, unknown>, allData: Record<string, unknown>) => boolean);
   pattern?: string;
   maxLength?: number;
@@ -78,6 +86,7 @@ export interface FormBuilderConfig {
   extendGetContent?: (req: Request, content: TranslationContent) => Record<string, unknown>;
   stepDir: string;
   translationKeys?: TranslationKeys;
+  customTemplate?: string;
   basePath?: string;
   flowConfig?: JourneyFlowConfig;
   showCancelButton?: boolean;

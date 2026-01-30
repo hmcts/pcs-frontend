@@ -51,6 +51,7 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'postcode-finder',
+    'contact-preferences',
   ],
   steps: {
     'start-now': {
@@ -82,7 +83,11 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
-      // Last step - no defaultNext
+      previousStep: 'defendant-date-of-birth',
+      defaultNext: 'contact-preferences',
+    },
+    'contact-preferences': {
+      // no default next
     },
   },
 };

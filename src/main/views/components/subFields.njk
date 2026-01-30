@@ -10,6 +10,8 @@
       {{ govukTextarea(subField.component) }}
     {% elif subField.componentType == 'characterCount' %}
       {{ govukCharacterCount(subField.component) }}
+    {% elif subField.componentType == 'postcodeLookup' %}
+      {% include "components/postcodeLookup.njk" %}
     {% else %}
       {# Default to input for unknown types #}
       {{ govukInput(subField.component) }}
