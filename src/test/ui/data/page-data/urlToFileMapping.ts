@@ -4,4 +4,5 @@ export default {
   home: 'home',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
+  'contact-by-text-message': 'contactByTextMessage',
 };
