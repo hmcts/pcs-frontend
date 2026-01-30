@@ -77,7 +77,7 @@ export function createPostHandler(
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
-        renderWithErrors(
+        await renderWithErrors(
           req,
           res,
           viewPath,

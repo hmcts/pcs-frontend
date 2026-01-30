@@ -1,8 +1,8 @@
 {
-  "pageTitle": "cyYour correspondence address",
-  "title": "cyIs your correspondence address 15 Garden Drive, Luton, Bedfordshire, LU1 1AB?",
-  "subtitle": "cyThis is the address provided by Treetops Housing",
-  "legend": "cyIs this your correspondence address?",
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyAddress Confirmation",
+  "legend": "cyIs your correspondence address 15 Garden Drive, Luton, Bedfordshire, LU1 1AB?",
+  "legend.hint": "cyThis is the address provided by Treetops Housing",
   "labels": {
     "yes": "cyYes",
     "no": "cyNo",
@@ -11,7 +11,8 @@
     "enterManually": "cyEnter an address manually",
     "enterManuallySubText": "cyYou can enter your address details in the fields below.",
     "selectAddress": "cySelect an address",
-    "addressHeading": "cyWhat’s your correspondence address?",
+    "selectAddressLabel": "cySelect an address",
+    "addressHeading": "cyWhat's your correspondence address?",
     "addressLine1": "cyAddress line 1",
     "addressLine2": "cyAddress line 2 (optional)",
     "townOrCity": "cyTown or city",
@@ -24,10 +25,12 @@
     "saveForLater": "cySave for later"
   },
   "errors": {
+    "lookupPostcode": "cyEnter a valid UK postcode",
     "postcodeNotFound": "cyPostcode not found. Please check and try again.",
+    "selectAddress": "cyPlease select an address",
     "correspondenceAddressConfirm": "cyPlease confirm your address by selecting the options below",
     "correspondenceAddressConfirm.addressLine1": "cyEnter address line 1, typically the building and street",
     "correspondenceAddressConfirm.townOrCity": "cyEnter town or city",
-    "correspondenceAddressConfirm.postcode": "cyEnter postcode"
+    "correspondenceAddressConfirm.postcode": "cyEnter a valid UK postcode"
   }
 }
