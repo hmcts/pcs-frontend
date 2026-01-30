@@ -1,45 +1,12 @@
-import { Logger } from '@hmcts/nodejs-logging';
-import * as LDClient from '@launchdarkly/node-server-sdk';
 import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-
-const logger = Logger.getLogger('respond-to-claim-flow');
+import { isDefendantNameKnown } from '../utils/isDefendantNameKnown';
+import { isNoticeDateProvided } from '../utils/isNoticeDateProvided';
+import { isNoticeServed } from '../utils/isNoticeServed';
+import { isRentArrearsClaim } from '../utils/isRentArrearsClaim';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
-
-//TODO need to add logic to check if defendant name is known from CCD case data
-const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
-  const ldClient = (req.app?.locals?.launchDarklyClient as LDClient.LDClient | undefined) ?? undefined;
-
-  let result = '';
-  try {
-    const context: LDClient.LDContext = {
-      kind: 'user',
-      key: (req.session?.user?.uid as string) ?? 'anonymous',
-      name: req.session?.user?.name ?? 'anonymous',
-      email: req.session?.user?.email ?? 'anonymous',
-      firstName: req.session?.user?.given_name ?? 'anonymous',
-      lastName: req.session?.user?.family_name ?? 'anonymous',
-      custom: {
-        roles: req.session?.user?.roles ?? [],
-      },
-    };
-
-    // If the flag does not exist LD will return the default (empty string) so we route to capture.
-    // If LaunchDarkly client is not initialized or variation returns null/undefined, default to empty string.
-    result = (await ldClient?.variation('defendant-name', context, '')) ?? '';
-    logger.info('-------Defendant name from LaunchDarkly----------', { result });
-    logger.info('--------ldClient instance------', { ldClient });
-
-    req.session.defendantName = result;
-  } catch (err: unknown) {
-    // eslint-disable-next-line no-console
-    console.error('LaunchDarkly evaluation failed', err);
-  }
-
-  return Promise.resolve(result !== '');
-};
 
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
@@ -51,6 +18,13 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'postcode-finder',
+    'tenancy-details',
+    'confirmation-of-notice-given',
+    'confirmation-of-notice-date-when-provided',
+    'confirmation-of-notice-date-when-not-provided',
+    'rent-arrears-dispute',
+    'non-rent-arrears-dispute',
+    'end',
   ],
   steps: {
     'start-now': {
@@ -81,7 +55,149 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
-      // Last step - no defaultNext
+      defaultNext: 'tenancy-details',
+    },
+    'tenancy-details': {
+      routes: [
+        {
+          condition: async (req: Request) => isNoticeServed(req),
+          nextStep: 'confirmation-of-notice-given',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeServed = await isNoticeServed(req);
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            return !noticeServed && noticeDateProvided;
+          },
+          nextStep: 'confirmation-of-notice-date-when-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeServed = await isNoticeServed(req);
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            return !noticeServed && !noticeDateProvided;
+          },
+          nextStep: 'confirmation-of-notice-date-when-not-provided',
+        },
+      ],
+      previousStep: 'postcode-finder',
+    },
+    'confirmation-of-notice-given': {
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
+            if (!confirmed) {
+              return false;
+            }
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            return noticeDateProvided;
+          },
+          nextStep: 'confirmation-of-notice-date-when-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
+            if (!confirmed) {
+              return false;
+            }
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            return !noticeDateProvided;
+          },
+          nextStep: 'confirmation-of-notice-date-when-not-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+              return false;
+            }
+            const rentArrears = await isRentArrearsClaim(req);
+            return rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+              return false;
+            }
+            const rentArrears = await isRentArrearsClaim(req);
+            return !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
+      previousStep: 'tenancy-details',
+    },
+
+    'confirmation-of-notice-date-when-provided': {
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => !(await isNoticeDateProvided(req)),
+          nextStep: 'confirmation-of-notice-date-when-not-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return noticeDateProvided && rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return noticeDateProvided && !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
+    },
+    'confirmation-of-notice-date-when-not-provided': {
+      routes: [
+        {
+          condition: (req: Request): Promise<boolean> => isNoticeDateProvided(req),
+          nextStep: 'confirmation-of-notice-date-when-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return !noticeDateProvided && rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return !noticeDateProvided && !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
+    },
+    'rent-arrears-dispute': {
+      defaultNext: 'end',
+    },
+
+    'non-rent-arrears-dispute': {
+      defaultNext: 'end',
+    },
+
+    end: {
+      previousStep: (formData: Record<string, unknown>) => {
+        if (formData['rent-arrears-dispute']) {
+          return 'rent-arrears-dispute';
+        }
+        if (formData['non-rent-arrears-dispute']) {
+          return 'non-rent-arrears-dispute';
+        }
+        return '';
+      },
     },
   },
 };
