@@ -81,17 +81,11 @@ export function initPostcodeLookup(): void {
   };
 
   const populateAddressFields = (container: HTMLElement, selected: HTMLOptionElement) => {
-    const { addressLine1, addressLine2, town, county, postcodeOut, addressForm, enterManuallyDetails } =
-      getParts(container);
+    const { addressLine1, addressLine2, town, county, postcodeOut, enterManuallyDetails } = getParts(container);
 
-    // Show the address form by removing govuk-visually-hidden class
-    if (addressForm) {
-      addressForm.classList.remove('govuk-visually-hidden');
-    }
-
-    // Hide the "Enter manually" Details component when address is selected
+    // Ensure the Details component is open so address fields are visible
     if (enterManuallyDetails) {
-      enterManuallyDetails.style.display = 'none';
+      enterManuallyDetails.open = true;
     }
 
     const fieldMappings = [
@@ -112,13 +106,16 @@ export function initPostcodeLookup(): void {
   };
 
   const handleSelectionChange = (container: HTMLElement, select: HTMLSelectElement) => {
-    const { selectErrorMessage, selectFormGroup } = getParts(container);
+    const { selectErrorMessage, selectFormGroup, prefix } = getParts(container);
 
     // Clear any dropdown errors when user makes a selection
     hideError(selectErrorMessage, select);
     if (selectFormGroup) {
       selectFormGroup.classList.remove('govuk-form-group--error');
     }
+
+    // Remove dropdown error from error summary
+    removeErrorFromSummary(`${prefix}-selectedAddress-error`);
 
     const selected = select.options[select.selectedIndex];
     if (!selected?.value) {
@@ -161,6 +158,68 @@ export function initPostcodeLookup(): void {
     }
   };
 
+  // Helper functions to manage the error summary
+  const getErrorSummary = () => {
+    return document.querySelector<HTMLDivElement>('.govuk-error-summary');
+  };
+
+  const getErrorSummaryList = () => {
+    return document.querySelector<HTMLUListElement>('.govuk-error-summary__list');
+  };
+
+  const addErrorToSummary = (errorId: string, errorText: string, href: string) => {
+    const errorSummary = getErrorSummary();
+    const errorList = getErrorSummaryList();
+
+    if (!errorList) {
+      return;
+    }
+
+    // Check if error already exists
+    const existingError = errorList.querySelector(`li[data-error-id="${errorId}"]`);
+    if (existingError) {
+      return;
+    }
+
+    // Create new error list item
+    const li = document.createElement('li');
+    li.setAttribute('data-error-id', errorId);
+    const link = document.createElement('a');
+    link.href = href;
+    link.textContent = errorText;
+    li.appendChild(link);
+    errorList.appendChild(li);
+
+    // Show the error summary
+    if (errorSummary) {
+      errorSummary.hidden = false;
+      errorSummary.style.display = '';
+      // Focus on error summary (GOV.UK pattern)
+      errorSummary.focus();
+    }
+  };
+
+  const removeErrorFromSummary = (errorId: string) => {
+    const errorList = getErrorSummaryList();
+    if (!errorList) {
+      return;
+    }
+
+    const errorItem = errorList.querySelector(`li[data-error-id="${errorId}"]`);
+    if (errorItem) {
+      errorItem.remove();
+    }
+
+    // Hide error summary if no errors remain
+    const remainingErrors = errorList.querySelectorAll('li');
+    if (remainingErrors.length === 0) {
+      const errorSummary = getErrorSummary();
+      if (errorSummary) {
+        errorSummary.hidden = true;
+      }
+    }
+  };
+
   const showEmptyDropdown = (
     select: HTMLSelectElement,
     selectContainer: HTMLDivElement | null,
@@ -178,6 +237,32 @@ export function initPostcodeLookup(): void {
     select.hidden = false;
   };
 
+  const handleNoAddresses = (
+    errorMessage: HTMLParagraphElement | null,
+    input: HTMLInputElement | null,
+    select: HTMLSelectElement,
+    selectContainer: HTMLDivElement | null,
+    enterManuallyDetails: HTMLDetailsElement | null,
+    addressesFoundFlag: HTMLInputElement | null,
+    prefix: string
+  ) => {
+    showError(errorMessage, input);
+    showEmptyDropdown(select, selectContainer);
+    if (enterManuallyDetails) {
+      enterManuallyDetails.open = true;
+      enterManuallyDetails.style.display = '';
+    }
+    if (addressesFoundFlag) {
+      addressesFoundFlag.value = 'false';
+    }
+
+    // Add error to error summary
+    if (errorMessage?.textContent && input) {
+      const errorText = errorMessage.textContent.replace('Error:', '').trim();
+      addErrorToSummary(`${prefix}-postcode-error`, errorText, `#${prefix}-lookupPostcode`);
+    }
+  };
+
   const performPostcodeLookup = async (
     postcode: string,
     select: HTMLSelectElement,
@@ -186,10 +271,14 @@ export function initPostcodeLookup(): void {
     errorMessage: HTMLParagraphElement | null,
     input: HTMLInputElement | null,
     enterManuallyDetails: HTMLDetailsElement | null,
-    addressesFoundFlag: HTMLInputElement | null
+    addressesFoundFlag: HTMLInputElement | null,
+    prefix: string
   ) => {
     button.disabled = true;
     hideError(errorMessage, input);
+
+    // Remove any previous "no addresses found" error from summary
+    removeErrorFromSummary(`${prefix}-postcode-error`);
 
     try {
       const resp = await fetch(`/api/postcode-lookup?postcode=${encodeURIComponent(postcode)}`, {
@@ -203,17 +292,15 @@ export function initPostcodeLookup(): void {
       const addresses = json.addresses || [];
 
       if (addresses.length === 0) {
-        showError(errorMessage, input);
-        showEmptyDropdown(select, selectContainer);
-        // Open the "Enter manually" Details component when no addresses found
-        if (enterManuallyDetails) {
-          enterManuallyDetails.open = true;
-          enterManuallyDetails.style.display = '';
-        }
-        // Mark that no addresses were found
-        if (addressesFoundFlag) {
-          addressesFoundFlag.value = 'false';
-        }
+        handleNoAddresses(
+          errorMessage,
+          input,
+          select,
+          selectContainer,
+          enterManuallyDetails,
+          addressesFoundFlag,
+          prefix
+        );
       } else {
         // Keep the "Enter manually" Details component visible when addresses are found
         if (enterManuallyDetails) {
@@ -226,17 +313,7 @@ export function initPostcodeLookup(): void {
         }
       }
     } catch {
-      showError(errorMessage, input);
-      showEmptyDropdown(select, selectContainer);
-      // Open the "Enter manually" Details component on error
-      if (enterManuallyDetails) {
-        enterManuallyDetails.open = true;
-        enterManuallyDetails.style.display = '';
-      }
-      // Mark that no addresses were found
-      if (addressesFoundFlag) {
-        addressesFoundFlag.value = 'false';
-      }
+      handleNoAddresses(errorMessage, input, select, selectContainer, enterManuallyDetails, addressesFoundFlag, prefix);
     } finally {
       button.disabled = false;
     }
@@ -274,6 +351,7 @@ export function initPostcodeLookup(): void {
       return;
     }
     const {
+      prefix,
       postcodeInput,
       select,
       selectContainer,
@@ -295,6 +373,13 @@ export function initPostcodeLookup(): void {
       if (postcodeFormGroup) {
         postcodeFormGroup.classList.add('govuk-form-group--error');
       }
+
+      // Add error to error summary
+      if (lookupErrorMessage?.textContent) {
+        const errorText = lookupErrorMessage.textContent.replace('Error:', '').trim();
+        addErrorToSummary(`${prefix}-lookup-postcode-error`, errorText, `#${prefix}-lookupPostcode`);
+      }
+
       return;
     }
     // Hide blank field error before lookup
@@ -302,6 +387,10 @@ export function initPostcodeLookup(): void {
     if (postcodeFormGroup) {
       postcodeFormGroup.classList.remove('govuk-form-group--error');
     }
+
+    // Remove error from error summary
+    removeErrorFromSummary(`${prefix}-lookup-postcode-error`);
+
     await performPostcodeLookup(
       value,
       select,
@@ -310,7 +399,8 @@ export function initPostcodeLookup(): void {
       errorMessage,
       postcodeInput,
       enterManuallyDetails,
-      addressesFoundFlag
+      addressesFoundFlag,
+      prefix
     );
   });
 
@@ -327,8 +417,11 @@ export function initPostcodeLookup(): void {
     if (!container) {
       return;
     }
-    const { lookupErrorMessage } = getParts(container);
+    const { prefix, lookupErrorMessage } = getParts(container);
     hideError(lookupErrorMessage, input);
+
+    // Remove error from error summary when user starts typing
+    removeErrorFromSummary(`${prefix}-lookup-postcode-error`);
   });
 
   document.addEventListener('change', evt => {
@@ -347,22 +440,6 @@ export function initPostcodeLookup(): void {
     handleSelectionChange(container, select);
   });
 
-  // Handle Details component toggle to show address form
-  document.addEventListener('toggle', (evt: Event) => {
-    const target = evt.target as HTMLDetailsElement | null;
-    if (!target?.id?.endsWith('-enterManuallyDetails')) {
-      return;
-    }
-    const container = target.closest('[data-address-component]') as HTMLElement;
-    if (!container) {
-      return;
-    }
-    const { addressForm } = getParts(container);
-    if (target.open && addressForm) {
-      addressForm.classList.remove('govuk-visually-hidden');
-    }
-  });
-
   // Handle form submission validation for dropdown
   document.addEventListener('submit', (evt: Event) => {
     const form = evt.target as HTMLFormElement | null;
@@ -374,7 +451,8 @@ export function initPostcodeLookup(): void {
     const addressComponents = Array.from(form.querySelectorAll<HTMLElement>('[data-address-component]'));
 
     for (const container of addressComponents) {
-      const { addressesFoundFlag, select, selectContainer, selectErrorMessage, selectFormGroup } = getParts(container);
+      const { prefix, addressesFoundFlag, select, selectContainer, selectErrorMessage, selectFormGroup } =
+        getParts(container);
 
       // Check if addresses were found and dropdown is visible
       if (addressesFoundFlag?.value === 'true' && select && !selectContainer?.hidden && !select.hidden) {
@@ -390,11 +468,19 @@ export function initPostcodeLookup(): void {
             selectFormGroup.classList.add('govuk-form-group--error');
           }
 
-          // Focus on the dropdown
-          select.focus();
+          // Add error to error summary
+          if (selectErrorMessage?.textContent) {
+            const errorText = selectErrorMessage.textContent.replace('Error:', '').trim();
+            addErrorToSummary(`${prefix}-selectedAddress-error`, errorText, `#${prefix}-selectedAddress`);
+          }
 
-          // Scroll to error
-          select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Focus on the error summary (GOV.UK pattern)
+          const errorSummary = getErrorSummary();
+          if (errorSummary) {
+            errorSummary.focus();
+            errorSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+
           return;
         }
       }

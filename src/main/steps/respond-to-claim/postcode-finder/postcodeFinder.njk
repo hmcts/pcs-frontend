@@ -66,18 +66,12 @@
         
         <input type="hidden" id="correspondence-addressesFoundFlag" name="addressesFoundFlag" value="false" />
         
-        {{ govukDetails({
-          summaryText: labels.enterManually,
-          text: labels.enterManuallySubText,
-          id: "correspondence-enterManuallyDetails",
-          open: hasAddressErrors
-        }) }}
-        
-        {% set addressFormVisible = correspondenceAddressConfirm == 'no' or hasAddressErrors %}
-        <div class="address-form{% if not addressFormVisible %} govuk-visually-hidden{% endif %}" id="correspondence-addressForm">
-          <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ labels.addressHeading }}</h2>
-          
-          {{ govukInput({
+        {% set manualAddressFieldsHtml %}
+          <p class="govuk-body">{{ labels.enterManuallySubText }}</p>
+          <div class="address-form" id="correspondence-addressForm">
+            <h2 class="govuk-heading-m govuk-!-margin-top-2">{{ labels.addressHeading }}</h2>
+            
+            {{ govukInput({
             id: 'correspondence-addressLine1',
             name: 'correspondenceAddressConfirm.addressLine1',
             label: {
@@ -145,7 +139,15 @@
               text: errors['correspondenceAddressConfirm.postcode']
             } if errors['correspondenceAddressConfirm.postcode']
           }) }}
-        </div>
+          </div>
+        {% endset %}
+        
+        {{ govukDetails({
+          summaryText: labels.enterManually,
+          html: manualAddressFieldsHtml,
+          id: "correspondence-enterManuallyDetails",
+          open: hasAddressErrors
+        }) }}
       </div>
     {% endset %}
 
