@@ -34,7 +34,9 @@ export const correspondenceAddressKnown = {
   errorValidationField: {
     errorRadioMsg: [{ errMessage: 'Please confirm your address by selecting the options below' }],
     errorTextField1: [{ type: 'empty', label: 'Enter a UK postcode', errMessage: 'Enter a valid UK postcode' }],
-    errorTextField2: [{ type: 'empty', label: 'Enter a UK postcode', errMessage: 'Postcode not found. Please check and try again.' }],
+    errorTextField2: [
+      { type: 'empty', label: 'Enter a UK postcode', errMessage: 'Postcode not found. Please check and try again.' },
+    ],
     errorTextField3: [{ type: 'empty', label: 'Select an address', errMessage: 'Please select an address' }],
     errorTextField4: [
       { type: 'empty', label: 'Address line 1', errMessage: 'Enter address line 1, typically the building and street' },
