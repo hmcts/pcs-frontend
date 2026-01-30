@@ -72,7 +72,15 @@ export function createPostHandler(
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
-        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
+        const formContent = buildFormContent(
+          fields,
+          t,
+          req.body,
+          errors,
+          translationKeys,
+          nunjucksEnv,
+          showCancelButton
+        );
         await renderWithErrors(
           req,
           res,

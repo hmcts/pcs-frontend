@@ -1,7 +1,11 @@
 import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
-import { buildErrorSummary, renderWithErrors } from '../../../../../main/modules/steps/formBuilder/errorUtils';
+import {
+  type FormError,
+  buildErrorSummary,
+  renderWithErrors,
+} from '../../../../../main/modules/steps/formBuilder/errorUtils';
 
 describe('errorUtils', () => {
   describe('buildErrorSummary', () => {
@@ -70,9 +74,99 @@ describe('errorUtils', () => {
       expect(result?.errorList[2].href).toBe('#field3');
     });
 
-    it('should use correct anchor for date fields', () => {
-      const errors: Record<string, string> = {
-        dateField: 'Date is required',
+    it('should use correct anchor for date fields with generic error', () => {
+      const errors: Record<string, FormError> = {
+        dateField: 'Date is required', // String error (backward compatible)
+      };
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'dateField',
+          type: 'date',
+        },
+      ];
+
+      const result = buildErrorSummary(errors, fields, mockT);
+      expect(result?.errorList[0].href).toBe('#dateField-day');
+    });
+
+    it('should anchor to day field when error mentions day', () => {
+      const errors: Record<string, FormError> = {
+        dateField: {
+          message: 'Date must include a day',
+          erroneousParts: ['day'],
+        },
+      };
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'dateField',
+          type: 'date',
+        },
+      ];
+
+      const result = buildErrorSummary(errors, fields, mockT);
+      expect(result?.errorList[0].href).toBe('#dateField-day');
+    });
+
+    it('should anchor to month field when error mentions month', () => {
+      const errors: Record<string, FormError> = {
+        dateField: {
+          message: 'Date must include a month',
+          erroneousParts: ['month'],
+        },
+      };
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'dateField',
+          type: 'date',
+        },
+      ];
+
+      const result = buildErrorSummary(errors, fields, mockT);
+      expect(result?.errorList[0].href).toBe('#dateField-month');
+    });
+
+    it('should anchor to year field when error mentions year', () => {
+      const errors: Record<string, FormError> = {
+        dateField: {
+          message: 'Date must include a year',
+          erroneousParts: ['year'],
+        },
+      };
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'dateField',
+          type: 'date',
+        },
+      ];
+
+      const result = buildErrorSummary(errors, fields, mockT);
+      expect(result?.errorList[0].href).toBe('#dateField-year');
+    });
+
+    it('should anchor to day field when error mentions multiple parts', () => {
+      const errors: Record<string, FormError> = {
+        dateField: {
+          message: 'Date must include a day and month',
+          erroneousParts: undefined, // Multiple parts or generic error
+        },
+      };
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'dateField',
+          type: 'date',
+        },
+      ];
+
+      const result = buildErrorSummary(errors, fields, mockT);
+      expect(result?.errorList[0].href).toBe('#dateField-day');
+    });
+
+    it('should anchor to day field for generic date errors', () => {
+      const errors: Record<string, FormError> = {
+        dateField: {
+          message: 'Enter a valid date',
+          erroneousParts: undefined, // Generic error
+        },
       };
       const fields: FormFieldConfig[] = [
         {

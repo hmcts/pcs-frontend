@@ -126,9 +126,10 @@ export const createPostController = (
 
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
+        const errorMessage = typeof errors[firstField] === 'string' ? errors[firstField] : errors[firstField].message;
         return res.status(400).render(view, {
           ...req.body,
-          error: { field: firstField, text: errors[firstField] },
+          error: { field: firstField, text: errorMessage },
           lang: reqLang,
           pageUrl: req.originalUrl || '/',
           t,
