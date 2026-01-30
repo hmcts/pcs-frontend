@@ -1,5 +1,6 @@
 import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 
+import { step as contactPreferences } from './contact-preferences';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
@@ -14,4 +15,5 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
+  'contact-preferences': contactPreferences,
 };

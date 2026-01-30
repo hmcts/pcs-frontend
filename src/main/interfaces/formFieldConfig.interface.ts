@@ -92,6 +92,7 @@ export interface FormBuilderConfig {
   customTemplate?: string;
   basePath?: string;
   flowConfig?: JourneyFlowConfig;
+  showCancelButton?: boolean;
 }
 
 export interface ComponentConfig {

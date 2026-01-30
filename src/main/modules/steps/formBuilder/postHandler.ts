@@ -29,6 +29,7 @@ export function createPostHandler(
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
   flowConfig?: JourneyFlowConfig,
+  showCancelButton?: boolean,
   extendGetContent?: ExtendGetContent,
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
@@ -77,7 +78,7 @@ export function createPostHandler(
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
-        renderWithErrors(
+        await renderWithErrors(
           req,
           res,
           viewPath,
@@ -87,7 +88,8 @@ export function createPostHandler(
           stepName,
           journeyFolder,
           navigation,
-          translationKeys
+          translationKeys,
+          showCancelButton
         );
         return; // renderWithErrors sends the response, so we return early
       }

@@ -36,6 +36,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     stepDir,
     translationKeys,
     flowConfig,
+    showCancelButton,
     customTemplate,
   } = config;
 
@@ -71,6 +72,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           journeyFolder,
           languageToggle: t('languageToggle'),
           backUrl: await navigation.getBackUrl(req, stepName),
+          showCancelButton,
         };
       });
     },
@@ -82,6 +84,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       beforeRedirect,
       translationKeys,
       flowConfig,
+      showCancelButton,
       extendGetContent
     ),
   };

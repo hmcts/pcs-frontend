@@ -1,10 +1,10 @@
 {
-  "pageTitle": "Your correspondence address",
-  "title": "Is your correspondence address",
-  "titleNa": "What's your correspondence address?",
-  "subtitle": "This is the address provided by Treetops Housing",
-  "subtitleNa": "Your correspondence address is your postal address",
-  "legend": "Is this your correspondence address?",
+"caption": "Respond to a property possession claim",
+  "pageTitle": "Address Confirmation",
+  "pageTitleNa": "What's your correspondence address?",
+  "legend": "Is your correspondence address ",
+  "legend.hint": "This is the address provided by Treetops Housing",
+  "legend.hintNa": "This is the address provided by Treetops Housing",
   "labels": {
     "yes": "Yes",
     "no": "No",
@@ -13,7 +13,8 @@
     "enterManually": "Enter an address manually",
     "enterManuallySubText": "You can enter your address details in the fields below.",
     "selectAddress": "Select an address",
-    "addressHeading": "What’s your correspondence address?",
+    "selectAddressLabel": "Select an address",
+    "addressHeading": "What's your correspondence address?",
     "addressLine1": "Address line 1",
     "addressLine2": "Address line 2 (optional)",
     "townOrCity": "Town or city",
@@ -26,10 +27,12 @@
     "saveForLater": "Save for later"
   },
   "errors": {
+    "lookupPostcode": "Enter a valid UK postcode",
     "postcodeNotFound": "Postcode not found. Please check and try again.",
+    "selectAddress": "Please select an address",
     "correspondenceAddressConfirm": "Please confirm your address by selecting the options below",
     "correspondenceAddressConfirm.addressLine1": "Enter address line 1, typically the building and street",
     "correspondenceAddressConfirm.townOrCity": "Enter town or city",
-    "correspondenceAddressConfirm.postcode": "Enter postcode"
+    "correspondenceAddressConfirm.postcode": "Enter a valid UK postcode"
   }
 }

@@ -16,60 +16,62 @@
   {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+  
     {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
     {% set postcodeFinderHtml %}
-      <div class="govuk-form-group postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
+      <div class="postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
         <h2 class="govuk-heading-m">{{ labels.enterAddress }}</h2>
-        <label class="govuk-label" for="correspondence-lookupPostcode">
-          {{ labels.enterPostcode }}
-        </label>
-        <p class="govuk-error-message govuk-visually-hidden" id="correspondence-postcode-error" role="alert">
-          <span class="govuk-visually-hidden">Error:</span> {{ errors.postcodeNotFound }}
-        </p>
-        <input class="govuk-input govuk-input--width-10" 
-                id="correspondence-lookupPostcode" 
-                name="lookupPostcode" 
-                type="text" 
-                autocomplete="postal-code"
-                aria-describedby="correspondence-postcode-error"/>
-        <button class="govuk-button" 
-                id="correspondence-findAddressBtn"
-                data-module="govuk-button" 
-                type="button">
-          {{ buttons.findAddress }}
-        </button>
-        
-        <div id="correspondence-addressSelectContainer" hidden>
-          {{ govukSelect({
-            id: 'correspondence-selectedAddress',
-            name: "addressList",
-            classes: 'addressList govuk-!-width-full',
-            label: {
-              text: labels.selectAddress,
-              for: 'correspondence-selectedAddress'
-            },
-            items: [
-              {
-                value: "",
-                text: "Select an address",
-                selected: true
-              }
-            ]
-          }) }}
+        <div class="govuk-form-group" id="correspondence-postcode-form-group">
+          <label class="govuk-label" for="correspondence-lookupPostcode">
+            {{ labels.enterPostcode }}
+          </label>
+          <p class="govuk-error-message govuk-!-display-none" id="correspondence-lookup-postcode-error">
+            <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.lookupPostcode }}
+          </p>
+          <p class="govuk-error-message govuk-!-display-none" id="correspondence-postcode-error">
+            <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.postcodeNotFound }}
+          </p>
+          <div class="govuk-input__wrapper">
+            <input class="govuk-input govuk-input--width-10" 
+                    id="correspondence-lookupPostcode" 
+                    name="lookupPostcode" 
+                    type="text" 
+                    autocomplete="postal-code"
+                    aria-describedby="correspondence-lookup-postcode-error correspondence-postcode-error"/>
+            <button class="govuk-button govuk-!-margin-left-2 govuk-!-margin-bottom-0" 
+                    id="correspondence-findAddressBtn"
+                    data-module="govuk-button" 
+                    type="button">
+              {{ buttons.findAddress }}
+            </button>
+          </div>
         </div>
         
-        {{ govukDetails({
-          summaryText: labels.enterManually,
-          text: labels.enterManuallySubText,
-          id: "correspondence-enterManuallyDetails",
-          open: hasAddressErrors
-        }) }}
+        <div id="correspondence-addressSelectContainer" hidden>
+          <div class="govuk-form-group govuk-!-margin-bottom-2" id="correspondence-selectedAddress-form-group">
+            <label class="govuk-label" for="correspondence-selectedAddress">
+              {{ labels.selectAddress }}
+            </label>
+            <p class="govuk-error-message govuk-!-display-none" id="correspondence-selectedAddress-error">
+              <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.selectAddress }}
+            </p>
+            <select class="govuk-select govuk-!-width-full" id="correspondence-selectedAddress" name="addressList">
+              <option value="" selected>{{ labels.selectAddressLabel }}</option>
+            </select>
+          </div>
+        </div>
         
-        {% set addressFormVisible = correspondenceAddressConfirm == 'no' or hasAddressErrors %}
-        <div class="address-form{% if not addressFormVisible %} govuk-visually-hidden{% endif %}" id="correspondence-addressForm">
-          <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ labels.addressHeading }}</h2>
-          
-          {{ govukInput({
+        <input type="hidden" id="correspondence-addressesFoundFlag" name="addressesFoundFlag" value="false" />
+        
+        {% set manualAddressFieldsHtml %}
+          <p class="govuk-body">{{ labels.enterManuallySubText }}</p>
+          <div class="address-form" id="correspondence-addressForm">
+            <h2 class="govuk-heading-m govuk-!-margin-top-2">{{ labels.addressHeading }}</h2>
+            
+            {{ govukInput({
             id: 'correspondence-addressLine1',
             name: 'correspondenceAddressConfirm.addressLine1',
             label: {
@@ -137,7 +139,15 @@
               text: errors['correspondenceAddressConfirm.postcode']
             } if errors['correspondenceAddressConfirm.postcode']
           }) }}
-        </div>
+          </div>
+        {% endset %}
+        
+        {{ govukDetails({
+          summaryText: labels.enterManually,
+          html: manualAddressFieldsHtml,
+          id: "correspondence-enterManuallyDetails",
+          open: hasAddressErrors
+        }) }}
       </div>
     {% endset %}
 
@@ -166,6 +176,7 @@
         {{ govukRadios({
           name: field.component.name,
           fieldset: field.component.fieldset,
+          hint: field.component.hint,
           errorMessage: field.component.errorMessage,
           items: updatedItems
         }) }}
@@ -184,7 +195,8 @@
       }) }}
       {{ govukButton({
         text: buttons.saveForLater,
-        classes: "govuk-button--secondary"
+        classes: "govuk-button--secondary",
+        attributes: { name: 'action', value: 'saveForLater' }
       }) }}
     </div>
   </form>
