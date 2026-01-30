@@ -19,6 +19,7 @@ test.beforeEach(async ({ page }) => {
   //await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  //Below hard coded case number will be replaced with actual case number once data setup is integrated.
   await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
   await performAction('clickButton', startNow.startNowButton);
 });

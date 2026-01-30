@@ -25,6 +25,7 @@ test.afterEach(async () => {
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim', async () => {
+    //Below hard coded case number will be replaced with actual case number once data setup is integrated.
     await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
