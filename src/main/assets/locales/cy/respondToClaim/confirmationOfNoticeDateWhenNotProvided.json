@@ -1,0 +1,19 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyNotice Date",
+  "noticeDateLabel": "cyWhen did you receive notice from {{claimantName}} (Optional)?",
+  "noticeDateHint": "cyFor example, 27 9 2022. If you’re not sure of the exact date, you can find it on the notice",
+  "paragraph": "cy{{claimantName}} did not provide the date they served you notice.",
+  "errors": {
+    "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
+      "notRealDate": "cyDate of notice must be a real date",
+      "futureDate": "cyDate of notice must be in the past",
+      "invalidValue": "cyDate of notice must be a real date",
+      "missingOne": "cyYour date of notice must include a {{missingField}}",
+      "missingTwo": "cyYour date of notice must include a {{first}} and {{second}}"
+    }
+  }
+}

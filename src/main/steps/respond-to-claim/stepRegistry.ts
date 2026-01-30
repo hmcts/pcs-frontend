@@ -1,6 +1,7 @@
 import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 
-import { step as confirmationOfNoticeDate } from './confirmation-of-notice-date';
+import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
+import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
@@ -19,7 +20,8 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
-  'confirmation-of-notice-date': confirmationOfNoticeDate,
+  'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
+  'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
 };
