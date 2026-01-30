@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
+import { contactByTextMessage, defendantNameCapture,freeLegalAdvice } from '../../../data/page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -10,6 +10,7 @@ export class RespondToClaimAction implements IAction {
       ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
+      ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -32,6 +33,14 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
+  // Below changes are temporary will be changed as part of HDPI-3208
+  private async selectContactByTextMessage(contactData: actionData): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: contactByTextMessage.contactByTextMessageQuestion,
+      option: contactData,
+    });
+    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
+  }
   // Below changes are temporary will be changed as part of HDPI-3596
   private async inputErrorValidation(validationArr: actionRecord) {
     if (!validationArr || validationArr.validationReq !== 'YES') {

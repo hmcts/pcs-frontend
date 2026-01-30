@@ -4,7 +4,7 @@ import config from 'config';
 //Below lines are commented to avoid API calls until data setup is integrated.
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import { contactByTextMessage, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
@@ -58,4 +58,7 @@ test.describe('Respond to a claim @PR @nightly', async () => {
     await performAction('clickButton', defendantNameCapture.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
+  await performValidation('mainHeader', contactByTextMessage.mainHeader);
+  await performAction('selectContactUsByTextMessage', contactByTextMessage.yesRadioOption);
+
 });

@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { defendantDateOfBirth, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import { contactByTextMessage, defendantDateOfBirth, defendantNameCapture, freeLegalAdvice,startNow } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
@@ -33,5 +33,6 @@ test.describe('Respond to a claim @PR @nightly', async () => {
       lName: defendantNameCapture.lastNameInputText,
     });
     await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
+    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
   });
 });
