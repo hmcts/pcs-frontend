@@ -24,6 +24,7 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-not-provided',
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
+    'end',
   ],
   steps: {
     'start-now': {
@@ -107,8 +108,8 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven !== 'yes';
-            if (!confirmed) {
+            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
               return false;
             }
             const rentArrears = await isRentArrearsClaim(req);
@@ -118,8 +119,8 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven !== 'yes';
-            if (!confirmed) {
+            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
               return false;
             }
             const rentArrears = await isRentArrearsClaim(req);
@@ -134,13 +135,22 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-provided': {
       routes: [
         {
-          condition: async (req: Request) => isRentArrearsClaim(req),
+          condition: async (req: Request): Promise<boolean> => !(await isNoticeDateProvided(req)),
+          nextStep: 'confirmation-of-notice-date-when-not-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return noticeDateProvided && rentArrears;
+          },
           nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
             const rentArrears = await isRentArrearsClaim(req);
-            return !rentArrears;
+            return noticeDateProvided && !rentArrears;
           },
           nextStep: 'non-rent-arrears-dispute',
         },
@@ -149,25 +159,45 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-not-provided': {
       routes: [
         {
-          condition: async (req: Request) => isRentArrearsClaim(req),
+          condition: (req: Request): Promise<boolean> => isNoticeDateProvided(req),
+          nextStep: 'confirmation-of-notice-date-when-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return !noticeDateProvided && rentArrears;
+          },
           nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
             const rentArrears = await isRentArrearsClaim(req);
-            return !rentArrears;
+            return !noticeDateProvided && !rentArrears;
           },
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
     },
-   'rent-arrears-dispute': {
-    defaultNext: '',
-  },
-
-    'non-rent-arrears-dispute': {
-      defaultNext: '',
+    'rent-arrears-dispute': {
+      defaultNext: 'end',
     },
 
+    'non-rent-arrears-dispute': {
+      defaultNext: 'end',
+    },
+
+    end: {
+      previousStep: (formData: Record<string, unknown>) => {
+        if (formData['rent-arrears-dispute']) {
+          return 'rent-arrears-dispute';
+        }
+        if (formData['non-rent-arrears-dispute']) {
+          return 'non-rent-arrears-dispute';
+        }
+        return '';
+      },
+    },
   },
 };
