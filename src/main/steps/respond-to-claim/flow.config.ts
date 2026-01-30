@@ -3,6 +3,7 @@ import { type Request } from 'express';
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import { isDefendantNameKnown } from '../utils/isDefendantNameKnown';
 import { isNoticeDateProvided } from '../utils/isNoticeDateProvided';
+import { isNoticeServed } from '../utils/isNoticeServed';
 import { isRentArrearsClaim } from '../utils/isRentArrearsClaim';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
@@ -17,6 +18,7 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'postcode-finder',
+    'tenancy-details',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
     'confirmation-of-notice-date-when-not-provided',
@@ -52,7 +54,32 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
-      defaultNext: 'confirmation-of-notice-given',
+      defaultNext: 'tenancy-details',
+    },
+    'tenancy-details': {
+      routes: [
+        {
+          condition: async (req: Request) => isNoticeServed(req),
+          nextStep: 'confirmation-of-notice-given',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeServed = await isNoticeServed(req);
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            return !noticeServed && noticeDateProvided;
+          },
+          nextStep: 'confirmation-of-notice-date-when-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeServed = await isNoticeServed(req);
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            return !noticeServed && !noticeDateProvided;
+          },
+          nextStep: 'confirmation-of-notice-date-when-not-provided',
+        },
+      ],
+      previousStep: 'postcode-finder',
     },
     'confirmation-of-notice-given': {
       routes: [
@@ -101,7 +128,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: 'postcode-finder',
+      previousStep: 'tenancy-details',
     },
 
     'confirmation-of-notice-date-when-provided': {
@@ -118,7 +145,6 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: 'confirmation-of-notice-given',
     },
     'confirmation-of-notice-date-when-not-provided': {
       routes: [
@@ -134,13 +160,14 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: 'confirmation-of-notice-given',
     },
-    'rent-arrears-dispute': {
-      defaultNext: '',
-    },
+   'rent-arrears-dispute': {
+    defaultNext: '',
+  },
+
     'non-rent-arrears-dispute': {
       defaultNext: '',
     },
+
   },
 };

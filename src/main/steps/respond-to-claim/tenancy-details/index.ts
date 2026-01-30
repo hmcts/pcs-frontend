@@ -4,7 +4,7 @@ import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep(
   {
-    stepName: 'non-rent-arrears-dispute',
+    stepName: 'tenancy-details',
     journeyFolder: 'respondToClaim',
     stepDir: __dirname,
     flowConfig,
@@ -14,5 +14,5 @@ export const step: StepDefinition = createFormStep(
     },
     fields: [],
   },
-  `${__dirname}/nonRentArrearsDispute.njk`
+  `${__dirname}/tenancyDetails.njk`
 );

@@ -11,6 +11,7 @@ import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as postcodeFinder } from './postcode-finder';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as startNow } from './start-now';
+import { step as tenancyDetails } from './tenancy-details';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -19,6 +20,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
+  'tenancy-details': tenancyDetails,
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
   'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
   'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,

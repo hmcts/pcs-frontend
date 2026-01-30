@@ -10,7 +10,7 @@
       "month": "Month",
       "year": "Year",
       "notRealDate": "Date of notice must be a real date",
-      "futureDate": "Date of notice must be in the past",
+      "futureDate": "The date you received notice must either be today's date or in the past",
       "invalidValue": "Date of notice must be a real date",
       "missingOne": "Your date of notice must include a {{missingField}}",
       "missingTwo": "Your date of notice must include a {{first}} and {{second}}"
