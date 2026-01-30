@@ -11,7 +11,8 @@
     "enterManually": "cyEnter an address manually",
     "enterManuallySubText": "cyYou can enter your address details in the fields below.",
     "selectAddress": "cySelect an address",
-    "addressHeading": "cyWhat’s your correspondence address?",
+    "selectAddressLabel": "cySelect an address",
+    "addressHeading": "cyWhat's your correspondence address?",
     "addressLine1": "cyAddress line 1",
     "addressLine2": "cyAddress line 2 (optional)",
     "townOrCity": "cyTown or city",
@@ -26,6 +27,7 @@
   "errors": {
     "lookupPostcode": "cyEnter a valid UK postcode",
     "postcodeNotFound": "cyPostcode not found. Please check and try again.",
+    "selectAddress": "cyPlease select an address",
     "correspondenceAddressConfirm": "cyPlease confirm your address by selecting the options below",
     "correspondenceAddressConfirm.addressLine1": "cyEnter address line 1, typically the building and street",
     "correspondenceAddressConfirm.townOrCity": "cyEnter town or city",

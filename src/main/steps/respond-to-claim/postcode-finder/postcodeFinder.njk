@@ -41,7 +41,7 @@
                     type="text" 
                     autocomplete="postal-code"
                     aria-describedby="correspondence-lookup-postcode-error correspondence-postcode-error"/>
-            <button class="govuk-button govuk-!-margin-left-2" 
+            <button class="govuk-button govuk-!-margin-left-2 govuk-!-margin-bottom-0" 
                     id="correspondence-findAddressBtn"
                     data-module="govuk-button" 
                     type="button">
@@ -51,23 +51,20 @@
         </div>
         
         <div id="correspondence-addressSelectContainer" hidden>
-          {{ govukSelect({
-            id: 'correspondence-selectedAddress',
-            name: "addressList",
-            classes: 'addressList govuk-!-width-full',
-            label: {
-              text: labels.selectAddress,
-              for: 'correspondence-selectedAddress'
-            },
-            items: [
-              {
-                value: "",
-                text: "Select an address",
-                selected: true
-              }
-            ]
-          }) }}
+          <div class="govuk-form-group govuk-!-margin-bottom-2" id="correspondence-selectedAddress-form-group">
+            <label class="govuk-label" for="correspondence-selectedAddress">
+              {{ labels.selectAddress }}
+            </label>
+            <p class="govuk-error-message govuk-!-display-none" id="correspondence-selectedAddress-error">
+              <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.selectAddress }}
+            </p>
+            <select class="govuk-select govuk-!-width-full" id="correspondence-selectedAddress" name="addressList">
+              <option value="" selected>{{ labels.selectAddressLabel }}</option>
+            </select>
+          </div>
         </div>
+        
+        <input type="hidden" id="correspondence-addressesFoundFlag" name="addressesFoundFlag" value="false" />
         
         {{ govukDetails({
           summaryText: labels.enterManually,
@@ -186,7 +183,7 @@
       {{ govukButton({
         text: buttons.saveForLater,
         classes: "govuk-button--secondary",
-        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+        attributes: { name: 'action', value: 'saveForLater' }
       }) }}
     </div>
   </form>

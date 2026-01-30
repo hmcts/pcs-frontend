@@ -57,6 +57,15 @@ export function createPostHandler(
         throw new Error('Nunjucks environment not initialized');
       }
 
+      // Handle saveForLater action BEFORE validation to allow incomplete forms
+      if (action === 'saveForLater') {
+        // Process field data (normalize checkboxes + consolidate date fields) before saving
+        processFieldData(req, fields);
+        const { action: _, ...bodyWithoutAction } = req.body;
+        setFormData(req, stepName, bodyWithoutAction);
+        return res.redirect(303, DASHBOARD_ROUTE);
+      }
+
       // Get all form data from session for cross-field validation
       const allFormData = req.session.formData
         ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
@@ -91,15 +100,6 @@ export function createPostHandler(
           showCancelButton
         );
         return; // renderWithErrors sends the response, so we return early
-      }
-
-      // Handle saveForLater action after validation passes
-      if (action === 'saveForLater') {
-        // Process field data (normalize checkboxes + consolidate date fields) before saving
-        processFieldData(req, fields);
-        const { action: _, ...bodyWithoutAction } = req.body;
-        setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, DASHBOARD_ROUTE);
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving

@@ -126,6 +126,7 @@ export const step: StepDefinition = createFormStep({
         enterManually: t('labels.enterManually'),
         enterManuallySubText: t('labels.enterManuallySubText'),
         selectAddress: t('labels.selectAddress'),
+        selectAddressLabel: t('labels.selectAddressLabel'),
         addressHeading: t('labels.addressHeading'),
         addressLine1: t('labels.addressLine1'),
         addressLine2: t('labels.addressLine2'),
@@ -141,6 +142,7 @@ export const step: StepDefinition = createFormStep({
       clientErrors: {
         lookupPostcode: t('errors.lookupPostcode'),
         postcodeNotFound: t('errors.postcodeNotFound'),
+        selectAddress: t('errors.selectAddress'),
       },
       // Extract nested field values for easy template access (only on POST with errors)
       correspondenceAddressLine1: req.body?.['correspondenceAddressConfirm.addressLine1'] || '',

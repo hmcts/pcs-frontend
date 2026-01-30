@@ -11,7 +11,8 @@
     "enterManually": "Enter an address manually",
     "enterManuallySubText": "You can enter your address details in the fields below.",
     "selectAddress": "Select an address",
-    "addressHeading": "What’s your correspondence address?",
+    "selectAddressLabel": "Select an address",
+    "addressHeading": "What's your correspondence address?",
     "addressLine1": "Address line 1",
     "addressLine2": "Address line 2 (optional)",
     "townOrCity": "Town or city",
@@ -26,6 +27,7 @@
   "errors": {
     "lookupPostcode": "Enter a valid UK postcode",
     "postcodeNotFound": "Postcode not found. Please check and try again.",
+    "selectAddress": "Please select an address",
     "correspondenceAddressConfirm": "Please confirm your address by selecting the options below",
     "correspondenceAddressConfirm.addressLine1": "Enter address line 1, typically the building and street",
     "correspondenceAddressConfirm.townOrCity": "Enter town or city",
