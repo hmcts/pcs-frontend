@@ -21,18 +21,38 @@ describe('initPostcodeLookup', () => {
     document.body.innerHTML = '';
     jest.restoreAllMocks();
     setFetch(undefined);
+    // Reset the global flag
+    (global as { postcodeLookupDelegatedBound?: boolean }).postcodeLookupDelegatedBound = false;
+
+    // Mock scrollIntoView for jsdom
+    Element.prototype.scrollIntoView = jest.fn();
   });
 
   const buildComponent = (prefix = 'address') => `
     <div data-address-component data-name-prefix="${prefix}">
-      <input id="${prefix}-lookupPostcode" name="${prefix}[lookupPostcode]" />
-      <button id="${prefix}-findAddressBtn" type="button">Find</button>
-      <div id="${prefix}-addressSelectContainer" hidden>
-        <select id="${prefix}-selectedAddress" name="${prefix}[selectedAddress]">
-          <option value="">Initial</option>
-        </select>
+      <div id="${prefix}-postcode-form-group" class="govuk-form-group">
+        <input id="${prefix}-lookupPostcode" name="${prefix}[lookupPostcode]" />
+        <p class="govuk-error-message govuk-!-display-none" id="${prefix}-lookup-postcode-error">
+          <span class="govuk-visually-hidden">Error:</span> Enter a postcode
+        </p>
       </div>
-      <details id="${prefix}-enterManuallyDetails"></details>
+      <button id="${prefix}-findAddressBtn" type="button">Find</button>
+      <div id="${prefix}-selectedAddress-form-group" class="govuk-form-group">
+        <div id="${prefix}-addressSelectContainer" hidden>
+          <select id="${prefix}-selectedAddress" name="${prefix}[selectedAddress]">
+            <option value="">Initial</option>
+          </select>
+          <p class="govuk-error-message govuk-!-display-none" id="${prefix}-selectedAddress-error">
+            <span class="govuk-visually-hidden">Error:</span> Select an address
+          </p>
+        </div>
+      </div>
+      <p class="govuk-error-message govuk-!-display-none" id="${prefix}-postcode-error">
+        <span class="govuk-visually-hidden">Error:</span> No addresses found
+      </p>
+      <details id="${prefix}-enterManuallyDetails">
+        <summary>Enter manually</summary>
+      </details>
       <div id="${prefix}-addressForm" class="govuk-visually-hidden">
         <input id="${prefix}-addressLine1" name="${prefix}[addressLine1]" />
         <input id="${prefix}-addressLine2" name="${prefix}[addressLine2]" />
@@ -40,404 +60,978 @@ describe('initPostcodeLookup', () => {
         <input id="${prefix}-county" name="${prefix}[county]" />
         <input id="${prefix}-postcode" name="${prefix}[postcode]" />
       </div>
+      <input type="hidden" id="${prefix}-addressesFoundFlag" name="${prefix}[addressesFoundFlag]" value="" />
     </div>
   `;
 
-  it('does nothing when no containers present', () => {
-    expect(() => initPostcodeLookup()).not.toThrow();
-  });
+  const buildErrorSummary = () => `
+    <div class="govuk-error-summary" hidden>
+      <h2 class="govuk-error-summary__title">There is a problem</h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-error-summary__list"></ul>
+      </div>
+    </div>
+  `;
 
-  it('performs lookup and populates select with results', async () => {
-    document.body.innerHTML = buildComponent();
-
-    const addresses = [
-      {
-        fullAddress: '10 Downing Street, London, SW1A 2AA',
-        addressLine1: '10 Downing Street',
-        addressLine2: '',
-        town: 'London',
-        county: 'Greater London',
-        postcode: 'SW1A 2AA',
-      },
-      {
-        fullAddress: '11 Downing Street, London, SW1A 2AB',
-        addressLine1: '11 Downing Street',
-        addressLine2: '',
-        town: 'London',
-        county: 'Greater London',
-        postcode: 'SW1A 2AB',
-      },
-    ];
-
-    setFetch(
-      jest.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ addresses }),
-      })
-    );
-
-    initPostcodeLookup();
-
-    const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
-    const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-    const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-
-    const focusSpy = jest.spyOn(select, 'focus');
-
-    input.value = 'SW1A 2AA';
-    button.click();
-
-    await flushPromises();
-
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('/api/postcode-lookup?postcode=SW1A%202AA');
-    expect((global.fetch as jest.Mock).mock.calls[0][1]).toMatchObject({
-      headers: { Accept: 'application/json' },
-      credentials: 'same-origin',
+  describe('Initialization', () => {
+    it('does nothing when no containers present', () => {
+      expect(() => initPostcodeLookup()).not.toThrow();
     });
 
-    // First option is the summary ("n addresses found") + 2 address options
-    expect(select.options).toHaveLength(3);
-    expect(select.options[0].textContent).toBe('2 addresses found');
-    expect(select.options[1].textContent).toBe('10 Downing Street, London, SW1A 2AA');
-    expect(select.options[1].dataset.line1).toBe('10 Downing Street');
-    expect(select.hidden).toBe(false);
-    expect(selectContainer.hidden).toBe(false);
-    expect(focusSpy).toHaveBeenCalled();
-    expect(button.disabled).toBe(false);
-  });
+    it('hides error messages on initialization', () => {
+      document.body.innerHTML = buildComponent();
+      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
+      const postcodeError = document.getElementById('address-postcode-error') as HTMLParagraphElement;
 
-  it('shows fallback when lookup fails', async () => {
-    document.body.innerHTML = buildComponent();
+      // Make errors visible before init
+      lookupError.classList.remove('govuk-!-display-none');
+      postcodeError.classList.remove('govuk-!-display-none');
 
-    setFetch(
-      jest.fn().mockResolvedValue({
-        ok: false,
-        json: async () => ({ error: 'fail' }),
-      })
-    );
+      initPostcodeLookup();
 
-    initPostcodeLookup();
-
-    const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
-    const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-    const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-
-    input.value = 'SW1A 1AA';
-    button.click();
-
-    await flushPromises();
-
-    expect(select.options).toHaveLength(1);
-    expect(select.options[0].textContent).toBe('No addresses found');
-    expect(select.hidden).toBe(false);
-    expect(selectContainer.hidden).toBe(false);
-    expect(button.disabled).toBe(false);
-  });
-
-  it('does not call fetch for empty postcode', async () => {
-    document.body.innerHTML = buildComponent();
-    setFetch(jest.fn());
-
-    initPostcodeLookup();
-
-    const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
-    const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-
-    input.value = '   ';
-    button.click();
-
-    await flushPromises();
-
-    expect(global.fetch).not.toHaveBeenCalled();
-    // Ensure the initial option remains unchanged
-    expect(select.options).toHaveLength(1);
-    expect(button.disabled).toBe(false);
-  });
-
-  it('populates fields and shows addressForm on selection change', () => {
-    document.body.innerHTML = buildComponent();
-    initPostcodeLookup();
-
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-    const addressForm = document.getElementById('address-addressForm') as HTMLDivElement;
-    const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
-    const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
-    const line1FocusSpy = jest.spyOn(line1, 'focus');
-
-    // Replace options with a selected entry
-    while (select.options.length) {
-      select.remove(0);
-    }
-    const opt = document.createElement('option');
-    opt.value = '0';
-    opt.textContent = '1 Main St';
-    opt.dataset.line1 = '1 Main St';
-    opt.dataset.line2 = 'Area';
-    opt.dataset.town = 'Townsville';
-    opt.dataset.county = 'Countyshire';
-    opt.dataset.postcode = 'AB1 2CD';
-    select.appendChild(opt);
-
-    expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(true);
-    select.selectedIndex = 0;
-    select.dispatchEvent(new Event('change', { bubbles: true }));
-
-    expect(line1.value).toBe('1 Main St');
-    expect((document.getElementById('address-addressLine2') as HTMLInputElement).value).toBe('Area');
-    expect((document.getElementById('address-town') as HTMLInputElement).value).toBe('Townsville');
-    expect((document.getElementById('address-county') as HTMLInputElement).value).toBe('Countyshire');
-    expect((document.getElementById('address-postcode') as HTMLInputElement).value).toBe('AB1 2CD');
-    expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(false);
-    expect(enterManuallyDetails.style.display).toBe('none');
-    expect(line1FocusSpy).toHaveBeenCalled();
-  });
-
-  it('supports custom namePrefix per component container', async () => {
-    document.body.innerHTML = buildComponent('homeAddress');
-
-    setFetch(
-      jest.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ addresses: [] }),
-      })
-    );
-
-    initPostcodeLookup();
-
-    const input = document.getElementById('homeAddress-lookupPostcode') as HTMLInputElement;
-    const button = document.getElementById('homeAddress-findAddressBtn') as HTMLButtonElement;
-    const select = document.getElementById('homeAddress-selectedAddress') as HTMLSelectElement;
-    const selectContainer = document.getElementById('homeAddress-addressSelectContainer') as HTMLDivElement;
-
-    input.value = 'AB1 2CD';
-    button.click();
-    await flushPromises();
-
-    expect(global.fetch).toHaveBeenCalledWith('/api/postcode-lookup?postcode=AB1%202CD', expect.any(Object));
-    expect(select.hidden).toBe(false);
-    expect(selectContainer.hidden).toBe(false);
-  });
-
-  it('handles single address found (singular text)', async () => {
-    document.body.innerHTML = buildComponent();
-
-    const addresses = [
-      {
-        fullAddress: '10 Downing Street, London, SW1A 2AA',
-        addressLine1: '10 Downing Street',
-        addressLine2: '',
-        town: 'London',
-        county: 'Greater London',
-        postcode: 'SW1A 2AA',
-      },
-    ];
-
-    setFetch(
-      jest.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ addresses }),
-      })
-    );
-
-    initPostcodeLookup();
-
-    const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
-    const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-
-    input.value = 'SW1A 2AA';
-    button.click();
-    await flushPromises();
-
-    expect(select.options[0].textContent).toBe('1 address found');
-  });
-
-  it('handles missing select container gracefully', async () => {
-    document.body.innerHTML = `
-      <div data-address-component>
-        <input id="address-lookupPostcode" />
-        <button id="address-findAddressBtn" type="button">Find</button>
-        <select id="address-selectedAddress">
-          <option value="">Initial</option>
-        </select>
-        <details></details>
-        <input id="address-addressLine1" name="address[addressLine1]" />
-        <input id="address-addressLine2" name="address[addressLine2]" />
-        <input id="address-town" name="address[town]" />
-        <input id="address-county" name="address[county]" />
-        <input id="address-postcode" name="address[postcode]" />
-      </div>
-    `;
-
-    setFetch(
-      jest.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ addresses: [] }),
-      })
-    );
-
-    expect(() => initPostcodeLookup()).not.toThrow();
-
-    const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
-    const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-
-    input.value = 'SW1A 2AA';
-    button.click();
-    await flushPromises();
-
-    expect(select.hidden).toBe(false);
-  });
-
-  it('handles missing address fields gracefully', () => {
-    document.body.innerHTML = `
-      <div data-address-component>
-        <input id="address-lookupPostcode" />
-        <button id="address-findAddressBtn" type="button">Find</button>
-        <select id="address-selectedAddress">
-          <option value="">Initial</option>
-        </select>
-        <details></details>
-      </div>
-    `;
-
-    initPostcodeLookup();
-    initPostcodeSelection();
-
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-
-    // Replace options with a selected entry
-    while (select.options.length) {
-      select.remove(0);
-    }
-    const opt = document.createElement('option');
-    opt.value = '0';
-    opt.textContent = '1 Main St';
-    opt.dataset.line1 = '1 Main St';
-    opt.dataset.line2 = 'Area';
-    opt.dataset.line3 = 'Locality';
-    opt.dataset.town = 'Townsville';
-    opt.dataset.county = 'Countyshire';
-    opt.dataset.postcode = 'AB1 2CD';
-    select.appendChild(opt);
-
-    expect(() => {
-      select.selectedIndex = 0;
-      select.dispatchEvent(new Event('change'));
-    }).not.toThrow();
-  });
-
-  it('handles addressForm visibility on selection with new structure', () => {
-    document.body.innerHTML = `
-      <div data-address-component>
-        <input id="address-lookupPostcode" />
-        <button id="address-findAddressBtn" type="button">Find</button>
-        <select id="address-selectedAddress">
-          <option value="">Initial</option>
-        </select>
-        <details id="address-enterManuallyDetails"></details>
-        <div id="address-addressForm" class="govuk-visually-hidden">
-          <input id="address-addressLine1" />
-        </div>
-      </div>
-    `;
-
-    initPostcodeLookup();
-
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-    const addressForm = document.getElementById('address-addressForm') as HTMLDivElement;
-    const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
-
-    // Replace options with a selected entry
-    while (select.options.length) {
-      select.remove(0);
-    }
-    const opt = document.createElement('option');
-    opt.value = '0';
-    opt.textContent = '1 Main St';
-    opt.dataset.line1 = '1 Main St';
-    select.appendChild(opt);
-
-    // Check that addressForm is initially hidden
-    expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(true);
-    select.selectedIndex = 0;
-    select.dispatchEvent(new Event('change', { bubbles: true }));
-
-    // The addressForm should now be visible and enterManuallyDetails hidden
-    expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(false);
-    expect(enterManuallyDetails.style.display).toBe('none');
-  });
-
-  it('handles selection change with no value selected', () => {
-    document.body.innerHTML = buildComponent();
-    initPostcodeLookup();
-
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-    const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
-
-    // Don't change selectedIndex, keep it at 0 (initial option with empty value)
-    expect(() => {
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-    }).not.toThrow();
-
-    // Values should remain unchanged
-    expect(line1.value).toBe('');
-  });
-
-  it('handles selection change with empty value', () => {
-    document.body.innerHTML = buildComponent();
-    initPostcodeLookup();
-
-    const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-    const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
-
-    // Replace options with an option that has empty value
-    while (select.options.length) {
-      select.remove(0);
-    }
-    const opt = document.createElement('option');
-    opt.value = '';
-    opt.textContent = 'No selection';
-    select.appendChild(opt);
-
-    expect(() => {
-      select.selectedIndex = 0;
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-    }).not.toThrow();
-
-    // Values should remain unchanged
-    expect(line1.value).toBe('');
-  });
-
-  describe('multiple container scenarios (event delegation)', () => {
-    beforeEach(() => {
-      // Reset the global flag
-      (global as { postcodeLookupDelegatedBound?: boolean }).postcodeLookupDelegatedBound = false;
+      expect(lookupError.classList.contains('govuk-!-display-none')).toBe(true);
+      expect(postcodeError.classList.contains('govuk-!-display-none')).toBe(true);
     });
 
-    it('uses event delegation for multiple containers', async () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-          <div id="home-addressSelectContainer" hidden></div>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-          <div id="work-addressSelectContainer" hidden></div>
-        </div>
+    it('prevents duplicate event delegation binding', () => {
+      document.body.innerHTML = buildComponent('home') + buildComponent('work');
+
+      const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
+
+      initPostcodeLookup();
+      const firstCallCount = addEventListenerSpy.mock.calls.length;
+
+      initPostcodeLookup();
+      const secondCallCount = addEventListenerSpy.mock.calls.length;
+
+      expect(secondCallCount).toBe(firstCallCount);
+    });
+  });
+
+  describe('Postcode lookup - success scenarios', () => {
+    it('performs lookup and populates select with results', async () => {
+      document.body.innerHTML = buildComponent();
+
+      const addresses = [
+        {
+          fullAddress: '10 Downing Street, London, SW1A 2AA',
+          addressLine1: '10 Downing Street',
+          addressLine2: '',
+          town: 'London',
+          county: 'Greater London',
+          postcode: 'SW1A 2AA',
+        },
+        {
+          fullAddress: '11 Downing Street, London, SW1A 2AB',
+          addressLine1: '11 Downing Street',
+          addressLine2: '',
+          town: 'London',
+          county: 'Greater London',
+          postcode: 'SW1A 2AB',
+        },
+      ];
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+
+      const focusSpy = jest.spyOn(select, 'focus');
+
+      input.value = 'SW1A 2AA';
+      button.click();
+
+      await flushPromises();
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('/api/postcode-lookup?postcode=SW1A%202AA');
+      expect((global.fetch as jest.Mock).mock.calls[0][1]).toMatchObject({
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+
+      // First option is the summary ("n addresses found") + 2 address options
+      expect(select.options).toHaveLength(3);
+      expect(select.options[0].textContent).toBe('2 addresses found');
+      expect(select.options[1].textContent).toBe('10 Downing Street, London, SW1A 2AA');
+      expect(select.options[1].dataset.line1).toBe('10 Downing Street');
+      expect(select.hidden).toBe(false);
+      expect(selectContainer.hidden).toBe(false);
+      expect(focusSpy).toHaveBeenCalled();
+      expect(button.disabled).toBe(false);
+      expect(addressesFoundFlag.value).toBe('true');
+    });
+
+    it('handles single address found (singular text)', async () => {
+      document.body.innerHTML = buildComponent();
+
+      const addresses = [
+        {
+          fullAddress: '10 Downing Street, London, SW1A 2AA',
+          addressLine1: '10 Downing Street',
+          addressLine2: '',
+          town: 'London',
+          county: 'Greater London',
+          postcode: 'SW1A 2AA',
+        },
+      ];
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+
+      input.value = 'SW1A 2AA';
+      button.click();
+      await flushPromises();
+
+      expect(select.options[0].textContent).toBe('1 address found');
+      expect(addressesFoundFlag.value).toBe('true');
+    });
+
+    it('keeps "Enter manually" details visible when addresses are found', async () => {
+      document.body.innerHTML = buildComponent();
+
+      const addresses = [
+        {
+          fullAddress: '10 Downing Street, London, SW1A 2AA',
+          addressLine1: '10 Downing Street',
+          addressLine2: '',
+          town: 'London',
+          county: 'Greater London',
+          postcode: 'SW1A 2AA',
+        },
+      ];
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
+
+      // Hide details initially
+      enterManuallyDetails.style.display = 'none';
+
+      input.value = 'SW1A 2AA';
+      button.click();
+      await flushPromises();
+
+      expect(enterManuallyDetails.style.display).toBe('');
+    });
+
+    it('supports custom namePrefix per component container', async () => {
+      document.body.innerHTML = buildComponent('homeAddress');
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses: [] }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('homeAddress-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('homeAddress-findAddressBtn') as HTMLButtonElement;
+      const select = document.getElementById('homeAddress-selectedAddress') as HTMLSelectElement;
+      const selectContainer = document.getElementById('homeAddress-addressSelectContainer') as HTMLDivElement;
+
+      input.value = 'AB1 2CD';
+      button.click();
+      await flushPromises();
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/postcode-lookup?postcode=AB1%202CD', expect.any(Object));
+      expect(select.hidden).toBe(false);
+      expect(selectContainer.hidden).toBe(false);
+    });
+  });
+
+  describe('Postcode lookup - blank field validation', () => {
+    it('shows error when postcode field is empty', async () => {
+      document.body.innerHTML = buildComponent();
+      setFetch(jest.fn());
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
+      const postcodeFormGroup = document.getElementById('address-postcode-form-group') as HTMLDivElement;
+
+      input.value = '';
+      button.click();
+
+      await flushPromises();
+
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(lookupError.classList.contains('govuk-!-display-none')).toBe(false);
+      expect(input.classList.contains('govuk-input--error')).toBe(true);
+      expect(postcodeFormGroup.classList.contains('govuk-form-group--error')).toBe(true);
+      expect(button.disabled).toBe(false);
+    });
+
+    it('shows error when postcode field contains only whitespace', async () => {
+      document.body.innerHTML = buildComponent();
+      setFetch(jest.fn());
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
+
+      input.value = '   ';
+      button.click();
+
+      await flushPromises();
+
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(lookupError.classList.contains('govuk-!-display-none')).toBe(false);
+      expect(input.classList.contains('govuk-input--error')).toBe(true);
+    });
+
+    it('clears lookup error on input event', () => {
+      document.body.innerHTML = buildComponent();
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
+
+      // Trigger blank field error first
+      input.value = '';
+      button.click();
+
+      expect(input.classList.contains('govuk-input--error')).toBe(true);
+      expect(lookupError.classList.contains('govuk-!-display-none')).toBe(false);
+
+      // Now test that input event clears the error
+      input.value = 'SW1A';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+
+      expect(input.classList.contains('govuk-input--error')).toBe(false);
+      expect(lookupError.classList.contains('govuk-!-display-none')).toBe(true);
+    });
+
+    it('hides blank field error before performing lookup', async () => {
+      document.body.innerHTML = buildComponent();
+
+      const addresses = [
+        {
+          fullAddress: '10 Downing Street, London, SW1A 2AA',
+          addressLine1: '10 Downing Street',
+          addressLine2: '',
+          town: 'London',
+          county: 'Greater London',
+          postcode: 'SW1A 2AA',
+        },
+      ];
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
+      const postcodeFormGroup = document.getElementById('address-postcode-form-group') as HTMLDivElement;
+
+      // Trigger blank field error first
+      input.value = '';
+      button.click();
+      await flushPromises();
+
+      expect(lookupError.classList.contains('govuk-!-display-none')).toBe(false);
+      expect(postcodeFormGroup.classList.contains('govuk-form-group--error')).toBe(true);
+
+      // Now enter a postcode and lookup again (with addresses found)
+      input.value = 'SW1A 2AA';
+      button.click();
+      await flushPromises();
+
+      expect(lookupError.classList.contains('govuk-!-display-none')).toBe(true);
+      expect(input.classList.contains('govuk-input--error')).toBe(false);
+      expect(postcodeFormGroup.classList.contains('govuk-form-group--error')).toBe(false);
+    });
+  });
+
+  describe('Postcode lookup - no addresses found', () => {
+    it('shows error and empty dropdown when no addresses found', async () => {
+      document.body.innerHTML = buildComponent();
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses: [] }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
+      const postcodeError = document.getElementById('address-postcode-error') as HTMLParagraphElement;
+      const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
+      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+
+      input.value = 'SW1A 1AA';
+      button.click();
+
+      await flushPromises();
+
+      expect(select.options).toHaveLength(1);
+      expect(select.options[0].textContent).toBe('No addresses found');
+      expect(select.options[0].disabled).toBe(true);
+      expect(select.hidden).toBe(false);
+      expect(selectContainer.hidden).toBe(false);
+      expect(postcodeError.classList.contains('govuk-!-display-none')).toBe(false);
+      expect(input.classList.contains('govuk-input--error')).toBe(true);
+      expect(enterManuallyDetails.open).toBe(true);
+      expect(enterManuallyDetails.style.display).toBe('');
+      expect(addressesFoundFlag.value).toBe('false');
+      expect(button.disabled).toBe(false);
+    });
+
+    it('shows error when lookup fails with network error', async () => {
+      document.body.innerHTML = buildComponent();
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: false,
+          json: async () => ({ error: 'fail' }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
+      const postcodeError = document.getElementById('address-postcode-error') as HTMLParagraphElement;
+
+      input.value = 'SW1A 1AA';
+      button.click();
+
+      await flushPromises();
+
+      expect(select.options).toHaveLength(1);
+      expect(select.options[0].textContent).toBe('No addresses found');
+      expect(select.hidden).toBe(false);
+      expect(selectContainer.hidden).toBe(false);
+      expect(postcodeError.classList.contains('govuk-!-display-none')).toBe(false);
+      expect(button.disabled).toBe(false);
+    });
+
+    it('shows error when fetch throws exception', async () => {
+      document.body.innerHTML = buildComponent();
+
+      setFetch(jest.fn().mockRejectedValue(new Error('Network error')));
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const postcodeError = document.getElementById('address-postcode-error') as HTMLParagraphElement;
+
+      input.value = 'SW1A 1AA';
+      button.click();
+
+      await flushPromises();
+
+      expect(postcodeError.classList.contains('govuk-!-display-none')).toBe(false);
+      expect(input.classList.contains('govuk-input--error')).toBe(true);
+      expect(button.disabled).toBe(false);
+    });
+  });
+
+  describe('Error summary integration', () => {
+    it('adds blank field error to error summary', async () => {
+      document.body.innerHTML = buildErrorSummary() + buildComponent();
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const errorSummary = document.querySelector('.govuk-error-summary') as HTMLDivElement;
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+
+      input.value = '';
+      button.click();
+
+      await flushPromises();
+
+      expect(errorSummary.hidden).toBe(false);
+      const errorItem = errorList.querySelector('li[data-error-id="address-lookup-postcode-error"]');
+      expect(errorItem).toBeTruthy();
+      expect(errorItem?.textContent).toContain('Enter a postcode');
+      const link = errorItem?.querySelector('a');
+      expect(link?.getAttribute('href')).toBe('#address-lookupPostcode');
+    });
+
+    it('removes blank field error from error summary on input', () => {
+      document.body.innerHTML = buildErrorSummary() + buildComponent();
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+
+      // Trigger blank field error
+      input.value = '';
+      button.click();
+
+      let errorItem = errorList.querySelector('li[data-error-id="address-lookup-postcode-error"]');
+      expect(errorItem).toBeTruthy();
+
+      // Type in input
+      input.value = 'SW1A';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+
+      errorItem = errorList.querySelector('li[data-error-id="address-lookup-postcode-error"]');
+      expect(errorItem).toBeNull();
+    });
+
+    it('adds no addresses found error to error summary', async () => {
+      document.body.innerHTML = buildErrorSummary() + buildComponent();
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses: [] }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const errorSummary = document.querySelector('.govuk-error-summary') as HTMLDivElement;
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+
+      input.value = 'SW1A 2AA';
+      button.click();
+
+      await flushPromises();
+
+      expect(errorSummary.hidden).toBe(false);
+      const errorItem = errorList.querySelector('li[data-error-id="address-postcode-error"]');
+      expect(errorItem).toBeTruthy();
+      expect(errorItem?.textContent).toContain('No addresses found');
+    });
+
+    it('removes no addresses found error when performing new lookup', async () => {
+      document.body.innerHTML = buildErrorSummary() + buildComponent();
+
+      // First lookup returns no addresses
+      setFetch(
+        jest.fn().mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ addresses: [] }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+
+      input.value = 'SW1A 2AA';
+      button.click();
+      await flushPromises();
+
+      let errorItem = errorList.querySelector('li[data-error-id="address-postcode-error"]');
+      expect(errorItem).toBeTruthy();
+
+      // Second lookup returns addresses
+      setFetch(
+        jest.fn().mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            addresses: [
+              {
+                fullAddress: '10 Downing Street',
+                addressLine1: '10 Downing Street',
+                addressLine2: '',
+                town: 'London',
+                county: '',
+                postcode: 'SW1A 2AA',
+              },
+            ],
+          }),
+        })
+      );
+
+      input.value = 'SW1A 2AA';
+      button.click();
+      await flushPromises();
+
+      errorItem = errorList.querySelector('li[data-error-id="address-postcode-error"]');
+      expect(errorItem).toBeNull();
+    });
+
+    it('hides error summary when no errors remain', async () => {
+      document.body.innerHTML = buildErrorSummary() + buildComponent();
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const errorSummary = document.querySelector('.govuk-error-summary') as HTMLDivElement;
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+
+      // Trigger blank field error
+      input.value = '';
+      button.click();
+
+      expect(errorSummary.hidden).toBe(false);
+      expect(errorList.querySelectorAll('li')).toHaveLength(1);
+
+      // Clear error
+      input.value = 'SW1A';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+
+      expect(errorList.querySelectorAll('li')).toHaveLength(0);
+      expect(errorSummary.hidden).toBe(true);
+    });
+
+    it('does not duplicate errors in error summary', async () => {
+      document.body.innerHTML = buildErrorSummary() + buildComponent();
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+
+      // Trigger blank field error twice
+      input.value = '';
+      button.click();
+      await flushPromises();
+
+      input.value = '';
+      button.click();
+      await flushPromises();
+
+      const errorItems = errorList.querySelectorAll('li[data-error-id="address-lookup-postcode-error"]');
+      expect(errorItems).toHaveLength(1);
+    });
+
+    it('focuses error summary when blank field error occurs', async () => {
+      document.body.innerHTML = buildErrorSummary() + buildComponent();
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const errorSummary = document.querySelector('.govuk-error-summary') as HTMLDivElement;
+
+      const focusSpy = jest.spyOn(errorSummary, 'focus');
+
+      input.value = '';
+      button.click();
+
+      await flushPromises();
+
+      expect(focusSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('Address selection', () => {
+    it('populates fields and opens enterManually details on selection change', () => {
+      document.body.innerHTML = buildComponent();
+      initPostcodeLookup();
+
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
+      const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
+      const line1FocusSpy = jest.spyOn(line1, 'focus');
+
+      // Replace options with a selected entry
+      while (select.options.length) {
+        select.remove(0);
+      }
+      const opt = document.createElement('option');
+      opt.value = '0';
+      opt.textContent = '1 Main St';
+      opt.dataset.line1 = '1 Main St';
+      opt.dataset.line2 = 'Area';
+      opt.dataset.town = 'Townsville';
+      opt.dataset.county = 'Countyshire';
+      opt.dataset.postcode = 'AB1 2CD';
+      select.appendChild(opt);
+
+      enterManuallyDetails.open = false;
+      select.selectedIndex = 0;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+
+      expect(line1.value).toBe('1 Main St');
+      expect((document.getElementById('address-addressLine2') as HTMLInputElement).value).toBe('Area');
+      expect((document.getElementById('address-town') as HTMLInputElement).value).toBe('Townsville');
+      expect((document.getElementById('address-county') as HTMLInputElement).value).toBe('Countyshire');
+      expect((document.getElementById('address-postcode') as HTMLInputElement).value).toBe('AB1 2CD');
+      expect(enterManuallyDetails.open).toBe(true);
+      expect(line1FocusSpy).toHaveBeenCalled();
+    });
+
+    it('handles selection change with no value selected', () => {
+      document.body.innerHTML = buildComponent();
+      initPostcodeLookup();
+
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
+
+      expect(() => {
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }).not.toThrow();
+
+      expect(line1.value).toBe('');
+    });
+
+    it('handles selection change with empty value', () => {
+      document.body.innerHTML = buildComponent();
+      initPostcodeLookup();
+
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
+
+      // Replace options with an option that has empty value
+      while (select.options.length) {
+        select.remove(0);
+      }
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'No selection';
+      select.appendChild(opt);
+
+      expect(() => {
+        select.selectedIndex = 0;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }).not.toThrow();
+
+      expect(line1.value).toBe('');
+    });
+
+    it('clears dropdown error on selection change', () => {
+      document.body.innerHTML = buildComponent();
+      initPostcodeLookup();
+
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const selectError = document.getElementById('address-selectedAddress-error') as HTMLParagraphElement;
+      const selectFormGroup = document.getElementById('address-selectedAddress-form-group') as HTMLDivElement;
+
+      // Manually add error state
+      selectError.classList.remove('govuk-!-display-none');
+      select.classList.add('govuk-select--error');
+      selectFormGroup.classList.add('govuk-form-group--error');
+
+      // Replace options with a selected entry
+      while (select.options.length) {
+        select.remove(0);
+      }
+      const opt = document.createElement('option');
+      opt.value = '0';
+      opt.textContent = '1 Main St';
+      opt.dataset.line1 = '1 Main St';
+      select.appendChild(opt);
+
+      select.selectedIndex = 0;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+
+      expect(selectError.classList.contains('govuk-!-display-none')).toBe(true);
+      expect(select.classList.contains('govuk-select--error')).toBe(false);
+      expect(selectFormGroup.classList.contains('govuk-form-group--error')).toBe(false);
+    });
+
+    it('removes dropdown error from error summary on selection', () => {
+      document.body.innerHTML = buildErrorSummary() + buildComponent();
+      initPostcodeLookup();
+
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+
+      // Manually add error to summary
+      const li = document.createElement('li');
+      li.setAttribute('data-error-id', 'address-selectedAddress-error');
+      const link = document.createElement('a');
+      link.href = '#address-selectedAddress';
+      link.textContent = 'Select an address';
+      li.appendChild(link);
+      errorList.appendChild(li);
+
+      // Replace options with a selected entry
+      while (select.options.length) {
+        select.remove(0);
+      }
+      const opt = document.createElement('option');
+      opt.value = '0';
+      opt.textContent = '1 Main St';
+      opt.dataset.line1 = '1 Main St';
+      select.appendChild(opt);
+
+      select.selectedIndex = 0;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+
+      const errorItem = errorList.querySelector('li[data-error-id="address-selectedAddress-error"]');
+      expect(errorItem).toBeNull();
+    });
+  });
+
+  describe('Form submission validation', () => {
+    it('prevents submission when addresses found but none selected', () => {
+      const formHtml = `
+        <form id="testForm">
+          ${buildErrorSummary()}
+          ${buildComponent()}
+          <button type="submit">Submit</button>
+        </form>
       `;
+      document.body.innerHTML = formHtml;
+
+      initPostcodeLookup();
+
+      const form = document.getElementById('testForm') as HTMLFormElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+      const selectError = document.getElementById('address-selectedAddress-error') as HTMLParagraphElement;
+      const selectFormGroup = document.getElementById('address-selectedAddress-form-group') as HTMLDivElement;
+      const errorSummary = document.querySelector('.govuk-error-summary') as HTMLDivElement;
+
+      // Simulate addresses found scenario
+      addressesFoundFlag.value = 'true';
+      selectContainer.hidden = false;
+      select.hidden = false;
+      select.innerHTML = '<option value="">2 addresses found</option><option value="0">Address 1</option>';
+
+      const preventDefaultSpy = jest.fn();
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      Object.defineProperty(submitEvent, 'preventDefault', { value: preventDefaultSpy });
+
+      form.dispatchEvent(submitEvent);
+
+      expect(preventDefaultSpy).toHaveBeenCalled();
+      expect(selectError.classList.contains('govuk-!-display-none')).toBe(false);
+      expect(select.classList.contains('govuk-select--error')).toBe(true);
+      expect(selectFormGroup.classList.contains('govuk-form-group--error')).toBe(true);
+      expect(errorSummary.hidden).toBe(false);
+
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+      const errorItem = errorList.querySelector('li[data-error-id="address-selectedAddress-error"]');
+      expect(errorItem).toBeTruthy();
+    });
+
+    it('allows submission when address is selected', () => {
+      const formHtml = `
+        <form id="testForm">
+          ${buildComponent()}
+          <button type="submit">Submit</button>
+        </form>
+      `;
+      document.body.innerHTML = formHtml;
+
+      initPostcodeLookup();
+
+      const form = document.getElementById('testForm') as HTMLFormElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+
+      // Simulate addresses found and one selected
+      addressesFoundFlag.value = 'true';
+      selectContainer.hidden = false;
+      select.hidden = false;
+      select.innerHTML = '<option value="">2 addresses found</option><option value="0">Address 1</option>';
+      select.selectedIndex = 1;
+
+      const preventDefaultSpy = jest.fn();
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      Object.defineProperty(submitEvent, 'preventDefault', { value: preventDefaultSpy });
+
+      form.dispatchEvent(submitEvent);
+
+      expect(preventDefaultSpy).not.toHaveBeenCalled();
+    });
+
+    it('allows submission when no addresses found (manual entry)', () => {
+      const formHtml = `
+        <form id="testForm">
+          ${buildComponent()}
+          <button type="submit">Submit</button>
+        </form>
+      `;
+      document.body.innerHTML = formHtml;
+
+      initPostcodeLookup();
+
+      const form = document.getElementById('testForm') as HTMLFormElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+
+      // Simulate no addresses found scenario
+      addressesFoundFlag.value = 'false';
+      selectContainer.hidden = false;
+      select.hidden = false;
+      select.innerHTML = '<option value="">No addresses found</option>';
+
+      const preventDefaultSpy = jest.fn();
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      Object.defineProperty(submitEvent, 'preventDefault', { value: preventDefaultSpy });
+
+      form.dispatchEvent(submitEvent);
+
+      expect(preventDefaultSpy).not.toHaveBeenCalled();
+    });
+
+    it('allows submission when dropdown is hidden', () => {
+      const formHtml = `
+        <form id="testForm">
+          ${buildComponent()}
+          <button type="submit">Submit</button>
+        </form>
+      `;
+      document.body.innerHTML = formHtml;
+
+      initPostcodeLookup();
+
+      const form = document.getElementById('testForm') as HTMLFormElement;
+      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+
+      // Dropdown hidden (no lookup performed yet)
+      addressesFoundFlag.value = '';
+      selectContainer.hidden = true;
+
+      const preventDefaultSpy = jest.fn();
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      Object.defineProperty(submitEvent, 'preventDefault', { value: preventDefaultSpy });
+
+      form.dispatchEvent(submitEvent);
+
+      expect(preventDefaultSpy).not.toHaveBeenCalled();
+    });
+
+    it('validates multiple address components in same form', () => {
+      const formHtml = `
+        <form id="testForm">
+          ${buildErrorSummary()}
+          ${buildComponent('home')}
+          ${buildComponent('work')}
+          <button type="submit">Submit</button>
+        </form>
+      `;
+      document.body.innerHTML = formHtml;
+
+      initPostcodeLookup();
+
+      const form = document.getElementById('testForm') as HTMLFormElement;
+
+      // Set up home address (found, not selected)
+      const homeSelect = document.getElementById('home-selectedAddress') as HTMLSelectElement;
+      const homeSelectContainer = document.getElementById('home-addressSelectContainer') as HTMLDivElement;
+      const homeFlag = document.getElementById('home-addressesFoundFlag') as HTMLInputElement;
+      homeFlag.value = 'true';
+      homeSelectContainer.hidden = false;
+      homeSelect.hidden = false;
+      homeSelect.innerHTML = '<option value="">2 addresses found</option><option value="0">Address 1</option>';
+
+      // Set up work address (found, not selected)
+      const workSelect = document.getElementById('work-selectedAddress') as HTMLSelectElement;
+      const workSelectContainer = document.getElementById('work-addressSelectContainer') as HTMLDivElement;
+      const workFlag = document.getElementById('work-addressesFoundFlag') as HTMLInputElement;
+      workFlag.value = 'true';
+      workSelectContainer.hidden = false;
+      workSelect.hidden = false;
+      workSelect.innerHTML = '<option value="">1 address found</option><option value="0">Work Address</option>';
+
+      const preventDefaultSpy = jest.fn();
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      Object.defineProperty(submitEvent, 'preventDefault', { value: preventDefaultSpy });
+
+      form.dispatchEvent(submitEvent);
+
+      expect(preventDefaultSpy).toHaveBeenCalled();
+
+      // Note: The implementation returns after the first validation error,
+      // so only the first error is added to the summary
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+      expect(errorList.querySelector('li[data-error-id="home-selectedAddress-error"]')).toBeTruthy();
+    });
+
+    it('focuses and scrolls to error summary on validation failure', () => {
+      const formHtml = `
+        <form id="testForm">
+          ${buildErrorSummary()}
+          ${buildComponent()}
+          <button type="submit">Submit</button>
+        </form>
+      `;
+      document.body.innerHTML = formHtml;
+
+      initPostcodeLookup();
+
+      const form = document.getElementById('testForm') as HTMLFormElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+      const errorSummary = document.querySelector('.govuk-error-summary') as HTMLDivElement;
+
+      addressesFoundFlag.value = 'true';
+      selectContainer.hidden = false;
+      select.hidden = false;
+      select.innerHTML = '<option value="">2 addresses found</option><option value="0">Address 1</option>';
+
+      const focusSpy = jest.spyOn(errorSummary, 'focus');
+      const scrollSpy = jest.spyOn(errorSummary, 'scrollIntoView');
+
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(focusSpy).toHaveBeenCalled();
+      expect(scrollSpy).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  describe('Multiple containers with event delegation', () => {
+    it('handles click events for multiple containers', async () => {
+      document.body.innerHTML = buildComponent('home') + buildComponent('work');
 
       setFetch(
         jest.fn().mockResolvedValue({
@@ -458,55 +1052,21 @@ describe('initPostcodeLookup', () => {
 
       expect(global.fetch).toHaveBeenCalledWith('/api/postcode-lookup?postcode=SW1A%202AA', expect.any(Object));
       expect(homeSelect.hidden).toBe(false);
-    });
 
-    it('prevents duplicate event delegation binding', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-      `;
+      const workInput = document.getElementById('work-lookupPostcode') as HTMLInputElement;
+      const workButton = document.getElementById('work-findAddressBtn') as HTMLButtonElement;
+      const workSelect = document.getElementById('work-selectedAddress') as HTMLSelectElement;
 
-      const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
+      workInput.value = 'AB1 2CD';
+      workButton.click();
+      await flushPromises();
 
-      initPostcodeLookup();
-      const firstCallCount = addEventListenerSpy.mock.calls.length;
-
-      initPostcodeLookup();
-      const secondCallCount = addEventListenerSpy.mock.calls.length;
-
-      expect(secondCallCount).toBe(firstCallCount);
+      expect(global.fetch).toHaveBeenCalledWith('/api/postcode-lookup?postcode=AB1%202CD', expect.any(Object));
+      expect(workSelect.hidden).toBe(false);
     });
 
     it('handles click events on non-matching elements', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <button id="other-button">Other Button</button>
-      `;
+      document.body.innerHTML = buildComponent('home') + '<button id="other-button">Other Button</button>';
 
       setFetch(jest.fn());
       initPostcodeLookup();
@@ -516,39 +1076,8 @@ describe('initPostcodeLookup', () => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('handles change events on non-matching elements', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <select id="other-select">
-          <option value="">Other</option>
-        </select>
-      `;
-
-      initPostcodeLookup();
-
-      const otherSelect = document.getElementById('other-select') as HTMLSelectElement;
-      expect(() => {
-        otherSelect.dispatchEvent(new Event('change'));
-      }).not.toThrow();
-    });
-
-    it('handles missing container in event delegation', () => {
-      document.body.innerHTML = `
-        <button id="orphan-findAddressBtn" type="button">Find</button>
-      `;
+    it('handles missing container in event delegation for click', () => {
+      document.body.innerHTML = '<button id="orphan-findAddressBtn" type="button">Find</button>';
 
       setFetch(jest.fn());
       initPostcodeLookup();
@@ -558,7 +1087,7 @@ describe('initPostcodeLookup', () => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('handles missing elements in event delegation', () => {
+    it('handles missing elements in event delegation for click', () => {
       document.body.innerHTML = `
         <div data-address-component data-name-prefix="incomplete">
           <button id="incomplete-findAddressBtn" type="button">Find</button>
@@ -573,66 +1102,26 @@ describe('initPostcodeLookup', () => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('handles input events to clear lookup error via event delegation', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <p class="govuk-error-message" id="home-lookup-postcode-error">Error message</p>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-      `;
+    it('handles input events for multiple containers', () => {
+      document.body.innerHTML = buildComponent('home') + buildComponent('work');
 
       initPostcodeLookup();
 
       const homeInput = document.getElementById('home-lookupPostcode') as HTMLInputElement;
       const homeError = document.getElementById('home-lookup-postcode-error') as HTMLParagraphElement;
 
-      // Verify error messages are hidden after initialization
-      expect(homeError.classList.contains('govuk-!-display-none')).toBe(true);
-
-      // Simulate showing an error (e.g., from empty postcode validation)
+      // Show error first
       homeError.classList.remove('govuk-!-display-none');
       homeInput.classList.add('govuk-input--error');
 
-      expect(homeInput.classList.contains('govuk-input--error')).toBe(true);
-      expect(homeError.classList.contains('govuk-!-display-none')).toBe(false);
-
-      // Now test that input event clears the error
       homeInput.dispatchEvent(new Event('input', { bubbles: true }));
 
       expect(homeInput.classList.contains('govuk-input--error')).toBe(false);
       expect(homeError.classList.contains('govuk-!-display-none')).toBe(true);
     });
 
-    it('handles input events on non-matching elements via event delegation', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" class="govuk-input--error" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <p class="govuk-error-message" id="home-lookup-postcode-error">Error message</p>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <input id="other-input" />
-      `;
+    it('handles input events on non-matching elements', () => {
+      document.body.innerHTML = buildComponent('home') + '<input id="other-input" />';
 
       initPostcodeLookup();
 
@@ -642,24 +1131,8 @@ describe('initPostcodeLookup', () => {
       }).not.toThrow();
     });
 
-    it('handles input event with missing container via event delegation', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <input id="orphan-lookupPostcode" />
-      `;
+    it('handles input event with missing container', () => {
+      document.body.innerHTML = buildComponent('home') + '<input id="orphan-lookupPostcode" />';
 
       initPostcodeLookup();
 
@@ -669,263 +1142,241 @@ describe('initPostcodeLookup', () => {
       }).not.toThrow();
     });
 
-    it('handles change events to populate address fields via event delegation', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-          <details id="home-enterManuallyDetails"></details>
-          <div id="home-addressForm" class="govuk-visually-hidden">
-            <input id="home-addressLine1" />
-            <input id="home-addressLine2" />
-            <input id="home-town" />
-            <input id="home-county" />
-            <input id="home-postcode" />
-          </div>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-      `;
+    it('handles change events for multiple containers', () => {
+      document.body.innerHTML = buildComponent('home') + buildComponent('work');
 
       initPostcodeLookup();
 
       const homeSelect = document.getElementById('home-selectedAddress') as HTMLSelectElement;
-      const homeAddressForm = document.getElementById('home-addressForm') as HTMLDivElement;
-      const homeEnterManuallyDetails = document.getElementById('home-enterManuallyDetails') as HTMLDetailsElement;
       const homeLine1 = document.getElementById('home-addressLine1') as HTMLInputElement;
-      const homeLine1FocusSpy = jest.spyOn(homeLine1, 'focus');
 
       // Add an address option
       const opt = document.createElement('option');
       opt.value = '0';
       opt.textContent = '123 Main St';
       opt.dataset.line1 = '123 Main St';
-      opt.dataset.line2 = 'Suite 100';
-      opt.dataset.town = 'London';
-      opt.dataset.county = 'Greater London';
-      opt.dataset.postcode = 'SW1A 1AA';
       homeSelect.appendChild(opt);
-
-      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(true);
 
       homeSelect.selectedIndex = 1;
       homeSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
       expect(homeLine1.value).toBe('123 Main St');
-      expect((document.getElementById('home-addressLine2') as HTMLInputElement).value).toBe('Suite 100');
-      expect((document.getElementById('home-town') as HTMLInputElement).value).toBe('London');
-      expect((document.getElementById('home-county') as HTMLInputElement).value).toBe('Greater London');
-      expect((document.getElementById('home-postcode') as HTMLInputElement).value).toBe('SW1A 1AA');
-      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(false);
-      expect(homeEnterManuallyDetails.style.display).toBe('none');
-      expect(homeLine1FocusSpy).toHaveBeenCalled();
     });
 
-    it('handles change event with empty value via event delegation', () => {
+    it('handles change events on non-matching elements', () => {
+      document.body.innerHTML = buildComponent('home') + '<select id="other-select"><option>Other</option></select>';
+
+      initPostcodeLookup();
+
+      const otherSelect = document.getElementById('other-select') as HTMLSelectElement;
+      expect(() => {
+        otherSelect.dispatchEvent(new Event('change'));
+      }).not.toThrow();
+    });
+
+    it('handles change event with missing container', () => {
+      document.body.innerHTML =
+        buildComponent('home') + '<select id="orphan-selectedAddress"><option>Orphan</option></select>';
+
+      initPostcodeLookup();
+
+      const orphanSelect = document.getElementById('orphan-selectedAddress') as HTMLSelectElement;
+      expect(() => {
+        orphanSelect.dispatchEvent(new Event('change'));
+      }).not.toThrow();
+    });
+  });
+
+  describe('Edge cases and graceful degradation', () => {
+    it('handles missing select container gracefully', async () => {
       document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Select an address</option>
+        <div data-address-component>
+          <input id="address-lookupPostcode" />
+          <button id="address-findAddressBtn" type="button">Find</button>
+          <select id="address-selectedAddress">
+            <option value="">Initial</option>
           </select>
-          <div id="home-addressForm" class="govuk-visually-hidden">
-            <input id="home-addressLine1" />
+          <p class="govuk-error-message govuk-!-display-none" id="address-postcode-error">Error</p>
+          <input type="hidden" id="address-addressesFoundFlag" value="" />
+        </div>
+      `;
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses: [] }),
+        })
+      );
+
+      expect(() => initPostcodeLookup()).not.toThrow();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+
+      input.value = 'SW1A 2AA';
+      button.click();
+      await flushPromises();
+
+      expect(select.hidden).toBe(false);
+    });
+
+    it('handles missing address fields gracefully during selection', () => {
+      document.body.innerHTML = `
+        <div data-address-component>
+          <select id="address-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+          <details id="address-enterManuallyDetails"></details>
+        </div>
+      `;
+
+      initPostcodeLookup();
+
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+
+      const opt = document.createElement('option');
+      opt.value = '0';
+      opt.textContent = '1 Main St';
+      opt.dataset.line1 = '1 Main St';
+      select.appendChild(opt);
+
+      expect(() => {
+        select.selectedIndex = 1;
+        select.dispatchEvent(new Event('change'));
+      }).not.toThrow();
+    });
+
+    it('handles missing enterManually details gracefully', () => {
+      document.body.innerHTML = `
+        <div data-address-component>
+          <select id="address-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+          <input id="address-addressLine1" />
+        </div>
+      `;
+
+      initPostcodeLookup();
+
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+
+      const opt = document.createElement('option');
+      opt.value = '0';
+      opt.textContent = '1 Main St';
+      opt.dataset.line1 = '1 Main St';
+      select.appendChild(opt);
+
+      expect(() => {
+        select.selectedIndex = 1;
+        select.dispatchEvent(new Event('change'));
+      }).not.toThrow();
+    });
+
+    it('handles missing error messages gracefully', async () => {
+      document.body.innerHTML = `
+        <div data-address-component>
+          <input id="address-lookupPostcode" />
+          <button id="address-findAddressBtn" type="button">Find</button>
+          <select id="address-selectedAddress"></select>
+          <input type="hidden" id="address-addressesFoundFlag" value="" />
+        </div>
+      `;
+
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses: [] }),
+        })
+      );
+
+      expect(() => initPostcodeLookup()).not.toThrow();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+
+      input.value = 'SW1A 2AA';
+      expect(() => button.click()).not.toThrow();
+      await flushPromises();
+    });
+
+    it('supports data-address-fields container', () => {
+      document.body.innerHTML = `
+        <div data-address-component>
+          <input id="address-lookupPostcode" />
+          <button id="address-findAddressBtn" type="button">Find</button>
+          <select id="address-selectedAddress">
+            <option value="">Initial</option>
+          </select>
+          <details id="address-enterManuallyDetails"></details>
+          <div data-address-fields>
+            <input id="address-addressLine1" />
           </div>
         </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
       `;
 
       initPostcodeLookup();
 
-      const homeSelect = document.getElementById('home-selectedAddress') as HTMLSelectElement;
-      const homeLine1 = document.getElementById('home-addressLine1') as HTMLInputElement;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
 
-      expect(() => {
-        homeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-      }).not.toThrow();
+      const opt = document.createElement('option');
+      opt.value = '0';
+      opt.textContent = '1 Main St';
+      opt.dataset.line1 = '1 Main St';
+      select.appendChild(opt);
 
-      expect(homeLine1.value).toBe('');
+      select.selectedIndex = 1;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+
+      expect(line1.value).toBe('1 Main St');
     });
 
-    it('handles toggle events to show address form via event delegation', () => {
+    it('handles missing form group gracefully', async () => {
       document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-          <details id="home-enterManuallyDetails">
-            <summary>Enter manually</summary>
-          </details>
-          <div id="home-addressForm" class="govuk-visually-hidden">
-            <input id="home-addressLine1" />
-          </div>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
+        <div data-address-component>
+          <input id="address-lookupPostcode" />
+          <button id="address-findAddressBtn" type="button">Find</button>
+          <select id="address-selectedAddress"></select>
+          <p class="govuk-error-message govuk-!-display-none" id="address-lookup-postcode-error">Error</p>
         </div>
       `;
 
       initPostcodeLookup();
 
-      const homeDetails = document.getElementById('home-enterManuallyDetails') as HTMLDetailsElement;
-      const homeAddressForm = document.getElementById('home-addressForm') as HTMLDivElement;
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
 
-      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(true);
-
-      homeDetails.open = true;
-      homeDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
-
-      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(false);
+      input.value = '';
+      expect(() => button.click()).not.toThrow();
+      await flushPromises();
     });
 
-    it('handles toggle event when Details is closed via event delegation', () => {
+    it('handles missing addressesFoundFlag gracefully', async () => {
       document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-          <details id="home-enterManuallyDetails" open>
-            <summary>Enter manually</summary>
-          </details>
-          <div id="home-addressForm">
-            <input id="home-addressLine1" />
-          </div>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
+        <div data-address-component>
+          <input id="address-lookupPostcode" />
+          <button id="address-findAddressBtn" type="button">Find</button>
+          <select id="address-selectedAddress"></select>
+          <p class="govuk-error-message govuk-!-display-none" id="address-postcode-error">Error</p>
         </div>
       `;
 
-      initPostcodeLookup();
-
-      const homeDetails = document.getElementById('home-enterManuallyDetails') as HTMLDetailsElement;
-      const homeAddressForm = document.getElementById('home-addressForm') as HTMLDivElement;
-
-      homeDetails.open = false;
-      homeDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
-
-      // Should not add govuk-visually-hidden when closing
-      expect(homeAddressForm.classList.contains('govuk-visually-hidden')).toBe(false);
-    });
-
-    it('handles toggle events on non-matching elements via event delegation', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-          <details id="home-enterManuallyDetails">
-            <summary>Enter manually</summary>
-          </details>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <details id="other-details">
-          <summary>Other</summary>
-        </details>
-      `;
+      setFetch(
+        jest.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ addresses: [] }),
+        })
+      );
 
       initPostcodeLookup();
 
-      const otherDetails = document.getElementById('other-details') as HTMLDetailsElement;
-      expect(() => {
-        otherDetails.open = true;
-        otherDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
-      }).not.toThrow();
-    });
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
 
-    it('handles toggle event with missing container via event delegation', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-        <details id="orphan-enterManuallyDetails">
-          <summary>Orphan</summary>
-        </details>
-      `;
-
-      initPostcodeLookup();
-
-      const orphanDetails = document.getElementById('orphan-enterManuallyDetails') as HTMLDetailsElement;
-      expect(() => {
-        orphanDetails.open = true;
-        orphanDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
-      }).not.toThrow();
-    });
-
-    it('handles toggle event with missing addressForm via event delegation', () => {
-      document.body.innerHTML = `
-        <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" />
-          <button id="home-findAddressBtn" type="button">Find</button>
-          <select id="home-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-          <details id="home-enterManuallyDetails">
-            <summary>Enter manually</summary>
-          </details>
-        </div>
-        <div data-address-component data-name-prefix="work">
-          <input id="work-lookupPostcode" />
-          <button id="work-findAddressBtn" type="button">Find</button>
-          <select id="work-selectedAddress">
-            <option value="">Initial</option>
-          </select>
-        </div>
-      `;
-
-      initPostcodeLookup();
-
-      const homeDetails = document.getElementById('home-enterManuallyDetails') as HTMLDetailsElement;
-      expect(() => {
-        homeDetails.open = true;
-        homeDetails.dispatchEvent(new Event('toggle', { bubbles: true }));
-      }).not.toThrow();
+      input.value = 'SW1A 2AA';
+      expect(() => button.click()).not.toThrow();
+      await flushPromises();
     });
   });
 });
