@@ -868,6 +868,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -893,6 +895,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -971,6 +975,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1006,6 +1012,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1085,6 +1093,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1120,6 +1130,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1207,6 +1219,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();

@@ -5,17 +5,17 @@ import { createGetController, createStepNavigation } from '../../../modules/step
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
-const stepName = 'contact-preferences-telephone';
+const stepName = 'contact-preferences';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/contact-preferences-telephone`,
+  url: `${RESPOND_TO_CLAIM_ROUTE}/contact-preferences`,
   name: stepName,
-  view: 'respond-to-claim/contact-preferences-telephone/contactPreferencesTelephone.njk',
+  view: 'respond-to-claim/contact-preferences/contactPreferences.njk',
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'respond-to-claim/contact-preferences-telephone/contactPreferencesTelephone.njk',
+      'respond-to-claim/contact-preferences/contactPreferences.njk',
       stepName,
       async (req: Request) => {
         const backUrl = await stepNavigation.getBackUrl(req, stepName);
