@@ -158,10 +158,9 @@ describe('initPostcodeLookup', () => {
     expect(button.disabled).toBe(false);
   });
 
-  it('populates fields and shows addressForm on selection change (via postcode-select)', () => {
+  it('populates fields and shows addressForm on selection change', () => {
     document.body.innerHTML = buildComponent();
     initPostcodeLookup();
-    initPostcodeSelection();
 
     const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
     const addressForm = document.getElementById('address-addressForm') as HTMLDivElement;
@@ -178,7 +177,6 @@ describe('initPostcodeLookup', () => {
     opt.textContent = '1 Main St';
     opt.dataset.line1 = '1 Main St';
     opt.dataset.line2 = 'Area';
-    opt.dataset.line3 = 'Locality';
     opt.dataset.town = 'Townsville';
     opt.dataset.county = 'Countyshire';
     opt.dataset.postcode = 'AB1 2CD';
@@ -186,7 +184,7 @@ describe('initPostcodeLookup', () => {
 
     expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(true);
     select.selectedIndex = 0;
-    select.dispatchEvent(new Event('change'));
+    select.dispatchEvent(new Event('change', { bubbles: true }));
 
     expect(line1.value).toBe('1 Main St');
     expect((document.getElementById('address-addressLine2') as HTMLInputElement).value).toBe('Area');
@@ -349,7 +347,6 @@ describe('initPostcodeLookup', () => {
     `;
 
     initPostcodeLookup();
-    initPostcodeSelection();
 
     const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
     const addressForm = document.getElementById('address-addressForm') as HTMLDivElement;
@@ -368,7 +365,7 @@ describe('initPostcodeLookup', () => {
     // Check that addressForm is initially hidden
     expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(true);
     select.selectedIndex = 0;
-    select.dispatchEvent(new Event('change'));
+    select.dispatchEvent(new Event('change', { bubbles: true }));
 
     // The addressForm should now be visible and enterManuallyDetails hidden
     expect(addressForm.classList.contains('govuk-visually-hidden')).toBe(false);
@@ -378,14 +375,13 @@ describe('initPostcodeLookup', () => {
   it('handles selection change with no value selected', () => {
     document.body.innerHTML = buildComponent();
     initPostcodeLookup();
-    initPostcodeSelection();
 
     const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
     const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
 
     // Don't change selectedIndex, keep it at 0 (initial option with empty value)
     expect(() => {
-      select.dispatchEvent(new Event('change'));
+      select.dispatchEvent(new Event('change', { bubbles: true }));
     }).not.toThrow();
 
     // Values should remain unchanged
@@ -395,7 +391,6 @@ describe('initPostcodeLookup', () => {
   it('handles selection change with empty value', () => {
     document.body.innerHTML = buildComponent();
     initPostcodeLookup();
-    initPostcodeSelection();
 
     const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
     const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
@@ -411,7 +406,7 @@ describe('initPostcodeLookup', () => {
 
     expect(() => {
       select.selectedIndex = 0;
-      select.dispatchEvent(new Event('change'));
+      select.dispatchEvent(new Event('change', { bubbles: true }));
     }).not.toThrow();
 
     // Values should remain unchanged
@@ -581,7 +576,7 @@ describe('initPostcodeLookup', () => {
     it('handles input events to clear lookup error via event delegation', () => {
       document.body.innerHTML = `
         <div data-address-component data-name-prefix="home">
-          <input id="home-lookupPostcode" class="govuk-input--error" />
+          <input id="home-lookupPostcode" />
           <button id="home-findAddressBtn" type="button">Find</button>
           <p class="govuk-error-message" id="home-lookup-postcode-error">Error message</p>
           <select id="home-selectedAddress">
@@ -602,13 +597,21 @@ describe('initPostcodeLookup', () => {
       const homeInput = document.getElementById('home-lookupPostcode') as HTMLInputElement;
       const homeError = document.getElementById('home-lookup-postcode-error') as HTMLParagraphElement;
 
-      expect(homeInput.classList.contains('govuk-input--error')).toBe(true);
-      expect(homeError.classList.contains('govuk-visually-hidden')).toBe(false);
+      // Verify error messages are hidden after initialization
+      expect(homeError.classList.contains('govuk-!-display-none')).toBe(true);
 
+      // Simulate showing an error (e.g., from empty postcode validation)
+      homeError.classList.remove('govuk-!-display-none');
+      homeInput.classList.add('govuk-input--error');
+
+      expect(homeInput.classList.contains('govuk-input--error')).toBe(true);
+      expect(homeError.classList.contains('govuk-!-display-none')).toBe(false);
+
+      // Now test that input event clears the error
       homeInput.dispatchEvent(new Event('input', { bubbles: true }));
 
       expect(homeInput.classList.contains('govuk-input--error')).toBe(false);
-      expect(homeError.classList.contains('govuk-visually-hidden')).toBe(true);
+      expect(homeError.classList.contains('govuk-!-display-none')).toBe(true);
     });
 
     it('handles input events on non-matching elements via event delegation', () => {

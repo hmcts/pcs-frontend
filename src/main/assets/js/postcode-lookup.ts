@@ -249,248 +249,155 @@ export function initPostcodeLookup(): void {
     hideError(errorMessage, null);
   });
 
-  // If more than one component, use event delegation to avoid multiple handlers
-  if (containers.length > 1) {
-    if (postcodeLookupDelegatedBound) {
-      return;
-    }
-    postcodeLookupDelegatedBound = true;
-
-    document.addEventListener('click', async evt => {
-      const target = evt.target as Element | null;
-      if (!target) {
-        return;
-      }
-      const btn = target.closest('button[id$="-findAddressBtn"]') as HTMLButtonElement;
-      if (!btn) {
-        return;
-      }
-      const container = btn.closest('[data-address-component]') as HTMLElement;
-      if (!container) {
-        return;
-      }
-      const {
-        postcodeInput,
-        select,
-        selectContainer,
-        lookupErrorMessage,
-        errorMessage,
-        enterManuallyDetails,
-        postcodeFormGroup,
-        addressesFoundFlag,
-      } = getParts(container);
-      if (!postcodeInput || !select) {
-        return;
-      }
-
-      const value = postcodeInput.value?.trim();
-      if (!value) {
-        // Show blank field validation error
-        showError(lookupErrorMessage, postcodeInput);
-        hideError(errorMessage, null);
-        if (postcodeFormGroup) {
-          postcodeFormGroup.classList.add('govuk-form-group--error');
-        }
-        return;
-      }
-      // Hide blank field error before lookup
-      hideError(lookupErrorMessage, postcodeInput);
-      if (postcodeFormGroup) {
-        postcodeFormGroup.classList.remove('govuk-form-group--error');
-      }
-      await performPostcodeLookup(
-        value,
-        select,
-        selectContainer,
-        btn,
-        errorMessage,
-        postcodeInput,
-        enterManuallyDetails,
-        addressesFoundFlag
-      );
-    });
-
-    document.addEventListener('input', evt => {
-      const target = evt.target as Element | null;
-      if (!target) {
-        return;
-      }
-      const input = target.closest('input[id$="-lookupPostcode"]') as HTMLInputElement;
-      if (!input) {
-        return;
-      }
-      const container = input.closest('[data-address-component]') as HTMLElement;
-      if (!container) {
-        return;
-      }
-      const { lookupErrorMessage } = getParts(container);
-      hideError(lookupErrorMessage, input);
-    });
-
-    document.addEventListener('change', evt => {
-      const target = evt.target as Element | null;
-      if (!target) {
-        return;
-      }
-      const select = target.closest('select[id$="-selectedAddress"]') as HTMLSelectElement;
-      if (!select) {
-        return;
-      }
-      const container = select.closest('[data-address-component]') as HTMLElement;
-      if (!container) {
-        return;
-      }
-      handleSelectionChange(container, select);
-    });
-
-    // Handle Details component toggle to show address form
-    document.addEventListener('toggle', (evt: Event) => {
-      const target = evt.target as HTMLDetailsElement | null;
-      if (!target?.id?.endsWith('-enterManuallyDetails')) {
-        return;
-      }
-      const container = target.closest('[data-address-component]') as HTMLElement;
-      if (!container) {
-        return;
-      }
-      const { addressForm } = getParts(container);
-      if (target.open && addressForm) {
-        addressForm.classList.remove('govuk-visually-hidden');
-      }
-    });
-
-    // Handle form submission validation for dropdown
-    document.addEventListener('submit', (evt: Event) => {
-      const form = evt.target as HTMLFormElement | null;
-      if (!form) {
-        return;
-      }
-
-      // Find all address components within this form
-      const addressComponents = Array.from(form.querySelectorAll<HTMLElement>('[data-address-component]'));
-
-      for (const container of addressComponents) {
-        const { addressesFoundFlag, select, selectContainer, selectErrorMessage, selectFormGroup } =
-          getParts(container);
-
-        // Check if addresses were found and dropdown is visible
-        if (addressesFoundFlag?.value === 'true' && select && !selectContainer?.hidden && !select.hidden) {
-          // Check if no address is selected
-          const selectedValue = select.value;
-          if (!selectedValue) {
-            // Prevent form submission
-            evt.preventDefault();
-
-            // Show dropdown error
-            showError(selectErrorMessage, select);
-            if (selectFormGroup) {
-              selectFormGroup.classList.add('govuk-form-group--error');
-            }
-
-            // Focus on the dropdown
-            select.focus();
-
-            // Scroll to error
-            select.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return;
-          }
-        }
-      }
-    });
-
-    return;
-  }
-
-  // Fallback: bind directly when 0 or 1 components present
+  // Early return if no components found
   if (!containers.length) {
     return;
   }
 
-  containers.forEach(container => {
+  // Use event delegation to avoid multiple handlers (works for 0, 1, or many components)
+  if (postcodeLookupDelegatedBound) {
+    return;
+  }
+  postcodeLookupDelegatedBound = true;
+
+  document.addEventListener('click', async evt => {
+    const target = evt.target as Element | null;
+    if (!target) {
+      return;
+    }
+    const btn = target.closest('button[id$="-findAddressBtn"]') as HTMLButtonElement;
+    if (!btn) {
+      return;
+    }
+    const container = btn.closest('[data-address-component]') as HTMLElement;
+    if (!container) {
+      return;
+    }
     const {
       postcodeInput,
-      findBtn,
       select,
       selectContainer,
       lookupErrorMessage,
       errorMessage,
       enterManuallyDetails,
+      postcodeFormGroup,
       addressesFoundFlag,
-      selectErrorMessage,
-      selectFormGroup,
     } = getParts(container);
-    if (!postcodeInput || !findBtn || !select) {
+    if (!postcodeInput || !select) {
       return;
     }
 
-    // Initialize: ensure error messages are hidden on load
-    hideError(lookupErrorMessage, null);
-    hideError(errorMessage, null);
-
-    // Selection behaviour for single component
-    select.addEventListener('change', () => handleSelectionChange(container, select));
-
-    findBtn.addEventListener('click', async () => {
-      const value = postcodeInput.value?.trim();
-      if (!value) {
-        // Show blank field validation error
-        showError(lookupErrorMessage, postcodeInput);
-        hideError(errorMessage, null);
-        return;
+    const value = postcodeInput.value?.trim();
+    if (!value) {
+      // Show blank field validation error
+      showError(lookupErrorMessage, postcodeInput);
+      hideError(errorMessage, null);
+      if (postcodeFormGroup) {
+        postcodeFormGroup.classList.add('govuk-form-group--error');
       }
-      // Hide blank field error before lookup
-      hideError(lookupErrorMessage, postcodeInput);
-      await performPostcodeLookup(
-        value,
-        select,
-        selectContainer,
-        findBtn,
-        errorMessage,
-        postcodeInput,
-        enterManuallyDetails,
-        addressesFoundFlag
-      );
-    });
+      return;
+    }
+    // Hide blank field error before lookup
+    hideError(lookupErrorMessage, postcodeInput);
+    if (postcodeFormGroup) {
+      postcodeFormGroup.classList.remove('govuk-form-group--error');
+    }
+    await performPostcodeLookup(
+      value,
+      select,
+      selectContainer,
+      btn,
+      errorMessage,
+      postcodeInput,
+      enterManuallyDetails,
+      addressesFoundFlag
+    );
+  });
 
-    // Clear error when user starts typing
-    postcodeInput.addEventListener('input', () => {
-      hideError(lookupErrorMessage, postcodeInput);
-    });
+  document.addEventListener('input', evt => {
+    const target = evt.target as Element | null;
+    if (!target) {
+      return;
+    }
+    const input = target.closest('input[id$="-lookupPostcode"]') as HTMLInputElement;
+    if (!input) {
+      return;
+    }
+    const container = input.closest('[data-address-component]') as HTMLElement;
+    if (!container) {
+      return;
+    }
+    const { lookupErrorMessage } = getParts(container);
+    hideError(lookupErrorMessage, input);
+  });
 
-    // Handle Details component toggle to show address form
-    if (enterManuallyDetails) {
-      enterManuallyDetails.addEventListener('toggle', () => {
-        if (enterManuallyDetails.open) {
-          const { addressForm } = getParts(container);
-          if (addressForm) {
-            addressForm.classList.remove('govuk-visually-hidden');
-          }
-        }
-      });
+  document.addEventListener('change', evt => {
+    const target = evt.target as Element | null;
+    if (!target) {
+      return;
+    }
+    const select = target.closest('select[id$="-selectedAddress"]') as HTMLSelectElement;
+    if (!select) {
+      return;
+    }
+    const container = select.closest('[data-address-component]') as HTMLElement;
+    if (!container) {
+      return;
+    }
+    handleSelectionChange(container, select);
+  });
+
+  // Handle Details component toggle to show address form
+  document.addEventListener('toggle', (evt: Event) => {
+    const target = evt.target as HTMLDetailsElement | null;
+    if (!target?.id?.endsWith('-enterManuallyDetails')) {
+      return;
+    }
+    const container = target.closest('[data-address-component]') as HTMLElement;
+    if (!container) {
+      return;
+    }
+    const { addressForm } = getParts(container);
+    if (target.open && addressForm) {
+      addressForm.classList.remove('govuk-visually-hidden');
+    }
+  });
+
+  // Handle form submission validation for dropdown
+  document.addEventListener('submit', (evt: Event) => {
+    const form = evt.target as HTMLFormElement | null;
+    if (!form) {
+      return;
     }
 
-    // Handle form submission validation for dropdown
-    const form = container.closest('form');
-    if (form) {
-      form.addEventListener('submit', (evt: Event) => {
-        // Check if addresses were found and dropdown is visible
-        if (addressesFoundFlag?.value === 'true' && select && !selectContainer?.hidden && !select.hidden) {
-          // Check if no address is selected
-          const selectedValue = select.value;
-          if (!selectedValue) {
-            // Prevent form submission
-            evt.preventDefault();
+    // Find all address components within this form
+    const addressComponents = Array.from(form.querySelectorAll<HTMLElement>('[data-address-component]'));
 
-            // Show dropdown error
-            showError(selectErrorMessage, select);
-            if (selectFormGroup) {
-              selectFormGroup.classList.add('govuk-form-group--error');
-            }
-            select.focus();
-            select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    for (const container of addressComponents) {
+      const { addressesFoundFlag, select, selectContainer, selectErrorMessage, selectFormGroup } = getParts(container);
+
+      // Check if addresses were found and dropdown is visible
+      if (addressesFoundFlag?.value === 'true' && select && !selectContainer?.hidden && !select.hidden) {
+        // Check if no address is selected
+        const selectedValue = select.value;
+        if (!selectedValue) {
+          // Prevent form submission
+          evt.preventDefault();
+
+          // Show dropdown error
+          showError(selectErrorMessage, select);
+          if (selectFormGroup) {
+            selectFormGroup.classList.add('govuk-form-group--error');
           }
+
+          // Focus on the dropdown
+          select.focus();
+
+          // Scroll to error
+          select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
         }
-      });
+      }
     }
   });
 }
