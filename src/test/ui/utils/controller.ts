@@ -1,6 +1,6 @@
 import { Page, test } from '@playwright/test';
 
-import { actionData, actionRecord, validationData, validationRecord } from './interfaces';
+import { actionData, actionRecord, actionTuple, validationData, validationRecord } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
 
 let testExecutor: { page: Page };
@@ -74,6 +74,16 @@ export async function performAction(
     await actionInstance.execute(executor.page, action, fieldName, value);
   });
   await validatePageIfNavigated(action);
+}
+
+export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {
+  getExecutor();
+  await test.step(`Performed action group: ${groupName}`, async () => {
+    for (const action of actions) {
+      const [actionName, fieldName, value] = action;
+      await performAction(actionName, fieldName, value);
+    }
+  });
 }
 
 export async function performValidation(
