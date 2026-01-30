@@ -15,21 +15,27 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'title',
   },
-    extendGetContent: req => {
+    extendGetContent: async req => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
 
     const prepopulateAddress = await getExistingAddress(req.session.user?.accessToken || '', req.params.caseReference || '');
     console.log(prepopulateAddress); 
 
     return {
+      isAddressKnown: true,
+      // isAddressKnown: prepopulateAddress !== '',
       title: t('title'),
+      titleNa: t('titleNa'),
       subtitle: t('subtitle'),
+      subtitleNa: t('subtitleNa'),
       legend: t('legend'),
       labels: {
+        // prepopulateAddress: prepopulateAddress,
+        prepopulateAddress: "24 Dean Park Road, Swansea, G15 2LD",
         yes: t('labels.yes'),
         no: t('labels.no'),
         enterAddress: t('labels.enterAddress'),
-        enterPostcode: prepopulateAddress,
+        enterPostcode: t('labels.enterPostcode'),
         enterManually: t('labels.enterManually'),
         enterManuallySubText: t('labels.enterManuallySubText'),
         selectAddress: t('labels.selectAddress'),

@@ -1,7 +1,9 @@
 {
   "pageTitle": "cyYour correspondence address",
-  "title": "cyIs your correspondence address 15 Garden Drive, Luton, Bedfordshire, LU1 1AB?",
+  "title": "cyIs your correspondence address",
+  "titleNa": "cyWhat's your correspondence address?",
   "subtitle": "cyThis is the address provided by Treetops Housing",
+  "subtitleNa": "cyYour correspondence address is your postal address",
   "legend": "cyIs this your correspondence address?",
   "labels": {
     "yes": "cyYes",

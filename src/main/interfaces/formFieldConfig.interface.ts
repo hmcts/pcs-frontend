@@ -78,12 +78,15 @@ export interface TranslationKeys {
   [key: string]: string | undefined;
 }
 
+type MaybePromise<T> = T | Promise<T>;
+export type ExtendGetContent = (req: Request, content: TranslationContent) => MaybePromise<Record<string, unknown>>;
+
 export interface FormBuilderConfig {
   stepName: string;
   journeyFolder: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
-  extendGetContent?: (req: Request, content: TranslationContent) => Record<string, unknown>;
+  extendGetContent?: ExtendGetContent
   stepDir: string;
   translationKeys?: TranslationKeys;
   customTemplate?: string;

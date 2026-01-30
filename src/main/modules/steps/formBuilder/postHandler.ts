@@ -19,6 +19,7 @@ import {
   validateForm,
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
+import {ExtendGetContent} from '../../../interfaces/formFieldConfig.interface'
 
 export function createPostHandler(
   fields: FormFieldConfig[],
@@ -28,7 +29,7 @@ export function createPostHandler(
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
   flowConfig?: JourneyFlowConfig,
-  extendGetContent?: (req: Request, content: Record<string, unknown>) => Record<string, unknown>
+  extendGetContent?: ExtendGetContent,
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -74,7 +75,7 @@ export function createPostHandler(
       if (Object.keys(errors).length > 0) {
         const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
-        const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
+        const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
         renderWithErrors(
           req,
