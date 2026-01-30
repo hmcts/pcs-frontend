@@ -1,0 +1,18 @@
+export const tenancyOccupationContractOrLicence = {
+  mainHeader: 'Tenancy, occupation contract or licence agreement',
+  respondToAPropertyPossessionCaption: 'Respond to a property possession claim',
+  contactUsForHelpLink: 'Contact us for help',
+  detailsGivenByTreetopsHousingLabel: 'Details given by Treetops Housing:The property is let under an assured tenancy agreement Your tenancy began on 4th February 2015',
+  imNotSureRadioOption: 'I’m not sure',
+  isTheTenancyOccupationContractLabel: 'Is the tenancy, occupation contract or licence agreement type correct?',
+  noRadioOption: 'No',
+  orLabel: 'or',
+  saveAndContinueLabel: 'Save and continue',
+  saveForLaterLabel: 'Save for later',
+  signOutLabel: 'Sign out',
+  thisIsANewServiceLabel: 'This is a new service – your feedback will help us to improve it.',
+  whenTheyMadeTheirClaimLabel: 'When they made their claim, Treetops Housing had to give details about the type of tenancy, occupation contract or licence agreement you signed to rent your property, and the date it began, if known.',
+  yesRadioOption: 'Yes',
+  backLink: 'Back',
+  cancelLabel: 'Cancel',
+};

@@ -1,0 +1,15 @@
+export const tenancyOccupationContractOrLicenceStratDate = {
+  mainHeader: 'Tenancy, occupation contract or licence agreement',
+  backLink: 'Back',
+  cancelLabel: 'Cancel',
+  contactUsForHelpLink: 'Contact us for help',
+  didNotProvideStartDateLabel: ' Treetops Housing did not provide the start date of your tenancy, occupation contract or licence.',
+  whenDidYourTenancyStartLabel: 'When did your tenancy, occupation contract or licence start(optional)?',
+  exampleHintText: '',
+  respondToAPropertyPossessionCaption: 'Respond to a property possession claim',
+  saveAndContinueLabel: 'Save and continue',
+  saveForLaterLabel: 'Save for later',
+  signOutLabel: 'Sign out',
+  thisIsANewServiceLabel: 'This is a new service – your feedback will help us to improve it.',
+  whenTheyMadeTheirClaimLabel: 'When they made their claim, Treetops Housing had to give details about the type of tenancy, occupation contract or licence agreement you signed to rent your property, and the date it began, if known.',
+};

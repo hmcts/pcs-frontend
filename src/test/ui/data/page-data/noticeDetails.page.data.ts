@@ -1,0 +1,16 @@
+export const noticeDetails = {
+  mainHeader: 'Notice details',
+  noticeIsAFormalHintText: 'A notice is a formal document from your landlord or mortgage provider saying they plan to take legal action to repossess the property, which must follow certain legal requirements',
+  backLink: 'Back',
+  cancelLink: 'Cancel',
+  contactUsForHelpLink: 'Contact us for help',
+  didClaimantGiveYouQuestion: 'Did claimant give you notice of their intention to begin possession proceedings?',
+  imNotSureRadioOption: 'I’m not sure',
+  noRadioOption: 'No',
+  orLabel: 'or',
+  respondToAPropertyPossessionCaption: 'Respond to a property possession claim',
+  saveAndContinueButton: 'Save and continue',
+  saveForLaterButton: 'Save for later',
+  signOutLink: 'Sign out',
+  yesRadioOption: 'Yes',
+};
