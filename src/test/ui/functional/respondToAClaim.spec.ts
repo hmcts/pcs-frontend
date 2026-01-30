@@ -60,5 +60,4 @@ test.describe('Respond to a claim @PR @nightly', async () => {
   });
   await performValidation('mainHeader', contactByTextMessage.mainHeader);
   await performAction('selectContactUsByTextMessage', contactByTextMessage.yesRadioOption);
-
 });

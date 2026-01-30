@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { contactByTextMessage, defendantNameCapture,freeLegalAdvice } from '../../../data/page-data';
+import { contactByTextMessage, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
