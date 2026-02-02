@@ -50,6 +50,8 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-confirmation',
     'defendant-name-capture',
     'defendant-date-of-birth',
+    'counter-claim',
+    'payment-interstitial',
     'postcode-finder',
   ],
   steps: {
@@ -79,6 +81,14 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'defendant-date-of-birth': {
       previousStep: 'defendant-name-capture',
+      defaultNext: 'counter-claim',
+    },
+    'counter-claim': {
+      previousStep: 'defendant-date-of-birth',
+      defaultNext: 'payment-interstitial',
+    },
+    'payment-interstitial': {
+      previousStep: 'counter-claim',
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
