@@ -45,14 +45,23 @@ mkdir -p src/main/assets/locales/cy/registerInterest
 src/main/nest/register-interest/
 ├── register-interest.module.ts
 ├── register-interest.controller.ts
-├── register-interest.service.ts
+├── register-interest.service.ts          # Navigation logic
+├── register-interest-session.service.ts  # Session management
+├── validation.service.ts                 # Error formatting
+├── i18n.interceptor.ts                   # Translation loading
 └── dto/
     ├── step1.dto.ts
     ├── step2.dto.ts
     └── step3.dto.ts
 ```
 
-// dto is short for Data Transfer Object which does not contain any business logic but is used to transfer data between different parts of the application and used to validate the data before it is processed by the service.
+**Separation of Concerns:**
+- **Controller** - HTTP routing only (thin layer)
+- **RegisterInterestService** - Navigation logic (next/previous step)
+- **RegisterInterestSessionService** - Session data management
+- **ValidationService** - Error formatting and validation helpers
+- **I18nInterceptor** - Automatic translation loading per route
+- **DTOs** - Data validation schemas (no business logic)
 
 ---
 
@@ -65,12 +74,20 @@ src/main/nest/register-interest/
 ```typescript
 import { Module } from '@nestjs/common';
 
+import { I18nInterceptor } from './i18n.interceptor';
+import { RegisterInterestSessionService } from './register-interest-session.service';
 import { RegisterInterestController } from './register-interest.controller';
 import { RegisterInterestService } from './register-interest.service';
+import { ValidationService } from './validation.service';
 
 @Module({
   controllers: [RegisterInterestController],
-  providers: [RegisterInterestService], 
+  providers: [
+    RegisterInterestService,
+    RegisterInterestSessionService,
+    ValidationService,
+    I18nInterceptor,
+  ],
 })
 export class RegisterInterestModule {}
 ```
@@ -78,8 +95,12 @@ export class RegisterInterestModule {}
 
 **What this does:**
 - Declares the module
-- Registers the controller (handles HTTP requests)
-- Registers the service (handles business logic)
+- Registers the controller (handles HTTP requests only)
+- Registers the services with proper separation of concerns:
+  - `RegisterInterestService` - Navigation logic (next/previous step)
+  - `RegisterInterestSessionService` - Session data management
+  - `ValidationService` - Error formatting and validation helpers
+  - `I18nInterceptor` - Automatic translation loading
 
 ---
 
@@ -124,6 +145,161 @@ export class RegisterInterestService {
 - Defines navigation between steps
 - Can be extended for conditional routing based on form data
 - Keeps navigation logic separate from controller
+
+---
+
+### Step 3b: Create the Session Service
+
+**Time:** 3 minutes
+
+**File:** `src/main/nest/register-interest/register-interest-session.service.ts`
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import type { Request } from 'express';
+
+export interface RegisterInterestSession {
+  step1?: { contactPreference?: string };
+  step2?: { fullName?: string; email?: string; phone?: string; address?: string };
+  step3?: { confirmAccuracy?: string };
+}
+
+@Injectable()
+export class RegisterInterestSessionService {
+  getSessionData(req: Request): RegisterInterestSession {
+    const session = req.session as unknown as Record<string, unknown>;
+    return (session.registerInterest as RegisterInterestSession) || {};
+  }
+
+  getStepData<K extends keyof RegisterInterestSession>(
+    req: Request,
+    step: K
+  ): RegisterInterestSession[K] | undefined {
+    return this.getSessionData(req)[step];
+  }
+
+  saveStepData<K extends keyof RegisterInterestSession>(
+    req: Request,
+    step: K,
+    data: RegisterInterestSession[K]
+  ): void {
+    const session = req.session as unknown as Record<string, unknown>;
+    if (!session.registerInterest) {
+      session.registerInterest = {};
+    }
+    (session.registerInterest as RegisterInterestSession)[step] = data;
+  }
+
+  getSummaryData(req: Request) {
+    const sessionData = this.getSessionData(req);
+    return {
+      step1: sessionData.step1 || {},
+      step2: sessionData.step2 || {},
+    };
+  }
+}
+```
+
+**What this does:**
+- Abstracts all session access into a single service
+- Provides type-safe methods for reading/writing step data
+- Keeps session logic out of the controller
+
+---
+
+### Step 3c: Create the Validation Service
+
+**Time:** 2 minutes
+
+**File:** `src/main/nest/register-interest/validation.service.ts`
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import type { ZodError } from 'zod';
+
+export interface ErrorSummary {
+  titleText: string;
+  errorList: { text: string; href: string }[];
+}
+
+@Injectable()
+export class ValidationService {
+  formatZodErrors(zodError: ZodError) {
+    const fieldErrors = zodError.flatten().fieldErrors;
+    const errors: Record<string, { text: string }> = {};
+    const errorList: { text: string; href: string }[] = [];
+
+    for (const [field, messages] of Object.entries(fieldErrors)) {
+      const errorText = messages?.[0] || 'Validation error';
+      errors[field] = { text: errorText };
+      errorList.push({ text: errorText, href: `#${field}` });
+    }
+
+    return {
+      errors,
+      errorSummary: { titleText: 'There is a problem', errorList },
+    };
+  }
+
+  getFirstError(zodError: ZodError) {
+    const fieldErrors = zodError.flatten().fieldErrors;
+    const firstField = Object.keys(fieldErrors)[0];
+    const messages = fieldErrors[firstField as keyof typeof fieldErrors];
+    return {
+      field: firstField,
+      text: Array.isArray(messages) ? messages[0] : 'Validation error',
+    };
+  }
+}
+```
+
+**What this does:**
+- Formats Zod validation errors into GOV.UK error summary format
+- Provides consistent error handling across all steps
+- Keeps error transformation logic out of the controller
+
+---
+
+### Step 3d: Create the i18n Interceptor
+
+**Time:** 2 minutes
+
+**File:** `src/main/nest/register-interest/i18n.interceptor.ts`
+
+```typescript
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import type { Request } from 'express';
+import { Observable } from 'rxjs';
+
+import { getTranslationFunction, loadStepNamespace } from '../../modules/steps/i18n';
+
+@Injectable()
+export class I18nInterceptor implements NestInterceptor {
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
+    const request = context.switchToHttp().getRequest<Request>();
+    const handlerName = context.getHandler().name;
+
+    const stepName = this.extractStepName(handlerName);
+    if (stepName) {
+      await loadStepNamespace(request, stepName, 'registerInterest');
+      const t = getTranslationFunction(request, stepName, ['common']);
+      request.t = t;
+    }
+
+    return next.handle();
+  }
+
+  private extractStepName(handlerName: string): string | null {
+    const stepMatch = handlerName.match(/(?:get|post)(Step\d+|Confirmation)/i);
+    return stepMatch ? stepMatch[1].toLowerCase() : null;
+  }
+}
+```
+
+**What this does:**
+- Automatically loads translations based on route handler name
+- Removes repetitive i18n code from every controller method
+- Attaches translation function to request object
 
 ---
 
@@ -195,9 +371,11 @@ export type Step3Dto = z.infer<typeof Step3Schema>;
 
 ### Step 5: Create the Controller (Routes)
 
-**Time:** 10 minutes
+**Time:** 5 minutes
 
 **File:** `src/main/nest/register-interest/register-interest.controller.ts`
+
+This controller is intentionally **thin** - it only handles HTTP routing. All other concerns are delegated to services.
 
 ```typescript
 import {
@@ -208,21 +386,29 @@ import {
   Req,
   Res,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import type { Request, Response } from 'express';
 
-import { getTranslationFunction, loadStepNamespace } from '../../modules/steps/i18n';
 import { OidcGuard } from '../guards/oidc.guard';
 import { Step1Schema } from './dto/step1.dto';
 import { Step2Schema } from './dto/step2.dto';
 import { Step3Schema } from './dto/step3.dto';
+import { I18nInterceptor } from './i18n.interceptor';
+import { RegisterInterestSessionService } from './register-interest-session.service';
 import { RegisterInterestService } from './register-interest.service';
+import { ValidationService } from './validation.service';
 
 @Controller('register-interest')
 @UseGuards(OidcGuard)
+@UseInterceptors(I18nInterceptor)  // Handles i18n automatically
 export class RegisterInterestController {
-  constructor(private readonly registerInterestService: RegisterInterestService) {}
+  constructor(
+    private readonly registerInterestService: RegisterInterestService,
+    private readonly sessionService: RegisterInterestSessionService,
+    private readonly validationService: ValidationService
+  ) {}
 
   // ============================================
   // STEP 1: Contact Preference
@@ -231,63 +417,36 @@ export class RegisterInterestController {
   @Get('step1')
   @Render('register-interest/step1.njk')
   async getStep1(@Req() req: Request) {
-    // Load translation namespace for this step
-    await loadStepNamespace(req, 'step1', 'registerInterest');
-    const t = getTranslationFunction(req, 'step1', ['common']);
-    req.t = t;
-
-    const session = req.session as unknown as Record<string, unknown>;
-    const registerInterest = (session.registerInterest as Record<string, unknown>) || {};
+    const stepData = this.sessionService.getStepData(req, 'step1');
 
     return {
-      content: t('step1'), // Load translations
-      form: registerInterest.step1 || {},
+      form: stepData || {},
       backLink: null,
-      t, // Pass translation function to template
+      t: req.t,
     };
   }
 
   @Post('step1')
   async postStep1(@Req() req: Request, @Res() res: Response) {
-    // Load translation namespace for this step
-    await loadStepNamespace(req, 'step1', 'registerInterest');
-    const t = getTranslationFunction(req, 'step1', ['common']);
-    req.t = t;
-
-    const session = req.session as unknown as Record<string, unknown>;
-    
-    // Validate form data
     const result = Step1Schema.safeParse(req.body);
 
     if (!result.success) {
-      const errors = result.error.flatten().fieldErrors;
-      const firstErrorField = Object.keys(errors)[0];
-      const error = {
-        field: firstErrorField,
-        text: (errors as Record<string, string[]>)[firstErrorField]?.[0] || 'Validation error',
-      };
+      const { errors, errorSummary } = this.validationService.formatZodErrors(result.error);
+      const firstError = this.validationService.getFirstError(result.error);
 
       return res.render('register-interest/step1.njk', {
-        content: t('step1'), // Include translations
         form: req.body,
-        error,
-        errorSummary: {
-          titleText: 'There is a problem',
-          errorList: [{ text: error.text, href: `#${error.field}` }],
-        },
+        error: firstError,
+        errors,
+        errorSummary,
         backLink: null,
-        t, // Pass translation function
+        t: req.t,
       });
     }
 
-    // Save to session
-    if (!session.registerInterest) {
-      session.registerInterest = {};
-    }
-    (session.registerInterest as Record<string, unknown>).step1 = result.data;
-
-    // Navigate to next step
+    this.sessionService.saveStepData(req, 'step1', result.data);
     const nextStep = this.registerInterestService.getNextStep('step1', result.data);
+
     return res.redirect(nextStep);
   }
 
@@ -297,117 +456,83 @@ export class RegisterInterestController {
 
   @Get('step2')
   @Render('register-interest/step2.njk')
-  getStep2(@Req() req: Request) {
-    const session = req.session as unknown as Record<string, unknown>;
-    const registerInterest = (session.registerInterest as Record<string, unknown>) || {};
+  async getStep2(@Req() req: Request) {
+    const stepData = this.sessionService.getStepData(req, 'step2');
+    const backLink = this.registerInterestService.getPreviousStep('step2');
 
     return {
-      form: registerInterest.step2 || {},
-      backLink: this.registerInterestService.getPreviousStep('step2'),
+      form: stepData || {},
+      backLink,
+      t: req.t,
     };
   }
 
   @Post('step2')
   async postStep2(@Req() req: Request, @Res() res: Response) {
-    const session = req.session as unknown as Record<string, unknown>;
-    
-    // Validate form data
     const result = Step2Schema.safeParse(req.body);
 
     if (!result.success) {
-      const errors = result.error.flatten().fieldErrors;
-      const errorList = Object.entries(errors).map(([field, messages]) => ({
-        text: messages?.[0] || 'Validation error',
-        href: `#${field}`,
-      }));
+      const { errors, errorSummary } = this.validationService.formatZodErrors(result.error);
+      const backLink = this.registerInterestService.getPreviousStep('step2');
 
       return res.render('register-interest/step2.njk', {
         form: req.body,
-        errors: Object.fromEntries(
-          Object.entries(errors).map(([field, messages]) => [
-            field,
-            { text: messages?.[0] },
-          ])
-        ),
-        errorSummary: {
-          titleText: 'There is a problem',
-          errorList,
-        },
-        backLink: this.registerInterestService.getPreviousStep('step2'),
+        errors,
+        errorSummary,
+        backLink,
+        t: req.t,
       });
     }
 
-    // Save to session
-    if (!session.registerInterest) {
-      session.registerInterest = {};
-    }
-    (session.registerInterest as Record<string, unknown>).step2 = result.data;
-
-    // Navigate to next step
+    this.sessionService.saveStepData(req, 'step2', result.data);
     const nextStep = this.registerInterestService.getNextStep('step2', result.data);
+
     return res.redirect(nextStep);
   }
 
   // ============================================
-  // STEP 3: Confirmation
+  // STEP 3: Review & Confirm
   // ============================================
 
   @Get('step3')
   @Render('register-interest/step3.njk')
-  getStep3(@Req() req: Request) {
-    const session = req.session as unknown as Record<string, unknown>;
-    const registerInterest = (session.registerInterest as Record<string, unknown>) || {};
+  async getStep3(@Req() req: Request) {
+    const stepData = this.sessionService.getStepData(req, 'step3');
+    const summary = this.sessionService.getSummaryData(req);
+    const backLink = this.registerInterestService.getPreviousStep('step3');
 
     return {
-      form: registerInterest.step3 || {},
-      summary: {
-        step1: registerInterest.step1 || {},
-        step2: registerInterest.step2 || {},
-      },
-      backLink: this.registerInterestService.getPreviousStep('step3'),
+      form: stepData || {},
+      summary,
+      backLink,
+      t: req.t,
     };
   }
 
   @Post('step3')
   async postStep3(@Req() req: Request, @Res() res: Response) {
-    const session = req.session as unknown as Record<string, unknown>;
-    
-    // Validate form data
     const result = Step3Schema.safeParse(req.body);
 
     if (!result.success) {
-      const errors = result.error.flatten().fieldErrors;
-      const firstErrorField = Object.keys(errors)[0];
-      const error = {
-        field: firstErrorField,
-        text: (errors as Record<string, string[]>)[firstErrorField]?.[0] || 'Validation error',
-      };
-
-      const registerInterest = (session.registerInterest as Record<string, unknown>) || {};
+      const { errors, errorSummary } = this.validationService.formatZodErrors(result.error);
+      const firstError = this.validationService.getFirstError(result.error);
+      const summary = this.sessionService.getSummaryData(req);
+      const backLink = this.registerInterestService.getPreviousStep('step3');
 
       return res.render('register-interest/step3.njk', {
         form: req.body,
-        error,
-        errorSummary: {
-          titleText: 'There is a problem',
-          errorList: [{ text: error.text, href: `#${error.field}` }],
-        },
-        summary: {
-          step1: registerInterest.step1 || {},
-          step2: registerInterest.step2 || {},
-        },
-        backLink: this.registerInterestService.getPreviousStep('step3'),
+        error: firstError,
+        errors,
+        errorSummary,
+        summary,
+        backLink,
+        t: req.t,
       });
     }
 
-    // Save to session
-    if (!session.registerInterest) {
-      session.registerInterest = {};
-    }
-    (session.registerInterest as Record<string, unknown>).step3 = result.data;
-
-    // Navigate to confirmation
+    this.sessionService.saveStepData(req, 'step3', result.data);
     const nextStep = this.registerInterestService.getNextStep('step3', result.data);
+
     return res.redirect(nextStep);
   }
 
@@ -417,28 +542,39 @@ export class RegisterInterestController {
 
   @Get('confirmation')
   @Render('register-interest/confirmation.njk')
-  getConfirmation(@Req() req: Request) {
-    const session = req.session as unknown as Record<string, unknown>;
-    const registerInterest = (session.registerInterest as Record<string, unknown>) || {};
+  async getConfirmation(@Req() req: Request) {
+    const sessionData = this.sessionService.getSessionData(req);
 
     return {
       data: {
-        step1: registerInterest.step1 || {},
-        step2: registerInterest.step2 || {},
-        step3: registerInterest.step3 || {},
+        step1: sessionData.step1 || {},
+        step2: sessionData.step2 || {},
+        step3: sessionData.step3 || {},
       },
+      t: req.t,
     };
   }
 }
 ```
 
 **What this does:**
-- Defines all routes (GET and POST for each step)
-- Handles validation with Zod schemas
-- Manages session data
-- Renders templates with error handling
-- Uses `@Render()` decorator for GET routes
-- Uses `res.render()` for POST routes (to show errors)
+- **Controller is thin** - Only handles HTTP routing and response
+- **Session logic delegated** - `sessionService` handles all session access
+- **Validation delegated** - `validationService` formats errors consistently
+- **i18n automatic** - `I18nInterceptor` loads translations per route
+- **Navigation delegated** - `registerInterestService` handles step flow
+
+**Separation of Concerns Achieved:**
+| Concern | Handled By |
+|---------|-----------|
+| HTTP Routing | Controller |
+| Session Management | RegisterInterestSessionService |
+| Error Formatting | ValidationService |
+| Translation Loading | I18nInterceptor |
+| Navigation Logic | RegisterInterestService |
+| Data Validation | DTOs (Zod schemas) |
+
+**Note:** Uses `@Render()` decorator for GET routes and `res.render()` for POST routes (to show validation errors).
 
 ---
 

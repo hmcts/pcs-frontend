@@ -2,7 +2,7 @@
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% block page_title %}{{ t('step3:title') }}{% endblock %}
+{% block page_title %}{{ t('title') }}{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -11,19 +11,19 @@
         {{ govukErrorSummary(errorSummary) }}
       {% endif %}
 
-      <h1 class="govuk-heading-l">{{ t('step3:title') }}</h1>
+      <h1 class="govuk-heading-l">{{ t('title') }}</h1>
 
       {# Summary List #}
       <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">
-            {{ t('step3:summary.contactPreference.label') }}
+            {{ t('summary.contactPreference.label') }}
           </dt>
           <dd class="govuk-summary-list__value">
             {{ summary.step1.contactPreference }}
           </dd>
           <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" href="{{ t('step3:summary.contactPreference.changeLink') }}">
+            <a class="govuk-link" href="/register-interest/step1">
               Change<span class="govuk-visually-hidden"> contact preference</span>
             </a>
           </dd>
@@ -31,13 +31,13 @@
 
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">
-            Full name
+            {{ t('summary.fullName.label') }}
           </dt>
           <dd class="govuk-summary-list__value">
             {{ summary.step2.fullName }}
           </dd>
           <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" href="{{ content.summary.contactDetails.changeLink }}">
+            <a class="govuk-link" href="/register-interest/step2">
               Change<span class="govuk-visually-hidden"> full name</span>
             </a>
           </dd>
@@ -45,13 +45,13 @@
 
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">
-            Email
+            {{ t('summary.email.label') }}
           </dt>
           <dd class="govuk-summary-list__value">
             {{ summary.step2.email }}
           </dd>
           <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" href="{{ content.summary.contactDetails.changeLink }}">
+            <a class="govuk-link" href="/register-interest/step2">
               Change<span class="govuk-visually-hidden"> email</span>
             </a>
           </dd>
@@ -59,13 +59,13 @@
 
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">
-            Phone number
+            {{ t('summary.phoneNumber.label') }}
           </dt>
           <dd class="govuk-summary-list__value">
             {{ summary.step2.phoneNumber }}
           </dd>
           <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" href="{{ t('step3:summary.contactDetails.changeLink') }}">
+            <a class="govuk-link" href="/register-interest/step2">
               Change<span class="govuk-visually-hidden"> phone number</span>
             </a>
           </dd>
@@ -75,7 +75,7 @@
       <form action="/register-interest/step3" method="post" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-        <h2 class="govuk-heading-m">{{ t('step3:declaration.title') }}</h2>
+        <h2 class="govuk-heading-m">{{ t('declaration.title') }}</h2>
 
         <div class="govuk-form-group {% if error %}govuk-form-group--error{% endif %}">
           {% if error %}
@@ -91,14 +91,14 @@
                      name="confirmAccuracy" type="checkbox" value="confirmed"
                      {{ 'checked' if form.confirmAccuracy === 'confirmed' }}>
               <label class="govuk-label govuk-checkboxes__label" for="confirmAccuracy">
-                {{ t('step3:declaration.checkbox') }}
+                {{ t('declaration.checkbox') }}
               </label>
             </div>
           </div>
         </div>
 
         <button class="govuk-button" data-module="govuk-button">
-          {{ t('step3:buttons.submit') }}
+          {{ t('buttons.submit') }}
         </button>
       </form>
     </div>

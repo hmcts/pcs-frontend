@@ -2,7 +2,7 @@
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% block page_title %}{{ t('step1:title') }}{% endblock %}
+{% block page_title %}{{ t('title') }}{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -18,7 +18,7 @@
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
               <h1 class="govuk-fieldset__heading">
-                {{ t('step1:title') }}
+                {{ t('title') }}
               </h1>
             </legend>
 
@@ -35,7 +35,7 @@
                        name="contactPreference" type="radio" value="email"
                        {{ 'checked' if form.contactPreference === 'email' }}>
                 <label class="govuk-label govuk-radios__label" for="contactPreference-email">
-                  {{ t('step1:options.email') }}
+                  {{ t('options.email') }}
                 </label>
               </div>
               <div class="govuk-radios__item">
@@ -43,7 +43,7 @@
                        name="contactPreference" type="radio" value="phone"
                        {{ 'checked' if form.contactPreference === 'phone' }}>
                 <label class="govuk-label govuk-radios__label" for="contactPreference-phone">
-                  {{ t('step1:options.phone') }}
+                  {{ t('options.phone') }}
                 </label>
               </div>
               <div class="govuk-radios__item">
@@ -51,7 +51,7 @@
                        name="contactPreference" type="radio" value="post"
                        {{ 'checked' if form.contactPreference === 'post' }}>
                 <label class="govuk-label govuk-radios__label" for="contactPreference-post">
-                  {{ t('step1:options.post') }}
+                  {{ t('options.post') }}
                 </label>
               </div>
             </div>
@@ -59,7 +59,7 @@
         </div>
 
         <button class="govuk-button" data-module="govuk-button">
-          {{ t('step1:buttons.continue') }}
+          {{ t('buttons.continue') }}
         </button>
       </form>
     </div>

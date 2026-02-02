@@ -2,12 +2,16 @@
   "title": "Check your answers",
   "summary": {
     "contactPreference": {
-      "label": "Contact preference",
-      "changeLink": "/register-interest/step1"
+      "label": "Contact preference"
     },
-    "contactDetails": {
-      "label": "Contact details",
-      "changeLink": "/register-interest/step2"
+    "fullName": {
+      "label": "Full name"
+    },
+    "email": {
+      "label": "Email address"
+    },
+    "phoneNumber": {
+      "label": "Phone number"
     }
   },
   "declaration": {

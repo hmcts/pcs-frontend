@@ -2,7 +2,7 @@
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% block page_title %}{{ t('step2:title') }}{% endblock %}
+{% block page_title %}{{ t('title') }}{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -14,12 +14,12 @@
       <form action="/register-interest/step2" method="post" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-        <h1 class="govuk-heading-l">{{ t('step2:title') }}</h1>
+        <h1 class="govuk-heading-l">{{ t('title') }}</h1>
 
         {# Full Name #}
         <div class="govuk-form-group {% if errors.fullName %}govuk-form-group--error{% endif %}">
           <label class="govuk-label" for="fullName">
-            {{ t('step2:fields.fullName.label') }}
+            {{ t('fields.fullName.label') }}
           </label>
           {% if errors.fullName %}
             <p id="fullName-error" class="govuk-error-message">
@@ -34,10 +34,10 @@
         {# Email #}
         <div class="govuk-form-group {% if errors.email %}govuk-form-group--error{% endif %}">
           <label class="govuk-label" for="email">
-            {{ t('step2:fields.email.label') }}
+            {{ t('fields.email.label') }}
           </label>
           <div class="govuk-hint">
-            {{ t('step2:fields.email.hint') }}
+            {{ t('fields.email.hint') }}
           </div>
           {% if errors.email %}
             <p id="email-error" class="govuk-error-message">
@@ -53,10 +53,10 @@
         {# Phone Number #}
         <div class="govuk-form-group {% if errors.phoneNumber %}govuk-form-group--error{% endif %}">
           <label class="govuk-label" for="phoneNumber">
-            {{ t('step2:fields.phoneNumber.label') }}
+            {{ t('fields.phoneNumber.label') }}
           </label>
           <div class="govuk-hint">
-            {{ t('step2:fields.phoneNumber.hint') }}
+            {{ t('fields.phoneNumber.hint') }}
           </div>
           {% if errors.phoneNumber %}
             <p id="phoneNumber-error" class="govuk-error-message">
@@ -70,7 +70,7 @@
         </div>
 
         <button class="govuk-button" data-module="govuk-button">
-          {{ t('step2:buttons.continue') }}
+          {{ t('buttons.continue') }}
         </button>
       </form>
     </div>
