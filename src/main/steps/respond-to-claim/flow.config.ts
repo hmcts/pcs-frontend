@@ -1,10 +1,7 @@
 import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import { isDefendantNameKnown } from '../utils/isDefendantNameKnown';
-import { isNoticeDateProvided } from '../utils/isNoticeDateProvided';
-import { isNoticeServed } from '../utils/isNoticeServed';
-import { isRentArrearsClaim } from '../utils/isRentArrearsClaim';
+import { isDefendantNameKnown , isNoticeDateProvided , isNoticeServed , isRentArrearsClaim } from '../utils';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -24,7 +21,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-not-provided',
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
-    'end',
   ],
   steps: {
     'start-now': {
@@ -188,16 +184,16 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'end',
     },
 
-    end: {
-      previousStep: (formData: Record<string, unknown>) => {
-        if (formData['rent-arrears-dispute']) {
-          return 'rent-arrears-dispute';
-        }
-        if (formData['non-rent-arrears-dispute']) {
-          return 'non-rent-arrears-dispute';
-        }
-        return '';
-      },
-    },
+    // end: {
+    //   previousStep: (formData: Record<string, unknown>) => {
+    //     if (formData['rent-arrears-dispute']) {
+    //       return 'rent-arrears-dispute';
+    //     }
+    //     if (formData['non-rent-arrears-dispute']) {
+    //       return 'non-rent-arrears-dispute';
+    //     }
+    //     return '';
+    //   },
+    // },
   },
 };

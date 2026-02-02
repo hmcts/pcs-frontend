@@ -6,7 +6,6 @@ import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-give
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
-import { step as end } from './end';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as postcodeFinder } from './postcode-finder';
@@ -27,5 +26,4 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
-  end,
 };
