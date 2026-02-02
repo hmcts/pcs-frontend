@@ -78,7 +78,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'tenancy-details',
     },
     'landlord-registered': {
-      defaultNext: 'tenancy-details',
+      defaultNext: 'end-now',
     },
     'tenancy-details': {
       routes: [
@@ -103,7 +103,6 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'confirmation-of-notice-date-when-not-provided',
         },
       ],
-      previousStep: 'postcode-finder',
     },
     'confirmation-of-notice-given': {
       routes: [
