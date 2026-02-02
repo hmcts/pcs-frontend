@@ -111,17 +111,17 @@ export const step: StepDefinition = createFormStep({
       req.params.caseReference || ''
     );
 
+    const isAddressKnown = prepopulateAddress !== '?';
     const radio = formContent.fields.find(f => f.componentType === 'radios');
     if (!radio || !radio.component) return {};
 
-    const dynamicText = `${t('legend')}${prepopulateAddress}`;
-    radio.component.label.text = dynamicText;
-    
-    console.log(radio.component)
-    radio.component.fieldset.legend.text = dynamicText;
+    if (isAddressKnown) {
+      const dynamicText = `${t('legend')}${prepopulateAddress}`;
+      radio.component.label.text = dynamicText;
+      radio.component.fieldset.legend.text = dynamicText;
+    }
 
-
-    console.log(radio.component.label.text);
+    // Override value used in njk File with our dynamic value.
 
     // Dynamically inject validator with translation function
     const postcodeField = fieldsConfig[0].options?.[1]?.subFields?.postcode;
@@ -138,15 +138,9 @@ export const step: StepDefinition = createFormStep({
     }
     return {
       ...formContent,
-      // isAddressKnown: true,
-      isAddressKnown: prepopulateAddress !== '',
-      pageTitle: t('pageTitle'),
-      pageTitleNa: t('pageTitleNa'),
-      legend: '1234tnjwandjwandwa',
+      isAddressKnown: isAddressKnown,
+      legendNa: t('legendNa'),
       legendhintNa: t('legend.hintNa'),
-
-      prepopulateAddress: prepopulateAddress,
-      // prepopulateAddress: "2 D Park Road, Swansea, G15 2LD",
 
       caption: t('caption'),
       labels: {
@@ -192,23 +186,23 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
   const address = response.case_details.case_data.possessionClaimResponse?.party?.address;
 
   if (address) {
-    // const formattedAddress =
-    //   [
-    //     address.AddressLine1,
-    //     address.AddressLine2,
-    //     address.AddressLine3,
-    //     address.PostTown,
-    //     address.County,
-    //     address.PostCode,
-    //     address.Country,
-    //   ]
-    //     .map(v => (v ?? '').trim())
-    //     .filter(Boolean)
-    //     .join(', ') + '?';
+    const formattedAddress =
+      [
+        address.AddressLine1,
+        address.AddressLine2,
+        address.AddressLine3,
+        address.PostTown,
+        address.County,
+        address.PostCode,
+        address.Country,
+      ]
+        .map(v => (v ?? '').trim())
+        .filter(Boolean)
+        .join(', ') + '?';
 
-    const formattedAddress = 'testing address';
+    // const formattedAddress = '';
 
-    logger.info('Mapping addy', formattedAddress);
+    logger.info('Mapping address', formattedAddress);
     return formattedAddress;
   } else {
     return '';
