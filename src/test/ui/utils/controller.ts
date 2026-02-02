@@ -76,6 +76,16 @@ export async function performAction(
   await validatePageIfNavigated(action);
 }
 
+export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {
+  getExecutor();
+  await test.step(`Performed action group: ${groupName}`, async () => {
+    for (const action of actions) {
+      const [actionName, fieldName, value] = action;
+      await performAction(actionName, fieldName, value);
+    }
+  });
+}
+
 export async function performValidation(
   validation: string,
   inputFieldName?: validationData | validationRecord,
@@ -97,16 +107,6 @@ export async function performValidation(
     data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''
   }`, async () => {
     await validationInstance.validate(executor.page, validation, fieldName, data);
-  });
-}
-
-export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {
-  getExecutor();
-  await test.step(`Performed action group: ${groupName}`, async () => {
-    for (const action of actions) {
-      const [actionName, fieldName, value] = action;
-      await performAction(actionName, fieldName, value);
-    }
   });
 }
 

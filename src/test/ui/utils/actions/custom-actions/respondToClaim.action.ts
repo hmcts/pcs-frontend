@@ -1,7 +1,12 @@
 import { Page } from '@playwright/test';
 
-import { correspondenceAddressKnown, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
-import { performAction, performActions, performValidation } from '../../controller';
+import {
+  correspondenceAddressKnown,
+  dateOfBirth,
+  defendantNameCapture,
+  freeLegalAdvice,
+} from '../../../data/page-data';
+import { performAction, performActions, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class RespondToClaimAction implements IAction {
@@ -10,6 +15,7 @@ export class RespondToClaimAction implements IAction {
       ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
+      ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -33,6 +39,16 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
+  private async enterDateOfBirthDetails(defendantData: actionRecord): Promise<void> {
+    await performActions(
+      'Defendant Date of Birth Entry',
+      ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
+      ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
+      ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear],
+      ['clickButton', dateOfBirth.saveAndContinueButton]
+    );
+  }
+
   private async selectCorrespondenceAddressKnown(addressData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: correspondenceAddressKnown.correspondenceAddressConfirmHintText,
@@ -54,6 +70,7 @@ export class RespondToClaimAction implements IAction {
     if (!validationArr || validationArr.validationReq !== 'YES') {
       return;
     }
+
     if (!Array.isArray(validationArr.inputArray)) {
       return;
     }
