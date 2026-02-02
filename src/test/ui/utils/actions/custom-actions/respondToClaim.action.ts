@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { dateOfBirth, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
-import { performAction, performValidation } from '../../controller';
+import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class RespondToClaimAction implements IAction {
@@ -34,10 +34,13 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterDateOfBirthDetails(defendantData: actionRecord): Promise<void> {
-    await performAction('inputText', dateOfBirth.dayTextLabel, defendantData.dobDay);
-    await performAction('inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth);
-    await performAction('inputText', dateOfBirth.yearTextLabel, defendantData.dobYear);
-    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
+    await performActions(
+      'Defendant Date of Birth Entry',
+      ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
+      ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
+      ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear],
+      ['clickButton', dateOfBirth.saveAndContinueButton]
+    );
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
@@ -45,6 +48,7 @@ export class RespondToClaimAction implements IAction {
     if (!validationArr || validationArr.validationReq !== 'YES') {
       return;
     }
+
     if (!Array.isArray(validationArr.inputArray)) {
       return;
     }

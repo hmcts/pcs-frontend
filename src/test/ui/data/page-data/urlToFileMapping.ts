@@ -5,5 +5,6 @@ export default {
   home: 'home',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
+  'date-of-birth': 'dateOfBirth',
   'correspondence-address-known': 'correspondenceAddressKnown',
 };
