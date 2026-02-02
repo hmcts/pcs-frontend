@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { dateOfBirth, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
+import { dateOfBirth, defendantNameCapture, defendantNameConfirmation, freeLegalAdvice } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -11,6 +11,7 @@ export class RespondToClaimAction implements IAction {
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
+      ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -41,6 +42,14 @@ export class RespondToClaimAction implements IAction {
       ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear],
       ['clickButton', dateOfBirth.saveAndContinueButton]
     );
+  }
+
+  private async confirmDefendantDetails(confirmDefendantName: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: confirmDefendantName.question,
+      option: confirmDefendantName.option,
+    });
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

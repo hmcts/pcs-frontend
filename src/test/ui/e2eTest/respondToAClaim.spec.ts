@@ -6,9 +6,9 @@ import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
+  defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
-  registeredLandlord,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
@@ -57,13 +57,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   // Wales postcode routing is not implemented yet, launch darkly flags are used as of now
-  test.skip('Respond to a claim - Wales postcode', async () => {
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+  test('Respond to a claim - Wales postcode', async () => {
+    await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -75,6 +75,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', registeredLandlord.mockText);
+    await performValidation('mainHeader', tenancyDetails.mockText);
   });
 });
