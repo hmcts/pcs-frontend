@@ -59,8 +59,18 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
-        const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv);
-        const result = extendGetContent ? { ...formContent, ...extendGetContent(req, {}) } : formContent;
+        // Get interpolation values from extendGetContent if available (for dynamic translation values)
+        const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
+        const formContent = buildFormContent(
+          fields,
+          t,
+          getFormData(req, stepName),
+          {},
+          translationKeys,
+          nunjucksEnv,
+          interpolationValues
+        );
+        const result = extendGetContent ? { ...formContent, ...interpolationValues } : formContent;
 
         return {
           ...result,
@@ -83,7 +93,8 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
       beforeRedirect,
       translationKeys,
       flowConfig,
-      showCancelButton
+      showCancelButton,
+      extendGetContent
     ),
   };
 }
