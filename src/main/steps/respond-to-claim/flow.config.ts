@@ -183,17 +183,5 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute': {
       defaultNext: 'end',
     },
-
-    // end: {
-    //   previousStep: (formData: Record<string, unknown>) => {
-    //     if (formData['rent-arrears-dispute']) {
-    //       return 'rent-arrears-dispute';
-    //     }
-    //     if (formData['non-rent-arrears-dispute']) {
-    //       return 'non-rent-arrears-dispute';
-    //     }
-    //     return '';
-    //   },
-    // },
   },
 };
