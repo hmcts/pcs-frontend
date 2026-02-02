@@ -88,13 +88,21 @@ export function createPostHandler(
 
       if (Object.keys(errors).length > 0) {
         const formContent = buildFormContent(
+          
           fields,
+         
           t,
+         
           req.body,
+         
           errors,
+         
           translationKeys,
+         
           nunjucksEnv,
           interpolationValues
+        ,
+          showCancelButton
         );
         await renderWithErrors(
           req,
