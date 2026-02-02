@@ -5,6 +5,8 @@ import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as postcodeFinder } from './postcode-finder';
+import { step as paymentInterstitial } from './payment-interstitial';
+import { step as counterClaim } from './counter-claim';
 import { step as startNow } from './start-now';
 
 export const stepRegistry: Record<string, StepDefinition> = {
@@ -14,4 +16,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
+  'payment-interstitial': paymentInterstitial,
+  'counter-claim': counterClaim,
 };
