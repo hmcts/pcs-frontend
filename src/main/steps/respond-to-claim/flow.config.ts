@@ -1,7 +1,7 @@
 import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import { isDefendantNameKnown , isNoticeDateProvided , isNoticeServed , isRentArrearsClaim } from '../utils';
+import { isDefendantNameKnown, isNoticeDateProvided, isNoticeServed, isRentArrearsClaim } from '../utils';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
