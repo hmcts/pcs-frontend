@@ -123,6 +123,8 @@ export async function renderWithErrors(
   // res.render() sends the response directly and doesn't return a value
   res.status(400).render(viewPath, {
     ...formContent,
+    errors,
+    // errorSummary,
     stepName,
     journeyFolder,
     backUrl: await navigation.getBackUrl(req, stepName),
