@@ -123,11 +123,7 @@ describe('getLaunchDarklyFlag', () => {
 
       // Assert
       expect(result).toBe(flagValue);
-      expect(mockLdClient.variation).toHaveBeenCalledWith(
-        flagName,
-        expect.any(Object),
-        defaultValue
-      );
+      expect(mockLdClient.variation).toHaveBeenCalledWith(flagName, expect.any(Object), defaultValue);
     });
 
     it('should work with number default values', async () => {
