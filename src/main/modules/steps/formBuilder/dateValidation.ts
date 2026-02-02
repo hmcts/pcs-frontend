@@ -198,6 +198,11 @@ function checkFutureDate(
   return null;
 }
 
+export interface DateFieldError {
+  message: string;
+  erroneousParts?: ('day' | 'month' | 'year')[];
+}
+
 /**
  * Validates a date field with day, month, and year components
  * @param day - Day value as string
@@ -207,7 +212,7 @@ function checkFutureDate(
  * @param t - Translation function for error messages
  * @param noFutureDate - If true, disallows future and current dates
  * @param translations - Optional translations object for error messages
- * @returns Error message string if validation fails, null if valid
+ * @returns DateFieldError object if validation fails, null if valid
  */
 export function validateDateField(
   day: string,
@@ -217,11 +222,33 @@ export function validateDateField(
   t?: TFunction,
   noFutureDate = false,
   translations?: Record<string, string>
-): string | null {
+): DateFieldError | null {
+  const hasDay = !!day;
+  const hasMonth = !!month;
+  const hasYear = !!year;
+  const hasAllParts = hasDay && hasMonth && hasYear;
+
   // Check required parts first
   const requiredError = checkRequiredParts(day, month, year, requireAllParts, t);
   if (requiredError) {
-    return requiredError;
+    // Determine which parts are missing
+    const missingParts: ('day' | 'month' | 'year')[] = [];
+    if (!hasDay) {
+      missingParts.push('day');
+    }
+    if (!hasMonth) {
+      missingParts.push('month');
+    }
+    if (!hasYear) {
+      missingParts.push('year');
+    }
+
+    // If all parts missing or 2+ parts missing, it's a generic error (anchor to day)
+    // If exactly one part missing, specify that part
+    return {
+      message: requiredError,
+      erroneousParts: missingParts.length === 1 ? missingParts : undefined,
+    };
   }
 
   // Validate individual date parts
@@ -235,7 +262,10 @@ export function validateDateField(
     translations
   );
   if (dayError) {
-    return dayError;
+    return {
+      message: dayError,
+      erroneousParts: ['day'],
+    };
   }
 
   const monthError = validateDatePart(
@@ -248,7 +278,10 @@ export function validateDateField(
     translations
   );
   if (monthError) {
-    return monthError;
+    return {
+      message: monthError,
+      erroneousParts: ['month'],
+    };
   }
 
   const yearError = validateDatePart(
@@ -262,11 +295,13 @@ export function validateDateField(
     DATE_PART_CONSTRAINTS.year.noLeadingZero
   );
   if (yearError) {
-    return yearError;
+    return {
+      message: yearError,
+      erroneousParts: ['year'],
+    };
   }
 
   // If not all parts are present, validation stops here
-  const hasAllParts = !!day && !!month && !!year;
   if (!hasAllParts) {
     return null;
   }
@@ -274,13 +309,21 @@ export function validateDateField(
   // Validate complete date (e.g., day exists in month)
   const completeDateError = validateCompleteDate(day, month, year, t, translations);
   if (completeDateError) {
-    return completeDateError;
+    // Generic error - could be day or month issue, anchor to day
+    return {
+      message: completeDateError,
+      erroneousParts: undefined,
+    };
   }
 
   // Check for future dates if restricted
   const futureDateError = checkFutureDate(day, month, year, noFutureDate, t, translations);
   if (futureDateError) {
-    return futureDateError;
+    // Generic error - anchor to day
+    return {
+      message: futureDateError,
+      erroneousParts: undefined,
+    };
   }
 
   return null;
