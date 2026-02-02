@@ -6,7 +6,7 @@ import {
   defendantNameCapture,
   freeLegalAdvice,
 } from '../../../data/page-data';
-import { performAction, performActions, performActions, performValidation } from '../../controller';
+import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class RespondToClaimAction implements IAction {
