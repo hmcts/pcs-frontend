@@ -8,6 +8,7 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block pageTitle %}
   {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
@@ -15,16 +16,7 @@
 
 {% block mainContent %}
   {% if errorSummary %}
-    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-      <h2 class="govuk-error-summary__title" id="error-summary-title">{{ errorSummary.titleText }}</h2>
-      <div class="govuk-error-summary__body">
-        <ul class="govuk-list govuk-error-summary__list">
-          {% for error in errorSummary.errorList %}
-            <li><a href="{{ error.href }}">{{ error.text }}</a></li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
+    {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
   {% if caption %}
