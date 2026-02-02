@@ -34,8 +34,8 @@ test.afterEach(async () => {
   PageContentValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim - e2e Journey - e2e Journey @nightly', async () => {
-  test('Correspondence address known - Yes  - England postcode', async () => {
+test.describe('Respond to a claim - e2e Journey @nightly', async () => {
+  test('Respond to a claim - England postcode', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
