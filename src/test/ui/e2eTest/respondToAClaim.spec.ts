@@ -26,7 +26,7 @@ test.beforeEach(async ({ page }) => {
   await performAction('createUser', 'citizen', ['citizen']);
   //await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url + '/case/1234567891234567/respond-to-claim/start-now');
-  await performAction('login');  
+  await performAction('login');
   await performAction('clickButton', startNow.startNowButton);
 });
 
