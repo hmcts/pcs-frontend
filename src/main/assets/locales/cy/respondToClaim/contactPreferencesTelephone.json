@@ -1,0 +1,17 @@
+{
+  "title": "cyContact by telephone",
+  "subtitle": "cyWe might need to contact you by telephone with urgent updates about your case.",
+  "labels": {
+    "question": "cyAre you happy to be contacted by telephone?",
+    "yes": "cyYes",
+    "no": "cyNo",
+    "phoneNumberLabel": "cyUK phone number"
+  },
+  "buttons": {
+    "saveAndContinue": "cySave and continue",
+    "saveForLater": "cySave for later"
+  },
+  "errors": {
+    "phoneNumber": "cyPlease enter your phone number before continuing."
+  }
+}
