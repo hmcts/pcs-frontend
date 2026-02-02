@@ -22,4 +22,5 @@ export interface StepDefinition {
   getController: GetController | ((lang?: SupportedLang) => GetController);
   postController?: { post: RequestHandler };
   middleware?: RequestHandler[];
+  showCancelButton?: boolean;
 }

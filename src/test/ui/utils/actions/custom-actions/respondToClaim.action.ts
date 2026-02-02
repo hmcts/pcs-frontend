@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 
-import { defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
-import { performAction, performValidation } from '../../controller';
+import { dateOfBirth, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
+import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class RespondToClaimAction implements IAction {
@@ -10,6 +10,7 @@ export class RespondToClaimAction implements IAction {
       ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
+      ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -32,11 +33,22 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
+  private async enterDateOfBirthDetails(defendantData: actionRecord): Promise<void> {
+    await performActions(
+      'Defendant Date of Birth Entry',
+      ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
+      ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
+      ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear],
+      ['clickButton', dateOfBirth.saveAndContinueButton]
+    );
+  }
+
   // Below changes are temporary will be changed as part of HDPI-3596
   private async inputErrorValidation(validationArr: actionRecord) {
     if (!validationArr || validationArr.validationReq !== 'YES') {
       return;
     }
+
     if (!Array.isArray(validationArr.inputArray)) {
       return;
     }
