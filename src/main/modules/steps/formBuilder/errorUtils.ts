@@ -6,20 +6,33 @@ import { getDashboardUrl } from '../../../routes/dashboard';
 import { getRequestLanguage } from '../../i18n';
 import { getTranslationFunction } from '../i18n';
 
+import type { DateFieldError } from './dateValidation';
+
 export interface ErrorSummaryData {
   titleText: string;
   errorList: { text: string; href: string }[];
 }
 
+export type FormError = string | DateFieldError;
+
+/**
+ * Extracts the error message string from a FormError
+ * @param error - FormError (string or DateFieldError)
+ * @returns The error message string
+ */
+export function getErrorMessage(error: FormError): string {
+  return typeof error === 'string' ? error : error.message;
+}
+
 /**
  * Builds an error summary object in GOV.UK Design System format
- * @param errors - Record of field names to error messages
+ * @param errors - Record of field names to error messages or date field error objects
  * @param fields - Array of form field configurations
  * @param t - Translation function
  * @returns ErrorSummaryData object or null if no errors
  */
 export function buildErrorSummary(
-  errors: Record<string, string>,
+  errors: Record<string, FormError>,
   fields: FormFieldConfig[],
   t: TFunction
 ): ErrorSummaryData | null {
@@ -29,15 +42,25 @@ export function buildErrorSummary(
 
   const errorList: { text: string; href: string }[] = [];
 
-  for (const [fieldName, errorMessage] of Object.entries(errors)) {
+  for (const [fieldName, error] of Object.entries(errors)) {
     const fieldConfig = fields.find(f => f.name === fieldName);
     const fieldType = fieldConfig?.type;
+
+    // Extract error message and date part info
+    const errorMessage = typeof error === 'string' ? error : error.message;
+    const erroneousParts = typeof error === 'string' ? undefined : error.erroneousParts;
 
     // Determine the anchor ID for the error link
     let anchorId: string;
     if (fieldType === 'date') {
-      // Date fields anchor to the day input
-      anchorId = `${fieldName}-day`;
+      // For date fields, use erroneous parts info if available
+      if (erroneousParts && erroneousParts.length === 1) {
+        // Single specific part error - anchor to that part
+        anchorId = `${fieldName}-${erroneousParts[0]}`;
+      } else {
+        // Generic error or multiple parts - anchor to day
+        anchorId = `${fieldName}-day`;
+      }
     } else if (fieldType === 'radio' || fieldType === 'checkbox') {
       // Radio/checkbox fields anchor to the field name (group-level anchor)
       anchorId = fieldName;
@@ -84,7 +107,7 @@ export async function renderWithErrors(
   req: Request,
   res: Response,
   viewPath: string,
-  errors: Record<string, string>,
+  errors: Record<string, FormError>,
   fields: FormFieldConfig[],
   formContent: Record<string, unknown>,
   stepName: string,
@@ -96,13 +119,10 @@ export async function renderWithErrors(
   const lang = getRequestLanguage(req);
   const t: TFunction = getTranslationFunction(req, stepName, ['common']);
 
-  // Build error summary
-  const errorSummary = buildErrorSummary(errors, fields, t);
-
+  // formContent already includes errorSummary from buildFormContent, so we don't need to rebuild it
   // res.render() sends the response directly and doesn't return a value
   res.status(400).render(viewPath, {
     ...formContent,
-    errorSummary,
     stepName,
     journeyFolder,
     backUrl: await navigation.getBackUrl(req, stepName),
