@@ -1,7 +1,13 @@
 import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import { isDefendantNameKnown, isNoticeDateProvided, isNoticeServed, isRentArrearsClaim } from '../utils';
+import {
+  isDefendantNameKnown,
+  isNoticeDateProvided,
+  isNoticeServed,
+  isRentArrearsClaim,
+  isWelshProperty,
+} from '../utils';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -15,12 +21,15 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'postcode-finder',
+    'dispute-claim-interstitial',
+    'landlord-registered',
     'tenancy-details',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
     'confirmation-of-notice-date-when-not-provided',
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
+    'end-now',
   ],
   steps: {
     'start-now': {
@@ -51,6 +60,24 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
+      defaultNext: 'dispute-claim-interstitial',
+    },
+    'dispute-claim-interstitial': {
+      routes: [
+        {
+          // Route to defendant name confirmation if defendant is known
+          condition: async (req: Request) => isWelshProperty(req),
+          nextStep: 'landlord-registered',
+        },
+        {
+          // Route to defendant name capture if defendant is unknown
+          condition: async (req: Request) => !isWelshProperty(req),
+          nextStep: 'tenancy-details',
+        },
+      ],
+      defaultNext: 'tenancy-details',
+    },
+    'landlord-registered': {
       defaultNext: 'tenancy-details',
     },
     'tenancy-details': {
@@ -177,11 +204,11 @@ export const flowConfig: JourneyFlowConfig = {
       ],
     },
     'rent-arrears-dispute': {
-      defaultNext: 'end',
+      defaultNext: 'end-now',
     },
 
     'non-rent-arrears-dispute': {
-      defaultNext: 'end',
+      defaultNext: 'end-now',
     },
   },
 };

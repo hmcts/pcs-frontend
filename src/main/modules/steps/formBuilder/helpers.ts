@@ -7,6 +7,7 @@ import type { StepFormData } from '../../../interfaces/stepFormData.interface';
 
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
+import type { FormError } from './errorUtils';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
@@ -208,8 +209,8 @@ export function validateForm(
   translations?: Record<string, string>,
   allFormData?: Record<string, unknown>,
   t?: TFunction
-): Record<string, string> {
-  const errors: Record<string, string> = {};
+): Record<string, FormError> {
+  const errors: Record<string, FormError> = {};
   // Build formData from current request body (before processing date fields)
   const formData: Record<string, unknown> = { ...req.body };
 

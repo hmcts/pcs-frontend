@@ -1,6 +1,6 @@
 {
   "caption": "cyRespond to a property possession claim",
-  "pageTitle": "cyYour Name",
+  "pageTitle": "cyYour name",
   "nameConfirmationLabel": "cyIs your name {{defendantName}}?",
   "nameConfirmationHint": "cyThis is the name provided by {{organisationName}}",
   "yesOption": "cyYes",

@@ -5,17 +5,17 @@ import { createGetController, createStepNavigation } from '../../../modules/step
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
-const stepName = 'tenancy-details';
+const stepName = 'landlord-registered';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/tenancy-details`,
+  url: `${RESPOND_TO_CLAIM_ROUTE}/landlord-registered`,
   name: stepName,
-  view: 'respond-to-claim/tenancy-details/tenancyDetails.njk',
+  view: 'respond-to-claim/landlord-registered/landlordRegistered.njk',
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'respond-to-claim/tenancy-details/tenancyDetails.njk',
+      'respond-to-claim/landlord-registered/landlordRegistered.njk',
       stepName,
       async (req: Request) => {
         return {
