@@ -18,15 +18,11 @@ test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   //await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
-  //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  //await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   //await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   //await performAction('validateAccessCodeAPI');
-  await performAction('navigateToUrl', home_url);
-  await performAction('login');
-  //Below hard coded case number will be replaced with actual case number once data setup is integrated.
   await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
+  await performAction('login');
   await performAction('clickButton', startNow.startNowButton);
 });
 
@@ -81,7 +77,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
     });
-    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
     await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddressKnown.errorValidation,
