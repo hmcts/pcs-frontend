@@ -28,10 +28,13 @@ interface CustomSessionData extends SessionData {
   returnTo?: string;
   formData?: Record<string, any>;
   ccdCase?: CcdCase;
+  caseReference?: string;
   postcodeLookupResult?: any[];
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
   _addressLookup?: AddressLookupSessionData;
+  //TODO: currently served from LaunchDarkly flag - remove this once CCD case is implemented
+  defendantName?: string;
   destroy(callback: (err?: Error) => void): void;
 }
 

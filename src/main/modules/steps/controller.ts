@@ -76,7 +76,7 @@ export const createGetController = (
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
-      backUrl: stepNavigation.getBackUrl(req, stepName),
+      backUrl: await stepNavigation.getBackUrl(req, stepName),
       ...commonI18nTranslations,
       ...commonContent,
       ...stepTranslations,
@@ -126,13 +126,14 @@ export const createPostController = (
 
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
+        const errorMessage = typeof errors[firstField] === 'string' ? errors[firstField] : errors[firstField].message;
         return res.status(400).render(view, {
           ...req.body,
-          error: { field: firstField, text: errors[firstField] },
+          error: { field: firstField, text: errorMessage },
           lang: reqLang,
           pageUrl: req.originalUrl || '/',
           t,
-          backUrl: stepNavigation.getBackUrl(req, stepName),
+          backUrl: await stepNavigation.getBackUrl(req, stepName),
         });
       }
 
@@ -149,7 +150,7 @@ export const createPostController = (
         }
       }
 
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

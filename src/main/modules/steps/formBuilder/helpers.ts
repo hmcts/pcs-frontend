@@ -7,12 +7,16 @@ import type { StepFormData } from '../../../interfaces/stepFormData.interface';
 
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
+import type { FormError } from './errorUtils';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
 export function getTranslation(t: TFunction, key: string, fallback?: string): string | undefined {
-  const translation = t(key);
-  return translation !== key ? translation : fallback;
+  const result = t(key, { returnObjects: true }) as unknown;
+  if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
+    return result;
+  }
+  return fallback;
 }
 
 /**
@@ -94,6 +98,12 @@ export function getTranslationErrors(
 ): Record<string, string> {
   const translationErrors: Record<string, string> = {};
 
+  const getStringTranslation = (key: string): string | undefined => {
+    // Ask for objects so we can detect object-valued keys safely
+    const result = t(key, { returnObjects: true }) as unknown;
+    return typeof result === 'string' && result !== key ? result : undefined;
+  };
+
   for (const field of fields) {
     // Get the nested field name if this is a subField
     const fieldName = parentFieldName ? getNestedFieldName(parentFieldName, field.name) : field.name;
@@ -117,9 +127,10 @@ export function getTranslationErrors(
       }
     } else {
       // For top-level fields, check error message translation using the field name
+      // Prefer flat string keys (errors.<field>) used across the service.
       const errorKey = `errors.${field.name}`;
-      const errorMsg = t(errorKey);
-      if (errorMsg && errorMsg !== errorKey) {
+      const errorMsg = getStringTranslation(errorKey);
+      if (errorMsg) {
         translationErrors[field.name] = errorMsg;
       }
 
@@ -189,8 +200,8 @@ export function validateForm(
   translations?: Record<string, string>,
   allFormData?: Record<string, unknown>,
   t?: TFunction
-): Record<string, string> {
-  const errors: Record<string, string> = {};
+): Record<string, FormError> {
+  const errors: Record<string, FormError> = {};
   // Build formData from current request body (before processing date fields)
   const formData: Record<string, unknown> = { ...req.body };
 
@@ -402,7 +413,7 @@ export function validateForm(
       }
 
       for (const option of field.options) {
-        if (option.subFields && isOptionSelected(fieldValue, option.value, field.type)) {
+        if (option.subFields && option.value && isOptionSelected(fieldValue, option.value, field.type)) {
           // Validate each subField recursively
           for (const [subFieldName, subField] of Object.entries(option.subFields)) {
             // Set the name on the subField if not already set

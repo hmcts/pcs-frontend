@@ -3,6 +3,7 @@ import {
   FetchPINsAndValidateAccessCodeAPIAction,
   LoginAction,
   NavigateToUrlAction,
+  RespondToClaimAction,
 } from '../actions/custom-actions';
 import { RespondToClaimAction } from '../actions/custom-actions/respondToClaim.action';
 import {
@@ -36,9 +37,16 @@ export class ActionRegistry {
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['selectLegalAdvice', new RespondToClaimAction()],
+    ['inputDefendantDetails', new RespondToClaimAction()],
+    ['enterDateOfBirthDetails', new RespondToClaimAction()],
+    ['inputErrorValidation', new RespondToClaimAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['selectNoticeDetails', new RespondToClaimAction()]
+    ['selectLegalAdvice', new RespondToClaimAction()],
+    ['inputDefendantDetails', new RespondToClaimAction()],
+    ['enterDateOfBirthDetails', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

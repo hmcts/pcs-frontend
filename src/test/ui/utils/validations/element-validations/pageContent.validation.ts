@@ -81,6 +81,7 @@ export class PageContentValidation implements IValidation {
                     .radio:text("${value}") ~ input[type="radio"],
                     legend:text("${value}") ~ input[type="radio"],
                     .question:text("${value}") ~ input[type="radio"],
+                    legend:text("${value}"),
                     label >> text=${value} >> xpath=..//input[@type="radio"]`),
     RadioOption: (page: Page, value: string) =>
       page.locator(`
@@ -98,7 +99,7 @@ export class PageContentValidation implements IValidation {
                     select option:text("${value}")`),
     HintText: (page: Page, value: string) =>
       page.locator(`
-                    .hint:text("${value}")`),
+                    .govuk-hint:text("${value}")`),
     TextLabel: (page: Page, value: string) =>
       page.locator(`
                     label:has-text("${value}"),
@@ -108,7 +109,7 @@ export class PageContentValidation implements IValidation {
                     .paragraph:text("${value}"),
                     p:text("${value}"),
                     markdown:text("${value}"),
-                    .content:text("${value}"),
+                    .govuk-caption-l:text("${value}"),
                     .body:text("${value}"),
                     .text-content:text("${value}"),
                     .govuk-body:text("${value}"),
@@ -136,7 +137,12 @@ export class PageContentValidation implements IValidation {
     }
 
     for (const [key, value] of Object.entries(pageData)) {
-      if (key.includes('Input') || key.includes('Hidden')) {
+      if (
+        key.includes('Input') ||
+        key.includes('Hidden') ||
+        key.includes('Validation') ||
+        key.includes('ErrorMessage')
+      ) {
         continue;
       }
       if (typeof value === 'string' && value.trim() !== '') {
