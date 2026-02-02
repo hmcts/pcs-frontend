@@ -48,6 +48,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
     name: stepName,
     view: viewPath,
     stepDir,
+    showCancelButton,
     getController: () => {
       return createGetController(viewPath, stepName, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
