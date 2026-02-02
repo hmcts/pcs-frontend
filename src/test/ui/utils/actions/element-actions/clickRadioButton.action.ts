@@ -11,9 +11,11 @@ export class ClickRadioButtonAction implements IAction {
     }
     const { question, option, index } = params as actionRecord;
     const idx = index !== undefined ? Number(index) : 0;
-    const questionLocators = page.locator(`legend:has-text("${question}")`);
-    const targetQuestion = questionLocators.nth(idx);
-    const radioButton = targetQuestion.locator('..').getByRole('radio', { name: option as string, exact: true });
+    const targetQuestion = page
+      .locator('fieldset')
+      .filter({ hasText: question as string })
+      .nth(idx);
+    const radioButton = targetQuestion.getByRole('radio', { name: option as string });
     await radioButton.click();
   }
 }
