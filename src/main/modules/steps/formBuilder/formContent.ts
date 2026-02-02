@@ -26,24 +26,22 @@ export function buildFormContent(
   );
   // Pass bodyData as originalData so translateFields can extract nested field values
   const fieldsWithLabels = translateFields(
-    
     fields,
-   
+
     t,
-   
+
     fieldValues,
-   
+
     stringErrors,
-   
+
     !!pageTitle,
-   
+
     '',
-   
+
     bodyData,
-   
+
     nunjucksEnv,
     interpolation
-  
   );
 
   // Build error summary
