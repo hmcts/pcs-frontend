@@ -41,8 +41,11 @@ test.describe('Respond to a claim - e2e Journey - e2e Journey @nightly', async (
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
     });
-    await performValidation('mainHeader', dateOfBirth.mainHeader);
-    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddressKnown.yesRadioOption,
     });
@@ -60,8 +63,11 @@ test.describe('Respond to a claim - e2e Journey - e2e Journey @nightly', async (
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
     });
-    await performValidation('mainHeader', dateOfBirth.mainHeader);
-    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddressKnown.noRadioOption,
       postcode: correspondenceAddressKnown.englandPostcodeTextInput,
