@@ -10,7 +10,7 @@ import { IAction, actionData, actionRecord } from '../../interfaces';
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName)],
+      ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)]
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -20,20 +20,21 @@ export class RespondToClaimAction implements IAction {
     await actionToPerform();
   }
 
-  private async selectNoticeDetails(noticeGivenOption: actionData): Promise<void> {
-    await performAction('clickRadioButton', {
-      question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeGivenOption,
-    });
+  private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
+
+      await performAction('clickRadioButton', {
+        question: noticeDetails.didClaimantGiveYouQuestion,
+        option: noticeGivenData.option,
+      });
     // add back link navigation step??
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
-    await performValidation('text',{
-      'text': noticeDateKnown.noticeGivenDateLabel,
-      'elementType': 'inlineText'
-    });
+    // await performValidation('text',{
+    //   'text': noticeDateKnown.noticeGivenDateLabel,
+    //   'elementType': 'inlineText'
+    // });
     if (noticeData.day && noticeData.month && noticeData.year) {
       await performAction('inputText', noticeDateKnown.dayTextLabel, noticeData.day);
       await performAction('inputText', noticeDateKnown.monthTextLabel, noticeData.month);

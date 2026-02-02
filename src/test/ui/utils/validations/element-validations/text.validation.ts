@@ -26,6 +26,9 @@ export class TextValidation implements IValidation {
       case 'summaryText':
         data.elementType = '.govuk-details__text';
         break;
+      case 'legend':
+        data.elementType = 'legend';
+        break;
     }
     const locator = page.locator(`${data.elementType}:has-text("${data.text}")`).first();
     await expect(locator).toHaveText(String(data.text));

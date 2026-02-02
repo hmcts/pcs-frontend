@@ -4,6 +4,7 @@ import {
   LoginAction,
   NavigateToUrlAction,
 } from '../actions/custom-actions';
+import { RespondToClaimAction } from '../actions/custom-actions/respondToClaim.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -37,6 +38,7 @@ export class ActionRegistry {
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['selectNoticeDetails', new RespondToClaimAction()]
   ]);
 
   static getAction(actionName: string): IAction {
