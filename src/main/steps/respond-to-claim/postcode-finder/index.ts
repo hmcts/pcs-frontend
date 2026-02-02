@@ -103,11 +103,25 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
   },
-  extendGetContent: async req => {
+  extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
 
-    const prepopulateAddress = await getExistingAddress(req.session.user?.accessToken || '', req.params.caseReference || '');
-    console.log(prepopulateAddress); 
+    const prepopulateAddress = await getExistingAddress(
+      req.session.user?.accessToken || '',
+      req.params.caseReference || ''
+    );
+
+    const radio = formContent.fields.find(f => f.componentType === 'radios');
+    if (!radio || !radio.component) return {};
+
+    const dynamicText = `${t('legend')}${prepopulateAddress}`;
+    radio.component.label.text = dynamicText;
+    
+    console.log(radio.component)
+    radio.component.fieldset.legend.text = dynamicText;
+
+
+    console.log(radio.component.label.text);
 
     // Dynamically inject validator with translation function
     const postcodeField = fieldsConfig[0].options?.[1]?.subFields?.postcode;
@@ -122,17 +136,17 @@ export const step: StepDefinition = createFormStep({
         return true;
       };
     }
-
     return {
-      isAddressKnown: true,
-      // isAddressKnown: prepopulateAddress !== '',
-      title: t('title'),
-      titleNa: t('titleNa'),
-      subtitle: t('subtitle'),
-      subtitleNa: t('subtitleNa'),
-      legend: t('legend'),
-      // prepopulateAddress: prepopulateAddress,
-      prepopulateAddress: "24 Dean Park Road, Swansea, G15 2LD",
+      ...formContent,
+      // isAddressKnown: true,
+      isAddressKnown: prepopulateAddress !== '',
+      pageTitle: t('pageTitle'),
+      pageTitleNa: t('pageTitleNa'),
+      legend: '1234tnjwandjwandwa',
+      legendhintNa: t('legend.hintNa'),
+
+      prepopulateAddress: prepopulateAddress,
+      // prepopulateAddress: "2 D Park Road, Swansea, G15 2LD",
 
       caption: t('caption'),
       labels: {
@@ -178,19 +192,21 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
   const address = response.case_details.case_data.possessionClaimResponse?.party?.address;
 
   if (address) {
-    const formattedAddress =
-      [
-        address.AddressLine1,
-        address.AddressLine2,
-        address.AddressLine3,
-        address.PostTown,
-        address.County,
-        address.PostCode,
-        address.Country,
-      ]
-        .map(v => (v ?? '').trim())
-        .filter(Boolean)
-        .join(', ') + '?';
+    // const formattedAddress =
+    //   [
+    //     address.AddressLine1,
+    //     address.AddressLine2,
+    //     address.AddressLine3,
+    //     address.PostTown,
+    //     address.County,
+    //     address.PostCode,
+    //     address.Country,
+    //   ]
+    //     .map(v => (v ?? '').trim())
+    //     .filter(Boolean)
+    //     .join(', ') + '?';
+
+    const formattedAddress = 'testing address';
 
     logger.info('Mapping addy', formattedAddress);
     return formattedAddress;

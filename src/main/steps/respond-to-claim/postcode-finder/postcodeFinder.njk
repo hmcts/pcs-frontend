@@ -16,9 +16,6 @@
   {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
-  {% if caption %}
-    <span class="govuk-caption-xl">{{ caption }}</span>
-  {% endif %}
   
     {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
     {% set postcodeFinderHtml %}

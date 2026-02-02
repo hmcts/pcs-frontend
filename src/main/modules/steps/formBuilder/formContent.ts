@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import type { BuiltFormContent, FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 
 import { buildErrorSummary } from './errorUtils';
 import { buildFieldValues, translateFields } from './fieldTranslation';
@@ -14,7 +14,7 @@ export function buildFormContent(
   errors: Record<string, string> = {},
   translationKeys?: TranslationKeys,
   nunjucksEnv?: Environment
-): Record<string, unknown> {
+): BuiltFormContent {
   const fieldValues = buildFieldValues(fields, bodyData);
   const pageTitle = getTranslation(t, 'title', undefined) || getTranslation(t, 'question', undefined);
   // Pass bodyData as originalData so translateFields can extract nested field values

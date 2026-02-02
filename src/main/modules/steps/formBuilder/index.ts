@@ -2,7 +2,7 @@ import path from 'path';
 
 import type { TFunction } from 'i18next';
 
-import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
+import type { BuiltFormContent, FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
@@ -60,8 +60,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
-        const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv);
-        const extraContent = extendGetContent ? await extendGetContent(req, {}) : undefined;
+        const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv) as BuiltFormContent;
+        const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
         const result = extraContent ? { ...formContent, ...extraContent } : formContent; 
         return {
           ...result,
