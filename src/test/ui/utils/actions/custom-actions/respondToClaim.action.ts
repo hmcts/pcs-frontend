@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 import {
+  contactByPhone,
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
@@ -40,18 +41,6 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
-  private async selectContactByPhone(contactByPhoneData: actionRecord): Promise<void> {
-    await performAction('clickRadioButton', {
-      question: contactByPhone.areYouHappyToContactQuestion,
-      option: contactByPhoneData,
-    });
-    if (contactByPhoneData.radioOption === contactByPhone.yesRadioOption) {
-      await performActions(
-        'UK phone number',
-        ['inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.UkPhoneNumber],
-      );
-    }
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
   private async enterDateOfBirthDetails(defendantData: actionRecord): Promise<void> {
     await performActions(
       'Defendant Date of Birth Entry',
@@ -76,6 +65,17 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  }
+
+  private async selectContactByPhone(contactByPhoneData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: contactByPhone.areYouHappyToContactQuestion,
+      option: contactByPhoneData,
+    });
+    if (contactByPhoneData.radioOption === contactByPhone.yesRadioOption) {
+      await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.UkPhoneNumber);
+    }
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

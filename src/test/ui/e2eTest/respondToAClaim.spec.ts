@@ -3,6 +3,7 @@ import config from 'config';
 
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  contactByPhone,
   contactPreference,
   correspondenceAddressKnown,
   dateOfBirth,
@@ -34,10 +35,6 @@ test.afterEach(async () => {
   PageContentValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim @nightly', async () => {
-  test('Respond to a claim', async () => {
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-    await performAction('clickButton', startNow.startNowButton);
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim - England postcode', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -55,6 +52,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByPhone', {
+      radioOption: contactByPhone.yesRadioOption,
+      phoneNumber: contactByPhone.inputUkPhoneNumber,
+    });
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mockText);
@@ -79,25 +80,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByPhone', contactByPhone.noRadioOption);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', registeredLandlord.mockText);
-  });
-
-  test('Contact By Phone  - Yes', async () => {
-    await performAction('selectContactByPhone',{
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
-
-    });
-    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhone.inputUkPhoneNumber);
-    await performAction('clickButton', contactByPhone.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
-  });
-
-  test('Contact By Phone  - No', async () => {
-    await performAction('selectContactByPhone', contactByPhone.noRadioOption);
-    await performAction('clickButton', contactByPhone.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
   });
 });

@@ -4,6 +4,8 @@ import config from 'config';
 //Below lines are commented to avoid API calls until data setup is integrated.
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  contactByPhone,
+  contactPreference,
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
@@ -55,36 +57,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', defendantNameCapture.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
-  test('Contact By Phone  - Error messages - save for later Validations', async () => {
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: contactByPhone.errorValidation,
-      validationType: contactByPhone.errorValidationType.radio,
-      inputArray: contactByPhone.errorValidationField.errorRadioMsg,
-      question: contactByPhone.areYouHappyToContactQuestion,
-      header: contactByPhone.errorValidationHeader,
-    });
-    await performAction('selectContactByPhone', contactByPhone.yesRadioOption);
-    //await performValidation('text', { 'text': contactByPhone.ukPhoneNumberHiddenTextLabel, 'elementType': 'TextBox' });
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: contactByPhone.errorValidation,
-      validationType: contactByPhone.errorValidationType.input,
-      inputArray: contactByPhone.errorValidationField.errorTextField,
-      header: defendantNameCapture.errorValidationHeader,
-    });
-    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, '7ab00 90*2£&');
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: contactByPhone.errorValidation,
-      validationType: contactByPhone.errorValidationType.input,
-      inputArray: contactByPhone.errorValidationField.errorTextField,
-      header: defendantNameCapture.errorValidationHeader,
-    });
-    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, '07700 900123');
-    await performAction('clickButton', contactByPhone.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
-
 
   test('Defendant Date of birth - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -184,5 +156,50 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('clickRadioButton', correspondenceAddressKnown.yesRadioOption);
     await performAction('clickButton', correspondenceAddressKnown.saveForLaterButton);
+  });
+
+  test('Contact By Phone  - Error messages - save for later Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: contactByPhone.errorValidation,
+      validationType: contactByPhone.errorValidationType.radio,
+      inputArray: contactByPhone.errorValidationField.errorRadioMsg,
+      question: contactByPhone.areYouHappyToContactQuestion,
+      header: contactByPhone.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', contactByPhone.yesRadioOption);
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: contactByPhone.errorValidation,
+      validationType: contactByPhone.errorValidationType.input,
+      inputArray: contactByPhone.errorValidationField.errorTextField1,
+      header: defendantNameCapture.errorValidationHeader,
+    });
+    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, '7ab00 90*2£&');
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: contactByPhone.errorValidation,
+      validationType: contactByPhone.errorValidationType.input,
+      inputArray: contactByPhone.errorValidationField.errorTextField2,
+      header: defendantNameCapture.errorValidationHeader,
+    });
+    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhone.inputUkPhoneNumber);
+    await performAction('clickButton', contactByPhone.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
   });
 });

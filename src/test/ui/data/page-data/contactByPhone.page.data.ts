@@ -7,7 +7,7 @@ export const contactByPhone = {
   yesRadioOption: 'Yes',
   noRadioOption: 'No',
   ukPhoneNumberHiddenTextLabel: 'UK Phone Number',
-  inputUkPhoneNumber:'07700 900123',
+  inputUkPhoneNumber: '07700 900123',
   saveAndContinueButton: 'Save and continue',
   saveForLaterButton: 'Save for later',
   cymraegLink: 'Cymraeg',
@@ -16,8 +16,7 @@ export const contactByPhone = {
   errorValidationHeader: 'There is a problem',
   errorValidationField: {
     errorRadioMsg: [{ errMessage: 'Please confirm your Contact by selecting the options below' }],
-    errorTextField: [
-      { type: 'empty', label: 'UK Phone Number', errMessage: 'Enter UK Phone Number' },
-    ],
+    errorTextField1: [{ type: 'empty', label: 'UK Phone Number', errMessage: 'Enter UK Phone Number' }],
+    errorTextField2: [{ type: 'empty', label: 'UK Phone Number', errMessage: 'Enter UK Phone Number' }],
   },
 };
