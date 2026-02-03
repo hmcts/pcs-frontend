@@ -19,7 +19,21 @@ jest.mock('../../../main/utils/caseReference', () => ({
   }),
 }));
 
+const mockGetCaseById = jest.fn();
+
+jest.mock('../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    getCaseById: (...args: unknown[]) => mockGetCaseById(...args),
+  },
+}));
+
 import { caseReferenceParamMiddleware } from '../../../main/middleware/caseReference';
+
+interface MockSession {
+  user?: {
+    accessToken?: string;
+  };
+}
 
 describe('caseReferenceParamMiddleware', () => {
   let mockReq: Partial<Request>;
@@ -31,6 +45,7 @@ describe('caseReferenceParamMiddleware', () => {
 
     mockReq = {
       params: {},
+      session: {} as unknown as Request['session'],
     };
 
     mockRes = {
@@ -43,23 +58,72 @@ describe('caseReferenceParamMiddleware', () => {
   });
 
   describe('valid case reference', () => {
-    it('should set res.locals.caseReference and req.params.caseReference with valid 16-digit case reference', () => {
+    it('should set res.locals.validatedCase with valid 16-digit case reference', async () => {
       const validCaseRef = '1234567890123456';
+      const mockCase = { id: validCaseRef, state: 'Open' };
+      const mockAccessToken = 'mock-access-token';
 
-      caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+      mockReq.session = { user: { accessToken: mockAccessToken } } as MockSession as Request['session'];
+      mockGetCaseById.mockResolvedValue(mockCase);
 
-      expect(mockRes.locals?.caseReference).toBe(validCaseRef);
-      expect(mockReq.params?.caseReference).toBe(validCaseRef);
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef);
+      expect(mockRes.locals?.validatedCase).toEqual(mockCase);
       expect(next).toHaveBeenCalledWith();
     });
 
-    it('should call next() after successful validation', () => {
+    it('should call next() after successful validation', async () => {
       const validCaseRef = '9876543210987654';
+      const mockCase = { id: validCaseRef, state: 'Open' };
+      const mockAccessToken = 'mock-access-token';
 
-      caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+      mockReq.session = { user: { accessToken: mockAccessToken } } as MockSession as Request['session'];
+      mockGetCaseById.mockResolvedValue(mockCase);
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
       expect(next).toHaveBeenCalledTimes(1);
       expect(mockRes.status).not.toHaveBeenCalled();
+    });
+
+    it('should return 404 when user has no access token', async () => {
+      const validCaseRef = '1234567890123456';
+      mockReq.session = {} as MockSession as Request['session'];
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(mockRes.status).toHaveBeenCalledWith(404);
+      expect(mockRes.render).toHaveBeenCalledWith('error', {
+        error: 'Case not found or access denied',
+      });
+      expect(next).not.toHaveBeenCalled();
+      expect(mockLogger.error).toHaveBeenCalledWith('User not authenticated - no access token', {
+        caseReference: validCaseRef,
+      });
+    });
+
+    it('should return 404 when case is not found', async () => {
+      const validCaseRef = '1234567890123456';
+      const mockAccessToken = 'mock-access-token';
+
+      mockReq.session = { user: { accessToken: mockAccessToken } } as MockSession as Request['session'];
+      mockGetCaseById.mockRejectedValue(new Error('Case not found'));
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(mockRes.status).toHaveBeenCalledWith(404);
+      expect(mockRes.render).toHaveBeenCalledWith('error', {
+        error: 'Case not found or access denied',
+      });
+      expect(next).not.toHaveBeenCalled();
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Case access validation failed',
+        expect.objectContaining({
+          caseReference: validCaseRef,
+          error: 'Case not found',
+        })
+      );
     });
   });
 
