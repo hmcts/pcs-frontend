@@ -10,4 +10,3 @@ export const step: StepDefinition = createFormStep({
   fields: [],
   customTemplate: `${__dirname}/repayments.njk`,
 });
-

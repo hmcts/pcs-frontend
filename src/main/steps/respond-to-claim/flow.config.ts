@@ -61,7 +61,7 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'counter-claim',
       defaultNext: 'repayments',
     },
-    'repayments': {
+    repayments: {
       previousStep: 'payment-interstitial',
       defaultNext: 'postcode-finder',
     },
