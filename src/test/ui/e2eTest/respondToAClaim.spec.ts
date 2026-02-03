@@ -1,15 +1,9 @@
 import { test } from '@playwright/test';
 import config from 'config';
 
-import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import {
-  contactByTextMessage,
-  defendantDateOfBirth,
-  defendantNameCapture,
-  freeLegalAdvice,
-  startNow,
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  contactByTextMessage,
   contactPreference,
   correspondenceAddressKnown,
   dateOfBirth,
@@ -48,8 +42,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
     });
-    await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
@@ -60,6 +52,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mockText);
@@ -84,6 +77,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', registeredLandlord.mockText);

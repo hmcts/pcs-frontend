@@ -3,9 +3,9 @@ import config from 'config';
 
 //Below lines are commented to avoid API calls until data setup is integrated.
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { contactByTextMessage, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
 import {
+  contactByTextMessage,
+  contactPreference,
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
@@ -57,8 +57,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', defendantNameCapture.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
-  await performValidation('mainHeader', contactByTextMessage.mainHeader);
-  await performAction('selectContactUsByTextMessage', contactByTextMessage.yesRadioOption);
 
   test('Defendant Date of birth - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -158,6 +156,35 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('clickRadioButton', correspondenceAddressKnown.yesRadioOption);
     await performAction('clickButton', correspondenceAddressKnown.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
+  });
+
+  test('Contact By Text Message - Error messages - save for later Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: contactByTextMessage.errorValidation,
+      validationType: contactByTextMessage.errorValidationType.radio,
+      inputArray: contactByTextMessage.errorValidationField.errorRadioMsg,
+      question: contactByTextMessage.contactByTextMessageQuestion,
+      header: contactByTextMessage.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', contactByTextMessage.yesRadioOption);
+    await performAction('clickButton', contactByTextMessage.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
 });

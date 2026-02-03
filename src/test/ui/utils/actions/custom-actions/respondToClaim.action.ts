@@ -1,8 +1,7 @@
 import { Page } from '@playwright/test';
 
-import { contactByTextMessage, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
-import { performAction, performValidation } from '../../controller';
 import {
+  contactByTextMessage,
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
@@ -42,14 +41,6 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
-  // Below changes are temporary will be changed as part of HDPI-3208
-  private async selectContactByTextMessage(contactData: actionData): Promise<void> {
-    await performAction('clickRadioButton', {
-      question: contactByTextMessage.contactByTextMessageQuestion,
-      option: contactData,
-    });
-    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
-  }
   private async enterDateOfBirthDetails(defendantData: actionRecord): Promise<void> {
     await performActions(
       'Defendant Date of Birth Entry',
@@ -74,6 +65,14 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  }
+
+  private async selectContactByTextMessage(contactData: actionData): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: contactByTextMessage.contactByTextMessageQuestion,
+      option: contactData,
+    });
+    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
