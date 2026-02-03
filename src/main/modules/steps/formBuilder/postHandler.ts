@@ -19,7 +19,7 @@ import {
   validateForm,
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
-import {ExtendGetContent} from '../../../interfaces/formFieldConfig.interface'
+import { ExtendGetContent } from '../../../interfaces/formFieldConfig.interface';
 
 export function createPostHandler(
   fields: FormFieldConfig[],
@@ -30,7 +30,7 @@ export function createPostHandler(
   translationKeys?: TranslationKeys,
   flowConfig?: JourneyFlowConfig,
   showCancelButton?: boolean,
-  extendGetContent?: ExtendGetContent,
+  extendGetContent?: ExtendGetContent
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
