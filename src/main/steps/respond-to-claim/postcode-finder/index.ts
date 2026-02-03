@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import isPostalCode from 'validator/lib/isPostalCode';
 
 import type { Address, CcdCase, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
@@ -8,7 +7,6 @@ import { createFormStep, getFormData, getTranslationFunction, setFormData } from
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { flowConfig } from '../flow.config';
 
-const logger = Logger.getLogger('postcode-finder');
 const STEP_NAME = 'postcode-finder';
 
 let prepopulateAddress: Address | undefined;
