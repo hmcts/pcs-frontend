@@ -3,18 +3,24 @@ import isPostalCode from 'validator/lib/isPostalCode';
 
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const logger = Logger.getLogger('postcode-finder');
+const STEP_NAME = 'postcode-finder';
+
+// Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
+// Session is set in extendGetContent; validation reads it via allData on POST.
+const correspondenceAddressRequired = (_formData: Record<string, unknown>, allData: Record<string, unknown>): boolean =>
+  allData.__isAddressKnown === true;
 
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'correspondenceAddressConfirm',
     type: 'radio',
-    required: true,
+    required: correspondenceAddressRequired,
     translationKey: {
       label: 'legend',
       hint: 'legend.hint',
@@ -103,6 +109,9 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
   },
+  beforeRedirect: () => {
+    console.log('Before redirect');
+  },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
 
@@ -111,7 +120,9 @@ export const step: StepDefinition = createFormStep({
       req.params.caseReference || ''
     );
 
-    const isAddressKnown = prepopulateAddress !== '?';
+    const isAddressKnown = prepopulateAddress !== '';
+    setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
+
     const radio = formContent.fields.find(f => f.componentType === 'radios');
     if (!radio || !radio.component) return {};
 
@@ -122,7 +133,6 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Override value used in njk File with our dynamic value.
-
     // Dynamically inject validator with translation function
     const postcodeField = fieldsConfig[0].options?.[1]?.subFields?.postcode;
     if (postcodeField) {
@@ -185,22 +195,24 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
   const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
   const address = response.case_details.case_data.possessionClaimResponse?.party?.address;
 
-  if (address) {
-    const formattedAddress =
-      [
-        address.AddressLine1,
-        address.AddressLine2,
-        address.AddressLine3,
-        address.PostTown,
-        address.County,
-        address.PostCode,
-        address.Country,
-      ]
-        .map(v => (v ?? '').trim())
-        .filter(Boolean)
-        .join(', ') + '?';
+  return 'Test address';
 
-    // const formattedAddress = '';
+  if (address) {
+    //   const formattedAddress =
+    //     [
+    //       address.AddressLine1,
+    //       address.AddressLine2,
+    //       address.AddressLine3,
+    //       address.PostTown,
+    //       address.County,
+    //       address.PostCode,
+    //       address.Country,
+    //     ]
+    //       .map(v => (v ?? '').trim())
+    //       .filter(Boolean)
+    //       .join(', ') + '?';
+
+    const formattedAddress = 'Test address';
 
     logger.info('Mapping address', formattedAddress);
     return formattedAddress;
