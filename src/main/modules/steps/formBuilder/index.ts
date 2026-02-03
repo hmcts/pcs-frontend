@@ -23,14 +23,25 @@ function camelToKebabCase(str: string): string {
   return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
-export function createFormStep(config: FormBuilderConfig, viewPath: string = 'formBuilder.njk'): StepDefinition {
+export function createFormStep(config: FormBuilderConfig): StepDefinition {
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
-  const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys, flowConfig } =
-    config;
+  const {
+    stepName,
+    journeyFolder,
+    fields,
+    beforeRedirect,
+    extendGetContent,
+    stepDir,
+    translationKeys,
+    flowConfig,
+    showCancelButton,
+    customTemplate,
+  } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
+  const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
@@ -39,6 +50,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
     name: stepName,
     view: viewPath,
     stepDir,
+    showCancelButton,
     getController: () => {
       return createGetController(viewPath, stepName, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
@@ -61,6 +73,7 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
           journeyFolder,
           languageToggle: t('languageToggle'),
           backUrl: await navigation.getBackUrl(req, stepName),
+          showCancelButton,
         };
       });
     },
@@ -71,7 +84,9 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
       journeyFolder,
       beforeRedirect,
       translationKeys,
-      flowConfig
+      flowConfig,
+      showCancelButton,
+      extendGetContent
     ),
   };
 }

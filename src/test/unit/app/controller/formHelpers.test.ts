@@ -10,6 +10,7 @@ import {
   setFormData,
   validateForm,
 } from '../../../../main/modules/steps';
+import { getErrorMessage } from '../../../../main/modules/steps/formBuilder/errorUtils';
 
 describe('formHelpers', () => {
   describe('getFormData', () => {
@@ -460,7 +461,7 @@ describe('formHelpers', () => {
 
       const result = validateForm(req, fields);
       expect(result).toHaveProperty('dateField');
-      expect(result.dateField).toBe('Enter a valid date');
+      expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
     });
 
     it('should validate date fields - missing month', () => {
@@ -527,7 +528,7 @@ describe('formHelpers', () => {
 
       const result = validateForm(req, fields);
       expect(result).toHaveProperty('dateField');
-      expect(result.dateField).toBe('Enter a valid date');
+      expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
     });
 
     it('should validate date fields - invalid day range', () => {
@@ -550,7 +551,7 @@ describe('formHelpers', () => {
 
       const result = validateForm(req, fields);
       expect(result).toHaveProperty('dateField');
-      expect(result.dateField).toBe('Enter a valid date');
+      expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
     });
 
     it('should validate date fields - invalid month range', () => {
@@ -684,7 +685,7 @@ describe('formHelpers', () => {
       ];
 
       const result = validateForm(req, fields);
-      expect(result.dateField).toBe('Enter a valid date');
+      expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
     });
 
     it('should use translation error message for date validation', () => {
@@ -706,7 +707,7 @@ describe('formHelpers', () => {
       ];
 
       const result = validateForm(req, fields);
-      expect(result.dateField).toBe('Enter a valid date');
+      expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
     });
 
     describe('function-based required validation', () => {
@@ -1127,7 +1128,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return step-specific error when all date parts are missing', () => {
@@ -1157,7 +1158,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields, {}, undefined, mockT);
         expect(result).toHaveProperty('dateOfBirth');
-        expect(result.dateOfBirth).toBe('Enter your date of birth');
+        expect(getErrorMessage(result.dateOfBirth)).toBe('Enter your date of birth');
       });
 
       it('should return error when day is missing', () => {
@@ -1180,7 +1181,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error when month is missing', () => {
@@ -1203,7 +1204,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error when year is missing', () => {
@@ -1226,7 +1227,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error when day and month are missing', () => {
@@ -1249,7 +1250,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error when day and year are missing', () => {
@@ -1272,7 +1273,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error when month and year are missing', () => {
@@ -1295,7 +1296,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should use step-specific error messages for missing parts', () => {
@@ -1318,7 +1319,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateOfBirth');
-        expect(result.dateOfBirth).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateOfBirth)).toBe('Enter a valid date');
       });
 
       it('should use fallback message when dateMissingTwo translation is not provided', () => {
@@ -1341,7 +1342,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields, {});
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should use fallback message when single missing part translation is not provided', () => {
@@ -1364,7 +1365,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields, {});
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
     });
 
@@ -1400,7 +1401,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields, {}, undefined, mockT);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Date must be in the past');
+        expect(getErrorMessage(result.dateField)).toBe('Date must be in the past');
       });
 
       it('should return error when date is today and noFutureDate is true', () => {
@@ -1433,7 +1434,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields, {}, undefined, mockT);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Date must be in the past');
+        expect(getErrorMessage(result.dateField)).toBe('Date must be in the past');
       });
 
       it('should allow past date when noFutureDate is true', () => {
@@ -1524,7 +1525,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields, translations, undefined, mockT);
         expect(result).toHaveProperty('dateOfBirth');
-        expect(result.dateOfBirth).toBe('Your date of birth must be in the past');
+        expect(getErrorMessage(result.dateOfBirth)).toBe('Your date of birth must be in the past');
       });
     });
 
@@ -1549,7 +1550,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error for day with leading zero when not allowed', () => {
@@ -1572,7 +1573,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error for year with leading zero', () => {
@@ -1595,7 +1596,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error for day exceeding max length', () => {
@@ -1618,7 +1619,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error for month exceeding max length', () => {
@@ -1641,7 +1642,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error for year exceeding max length', () => {
@@ -1664,7 +1665,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
     });
 
@@ -1689,7 +1690,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should return error for invalid date - 29th Feb in non-leap year', () => {
@@ -1712,7 +1713,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Enter a valid date');
+        expect(getErrorMessage(result.dateField)).toBe('Enter a valid date');
       });
 
       it('should pass validation for valid leap year date - 29th Feb 2024', () => {
@@ -1771,7 +1772,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields, translations);
         expect(result).toHaveProperty('dateField');
-        expect(result.dateField).toBe('Year must be 2000 or later');
+        expect(getErrorMessage(result.dateField)).toBe('Year must be 2000 or later');
       });
 
       it('should handle custom validation for date field', () => {
@@ -1805,7 +1806,7 @@ describe('formHelpers', () => {
 
         const result = validateForm(req, fields, translations);
         expect(result).toHaveProperty('dateOfBirth');
-        expect(result.dateOfBirth).toBe('Custom validation error');
+        expect(getErrorMessage(result.dateOfBirth)).toBe('Custom validation error');
       });
     });
   });

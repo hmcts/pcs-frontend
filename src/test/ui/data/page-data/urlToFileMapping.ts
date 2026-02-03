@@ -5,4 +5,7 @@ export default {
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'contact-by-phone': 'contactByPhone',
+  'dispute-claim-interstitial': 'disputeClaimInterstitial',
+  'date-of-birth': 'dateOfBirth',
+  'postcode-finder': 'correspondenceAddressKnown',
 };
