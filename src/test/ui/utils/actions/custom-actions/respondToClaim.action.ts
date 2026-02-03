@@ -4,8 +4,8 @@ import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
+  defendantNameConfirmation,
   freeLegalAdvice,
-  defendantNameConfirmation
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -58,7 +58,7 @@ export class RespondToClaimAction implements IAction {
     });
     await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
-  
+
   private async selectCorrespondenceAddressKnown(addressData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: correspondenceAddressKnown.correspondenceAddressConfirmHintText,
