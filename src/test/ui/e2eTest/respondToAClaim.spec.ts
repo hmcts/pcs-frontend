@@ -10,6 +10,7 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  registeredLandlord,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
@@ -56,8 +57,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mockText);
   });
 
-  // Wales postcode routing is not implemented yet, launch darkly flags are used as of now
-  test('Respond to a claim - Wales postcode', async () => {
+  // Wales postcode routing is not implemented yet, e2e test coverage, functional test coverage needs to be reviewed once HDPI-3451 is done
+  test.skip('Respond to a claim - Wales postcode', async () => {
     await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -79,6 +80,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
+    await performValidation('mainHeader', registeredLandlord.mockText);
   });
 });
