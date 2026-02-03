@@ -246,21 +246,19 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
   // return 'Test address';
 
   if (prepopulateAddress) {
-    //   const formattedAddress =
-    //     [
-    //       address.AddressLine1,
-    //       address.AddressLine2,
-    //       address.AddressLine3,
-    //       address.PostTown,
-    //       address.County,
-    //       address.PostCode,
-    //       address.Country,
-    //     ]
-    //       .map(v => (v ?? '').trim())
-    //       .filter(Boolean)
-    //       .join(', ') + '?';
-
-    const formattedAddress = '';
+    const formattedAddress =
+      [
+        prepopulateAddress.AddressLine1,
+        prepopulateAddress.AddressLine2,
+        prepopulateAddress.AddressLine3,
+        prepopulateAddress.PostTown,
+        prepopulateAddress.County,
+        prepopulateAddress.PostCode,
+        prepopulateAddress.Country,
+      ]
+        .map(v => (v ?? '').trim())
+        .filter(Boolean)
+        .join(', ') + '?';
 
     logger.info('Mapping address', formattedAddress);
     return formattedAddress;
