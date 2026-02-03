@@ -102,13 +102,16 @@ export function createPostHandler(
           interpolationValues,
           showCancelButton
         );
+        // Call extendGetContent to get additional translated content (buttons, labels, etc.)
+        const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
+        const fullContent = { ...formContent, ...extendedContent };
         await renderWithErrors(
           req,
           res,
           viewPath,
           errors,
           fields,
-          formContent,
+          fullContent,
           stepName,
           journeyFolder,
           navigation,

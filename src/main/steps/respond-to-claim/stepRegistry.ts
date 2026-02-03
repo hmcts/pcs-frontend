@@ -1,5 +1,5 @@
 import type { StepDefinition } from '../../interfaces/stepFormData.interface';
-
+import { step as contactPreferences } from './contact-preferences';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
@@ -25,6 +25,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
   'tenancy-details': tenancyDetails,
+  'contact-preferences': contactPreferences,
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
   'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
   'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,
