@@ -6,5 +6,5 @@ export default {
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'date-of-birth': 'dateOfBirth',
-  'correspondence-address-known': 'correspondenceAddressKnown',
+  'postcode-finder': 'correspondenceAddressKnown',
 };
