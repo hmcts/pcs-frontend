@@ -1,18 +1,17 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import type { CcdCase, Address } from '../../../interfaces/ccdCase.interface';
+import type { Address, CcdCase, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
-import { flowConfig } from '../flow.config';
 import { ccdCaseService } from '../../../services/ccdCaseService';
+import { flowConfig } from '../flow.config';
 
 const logger = Logger.getLogger('postcode-finder');
 const STEP_NAME = 'postcode-finder';
 
-var prepopulateAddress: Address | undefined;
+let prepopulateAddress: Address | undefined;
 
 // Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
 // Session is set in extendGetContent; validation reads it via allData on POST.
@@ -114,7 +113,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
   },
   beforeRedirect: req => {
-    var possessionClaimResponse: PossessionClaimResponse;
+    let possessionClaimResponse: PossessionClaimResponse;
     //prepopulate address is correct
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
       possessionClaimResponse = {
@@ -147,33 +146,32 @@ export const step: StepDefinition = createFormStep({
     const ccdCase: CcdCase = {
       id: req.session?.ccdCase?.id ?? req.params.caseReference ?? '',
       data: {
-        possessionClaimResponse: possessionClaimResponse,
+        possessionClaimResponse,
         submitDraftAnswers: 'No',
       },
     };
 
-    //log the payload so we can see what's going to be sent to ccd
-    console.log('REDIRECT PAYLOAD: ');
-    console.log(JSON.stringify(ccdCase, null, 2));
     ccdCaseService.submitResponseToClaim(req.session.user?.accessToken, ccdCase);
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
 
-    const prepopulateAddress = await getExistingAddress(
+    const formattedAddressStr = await getExistingAddress(
       req.session.user?.accessToken || '',
       req.params.caseReference || ''
     );
 
-    const isAddressKnown = prepopulateAddress !== '';
+    const isAddressKnown = formattedAddressStr !== '';
     setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
 
     const radio = formContent.fields.find(f => f.componentType === 'radios');
-    if (!radio || !radio.component) return {};
+    if (!radio || !radio.component) {
+      return {};
+    }
 
     let prepopulateHeading = '';
     if (isAddressKnown) {
-      prepopulateHeading = `${t('legend')}${prepopulateAddress}`;
+      prepopulateHeading = `${t('legend')}${formattedAddressStr}`;
       // subtitle = t('legend.hint');
       radio.component.label.text = prepopulateHeading;
       radio.component.fieldset.legend.text = prepopulateHeading;
@@ -195,7 +193,7 @@ export const step: StepDefinition = createFormStep({
     }
     return {
       ...formContent,
-      isAddressKnown: isAddressKnown,
+      isAddressKnown,
       prepopulateHeading,
       // subtitle,
       legendNa: t('legendNa'),

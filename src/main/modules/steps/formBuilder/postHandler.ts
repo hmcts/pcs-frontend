@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import type { ExtendGetContent, FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createStepNavigation, stepNavigation } from '../flow';
@@ -19,7 +19,6 @@ import {
   validateForm,
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
-import { ExtendGetContent } from '../../../interfaces/formFieldConfig.interface';
 
 export function createPostHandler(
   fields: FormFieldConfig[],

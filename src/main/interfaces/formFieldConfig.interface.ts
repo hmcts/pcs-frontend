@@ -77,24 +77,27 @@ export interface TranslationKeys {
 }
 
 export type BuiltFormContent = {
-    fields: Array<{
-      componentType?: string;
-      component?: any;
-    }>;
-    errorSummary?: unknown;
-    errors?: Record<string, string>;
-    [key: string]: unknown;
-  };
+  fields: {
+    componentType?: string;
+    component?: Record<string, unknown>;
+  }[];
+  errorSummary?: unknown;
+  errors?: Record<string, string>;
+  [key: string]: unknown;
+};
 
 type MaybePromise<T> = T | Promise<T>;
-export type ExtendGetContent = (req: Request, formContent: BuiltFormContent) => MaybePromise<Partial<BuiltFormContent> & Record<string, unknown>>;
+export type ExtendGetContent = (
+  req: Request,
+  formContent: BuiltFormContent
+) => MaybePromise<Partial<BuiltFormContent> & Record<string, unknown>>;
 
 export interface FormBuilderConfig {
   stepName: string;
   journeyFolder: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
-  extendGetContent?: ExtendGetContent
+  extendGetContent?: ExtendGetContent;
   stepDir: string;
   translationKeys?: TranslationKeys;
   customTemplate?: string;

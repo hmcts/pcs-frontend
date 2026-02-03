@@ -61,9 +61,16 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
-        const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv) as BuiltFormContent;
+        const formContent = buildFormContent(
+          fields,
+          t,
+          getFormData(req, stepName),
+          {},
+          translationKeys,
+          nunjucksEnv
+        ) as BuiltFormContent;
         const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
-        const result = extraContent ? { ...formContent, ...extraContent } : formContent; 
+        const result = extraContent ? { ...formContent, ...extraContent } : formContent;
         return {
           ...result,
           ccdId: req.session?.ccdCase?.id,

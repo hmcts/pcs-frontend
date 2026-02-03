@@ -176,7 +176,7 @@ export const ccdCaseService = {
 
   async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {
     const eventUrl = `${getBaseUrl()}/cases/${ccdCaseId}/event-triggers/respondPossessionClaim?ignore-warning=false`;
-    console.log("EVENT URL: ", eventUrl);
+    logger.info('getExistingCaseData event URL', { eventUrl });
     try {
       const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
       return response.data;
