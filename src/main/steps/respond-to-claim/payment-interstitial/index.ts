@@ -8,6 +8,7 @@ export const step: StepDefinition = createFormStep(
     journeyFolder: 'respondToClaim',
     stepDir: __dirname,
     flowConfig,
+    customTemplate: `${__dirname}/paymentInterstitial.njk`,
     translationKeys: {
       heading: 'heading',
       caption: 'caption',
@@ -19,6 +20,5 @@ export const step: StepDefinition = createFormStep(
       bullet2: 'bullet2',
     },
     fields: [],
-  },
-  `${__dirname}/paymentInterstitial.njk`
+  }
 );

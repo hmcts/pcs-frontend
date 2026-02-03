@@ -9,6 +9,6 @@ export const step: StepDefinition = createFormStep(
     stepDir: __dirname,
     flowConfig,
     fields: [],
-  },
-  `${__dirname}/counterClaim.njk`
+    customTemplate: `${__dirname}/counterClaim.njk`,
+  }
 );
