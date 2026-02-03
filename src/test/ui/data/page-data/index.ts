@@ -9,3 +9,4 @@ export * from './correspondenceAddressKnown.page.data';
 export * from './tenancyDetails.page.data';
 export * from './registeredLandlord.page.data';
 export * from './contactPreference.page.data';
+export * from './contactByTextMessage.page.data';

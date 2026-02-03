@@ -4,6 +4,7 @@ import config from 'config';
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactByPhone,
+  contactByTextMessage,
   contactPreference,
   correspondenceAddressKnown,
   dateOfBirth,
@@ -56,6 +57,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactByPhone.yesRadioOption,
       phoneNumber: contactByPhone.inputUkPhoneNumber,
     });
+    await performValidation('mainHeader', contactByTextMessage.mainHeader);
+    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mockText);
