@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { contactByPhone, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
-import { performAction, performValidation } from '../../controller';
+import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class RespondToClaimAction implements IAction {
@@ -33,11 +33,17 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
-  private async selectContactByPhone(contactByPhoneData: actionData): Promise<void> {
+  private async selectContactByPhone(contactByPhoneData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: contactByPhone.areYouHappyToContactQuestion,
       option: contactByPhoneData,
     });
+    if (contactByPhoneData.radioOption === contactByPhone.yesRadioOption) {
+      await performActions(
+        'UK phone number',
+        ['inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.UkPhoneNumber],
+      );
+    }
     await performAction('clickButton', contactByPhone.saveAndContinueButton);
   }
 

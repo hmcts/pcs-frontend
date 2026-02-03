@@ -2,7 +2,13 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { defendantDateOfBirth, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import {
+  contactByPhone,
+  defendantDateOfBirth,
+  defendantNameCapture,
+  freeLegalAdvice,
+  startNow,
+} from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
@@ -33,5 +39,22 @@ test.describe('Respond to a claim @nightly', async () => {
       lName: defendantNameCapture.lastNameInputText,
     });
     await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
+  });
+
+  test('Contact By Phone  - Yes', async () => {
+    await performAction('selectContactByPhone',{
+      radioOption: contactByPhone.yesRadioOption,
+      phoneNumber: contactByPhone.inputUkPhoneNumber,
+
+    });
+    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhone.inputUkPhoneNumber);
+    await performAction('clickButton', contactByPhone.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
+  });
+
+  test('Contact By Phone  - No', async () => {
+    await performAction('selectContactByPhone', contactByPhone.noRadioOption);
+    await performAction('clickButton', contactByPhone.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
   });
 });
