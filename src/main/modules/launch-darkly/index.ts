@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 
 import { Logger } from '@hmcts/nodejs-logging';
 import { type LDClient, type LDOptions, init } from '@launchdarkly/node-server-sdk';
