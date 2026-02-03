@@ -4,11 +4,13 @@ import config from 'config';
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactPreference,
-  correspondenceAddressKnown, counterClaim,
+  correspondenceAddressKnown,
+  counterClaim,
   dateOfBirth,
   defendantNameCapture,
   disputeClaimInterstitial,
-  freeLegalAdvice, paymentInterstitial,
+  freeLegalAdvice,
+  paymentInterstitial,
   repayments,
   startNow,
   tenancyDetails,
