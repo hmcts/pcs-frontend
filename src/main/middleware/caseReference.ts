@@ -56,13 +56,12 @@ export async function caseReferenceParamMiddleware(
       dataKeys: Object.keys(validatedCase.data || {}),
     });
 
-    // Store values
-    req.params.caseReference = sanitisedCaseReference;
-    res.locals.caseReference = sanitisedCaseReference;
+    // Store validated case
     res.locals.validatedCase = validatedCase;
 
-    logger.info('[****SUCCESS*****] Case access validation done', {
-      caseReference: sanitisedCaseReference,
+    logger.info('[****SUCCESS*****] Case access validation done - validatedCase stored', {
+      validatedCaseId: validatedCase.id,
+      url: req.originalUrl,
     });
 
     next();

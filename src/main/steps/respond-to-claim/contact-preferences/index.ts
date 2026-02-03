@@ -35,7 +35,9 @@ export const step: StepDefinition = {
 
       // Handle saveForLater action
       if (action === 'saveForLater') {
-        return res.redirect(303, DASHBOARD_ROUTE);
+        const validatedCaseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = validatedCaseId ? `${DASHBOARD_ROUTE}/${validatedCaseId}` : DASHBOARD_ROUTE;
+        return res.redirect(303, dashboardUrl);
       }
 
       // Handle continue action - go to next step
