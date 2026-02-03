@@ -8,3 +8,6 @@ export * from './correspondenceAddressKnown.page.data';
 export * from './tenancyDetails.page.data';
 export * from './registeredLandlord.page.data';
 export * from './contactPreference.page.data';
+export * from './counterClaim.page.data';
+export * from './payment-interstitial.page.data';
+export * from './repayments.page.data';

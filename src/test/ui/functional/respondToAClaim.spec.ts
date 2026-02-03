@@ -5,9 +5,12 @@ import config from 'config';
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   correspondenceAddressKnown,
+  counterClaim,
   dateOfBirth,
   defendantNameCapture,
   freeLegalAdvice,
+  paymentInterstitial,
+  repayments,
   startNow,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -82,6 +85,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('clickButton', paymentInterstitial.saveAndContinueButton);
+    await performAction('clickButton', repayments.saveAndContinueButton);
     await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddressKnown.errorValidation,

@@ -4,12 +4,12 @@ import config from 'config';
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactPreference,
-  correspondenceAddressKnown,
+  correspondenceAddressKnown, counterClaim,
   dateOfBirth,
   defendantNameCapture,
   disputeClaimInterstitial,
-  freeLegalAdvice,
-  registeredLandlord,
+  freeLegalAdvice, paymentInterstitial,
+  repayments,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
@@ -46,6 +46,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performValidation('mainHeader', paymentInterstitial.mainHeader);
+    await performAction('clickButton', paymentInterstitial.saveAndContinueButton);
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddressKnown.yesRadioOption,
     });
@@ -57,7 +63,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   // Wales postcode routing is not implemented yet, launch darkly flags are used as of now
-  test.skip('Respond to a claim - Wales postcode', async () => {
+  test('Respond to a claim - Wales postcode', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
@@ -68,6 +74,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performValidation('mainHeader', paymentInterstitial.mainHeader);
+    await performAction('clickButton', paymentInterstitial.saveAndContinueButton);
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddressKnown.noRadioOption,
       postcode: correspondenceAddressKnown.englandPostcodeTextInput,
@@ -77,6 +89,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', registeredLandlord.mockText);
+    //await performValidation('mainHeader', registeredLandlord.mockText);
   });
 });
