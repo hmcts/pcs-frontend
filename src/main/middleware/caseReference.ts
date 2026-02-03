@@ -12,11 +12,6 @@ export async function caseReferenceParamMiddleware(
   next: NextFunction,
   caseReference: string
 ): Promise<void> {
-  logger.info('[***START****] Case reference middleware start', {
-    url: req.originalUrl,
-    rawCaseReference: caseReference,
-  });
-
   // Validate format - 16 digits
   const sanitisedCaseReference = sanitiseCaseReference(caseReference);
 
@@ -26,11 +21,6 @@ export async function caseReferenceParamMiddleware(
       error: 'Invalid case reference format',
     });
   }
-
-  logger.info('[****SANITISED******] Case reference format validated', {
-    sanitisedCaseReference,
-    originalInput: caseReference,
-  });
 
   // Validate case exists and user has access
   try {
@@ -43,30 +33,14 @@ export async function caseReferenceParamMiddleware(
       });
     }
 
-    logger.info('[*****VALIDATING*******] Calling CCD to validate case access', {
-      caseReference: sanitisedCaseReference,
-      url: req.originalUrl,
-    });
-
     const validatedCase = await ccdCaseService.getCaseById(accessToken, sanitisedCaseReference);
-
-    logger.info('[*****VALIDATED*****] Case data retrieved from CCD', {
-      caseId: validatedCase.id,
-      hasData: !!validatedCase.data,
-      dataKeys: Object.keys(validatedCase.data || {}),
-    });
 
     // Store validated case
     res.locals.validatedCase = validatedCase;
 
-    logger.info('[****SUCCESS*****] Case access validation done - validatedCase stored', {
-      validatedCaseId: validatedCase.id,
-      url: req.originalUrl,
-    });
-
     next();
   } catch (error) {
-    logger.error('[****FAILED*****] Case access validation failed', {
+    logger.error('Case access validation failed', {
       caseReference: sanitisedCaseReference,
       error: error instanceof Error ? error.message : 'Unknown error',
       url: req.originalUrl,
