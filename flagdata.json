@@ -1,0 +1,149 @@
+{
+  "segments": {},
+  "flags": {
+    "defendant-name": {
+      "key": "defendant-name",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": ["Joe Smith", ""],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "58e43d5673764b999ebe3485705a94d7",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 62,
+      "deleted": false
+    },
+    "is-notice-date-provided": {
+      "key": "is-notice-date-provided",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": ["2nd January 2026", "\"\""],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "b2d98cf76a284632b6a4441c804a2184",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "is-notice-served": {
+      "key": "is-notice-served",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [true, false],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "964c4dcedc024dfe9a0b01237804b5ee",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 4,
+      "deleted": false
+    },
+    "is-rent-arrears-claim": {
+      "key": "is-rent-arrears-claim",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [true, false],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "8227a73c8d134fe199be8f0a34995546",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "is-welsh-property": {
+      "key": "is-welsh-property",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [true, false],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "386afa089ff5479d8a2e1feafe008bc1",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 8,
+      "deleted": false
+    },
+    "notice-date-provided": {
+      "key": "notice-date-provided",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": ["2nd January 2026", "''"],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "b007547f89994af88c39caefdfff3b20",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    }
+  }
+}
