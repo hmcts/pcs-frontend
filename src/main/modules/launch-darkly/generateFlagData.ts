@@ -1,8 +1,8 @@
+import { writeFileSync } from 'node:fs';
 
 const sdkKey = process.env.LAUNCHDARKLY_SDK_KEY;
 const url = `https://sdk.launchdarkly.com/sdk/latest-all?sdkKey=${sdkKey}`;
 
-import { writeFileSync } from 'node:fs';
 
 const fetchFlagData = async (): Promise<void> => {
   if (!sdkKey) {
