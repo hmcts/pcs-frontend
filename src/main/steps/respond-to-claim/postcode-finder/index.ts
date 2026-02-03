@@ -171,10 +171,12 @@ export const step: StepDefinition = createFormStep({
     const radio = formContent.fields.find(f => f.componentType === 'radios');
     if (!radio || !radio.component) return {};
 
+    let prepopulateHeading = '';
     if (isAddressKnown) {
-      const dynamicText = `${t('legend')}${prepopulateAddress}`;
-      radio.component.label.text = dynamicText;
-      radio.component.fieldset.legend.text = dynamicText;
+      prepopulateHeading = `${t('legend')}${prepopulateAddress}`;
+      // subtitle = t('legend.hint');
+      radio.component.label.text = prepopulateHeading;
+      radio.component.fieldset.legend.text = prepopulateHeading;
     }
 
     // Override value used in njk File with our dynamic value.
@@ -194,6 +196,8 @@ export const step: StepDefinition = createFormStep({
     return {
       ...formContent,
       isAddressKnown: isAddressKnown,
+      prepopulateHeading,
+      // subtitle,
       legendNa: t('legendNa'),
       legendhintNa: t('legend.hintNa'),
 
@@ -240,7 +244,7 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
   const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
   prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.party?.address;
 
-  return 'Test address';
+  // return 'Test address';
 
   if (prepopulateAddress) {
     //   const formattedAddress =

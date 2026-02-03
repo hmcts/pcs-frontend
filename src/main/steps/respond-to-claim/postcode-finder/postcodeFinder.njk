@@ -149,10 +149,8 @@
     {% endset %}
 
     
-    <span class="govuk-caption-xl">{{ serviceName}}</span>
+    <span class="govuk-caption-xl">{{ caption or serviceName }}</span>
     {% if isAddressKnown %}
-    <h1 class="govuk-heading-l">{{ title }}{{ labels.prepopulateAddress }}</h1>
-    <p class="govuk-body">{{ subtitle }}</p>
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
         {% set updatedItems = [] %}
