@@ -1,14 +1,18 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import isPostalCode from 'validator/lib/isPostalCode';
 
+import type { CcdCase, Address } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 
 const logger = Logger.getLogger('postcode-finder');
 const STEP_NAME = 'postcode-finder';
+
+var prepopulateAddress: Address | undefined;
 
 // Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
 // Session is set in extendGetContent; validation reads it via allData on POST.
@@ -109,8 +113,49 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
   },
-  beforeRedirect: () => {
-    console.log('Before redirect');
+  beforeRedirect: req => {
+    var possessionClaimResponse: PossessionClaimResponse;
+    //prepopulate address is correct
+    if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
+      possessionClaimResponse = {
+        party: {
+          address: prepopulateAddress,
+        },
+      };
+    } else {
+      const addressLine1 = req.body?.['correspondenceAddressConfirm.addressLine1'] ?? '';
+      const addressLine2 = req.body?.['correspondenceAddressConfirm.addressLine2'];
+      const townOrCity = req.body?.['correspondenceAddressConfirm.townOrCity'] ?? '';
+      const county = req.body?.['correspondenceAddressConfirm.county'];
+      const postcode = req.body?.['correspondenceAddressConfirm.postcode'] ?? '';
+
+      //only the details the defendant provides
+      possessionClaimResponse = {
+        party: {
+          address: {
+            AddressLine1: addressLine1,
+            ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
+            PostTown: townOrCity,
+            ...(county !== undefined && county !== '' && { County: county }),
+            PostCode: postcode,
+          },
+        },
+      };
+    }
+
+    //wrap in ccd case object so ccd can validate
+    const ccdCase: CcdCase = {
+      id: req.session?.ccdCase?.id ?? req.params.caseReference ?? '',
+      data: {
+        possessionClaimResponse: possessionClaimResponse,
+        submitDraftAnswers: 'No',
+      },
+    };
+
+    //log the payload so we can see what's going to be sent to ccd
+    console.log('REDIRECT PAYLOAD: ');
+    console.log(JSON.stringify(ccdCase, null, 2));
+    ccdCaseService.submitResponseToClaim(req.session.user?.accessToken, ccdCase);
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
@@ -193,11 +238,11 @@ export const step: StepDefinition = createFormStep({
 async function getExistingAddress(accessToken: string, caseReference: string): Promise<string> {
   // Pull data from API
   const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
-  const address = response.case_details.case_data.possessionClaimResponse?.party?.address;
+  prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.party?.address;
 
   return 'Test address';
 
-  if (address) {
+  if (prepopulateAddress) {
     //   const formattedAddress =
     //     [
     //       address.AddressLine1,
@@ -212,7 +257,7 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
     //       .filter(Boolean)
     //       .join(', ') + '?';
 
-    const formattedAddress = 'Test address';
+    const formattedAddress = '';
 
     logger.info('Mapping address', formattedAddress);
     return formattedAddress;
