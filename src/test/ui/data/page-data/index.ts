@@ -10,3 +10,4 @@ export * from './registeredLandlord.page.data';
 export * from './noticeDetails.page.data';
 export * from './noticeDateKnown.page.data';
 export * from './noticeDateUnknown.page.data';
+export * from './contactPreference.page.data';
