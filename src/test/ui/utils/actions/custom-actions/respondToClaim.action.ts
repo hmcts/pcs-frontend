@@ -1,16 +1,9 @@
 import { Page } from '@playwright/test';
 
-import { noticeDateKnown } from '../../../data/page-data/noticeDateKnown.page.data';
-import { noticeDateUnknown } from '../../../data/page-data/noticeDateUnknown.page.data';
-import { noticeDetails } from '../../../data/page-data/noticeDetails.page.data';
-import { dateOfBirth, defendantNameCapture, freeLegalAdvice } from '../../../data/page-data';
+import { dateOfBirth, defendantNameCapture, freeLegalAdvice , noticeDateKnown , noticeDateUnknown , noticeDetails } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
-export class RespondToClaimAction implements IAction {
-  async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
-    const actionsMap = new Map<string, () => Promise<void>>([
-      
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([

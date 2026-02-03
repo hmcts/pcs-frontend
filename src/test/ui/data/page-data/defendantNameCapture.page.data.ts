@@ -10,6 +10,8 @@ export const defendantNameCapture = {
   firstNameInputText: 'John',
   lastNameInputText: 'Doe',
   errorValidation: 'YES',
+  yesRadioOption: 'Yes',
+  noRadioOption: 'No',
   errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
   errorValidationHeader: 'There is a problem',
   errorValidationField: {

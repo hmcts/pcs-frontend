@@ -5,7 +5,6 @@ import {
   NavigateToUrlAction,
   RespondToClaimAction,
 } from '../actions/custom-actions';
-import { RespondToClaimAction } from '../actions/custom-actions/respondToClaim.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -43,7 +42,7 @@ export class ActionRegistry {
     ['inputErrorValidation', new RespondToClaimAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
-    ['selectNoticeDetails', new RespondToClaimAction()]
+    ['selectNoticeDetails', new RespondToClaimAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],

@@ -7,3 +7,6 @@ export * from './dateOfBirth.page.data';
 export * from './correspondenceAddressKnown.page.data';
 export * from './tenancyDetails.page.data';
 export * from './registeredLandlord.page.data';
+export * from './noticeDetails.page.data';
+export * from './noticeDateKnown.page.data';
+export * from './noticeDateUnknown.page.data';

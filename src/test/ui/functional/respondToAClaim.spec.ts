@@ -2,14 +2,11 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { startNow } from '../data/page-data';
-import { noticeDateKnown } from '../data/page-data/noticeDateKnown.page.data';
-import { noticeDateUnknown } from '../data/page-data/noticeDateUnknown.page.data';
-import { noticeDetails } from '../data/page-data/noticeDetails.page.data';
+// eslint-disable-next-line import/no-duplicates
+import { dateOfBirth, defendantNameCapture, freeLegalAdvice, noticeDateKnown, noticeDateUnknown, noticeDetails, startNow, } from '../data/page-data';
 //Below lines are commented to avoid API calls until data setup is integrated.
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { dateOfBirth, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
@@ -86,17 +83,15 @@ test.describe('Respond to a claim - functional @nightly', async () => {
 
   test('tenancy date details - Select Yes on Notice details screen and claimant provided notice date', async () => {
     //steps to progress to Screen 1 or Screen 2
-    //entitled to free legal advice
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);
+    await performAction('enterDateOfBirthDetails', {
+      whatsYouDOB: dateOfBirth.mainHeader,
+      day: '16', month: '07', year: '2000' });
     await performAction('clickRadioButton', 'yes');
     await performAction('clickButton', 'Save and continue');
-    //name
-    await performAction('clickRadioButton', 'yes');
-    await performAction('clickButton', 'Save and continue');
-    //defendant
-    await performAction('clickButton', 'Save and continue');
-    //address
-    await performAction('clickRadioButton', 'yes');
-    await performAction('clickButton', 'Save and continue');
+    await performAction('clickButton','Continue');
     //tenancy
     await performAction('clickButton', 'Save and continue');
     await performValidation('mainHeader', noticeDetails.mainHeader);
