@@ -20,10 +20,11 @@ export class LaunchDarkly {
         paths: [path.join(__dirname, '../../../../flagdata.json')],
       });
       options.updateProcessor = fileData.getFactory();
+      this.logger.info('Using file data source for LaunchDarkly in CI environment');
     }
 
     const client: LDClient = init(config.get<string>('secrets.pcs.launchdarkly-sdk-key'), options);
-
+    this.logger.info('LaunchDarkly client initialized');
     try {
       await client.waitForInitialization({ timeout: 10 });
       app.locals.launchDarklyClient = client;

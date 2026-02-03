@@ -3,7 +3,6 @@ import { writeFileSync } from 'node:fs';
 const sdkKey = process.env.LAUNCHDARKLY_SDK_KEY;
 const url = `https://sdk.launchdarkly.com/sdk/latest-all?sdkKey=${sdkKey}`;
 
-
 const fetchFlagData = async (): Promise<void> => {
   if (!sdkKey) {
     throw new Error('LAUNCHDARKLY_SDK_KEY is not set in environment variables');
