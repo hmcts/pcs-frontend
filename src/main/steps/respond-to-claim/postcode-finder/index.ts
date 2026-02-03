@@ -164,7 +164,9 @@ export const step: StepDefinition = createFormStep({
     const isAddressKnown = formattedAddressStr !== '';
     setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
 
-    const radio = formContent.fields.find(f => f.componentType === 'radios');
+    const radio = formContent.fields.find(f => f.componentType === 'radios') as
+      | { component: { label: { text: string }; fieldset: { legend: { text: string } } } }
+      | undefined;
     if (!radio || !radio.component) {
       return {};
     }
@@ -172,7 +174,6 @@ export const step: StepDefinition = createFormStep({
     let prepopulateHeading = '';
     if (isAddressKnown) {
       prepopulateHeading = `${t('legend')}${formattedAddressStr}`;
-      // subtitle = t('legend.hint');
       radio.component.label.text = prepopulateHeading;
       radio.component.fieldset.legend.text = prepopulateHeading;
     }
