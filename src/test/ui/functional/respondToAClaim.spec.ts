@@ -5,31 +5,32 @@ import config from 'config';
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { contactByTextMessage, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import {
+  correspondenceAddressKnown,
+  dateOfBirth,
+  defendantNameCapture,
+  freeLegalAdvice,
+  startNow,
+} from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
 const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
-  await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+  //await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   //await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   //await performAction('validateAccessCodeAPI');
-  await performAction('navigateToUrl', home_url);
+  await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
   await performAction('login');
-  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
 
-test.afterEach(async () => {
-  PageContentValidation.finaliseTest();
-});
-
-test.describe('Respond to a claim @PR @nightly', async () => {
+test.describe('Respond to a claim - functional @nightly', async () => {
   test('Free legal advice - Error messages - Save for later Validations', async () => {
-    await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+    await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: freeLegalAdvice.errorValidation,
       validationType: freeLegalAdvice.errorValidationType.radio,
@@ -38,14 +39,12 @@ test.describe('Respond to a claim @PR @nightly', async () => {
       header: freeLegalAdvice.errorValidationHeader,
     });
     await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
-    await performAction('clickButton', defendantNameCapture.saveForLaterButton);
+    await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
 
   test('Defendant name capture - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputText', defendantNameCapture.firstNameLabelText, '');
-    await performAction('inputText', defendantNameCapture.lastNameLabelText, '');
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: defendantNameCapture.errorValidation,
@@ -60,4 +59,105 @@ test.describe('Respond to a claim @PR @nightly', async () => {
   });
   await performValidation('mainHeader', contactByTextMessage.mainHeader);
   await performAction('selectContactUsByTextMessage', contactByTextMessage.yesRadioOption);
+
+  test('Defendant Date of birth - Error messages - save for later Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: dateOfBirth.errorValidation,
+      validationType: dateOfBirth.errorValidationType.input,
+      inputArray: dateOfBirth.errorValidationField.errorTextField,
+      header: dateOfBirth.errorValidationHeader,
+    });
+  });
+
+  test('Correspondent Address Known - Error messages - save for later Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.radio,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorRadioMsg,
+      question: correspondenceAddressKnown.mainHeader,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', correspondenceAddressKnown.noRadioOption);
+    await performAction('clickButton', correspondenceAddressKnown.findAddressHiddenButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField1,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction('inputText', correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel, '12345');
+    await performAction('clickButton', correspondenceAddressKnown.findAddressHiddenButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField2,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction(
+      'inputText',
+      correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel,
+      correspondenceAddressKnown.englandPostcodeTextInput
+    );
+    await performAction('clickButton', correspondenceAddressKnown.findAddressHiddenButton);
+    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField3,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction(
+      'select',
+      correspondenceAddressKnown.addressSelectHiddenLabel,
+      correspondenceAddressKnown.addressIndex
+    );
+    await performAction('inputText', correspondenceAddressKnown.addressLine1HiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddressKnown.townOrCityHiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddressKnown.postcodeHiddenTextLabel, '');
+    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField4,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction(
+      'inputText',
+      correspondenceAddressKnown.addressLine1HiddenTextLabel,
+      correspondenceAddressKnown.englandAddressLine1TextInput
+    );
+    await performAction(
+      'inputText',
+      correspondenceAddressKnown.townOrCityHiddenTextLabel,
+      correspondenceAddressKnown.englandTownOrCityTextInput
+    );
+    await performAction('inputText', correspondenceAddressKnown.postcodeHiddenTextLabel, 'ABED');
+    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddressKnown.errorValidation,
+      validationType: correspondenceAddressKnown.errorValidationType.input,
+      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField1,
+      header: correspondenceAddressKnown.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', correspondenceAddressKnown.yesRadioOption);
+    await performAction('clickButton', correspondenceAddressKnown.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
+  });
 });

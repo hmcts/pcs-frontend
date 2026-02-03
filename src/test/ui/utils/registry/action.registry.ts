@@ -38,11 +38,15 @@ export class ActionRegistry {
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
+    ['enterDateOfBirthDetails', new RespondToClaimAction()],
     ['inputErrorValidation', new RespondToClaimAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['selectContactByTextMessage', new RespondToClaimAction()],
+    ['inputDefendantDetails', new RespondToClaimAction()],
+    ['enterDateOfBirthDetails', new RespondToClaimAction()],
+    ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
