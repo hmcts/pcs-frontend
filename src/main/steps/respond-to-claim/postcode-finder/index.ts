@@ -243,8 +243,6 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
   const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
   prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.party?.address;
 
-  // return 'Test address';
-
   if (prepopulateAddress) {
     const formattedAddress =
       [
@@ -260,7 +258,6 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
         .filter(Boolean)
         .join(', ') + '?';
 
-    logger.info('Mapping address', formattedAddress);
     return formattedAddress;
   } else {
     return '';
