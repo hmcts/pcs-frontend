@@ -1,8 +1,9 @@
 import type { StepDefinition } from '../../interfaces/stepFormData.interface';
-import { step as contactPreferences } from './contact-preferences';
+
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
+import { step as contactPreferences } from './contact-preferences';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
