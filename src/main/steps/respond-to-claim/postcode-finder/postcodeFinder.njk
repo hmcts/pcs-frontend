@@ -182,6 +182,8 @@
     {% else %}
     <h1 class="govuk-heading-l">{{ legendNa }}</h1>
     <p class="govuk-body">{{ legendhintNa }}</p>
+    {# When address is not shown we don't render the radio; send "no" so subField validation (e.g. postcode) still runs #}
+    <input type="hidden" name="correspondenceAddressConfirm" value="no" />
     <div>
       {{ postcodeFinderHtml | safe }}
     </div>
