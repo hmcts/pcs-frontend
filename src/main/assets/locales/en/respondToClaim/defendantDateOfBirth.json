@@ -1,0 +1,13 @@
+{
+  "caption": "Respond to a property possession claim",
+  "heading": "What's your date of birth?",
+  "pageTitle": "Your date of birth",
+  "dateOfBirthLabel": "Date of birth",
+  "contactUs": "Contact us for help",
+  "errors": {
+    "dateOfBirth": "Enter your date of birth",
+    "dateOfBirthRequired": "Enter your date of birth",
+    "dateOfBirthInvalid": "Enter a valid date of birth",
+    "dateOfBirthFuture": "Date of birth must be in the past"
+  }
+}

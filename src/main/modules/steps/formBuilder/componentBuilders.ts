@@ -20,7 +20,7 @@ function createFieldsetLegend(
     legend: {
       text: label,
       isPageHeading: isFirstField,
-      classes: [isFirstField ? 'govuk-fieldset__legend--l' : '', legendClasses].filter(Boolean).join(' '),
+      classes: legendClasses || (isFirstField ? 'govuk-fieldset__legend--l' : ''),
     },
   };
 }
@@ -30,7 +30,7 @@ export function buildComponentConfig(
   label: string,
   hint: string | undefined,
   fieldValue: unknown,
-  translatedOptions: { value: string; text: string }[] | undefined,
+  translatedOptions: { value?: string; text?: string; divider?: string }[] | undefined,
   hasError: boolean,
   errorText: string | undefined,
   index: number,
@@ -42,7 +42,7 @@ export function buildComponentConfig(
   const component: Record<string, unknown> = {
     id: field.name,
     name: field.name,
-    label: { text: label },
+    label: { text: label, classes: field.labelClasses },
     hint: hint ? { text: hint } : null,
     errorMessage: hasError && errorText ? { text: errorText } : null,
     classes: field.classes || (field.type === 'text' ? 'govuk-!-width-three-quarters' : undefined),
@@ -96,13 +96,15 @@ export function buildComponentConfig(
     }
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
-
-      // Build items with conditional content and subFields support
       component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
 
       // Build items with conditional content and subFields support
       component.items =
         field.options?.map((option: FormFieldOption, optionIndex: number) => {
+          if (option.divider) {
+            return translatedOptions?.[optionIndex];
+          }
+
           const item: Record<string, unknown> = {
             value: option.value,
             text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
@@ -142,15 +144,19 @@ export function buildComponentConfig(
       // Normalize checkbox value to handle edge case: [{ '0': 'value1', '1': 'value2' }]
       // This ensures checkbox values are always in the correct format for rendering
       const checkboxArray = normalizeCheckboxValue(fieldValue);
-      component.fieldset = createFieldsetLegend(label, isFirstField);
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
 
       // Build items with conditional content and subFields support
       component.items =
         field.options?.map((option: FormFieldOption, optionIndex: number) => {
+          if (option.divider) {
+            return translatedOptions?.[optionIndex];
+          }
+
           const item: Record<string, unknown> = {
             value: option.value,
             text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
-            checked: checkboxArray.includes(option.value),
+            checked: option.value ? checkboxArray.includes(option.value) : false,
           };
 
           // Build conditional HTML from conditionalText and subFields
@@ -190,7 +196,7 @@ export function buildComponentConfig(
       };
       component.namePrefix = field.name;
       component.idPrefix = field.name;
-      component.fieldset = createFieldsetLegend(label, isFirstField);
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
       component.items = [
         {
           name: 'day',

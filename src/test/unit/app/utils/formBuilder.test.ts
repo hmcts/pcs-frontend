@@ -41,6 +41,10 @@ jest.mock('../../../../main/modules/steps/flow', () => ({
     getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
     getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
   },
+  createStepNavigation: jest.fn(() => ({
+    getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
+    getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
+  })),
 }));
 
 const mockGetValidatedLanguage = jest.fn();
@@ -118,6 +122,7 @@ describe('formBuilder', () => {
       },
     };
     return {
+      params: {},
       session: { formData: {} },
       language: 'en',
       t: defaultT,
@@ -149,8 +154,8 @@ describe('formBuilder', () => {
       session.formData[stepName] = data;
     });
     mockValidateForm.mockReturnValue({});
-    mockGetNextStepUrl.mockReturnValue('/steps/test-journey/next-step');
-    mockGetBackUrl.mockReturnValue('/steps/test-journey/previous-step');
+    mockGetNextStepUrl.mockResolvedValue('/steps/test-journey/next-step');
+    mockGetBackUrl.mockResolvedValue('/steps/test-journey/previous-step');
     mockGetValidatedLanguage.mockReturnValue('en' as const);
     mockGetRequestLanguage.mockImplementation((req: Request) => req.language || 'en');
     mockGetTranslationFunction.mockImplementation((req: Request) => {
@@ -161,16 +166,37 @@ describe('formBuilder', () => {
   describe('createFormStep', () => {
     it('should create a step definition with correct URL', () => {
       const step = createFormStep(baseConfig);
-      expect(step.url).toBe('/test-journey/test-step');
+      expect(step.url).toBe('/steps/test-journey/test-step');
       expect(step.name).toBe('test-step');
       expect(step.view).toBe('formBuilder.njk');
       expect(step.stepDir).toBe(mockStepDir);
     });
 
-    it('should handle journeyFolder with camelCase', () => {
-      const config = { ...baseConfig, journeyFolder: 'respondToClaim' };
+    it('should use flowConfig.basePath when provided', () => {
+      const config = {
+        ...baseConfig,
+        journeyFolder: 'respondToClaim',
+        flowConfig: {
+          basePath: '/case/:caseReference/respond-to-claim',
+          stepOrder: [],
+          steps: {},
+        },
+      };
       const step = createFormStep(config);
-      expect(step.url).toBe('/respond-to-claim/test-step');
+      expect(step.url).toBe('/case/:caseReference/respond-to-claim/test-step');
+    });
+
+    it('should fallback to default path when flowConfig.basePath is not provided', () => {
+      const config = {
+        ...baseConfig,
+        journeyFolder: 'testJourney',
+        flowConfig: {
+          stepOrder: [],
+          steps: {},
+        },
+      };
+      const step = createFormStep(config);
+      expect(step.url).toBe('/steps/test-journey/test-step');
     });
 
     it('should create getController that renders with form content', async () => {
@@ -1198,7 +1224,7 @@ describe('formBuilder', () => {
       });
 
       it('should return 500 when no redirect path available', async () => {
-        mockGetNextStepUrl.mockReturnValueOnce(null as unknown as string);
+        mockGetNextStepUrl.mockResolvedValueOnce(null);
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);

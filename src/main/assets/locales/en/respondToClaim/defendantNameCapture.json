@@ -1,0 +1,12 @@
+{
+  "caption": "Respond to a property possession claim",
+  "heading": "What’s your name?",
+  "pageTitle": "Your name",
+  "firstNameLabel": "First name",
+  "lastNameLabel": "Last name",
+  "contactUs": "Contact us for help",
+  "errors": {
+    "firstName": "Enter your first name",
+    "lastName": "Enter your last name"
+  }
+}

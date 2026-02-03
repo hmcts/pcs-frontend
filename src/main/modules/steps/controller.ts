@@ -73,10 +73,11 @@ export const createGetController = (
       pageUrl: req.originalUrl || '/',
       selected,
       t,
+      caseReference: req.params.caseReference,
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
-      backUrl: stepNavigation.getBackUrl(req, stepName),
+      backUrl: await stepNavigation.getBackUrl(req, stepName),
       ...commonI18nTranslations,
       ...commonContent,
       ...stepTranslations,
@@ -132,7 +133,7 @@ export const createPostController = (
           lang: reqLang,
           pageUrl: req.originalUrl || '/',
           t,
-          backUrl: stepNavigation.getBackUrl(req, stepName),
+          backUrl: await stepNavigation.getBackUrl(req, stepName),
         });
       }
 
@@ -149,7 +150,7 @@ export const createPostController = (
         }
       }
 
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

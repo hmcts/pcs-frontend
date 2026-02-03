@@ -1,11 +1,12 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+import { createGetController, stepNavigation } from '../../../modules/steps';
+import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
+const logger = Logger.getLogger('postcode-finder');
 const stepName = 'postcode-finder';
-const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
   url: `${RESPOND_TO_CLAIM_ROUTE}/postcode-finder`,
@@ -16,9 +17,12 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/postcode-finder/postcodeFinder.njk',
       stepName,
-      (_req: Request) => {
+      async (req: Request) => {
+        const caseReference = req.params.caseReference;
+        logger.info('Postcode page logged', { caseReference });
+
         return {
-          backUrl: `${RESPOND_TO_CLAIM_ROUTE}/start-now`,
+          backUrl: await stepNavigation.getBackUrl(req, stepName),
         };
       },
       'respondToClaim'
@@ -27,7 +31,7 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       // Get next step URL and redirect
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
 
       if (!redirectPath) {
         // No next step defined - show not found page
