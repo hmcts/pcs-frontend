@@ -150,7 +150,6 @@
     
     <span class="govuk-caption-xl">{{ caption or serviceName }}</span>
     {% if isAddressKnown %}
-    {# <h1 class="govuk-heading-l">{{ prepopulateHeading }}</h1> #}
     {% if subtitle %}<p class="govuk-body">{{ subtitle }}</p>{% endif %}
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
