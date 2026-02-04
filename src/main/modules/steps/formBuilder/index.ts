@@ -23,7 +23,7 @@ function camelToKebabCase(str: string): string {
   return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
-export function createFormStep(config: FormBuilderConfig, viewPath: string = 'formBuilder.njk'): StepDefinition {
+export function createFormStep(config: FormBuilderConfig): StepDefinition {
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
@@ -37,9 +37,11 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
     translationKeys,
     flowConfig,
     showCancelButton,
+    customTemplate,
   } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
+  const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
@@ -59,8 +61,18 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
-        const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv);
-        const result = extendGetContent ? { ...formContent, ...extendGetContent(req, {}) } : formContent;
+        // Get interpolation values from extendGetContent if available (for dynamic translation values)
+        const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
+        const formContent = buildFormContent(
+          fields,
+          t,
+          getFormData(req, stepName),
+          {},
+          translationKeys,
+          nunjucksEnv,
+          interpolationValues
+        );
+        const result = extendGetContent ? { ...formContent, ...interpolationValues } : formContent;
 
         return {
           ...result,
@@ -83,7 +95,8 @@ export function createFormStep(config: FormBuilderConfig, viewPath: string = 'fo
       beforeRedirect,
       translationKeys,
       flowConfig,
-      showCancelButton
+      showCancelButton,
+      extendGetContent
     ),
   };
 }

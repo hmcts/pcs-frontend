@@ -19,6 +19,7 @@ export const flowConfig: JourneyFlowConfig = {
     'landlord-registered',
     'tenancy-details',
     'end-now',
+    'contact-preferences',
   ],
   steps: {
     'start-now': {
@@ -46,10 +47,14 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-date-of-birth': {
-      previousStep: 'defendant-name-capture',
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
+      previousStep: 'defendant-date-of-birth',
+      defaultNext: 'contact-preferences',
+    },
+    'contact-preferences': {
+      previousStep: 'postcode-finder',
       defaultNext: 'dispute-claim-interstitial',
     },
     'dispute-claim-interstitial': {
