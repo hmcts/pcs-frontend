@@ -11,6 +11,6 @@ export const buildCcdCaseForPossessionClaimResponse = (
   id: req.session?.ccdCase?.id ?? req.params.caseReference ?? '',
   data: {
     possessionClaimResponse,
-    submitDraftAnswers,
+    submitDraftAnswers: submitDraftAnswers ? 'Yes' : 'No',
   },
 });
