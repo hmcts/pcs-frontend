@@ -3,6 +3,7 @@ import config from 'config';
 
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  contactPreference,
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
@@ -51,6 +52,7 @@ test.describe('Respond to a claim - e2e Journey @PR @nightly', async () => {
     await performValidation('mainHeader', correspondenceAddressKnown.mainHeader);
     await performAction('clickRadioButton', 'Yes');
     await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mockText);
@@ -73,6 +75,7 @@ test.describe('Respond to a claim - e2e Journey @PR @nightly', async () => {
     await performValidation('mainHeader', correspondenceAddressKnown.mainHeader);
     await performAction('clickRadioButton', 'Yes');
     await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', registeredLandlord.mockText);
