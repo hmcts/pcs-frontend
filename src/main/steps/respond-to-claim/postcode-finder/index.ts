@@ -1,12 +1,12 @@
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import type { Address, CcdCase, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { Address, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from 'steps/utils/populateResponseToClaimPayloadmap';
 
 const STEP_NAME = 'postcode-finder';
 

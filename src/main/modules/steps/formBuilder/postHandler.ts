@@ -1,12 +1,16 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { ExtendGetContent, FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import type {
+  BuiltFormContent,
+  ExtendGetContent,
+  FormFieldConfig,
+  TranslationKeys,
+} from '../../../interfaces/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
-import type { TranslationContent } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
@@ -69,7 +73,8 @@ export function createPostHandler(
       normalizeCheckboxFields(req, fields);
 
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
-      const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
+      const emptyFormContent = { fields: [] } as BuiltFormContent;
+      const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
 
       const fieldsWithLabels = translateFields(
         fields,

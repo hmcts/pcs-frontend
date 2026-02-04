@@ -1,6 +1,6 @@
-import { CcdCase } from '../../interfaces/ccdCase.interface';
-import { PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
 import { Request } from 'express';
+
+import { CcdCase, PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
 
 // wrap the possession claim response in a ccd case object so it can pass through ccd validation
 export const buildCcdCaseForPossessionClaimResponse = (
@@ -11,6 +11,6 @@ export const buildCcdCaseForPossessionClaimResponse = (
   id: req.session?.ccdCase?.id ?? req.params.caseReference ?? '',
   data: {
     possessionClaimResponse,
-    submitDraftAnswers: submitDraftAnswers,
+    submitDraftAnswers,
   },
 });
