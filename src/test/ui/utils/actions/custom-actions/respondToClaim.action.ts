@@ -113,16 +113,11 @@ export class RespondToClaimAction implements IAction {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeGivenData.option,
     });
-    // add back link navigation step??
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
-    // await performValidation('text',{
-    //   'text': noticeDateKnown.noticeGivenDateLabel,
-    //   'elementType': 'inlineText'
-    // });
-    if (noticeData.day && noticeData.month && noticeData.year) {
+    if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performAction('inputText', noticeDateKnown.dayTextLabel, noticeData.day);
       await performAction('inputText', noticeDateKnown.monthTextLabel, noticeData.month);
       await performAction('inputText', noticeDateKnown.yearTextLabel, noticeData.year);
@@ -131,11 +126,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
-    // await performValidation('text',{
-    //   'text': noticeDateUnknown.didNotProvideNoticeLabel,
-    //   'elementType': 'inlineText'
-    // });
-    if (noticeData.day && noticeData.month && noticeData.year) {
+    if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performAction('inputText', noticeDateUnknown.dayTextLabel, noticeData.day);
       await performAction('inputText', noticeDateUnknown.monthTextLabel, noticeData.month);
       await performAction('inputText', noticeDateUnknown.yearTextLabel, noticeData.year);
