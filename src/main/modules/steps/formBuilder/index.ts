@@ -61,13 +61,17 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
+        // Get interpolation values from extendGetContent if available (for dynamic translation values)
+        const emptyFormContent = { fields: [] } as BuiltFormContent;
+        const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
         const formContent = buildFormContent(
           fields,
           t,
           getFormData(req, stepName),
           {},
           translationKeys,
-          nunjucksEnv
+          nunjucksEnv,
+          interpolationValues as Record<string, unknown>
         ) as BuiltFormContent;
         const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
         const result = extraContent ? { ...formContent, ...extraContent } : formContent;

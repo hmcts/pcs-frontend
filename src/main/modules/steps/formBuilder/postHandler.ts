@@ -6,6 +6,7 @@ import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
+import type { TranslationContent } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
@@ -67,13 +68,40 @@ export function createPostHandler(
       // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
       normalizeCheckboxFields(req, fields);
 
-      const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
+      // Get interpolation values from extendGetContent if available (for dynamic translation values)
+      const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
+
+      const fieldsWithLabels = translateFields(
+        fields,
+        t,
+        {},
+        {},
+        false,
+        '',
+        undefined,
+        nunjucksEnv,
+        interpolationValues
+      );
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
-      const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
+      const fieldErrors = getTranslationErrors(t, fields, undefined, interpolationValues);
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
-        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
+        const formContent = buildFormContent(
+          fields,
+
+          t,
+
+          req.body,
+
+          errors,
+
+          translationKeys,
+
+          nunjucksEnv,
+          interpolationValues,
+          showCancelButton
+        );
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
