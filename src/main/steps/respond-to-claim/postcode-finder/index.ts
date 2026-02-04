@@ -151,7 +151,7 @@ export const step: StepDefinition = createFormStep({
       req.params.caseReference || ''
     );
 
-    const isAddressKnown = formattedAddressStr !== '';
+    const isAddressKnown = formattedAddressStr !== '?';
     setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as
@@ -250,6 +250,6 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
 
     return formattedAddress;
   } else {
-    return '';
+    return '?'; //no address
   }
 }
