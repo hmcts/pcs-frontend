@@ -111,7 +111,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
   },
-  beforeRedirect: req => {
+  beforeRedirect: async req => {
     let possessionClaimResponse: PossessionClaimResponse;
     //prepopulate address is correct
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
@@ -141,7 +141,7 @@ export const step: StepDefinition = createFormStep({
       };
     }
 
-    buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
