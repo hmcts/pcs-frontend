@@ -5,7 +5,6 @@ import config from 'config';
 import {
   contactPreference,
   correspondenceAddressKnown,
-  counterClaim,
   dateOfBirth,
   defendantNameCapture,
   disputeClaimInterstitial,
@@ -49,11 +48,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('clickButton', paymentInterstitial.saveAndContinueButton);
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddressKnown.yesRadioOption,
     });
@@ -61,7 +55,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
+    // Disabled temp as decision is pending from BA
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    // await performValidation('mainHeader', counterClaim.mainHeader);
+    // await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('clickButton', paymentInterstitial.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
   });
 
   // Wales postcode routing is not implemented yet, launch darkly flags are used as of now
@@ -76,12 +79,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performValidation('mainHeader', paymentInterstitial.mainHeader);
-    await performAction('clickButton', paymentInterstitial.saveAndContinueButton);
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddressKnown.noRadioOption,
       postcode: correspondenceAddressKnown.englandPostcodeTextInput,
@@ -92,5 +89,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', registeredLandlord.mockText);
+    //Added below pages to welsh journey as per english journey
+    // Disabled temp as decision is pending from BA
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    // await performValidation('mainHeader', counterClaim.mainHeader);
+    // await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('clickButton', paymentInterstitial.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
   });
 });

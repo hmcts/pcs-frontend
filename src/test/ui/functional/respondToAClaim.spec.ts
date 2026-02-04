@@ -4,14 +4,15 @@ import config from 'config';
 //Below lines are commented to avoid API calls until data setup is integrated.
 //import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  contactPreference,
   correspondenceAddressKnown,
-  counterClaim,
   dateOfBirth,
   defendantNameCapture,
+  disputeClaimInterstitial,
   freeLegalAdvice,
   paymentInterstitial,
-  repayments,
   startNow,
+  tenancyDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -85,9 +86,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('clickButton', paymentInterstitial.saveAndContinueButton);
-    await performAction('clickButton', repayments.saveAndContinueButton);
     await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddressKnown.errorValidation,
@@ -160,6 +158,38 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('clickRadioButton', correspondenceAddressKnown.yesRadioOption);
     await performAction('clickButton', correspondenceAddressKnown.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
+  });
+  test('paymentInterstitial - back and cancel link Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
+    // Disabled temporarily as decision is pending from BA
+    // await performValidation('mainHeader', counterClaim.mainHeader);
+    // await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('clickLink', paymentInterstitial.backLink);
+    // Disabled temporarily as decision is pending from BA
+    //await performValidation('mainHeader', counterClaim.mainHeader);
+    //await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickLink', paymentInterstitial.cancelLink);
     await performValidation('mainHeader', 'Dashboard');
   });
 });
