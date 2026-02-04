@@ -10,7 +10,6 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
-  paymentInterstitial,
   registeredLandlord,
   repayments,
   startNow,
@@ -62,7 +61,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     // await performValidation('mainHeader', counterClaim.mainHeader);
     // await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('clickButton', paymentInterstitial.continueButton);
+    await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', repayments.mainHeader);
     await performAction('clickButton', repayments.saveAndContinueButton);
@@ -97,7 +96,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     // await performValidation('mainHeader', counterClaim.mainHeader);
     // await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('clickButton', paymentInterstitial.continueButton);
+    await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', repayments.mainHeader);
     await performAction('clickButton', repayments.saveAndContinueButton);
