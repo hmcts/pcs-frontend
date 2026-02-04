@@ -160,6 +160,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', correspondenceAddressKnown.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
+
   test('paymentInterstitial - back and cancel link Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
