@@ -3,8 +3,10 @@ import { Page } from '@playwright/test';
 import {
   correspondenceAddressKnown,
   dateOfBirth,
-  defendantNameCapture, defendantNameConfirmation,
-  freeLegalAdvice, paymentInterstitial,
+  defendantNameCapture,
+  defendantNameConfirmation,
+  freeLegalAdvice,
+  paymentInterstitial,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
