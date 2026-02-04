@@ -19,7 +19,8 @@ node-rpm-packaging/
 mochawesome-report/
 npm-debug.log.*
 
-*.env
+.env*
+!.env.example
 .project
 .settings/
 dist/
