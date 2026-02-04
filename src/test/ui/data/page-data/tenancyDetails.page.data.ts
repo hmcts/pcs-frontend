@@ -1,3 +1,3 @@
 export const tenancyDetails = {
-  mockText: 'Tenancy details',
+  mockText: 'Tenancy details (Placeholder)',
 };

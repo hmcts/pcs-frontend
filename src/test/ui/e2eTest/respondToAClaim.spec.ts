@@ -9,6 +9,7 @@ import {
   defendantNameCapture,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  noticeDetails,
   registeredLandlord,
   startNow,
   tenancyDetails,
@@ -78,5 +79,104 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', registeredLandlord.mockText);
+  });
+
+  test('Rent Arrears - NoticeServed - Yes and NoticeDateProvided - Yes - Notice date known', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mockText);
+    await performAction('clickButton', 'Save and continue');
+    await performValidation('mainHeader', noticeDetails.mainHeader);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption  });
+    await performAction('enterNoticeDateKnown', {
+      day: '24',
+      month: '2',
+      year: '2020'
+    });
+    //rent arrears screen
+  });
+
+  test('NON-Rent Arrears - NoticeServed - Yes and NoticeDateProvided - No - Notice date unknown', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mockText);
+    await performAction('clickButton', 'Save and continue');
+    await performValidation('mainHeader', noticeDetails.mainHeader);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption  });
+    await performAction('enterNoticeDateUnknown', {
+      day: '24',
+      month: '2',
+      year: '2020'
+    });
+    // progress to non-rent arrears screen?????
+  });
+
+  test('Rent Arrears - NoticeServed - Yes and NoticeDateProvided - No - Notice date unknown', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mockText);
+    await performAction('clickButton', 'Save and continue');
+    await performValidation('mainHeader', noticeDetails.mainHeader);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption  });
+    //await performValidation('mainHeader', noticeDateUnknown.mainHeader);
+    await performAction('enterNoticeDateUnknown');
+    // progress to rent arrears or non-rent arrears screen?????
   });
 });

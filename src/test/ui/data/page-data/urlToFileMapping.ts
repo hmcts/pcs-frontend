@@ -7,4 +7,5 @@ export default {
   'defendant-name-capture': 'defendantNameCapture',
   'date-of-birth': 'dateOfBirth',
   'postcode-finder': 'correspondenceAddressKnown',
+  'confirmation-of-notice-date-when-not-provided': 'noticeDateUnknown'
 };
