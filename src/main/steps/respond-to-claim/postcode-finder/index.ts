@@ -6,6 +6,7 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { flowConfig } from '../flow.config';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from 'steps/utils/populateResponseToClaimPayloadmap';
 
 const STEP_NAME = 'postcode-finder';
 
@@ -140,16 +141,7 @@ export const step: StepDefinition = createFormStep({
       };
     }
 
-    //wrap in ccd case object so ccd can validate
-    const ccdCase: CcdCase = {
-      id: req.session?.ccdCase?.id ?? req.params.caseReference ?? '',
-      data: {
-        possessionClaimResponse,
-        submitDraftAnswers: 'No',
-      },
-    };
-
-    ccdCaseService.submitResponseToClaim(req.session.user?.accessToken, ccdCase);
+    buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
