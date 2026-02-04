@@ -3,7 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}{{ t('pageTitle') }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+{% block pageTitle %}Tenancy details - HM Courts & Tribunals Service – GOV.UK{% endblock %}
 
 {% block serviceNavigation %}
   {# Service navigation without serviceName on start now page - only logout button #}
@@ -22,9 +22,14 @@
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-
-
-  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+  <h1 class="govuk-heading-l">Tenancy details</h1>
   <p class="govuk-body">dummy page</p>
+  <form method="post" action="{{ url }}">
+  <div class="govuk-button-group">
+      {{ govukButton({
+        text: 'Continue',
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+  </div>
+  </form>
 {% endblock %}
-

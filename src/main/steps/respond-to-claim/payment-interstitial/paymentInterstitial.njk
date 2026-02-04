@@ -23,14 +23,12 @@
     <form method="post" action="{{ url }}">
         <div class="govuk-button-group">
         {{ govukButton({ 
-            text: continue,
+            text: 'Continue',
             attributes: { type: 'submit', name: 'action', value: 'continue' }
         }) }}
-        {{ govukButton({ 
-            text: saveForLater,
-            classes: 'govuk-button--secondary',
-            attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
-        }) }}
+        <p class="govuk-body">
+          <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+        </p>
         </div>
   </form>
 {% endblock %}
