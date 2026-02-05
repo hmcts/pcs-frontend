@@ -282,8 +282,18 @@ export function validateForm(
       const day = req.body[dayKey]?.trim() || '';
       const month = req.body[monthKey]?.trim() || '';
       const year = req.body[yearKey]?.trim() || '';
+      const anyValueProvided = day || month || year;
 
-      const dateError = validateDateField(day, month, year, isRequired, t, field.noFutureDate, translations);
+      const dateError = validateDateField(
+        day,
+        month,
+        year,
+        isRequired || anyValueProvided,
+        t,
+        field.noFutureDate,
+        translations
+      );
+
       if (dateError) {
         errors[fieldName] = dateError;
       }

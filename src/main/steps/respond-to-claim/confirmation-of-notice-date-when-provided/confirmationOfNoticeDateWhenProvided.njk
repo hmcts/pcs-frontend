@@ -1,24 +1,13 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
-{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}{{ t('pageTitle') }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
 
-{% block serviceNavigation %}
-  {# Service navigation without serviceName on start now page - only logout button #}
-  {{ govukServiceNavigation({
-    navigation: [
-      {
-        text: t('logout', 'Log out'),
-        href: "/logout"
-      }
-    ],
-    navigationLabel: t('navigationLabel', 'Service navigation'),
-    navigationClasses: "pcs-service-navigation-wrapper"
-  }) }}
-{% endblock %}
 {% block mainContent %}
+
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
@@ -28,17 +17,32 @@
   {% endif %}
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
-  <p class="govuk-body">dummy page</p>
+
+
+  {{ govukInsetText({ text: hintText | replace("{{claimantName}}", claimantName)  }) }}
+
+  <h3 class="govuk-heading-s">{{ bulletPointLabel | replace("{{claimantName}}", claimantName) }}</h3>
+
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
+    <li>{{ listItem1 | replace("{{noticeDate}}", noticeDate) }}</li>
+  </ul>
+
 
   <form method="post" action="{{ url }}" novalidate>
 
+    {% for field in fields %}
+      {% if field.componentType == 'dateInput' %}
+        {{ govukDateInput(field.component) }}
+      {% endif %}
+    {% endfor %}
+
     <div class="govuk-button-group">
       {{ govukButton({ 
-        text: buttons.continue,
+        text: continue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
       {{ govukButton({ 
-        text: buttons.saveForLater,
+        text: saveForLater,
         classes: 'govuk-button--secondary',
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
