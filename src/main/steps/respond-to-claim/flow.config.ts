@@ -87,7 +87,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'payment-interstitial',
     },
     'payment-interstitial': {
-      previousStep: 'tenancy-details',
+      previousStep: 'counter-claim',
       defaultNext: 'repayments',
     },
     repayments: {
