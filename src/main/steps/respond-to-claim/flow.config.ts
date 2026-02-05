@@ -15,13 +15,13 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'postcode-finder',
+    'contact-preferences',
     'contact-preferences-telephone',
     'contact-preferences-text-message',
     'dispute-claim-interstitial',
     'landlord-registered',
     'tenancy-details',
     'end-now',
-    'contact-preferences',
   ],
   steps: {
     'start-now': {
@@ -52,6 +52,9 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
+      defaultNext: 'contact-preferences',
+    },
+    'contact-preferences': {
       defaultNext: 'contact-preferences-telephone',
     },
     'contact-preferences-telephone': {
