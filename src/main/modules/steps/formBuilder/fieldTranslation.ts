@@ -111,7 +111,8 @@ function processOptions(
   options: FormFieldOption[] | undefined,
   t: TFunction,
   translations: Record<string, string>,
-  parentFieldName?: string
+  parentFieldName?: string,
+  interpolation?: Record<string, unknown>
 ): FormFieldOption[] {
   if (!options) {
     return [];
@@ -126,7 +127,12 @@ function processOptions(
     const optionLabel = resolveLabel(
       option.label,
       translations,
-      option.text || (option.translationKey ? t(option.translationKey) : (option.value ?? ''))
+      option.text ||
+        (option.translationKey
+          ? interpolation
+            ? t(option.translationKey, interpolation)
+            : t(option.translationKey)
+          : (option.value ?? ''))
     );
 
     // Process conditionalText if provided
@@ -143,7 +149,14 @@ function processOptions(
       for (const [subFieldName, subField] of Object.entries(option.subFields)) {
         // Create nested field name: parentField.subField
         const nestedFieldName = getNestedFieldName(parentFieldName, subFieldName);
-        const processedSubField = processField(subField, t, translations, nestedFieldName, parentFieldName);
+        const processedSubField = processField(
+          subField,
+          t,
+          translations,
+          nestedFieldName,
+          parentFieldName,
+          interpolation
+        );
         // Store with original subFieldName as key for template access, but field has nested name
         processedSubFields[subFieldName] = processedSubField;
       }
@@ -166,7 +179,8 @@ function processField(
   t: TFunction,
   translations: Record<string, string>,
   fieldNameOverride?: string,
-  parentFieldName?: string
+  parentFieldName?: string,
+  interpolation?: Record<string, unknown>
 ): FormFieldConfig {
   const fieldName = fieldNameOverride || field.name;
 
@@ -174,25 +188,27 @@ function processField(
   let label = resolveLabel(
     field.label,
     translations,
-    field.translationKey?.label ? getTranslation(t, field.translationKey.label, undefined) || fieldName : fieldName
+    field.translationKey?.label
+      ? getTranslation(t, field.translationKey.label, undefined, interpolation) || fieldName
+      : fieldName
   );
 
   // Fallback to translation key or field name if label is still empty
   if (!label || label === fieldName) {
-    label = getTranslation(t, `${fieldName}Label`, fieldName) || fieldName;
+    label = getTranslation(t, `${fieldName}Label`, fieldName, interpolation) || fieldName;
   }
 
   let hint = field.hint;
   if (!hint && field.translationKey?.hint) {
-    hint = getTranslation(t, field.translationKey.hint, undefined);
+    hint = getTranslation(t, field.translationKey.hint, undefined, interpolation);
   }
   if (!hint) {
-    hint = getTranslation(t, `${fieldName}Hint`, undefined);
+    hint = getTranslation(t, `${fieldName}Hint`, undefined, interpolation);
   }
 
   // Process options with label functions and conditionalText
   // Pass parentFieldName so subFields can be properly prefixed
-  const processedOptions = processOptions(field.options, t, translations, parentFieldName || fieldName);
+  const processedOptions = processOptions(field.options, t, translations, parentFieldName || fieldName, interpolation);
 
   return {
     ...field,
@@ -211,7 +227,8 @@ export function translateFields(
   hasTitle = false,
   fieldPrefix = '',
   originalData?: Record<string, unknown>,
-  nunjucksEnv?: Environment
+  nunjucksEnv?: Environment,
+  interpolation?: Record<string, unknown>
 ): FormFieldConfig[] {
   const translations = buildTranslationsObject(t);
   // Use originalData if provided, otherwise fall back to fieldValues
@@ -219,7 +236,7 @@ export function translateFields(
 
   return fields.map((field, index) => {
     // Process field (handles label functions)
-    const processedField = processField(field, t, translations, undefined, fieldPrefix || undefined);
+    const processedField = processField(field, t, translations, undefined, fieldPrefix || undefined, interpolation);
 
     // Process subFields recursively if they exist in options
     let processedOptionsWithSubFields = processedField.options;
@@ -248,7 +265,8 @@ export function translateFields(
             false,
             parentFieldName, // Pass full parent field name as prefix
             originalData, // Pass originalData down for nested subFields
-            nunjucksEnv // Pass nunjucksEnv down for nested subFields
+            nunjucksEnv, // Pass nunjucksEnv down for nested subFields
+            interpolation // Pass interpolation down for nested subFields
           );
 
           // Convert back to Record format with original subField names as keys
@@ -309,7 +327,7 @@ export function translateFields(
     return {
       ...processedField,
       options: processedOptionsWithSubFields,
-      errorMessage: errorText,
+      errorMessage: getTranslation(t, `errors.${field.name}`, field.errorMessage, interpolation),
       component,
       componentType,
     };
