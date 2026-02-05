@@ -80,6 +80,10 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'tenancy-details',
     },
     'tenancy-details': {
+      defaultNext: 'counter-claim',
+    },
+    'counter-claim': {
+      previousStep: 'tenancy-details',
       defaultNext: 'payment-interstitial',
     },
     'payment-interstitial': {
