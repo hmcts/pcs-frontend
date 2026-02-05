@@ -5,7 +5,7 @@ export const noticeDetails = {
   cancelLink: 'Cancel',
   contactUsForHelpLink: 'Contact us for help',
   didClaimantGiveYouQuestion: 'Did Treetops Housing give you notice of their intention to begin possession proceedings?',
-  imNotSureRadioOption: 'I’m not sure',
+  imNotSureRadioOption: 'I\'m not sure',
   noRadioOption: 'No',
   orLabel: 'or',
   respondToAPropertyPossessionCaption: 'Respond to a property possession claim',
