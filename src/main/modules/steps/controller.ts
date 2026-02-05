@@ -73,7 +73,6 @@ export const createGetController = (
       pageUrl: req.originalUrl || '/',
       selected,
       t,
-      caseReference: req.params.caseReference,
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
