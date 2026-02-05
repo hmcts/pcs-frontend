@@ -1,15 +1,20 @@
 import { isMobilePhone } from 'validator';
 
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-telephone',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
+  flowConfig,
 
   translationKeys: {
     pageTitle: 'pageTitle',
+    heading: 'heading',
     content: 'subtitle',
   },
   fields: [
@@ -39,10 +44,10 @@ export const step: StepDefinition = createFormStep({
                 autocomplete: 'tel',
               },
               validator: (value: unknown) => {
-              if (!isMobilePhone(value as string, 'en-GB')) {
-                return 'errors.contactByTelephone.phoneNumber.invalid';
-              }
-              return true;
+                if (!isMobilePhone(value as string, 'en-GB')) {
+                  return 'errors.contactByTelephone.phoneNumber.invalid';
+                }
+                return true;
               },
             },
           },
@@ -54,4 +59,19 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+
+  beforeRedirect: async req => {
+    const telephoneForm = req.session.formData?.['contact-preferences-telephone'];
+    if (!telephoneForm) {
+      return;
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      contact_preferences: {
+        contact_by_phone: telephoneForm.contactByTelephone === 'yes' ? 'Yes' : 'No',
+      },
+    };
+
+    buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+  },
 });

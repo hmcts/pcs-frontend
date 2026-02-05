@@ -28,7 +28,8 @@ export function createPostHandler(
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
   flowConfig?: JourneyFlowConfig,
-  showCancelButton?: boolean
+  showCancelButton?: boolean,
+  extendGetContent?: (req: Request, content: Record<string, unknown>) => Record<string, unknown>
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -72,14 +73,25 @@ export function createPostHandler(
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
-        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
+        const formContent = buildFormContent(
+          fields,
+          t,
+          req.body,
+          errors,
+          translationKeys,
+          nunjucksEnv,
+          showCancelButton
+        );
+        // Call extendGetContent to get additional translated content (buttons, labels, etc.)
+        const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
+        const fullContent = { ...formContent, ...extendedContent };
         await renderWithErrors(
           req,
           res,
           viewPath,
           errors,
           fields,
-          formContent,
+          fullContent,
           stepName,
           journeyFolder,
           navigation,

@@ -172,12 +172,13 @@ describe('formBuilder', () => {
       expect(step.stepDir).toBe(mockStepDir);
     });
 
-    it('should use flowConfig.basePath when provided', () => {
+    it('should handle journeyFolder with camelCase', () => {
       const config = {
         ...baseConfig,
         journeyFolder: 'respondToClaim',
         flowConfig: {
           basePath: '/case/:caseReference/respond-to-claim',
+          journeyName: 'respondToClaim',
           stepOrder: [],
           steps: {},
         },
@@ -872,6 +873,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -897,6 +900,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -975,6 +980,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1010,6 +1017,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1089,6 +1098,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1124,6 +1135,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1211,6 +1224,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();

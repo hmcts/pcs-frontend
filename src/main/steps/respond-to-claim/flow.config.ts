@@ -1,45 +1,9 @@
-import { Logger } from '@hmcts/nodejs-logging';
-import * as LDClient from '@launchdarkly/node-server-sdk';
 import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-
-const logger = Logger.getLogger('respond-to-claim-flow');
+import { isDefendantNameKnown, isWelshProperty } from '../utils';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
-
-//TODO need to add logic to check if defendant name is known from CCD case data
-const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
-  const ldClient = (req.app?.locals?.launchDarklyClient as LDClient.LDClient | undefined) ?? undefined;
-
-  let result = '';
-  try {
-    const context: LDClient.LDContext = {
-      kind: 'user',
-      key: (req.session?.user?.uid as string) ?? 'anonymous',
-      name: req.session?.user?.name ?? 'anonymous',
-      email: req.session?.user?.email ?? 'anonymous',
-      firstName: req.session?.user?.given_name ?? 'anonymous',
-      lastName: req.session?.user?.family_name ?? 'anonymous',
-      custom: {
-        roles: req.session?.user?.roles ?? [],
-      },
-    };
-
-    // If the flag does not exist LD will return the default (empty string) so we route to capture.
-    // If LaunchDarkly client is not initialized or variation returns null/undefined, default to empty string.
-    result = (await ldClient?.variation('defendant-name', context, '')) ?? '';
-    logger.info('-------Defendant name from LaunchDarkly----------', { result });
-    logger.info('--------ldClient instance------', { ldClient });
-
-    req.session.defendantName = result;
-  } catch (err: unknown) {
-    // eslint-disable-next-line no-console
-    console.error('LaunchDarkly evaluation failed', err);
-  }
-
-  return Promise.resolve(result !== '');
-};
 
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
@@ -53,7 +17,11 @@ export const flowConfig: JourneyFlowConfig = {
     'postcode-finder',
     'contact-preferences-telephone',
     'contact-preferences-text-message',
-    'interstitial',
+    'dispute-claim-interstitial',
+    'landlord-registered',
+    'tenancy-details',
+    'end-now',
+    'contact-preferences',
   ],
   steps: {
     'start-now': {
@@ -91,10 +59,28 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'contact-preferences-text-message',
     },
     'contact-preferences-text-message': {
-      defaultNext: 'interstitial',
+      defaultNext: 'dispute-claim-interstitial',
     },
-    'interstitial': {
-      defaultNext: undefined,
+    'dispute-claim-interstitial': {
+      routes: [
+        {
+          // Route to defendant name confirmation if defendant is known
+          condition: async (req: Request) => isWelshProperty(req),
+          nextStep: 'landlord-registered',
+        },
+        {
+          // Route to defendant name capture if defendant is unknown
+          condition: async (req: Request) => !isWelshProperty(req),
+          nextStep: 'tenancy-details',
+        },
+      ],
+      defaultNext: 'tenancy-details',
+    },
+    'landlord-registered': {
+      defaultNext: 'end-now',
+    },
+    'tenancy-details': {
+      defaultNext: 'end-now',
     },
   },
 };

@@ -1,5 +1,5 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import type {
   FormBuilderConfig,
