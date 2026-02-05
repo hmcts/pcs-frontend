@@ -1,3 +1,6 @@
 {
-  "pageTitle": "Landlord registered"
+  "pageTitle": "Landlord registered",
+  "buttons": {
+    "continue": "Continue"
+  }
 }

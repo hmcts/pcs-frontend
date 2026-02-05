@@ -1,3 +1,6 @@
 {
-  "pageTitle": "cyLandlord registered"
+  "pageTitle": "cyLandlord registered",
+  "buttons": {
+    "continue": "cyContinue"
+  }
 }

@@ -6,5 +6,8 @@
   "paragraph3": "cyThe claimant will be able to see your answers.",
   "paragraph4": "cyIf you’ve paid some or all of the money you owe, you should bring proof of this to the hearing.",
   "bullet1": "cyIf any arrangements have already been made to pay off the money you owe in rent payments (rent arrears)",
-  "bullet2": "cyIf you’ve paid some or all of the money you owe"
+  "bullet2": "cyIf you’ve paid some or all of the money you owe",
+  "buttons": {
+    "continue": "cyContinue"
+  }
 }

@@ -22,8 +22,8 @@
     <p class="govuk-body">{{ paragraph4 }}</p>
     <form method="post" action="{{ url }}">
         <div class="govuk-button-group">
-        {{ govukButton({ 
-            text: 'Continue',
+        {{ govukButton({
+            text: t('buttons.continue', { ns: 'common' }),
             attributes: { type: 'submit', name: 'action', value: 'continue' }
         }) }}
         <p class="govuk-body">
