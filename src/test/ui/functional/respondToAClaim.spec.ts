@@ -6,6 +6,7 @@ import config from 'config';
 import {
   contactPreference,
   correspondenceAddressKnown,
+  counterClaim,
   dateOfBirth,
   defendantNameCapture,
   disputeClaimInterstitial,
@@ -181,15 +182,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.continueButton);
-    // Disabled temporarily as decision is pending from BA
-    // await performValidation('mainHeader', counterClaim.mainHeader);
-    // await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickLink', paymentInterstitial.backLink);
-    // Disabled temporarily as decision is pending from BA
-    //await performValidation('mainHeader', counterClaim.mainHeader);
-    //await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickLink', paymentInterstitial.cancelLink);
     await performValidation('mainHeader', 'Dashboard');
   });
