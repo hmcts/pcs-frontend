@@ -68,7 +68,9 @@ Run:
 yarn start
 ```
 
-The applications's home page will be available at http://localhost:3209
+The application's home page will be available at http://localhost:3209.
+
+For testing the frontend against pcs-api, ensure the API base URL is configured in your environment (see `config/custom-environment-variables.json`).
 
 ### Running with Docker
 
