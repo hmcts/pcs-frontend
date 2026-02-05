@@ -178,14 +178,4 @@ export const ccdCaseService = {
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
     return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
   },
-
-  async respondToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
-    if (!ccdCase.id) {
-      throw new HTTPError('Cannot RESPOND TO CLAIM, CCD Case Not found', 500);
-    }
-    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
-    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-    return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
-  },
 };
