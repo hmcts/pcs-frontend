@@ -83,6 +83,5 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute': {
       defaultNext: 'end-now',
     },
-
   },
 };

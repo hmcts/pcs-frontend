@@ -12,7 +12,6 @@ import { step as postcodeFinder } from './postcode-finder';
 import { step as startNow } from './start-now';
 import { step as tenancyDetails } from './tenancy-details';
 
-
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
   'postcode-finder': postcodeFinder,
