@@ -2,6 +2,7 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
+  getPreviousPageForArrears,
   isDefendantNameKnown,
   isNoticeDateProvided,
   isNoticeServed,
@@ -84,7 +85,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'tenancy-details',
     },
     'landlord-registered': {
-      defaultNext: 'end-now',
+      defaultNext: 'tenancy-details',
     },
     'tenancy-details': {
       routes: [
@@ -94,19 +95,17 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const noticeServed = await isNoticeServed(req);
-            const noticeDateProvided = await isNoticeDateProvided(req);
-            return !noticeServed && noticeDateProvided;
+            const rentArrears = await isRentArrearsClaim(req);
+            return rentArrears;
           },
-          nextStep: 'confirmation-of-notice-date-when-provided',
+          nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const noticeServed = await isNoticeServed(req);
-            const noticeDateProvided = await isNoticeDateProvided(req);
-            return !noticeServed && !noticeDateProvided;
+            const rentArrears = await isRentArrearsClaim(req);
+            return !rentArrears;
           },
-          nextStep: 'confirmation-of-notice-date-when-not-provided',
+          nextStep: 'non-rent-arrears-dispute',
         },
       ],
     },
@@ -163,10 +162,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-provided': {
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> => !(await isNoticeDateProvided(req)),
-          nextStep: 'confirmation-of-notice-date-when-not-provided',
-        },
-        {
           condition: async (req: Request): Promise<boolean> => {
             const noticeDateProvided = await isNoticeDateProvided(req);
             const rentArrears = await isRentArrearsClaim(req);
@@ -187,10 +182,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-not-provided': {
       routes: [
         {
-          condition: (req: Request): Promise<boolean> => isNoticeDateProvided(req),
-          nextStep: 'confirmation-of-notice-date-when-provided',
-        },
-        {
           condition: async (req: Request): Promise<boolean> => {
             const noticeDateProvided = await isNoticeDateProvided(req);
             const rentArrears = await isRentArrearsClaim(req);
@@ -210,10 +201,12 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'rent-arrears-dispute': {
       defaultNext: 'end-now',
+      previousStep: req => getPreviousPageForArrears(req),
     },
 
     'non-rent-arrears-dispute': {
       defaultNext: 'end-now',
+      previousStep: req => getPreviousPageForArrears(req),
     },
   },
 };
