@@ -2,11 +2,11 @@ import { isNoticeDateProvided } from '../../../../main/steps/utils/isNoticeDateP
 import { isNoticeServed } from '../../../../main/steps/utils/isNoticeServed';
 import { getPreviousPageForArrears } from '../../../../main/steps/utils/journeyHelpers';
 
-
 jest.mock('../../../../main/steps/utils/isNoticeDateProvided');
 jest.mock('../../../../main/steps/utils/isNoticeServed');
 
 describe('getPreviousPageForArrears', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockReq: any;
 
   beforeEach(() => {
