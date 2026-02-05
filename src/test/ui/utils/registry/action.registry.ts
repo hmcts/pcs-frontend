@@ -45,6 +45,7 @@ export class ActionRegistry {
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
+    ['confirmDefendantDetails', new RespondToClaimAction()],
     ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
     ['selectNoticeDetails', new RespondToClaimAction()],
     ['enterNoticeDateKnown', new RespondToClaimAction()],
