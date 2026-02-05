@@ -4,10 +4,10 @@ import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
-  defendantNameConfirmation, 
-  freeLegalAdvice, 
-  noticeDateKnown, 
-  noticeDateUnknown, 
+  defendantNameConfirmation,
+  freeLegalAdvice,
+  noticeDateKnown,
+  noticeDateUnknown,
   noticeDetails,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -131,18 +131,20 @@ export class RespondToClaimAction implements IAction {
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
-      await performAction('inputText', noticeDateKnown.dayTextLabel, noticeData.day);
-      await performAction('inputText', noticeDateKnown.monthTextLabel, noticeData.month);
-      await performAction('inputText', noticeDateKnown.yearTextLabel, noticeData.year);
+      await performActions('Enter Date',
+        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]);
     }
     await performAction('clickButton', noticeDateKnown.saveAndContinueButton);
   }
 
   private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
-      await performAction('inputText', noticeDateUnknown.dayTextLabel, noticeData.day);
-      await performAction('inputText', noticeDateUnknown.monthTextLabel, noticeData.month);
-      await performAction('inputText', noticeDateUnknown.yearTextLabel, noticeData.year);
+      await performActions('Enter Date',
+        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]);
     }
     await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
   }
