@@ -21,15 +21,8 @@
     "label": "cyExplain which parts of the claim you do not agree with",
     "hint": "cyYou have 250 words remaining"
   },
-  "wordCount": {
-    "wordsUnderLimitText": {
-      "one": "cyYou have 1 word remaining",
-      "other": "cyYou have %{count} words remaining"
-    },
-    "wordsAtLimitText": "cyYou have 0 words remaining",
-    "wordsOverLimitText": {
-      "one": "cyYou have 1 word too many",
-      "other": "cyYou have %{count} words too many"
-    }
+  "errors": {
+    "disputeClaim": "cyYou must select whether you want to dispute any other parts of the claim",
+    "disputeDetails": "cyYou must explain which parts of the claim you do not agree with"
   }
 }

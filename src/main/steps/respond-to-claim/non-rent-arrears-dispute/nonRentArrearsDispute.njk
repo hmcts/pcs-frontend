@@ -3,70 +3,54 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
-{% block pageTitle %} Non Rent arrears Dispute{% endblock %}
+{% block pageTitle %}
+  {{ title }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
 
 {% block mainContent %}
-{% if errorSummary %}
-      {{ govukErrorSummary(errorSummary) }}
-    {% endif %}
-  <h1 class="govuk-heading-l">
-    <span class="govuk-caption-l">{{captionHeading}}</span>
-    {{ title }} 
-  </h1>
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
 
-<form method="post" action="{{ url }}" novalidate>
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+
   <p class="govuk-body">
     {{ introParagraph | replace("{{link}}", '<a href="' ~ introLinkHref ~ '" class="govuk-link" target="_blank" rel="noopener noreferrer">' ~ introLinkText ~ '</a>') | safe }}
   </p>
+  
   <p class="govuk-body">{{ includesHeading }}</p>
   <ul class="govuk-list govuk-list--bullet">
     {% for item in includesList %}
       <li>{{ item }}</li>
     {% endfor %}
   </ul>
-  
-  {% set conditionalHtml %}
-    {{ govukCharacterCount({
-      id: "disputeDetails",
-      name: "disputeDetails",
-      maxwords: 6500,
-      required: true,
-      rows: 5,
-      label: {
-        text: disputeDetails.label
-      }
-    }) }}
-  {% endset %}
 
-  {{ govukRadios({
-    name: "disputeClaim",
-    required: true,
-    fieldset: { legend: { text: disputeQuestion, classes: "govuk-fieldset__legend--m" } },
-    items: [
-      { 
-        value: "yes",
-        text: disputeOptions.yes,
-        conditional: {
-          html: conditionalHtml
-        }
-      },
-      { value: "no", text: disputeOptions.no }
-    ]
-  }) }}
-  
-  <div class="govuk-button-group">
-    {{ govukButton({ 
-      text: buttons.continue,
-      attributes: { type: 'submit', name: 'action', value: 'continue' }
-    }) }}
-    {{ govukButton({ 
-      text: buttons.saveForLater,
-      classes: 'govuk-button--secondary',
-      attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
-    }) }}
-  </div>  
-</form>
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.component and field.componentType %}
+        {% if field.componentType == 'radios' %}
+          {{ govukRadios(field.component) }}
+        {% elif field.componentType == 'characterCount' %}
+          {{ govukCharacterCount(field.component) }}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: continue,
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      {{ govukButton({
+        text: saveForLater,
+        classes: 'govuk-button--secondary',
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
+  </form>
 {% endblock %}
-

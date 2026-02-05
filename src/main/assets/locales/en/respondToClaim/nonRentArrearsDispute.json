@@ -1,35 +1,28 @@
 {
-    "title": "Disputing other parts of the claim",
-    "captionHeading": "Respond to a property possession claim",
-    "content": "<p class=\"govuk-body\">You should <a href=\"#\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">view the claim (opens in new tab)</a> to see if there's any other parts of the claim that are incorrect or you disagree with.</p><p class=\"govuk-body\">This includes:</p><ul class=\"govuk-list govuk-list--bullet\"><li>{{claimantName}}'s grounds for possession (their reasons for making the claim)</li><li>any documents they've uploaded to support their claim</li><li>any other information they've given as part of their claim</li></ul>",
-    "introduction": "You should view the claim (opens in new tab) to see if there's any other parts of the claim that are incorrect or you disagree with.",
-    "introLinkText": "view the claim (opens in new tab)",
-    "introLinkHref": "#",
-    "introParagraph": "You should {{link}} to see if there's any other parts of the claim that are incorrect or you disagree with.",
-    "includesHeading": "This includes:",
-    "includesList": [
-      "{{claimantName}}'s grounds for possession (their reasons for making the claim)",
-      "any documents they've uploaded to support their claim",
-      "any other information they've given as part of their claim"
-    ],
-    "disputeQuestion": "Do you want to dispute any other parts of the claim?",
-    "disputeOptions": {
-      "yes": "Yes",
-      "no": "No"
-    },
-    "disputeDetails": {
-      "label": "Explain which parts of the claim you do not agree with",
-      "hint": "You have 250 words remaining"
-    },
-    "wordCount": {
-      "wordsUnderLimitText": {
-        "one": "You have 1 word remaining",
-        "other": "You have %{count} words remaining"
-      },
-      "wordsAtLimitText": "You have 0 words remaining",
-      "wordsOverLimitText": {
-        "one": "You have 1 word too many",
-        "other": "You have %{count} words too many"
-      }
-    }
+  "title": "Disputing other parts of the claim",
+  "captionHeading": "Respond to a property possession claim",
+  "content": "<p class=\"govuk-body\">You should <a href=\"#\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">view the claim (opens in new tab)</a> to see if there's any other parts of the claim that are incorrect or you disagree with.</p><p class=\"govuk-body\">This includes:</p><ul class=\"govuk-list govuk-list--bullet\"><li>{{claimantName}}'s grounds for possession (their reasons for making the claim)</li><li>any documents they've uploaded to support their claim</li><li>any other information they've given as part of their claim</li></ul>",
+  "introduction": "You should view the claim (opens in new tab) to see if there's any other parts of the claim that are incorrect or you disagree with.",
+  "introLinkText": "view the claim (opens in new tab)",
+  "introLinkHref": "#",
+  "introParagraph": "You should {{link}} to see if there's any other parts of the claim that are incorrect or you disagree with.",
+  "includesHeading": "This includes:",
+  "includesList": [
+    "{{claimantName}}'s grounds for possession (their reasons for making the claim)",
+    "any documents they've uploaded to support their claim",
+    "any other information they've given as part of their claim"
+  ],
+  "disputeQuestion": "Do you want to dispute any other parts of the claim?",
+  "disputeOptions": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "disputeDetails": {
+    "label": "Explain which parts of the claim you do not agree with",
+    "hint": "You have 250 words remaining"
+  },
+  "errors": {
+    "disputeClaim": "You must select whether you want to dispute any other parts of the claim",
+    "disputeDetails": "You must explain which parts of the claim you do not agree with"
   }
+}
