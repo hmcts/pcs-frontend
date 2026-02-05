@@ -13,4 +13,10 @@ export const noticeDetails = {
   saveForLaterButton: 'Save for later',
   signOutLink: 'Sign out',
   yesRadioOption: 'Yes',
+  errorValidation: 'NO', //set it to 'NO' before raising a PR
+  errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
+  errorValidationHeader: 'There is a problem',
+  errorValidationField: {
+    errorRadioMsg: [{ errMessage: "Please confirm if you've been given notice" }],
+  },
 };
