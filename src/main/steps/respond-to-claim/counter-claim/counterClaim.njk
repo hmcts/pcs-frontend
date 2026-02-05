@@ -11,8 +11,8 @@
   <form method="post" action="{{ url }}">
     <div class="govuk-button-group">
       {{ govukButton({
-        text: t('buttons.continue', { ns: 'common' }),
-        attributes: { type: 'submit', name: 'action', value: 'continue' }
+        text: t('buttons.saveAndContinue', { ns: 'common' }),
+        attributes: { type: 'submit', name: 'action', value: 'continue' }]
       }) }}
       {{ govukButton({
         text: saveForLater,
