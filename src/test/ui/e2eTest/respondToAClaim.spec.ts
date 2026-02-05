@@ -88,7 +88,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', registeredLandlord.mockText);
   });
 
-  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - Notice date known', async () => {
+  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
@@ -121,7 +121,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
   });
 
-  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - Notice date unknown', async () => {
+  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
@@ -206,7 +206,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
 
-  test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - Notice date known', async () => {
+  test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
@@ -231,15 +231,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption  });
-    await performAction('enterNoticeDateKnown', {
-      day: '24',
-      month: '2',
-      year: '2020'
-    });
+    await performAction('enterNoticeDateKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 
-  test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - Notice date unknown', async () => {
+  test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
@@ -265,7 +261,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption  });
-    await performAction('enterNoticeDateUnknown');
+    await performAction('enterNoticeDateUnknown', {
+      day: '24',
+      month: '2',
+      year: '2020'
+    });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 
