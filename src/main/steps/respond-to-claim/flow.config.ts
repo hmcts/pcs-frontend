@@ -113,7 +113,7 @@ export const flowConfig: JourneyFlowConfig = {
         if (welshProperty) {
           return 'landlord-registered';
         }
-        return 'dispute-claim-interstitial';  
+        return 'dispute-claim-interstitial';
       },
     },
     'confirmation-of-notice-given': {
