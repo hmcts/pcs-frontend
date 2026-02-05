@@ -12,8 +12,9 @@
     <div class="govuk-button-group">
       {{ govukButton({
         text: t('buttons.saveAndContinue', { ns: 'common' }),
-        attributes: { type: 'submit', name: 'action', value: 'continue' }]
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
+
       {{ govukButton({
         text: saveForLater,
         classes: 'govuk-button--secondary',
