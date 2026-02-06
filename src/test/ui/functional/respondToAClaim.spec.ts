@@ -193,6 +193,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.yesRadioOption  });
+      option: noticeDetails.yesRadioOption,
+    });
   });
 });

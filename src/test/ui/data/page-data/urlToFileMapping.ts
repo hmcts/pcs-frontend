@@ -11,5 +11,5 @@ export default {
   'confirmation-of-notice-given': 'noticeDetails',
   'non-rent-arrears-dispute': 'nonRentArrearsDispute',
   'confirmation-of-notice-date-when-provided': 'noticeDateKnown',
-  'rent-arrears-dispute': 'rentArrearsDispute'
+  'rent-arrears-dispute': 'rentArrearsDispute',
 };

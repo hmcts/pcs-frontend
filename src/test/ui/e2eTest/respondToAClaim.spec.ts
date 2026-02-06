@@ -114,11 +114,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.yesRadioOption  });
+      option: noticeDetails.yesRadioOption,
+    });
     await performAction('enterNoticeDateKnown', {
       day: '24',
       month: '2',
-      year: '2020'
+      year: '2020',
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
   });
@@ -149,7 +150,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.yesRadioOption  });
+      option: noticeDetails.yesRadioOption,
+    });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
   });
@@ -178,7 +180,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.noRadioOption  });
+      option: noticeDetails.noRadioOption,
+    });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
   });
 
@@ -206,7 +209,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.imNotSureRadioOption  });
+      option: noticeDetails.imNotSureRadioOption,
+    });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
   });
 
@@ -235,7 +239,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.yesRadioOption  });
+      option: noticeDetails.yesRadioOption,
+    });
     await performAction('enterNoticeDateKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
@@ -266,11 +271,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.yesRadioOption  });
+      option: noticeDetails.yesRadioOption,
+    });
     await performAction('enterNoticeDateUnknown', {
       day: '24',
       month: '2',
-      year: '2020'
+      year: '2020',
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
@@ -299,7 +305,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.noRadioOption  });
+      option: noticeDetails.noRadioOption,
+    });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 
@@ -327,7 +334,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.imNotSureRadioOption  });
+      option: noticeDetails.imNotSureRadioOption,
+    });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 

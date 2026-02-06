@@ -10,5 +10,5 @@ export const noticeDateUnknown = {
   yearTextLabel: 'Year',
   saveAndContinueButton: 'Save and continue',
   saveForLaterButton: 'Save for later',
-  signOutLink: 'Sign out'
+  signOutLink: 'Sign out',
 };

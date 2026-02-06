@@ -130,20 +130,24 @@ export class RespondToClaimAction implements IAction {
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
-      await performActions('Enter Date',
+      await performActions(
+        'Enter Date',
         ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
         ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]);
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+      );
     }
     await performAction('clickButton', noticeDateKnown.saveAndContinueButton);
   }
 
   private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
-      await performActions('Enter Date',
+      await performActions(
+        'Enter Date',
         ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
         ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]);
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+      );
     }
     await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
   }
