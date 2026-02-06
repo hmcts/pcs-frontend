@@ -7,9 +7,9 @@
     "yes": "cyYes",
     "no": "cyNo",
     "or": "cyor",
-    "imNotSure": "cyI'm not sure"
+    "imNotSure": "cyI’m not sure"
   },
   "errors": {
-    "confirmNoticeGiven": "cyPlease confirm if you've been given notice"
+    "confirmNoticeGiven": "cyPlease confirm if you’ve been given notice"
   }
 }
