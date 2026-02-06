@@ -8,4 +8,5 @@ export * from './dateOfBirth.page.data';
 export * from './correspondenceAddressKnown.page.data';
 export * from './tenancyDetails.page.data';
 export * from './registeredLandlord.page.data';
+export * from './defendantNameConfirmation.page.data';
 export * from './contactPreference.page.data';
