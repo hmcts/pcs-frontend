@@ -108,6 +108,13 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
+      previousStep: async (req: Request) => {
+        const welshProperty = await isWelshProperty(req);
+        if (welshProperty) {
+          return 'landlord-registered';
+        }
+        return 'dispute-claim-interstitial';
+      },
     },
     'confirmation-of-notice-given': {
       routes: [
