@@ -130,14 +130,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown', {
-      day: '24',
+      day: '25',
       month: '2',
       year: '2020',
     });
@@ -165,8 +165,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
@@ -196,8 +196,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
@@ -225,8 +225,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
@@ -255,8 +255,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -286,8 +286,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
@@ -321,8 +321,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
@@ -350,8 +350,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
@@ -378,8 +378,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 });
