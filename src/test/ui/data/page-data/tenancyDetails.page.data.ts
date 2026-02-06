@@ -1,3 +1,4 @@
 export const tenancyDetails = {
-  mockText: 'Tenancy details',
+  mainHeader: 'Tenancy details',
+  continueButton: 'Continue',
 };

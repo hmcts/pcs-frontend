@@ -1,0 +1,34 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% block mainContent %}
+    {% if errorSummary %}
+        {{ govukErrorSummary(errorSummary) }}
+    {% endif %}
+    {% if caption %}
+        <span class="govuk-caption-xl">{{ caption }}</span>
+    {% endif %}
+    {% if heading %}
+        <h1 class="govuk-heading-l">{{ heading }}</h1>
+    {% endif %}
+    <p class="govuk-body">{{ paragraph1 }}</p>
+    <p class="govuk-body">{{ paragraph2 }}</p>
+    <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
+        <li>{{ bullet1 }}</li>
+        <li>{{ bullet2 }}</li>
+    </ul>
+    <p class="govuk-body">{{ paragraph3 }}</p>
+    <p class="govuk-body">{{ paragraph4 }}</p>
+    <form method="post" action="{{ url }}">
+        <div class="govuk-button-group">
+        {{ govukButton({
+            text: t('buttons.continue', { ns: 'common' }),
+            attributes: { type: 'submit', name: 'action', value: 'continue' }
+        }) }}
+        <p class="govuk-body">
+          <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+        </p>
+        </div>
+  </form>
+{% endblock %}

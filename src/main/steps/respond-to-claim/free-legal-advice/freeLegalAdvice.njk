@@ -40,11 +40,11 @@
       {% endif %}
     {% endfor %}
     <div class="govuk-button-group">
-      {{ govukButton({ 
-        text: continue,
+      {{ govukButton({
+        text: saveAndContinue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
-      {{ govukButton({ 
+      {{ govukButton({
         text: saveForLater,
         classes: 'govuk-button--secondary',
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
