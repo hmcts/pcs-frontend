@@ -10,10 +10,14 @@ export const pluralPossessive = (i18n: typeof i18next): void => {
         options.format = '’';
       }
 
-      if (lng === 'en') {
-        return value.endsWith('s') ? `${value}${options.format}` : `${value}${options.format}s`;
+      const trimmedValue = value.trim();
+
+      if (lng === 'en' || lng === 'cy') {
+        return trimmedValue.toLowerCase().endsWith('s')
+          ? `${trimmedValue}${options.format}`
+          : `${trimmedValue}${options.format}s`;
       }
-      return value;
+      return trimmedValue;
     }
   );
 };

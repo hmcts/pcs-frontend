@@ -86,11 +86,6 @@ describe('pluralPossessive formatter', () => {
       formatterFn = mockAdd.mock.calls[0][1];
     });
 
-    it('should return value as-is for Welsh (cy)', () => {
-      const result = formatterFn('James', 'cy', {});
-      expect(result).toBe('James');
-    });
-
     it('should return value as-is for French (fr)', () => {
       const result = formatterFn('Jean', 'fr', {});
       expect(result).toBe('Jean');
@@ -120,9 +115,9 @@ describe('pluralPossessive formatter', () => {
       expect(result).toBe('assess’');
     });
 
-    it('should add apostrophe and s for words ending with uppercase S (case-sensitive)', () => {
+    it('should not add apostrophe and s for words ending with uppercase S (case-sensitive)', () => {
       const result = formatterFn('JAMES', 'en', {});
-      expect(result).toBe('JAMES’s');
+      expect(result).toBe('JAMES’');
     });
 
     it('should handle mixed case words ending with s', () => {
