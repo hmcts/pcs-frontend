@@ -1,5 +1,7 @@
+import { submitCaseApiData } from '../api-data';
+
 export const correspondenceAddressKnown = {
-  mainHeader: 'Is your correspondence address 15 Garden Drive, Luton, Bedfordshire, LU1 1AB?',
+  mainHeader: `Is your correspondence address ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.AddressLine1}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostTown}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostCode}?`,
   respondToClaimParagraph: 'Respond to a property possession claim',
   correspondenceAddressConfirmHintText: 'This is the address provided by Treetops Housing',
   yesRadioOption: 'Yes',
