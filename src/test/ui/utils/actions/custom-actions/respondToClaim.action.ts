@@ -4,6 +4,7 @@ import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
+  defendantNameConfirmation,
   freeLegalAdvice,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -16,6 +17,7 @@ export class RespondToClaimAction implements IAction {
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
+      ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -47,6 +49,14 @@ export class RespondToClaimAction implements IAction {
       ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear],
       ['clickButton', dateOfBirth.saveAndContinueButton]
     );
+  }
+
+  private async confirmDefendantDetails(confirmDefendantName: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: confirmDefendantName.question,
+      option: confirmDefendantName.option,
+    });
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord): Promise<void> {
