@@ -18,13 +18,17 @@ export const step: StepDefinition = {
       'respond-to-claim/dispute-claim-interstitial/disputeClaimInterstitial.njk',
       stepName,
       async (req: Request) => {
-        // TODO:Retrieve claimantName dynamically from CCD case data and remove hardcoded default value
-        const claimantName = (req.session?.ccdCase?.data?.claimantName as string) || 'Treetops Housing';
-
         const t = req.t;
         if (!t) {
           throw new Error('Translation function not available');
         }
+
+        const claimantNameFromValidatedCase = req.res?.locals?.validatedCase?.data?.possessionClaimResponse
+          ?.claimantOrganisations?.[0]?.value as string | undefined;
+
+        const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
+
+        const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops Housing';
 
         return {
           backUrl: await stepNavigation.getBackUrl(req, stepName),
