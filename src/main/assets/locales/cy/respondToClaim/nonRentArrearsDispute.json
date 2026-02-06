@@ -1,14 +1,12 @@
 {
   "title": "cyDisputing other parts of the claim",
   "captionHeading": "cyRespond to a property possession claim",
-  "content": "<p class=\"govuk-body\">cyYou should <a href=\"#\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">view the claim (opens in new tab)</a> to see if there's any other parts of the claim that are incorrect or you disagree with.</p><p class=\"govuk-body\">cyThis includes:</p><ul class=\"govuk-list govuk-list--bullet\"><li>cy {{claimantName}}'s grounds for possession (their reasons for making the claim)</li><li>cyany documents they've uploaded to support their claim</li><li>cyany other information they've given as part of their claim</li></ul>",
-  "introduction": "cyYou should view the claim (opens in new tab) to see if there's any other parts of the claim that are incorrect or you disagree with.",
   "introLinkText": "cyview the claim (opens in new tab)",
   "introLinkHref": "#",
   "introParagraph": "cyYou should {{link}} to see if there's any other parts of the claim that are incorrect or you disagree with.",
   "includesHeading": "cyThis includes:",
   "includesList": [
-    "cy{{claimantName}}'s grounds for possession (their reasons for making the claim)",
+    "cy{{claimantName, pluralPossessive}} grounds for possession (their reasons for making the claim)",
     "cyany documents they've uploaded to support their claim",
     "cyany other information they've given as part of their claim"
   ],
@@ -18,8 +16,7 @@
     "no": "cyNo"
   },
   "disputeDetails": {
-    "label": "cyExplain which parts of the claim you do not agree with",
-    "hint": "cyYou have 250 words remaining"
+    "label": "cyExplain which parts of the claim you do not agree with"
   },
   "errors": {
     "disputeClaim": "cyYou must select whether you want to dispute any other parts of the claim",

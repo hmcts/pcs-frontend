@@ -11,6 +11,8 @@ import type { Environment } from 'nunjucks';
 import { z } from 'zod';
 import { makeZodI18nMap } from 'zod-i18n-map';
 
+import { pluralPossessive } from './formatters';
+
 function firstExistingPath(paths: string[]): string | null {
   for (const p of paths) {
     if (fs.existsSync(p)) {
@@ -216,6 +218,9 @@ export class I18n {
           this.logger.info('[i18n] initialised OK');
         }
       });
+
+    // Register custom formatters
+    pluralPossessive(i18next);
 
     app.use(i18nextHandle(i18next));
 

@@ -21,14 +21,10 @@ export const step: StepDefinition = createFormStep({
     // Pull dynamic claimantName from CCD (same as dispute-claim-interstitial)
     const claimantName = (req.session?.ccdCase?.data?.claimantName as string) || 'Treetops Housing';
 
-    // Get the step-scoped translation function
     const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
 
-    // Get the list and manually interpolate claimantName into each item
-    const includesListRaw = t('includesList', { returnObjects: true }) as string[] | string;
-    const includesList = Array.isArray(includesListRaw)
-      ? includesListRaw.map(item => item.replace('{{claimantName}}', claimantName))
-      : [];
+    // i18next automatically interpolates variables and applies formatters in translation strings
+    const includesList = t('includesList', { returnObjects: true, claimantName });
 
     return {
       includesList,
