@@ -7,9 +7,12 @@ import {
   contactPreference,
   correspondenceAddressKnown,
   dateOfBirth,
-  defendantNameCapture, disputeClaimInterstitial,
-  freeLegalAdvice, noticeDetails,
-  startNow, tenancyDetails,
+  defendantNameCapture,
+  disputeClaimInterstitial,
+  freeLegalAdvice,
+  noticeDetails,
+  startNow,
+  tenancyDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
