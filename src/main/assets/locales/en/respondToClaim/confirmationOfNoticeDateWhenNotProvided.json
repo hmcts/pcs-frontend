@@ -1,7 +1,7 @@
 {
   "caption": "Respond to a property possession claim",
   "pageTitle": "Notice date",
-  "noticeDateLabel": "When did you receive notice from {{claimantName}} (optional)?",
+  "question": "When did you receive notice from {{claimantName}} (optional)?",
   "noticeDateHint": "For example, 27 9 2022. If you’re not sure of the exact date, you can find it on the notice",
   "paragraph": "{{claimantName}} did not provide the date they served you notice.",
   "errors": {

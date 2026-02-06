@@ -14,3 +14,6 @@ export * from './noticeDateKnown.page.data';
 export * from './noticeDateUnknown.page.data';
 export * from './rentArrearsDispute.page.data';
 export * from './nonRentArrearsDispute.page.data';
+export * from './counterClaim.page.data';
+export * from './payment-interstitial.page.data';
+export * from './repayments.page.data';

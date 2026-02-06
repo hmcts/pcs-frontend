@@ -9,6 +9,7 @@ import {
   noticeDateKnown,
   noticeDateUnknown,
   noticeDetails,
+  paymentInterstitial,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -25,6 +26,7 @@ export class RespondToClaimAction implements IAction {
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
+      ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -79,6 +81,10 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  }
+
+  private async readPaymentInterstitial(): Promise<void> {
+    await performAction('clickButton', paymentInterstitial.continueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

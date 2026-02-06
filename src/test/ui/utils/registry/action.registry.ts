@@ -50,6 +50,7 @@ export class ActionRegistry {
     ['selectNoticeDetails', new RespondToClaimAction()],
     ['enterNoticeDateKnown', new RespondToClaimAction()],
     ['enterNoticeDateUnknown', new RespondToClaimAction()],
+    ['readPaymentInterstitial', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

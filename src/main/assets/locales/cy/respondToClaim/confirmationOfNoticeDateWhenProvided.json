@@ -4,7 +4,7 @@
   "bulletPointLabel": "cyNotice details given by {{claimantName}}:",
   "hintText": "cyWhen making the claim, {{claimantName}} had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.",
   "listItem1": "cyThey served you with a notice seeking possession on {{noticeDate}}",
-  "noticeDateLabel": "cyWhen did you receive notice from {{claimantName}} (optional)?",
+  "question": "cyWhen did you receive notice from {{claimantName}} (optional)?",
   "noticeDateHint": "cyFor example, 27 9 2022",
   "errors": {
     "date": {

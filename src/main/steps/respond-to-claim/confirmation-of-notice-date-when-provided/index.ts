@@ -16,7 +16,7 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     bulletPointLabel: 'bulletPointLabel',
     noticeDateHint: 'noticeDateHint',
-    noticeDateLabel: 'noticeDateLabel',
+    question: 'question',
   },
   fields: [
     {
@@ -26,7 +26,7 @@ export const step: StepDefinition = createFormStep({
       noFutureDate: true,
       legendClasses: 'govuk-fieldset__legend--m',
       translationKey: {
-        label: 'noticeDateLabel',
+        label: 'question',
         hint: 'noticeDateHint',
       },
     },

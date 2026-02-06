@@ -21,6 +21,9 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-confirmation',
     'defendant-name-capture',
     'defendant-date-of-birth',
+    'counter-claim',
+    'payment-interstitial',
+    'repayments',
     'postcode-finder',
     'dispute-claim-interstitial',
     'landlord-registered',
@@ -59,6 +62,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-date-of-birth': {
+      previousStep: 'defendant-name-capture',
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
@@ -207,13 +211,29 @@ export const flowConfig: JourneyFlowConfig = {
       ],
     },
     'rent-arrears-dispute': {
-      defaultNext: 'end-now',
+      defaultNext: 'counter-claim',
       previousStep: req => getPreviousPageForArrears(req),
     },
-
     'non-rent-arrears-dispute': {
-      defaultNext: 'end-now',
+      defaultNext: 'counter-claim',
       previousStep: req => getPreviousPageForArrears(req),
+    },
+    'counter-claim': {
+      defaultNext: 'payment-interstitial',
+      previousStep: async (req: Request) => {
+        const rentArrearsClaim = await isRentArrearsClaim(req);
+        if (rentArrearsClaim) {
+          return 'rent-arrears-dispute';
+        }
+        return 'non-rent-arrears-dispute';
+      },
+    },
+    'payment-interstitial': {
+      previousStep: 'counter-claim',
+      defaultNext: 'repayments',
+    },
+    repayments: {
+      previousStep: 'payment-interstitial',
     },
   },
 };

@@ -30,6 +30,7 @@ export const step: StepDefinition = {
           backUrl: await stepNavigation.getBackUrl(req, stepName),
           dashboardUrl: DASHBOARD_ROUTE,
           // these keys override the translations from the step namespace but interpolate the claimantName
+          cancel: t('buttons.cancel', { ns: 'common' }),
           heading: t('heading', { claimantName }),
           paragraph1: t('paragraph1', { claimantName }),
         };

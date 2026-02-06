@@ -12,7 +12,7 @@
     {% if caption %}
       <span class="govuk-caption-xl">{{ caption }}</span>
     {% endif %}
-   
+
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
       {% if field.component and field.componentType %}
@@ -23,7 +23,7 @@
     {% endfor %}
     <div class="govuk-button-group">
       {{ govukButton({
-        text: t('buttons.continue', { ns: 'common' }),
+        text: t('buttons.saveAndContinue', { ns: 'common' }),
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
       {{ govukButton({

@@ -6,11 +6,13 @@ import config from 'config';
 import {
   contactPreference,
   correspondenceAddressKnown,
+  counterClaim,
   dateOfBirth,
   defendantNameCapture,
   disputeClaimInterstitial,
   freeLegalAdvice,
   noticeDetails,
+  paymentInterstitial,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
@@ -165,6 +167,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+  test('paymentInterstitial - back and cancel link Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
@@ -180,9 +184,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);     
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: noticeDetails.errorValidation,
@@ -195,5 +199,13 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
     });
+   //add next steps
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('clickLink', paymentInterstitial.backLink);
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('clickLink', paymentInterstitial.cancelLink);
+    await performValidation('mainHeader', 'Dashboard');
   });
 });
