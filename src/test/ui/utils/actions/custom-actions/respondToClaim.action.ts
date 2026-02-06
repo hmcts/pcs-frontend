@@ -121,7 +121,6 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
-
     await performAction('clickRadioButton', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeGivenData.option,
