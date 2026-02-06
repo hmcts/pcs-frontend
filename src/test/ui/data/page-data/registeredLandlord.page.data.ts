@@ -1,3 +1,4 @@
 export const registeredLandlord = {
-  mockText: 'Registered landlord',
+  mainHeader: 'Landlord registered',
+  continueButton: 'Continue',
 };
