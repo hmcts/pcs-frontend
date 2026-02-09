@@ -5,12 +5,16 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactPreference,
   correspondenceAddressKnown,
-  dateOfBirth, defendantNameCapture,
+  counterClaim,
+  dateOfBirth,
+  defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
   registeredLandlord,
-  startNow, tenancyDetails,
+  repayments,
+  startNow,
+  tenancyDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
@@ -58,7 +62,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
   });
 
   test.skip('Respond to a claim - Wales postcode', async () => {
@@ -83,6 +95,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', registeredLandlord.mockText);
+    await performValidation('mainHeader', registeredLandlord.mainHeader);
+    await performAction('clickButton', registeredLandlord.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
+    //Added below pages to welsh journey as per english journey
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
   });
 });

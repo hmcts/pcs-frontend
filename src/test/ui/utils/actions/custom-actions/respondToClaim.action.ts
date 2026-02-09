@@ -7,6 +7,7 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   freeLegalAdvice,
+  paymentInterstitial,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -22,6 +23,7 @@ export class RespondToClaimAction implements IAction {
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
       ['validateClaimantName', () => this.validateClaimantName(fieldName)],
+      ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -88,6 +90,9 @@ export class RespondToClaimAction implements IAction {
       claimantsName.substring(claimantsName.length - 1) === 's' ? `${claimantsName}’` : `${claimantsName}’s`;
     claimantsName = nameClaimant;
     await performValidation('text', { elementType: 'paragraph', text: claimantsName });
+  }
+  private async readPaymentInterstitial(): Promise<void> {
+    await performAction('clickButton', paymentInterstitial.continueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

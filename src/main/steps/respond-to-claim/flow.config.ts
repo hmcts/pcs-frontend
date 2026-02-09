@@ -14,6 +14,9 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-confirmation',
     'defendant-name-capture',
     'defendant-date-of-birth',
+    'counter-claim',
+    'payment-interstitial',
+    'repayments',
     'postcode-finder',
     'dispute-claim-interstitial',
     'landlord-registered',
@@ -73,9 +76,21 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'tenancy-details',
     },
     'landlord-registered': {
-      defaultNext: 'end-now',
+      defaultNext: 'tenancy-details',
     },
     'tenancy-details': {
+      defaultNext: 'counter-claim',
+    },
+    'counter-claim': {
+      previousStep: 'tenancy-details',
+      defaultNext: 'payment-interstitial',
+    },
+    'payment-interstitial': {
+      previousStep: 'counter-claim',
+      defaultNext: 'repayments',
+    },
+    repayments: {
+      previousStep: 'payment-interstitial',
       defaultNext: 'end-now',
     },
   },
