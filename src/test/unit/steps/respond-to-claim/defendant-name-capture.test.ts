@@ -63,7 +63,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
   // Keep req/res loosely typed to avoid Express/i18n type augmentation conflicts in tests
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const createReq = (overrides: Record<string, unknown> = {}): any =>
     ({
       body: {},
@@ -74,7 +74,6 @@ describe('respond-to-claim defendant-name-capture step', () => {
       app: { locals: { nunjucksEnv } },
       i18n: { getResourceBundle: jest.fn(() => ({})) },
       ...overrides,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
 
   beforeEach(() => {
@@ -89,7 +88,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
   it('GET renders translated content and input attributes', async () => {
     const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { render: jest.fn() } as any;
 
     await controller.get(createReq(), res);
@@ -133,7 +132,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
   it('POST renders errors when validation fails', async () => {
     (validateForm as jest.Mock).mockReturnValue({ firstName: 'Enter your first name' });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
     const next = jest.fn();
 
@@ -151,7 +150,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
     (validateForm as jest.Mock).mockReturnValue({});
 
     const req = createReq({ body: { action: 'continue', firstName: 'Jane', lastName: 'Doe' } });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { redirect: jest.fn() } as any;
     const next = jest.fn();
 

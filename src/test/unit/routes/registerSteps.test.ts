@@ -132,7 +132,7 @@ describe('registerSteps', () => {
 
   const findRouteHandler = (method: jest.Mock, url: string) => {
     const routeCall = method.mock.calls.find(c => c[0] === url);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     return routeCall ? (routeCall[routeCall.length - 1] as (...args: any[]) => any) : null;
   };
 

@@ -1,5 +1,5 @@
 /* eslint-disable import/order */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import express from 'express';
 import type { Express, NextFunction, Request, Response } from 'express';
 import { HTTPError } from '../../../../main/HttpError';

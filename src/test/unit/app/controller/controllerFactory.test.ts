@@ -93,7 +93,7 @@ describe('createGetController', () => {
       t: mockT,
       i18n: undefined,
     } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { render: jest.fn() } as any;
 
     mockGetFormData.mockReturnValue({ answer: 'sessionAnswer', choices: ['choice1'] });
@@ -142,7 +142,7 @@ describe('createGetController', () => {
       t: mockT,
       i18n: undefined,
     } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { render: jest.fn() } as any;
 
     mockGetFormData.mockReturnValue({ answer: 'sessionAnswer' });
@@ -190,7 +190,6 @@ describe('createGetController', () => {
       i18n: undefined,
     } as unknown as Request;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { render: jest.fn() } as any;
 
     mockGetFormData.mockReturnValue({});
@@ -226,7 +225,7 @@ describe('createGetController', () => {
       t: mockT,
       i18n: undefined,
     } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { render: jest.fn() } as any;
 
     const extendContent = jest.fn((_req: Request) => ({ extended: true, ...mockContent }));
@@ -250,7 +249,7 @@ describe('GetController', () => {
     const mockGenerateContent = jest.fn(() => ({ title: 'Test' }));
     const controller = new GetController('test.njk', mockGenerateContent);
     const req = {} as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { render: jest.fn() } as any;
 
     await controller.get(req, res);
@@ -264,7 +263,7 @@ describe('createPostRedirectController', () => {
   it('should redirect to provided URL', () => {
     const controller = createPostRedirectController('/redirect-url');
     const req = {} as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { redirect: jest.fn() } as any;
 
     controller.post(req, res);
@@ -298,7 +297,7 @@ describe('createPostController', () => {
       t: mockT,
       i18n: undefined,
     } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
     const next = jest.fn();
 
@@ -329,7 +328,7 @@ describe('createPostController', () => {
       t: mockT,
       i18n: undefined,
     } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { redirect: jest.fn() } as any;
     const next = jest.fn();
 
@@ -351,7 +350,7 @@ describe('createPostController', () => {
       t: mockT,
       i18n: undefined,
     } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { redirect: jest.fn(), headersSent: false } as any;
     const next = jest.fn();
 
@@ -371,7 +370,7 @@ describe('createPostController', () => {
       t: mockT,
       i18n: undefined,
     } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { redirect: jest.fn(), headersSent: true } as any;
     const next = jest.fn();
 
@@ -394,7 +393,7 @@ describe('createPostController', () => {
       t: mockT,
       i18n: undefined,
     } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const res = { status: jest.fn().mockReturnThis(), send: jest.fn() } as any;
     const next = jest.fn();
 

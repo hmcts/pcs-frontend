@@ -1,5 +1,5 @@
 /* eslint-disable jest/no-conditional-expect */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DateTime } from 'luxon';
 
 import { buildDateInputSchema } from '../../../../../main/modules/journey/engine/date.schema';

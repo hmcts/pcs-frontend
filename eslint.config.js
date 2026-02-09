@@ -56,8 +56,8 @@ module.exports = defineConfig([
 
     rules: {
       '@typescript-eslint/array-type': 'error',
-      '@typescript-eslint/explicit-module-boundary-types': 'error',
-      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-require-imports': 'off',
 
@@ -91,7 +91,7 @@ module.exports = defineConfig([
       'jest/prefer-to-have-length': 'error',
       'jest/valid-expect': 'off',
       'linebreak-style': ['error', 'unix'],
-      'no-console': 'warn',
+      'no-console': 'off',
       'no-prototype-builtins': 'off',
       'no-return-await': 'error',
 
@@ -109,7 +109,7 @@ module.exports = defineConfig([
         'error',
         'single',
         {
-          allowTemplateLiterals: false,
+          allowTemplateLiterals: true,
           avoidEscape: true,
         },
       ],

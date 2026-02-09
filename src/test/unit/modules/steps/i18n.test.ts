@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { promises as fs } from 'fs';
 import path from 'path';
 
