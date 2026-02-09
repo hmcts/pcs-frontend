@@ -9,7 +9,8 @@
   "contactUsForHelp": "cyContact us for help",
   "contactUsForHelpText": "cyIf you need help using this service, contact us.",
   "buttons": {
-    "continue": "cySave and continue",
+    "saveAndContinue": "cySave and continue",
+    "continue": "cyContinue",
     "saveForLater": "cySave for later",
     "back": "cyBack",
     "cancel": "cyCancel",
