@@ -6,7 +6,7 @@
   "introParagraph": "cyYou should {{link}} to see if there's any other parts of the claim that are incorrect or you disagree with.",
   "includesHeading": "cyThis includes:",
   "includesList": [
-    "cy{{claimantName, possessive}} grounds for possession (their reasons for making the claim)",
+    "cy{{claimantName, pluralPossessive}} grounds for possession (their reasons for making the claim)",
     "cyany documents they've uploaded to support their claim",
     "cyany other information they've given as part of their claim"
   ],
