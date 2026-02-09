@@ -81,7 +81,7 @@ export class PageContentValidation implements IValidation {
                     .radio:text("${value}") ~ input[type="radio"],
                     legend:text("${value}") ~ input[type="radio"],
                     .question:text("${value}") ~ input[type="radio"],
-                    legend:text("${value}"),
+                    legend:has-text("${value}"),
                     label >> text=${value} >> xpath=..//input[@type="radio"]`),
     RadioOption: (page: Page, value: string) =>
       page.locator(`
@@ -99,7 +99,8 @@ export class PageContentValidation implements IValidation {
                     select option:text("${value}")`),
     HintText: (page: Page, value: string) =>
       page.locator(`
-                    .govuk-hint:text("${value}")`),
+                    .govuk-hint:text("${value}"),
+                    div:text("${value}")`),
     TextLabel: (page: Page, value: string) =>
       page.locator(`
                     label:has-text("${value}"),

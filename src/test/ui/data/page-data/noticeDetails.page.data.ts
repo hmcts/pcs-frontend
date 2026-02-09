@@ -17,6 +17,8 @@ export const noticeDetails = {
   errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
   errorValidationHeader: 'There is a problem',
   errorValidationField: {
-    errorRadioMsg: [{ errMessage: 'Please confirm if you’ve been given notice' }],
+    errorRadioMsg: [
+      { errMessage: 'Select if Treetops Housing gave you notice of their intention to begin possession proceedings' },
+    ],
   },
 };
