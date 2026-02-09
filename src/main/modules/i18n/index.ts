@@ -11,7 +11,7 @@ import type { Environment } from 'nunjucks';
 import { z } from 'zod';
 import { makeZodI18nMap } from 'zod-i18n-map';
 
-import { pluralPossessive } from './formatters';
+import { pluralPossessive, possessive } from './formatters';
 
 function firstExistingPath(paths: string[]): string | null {
   for (const p of paths) {
@@ -221,6 +221,7 @@ export class I18n {
 
     // Register custom formatters
     pluralPossessive(i18next);
+    possessive(i18next);
 
     app.use(i18nextHandle(i18next));
 

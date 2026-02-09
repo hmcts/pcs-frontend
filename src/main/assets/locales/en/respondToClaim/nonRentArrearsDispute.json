@@ -6,7 +6,7 @@
   "introParagraph": "You should {{link}} to see if there's any other parts of the claim that are incorrect or you disagree with.",
   "includesHeading": "This includes:",
   "includesList": [
-    "{{claimantName, pluralPossessive}} grounds for possession (their reasons for making the claim)",
+    "{{claimantName, possessive}} grounds for possession (their reasons for making the claim)",
     "any documents they've uploaded to support their claim",
     "any other information they've given as part of their claim"
   ],
