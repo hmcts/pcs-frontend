@@ -14,4 +14,10 @@ export const noticeDateKnown = {
   saveAndContinueButton: 'Save and continue',
   saveForLaterButton: 'Save for later',
   signOutLink: 'Sign out',
+  errorValidation: 'YES',
+  errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
+  errorValidationHeader: 'There is a problem',
+  errorValidationField: {
+    errorRadioMsg: [{ errMessage: 'The date you received notice must either be today’s date or in the past' }],
+  },
 };

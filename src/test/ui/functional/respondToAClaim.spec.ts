@@ -11,6 +11,8 @@ import {
   defendantNameCapture,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  noticeDateKnown,
+  noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
   startNow,
@@ -224,11 +226,91 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       validationType: noticeDetails.errorValidationType.radio,
       inputArray: noticeDetails.errorValidationField.errorRadioMsg,
       question: noticeDetails.didClaimantGiveYouQuestion,
-      header: freeLegalAdvice.errorValidationHeader,
+      header: noticeDetails.errorValidationHeader,
     });
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
+    });
+  });
+
+  test('Notice Date Known - Error messages - Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown', {
+      day: '25',
+      month: '2',
+      year: '2050',
+    });
+    await performAction('inputErrorValidation', {
+      validationReq: noticeDateKnown.errorValidation,
+      validationType: noticeDateKnown.errorValidationType.radio,
+      inputArray: noticeDateKnown.errorValidationField.errorRadioMsg,
+      question: noticeDateKnown.whenDidYouReceiveNoticeQuestion,
+      header: noticeDateKnown.errorValidationHeader,
+    });
+  });
+
+  test('Notice Date Unknown - Error messages - Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown', {
+      day: '25',
+      month: '2',
+      year: '2050',
+    });
+    await performAction('inputErrorValidation', {
+      validationReq: noticeDateUnknown.errorValidation,
+      validationType: noticeDateUnknown.errorValidationType.radio,
+      inputArray: noticeDateUnknown.errorValidationField.errorRadioMsg,
+      question: noticeDateUnknown.whenDidYouReceiveNoticeQuestion,
+      header: noticeDateUnknown.errorValidationHeader,
     });
   });
 });
