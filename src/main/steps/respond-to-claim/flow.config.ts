@@ -234,6 +234,7 @@ export const flowConfig: JourneyFlowConfig = {
     },
     repayments: {
       previousStep: 'payment-interstitial',
+      defaultNext: 'end-now',
     },
   },
 };
