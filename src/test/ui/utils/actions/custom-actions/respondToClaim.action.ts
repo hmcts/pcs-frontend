@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 
+import { submitCaseApiData } from '../../../data/api-data';
 import {
   correspondenceAddressKnown,
   dateOfBirth,
@@ -10,6 +11,7 @@ import {
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
+export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -19,6 +21,7 @@ export class RespondToClaimAction implements IAction {
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
+      ['validateClaimantName', () => this.validateClaimantName(fieldName)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -73,6 +76,18 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  }
+
+  private async validateClaimantName(isClaimantNameCorrect: actionData) {
+    if (isClaimantNameCorrect === 'YES') {
+      claimantsName = submitCaseApiData.submitCasePayload.claimantName;
+    } else {
+      claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
+    }
+    const nameClaimant =
+      claimantsName.substring(claimantsName.length - 1) === 's' ? `${claimantsName}’` : `${claimantsName}’s`;
+    claimantsName = nameClaimant;
+    await performValidation('text', { elementType: 'paragraph', text: claimantsName });
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

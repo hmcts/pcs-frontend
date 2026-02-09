@@ -47,6 +47,7 @@ export class ActionRegistry {
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
     ['confirmDefendantDetails', new RespondToClaimAction()],
     ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
+    ['validateClaimantName', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
