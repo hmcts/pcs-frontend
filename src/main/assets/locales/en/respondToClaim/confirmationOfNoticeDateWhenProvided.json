@@ -11,11 +11,11 @@
       "day": "Day",
       "month": "Month",
       "year": "Year",
-      "notRealDate": "Date of notice must be a real date",
+      "notRealDate": "The date you received notice must be a real date",
       "futureDate": "The date you received notice must either be today’s date or in the past",
-      "invalidValue": "Date of notice must be a real date",
-      "missingOne": "Your date of notice must include a {{missingField}}",
-      "missingTwo": "Your date of notice must include a {{first}} and {{second}}"
+      "invalidValue": "The date you received notice must be a real date",
+      "missingOne": "The date you received notice must include a {{missingField}}",
+      "missingTwo": "The date you received notice must include a {{first}} and {{second}}"
     }
   }
 }

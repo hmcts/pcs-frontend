@@ -10,6 +10,6 @@
     "imNotSure": "I’m not sure"
   },
   "errors": {
-    "confirmNoticeGiven": "Please confirm if you’ve been given notice"
+    "confirmNoticeGiven": "Select if {{claimantName}} gave you notice of their intention to begin possession proceedings"
   }
 }
