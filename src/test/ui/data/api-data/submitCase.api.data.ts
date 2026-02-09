@@ -93,7 +93,7 @@ export const submitCaseApiData = {
       agreementClaimant: ['BELIEVE_TRUE'],
     },
   },
-  submitCasePayloadWithoutDefendantAddress: {
+  submitCasePayloadNoDefendants: {
     legislativeCountry: 'England',
     claimantType: {
       value: {
@@ -140,7 +140,7 @@ export const submitCaseApiData = {
       nameKnown: 'YES',
       firstName: 'Test',
       lastName: 'John',
-      addressKnown: 'No',
+      addressKnown: 'NO',
     },
     addAnotherDefendant: 'NO',
     tenancy_TypeOfTenancyLicence: 'DEMOTED_TENANCY',

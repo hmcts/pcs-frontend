@@ -7,7 +7,7 @@ import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
-  defendantNameConfirmation,
+  //defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
   registeredLandlord,
@@ -19,10 +19,15 @@ import { PageContentValidation } from '../utils/validations/element-validations/
 
 const home_url = config.get('e2e.testUrl') as string;
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  if (testInfo.title.includes('@noDefendants')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  } else {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  }
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('validateAccessCodeAPI');
@@ -58,13 +63,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   // Wales postcode routing is not implemented yet, e2e test coverage, functional test coverage needs to be reviewed once HDPI-3451 is done
-  test.skip('Respond to a claim - Wales postcode', async () => {
-    await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
-    await performAction('clickButton', startNow.startNowButton);
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('confirmDefendantDetails', {
+  test('Respond to a claim - Wales postcode', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+/*    await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
+    });*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -73,7 +80,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddressKnown.noRadioOption,
-      postcode: correspondenceAddressKnown.englandPostcodeTextInput,
+      postcode: correspondenceAddressKnown.walesPostcodeTextInput,
       addressIndex: correspondenceAddressKnown.addressIndex,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
@@ -81,5 +88,26 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', registeredLandlord.mockText);
+  });
+
+  test('Respond to a claim - England postcode @noDefendants', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mockText);
   });
 });
