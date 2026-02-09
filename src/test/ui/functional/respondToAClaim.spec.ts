@@ -11,6 +11,7 @@ import {
   defendantNameCapture,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  nonRentArrearsDispute,
   noticeDateKnown,
   noticeDateUnknown,
   noticeDetails,
@@ -189,6 +190,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
     });
+    await performAction('enterNoticeDateKnown', noticeDateKnown.saveAndContinueButton);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickLink', paymentInterstitial.backLink);
