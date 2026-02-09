@@ -1,5 +1,7 @@
 import { Page, test } from '@playwright/test';
 
+import { enable_content_validation, enable_error_message_validation } from '../../../../playwright.config';
+
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
 
@@ -35,8 +37,12 @@ async function validatePageIfNavigated(action: string): Promise<void> {
   if (action.includes('click') || action.includes('navigate')) {
     const pageNavigated = await detectPageNavigation();
     if (pageNavigated) {
-      await performValidation('autoValidatePageContent');
-      await performValidation('validateErrorMessages');
+      if (enable_content_validation) {
+        await performValidation('autoValidatePageContent');
+      }
+      if (enable_error_message_validation) {
+        await performAction('triggerErrorMessagesForValidation');
+      }
     }
   }
 }

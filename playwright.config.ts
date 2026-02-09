@@ -8,6 +8,8 @@ export const SHORT_TIMEOUT = 5000;
 export const actionRetries = 5;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
+export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'true';
+export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGE_VALIDATION || 'true';
 
 export default defineConfig({
   testDir: './src/test/ui',
