@@ -16,8 +16,7 @@ services:
     environment:
       - REDIS_CONNECTION_STRING=redis://cache:6379
     env_file:
-      - path: .env
-        required: false
+      - .env
     volumes:
       - .:/app
       - /app/node_modules
