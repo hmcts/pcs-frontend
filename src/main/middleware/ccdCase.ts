@@ -15,7 +15,9 @@ export const ccdCaseMiddleware = async (req: Request, res: Response, next: NextF
       const caseData: CcdCase | null = await ccdCaseService.getCase(req.session.user?.accessToken);
 
       if (caseData && caseData.id) {
-        req.session.ccdCase = caseData;
+        // Only store caseId in session (not full case data) to reduce Redis storage
+        // Full case data is fetched fresh on each page via START event
+        req.session.ccdCase = { id: caseData.id, data: {} };
       }
     }
     next();

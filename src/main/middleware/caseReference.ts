@@ -35,11 +35,12 @@ export async function caseReferenceParamMiddleware(
 
     const validatedCase = await ccdCaseService.getCaseById(accessToken, sanitisedCaseReference);
 
-    // Store validated case in both locations
+    // Store validated case in res.locals for request-scoped access (fresh data from START event)
     res.locals.validatedCase = validatedCase;
 
-    // Also update session to ensure draft data from START event is available to all middleware
-    req.session.ccdCase = validatedCase;
+    // Store only caseId in session (not full case data) to reduce Redis storage
+    // Full case data is available in res.locals.validatedCase
+    req.session.ccdCase = { id: validatedCase.id, data: {} };
 
     next();
   } catch (error) {

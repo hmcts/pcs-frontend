@@ -273,13 +273,13 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
   const keys = path.split('.');
   const result: Record<string, unknown> = {};
 
-  keys.reduce((acc, key, index) => {
+  keys.reduce<Record<string, unknown>>((acc, key, index) => {
     if (index === keys.length - 1) {
       acc[key] = value;
     } else {
       acc[key] = {};
     }
-    return acc[key];
+    return acc[key] as Record<string, unknown>;
   }, result);
 
   return result;
@@ -357,8 +357,9 @@ export async function saveToDraft(
       },
     });
 
-    // Update session
-    req.session.ccdCase = updatedCase;
+    // Store only caseId in session (not full merged case data from CCD)
+    // Next page GET will fetch fresh data via START event
+    req.session.ccdCase = { id: updatedCase.id, data: {} };
 
     logger.info(`[${stepName}] ✅ Draft saved successfully`);
   } catch (error) {

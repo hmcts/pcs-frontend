@@ -320,8 +320,9 @@ async function saveToCCD(
       data: ccdPayload,
     });
 
-    // Update session with latest case data
-    req.session.ccdCase = updatedCase;
+    // Store only caseId in session (not full merged case data from CCD)
+    // Next page GET will fetch fresh data via START event
+    req.session.ccdCase = { id: updatedCase.id, data: {} };
 
     logger.info(`[${stepName}] Draft saved successfully to CCD`);
   } catch (error) {
