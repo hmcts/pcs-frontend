@@ -1,9 +1,8 @@
 {
   "title": "cyDisputing other parts of the claim",
   "captionHeading": "cyRespond to a property possession claim",
-  "introLinkText": "cyview the claim (opens in new tab)",
   "introLinkHref": "#",
-  "introParagraph": "cyYou should {{link}} to see if there's any other parts of the claim that are incorrect or you disagree with.",
+  "introParagraph": "cyYou should <link>cyview the claim (opens in new tab)</link> to see if there's any other parts of the claim that are incorrect or you disagree with.",
   "includesHeading": "cyThis includes:",
   "includesList": [
     "cy{{claimantName, pluralPossessive}} grounds for possession (their reasons for making the claim)",

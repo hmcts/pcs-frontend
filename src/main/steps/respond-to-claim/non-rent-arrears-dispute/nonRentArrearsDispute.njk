@@ -18,11 +18,17 @@
   {% endif %}
 
   <h1 class="govuk-heading-l">{{ title }}</h1>
-
-  <p class="govuk-body">
+  {# <p class="govuk-body">
     {{ introParagraph | replace("{{link}}", '<a href="' ~ introLinkHref ~ '" class="govuk-link" target="_blank" rel="noopener noreferrer">' ~ introLinkText ~ '</a>') | safe }}
+  </p> #}
+  {# <p class="govuk-body">
+    {{ introParagraph.before }}
+      <a href="{{ introLinkHref }}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ introLinkText }}</a>
+    {{ introParagraph.after }}
+  </p> #}
+  <p class="govuk-body">
+  {{ introParagraph | linkify(introLinkHref) | safe }}
   </p>
-  
   <p class="govuk-body">{{ includesHeading }}</p>
   <ul class="govuk-list govuk-list--bullet">
     {% for item in includesList %}
