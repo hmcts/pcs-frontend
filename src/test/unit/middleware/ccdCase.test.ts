@@ -58,7 +58,8 @@ describe('ccdCaseMiddleware', () => {
     await ccdCaseMiddleware(mockReq as Request, mockRes as Response, next);
 
     expect(ccdCaseService.getCase).toHaveBeenCalledWith('token');
-    expect((mockReq.session as CustomSession).ccdCase).toEqual(mockCase);
+    // After session optimization: only store caseId, not full case data
+    expect((mockReq.session as CustomSession).ccdCase).toEqual({ id: 'case123', data: {} });
     expect(next).toHaveBeenCalledWith();
   });
 
