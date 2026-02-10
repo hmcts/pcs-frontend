@@ -3,10 +3,10 @@ import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'contact-preferences',
+  stepName: 'do-any-other-adults-live-in-your-home',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
   fields: [],
-  customTemplate: `${__dirname}/contactPreferences.njk`,
+  customTemplate: `${__dirname}/otherAdults.njk`,
 });
