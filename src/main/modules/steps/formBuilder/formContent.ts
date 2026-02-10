@@ -64,6 +64,7 @@ export function buildFormContent(
     title: pageTitle,
     ...translatedContent,
     showCancelButton,
+    saveAndContinue: t('buttons.saveAndContinue'),
     continue: t('buttons.continue'),
     saveForLater: t('buttons.saveForLater'),
     cancel: t('buttons.cancel'),

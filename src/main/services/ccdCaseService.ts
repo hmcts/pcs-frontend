@@ -89,6 +89,26 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
+  async getCaseById(accessToken: string, caseId: string, eventId: string = 'respondPossessionClaim'): Promise<CcdCase> {
+    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
+
+    try {
+      logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
+      const response = await http.get<{ case_details?: { case_data?: Record<string, unknown> } }>(
+        eventUrl,
+        getCaseHeaders(accessToken)
+      );
+      logger.info(`[ccdCaseService] Case access validated successfully for caseId: ${caseId}`);
+
+      return {
+        id: caseId,
+        data: response.data.case_details?.case_data || {},
+      };
+    } catch (error) {
+      throw convertAxiosErrorToHttpError(error, 'getCaseById');
+    }
+  },
+
   async getCase(accessToken: string | undefined): Promise<CcdCase | null> {
     const url = `${getBaseUrl()}/searchCases?ctid=${getCaseTypeId()}`;
     const headersConfig = getCaseHeaders(accessToken || '');

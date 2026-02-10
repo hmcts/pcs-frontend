@@ -4,7 +4,9 @@ import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
+  defendantNameConfirmation,
   freeLegalAdvice,
+  paymentInterstitial,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -16,7 +18,9 @@ export class RespondToClaimAction implements IAction {
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
+      ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
+      ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -49,6 +53,14 @@ export class RespondToClaimAction implements IAction {
     );
   }
 
+  private async confirmDefendantDetails(confirmDefendantName: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: confirmDefendantName.question,
+      option: confirmDefendantName.option,
+    });
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  }
+
   private async selectCorrespondenceAddressKnown(addressData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: correspondenceAddressKnown.correspondenceAddressConfirmHintText,
@@ -63,6 +75,10 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  }
+
+  private async readPaymentInterstitial(): Promise<void> {
+    await performAction('clickButton', paymentInterstitial.continueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

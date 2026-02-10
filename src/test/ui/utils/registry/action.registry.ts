@@ -45,7 +45,9 @@ export class ActionRegistry {
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
+    ['confirmDefendantDetails', new RespondToClaimAction()],
     ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
+    ['readPaymentInterstitial', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
