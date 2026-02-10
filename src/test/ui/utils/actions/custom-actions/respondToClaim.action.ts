@@ -7,6 +7,7 @@ import {
   defendantNameConfirmation,
   freeLegalAdvice,
   paymentInterstitial,
+  repaymentsMade,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -21,6 +22,7 @@ export class RespondToClaimAction implements IAction {
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
+      ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -79,6 +81,18 @@ export class RespondToClaimAction implements IAction {
 
   private async readPaymentInterstitial(): Promise<void> {
     await performAction('clickButton', paymentInterstitial.continueButton);
+  }
+
+  private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: repaymentsMade.mainHeader,
+      option: repaymentsData.repaymentOption,
+    });
+
+    if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
+      await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
+    }
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

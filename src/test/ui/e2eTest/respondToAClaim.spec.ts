@@ -12,10 +12,11 @@ import {
   disputeClaimInterstitial,
   freeLegalAdvice,
   registeredLandlord,
-  repayments,
+  repaymentsMade,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
+import { repaymentsAgreed } from '../data/page-data/repaymentsAgreed.page.data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
 
@@ -63,9 +64,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.yesRadioOption,
+      repaymentInfo: repaymentsMade.detailsTextInput,
+    });
+    await performAction('mainHeader', repaymentsAgreed.mainHeader);
   });
+
+  // NO OPTION TO BE ADDED TO ANOTHER TEST
 
   // Wales postcode routing is not implemented yet, e2e test coverage, functional test coverage needs to be reviewed once HDPI-3451 is done
   test.skip('Respond to a claim - Wales postcode', async () => {
@@ -100,7 +106,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performValidation('mainHeader', repaymentsMade.mainHeader);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   });
 });

@@ -11,4 +11,4 @@ export * from './defendantNameConfirmation.page.data';
 export * from './contactPreference.page.data';
 export * from './counterClaim.page.data';
 export * from './payment-interstitial.page.data';
-export * from './repayments.page.data';
+export * from './repaymentsMade.page.data';

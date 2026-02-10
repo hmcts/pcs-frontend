@@ -12,6 +12,7 @@ import {
   disputeClaimInterstitial,
   freeLegalAdvice,
   paymentInterstitial,
+  repaymentsMade,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
@@ -189,5 +190,51 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickLink', paymentInterstitial.cancelLink);
     await performValidation('mainHeader', 'Dashboard');
+  });
+
+  test('madeRepayments - mandatory selection, mandatory text box,save for later and back link ', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.continueButton);
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('clickButton', paymentInterstitial.continueButton);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: repaymentsMade.errorValidation,
+      validationType: repaymentsMade.errorValidationType.radio,
+      inputArray: repaymentsMade.errorValidationField.errorRadioMsg,
+      question: repaymentsMade.mainHeader,
+      header: repaymentsMade.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: repaymentsMade.errorValidation,
+      validationType: repaymentsMade.errorValidationType.input,
+      inputArray: repaymentsMade.errorValidationField.errorTextField,
+      header: repaymentsMade.errorValidationHeader,
+    });
+    await performAction('clickLink', paymentInterstitial.cancelLink);
+    await performValidation('mainHeader', 'Dashboard');
+
+    await performAction('clickLink', paymentInterstitial.backLink);
+    await performValidation('mainHeader', counterClaim.mainHeader);
   });
 });

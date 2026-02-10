@@ -48,6 +48,7 @@ export class ActionRegistry {
     ['confirmDefendantDetails', new RespondToClaimAction()],
     ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
     ['readPaymentInterstitial', new RespondToClaimAction()],
+    ['repaymentsMade', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
