@@ -24,6 +24,7 @@ export const step: StepDefinition = createFormStep({
       type: 'date',
       required: false,
       noFutureDate: true,
+      noCurrentDate: false,
       legendClasses: 'govuk-fieldset__legend--m',
       translationKey: {
         label: 'question',
@@ -32,9 +33,8 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => ({
+    //TODO: get claimantName/noticeDate from CCD case - currently hardcoded/served from LaunchDarkly flag
     claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
-
-    //TODO: get noticeDate from CCD case - currently served from LaunchDarkly flag
     noticeDate: req.session.noticeDate ?? '',
   }),
 });
