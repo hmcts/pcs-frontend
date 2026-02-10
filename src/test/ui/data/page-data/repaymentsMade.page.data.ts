@@ -19,4 +19,6 @@ export const repaymentsMade = {
       },
     ],
   },
+  saveForLaterButton: 'Save for later',
+  backLink: 'Back',
 };

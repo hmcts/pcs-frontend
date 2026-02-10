@@ -231,10 +231,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       inputArray: repaymentsMade.errorValidationField.errorTextField,
       header: repaymentsMade.errorValidationHeader,
     });
-    await performAction('clickLink', paymentInterstitial.cancelLink);
+    await performAction('clickLink', repaymentsMade.backLink);
+    await performValidation('mainHeader', paymentInterstitial.mainHeader);
+    await performAction('clickButton', paymentInterstitial.continueButton);
+    await performAction('clickLink', repaymentsMade.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
-
-    await performAction('clickLink', paymentInterstitial.backLink);
-    await performValidation('mainHeader', counterClaim.mainHeader);
   });
 });
