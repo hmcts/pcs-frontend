@@ -8,6 +8,7 @@ import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
 import { caseReferenceParamMiddleware, sessionTimeoutMiddleware } from './middleware';
+import { autoSaveDraftToCCD } from './middleware/autoSaveDraftToCCD';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import registerSteps from './routes/registerSteps';
@@ -41,6 +42,9 @@ app.use((req, res, next) => {
 
 // timeout config available to all templates
 app.use(sessionTimeoutMiddleware);
+
+// Auto-save form data to CCD draft (intercepts res.redirect)
+app.use(autoSaveDraftToCCD);
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);

@@ -35,8 +35,11 @@ export async function caseReferenceParamMiddleware(
 
     const validatedCase = await ccdCaseService.getCaseById(accessToken, sanitisedCaseReference);
 
-    // Store validated case
+    // Store validated case in both locations
     res.locals.validatedCase = validatedCase;
+
+    // Also update session to ensure draft data from START event is available to all middleware
+    req.session.ccdCase = validatedCase;
 
     next();
   } catch (error) {

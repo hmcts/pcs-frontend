@@ -84,6 +84,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           languageToggle: t('languageToggle'),
           backUrl: await navigation.getBackUrl(req, stepName),
           showCancelButton,
+          url: req.originalUrl, // Form action URL - POST to current page
         };
       });
     },
