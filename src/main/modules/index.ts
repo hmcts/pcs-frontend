@@ -9,7 +9,6 @@ export { Helmet } from './helmet';
 export { Nunjucks } from './nunjucks';
 export { PropertiesVolume } from './properties-volume';
 export { Session } from './session';
-export { Journey } from './journey';
 export { LaunchDarkly } from './launch-darkly';
 export { I18n } from './i18n';
 

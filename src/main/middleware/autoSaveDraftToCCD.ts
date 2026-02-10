@@ -1,18 +1,6 @@
 /**
- * Auto-Save Draft to CCD Middleware
- *
- * Automatically saves form data to CCD draft table on every step submission.
- *
- * Features:
- * - Generic: Works for any step with simple configuration
- * - Helper functions: Reusable transformations (yesNoEnum, dateToISO, etc.)
- * - Convention over Configuration: Minimal setup per step
- * - Non-invasive: No changes to existing step definitions
- *
- * Usage:
- * 1. Add step to STEP_FIELD_MAPPING
- * 2. Register middleware in app.ts
- * 3. Done! Auto-saves on every form submission
+ * Middleware that intercepts res.redirect() to auto-save form data to CCD draft.
+ * Add steps to STEP_FIELD_MAPPING to enable auto-save.
  */
 
 import { Logger } from '@hmcts/nodejs-logging';
@@ -22,42 +10,16 @@ import { ccdCaseService } from '../services/ccdCaseService';
 
 const logger = Logger.getLogger('autoSaveDraftToCCD');
 
-// ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
-
-/**
- * Value mapper function: transforms form data to backend format
- *
- * Can accept either:
- * - Single value (for single field mapping)
- * - Full formData object (for multi-field mapping like dates)
- */
 type ValueMapper = (valueOrFormData: string | string[] | Record<string, unknown>) => Record<string, unknown>;
 
-/**
- * Step mapping configuration
- */
 interface StepMapping {
-  backendPath: string; // Where to save in CCD structure (e.g., 'possessionClaimResponse.defendantResponses')
-  frontendField?: string; // Single frontend field name (e.g., 'hadLegalAdvice')
-  frontendFields?: string[]; // Multiple frontend field names (e.g., ['day', 'month', 'year'])
-  valueMapper: ValueMapper; // Transformation function
+  backendPath: string;
+  frontendField?: string;
+  frontendFields?: string[];
+  valueMapper: ValueMapper;
 }
 
-// ============================================================================
-// HELPER FUNCTIONS (Reusable Transformations)
-// ============================================================================
-
-/**
- * Helper 1: Yes/No radio buttons → YES/NO enum
- *
- * Frontend values: 'yes', 'no', 'preferNotToSay'
- * Backend values: 'YES', 'NO', 'PREFER_NOT_TO_SAY'
- *
- * Usage:
- * valueMapper: yesNoEnum('receivedFreeLegalAdvice')
- */
+/** Transforms 'yes'/'no' to 'YES'/'NO' enum */
 export function yesNoEnum(backendFieldName: string): ValueMapper {
   return (value: string | string[] | Record<string, unknown>) => {
     if (typeof value !== 'string') {
@@ -77,15 +39,7 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
   };
 }
 
-/**
- * Helper 2: Date fields (day/month/year) → ISO date string
- *
- * Frontend values: { day: '15', month: '08', year: '1990' }
- * Backend value: '1990-08-15'
- *
- * Usage:
- * valueMapper: dateToISO('dateOfBirth')
- */
+/** Combines date fields (day/month/year) into ISO date string */
 export function dateToISO(backendFieldName: string): ValueMapper {
   return (formData: string | string[] | Record<string, unknown>) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
@@ -108,15 +62,7 @@ export function dateToISO(backendFieldName: string): ValueMapper {
   };
 }
 
-/**
- * Helper 3: Pass through fields unchanged (1:1 mapping)
- *
- * Frontend values: { firstName: 'John', lastName: 'Doe' }
- * Backend values: { firstName: 'John', lastName: 'Doe' }
- *
- * Usage:
- * valueMapper: passThrough(['firstName', 'lastName'])
- */
+/** Pass through fields unchanged (1:1 mapping) */
 export function passThrough(fieldNames: string[]): ValueMapper {
   return (formData: string | string[] | Record<string, unknown>) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
@@ -136,15 +82,7 @@ export function passThrough(fieldNames: string[]): ValueMapper {
   };
 }
 
-/**
- * Helper 4: Multiple yes/no checkboxes → Array of enum values
- *
- * Frontend values: { vulnerabilities: ['mentalHealth', 'disability'] }
- * Backend value: ['MENTAL_HEALTH', 'DISABILITY']
- *
- * Usage:
- * valueMapper: multipleYesNo('vulnerabilities')
- */
+/** Transforms array of checkbox values to uppercase enum array */
 export function multipleYesNo(backendFieldName: string): ValueMapper {
   return (value: string | string[] | Record<string, unknown>) => {
     if (!Array.isArray(value)) {
@@ -163,57 +101,15 @@ export function multipleYesNo(backendFieldName: string): ValueMapper {
   };
 }
 
-// ============================================================================
-// STEP CONFIGURATION (Add your steps here)
-// ============================================================================
-
-/**
- * Step field mapping configuration
- *
- * Add each step that needs auto-save here.
- *
- * Example:
- * 'step-name': {
- *   backendPath: 'possessionClaimResponse.defendantResponses',
- *   frontendField: 'fieldName',
- *   valueMapper: yesNoEnum('backendFieldName'),
- * }
- */
 const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
-  // Free Legal Advice step
   'free-legal-advice': {
     backendPath: 'possessionClaimResponse.defendantResponses',
     frontendField: 'hadLegalAdvice',
     valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
   },
-
-  // Add more steps here as needed...
-  // Example: Date of birth
-  // 'defendant-date-of-birth': {
-  //   backendPath: 'possessionClaimResponse.defendantResponses',
-  //   frontendFields: ['day', 'month', 'year'],
-  //   valueMapper: dateToISO('dateOfBirth'),
-  // },
-
-  // Example: Name
-  // 'defendant-name-capture': {
-  //   backendPath: 'possessionClaimResponse.defendantResponses',
-  //   frontendFields: ['firstName', 'lastName'],
-  //   valueMapper: passThrough(['firstName', 'lastName']),
-  // },
 };
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-/**
- * Extracts step name from URL path
- *
- * Supports:
- * - /steps/{journey}/{stepName} → stepName
- * - /case/{caseReference}/respond-to-claim/{stepName} → stepName
- */
+/** Extracts step name from URL path */
 function extractStepName(path: string): string | null {
   const stepsMatch = path.match(/\/steps\/[^/]+\/([^/]+)/);
   if (stepsMatch) {
@@ -223,12 +119,7 @@ function extractStepName(path: string): string | null {
   return respondToClaimMatch ? respondToClaimMatch[1] : null;
 }
 
-/**
- * Converts flat object to nested structure based on path
- *
- * Example:
- * pathToNested('a.b.c', { x: 1 }) → { a: { b: { c: { x: 1 } } } }
- */
+/** Converts dot-path to nested object (e.g., 'a.b.c' → { a: { b: { c: value } } }) */
 function pathToNested(path: string, value: Record<string, unknown>): Record<string, unknown> {
   const keys = path.split('.');
   const result: Record<string, unknown> = {};
@@ -245,13 +136,6 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
   return result;
 }
 
-// ============================================================================
-// MAIN SAVE FUNCTION
-// ============================================================================
-
-/**
- * Saves form data to CCD draft
- */
 async function saveToCCD(
   req: Request,
   stepName: string,
@@ -274,10 +158,8 @@ async function saveToCCD(
   try {
     logger.debug(`[${stepName}] Auto-saving to CCD draft`);
 
-    // Extract relevant fields
     let relevantData: string | string[] | Record<string, unknown>;
     if (config.frontendField) {
-      // Single field - could be string or array
       const fieldValue = formData[config.frontendField];
       if (fieldValue === undefined) {
         logger.warn(`[${stepName}] Field '${config.frontendField}' not found in form data, skipping save`);
@@ -285,7 +167,6 @@ async function saveToCCD(
       }
       relevantData = fieldValue as string | string[];
     } else if (config.frontendFields) {
-      // Multiple fields - collect into object
       const multiFieldData: Record<string, unknown> = {};
       for (const fieldName of config.frontendFields) {
         if (formData[fieldName] !== undefined) {
@@ -298,71 +179,45 @@ async function saveToCCD(
       }
       relevantData = multiFieldData;
     } else {
-      // All fields
       relevantData = formData;
     }
 
-    // Transform using mapper
     const transformedData = config.valueMapper(relevantData);
-
-    // Convert to nested CCD structure
     const nestedData = pathToNested(config.backendPath, transformedData);
 
-    // Prepare CCD payload - send only incremental changes
     const ccdPayload = {
-      submitDraftAnswers: 'No', // Always draft mode
+      submitDraftAnswers: 'No',
       ...nestedData,
     };
 
-    // Save to CCD
     const updatedCase = await ccdCaseService.updateCase(accessToken, {
       id: ccdCase.id,
       data: ccdPayload,
     });
 
-    // Store only caseId in session (not full merged case data from CCD)
-    // Next page GET will fetch fresh data via START event
+    // Store only caseId - next page will fetch fresh data via START event
     req.session.ccdCase = { id: updatedCase.id, data: {} };
 
     logger.info(`[${stepName}] Draft saved successfully to CCD`);
   } catch (error) {
     logger.error(`[${stepName}] Failed to save draft to CCD:`, error);
-    // Don't throw - allow user to continue even if draft save fails
-    // The form data is still in session
   }
 }
 
-// ============================================================================
-// MIDDLEWARE EXPORT
-// ============================================================================
-
-/**
- * Auto-save draft middleware
- *
- * Intercepts res.redirect() to save form data to CCD before redirect.
- */
 export function autoSaveDraftToCCD(req: Request, res: Response, next: NextFunction): void {
-  // Save original redirect function
   const originalRedirect = res.redirect.bind(res);
 
-  // Replace with our version that saves to CCD first
   res.redirect = async function (statusOrUrl: number | string, url?: string): Promise<void> {
-    // Properly handle Express redirect signatures:
-    // - res.redirect(url) → statusOrUrl is string, url is undefined
-    // - res.redirect(status, url) → statusOrUrl is number, url is string
     const isStatusProvided = typeof statusOrUrl === 'number';
 
     try {
-      // Extract step name from current URL
       const stepName = extractStepName(req.path);
 
       if (!stepName) {
         logger.debug('No step name found in path, skipping auto-save');
-        // Call original redirect with proper arguments
         return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
       }
 
-      // Check if this step has CCD mapping
       const config = STEP_FIELD_MAPPING[stepName];
 
       if (!config) {
@@ -370,7 +225,6 @@ export function autoSaveDraftToCCD(req: Request, res: Response, next: NextFuncti
         return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
       }
 
-      // Get form data from session
       const formData = req.session.formData?.[stepName];
 
       if (!formData || Object.keys(formData).length === 0) {
@@ -378,14 +232,11 @@ export function autoSaveDraftToCCD(req: Request, res: Response, next: NextFuncti
         return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
       }
 
-      // Save to CCD
       await saveToCCD(req, stepName, formData, config);
 
-      // Continue with original redirect
       return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
     } catch (error) {
       logger.error('Error in autoSaveDraftToCCD middleware:', error);
-      // Continue with redirect even if save failed
       return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
     }
   };
