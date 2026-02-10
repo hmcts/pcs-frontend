@@ -34,7 +34,7 @@ export interface Address {
 }
 
 export interface PossessionClaimResponse {
-  party?: {
+  party: {
     firstName?: string;
     lastName?: string;
     address?: Address;
@@ -51,10 +51,6 @@ export interface StartCallbackData {
       possessionClaimResponse?: {
         party?: {
           address?: Address;
-        };
-        contact_preferences?: {
-          contact_by_text?: YesNoValue;
-          contact_by_phone?: YesNoValue;
         };
       };
     };

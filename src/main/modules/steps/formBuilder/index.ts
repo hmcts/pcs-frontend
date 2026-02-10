@@ -2,7 +2,7 @@ import path from 'path';
 
 import type { TFunction } from 'i18next';
 
-import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
+import type { BuiltFormContent, FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
@@ -62,7 +62,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           throw new Error('Nunjucks environment not initialized');
         }
         // Get interpolation values from extendGetContent if available (for dynamic translation values)
-        const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
+        const emptyFormContent = { fields: [] } as BuiltFormContent;
+        const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
         const formContent = buildFormContent(
           fields,
           t,
@@ -70,10 +71,10 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           {},
           translationKeys,
           nunjucksEnv,
-          interpolationValues
-        );
-        const result = extendGetContent ? { ...formContent, ...interpolationValues } : formContent;
-
+          interpolationValues as Record<string, unknown>
+        ) as BuiltFormContent;
+        const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
+        const result = extraContent ? { ...formContent, ...extraContent } : formContent;
         return {
           ...result,
           ccdId: req.session?.ccdCase?.id,
