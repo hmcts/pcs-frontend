@@ -27,7 +27,6 @@ export class Session {
 
     app.locals.redisClient = redis;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const redisStore = new (RedisStore as any)({
       client: redis,
       prefix: config.get('session.prefix') + ':',

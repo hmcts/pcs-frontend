@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import fs, { promises as fsPromises } from 'fs';
 
 import express, { Express } from 'express';
