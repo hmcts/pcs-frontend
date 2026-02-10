@@ -1,1 +1,0 @@
-{"value":"axios","children":{"ID":1113092,"Issue":"Axios is Vulnerable to Denial of Service via __proto__ Key in mergeConfig","URL":"https://github.com/advisories/GHSA-43fc-jf86-j433","Severity":"high","Vulnerable Versions":"<=1.13.4","Tree Versions":["1.13.2"],"Dependents":["pcs-frontend@workspace:."]}}
