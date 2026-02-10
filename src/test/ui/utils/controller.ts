@@ -7,6 +7,7 @@ import { ActionRegistry, ValidationRegistry } from './registry';
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
+let startErrorMessageValidation = false;
 
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
@@ -23,7 +24,9 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-
+  if (executor.page.url().includes('free-legal-advice')) {
+    startErrorMessageValidation = true;
+  }
   const pageNavigated = currentUrl !== previousUrl;
 
   if (pageNavigated) {
@@ -40,7 +43,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
       if (enable_content_validation) {
         await performValidation('autoValidatePageContent');
       }
-      if (enable_error_message_validation) {
+      if (startErrorMessageValidation && enable_error_message_validation) {
         await performAction('triggerErrorMessagesForValidation');
       }
     }
