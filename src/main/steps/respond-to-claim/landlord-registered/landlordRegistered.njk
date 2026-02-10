@@ -26,5 +26,17 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
   <p class="govuk-body">dummy page</p>
+
+  <form method="post" action="{{ url }}">
+          <div class="govuk-button-group">
+          {{ govukButton({
+              text: t('buttons.continue', { ns: 'common' }),
+              attributes: { type: 'submit', name: 'action', value: 'continue' }
+          }) }}
+          <p class="govuk-body">
+            <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+          </p>
+          </div>
+    </form>
 {% endblock %}
 

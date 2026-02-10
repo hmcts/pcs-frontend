@@ -10,7 +10,7 @@ export const buildCcdCaseForPossessionClaimResponse = async (
   submitDraftAnswers: boolean
 ): Promise<CcdCase> => {
   const ccdCase: CcdCase = {
-    id: req.session?.ccdCase?.id ?? req.params.caseReference ?? '',
+    id: req.res?.locals.validatedCase?.id,
     data: {
       possessionClaimResponse,
       submitDraftAnswers: submitDraftAnswers ? 'Yes' : 'No',
