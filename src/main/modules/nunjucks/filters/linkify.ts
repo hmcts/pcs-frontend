@@ -1,3 +1,10 @@
+import nunjucks from 'nunjucks';
+
+const SafeString = (nunjucks as { runtime?: { SafeString: new (s: string) => unknown } }).runtime?.SafeString;
+if (!SafeString) {
+  throw new Error('Nunjucks SafeString not available');
+}
+
 export function linkify(
   text: string,
   href: string,
@@ -12,5 +19,6 @@ export function linkify(
   const open = `<a href="${href}" class="${className}" target="${target}" rel="${rel}">`;
   const close = '</a>';
 
-  return text.replace('<link>', open).replace('</link>', close);
+  const html = text.replace('<link>', open).replace('</link>', close);
+  return new (SafeString as new (s: string) => unknown)(html) as unknown as string;
 }
