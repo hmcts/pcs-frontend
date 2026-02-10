@@ -1,16 +1,28 @@
 import isPostalCode from 'validator/lib/isPostalCode';
 
+import type { Address, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
+import { ccdCaseService } from '../../../services/ccdCaseService';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
+const STEP_NAME = 'postcode-finder';
+
+let prepopulateAddress: Address | undefined;
+
+// Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
+// Session is set in extendGetContent; validation reads it via allData on POST.
+const correspondenceAddressRequired = (_formData: Record<string, unknown>, allData: Record<string, unknown>): boolean =>
+  allData.__isAddressKnown === true;
 
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'correspondenceAddressConfirm',
     type: 'radio',
-    required: true,
+    required: correspondenceAddressRequired,
     translationKey: {
       label: 'legend',
       hint: 'legend.hint',
@@ -99,9 +111,64 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
   },
-  extendGetContent: req => {
+  beforeRedirect: async req => {
+    let possessionClaimResponse: PossessionClaimResponse;
+    //prepopulate address is correct
+    if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
+      possessionClaimResponse = {
+        party: {
+          address: prepopulateAddress,
+        },
+      };
+    } else {
+      const addressLine1 = req.body?.['correspondenceAddressConfirm.addressLine1'] ?? '';
+      const addressLine2 = req.body?.['correspondenceAddressConfirm.addressLine2'];
+      const townOrCity = req.body?.['correspondenceAddressConfirm.townOrCity'] ?? '';
+      const county = req.body?.['correspondenceAddressConfirm.county'];
+      const postcode = req.body?.['correspondenceAddressConfirm.postcode'] ?? '';
+
+      //only the details the defendant provides
+      possessionClaimResponse = {
+        party: {
+          address: {
+            AddressLine1: addressLine1,
+            ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
+            PostTown: townOrCity,
+            ...(county !== undefined && county !== '' && { County: county }),
+            PostCode: postcode,
+          },
+        },
+      };
+    }
+
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+  },
+  extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'postcode-finder', ['common']);
 
+    const formattedAddressStr = await getExistingAddress(
+      req.session.user?.accessToken || '',
+      req.params.caseReference || ''
+    );
+
+    const isAddressKnown = formattedAddressStr !== '?';
+    setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
+
+    const radio = formContent.fields.find(f => f.componentType === 'radios') as
+      | { component: { label: { text: string }; fieldset: { legend: { text: string } } } }
+      | undefined;
+    if (!radio || !radio.component) {
+      return {};
+    }
+
+    let prepopulateHeading = '';
+    if (isAddressKnown) {
+      prepopulateHeading = `${t('legend')}${formattedAddressStr}`;
+      radio.component.label.text = prepopulateHeading;
+      radio.component.fieldset.legend.text = prepopulateHeading;
+    }
+
+    // Override value used in njk File with our dynamic value.
     // Dynamically inject validator with translation function
     const postcodeField = fieldsConfig[0].options?.[1]?.subFields?.postcode;
     if (postcodeField) {
@@ -115,8 +182,14 @@ export const step: StepDefinition = createFormStep({
         return true;
       };
     }
-
     return {
+      ...formContent,
+      isAddressKnown,
+      prepopulateHeading,
+      // subtitle,
+      legendNa: t('legendNa'),
+      legendhintNa: t('legend.hintNa'),
+
       caption: t('caption'),
       labels: {
         yes: t('labels.yes'),
@@ -154,3 +227,29 @@ export const step: StepDefinition = createFormStep({
   },
   fields: fieldsConfig,
 });
+
+async function getExistingAddress(accessToken: string, caseReference: string): Promise<string> {
+  // Pull data from API
+  const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
+  prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.party?.address;
+
+  if (prepopulateAddress) {
+    const formattedAddress =
+      [
+        prepopulateAddress.AddressLine1,
+        prepopulateAddress.AddressLine2,
+        prepopulateAddress.AddressLine3,
+        prepopulateAddress.PostTown,
+        prepopulateAddress.County,
+        prepopulateAddress.PostCode,
+        prepopulateAddress.Country,
+      ]
+        .map(v => (v ?? '').trim())
+        .filter(Boolean)
+        .join(', ') + '?';
+
+    return formattedAddress;
+  } else {
+    return '?'; //no address
+  }
+}

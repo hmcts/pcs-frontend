@@ -1,12 +1,16 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import type {
+  BuiltFormContent,
+  ExtendGetContent,
+  FormFieldConfig,
+  TranslationKeys,
+} from '../../../interfaces/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
-import type { TranslationContent } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
@@ -30,7 +34,7 @@ export function createPostHandler(
   translationKeys?: TranslationKeys,
   flowConfig?: JourneyFlowConfig,
   showCancelButton?: boolean,
-  extendGetContent?: (req: Request, content: TranslationContent) => Record<string, unknown>
+  extendGetContent?: ExtendGetContent
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -69,7 +73,8 @@ export function createPostHandler(
       normalizeCheckboxFields(req, fields);
 
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
-      const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
+      const emptyFormContent = { fields: [] } as BuiltFormContent;
+      const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
 
       const fieldsWithLabels = translateFields(
         fields,
@@ -103,7 +108,7 @@ export function createPostHandler(
           showCancelButton
         );
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
-        const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
+        const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
         await renderWithErrors(
           req,

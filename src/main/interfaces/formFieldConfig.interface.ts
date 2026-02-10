@@ -1,7 +1,5 @@
 import type { Request } from 'express';
 
-import type { TranslationContent } from '../modules/steps';
-
 import type { JourneyFlowConfig } from './stepFlow.interface';
 
 export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup';
@@ -78,12 +76,28 @@ export interface TranslationKeys {
   [key: string]: string | undefined;
 }
 
+export type BuiltFormContent = {
+  fields: {
+    componentType?: string;
+    component?: Record<string, unknown>;
+  }[];
+  errorSummary?: unknown;
+  errors?: Record<string, string>;
+  [key: string]: unknown;
+};
+
+type MaybePromise<T> = T | Promise<T>;
+export type ExtendGetContent = (
+  req: Request,
+  formContent: BuiltFormContent
+) => MaybePromise<Partial<BuiltFormContent> & Record<string, unknown>>;
+
 export interface FormBuilderConfig {
   stepName: string;
   journeyFolder: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
-  extendGetContent?: (req: Request, content: TranslationContent) => Record<string, unknown>;
+  extendGetContent?: ExtendGetContent;
   stepDir: string;
   translationKeys?: TranslationKeys;
   customTemplate?: string;
