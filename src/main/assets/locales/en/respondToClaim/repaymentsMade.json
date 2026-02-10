@@ -1,7 +1,7 @@
 {
   "pageTitle": "Repayments made",
   "caption": "Respond to a property possession claim",
-  "question": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}",
+  "question": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
   "options": {
     "yes": "Yes",
     "no": "No"
