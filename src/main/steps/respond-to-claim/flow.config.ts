@@ -23,6 +23,7 @@ export const flowConfig: JourneyFlowConfig = {
     'tenancy-details',
     'end-now',
     'contact-preferences',
+    'repayments-agreed',
   ],
   steps: {
     'start-now': {
@@ -92,6 +93,10 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'repayments-made': {
       previousStep: 'payment-interstitial',
+      defaultNext: 'repayments-agreed',
+    },
+    'repayments-agreed': {
+      previousStep: 'repayments-made',
       defaultNext: 'end-now',
     },
   },

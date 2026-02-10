@@ -3,10 +3,20 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
+{% block pageTitle %}
+  {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
+
 {% block mainContent %}
+
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
    <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
@@ -16,7 +26,7 @@
 
     <div class="govuk-button-group">
       {{ govukButton({
-        text: continue,
+        text: saveAndContinue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
       {{ govukButton({
