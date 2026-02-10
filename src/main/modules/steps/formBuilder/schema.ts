@@ -89,9 +89,11 @@ export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
 // FormFieldOption schema with nested conditional fields support
 export const FormFieldOptionSchema: z.ZodType<FormFieldOption> = z.lazy(() =>
   z.object({
-    value: z.string(),
+    value: z.string().optional(),
     // Backward compatible properties
     text: z.string().optional(),
+    // Divider text for visual separation of options
+    divider: z.string().optional(),
     translationKey: z.string().optional(),
     // New conditional fields support
     label: LabelFunctionSchema.optional(),
@@ -126,10 +128,14 @@ export const FormBuilderConfigSchema: z.ZodType<FormBuilderConfig> = z.object({
   stepName: z.string(),
   journeyFolder: z.string(),
   fields: z.array(FormFieldConfigSchema),
-  beforeRedirect: BeforeRedirectFunctionSchema,
-  extendGetContent: ExtendGetContentFunctionSchema,
+  beforeRedirect: BeforeRedirectFunctionSchema.optional(),
+  extendGetContent: ExtendGetContentFunctionSchema.optional(),
   stepDir: z.string(),
   translationKeys: TranslationKeysSchema.optional(),
+  customTemplate: z.string().optional(),
+  basePath: z.string().optional(),
+  flowConfig: z.any().optional(),
+  showCancelButton: z.boolean().optional(),
 });
 
 /**
@@ -175,7 +181,9 @@ export function validateConfigInDevelopment(config: FormBuilderConfig): FormBuil
   if (process.env.NODE_ENV !== 'production') {
     const result = validateFormBuilderConfig(config);
     if (!result.success && result.errors) {
-      logger.warn('FormBuilderConfig validation failed:', result.errors.format());
+      logger.warn('FormBuilderConfig validation failed for step:', config.stepName);
+      logger.warn('Validation errors:', JSON.stringify(result.errors.format(), null, 2));
+      logger.warn('Config keys:', Object.keys(config));
     }
   }
   return config;
