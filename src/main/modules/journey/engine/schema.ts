@@ -803,7 +803,6 @@ export const createFieldValidationSchema = (
         .map(o => (typeof o === 'string' ? o : (o.value ?? '')))
         .filter(v => v !== '' && v !== null && v !== undefined) as string[];
 
-       
       let schema: any = z.array(z.string());
 
       if (isRequired() || rules?.minLength !== undefined) {
@@ -925,7 +924,7 @@ export const createFieldValidationSchema = (
     default: {
       // Use a relaxed type here as the schema may switch between string, email, and URL validators
       // during the following conditional transformations.
-       
+
       let schema: any = z.string().trim();
       if (rules?.minLength !== undefined) {
         schema = schema.min(rules.minLength, { message: getMessage('minLength') });

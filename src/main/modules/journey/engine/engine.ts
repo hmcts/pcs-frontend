@@ -672,9 +672,8 @@ export class WizardEngine {
 
         // Translate fieldset.legend.{text|html}
         if (typedFieldConfig.fieldset?.legend) {
-           
           const legend = typedFieldConfig.fieldset.legend as any;
-           
+
           const newLegend: any = { ...legend };
           if (typeof newLegend.text === 'string') {
             newLegend.text = t(newLegend.text, newLegend.text);
@@ -682,7 +681,7 @@ export class WizardEngine {
           if (typeof newLegend.html === 'string') {
             newLegend.html = t(newLegend.html, newLegend.html);
           }
-           
+
           processed.fieldset = { ...(typedFieldConfig.fieldset as any), legend: newLegend };
         }
 
@@ -889,7 +888,6 @@ export class WizardEngine {
       return true;
     }
 
-     
     if ((allData as any).confirmation) {
       return stepId === 'confirmation';
     }
@@ -1045,7 +1043,6 @@ export class WizardEngine {
 
     const newFields: Record<string, FieldConfig> = {};
     for (const [name, config] of Object.entries(original.fields)) {
-       
       const cfg: any = config;
       const fieldDefaultKey = `${this.slug}-${original.id}-${name}`;
       const isEnabledFlag = await isEnabled(cfg.flag, fieldDefaultKey);
@@ -1572,7 +1569,7 @@ export class WizardEngine {
         const nextStep = this.journey.steps[nextId];
 
         // Generate reference number if needed
-         
+
         if (nextStep?.type === 'confirmation' && (nextStep as any).data?.referenceNumber) {
           const referenceNumber = await this.store.generateReference(req, this.slug, caseId);
           await this.store.save(req, caseId, version + 1, {
