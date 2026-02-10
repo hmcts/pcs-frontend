@@ -24,6 +24,7 @@ setupDev(app, developmentMode);
 app.use(cookieParser());
 
 modules.modules.forEach(async moduleName => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const moduleInstance = new (modules as any)[moduleName](developmentMode);
   await moduleInstance.enableFor(app);
 });

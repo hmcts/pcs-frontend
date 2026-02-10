@@ -5,6 +5,7 @@ import { JourneyStore } from './journeyStore.interface';
 
 export const redisStore = (slug: string): JourneyStore => {
   const keyFor = (req: Request, caseId: string): string => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userId = (req.session as any)?.user?.uid ?? 'anon';
     return `${slug}:${userId}:${caseId}`;
   };

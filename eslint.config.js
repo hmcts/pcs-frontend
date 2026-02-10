@@ -56,8 +56,8 @@ module.exports = defineConfig([
 
     rules: {
       '@typescript-eslint/array-type': 'error',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-require-imports': 'off',
 
@@ -91,7 +91,7 @@ module.exports = defineConfig([
       'jest/prefer-to-have-length': 'error',
       'jest/valid-expect': 'off',
       'linebreak-style': ['error', 'unix'],
-      'no-console': 'off',
+      'no-console': 'warn',
       'no-prototype-builtins': 'off',
       'no-return-await': 'error',
 
@@ -109,7 +109,7 @@ module.exports = defineConfig([
         'error',
         'single',
         {
-          allowTemplateLiterals: true,
+          allowTemplateLiterals: false,
           avoidEscape: true,
         },
       ],
@@ -125,6 +125,22 @@ module.exports = defineConfig([
           ignoreMemberSort: false,
         },
       ],
+    },
+  },
+  {
+    files: ['src/test/ui/**/*.ts'],
+    rules: {
+      quotes: [
+        'error',
+        'single',
+        {
+          allowTemplateLiterals: true,
+          avoidEscape: true,
+        },
+      ],
+      'no-console': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
     },
   },
   {

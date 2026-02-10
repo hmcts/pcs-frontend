@@ -7,7 +7,7 @@ export const ccdStore: JourneyStore = {
   async load(req: Request, caseId: string) {
     // const { data, version } = await fetchCase(caseId);
     // return { data, version };
-
+    /* eslint-disable-next-line no-console */
     console.log('Loading case', caseId);
 
     // TODO: Implement CCD store
@@ -18,7 +18,7 @@ export const ccdStore: JourneyStore = {
     // merge locally then push
     // const current = (await fetchCase(caseId)).data;
     // return patchCase(caseId, { ...current, ...patch }, version);
-
+    /* eslint-disable-next-line no-console */
     console.log('Saving case', caseId, version, patch);
 
     // TODO: Implement CCD store
