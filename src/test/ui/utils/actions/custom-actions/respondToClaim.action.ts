@@ -5,13 +5,12 @@ import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
-  defendantNameConfirmation,
+  defendantNameConfirmation, disputeClaimInterstitial,
   freeLegalAdvice,
   paymentInterstitial,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
-
 export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -22,8 +21,8 @@ export class RespondToClaimAction implements IAction {
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
-      ['validateClaimantName', () => this.validateClaimantName(fieldName)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
+      ['validateClaimantName', () => this.validateClaimantName(fieldName as actionData)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -86,11 +85,12 @@ export class RespondToClaimAction implements IAction {
     } else {
       claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     }
-    const nameClaimant =
-      claimantsName.substring(claimantsName.length - 1) === 's' ? `${claimantsName}’` : `${claimantsName}’s`;
-    claimantsName = nameClaimant;
-    await performValidation('text', { elementType: 'paragraph', text: claimantsName });
+    const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
+    const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
+    await performValidation('text', { elementType: 'heading', text: mainHeader });
+    await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
   }
+
   private async readPaymentInterstitial(): Promise<void> {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }

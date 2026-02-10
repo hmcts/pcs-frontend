@@ -30,12 +30,12 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
-  console.log('case number created is ' + process.env.CASE_NUMBER);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('validateAccessCodeAPI');
-  await performAction('navigateToUrl', home_url + '/case/1234567891234567/respond-to-claim/start-now');
+  await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
 
@@ -60,7 +60,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('validateClaimantName', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.continueButton);
@@ -73,7 +73,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', repayments.saveAndContinueButton);
   });
 
-  test.skip('Respond to a claim - Wales postcode', async () => {
+  test.skip('Respond to a claim - Wales postcode @noDefendants', async () => {
     await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -93,7 +93,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('validateClaimantName', submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', registeredLandlord.mainHeader);
     await performAction('clickButton', registeredLandlord.continueButton);
