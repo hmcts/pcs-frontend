@@ -6,13 +6,13 @@
 
 {% block mainContent %}
   <h1 class="govuk-heading-l">Contact preferences (placeholder)</h1>
-  
+
   <p class="govuk-body">This is a placeholder page for contact preferences capture.</p>
 
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">
       {{ govukButton({
-        text: t('buttons.continue', { ns: 'common' }),
+        text: t('buttons.saveAndContinue', { ns: 'common' }),
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
       {{ govukButton({

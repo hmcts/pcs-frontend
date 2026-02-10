@@ -51,7 +51,7 @@
           <div class="govuk-button-group">
             {% set btnAttrs = fieldConfig.attributes or { type: 'submit' } %}
             {{ govukButton({
-              text: fieldConfig.text or 'Continue',
+              text: fieldConfig.text or 'saveAndContinue',
               html: fieldConfig.html,
               href: fieldConfig.href,
               classes: fieldConfig.classes,
