@@ -148,7 +148,7 @@ export const step: StepDefinition = createFormStep({
 
     const formattedAddressStr = await getExistingAddress(
       req.session.user?.accessToken || '',
-      req.params.caseReference || ''
+      req.res?.locals.validatedCase?.id || ''
     );
 
     const isAddressKnown = formattedAddressStr !== '?';
