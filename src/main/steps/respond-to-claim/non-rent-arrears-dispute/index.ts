@@ -12,7 +12,6 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/nonRentArrearsDispute.njk`,
   translationKeys: {
     introParagraph: 'introParagraph',
-    introLinkText: 'introLinkText',
     introLinkHref: 'introLinkHref',
     includesHeading: 'includesHeading',
     caption: 'captionHeading',
