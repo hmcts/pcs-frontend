@@ -235,7 +235,7 @@ export const step: StepDefinition = createFormStep({
 async function getExistingAddress(accessToken: string, caseReference: string): Promise<string> {
   // Pull data from API
   const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
-  prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.party?.address;
+  prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.defendantContactDetails?.party?.address;
 
   if (prepopulateAddress) {
     const formattedAddress =

@@ -47,8 +47,10 @@ export interface StartCallbackData {
   case_details: {
     case_data: {
       possessionClaimResponse?: {
-        party?: {
-          address?: Address;
+        defendantContactDetails?: {
+          party?: {
+            address?: Address;
+          };
         };
       };
     };
