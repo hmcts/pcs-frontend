@@ -291,6 +291,7 @@ export function validateForm(
         isRequired || anyValueProvided,
         t,
         field.noFutureDate,
+        field.noCurrentDate,
         translations
       );
 

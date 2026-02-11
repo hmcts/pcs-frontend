@@ -12,7 +12,6 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     subTitle: 'subTitle',
     caption: 'caption',
-    noticeDateHint2: 'noticeDateHint',
     question: 'question',
     paragraph: 'paragraph',
   },

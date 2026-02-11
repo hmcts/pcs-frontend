@@ -285,6 +285,7 @@ describe('dateValidation', () => {
           true,
           undefined,
           true,
+          false,
           translations
         );
         expect(result?.message).toBe('Custom future date error');
@@ -400,6 +401,7 @@ describe('dateValidation', () => {
           tomorrow.getFullYear().toString(),
           true,
           undefined,
+          true,
           true,
           translations
         );
