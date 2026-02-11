@@ -1,5 +1,5 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -21,6 +21,7 @@ export const step: StepDefinition = createFormStep({
       type: 'date',
       required: false,
       noFutureDate: true,
+      noCurrentDate: false,
       legendClasses: 'govuk-fieldset__legend--m',
       translationKey: {
         label: 'question',
@@ -28,8 +29,17 @@ export const step: StepDefinition = createFormStep({
       },
     },
   ],
-  extendGetContent: req => ({
-    //TODO need to add logic to check if claimantName name is known from CCD case data
-    claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
-  }),
+  extendGetContent: req => {
+    //TODO: get claimantName from CCD case - currently hardcoded
+    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
+
+    const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-not-provided', ['common']);
+
+    const paragraph = t('paragraph', { returnObjects: true, claimantName });
+
+    return {
+      claimantName,
+      paragraph,
+    };
+  },
 });

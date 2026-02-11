@@ -1,5 +1,5 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -32,9 +32,23 @@ export const step: StepDefinition = createFormStep({
       },
     },
   ],
-  extendGetContent: req => ({
+  extendGetContent: req => {
     //TODO: get claimantName/noticeDate from CCD case - currently hardcoded/served from LaunchDarkly flag
-    claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
-    noticeDate: req.session.noticeDate ?? '',
-  }),
+    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
+    const noticeDate = req.session.noticeDate ?? '';
+
+    const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-provided', ['common']);
+
+    const bulletPointLabel = t('bulletPointLabel', { returnObjects: true, claimantName });
+    const hintText = t('hintText', { returnObjects: true, claimantName });
+    const listItem1 = t('listItem1', { returnObjects: true, noticeDate });
+
+    return {
+      claimantName,
+      noticeDate,
+      bulletPointLabel,
+      hintText,
+      listItem1,
+    };
+  },
 });
