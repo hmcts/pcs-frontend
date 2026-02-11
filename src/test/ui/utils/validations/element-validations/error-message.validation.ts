@@ -21,9 +21,9 @@ export class ErrorMessageValidation implements IValidation {
       return;
     }
 
+    let scenario: string;
+    let expected: string;
     let errorMessage: Locator;
-    let scenario = '';
-    let expected = '';
 
     if (typeof error === 'string') {
       scenario = 'Error message validation';
@@ -38,7 +38,7 @@ export class ErrorMessageValidation implements IValidation {
       `);
     }
 
-    const isVisible = await errorMessage
+    const isErrorMessageVisible = await errorMessage
       .first()
       .isVisible({ timeout: 5000 })
       .catch(() => false);
@@ -48,9 +48,9 @@ export class ErrorMessageValidation implements IValidation {
     ErrorMessageValidation.results.push({
       pageUrl,
       scenario,
-      passed: isVisible,
+      passed: isErrorMessageVisible,
       expected,
-      actual: isVisible ? 'Found' : 'Not found',
+      actual: isErrorMessageVisible ? 'Found' : 'Not found',
     });
 
     if (!ErrorMessageValidation.emvFileTracking.has(pageName)) {
@@ -134,7 +134,6 @@ export class ErrorMessageValidation implements IValidation {
       for (const [pageName, pageResults] of failedByPage) {
         console.log(`\n   Page: ${pageName}`);
         pageResults.forEach(result => {
-          console.log(`     - Scenario: ${result.scenario}`);
           console.log(`       Expected: ${result.expected}`);
           console.log(`       Status: ${result.actual}`);
           if (result.error) {
