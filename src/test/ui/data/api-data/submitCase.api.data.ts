@@ -55,7 +55,7 @@ export const submitCaseApiData = {
         AddressLine3: '',
         PostTown: 'London',
         County: '',
-        Country: 'United Kingdom',
+        Country: '',
         PostCode: 'W3 7RX',
       },
     },
