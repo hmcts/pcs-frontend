@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
-import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
+import { getDashboardUrl } from '../../../routes/dashboard';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 import type { TranslationContent } from '../i18n';
@@ -127,9 +127,7 @@ export function createPostHandler(
         processFieldData(req, fields);
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
-        const validatedCaseId = req.res?.locals.validatedCase?.id;
-        const dashboardUrl = validatedCaseId ? `${DASHBOARD_ROUTE}/${validatedCaseId}` : DASHBOARD_ROUTE;
-        return res.redirect(303, dashboardUrl);
+        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving
