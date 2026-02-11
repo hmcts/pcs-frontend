@@ -5,7 +5,8 @@ import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
-  defendantNameConfirmation, disputeClaimInterstitial,
+  defendantNameConfirmation,
+  disputeClaimInterstitial,
   freeLegalAdvice,
   paymentInterstitial,
 } from '../../../data/page-data';

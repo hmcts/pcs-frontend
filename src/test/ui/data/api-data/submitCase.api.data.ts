@@ -5,27 +5,27 @@ export const submitCaseApiData = {
     claimantType: {
       value: {
         code: 'PROVIDER_OF_SOCIAL_HOUSING',
-        label: 'Registered provider of social housing'
+        label: 'Registered provider of social housing',
       },
       list_items: [
         {
           code: 'PRIVATE_LANDLORD',
-          label: 'Private landlord'
+          label: 'Private landlord',
         },
         {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
-          label: 'Registered provider of social housing'
+          label: 'Registered provider of social housing',
         },
         {
           code: 'MORTGAGE_LENDER',
-          label: 'Mortgage lender'
+          label: 'Mortgage lender',
         },
         {
           code: 'OTHER',
-          label: 'Other'
-        }
+          label: 'Other',
+        },
       ],
-      valueCode: 'PROVIDER_OF_SOCIAL_HOUSING'
+      valueCode: 'PROVIDER_OF_SOCIAL_HOUSING',
     },
     claimAgainstTrespassers: 'NO',
     claimantName: 'Possession Claims Solicitor Org',
@@ -50,9 +50,9 @@ export const submitCaseApiData = {
           firstName: 'Peter',
           lastName: 'Parker',
           addressKnown: 'YES',
-          addressSameAsPossession: 'YES'
+          addressSameAsPossession: 'YES',
         },
-        id: null
+        id: null,
       },
       {
         value: {
@@ -60,9 +60,9 @@ export const submitCaseApiData = {
           firstName: 'Jen',
           lastName: 'Parker',
           addressKnown: 'YES',
-          addressSameAsPossession: 'YES'
+          addressSameAsPossession: 'YES',
         },
-        id: null
+        id: null,
       },
     ],
     tenancy_TypeOfTenancyLicence: 'DEMOTED_TENANCY',
@@ -85,40 +85,40 @@ export const submitCaseApiData = {
     claimingCostsWanted: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
-      reasons: null
+      reasons: null,
     },
     hasUnderlesseeOrMortgagee: 'NO',
     wantToUploadDocuments: 'NO',
     applicationWithClaim: 'NO',
     languageUsed: 'ENGLISH',
-    completionNextStep: 'SUBMIT_AND_PAY_NOW'
+    completionNextStep: 'SUBMIT_AND_PAY_NOW',
   },
   submitCasePayloadNoDefendants: {
     legislativeCountry: 'England',
     claimantType: {
       value: {
         code: 'PROVIDER_OF_SOCIAL_HOUSING',
-        label: 'Registered provider of social housing'
+        label: 'Registered provider of social housing',
       },
       list_items: [
         {
           code: 'PRIVATE_LANDLORD',
-          label: 'Private landlord'
+          label: 'Private landlord',
         },
         {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
-          label: 'Registered provider of social housing'
+          label: 'Registered provider of social housing',
         },
         {
           code: 'MORTGAGE_LENDER',
-          label: 'Mortgage lender'
+          label: 'Mortgage lender',
         },
         {
           code: 'OTHER',
-          label: 'Other'
-        }
+          label: 'Other',
+        },
       ],
-      valueCode: 'PROVIDER_OF_SOCIAL_HOUSING'
+      valueCode: 'PROVIDER_OF_SOCIAL_HOUSING',
     },
     claimAgainstTrespassers: 'NO',
     claimantName: 'Possession Claims Solicitor Org',
@@ -155,14 +155,13 @@ export const submitCaseApiData = {
     claimingCostsWanted: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
-      reasons: null
+      reasons: null,
     },
     hasUnderlesseeOrMortgagee: 'NO',
     wantToUploadDocuments: 'NO',
     applicationWithClaim: 'NO',
     languageUsed: 'ENGLISH',
-    completionNextStep: 'SUBMIT_AND_PAY_NOW'
+    completionNextStep: 'SUBMIT_AND_PAY_NOW',
   },
-  submitCaseApiEndPoint: (): string =>
-    `/cases/${process.env.CASE_NUMBER}/events`,
+  submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };
