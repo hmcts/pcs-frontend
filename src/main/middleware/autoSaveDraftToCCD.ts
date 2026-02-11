@@ -19,8 +19,28 @@ interface StepMapping {
   valueMapper: ValueMapper;
 }
 
-/** Transforms 'yes'/'no' to 'YES'/'NO' enum */
+/**
+ * Transforms yes/no/preferNotToSay enum values to CCD uppercase format.
+ *
+ * IMPORTANT: Only use for controlled enum fields (radio buttons with predefined options).
+ * DO NOT use for free-text fields or fields with arbitrary values.
+ *
+ * @example
+ * // Correct usage (radio button with controlled values)
+ * {
+ *   frontendField: 'hadLegalAdvice',
+ *   valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
+ * }
+ *
+ * // Wrong usage (text field)
+ * {
+ *   frontendField: 'userName',
+ *   valueMapper: yesNoEnum('userName'), // Don't do this!
+ * }
+ */
 export function yesNoEnum(backendFieldName: string): ValueMapper {
+  const ALLOWED_VALUES = ['yes', 'no', 'preferNotToSay'] as const;
+
   return (value: string | string[] | Record<string, unknown>) => {
     if (typeof value !== 'string') {
       logger.warn('yesNoEnum expects a string, received:', typeof value);
@@ -33,9 +53,20 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
       preferNotToSay: 'PREFER_NOT_TO_SAY',
     };
 
-    const transformedValue = enumMapping[value] || value.toUpperCase();
+    // Validate that value is one of the allowed enum values
+    const isAllowedValue = (ALLOWED_VALUES as readonly string[]).includes(value);
 
-    return { [backendFieldName]: transformedValue };
+    if (!isAllowedValue) {
+      const allowedStr = ALLOWED_VALUES.join(', ');
+      logger.error(
+        `yesNoEnum: Invalid value "${value}" for field "${backendFieldName}". ` +
+          `Allowed values: ${allowedStr}. This indicates a bug in form validation or incorrect mapper usage.`
+      );
+      // Return empty string to prevent invalid data in CCD
+      return { [backendFieldName]: '' };
+    }
+
+    return { [backendFieldName]: enumMapping[value] };
   };
 }
 
