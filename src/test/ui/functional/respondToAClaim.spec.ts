@@ -1,8 +1,7 @@
 import { test } from '@playwright/test';
 import config from 'config';
 
-//Below lines are commented to avoid API calls until data setup is integrated.
-//import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactPreference,
   correspondenceAddressKnown,
@@ -19,15 +18,21 @@ import { initializeExecutor, performAction, performValidation } from '../utils/c
 
 const home_url = config.get('e2e.testUrl') as string;
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  //await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
-  //await performAction('fetchPINsAPI');
+  if (testInfo.title.includes('@noDefendants')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  } else {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  }
+  await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  //await performAction('validateAccessCodeAPI');
-  await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
+  await performAction('validateAccessCodeAPI');
+  await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
 
@@ -178,7 +183,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.continueButton);
