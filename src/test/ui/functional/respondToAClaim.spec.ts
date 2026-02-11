@@ -556,11 +556,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', repayments.saveAndContinueButton);
   });
 
-  //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
-  test.skip('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute', async () => {
+  //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = false
+  test.skip('England - NonRentArrears - NoticeServed - No - NonRentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
-    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
@@ -573,15 +571,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddressKnown.yesRadioOption,
     });
+    await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.continueButton);
-    await performAction('selectNoticeDetails', {
-      question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.noRadioOption,
-    });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
