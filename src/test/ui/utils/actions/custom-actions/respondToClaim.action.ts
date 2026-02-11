@@ -23,7 +23,7 @@ export class RespondToClaimAction implements IAction {
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
-      ['validateClaimantName', () => this.validateClaimantName(fieldName as actionData)],
+      ['validateClaimantName', () => this.disputeClaimInterstitial(fieldName as actionData)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -80,7 +80,7 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
-  private async validateClaimantName(isClaimantNameCorrect: actionData) {
+  private async disputeClaimInterstitial(isClaimantNameCorrect: actionData) {
     if (isClaimantNameCorrect === 'YES') {
       claimantsName = submitCaseApiData.submitCasePayload.claimantName;
     } else {
@@ -90,6 +90,7 @@ export class RespondToClaimAction implements IAction {
     const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
     await performValidation('text', { elementType: 'heading', text: mainHeader });
     await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
   private async readPaymentInterstitial(): Promise<void> {
