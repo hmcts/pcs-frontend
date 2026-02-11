@@ -116,8 +116,10 @@ export const step: StepDefinition = createFormStep({
     //prepopulate address is correct
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
       possessionClaimResponse = {
-        party: {
-          address: prepopulateAddress,
+        defendantContactDetails: {
+          party: {
+            address: prepopulateAddress,
+          },
         },
       };
     } else {
