@@ -127,7 +127,9 @@ export function createPostHandler(
         processFieldData(req, fields);
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, DASHBOARD_ROUTE);
+        const validatedCaseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = validatedCaseId ? `${DASHBOARD_ROUTE}/${validatedCaseId}` : DASHBOARD_ROUTE;
+        return res.redirect(303, dashboardUrl);
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving
