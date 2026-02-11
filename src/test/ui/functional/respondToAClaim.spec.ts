@@ -234,7 +234,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickLink', repaymentsMade.backLink);
     await performValidation('mainHeader', paymentInterstitial.mainHeader);
     await performAction('clickButton', paymentInterstitial.continueButton);
-    await performAction('clickLink', repaymentsMade.saveForLaterButton);
+    await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
+    await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
+    await performAction('clickButton', repaymentsMade.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
 });
