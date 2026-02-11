@@ -77,7 +77,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         return {
           ...result,
           ccdId: req.session?.ccdCase?.id,
-          caseReference: req.params.caseReference,
+          caseReference: req.res?.locals.validatedCase?.id,
           dashboardUrl: DASHBOARD_ROUTE,
           stepName,
           journeyFolder,

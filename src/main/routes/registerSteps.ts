@@ -26,7 +26,15 @@ export default function registerSteps(app: Application): void {
     for (const step of journeySteps) {
       const stepConfig = flowConfig.steps[step.name];
       const requiresAuth = stepConfig?.requiresAuth !== false;
-      const middlewares = requiresAuth ? [oidcMiddleware, ccdCaseMiddleware] : [];
+
+      // Skip ccdCaseMiddleware for routes with :caseReference param
+      // as case validation is handled by caseReferenceParamMiddleware
+      const hasCaseReference = step.url.includes(':caseReference');
+      const middlewares = requiresAuth
+        ? hasCaseReference
+          ? [oidcMiddleware]
+          : [oidcMiddleware, ccdCaseMiddleware]
+        : [];
 
       // Use journey-specific flow config for dependency checking
       const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
