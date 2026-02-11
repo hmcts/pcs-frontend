@@ -8,4 +8,5 @@ export default {
   'date-of-birth': 'dateOfBirth',
   'postcode-finder': 'correspondenceAddressKnown',
   'payment-interstitial': 'payment-interstitial',
+  'repayments-made': 'repaymentsMade',
 };

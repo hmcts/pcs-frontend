@@ -68,7 +68,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.yesRadioOption,
       repaymentInfo: repaymentsMade.detailsTextInput,
     });
-    await performAction('mainHeader', repaymentsAgreed.mainHeader);
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
   // NO OPTION TO BE ADDED TO ANOTHER TEST
