@@ -73,13 +73,15 @@ export function pcqRedirectMiddleware() {
     };
 
     try {
-      await ccdCaseService.updateCase(user.accessToken, {
+      const updatedCase = await ccdCaseService.updateCase(user.accessToken, {
         id: ccdCase.id,
         data: {
           ...ccdCase.data,
           userPcqId: pcqId,
         },
       });
+
+      res.locals.validatedCase = updatedCase;
     } catch (err) {
       logger.error('Failed to update CCD with PCQ ID:', err);
       return next();
