@@ -167,7 +167,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('paymentInterstitial - back and cancel link Validations', async () => {
+  //This test will be enabled once https://tools.hmcts.net/jira/browse/HDPI-4185 bug is fixed
+  test.skip('paymentInterstitial - back and cancel link Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
