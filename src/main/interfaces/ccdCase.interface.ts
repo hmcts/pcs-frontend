@@ -34,10 +34,12 @@ export interface Address {
 }
 
 export interface PossessionClaimResponse {
-  party: {
-    firstName?: string;
-    lastName?: string;
-    address?: Address;
+  defendantContactDetails: {
+    party: {
+      firstName?: string;
+      lastName?: string;
+      address?: Address;
+    };
   };
 }
 

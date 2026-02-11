@@ -129,13 +129,15 @@ export const step: StepDefinition = createFormStep({
 
       //only the details the defendant provides
       possessionClaimResponse = {
-        party: {
-          address: {
-            AddressLine1: addressLine1,
-            ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
-            PostTown: townOrCity,
-            ...(county !== undefined && county !== '' && { County: county }),
-            PostCode: postcode,
+        defendantContactDetails: {
+          party: {
+            address: {
+              AddressLine1: addressLine1,
+              ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
+              PostTown: townOrCity,
+              ...(county !== undefined && county !== '' && { County: county }),
+              PostCode: postcode,
+            },
           },
         },
       };
