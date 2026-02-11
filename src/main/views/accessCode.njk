@@ -28,7 +28,7 @@
         </div>
       {% endif %}
 
-      <form method="POST" action="/validate-access-code/{{ caseId }}" novalidate>
+      <form method="POST" action="/case/{{ caseId }}/access-code" novalidate>
         <div class="govuk-form-group {% if error %}govuk-form-group--error{% endif %}">
           <label class="govuk-label govuk-label--m" for="accessCode">
             Enter your access code

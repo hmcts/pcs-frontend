@@ -22,7 +22,35 @@ export async function caseReferenceParamMiddleware(
     });
   }
 
-  // Validate case exists and user has access
+  // Check if user has access via access code validation (internal flow)
+  const sessionCaseId = req.session.ccdCase?.id;
+  const hasSessionAccess = sessionCaseId === sanitisedCaseReference;
+
+  // Check if this is respond-to-claim journey (citizen-only, external validation flow)
+  const isRespondToClaimJourney = req.originalUrl.includes('/respond-to-claim/');
+
+  if (hasSessionAccess || isRespondToClaimJourney) {
+    // Skip CCD validation for:
+    // 1. Access-code page flow: User validated via frontend access-code page (session has caseId)
+    // 2. External validation flow: User validated via pcs-api, accessing respond-to-claim (citizen-only journey)
+    logger.info('Skipping CCD verification', {
+      caseReference: sanitisedCaseReference,
+      reason: hasSessionAccess ? 'session access (access-code page)' : 'respond-to-claim journey (citizen)',
+      url: req.originalUrl,
+    });
+
+    // Set minimal case data in res.locals (case data fetched when needed)
+    res.locals.validatedCase = { id: sanitisedCaseReference, data: {} };
+
+    // Store in session if not already there
+    if (!req.session.ccdCase) {
+      req.session.ccdCase = { id: sanitisedCaseReference, data: {} };
+    }
+
+    return next();
+  }
+
+  // Other journeys - validate via CCD
   try {
     const accessToken = req.session.user?.accessToken;
 
