@@ -6,10 +6,8 @@ import { Page } from '@playwright/test';
 import { IAction } from '../../interfaces';
 
 export class TriggerErrorMessagesAction implements IAction {
-  async execute(page: Page, action: string, _fieldName?: any, _value?: any): Promise<void> {
-    if (action === 'triggerErrorMessagesForValidation') {
-      await this.triggerErrorMessages(page);
-    }
+  async execute(page: Page): Promise<void> {
+    await this.triggerErrorMessages(page);
   }
 
   private async triggerErrorMessages(page: Page): Promise<void> {
