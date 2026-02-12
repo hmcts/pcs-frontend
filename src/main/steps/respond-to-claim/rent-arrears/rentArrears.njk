@@ -1,0 +1,56 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% block pageTitle %}
+  {{ title }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+  
+  <div class="govuk-inset-text">
+    <p class="govuk-body">{{ insetIntroText }}</p>
+    <p class="govuk-body">{{ insetDetailsText }}</p>
+    <p class="govuk-body">{{ insetConditionalYesText }}</p>
+  </div>
+
+  <h2 class="govuk-heading-s">{{ amountOwedHeading }}</h2>
+
+  <p class="govuk-body">{{ rentArrearsAmount }}</p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.component and field.componentType %}
+        {% if field.componentType == 'radios' %}
+          {{ govukRadios(field.component) }}
+        {% elif field.componentType == 'characterCount' %}
+          {{ govukCharacterCount(field.component) }}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: continue,
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      {{ govukButton({
+        text: saveForLater,
+        classes: 'govuk-button--secondary',
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
+  </form>
+{% endblock %}

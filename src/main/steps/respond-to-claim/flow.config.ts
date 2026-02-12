@@ -21,6 +21,7 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial',
     'landlord-registered',
     'tenancy-details',
+    'rent-arrears',
     'end-now',
     'contact-preferences',
   ],
@@ -93,6 +94,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
     repayments: {
       previousStep: 'payment-interstitial',
+      defaultNext: 'end-now',
+    },
+    'rent-arrears': {
       defaultNext: 'end-now',
     },
   },

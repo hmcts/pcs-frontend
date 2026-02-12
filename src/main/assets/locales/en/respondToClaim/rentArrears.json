@@ -1,0 +1,26 @@
+{
+  "title": "Rent arrears",
+  "captionHeading": "Respond to a property possession claim",
+  "insetIntroText": "Rent arrears are money you owe in rent payments.",
+  "insetDetailsText": "When making their claim, {{claimantName}} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.",
+  "insetConditionalYesText": "The rent statement will have been included in the pack you received in the post, and is also available to view from ‘View the claim’ on your case dashboard.",
+  "amountOwedHeading": "Amount you owe in rent arrears given by {{claimantName}}:",
+  "rentArrearsQuestion": "Do you owe this amount in rent arrears?",
+  "rentArrearsOptions": {
+    "yes": "Yes",
+    "no": "No",
+    "notSure": "I'm not sure",
+    "or": "or"
+  },
+  "rentArrearsDetails": {
+    "label": "Explain which parts of the claim you do not agree with"
+  },
+  "rentArrearsAmountCorrection": {
+    "label": "How much do you believe you owe in rent arrears?"
+  },
+  "errors": {
+    "rentArrears": "Do you owe this amount in rent arrears?",
+    "rentArrearsDetails": "You must explain which parts of the claim you do not agree with",
+    "rentArrears.rentArrearsAmount": "Enter how much you believe you owe in rent arrears, in the correct format, up to £1,000,000,000.00"
+  }
+}
