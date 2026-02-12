@@ -17,9 +17,7 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  <p class="govuk-body">
-    {{ paragraph | replace("{{claimantName}}", claimantName) }}
-  </p>
+  <p class="govuk-body"> {{ paragraph }} </p>
 
   <form method="post" action="{{ url }}" novalidate>
 
