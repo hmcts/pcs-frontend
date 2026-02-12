@@ -1,12 +1,23 @@
 /**
- * Middleware that intercepts res.redirect() to auto-save form data to CCD draft.
+ * Auto-save form data to CCD draft for configured steps.
+ *
+ * Usage: Call autoSaveToCCD() in formBuilder's beforeRedirect callback.
  * Add steps to STEP_FIELD_MAPPING to enable auto-save.
+ *
+ * Example:
+ *   const step = createFormStep(
+ *     { ... },
+ *     templatePath,
+ *     async (req, res) => { await autoSaveToCCD(req, res, 'step-name'); }
+ *   );
  */
 
 import { Logger } from '@hmcts/nodejs-logging';
 import type { NextFunction, Request, Response } from 'express';
+import { DateTime } from 'luxon';
 
 import { ccdCaseService } from '../services/ccdCaseService';
+import { isNonEmpty } from '../utils/objectHelpers';
 
 const logger = Logger.getLogger('autoSaveDraftToCCD');
 
@@ -40,6 +51,7 @@ interface StepMapping {
  */
 export function yesNoEnum(backendFieldName: string): ValueMapper {
   const ALLOWED_VALUES = ['yes', 'no', 'preferNotToSay'] as const;
+  type AllowedValue = (typeof ALLOWED_VALUES)[number]; // 'yes' | 'no' | 'preferNotToSay'
 
   return (value: string | string[] | Record<string, unknown>) => {
     if (typeof value !== 'string') {
@@ -47,7 +59,8 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
       return { [backendFieldName]: '' };
     }
 
-    const enumMapping: Record<string, string> = {
+    // Type-safe mapping: only allowed values as keys
+    const enumMapping: Record<AllowedValue, string> = {
       yes: 'YES',
       no: 'NO',
       preferNotToSay: 'PREFER_NOT_TO_SAY',
@@ -66,11 +79,12 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
       return { [backendFieldName]: '' };
     }
 
-    return { [backendFieldName]: enumMapping[value] };
+    // Type assertion safe here because isAllowedValue check guarantees it
+    return { [backendFieldName]: enumMapping[value as AllowedValue] };
   };
 }
 
-/** Combines date fields (day/month/year) into ISO date string */
+/** Combines date fields (day/month/year) into ISO date string using luxon */
 export function dateToISO(backendFieldName: string): ValueMapper {
   return (formData: string | string[] | Record<string, unknown>) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
@@ -85,31 +99,34 @@ export function dateToISO(backendFieldName: string): ValueMapper {
       return {};
     }
 
-    const paddedMonth = String(month).padStart(2, '0');
-    const paddedDay = String(day).padStart(2, '0');
-    const isoDate = `${year}-${paddedMonth}-${paddedDay}`;
+    // Use luxon for proper date validation and formatting
+    const dateTime = DateTime.fromObject({
+      year: Number(year),
+      month: Number(month),
+      day: Number(day),
+    });
 
-    return { [backendFieldName]: isoDate };
+    if (!dateTime.isValid) {
+      logger.warn(`Invalid date: ${dateTime.invalidReason} (day=${day}, month=${month}, year=${year})`);
+      return {};
+    }
+
+    return { [backendFieldName]: dateTime.toISODate() };
   };
 }
 
 /** Pass through fields unchanged (1:1 mapping) */
-export function passThrough(fieldNames: string[]): ValueMapper {
+export function passThrough(fieldNames: readonly string[]): ValueMapper {
   return (formData: string | string[] | Record<string, unknown>) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
       logger.warn('passThrough expects an object, received:', typeof formData);
       return {};
     }
 
-    const result: Record<string, unknown> = {};
-
-    for (const fieldName of fieldNames) {
-      if (formData[fieldName] !== undefined && formData[fieldName] !== null && formData[fieldName] !== '') {
-        result[fieldName] = formData[fieldName];
-      }
-    }
-
-    return result;
+    // Functional approach: map field names to entries, filter non-empty values
+    return Object.fromEntries(
+      fieldNames.map(name => [name, formData[name]] as const).filter(([, value]) => isNonEmpty(value))
+    );
   };
 }
 
@@ -132,23 +149,13 @@ export function multipleYesNo(backendFieldName: string): ValueMapper {
   };
 }
 
-const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
+export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
   'free-legal-advice': {
     backendPath: 'possessionClaimResponse.defendantResponses',
     frontendField: 'hadLegalAdvice',
     valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
   },
 };
-
-/** Extracts step name from URL path */
-function extractStepName(path: string): string | null {
-  const stepsMatch = path.match(/\/steps\/[^/]+\/([^/]+)/);
-  if (stepsMatch) {
-    return stepsMatch[1];
-  }
-  const respondToClaimMatch = path.match(/\/case\/[^/]+\/respond-to-claim\/([^/]+)/);
-  return respondToClaimMatch ? respondToClaimMatch[1] : null;
-}
 
 /** Converts dot-path to nested object (e.g., 'a.b.c' → { a: { b: { c: value } } }) */
 function pathToNested(path: string, value: Record<string, unknown>): Record<string, unknown> {
@@ -165,6 +172,28 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
   }, result);
 
   return result;
+}
+
+/**
+ * Auto-saves form data to CCD draft if step is configured in STEP_FIELD_MAPPING.
+ * Use this in formBuilder's beforeRedirect callback instead of middleware.
+ */
+export async function autoSaveToCCD(req: Request, res: Response, stepName: string): Promise<void> {
+  const config = STEP_FIELD_MAPPING[stepName];
+
+  if (!config) {
+    logger.debug(`[${stepName}] No CCD mapping configured, skipping auto-save`);
+    return;
+  }
+
+  const formData = req.session.formData?.[stepName];
+
+  if (!formData || Object.keys(formData).length === 0) {
+    logger.debug(`[${stepName}] No form data in session, skipping auto-save`);
+    return;
+  }
+
+  await saveToCCD(req, res, stepName, formData, config);
 }
 
 async function saveToCCD(
@@ -222,10 +251,13 @@ async function saveToCCD(
       ...nestedData,
     };
 
-    await ccdCaseService.updateCase(accessToken, {
+    const updatedCase = await ccdCaseService.updateCase(accessToken, {
       id: validatedCase.id,
       data: ccdPayload,
     });
+
+    // Update res.locals with merged case data from CCD
+    res.locals.validatedCase = updatedCase;
 
     logger.info(`[${stepName}] Draft saved successfully to CCD`);
   } catch (error) {
@@ -233,42 +265,13 @@ async function saveToCCD(
   }
 }
 
-export function autoSaveDraftToCCD(req: Request, res: Response, next: NextFunction): void {
-  const originalRedirect = res.redirect.bind(res);
-
-  res.redirect = async function (statusOrUrl: number | string, url?: string): Promise<void> {
-    const isStatusProvided = typeof statusOrUrl === 'number';
-
-    try {
-      const stepName = extractStepName(req.path);
-
-      if (!stepName) {
-        logger.debug('No step name found in path, skipping auto-save');
-        return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
-      }
-
-      const config = STEP_FIELD_MAPPING[stepName];
-
-      if (!config) {
-        logger.debug(`[${stepName}] No CCD mapping configured, skipping auto-save`);
-        return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
-      }
-
-      const formData = req.session.formData?.[stepName];
-
-      if (!formData || Object.keys(formData).length === 0) {
-        logger.debug(`[${stepName}] No form data in session, skipping auto-save`);
-        return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
-      }
-
-      await saveToCCD(req, res, stepName, formData, config);
-
-      return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
-    } catch (error) {
-      logger.error('Error in autoSaveDraftToCCD middleware:', error);
-      return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
-    }
-  };
-
+/**
+ * DEPRECATED: Do not use this middleware approach.
+ * Instead, call autoSaveToCCD() directly in formBuilder's beforeRedirect callback.
+ *
+ * @deprecated Use autoSaveToCCD() function instead
+ */
+export function autoSaveDraftToCCD(_req: Request, _res: Response, next: NextFunction): void {
+  logger.warn('autoSaveDraftToCCD middleware is deprecated. Use autoSaveToCCD() in beforeRedirect callback instead.');
   next();
 }

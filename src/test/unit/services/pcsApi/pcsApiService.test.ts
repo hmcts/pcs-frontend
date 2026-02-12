@@ -119,7 +119,7 @@ describe('pcsApiService', () => {
   });
 
   test('should validate access code successfully', async () => {
-    mockHttp.post.mockResolvedValue({ data: { success: true } });
+    mockHttp.post.mockResolvedValue({ status: 200, data: { success: true } });
 
     const accessToken = 'test-access-token';
     const caseId = '1234567890123456';

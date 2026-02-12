@@ -30,7 +30,7 @@ export const getDashboardTaskGroups = async (caseReference: number): Promise<Das
 export const validateAccessCode = async (accessToken: string, caseId: string, accessCode: string): Promise<boolean> => {
   const pcsApiURL = getBaseUrl();
   try {
-    await http.post(
+    const response = await http.post(
       `${pcsApiURL}/cases/${caseId}/validate-access-code`,
       { accessCode },
       {
@@ -40,7 +40,13 @@ export const validateAccessCode = async (accessToken: string, caseId: string, ac
         },
       }
     );
-    return true;
+
+    // Verify successful response status (2xx)
+    if (response.status >= 200 && response.status < 300) {
+      return true;
+    }
+
+    return false;
   } catch {
     return false;
   }
