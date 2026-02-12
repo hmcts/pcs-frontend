@@ -13,6 +13,7 @@ export const correspondenceAddressKnown = {
   sectionHiddenTitle: 'Enter correspondence address',
   enterUKPostcodeHiddenTextLabel: 'Enter a UK postcode',
   findAddressHiddenButton: 'Find address',
+  enterAddressManuallyHiddenLink: 'Enter an address manually',
   addressSelectHiddenLabel: 'Select an address',
   whatsYourAddressHiddenQuestion: 'What’s your correspondence address?',
   addressLine1HiddenTextLabel: 'Address Line 1',

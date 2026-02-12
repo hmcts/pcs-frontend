@@ -123,8 +123,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.yesRadioOption,
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddressKnown.englandAddressLine1TextInput,
+      townOrCity: correspondenceAddressKnown.englandTownOrCityTextInput,
+      postcode: correspondenceAddressKnown.englandPostcodeTextInput,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);

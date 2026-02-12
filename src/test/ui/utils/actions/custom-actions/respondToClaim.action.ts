@@ -8,6 +8,7 @@ import {
   freeLegalAdvice,
   paymentInterstitial,
 } from '../../../data/page-data';
+import { correspondenceAddressUnKnown } from '../../../data/page-data/correspondenceAddressUnKnown.page.data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -20,6 +21,7 @@ export class RespondToClaimAction implements IAction {
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
+      ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -67,14 +69,33 @@ export class RespondToClaimAction implements IAction {
       option: addressData.radioOption,
     });
     if (addressData.radioOption === correspondenceAddressKnown.noRadioOption) {
+      await this.correspondenceAddress(addressData);
+    }
+    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+  }
+
+  private async selectCorrespondenceAddressUnKnown(addressData: actionRecord): Promise<void> {
+    await this.correspondenceAddress(addressData);
+    await performAction('clickButton', correspondenceAddressUnKnown.saveAndContinueButton);
+  }
+
+  private async correspondenceAddress(addressData: actionRecord): Promise<void> {
+    if (addressData.addressIndex) {
       await performActions(
         'Find Address based on postcode',
         ['inputText', correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel, addressData.postcode],
         ['clickButton', correspondenceAddressKnown.findAddressHiddenButton],
         ['select', correspondenceAddressKnown.addressSelectHiddenLabel, addressData.addressIndex]
       );
+    } else if (addressData.addressLine1) {
+      await performActions(
+        'Enter Address Manually',
+        ['clickLink', correspondenceAddressKnown.enterAddressManuallyHiddenLink],
+        ['inputText', correspondenceAddressKnown.addressLine1HiddenTextLabel, addressData.addressLine1],
+        ['inputText', correspondenceAddressKnown.townOrCityHiddenTextLabel, addressData.townOrCity],
+        ['inputText', correspondenceAddressKnown.postcodeHiddenTextLabel, addressData.postcode]
+      );
     }
-    await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
   private async readPaymentInterstitial(): Promise<void> {

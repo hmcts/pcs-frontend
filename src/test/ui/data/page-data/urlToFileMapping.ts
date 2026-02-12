@@ -6,6 +6,6 @@ export default {
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'date-of-birth': 'dateOfBirth',
-  'postcode-finder': 'correspondenceAddressKnown',
+  'postcode-finder': 'correspondenceAddressUnKnown',
   'payment-interstitial': 'payment-interstitial',
 };
