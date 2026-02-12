@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
+import { getDashboardUrl } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
 const stepName = 'tenancy-details';
@@ -18,9 +18,12 @@ export const step: StepDefinition = {
       'respond-to-claim/tenancy-details/tenancyDetails.njk',
       stepName,
       async (req: Request) => {
+        const backUrl = await stepNavigation.getBackUrl(req, stepName);
+        const nextStepUrl = await stepNavigation.getNextStepUrl(req, stepName, {});
         return {
-          backUrl: await stepNavigation.getBackUrl(req, stepName),
-          dashboardUrl: DASHBOARD_ROUTE,
+          backUrl,
+          nextStepUrl,
+          url: req.originalUrl,
         };
       },
       'respondToClaim'
@@ -28,11 +31,23 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
-      // Get next step URL and redirect
+      const action = req.body?.action;
+
+      // Handle saveForLater action
+      if (action === 'saveForLater') {
+        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
+      }
+
+      // Handle continue action - go to next step
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
 
       if (!redirectPath) {
-        // No next step defined - show not found page
+        return res.status(404).render('not-found');
+      }
+
+      // Validate redirect path to prevent open redirect vulnerability
+      // Ensure it's a relative path starting with /case/ (respond-to-claim journey)
+      if (!redirectPath.startsWith('/case/')) {
         return res.status(404).render('not-found');
       }
 

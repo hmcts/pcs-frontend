@@ -880,7 +880,7 @@ describe('formBuilder', () => {
         );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
       });
 
       it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
@@ -906,7 +906,7 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
       });
 
       it('should show validation errors when saveForLater is clicked with invalid data', async () => {
