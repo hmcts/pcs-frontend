@@ -26,7 +26,14 @@ export async function caseReferenceParamMiddleware(
   const sessionCaseId = req.session.ccdCase?.id;
   const hasSessionAccess = sessionCaseId === sanitisedCaseReference;
 
-  // Check if this is respond-to-claim journey (citizen-only, external validation flow)
+  /**
+   * TODO: TEMPORARY IMPLEMENTATION - For testing purposes only
+   *
+   * Current: URL-based bypass for respond-to-claim journey.
+   * Production: Implement proper case access validation aligned with current architecture.
+   *
+   * Related: src/main/routes/accessCode.ts (temporary testing page)
+   */
   const isRespondToClaimJourney = req.originalUrl.includes('/respond-to-claim/');
 
   if (hasSessionAccess || isRespondToClaimJourney) {
