@@ -169,15 +169,16 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
 
 async function saveToCCD(
   req: Request,
+  res: Response,
   stepName: string,
   formData: Record<string, unknown>,
   config: StepMapping
 ): Promise<void> {
-  const ccdCase = req.session.ccdCase;
+  const validatedCase = res.locals.validatedCase;
   const accessToken = req.session.user?.accessToken;
 
-  if (!ccdCase?.id) {
-    logger.warn(`[${stepName}] No CCD case in session, skipping draft save`);
+  if (!validatedCase?.id) {
+    logger.warn(`[${stepName}] No validated case, skipping draft save`);
     return;
   }
 
@@ -221,13 +222,10 @@ async function saveToCCD(
       ...nestedData,
     };
 
-    const updatedCase = await ccdCaseService.updateCase(accessToken, {
-      id: ccdCase.id,
+    await ccdCaseService.updateCase(accessToken, {
+      id: validatedCase.id,
       data: ccdPayload,
     });
-
-    // Store only caseId - next page will fetch fresh data via START event
-    req.session.ccdCase = { id: updatedCase.id, data: {} };
 
     logger.info(`[${stepName}] Draft saved successfully to CCD`);
   } catch (error) {
@@ -263,7 +261,7 @@ export function autoSaveDraftToCCD(req: Request, res: Response, next: NextFuncti
         return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
       }
 
-      await saveToCCD(req, stepName, formData, config);
+      await saveToCCD(req, res, stepName, formData, config);
 
       return isStatusProvided ? originalRedirect(statusOrUrl, url!) : originalRedirect(statusOrUrl);
     } catch (error) {

@@ -22,42 +22,7 @@ export async function caseReferenceParamMiddleware(
     });
   }
 
-  // Check if user has access via access code validation (internal flow)
-  const sessionCaseId = req.session.ccdCase?.id;
-  const hasSessionAccess = sessionCaseId === sanitisedCaseReference;
-
-  /**
-   * TODO: TEMPORARY IMPLEMENTATION - For testing purposes only
-   *
-   * Current: URL-based bypass for respond-to-claim journey.
-   * Production: Implement proper case access validation aligned with current architecture.
-   *
-   * Related: src/main/routes/accessCode.ts (temporary testing page)
-   */
-  const isRespondToClaimJourney = req.originalUrl.includes('/respond-to-claim/');
-
-  if (hasSessionAccess || isRespondToClaimJourney) {
-    // Skip CCD validation for:
-    // 1. Access-code page flow: User validated via frontend access-code page (session has caseId)
-    // 2. External validation flow: User validated via pcs-api, accessing respond-to-claim (citizen-only journey)
-    logger.info('Skipping CCD verification', {
-      caseReference: sanitisedCaseReference,
-      reason: hasSessionAccess ? 'session access (access-code page)' : 'respond-to-claim journey (citizen)',
-      url: req.originalUrl,
-    });
-
-    // Set minimal case data in res.locals (case data fetched when needed)
-    res.locals.validatedCase = { id: sanitisedCaseReference, data: {} };
-
-    // Store in session if not already there
-    if (!req.session.ccdCase) {
-      req.session.ccdCase = { id: sanitisedCaseReference, data: {} };
-    }
-
-    return next();
-  }
-
-  // Other journeys - validate via CCD
+  // Validate case exists and user has access
   try {
     const accessToken = req.session.user?.accessToken;
 
@@ -70,12 +35,8 @@ export async function caseReferenceParamMiddleware(
 
     const validatedCase = await ccdCaseService.getCaseById(accessToken, sanitisedCaseReference);
 
-    // Store validated case in res.locals for request-scoped access (fresh data from START event)
+    // Store validated case
     res.locals.validatedCase = validatedCase;
-
-    // Store only caseId in session (not full case data) to reduce Redis storage
-    // Full case data is available in res.locals.validatedCase
-    req.session.ccdCase = { id: validatedCase.id, data: {} };
 
     next();
   } catch (error) {

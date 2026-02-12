@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
+import { getDashboardUrl } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
 const stepName = 'landlord-registered';
@@ -20,7 +20,7 @@ export const step: StepDefinition = {
       async (req: Request) => {
         return {
           backUrl: await stepNavigation.getBackUrl(req, stepName),
-          dashboardUrl: DASHBOARD_ROUTE,
+          dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
         };
       },
       'respondToClaim'

@@ -38,10 +38,10 @@ export default function accessCodeRoutes(app: Application): void {
       const isValid = await validateAccessCode(userAccessToken, caseId, accessCode.trim());
 
       if (isValid) {
-        logger.info(`Access code validated successfully for case ${caseId} - granting user access`);
+        logger.info(`Access code validated successfully for case ${caseId}`);
 
-        // Store caseId in session (user now has access to this case)
-        req.session.ccdCase = { id: caseId, data: {} };
+        // pcs-api granted CCD access during validation
+        // caseReferenceParamMiddleware will validate access on redirect
 
         // Redirect to start of respond-to-claim journey
         return res.redirect(303, `/case/${caseId}/respond-to-claim/start-now`);

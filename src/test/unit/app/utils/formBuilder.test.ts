@@ -208,9 +208,17 @@ describe('formBuilder', () => {
           },
           ccdCase: { id: '1765881343803991' },
         },
+        res: {
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
+        },
       } as unknown as Request);
       const res = {
         render: jest.fn(),
+        locals: {
+          validatedCase: { id: '1765881343803991' },
+        },
       } as unknown as Response;
 
       expect(step.getController).toBeDefined();
@@ -237,9 +245,17 @@ describe('formBuilder', () => {
           formData: {},
           ccdCase: { id: '1765881343803992' },
         },
+        res: {
+          locals: {
+            validatedCase: { id: '1765881343803992' },
+          },
+        },
       } as unknown as Request);
       const res = {
         render: jest.fn(),
+        locals: {
+          validatedCase: { id: '1765881343803992' },
+        },
       } as unknown as Response;
 
       expect(step.getController).toBeDefined();
@@ -865,11 +881,19 @@ describe('formBuilder', () => {
           session: {
             ccdCase: { id: '1765881343803991' },
           },
+          res: {
+            locals: {
+              validatedCase: { id: '1765881343803991' },
+            },
+          },
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
           status: jest.fn().mockReturnThis(),
           render: jest.fn(),
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -880,7 +904,7 @@ describe('formBuilder', () => {
         );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
       });
 
       it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
@@ -921,12 +945,20 @@ describe('formBuilder', () => {
           session: {
             ccdCase: { id: '1765881343803991' },
           },
+          res: {
+            locals: {
+              validatedCase: { id: '1765881343803991' },
+            },
+          },
           originalUrl: '/test-url',
         } as unknown as Request);
         const res = {
           status: jest.fn().mockReturnThis(),
           render: jest.fn(),
           redirect: jest.fn(),
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1040,12 +1072,20 @@ describe('formBuilder', () => {
           session: {
             ccdCase: { id: '1765881343803991' },
           },
+          res: {
+            locals: {
+              validatedCase: { id: '1765881343803991' },
+            },
+          },
           originalUrl: '/test-url',
         } as unknown as Request);
         const res = {
           status: jest.fn().mockReturnThis(),
           render: jest.fn(),
           redirect: jest.fn(), // Add redirect in case validation somehow passes
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
