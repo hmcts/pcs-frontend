@@ -10,7 +10,8 @@ import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as postcodeFinder } from './postcode-finder';
-import { step as repayments } from './repayments';
+import { step as repaymentsAgreed } from './repayments-agreed';
+import { step as repaymentsMade } from './repayments-made';
 import { step as startNow } from './start-now';
 import { step as tenancyDetails } from './tenancy-details';
 
@@ -22,10 +23,11 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
   'payment-interstitial': paymentInterstitial,
-  repayments,
+  'repayments-made': repaymentsMade,
   'counter-claim': counterClaim,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
   'tenancy-details': tenancyDetails,
   'contact-preferences': contactPreferences,
+  'repayments-agreed': repaymentsAgreed,
 };

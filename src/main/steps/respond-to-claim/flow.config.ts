@@ -16,13 +16,14 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-date-of-birth',
     'counter-claim',
     'payment-interstitial',
-    'repayments',
+    'repayments-made',
     'postcode-finder',
     'dispute-claim-interstitial',
     'landlord-registered',
     'tenancy-details',
     'end-now',
     'contact-preferences',
+    'repayments-agreed',
   ],
   steps: {
     'start-now': {
@@ -89,10 +90,14 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'payment-interstitial': {
       previousStep: 'counter-claim',
-      defaultNext: 'repayments',
+      defaultNext: 'repayments-made',
     },
-    repayments: {
+    'repayments-made': {
       previousStep: 'payment-interstitial',
+      defaultNext: 'repayments-agreed',
+    },
+    'repayments-agreed': {
+      previousStep: 'repayments-made',
       defaultNext: 'end-now',
     },
   },
