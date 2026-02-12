@@ -1,35 +1,25 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}Tenancy details - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+{% block pageTitle %}Contact Preferences - HM Courts & Tribunals Service – GOV.UK{% endblock %}
 
-{% block serviceNavigation %}
-  {# Service navigation without serviceName on start now page - only logout button #}
-  {{ govukServiceNavigation({
-    navigation: [
-      {
-        text: t('logout', 'Log out'),
-        href: "/logout"
-      }
-    ],
-    navigationLabel: t('navigationLabel', 'Service navigation'),
-    navigationClasses: "pcs-service-navigation-wrapper"
-  }) }}
-{% endblock %}
 {% block mainContent %}
-  {% if errorSummary %}
-    {{ govukErrorSummary(errorSummary) }}
-  {% endif %}
-  <h1 class="govuk-heading-l">Tenancy details</h1>
-  <p class="govuk-body">dummy page</p>
-  <form method="post" action="{{ url }}">
-  <div class="govuk-button-group">
+  <h1 class="govuk-heading-l">Tenancy Details(placeholder)</h1>
+
+  <p class="govuk-body">This is a placeholder page for tenancy details capture.</p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    <div class="govuk-button-group">
       {{ govukButton({
-        text: t('buttons.continue', { ns: 'common' }),
+        text: t('buttons.saveAndContinue', { ns: 'common' }),
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
-  </div>
+      {{ govukButton({
+        text: t('buttons.saveForLater', { ns: 'common' }),
+        classes: "govuk-button--secondary",
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
   </form>
 {% endblock %}
