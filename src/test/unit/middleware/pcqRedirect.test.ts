@@ -70,15 +70,17 @@ describe('pcqRedirectMiddleware', () => {
           idToken: 'dummy-id-token',
           refreshToken: 'dummy-refresh-token',
         },
-        ccdCase: {
-          id: '123456789',
-          data: {},
-        },
       } as unknown as CustomSession,
     };
 
     mockRes = {
       redirect: mockRedirect,
+      locals: {
+        validatedCase: {
+          id: '123456789',
+          data: {},
+        },
+      },
     };
 
     mockNext = jest.fn();
@@ -129,7 +131,7 @@ describe('pcqRedirectMiddleware', () => {
   });
 
   it('should call next() if session is missing CCD or user data', async () => {
-    (mockReq.session as CustomSession).ccdCase = undefined;
+    mockRes.locals!.validatedCase = undefined;
 
     const middleware = pcqRedirectMiddleware();
     await middleware(mockReq as Request, mockRes as Response, mockNext);
@@ -160,7 +162,7 @@ describe('pcqRedirectMiddleware', () => {
   });
 
   it('should not redirect if userPcqIdSet is already Yes', async () => {
-    (mockReq.session as CustomSession).ccdCase = {
+    mockRes.locals!.validatedCase = {
       id: '123456789',
       data: {
         userPcqIdSet: 'Yes',

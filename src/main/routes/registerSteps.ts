@@ -1,7 +1,7 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 
-import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
+import { oidcMiddleware } from '../middleware';
 import { getValidatedLanguage, stepDependencyCheckMiddleware } from '../modules/steps';
 import { getStepsForJourney, journeyRegistry } from '../steps';
 
@@ -27,14 +27,7 @@ export default function registerSteps(app: Application): void {
       const stepConfig = flowConfig.steps[step.name];
       const requiresAuth = stepConfig?.requiresAuth !== false;
 
-      // Skip ccdCaseMiddleware for routes with :caseReference param
-      // as case validation is handled by caseReferenceParamMiddleware
-      const hasCaseReference = step.url.includes(':caseReference');
-      const middlewares = requiresAuth
-        ? hasCaseReference
-          ? [oidcMiddleware]
-          : [oidcMiddleware, ccdCaseMiddleware]
-        : [];
+      const middlewares = requiresAuth ? [oidcMiddleware] : [];
 
       // Use journey-specific flow config for dependency checking
       const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);

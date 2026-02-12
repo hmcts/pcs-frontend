@@ -34,10 +34,12 @@ export interface Address {
 }
 
 export interface PossessionClaimResponse {
-  party: {
-    firstName?: string;
-    lastName?: string;
-    address?: Address;
+  defendantContactDetails: {
+    party: {
+      firstName?: string;
+      lastName?: string;
+      address?: Address;
+    };
   };
 }
 
@@ -45,8 +47,10 @@ export interface StartCallbackData {
   case_details: {
     case_data: {
       possessionClaimResponse?: {
-        party?: {
-          address?: Address;
+        defendantContactDetails?: {
+          party?: {
+            address?: Address;
+          };
         };
       };
     };
