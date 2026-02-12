@@ -116,8 +116,10 @@ export const step: StepDefinition = createFormStep({
     //prepopulate address is correct
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
       possessionClaimResponse = {
-        party: {
-          address: prepopulateAddress,
+        defendantContactDetails: {
+          party: {
+            address: prepopulateAddress,
+          },
         },
       };
     } else {
@@ -129,13 +131,15 @@ export const step: StepDefinition = createFormStep({
 
       //only the details the defendant provides
       possessionClaimResponse = {
-        party: {
-          address: {
-            AddressLine1: addressLine1,
-            ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
-            PostTown: townOrCity,
-            ...(county !== undefined && county !== '' && { County: county }),
-            PostCode: postcode,
+        defendantContactDetails: {
+          party: {
+            address: {
+              AddressLine1: addressLine1,
+              ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
+              PostTown: townOrCity,
+              ...(county !== undefined && county !== '' && { County: county }),
+              PostCode: postcode,
+            },
           },
         },
       };
@@ -148,7 +152,7 @@ export const step: StepDefinition = createFormStep({
 
     const formattedAddressStr = await getExistingAddress(
       req.session.user?.accessToken || '',
-      req.params.caseReference || ''
+      req.res?.locals.validatedCase?.id || ''
     );
 
     const isAddressKnown = formattedAddressStr !== '?';
@@ -231,7 +235,7 @@ export const step: StepDefinition = createFormStep({
 async function getExistingAddress(accessToken: string, caseReference: string): Promise<string> {
   // Pull data from API
   const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
-  prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.party?.address;
+  prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.defendantContactDetails?.party?.address;
 
   if (prepopulateAddress) {
     const formattedAddress =

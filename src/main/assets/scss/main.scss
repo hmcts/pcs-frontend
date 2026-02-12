@@ -1,8 +1,8 @@
-@import 'govuk-frontend';
+@use 'govuk-frontend' as *;
 
-@import 'phase-banner';
-@import 'service-navigation';
-@import 'timeout-modal';
+@use 'phase-banner';
+@use 'service-navigation';
+@use 'timeout-modal';
 
 .govuk-header__content {
   display: flex;
