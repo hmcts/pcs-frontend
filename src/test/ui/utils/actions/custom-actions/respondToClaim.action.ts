@@ -23,7 +23,7 @@ export class RespondToClaimAction implements IAction {
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
-      ['validateClaimantName', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
