@@ -1,8 +1,7 @@
 import { test } from '@playwright/test';
 import config from 'config';
 
-//Below lines are commented to avoid API calls until data setup is integrated.
-//import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactPreference,
   correspondenceAddressKnown,
@@ -27,13 +26,14 @@ const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
-  //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  //await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
-  //await performAction('fetchPINsAPI');
+  await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  //await performAction('validateAccessCodeAPI');
-  await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
+  await performAction('validateAccessCodeAPI');
+  await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
 
@@ -168,7 +168,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('paymentInterstitial - back and cancel link Validations', async () => {
+  test('Dispute claim interstitial - back and cancel link Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
@@ -184,7 +184,29 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
+    await performAction('clickLink', disputeClaimInterstitial.backLink);
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('clickButton', disputeClaimInterstitial.cancelLink);
+    await performValidation('mainHeader', 'Dashboard');
+  });
+
+  test('Payment interstitial - back and cancel link Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.continueButton);

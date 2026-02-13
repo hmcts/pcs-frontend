@@ -25,7 +25,7 @@ export function pcqRedirectMiddleware() {
     const serviceId = config.get<string>('pcq.serviceId');
     const actor = config.get<string>('pcq.actor');
 
-    const ccdCase = req.session?.ccdCase;
+    const ccdCase = res.locals.validatedCase;
     const user = req.session?.user;
 
     if (!ccdCase?.id || !user?.accessToken) {
@@ -81,7 +81,7 @@ export function pcqRedirectMiddleware() {
         },
       });
 
-      req.session.ccdCase = updatedCase;
+      res.locals.validatedCase = updatedCase;
     } catch (err) {
       logger.error('Failed to update CCD with PCQ ID:', err);
       return next();
