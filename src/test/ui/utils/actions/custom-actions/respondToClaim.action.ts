@@ -30,7 +30,7 @@ export class RespondToClaimAction implements IAction {
     await actionToPerform();
   }
 
-  private async selectLegalAdvice(legalAdviceData: actionData): Promise<void> {
+  private async selectLegalAdvice(legalAdviceData: actionData) {
     await performAction('clickRadioButton', {
       question: freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion,
       option: legalAdviceData,
@@ -38,13 +38,13 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
   }
 
-  private async inputDefendantDetails(defendantData: actionRecord): Promise<void> {
+  private async inputDefendantDetails(defendantData: actionRecord) {
     await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantData.fName);
     await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantData.lName);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
-  private async enterDateOfBirthDetails(defendantData: actionRecord): Promise<void> {
+  private async enterDateOfBirthDetails(defendantData: actionRecord) {
     await performActions(
       'Defendant Date of Birth Entry',
       ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
@@ -54,7 +54,7 @@ export class RespondToClaimAction implements IAction {
     );
   }
 
-  private async confirmDefendantDetails(confirmDefendantName: actionRecord): Promise<void> {
+  private async confirmDefendantDetails(confirmDefendantName: actionRecord) {
     await performAction('clickRadioButton', {
       question: confirmDefendantName.question,
       option: confirmDefendantName.option,
@@ -62,7 +62,7 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
 
-  private async selectCorrespondenceAddressKnown(addressData: actionRecord): Promise<void> {
+  private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
     await performAction('clickRadioButton', {
       question: correspondenceAddress.correspondenceAddressConfirmHintText,
       option: addressData.radioOption,
@@ -74,7 +74,7 @@ export class RespondToClaimAction implements IAction {
     }
   }
 
-  private async selectCorrespondenceAddressUnKnown(addressData: actionRecord): Promise<void> {
+  private async selectCorrespondenceAddressUnKnown(addressData: actionRecord) {
     if (addressData.addressIndex) {
       await performActions(
         'Find Address based on postcode',
@@ -94,7 +94,7 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
-  private async readPaymentInterstitial(): Promise<void> {
+  private async readPaymentInterstitial() {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
 
