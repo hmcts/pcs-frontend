@@ -1,4 +1,5 @@
 {
+  "pageTitle": "Have you paid any money to the claimant since the claim issue date?",
   "caption": "Respond to a property possession claim",
   "question": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
   "options": {

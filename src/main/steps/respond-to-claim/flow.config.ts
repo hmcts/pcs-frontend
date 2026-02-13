@@ -17,13 +17,26 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim',
     'payment-interstitial',
     'repayments-made',
-    'postcode-finder',
+    'repayments-agreed',
+    'correspondence-address',
     'dispute-claim-interstitial',
     'landlord-registered',
     'tenancy-details',
+    'your-household-and-circumstances',
+    'do-you-have-any-dependant-children',
+    'do-you-have-any-other-dependants',
+    'do-any-other-adults-live-in-your-home',
+    'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
+    'your-circumstances',
+    'exceptional-hardship',
+    'income-and-expenditure',
+    'what-regular-income-do-you-receive',
+    'have-you-applied-for-universal-credit',
+    'priority-debts',
+    'priority-debt-details',
+    'what-other-regular-expenses-do-you-have',
     'end-now',
     'contact-preferences',
-    'repayments-agreed',
   ],
   steps: {
     'start-now': {
@@ -53,14 +66,14 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-date-of-birth': {
       previousStep: formData =>
         'defendant-name-confirmation' in formData ? 'defendant-name-confirmation' : 'defendant-name-capture',
-      defaultNext: 'postcode-finder',
+      defaultNext: 'correspondence-address',
     },
-    'postcode-finder': {
+    'correspondence-address': {
       previousStep: 'defendant-date-of-birth',
       defaultNext: 'contact-preferences',
     },
     'contact-preferences': {
-      previousStep: 'postcode-finder',
+      previousStep: 'correspondence-address',
       defaultNext: 'dispute-claim-interstitial',
     },
     'dispute-claim-interstitial': {
@@ -98,6 +111,58 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'repayments-agreed': {
       previousStep: 'repayments-made',
+      defaultNext: 'your-household-and-circumstances',
+    },
+    'your-household-and-circumstances': {
+      previousStep: 'repayments',
+      defaultNext: 'do-you-have-any-dependant-children',
+    },
+    'do-you-have-any-dependant-children': {
+      previousStep: 'your-household-and-circumstances',
+      defaultNext: 'do-you-have-any-other-dependants',
+    },
+    'do-you-have-any-other-dependants': {
+      previousStep: 'do-you-have-any-dependant-children',
+      defaultNext: 'do-any-other-adults-live-in-your-home',
+    },
+    'do-any-other-adults-live-in-your-home': {
+      previousStep: 'do-you-have-any-other-dependants',
+      defaultNext: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
+    },
+    'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home': {
+      previousStep: 'do-any-other-adults-live-in-your-home',
+      defaultNext: 'your-circumstances',
+    },
+    'your-circumstances': {
+      previousStep: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
+      defaultNext: 'exceptional-hardship',
+    },
+    'exceptional-hardship': {
+      previousStep: 'your-circumstances',
+      defaultNext: 'income-and-expenditure',
+    },
+    'income-and-expenditure': {
+      previousStep: 'exceptional-hardship',
+      defaultNext: 'what-regular-income-do-you-receive',
+    },
+    'what-regular-income-do-you-receive': {
+      previousStep: 'income-and-expenditure',
+      defaultNext: 'have-you-applied-for-universal-credit',
+    },
+    'have-you-applied-for-universal-credit': {
+      previousStep: 'what-regular-income-do-you-receive',
+      defaultNext: 'priority-debts',
+    },
+    'priority-debts': {
+      previousStep: 'have-you-applied-for-universal-credit',
+      defaultNext: 'priority-debt-details',
+    },
+    'priority-debt-details': {
+      previousStep: 'priority-debts',
+      defaultNext: 'what-other-regular-expenses-do-you-have',
+    },
+    'what-other-regular-expenses-do-you-have': {
+      previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
     },
   },

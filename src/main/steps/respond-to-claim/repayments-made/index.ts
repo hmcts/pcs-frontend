@@ -1,5 +1,5 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -8,8 +8,8 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   translationKeys: {
+    pageTitle: 'pageTitle',
     caption: 'caption',
-    question: 'question',
   },
   fields: [
     {
@@ -42,18 +42,10 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  extendGetContent: req => {
+  extendGetContent: req => ({
     // TODO:Retrieve claimantName/claimIssueDate dynamically from CCD case data and remove hardcoded default value
-    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
-    const claimIssueDate = req.session?.ccdCase?.data?.claimIssueDate || '16th June 2025';
-    const t = getTranslationFunction(req, 'repayments-made', ['common']);
-    const question = t('question', { returnObjects: true, claimantName, claimIssueDate });
-
-    return {
-      question,
-      claimantName,
-      claimIssueDate,
-    };
-  },
+    claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
+    claimIssueDate: req.session?.ccdCase?.data?.claimIssueDate || '16th June 2025',
+  }),
   customTemplate: `${__dirname}/repaymentsMade.njk`,
 });
