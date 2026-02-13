@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -396,7 +395,6 @@ export class PageContentValidation implements IValidation {
     return 'Text';
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   static getValidationResults() {
     return this.validationResults;
   }
