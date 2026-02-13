@@ -67,7 +67,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', registeredLandlord.mainHeader);
     await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     //Added below pages to welsh journey as per english journey
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
@@ -100,7 +100,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -130,7 +130,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
@@ -167,7 +167,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
