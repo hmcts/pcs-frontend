@@ -8,7 +8,7 @@ import {
   counterClaim,
   dateOfBirth,
   defendantNameCapture,
-  defendantNameConfirmation,
+  //defendantNameConfirmation,
   freeLegalAdvice,
   registeredLandlord,
   repayments,
