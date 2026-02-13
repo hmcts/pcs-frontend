@@ -14,7 +14,7 @@ import { ActionRegistry, ValidationRegistry } from './registry';
 let testExecutor: { page: Page };
 let previousUrl: string = '';
 let startErrorMessageValidation = false;
-let startAxeAudits = false;
+let startAxeAudit = false;
 
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
@@ -31,8 +31,8 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-  if (!startAxeAudits && executor.page.url().includes('start-now')) {
-    startAxeAudits = true;
+  if (!startAxeAudit && executor.page.url().includes('start-now')) {
+    startAxeAudit = true;
   }
   if (!startErrorMessageValidation && executor.page.url().includes('free-legal-advice')) {
     startErrorMessageValidation = true;
@@ -54,7 +54,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
       if (enable_content_validation) {
         await performValidation('autoValidatePageContent');
       }
-      if (startAxeAudits && enable_axe_audit) {
+      if (startAxeAudit && enable_axe_audit) {
         try {
           await new AxeUtils(executor.page).audit({
             exclude: axe_exclusions,
