@@ -59,9 +59,8 @@ export class CreateCaseAPIAction implements IAction {
       if (Axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 404) {
-          /* eslint-disable no-console */
           console.error(submitCaseApiData.submitCasePayload);
-          /* eslint-enable no-console */
+
           throw new Error(
             `Submission failed: endpoint not found (404). Please check the payload above.\n${error.message}`
           );
