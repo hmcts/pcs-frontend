@@ -7,11 +7,10 @@ import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
-import { caseReferenceParamMiddleware, sessionTimeoutMiddleware } from './middleware';
-import { autoSaveDraftToCCD } from './middleware/autoSaveDraftToCCD';
+import { sessionTimeoutMiddleware } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
-import registerSteps from './routes/registerSteps';
+import { registerAllJourneys } from './routes/registerSteps';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
@@ -43,16 +42,14 @@ app.use((req, res, next) => {
 // timeout config available to all templates
 app.use(sessionTimeoutMiddleware);
 
-// Auto-save form data to CCD draft (intercepts res.redirect)
-app.use(autoSaveDraftToCCD);
+// Auto-register all journeys from the journey registry
+// This creates a dedicated router for each journey with journey-specific middleware
+registerAllJourneys(app);
 
-// param middleware for caseReference
-app.param('caseReference', caseReferenceParamMiddleware);
-
-registerSteps(app);
-
+// Load all other routes (excluding registerSteps.ts which is called manually above)
 glob
   .sync(__dirname + '/routes/**/*.+(ts|js)')
+  .filter(filename => !filename.includes('registerSteps'))
   .map(filename => require(filename))
   .forEach(route => route.default(app));
 

@@ -118,7 +118,7 @@ const mockStepsData = {
 import { Application } from 'express';
 
 import { oidcMiddleware } from '../../../main/middleware';
-import registerSteps from '../../../main/routes/registerSteps';
+import { registerSteps } from '../../../main/routes/registerSteps';
 
 describe('registerSteps', () => {
   const mockGet = jest.fn();
@@ -299,7 +299,7 @@ describe('registerSteps', () => {
     }));
 
     jest.resetModules();
-    const registerStepsNew = require('../../../main/routes/registerSteps').default;
+    const { registerSteps: registerStepsNew } = require('../../../main/routes/registerSteps');
 
     registerStepsNew(testApp);
 

@@ -1,18 +1,33 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import { Application } from 'express';
+import { Application, IRouter, Router } from 'express';
 
-import { oidcMiddleware } from '../middleware';
+import { caseReferenceParamMiddleware, oidcMiddleware } from '../middleware';
 import { getValidatedLanguage, stepDependencyCheckMiddleware } from '../modules/steps';
 import { getStepsForJourney, journeyRegistry } from '../steps';
 
 const logger = Logger.getLogger('registerSteps');
 
-export default function registerSteps(app: Application): void {
+/**
+ * Register steps for all journeys or a specific journey
+ * @param router - Express Application or Router instance
+ * @param specificJourney - Optional journey name to register only that journey
+ */
+export function registerSteps(router: IRouter, specificJourney?: string): void {
   let totalSteps = 0;
   let totalProtectedSteps = 0;
 
-  // Iterate over all journeys
-  for (const [journeyName, journey] of Object.entries(journeyRegistry)) {
+  // Iterate over all journeys (or just the specific one if provided)
+  const journeysToRegister = specificJourney
+    ? Object.entries(journeyRegistry).filter(([name]) => name === specificJourney)
+    : Object.entries(journeyRegistry);
+
+  // Validate that the specific journey exists
+  if (specificJourney && journeysToRegister.length === 0) {
+    const availableJourneys = Object.keys(journeyRegistry).join(', ');
+    throw new Error(`Journey '${specificJourney}' not found in registry. Available journeys: ${availableJourneys}`);
+  }
+
+  for (const [journeyName, journey] of journeysToRegister) {
     const flowConfig = journey.flowConfig;
     const journeySteps = getStepsForJourney(journeyName);
     let journeyProtectedSteps = 0;
@@ -37,7 +52,7 @@ export default function registerSteps(app: Application): void {
         : [...middlewares, dependencyCheck];
 
       if (step.getController) {
-        app.get(step.url, ...allGetMiddleware, (req, res) => {
+        router.get(step.url, ...allGetMiddleware, (req, res) => {
           const lang = getValidatedLanguage(req);
 
           logger.debug('Language information', {
@@ -59,7 +74,7 @@ export default function registerSteps(app: Application): void {
       }
 
       if (step.postController?.post) {
-        app.post(step.url, ...middlewares, step.postController.post);
+        router.post(step.url, ...middlewares, step.postController.post);
       }
 
       totalSteps++;
@@ -81,4 +96,36 @@ export default function registerSteps(app: Application): void {
     totalSteps,
     totalProtectedSteps,
   });
+}
+
+/**
+ * Auto-discovers and registers all journeys from the journey registry.
+ * Creates a dedicated router for each journey with journey-specific middleware.
+ *
+ * This prevents the need to manually import and mount each journey router in app.ts.
+ * When you add a new journey, just add it to the journeyRegistry and it will be auto-mounted.
+ *
+ * @param app - Express Application instance
+ */
+export function registerAllJourneys(app: Application): void {
+  logger.info('Auto-registering all journeys from registry');
+
+  for (const [journeyName] of Object.entries(journeyRegistry)) {
+    // Create a dedicated router for this journey with param merging enabled
+    const journeyRouter = Router({ mergeParams: true });
+
+    // Apply journey-specific middleware
+    // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
+    journeyRouter.param('caseReference', caseReferenceParamMiddleware);
+
+    // Register all steps for this journey on the journey router
+    registerSteps(journeyRouter, journeyName);
+
+    // Mount the journey router on the app at root (routes have full paths)
+    app.use(journeyRouter);
+
+    logger.info(`Journey '${journeyName}' auto-registered and mounted`);
+  }
+
+  logger.info('All journeys registered successfully');
 }
