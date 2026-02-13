@@ -8,8 +8,7 @@ import {
   counterClaim,
   dateOfBirth,
   defendantNameCapture,
-  //defendantNameConfirmation,
-  disputeClaimInterstitial,
+  defendantNameConfirmation,
   freeLegalAdvice,
   registeredLandlord,
   repayments,
@@ -27,7 +26,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title.includes('@noDefendants')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
-    process.env.defendant = 'No';
   } else {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
@@ -63,7 +61,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
@@ -98,7 +96,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+    );
     await performValidation('mainHeader', registeredLandlord.mainHeader);
     await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -131,7 +132,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
   });
 });

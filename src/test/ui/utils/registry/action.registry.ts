@@ -49,6 +49,7 @@ export class ActionRegistry {
     ['confirmDefendantDetails', new RespondToClaimAction()],
     ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
     ['selectCorrespondenceAddressUnKnown', new RespondToClaimAction()],
+    ['disputeClaimInterstitial', new RespondToClaimAction()],
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['triggerErrorMessagesForValidation', new TriggerErrorMessagesAction()],
   ]);
