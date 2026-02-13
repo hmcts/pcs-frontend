@@ -63,7 +63,8 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-date-of-birth': {
-      previousStep: 'defendant-name-capture',
+      previousStep: formData =>
+        'defendant-name-confirmation' in formData ? 'defendant-name-confirmation' : 'defendant-name-capture',
       defaultNext: 'postcode-finder',
     },
     'postcode-finder': {
