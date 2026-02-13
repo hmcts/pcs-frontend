@@ -6,7 +6,7 @@ export default {
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'date-of-birth': 'dateOfBirth',
-  'correspondence-address': 'correspondenceAddressKnown',,
+  'correspondence-address': 'correspondenceAddressKnown',
   'confirmation-of-notice-date-when-not-provided': 'noticeDateUnknown',
   'confirmation-of-notice-given': 'noticeDetails',
   'non-rent-arrears-dispute': 'nonRentArrearsDispute',
