@@ -169,7 +169,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
-    await performAction('selectcorrespondenceAddress', {
+    await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
