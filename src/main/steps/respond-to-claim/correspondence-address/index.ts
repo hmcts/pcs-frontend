@@ -91,16 +91,16 @@ const fieldsConfig: FormFieldConfig[] = [
 ];
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'postcode-finder',
+  stepName: 'correspondence-address',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
+  customTemplate: 'respond-to-claim/correspondence-address/correspondenceAddress.njk',
   translationKeys: {
     pageTitle: 'pageTitle',
   },
   extendGetContent: req => {
-    const t = getTranslationFunction(req, 'postcode-finder', ['common']);
+    const t = getTranslationFunction(req, 'correspondence-address', ['common']);
 
     // Dynamically inject validator with translation function
     const postcodeField = fieldsConfig[0].options?.[1]?.subFields?.postcode;

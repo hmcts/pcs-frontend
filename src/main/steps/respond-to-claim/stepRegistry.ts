@@ -3,6 +3,7 @@ import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
 import { step as contactPreferences } from './contact-preferences';
+import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
 import { step as yourCircumstances } from './current-circumstances';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
@@ -16,7 +17,6 @@ import { step as incomeAndExpenditure } from './income-and-expenditure';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
 import { step as paymentInterstitial } from './payment-interstitial';
-import { step as postcodeFinder } from './postcode-finder';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
 import { step as whatOtherRegularExpensesDoYouHave } from './regular-expenses';
@@ -29,7 +29,7 @@ import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
-  'postcode-finder': postcodeFinder,
+  'correspondence-address': correspondenceAddress,
   'free-legal-advice': freeLegalAdvice,
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
