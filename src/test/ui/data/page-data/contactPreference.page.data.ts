@@ -1,4 +1,4 @@
 export const contactPreference = {
-  mainHeader: 'Contact preferences (placeholder)',
+  mainHeader: 'Contact Preferences (placeholder)',
   saveAndContinueButton: 'Save and continue',
 };
