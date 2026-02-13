@@ -1,6 +1,12 @@
+import { AxeUtils } from '@hmcts/playwright-common';
 import { Page, test } from '@playwright/test';
 
-import { enable_content_validation, enable_error_message_validation } from '../../../../playwright.config';
+import {
+  enable_axe_audit,
+  enable_content_validation,
+  enable_error_message_validation,
+} from '../../../../playwright.config';
+import { axe_exclusions } from '../config/axe-exclusions.config';
 
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
@@ -8,6 +14,7 @@ import { ActionRegistry, ValidationRegistry } from './registry';
 let testExecutor: { page: Page };
 let previousUrl: string = '';
 let startErrorMessageValidation = false;
+let startAxeAudits = false;
 
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
@@ -24,7 +31,10 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-  if (executor.page.url().includes('free-legal-advice')) {
+  if (!startAxeAudits && executor.page.url().includes('start-now')) {
+    startAxeAudits = true;
+  }
+  if (!startErrorMessageValidation && executor.page.url().includes('free-legal-advice')) {
     startErrorMessageValidation = true;
   }
   const pageNavigated = currentUrl !== previousUrl;
@@ -39,9 +49,24 @@ async function detectPageNavigation(): Promise<boolean> {
 async function validatePageIfNavigated(action: string): Promise<void> {
   if (action.includes('click') || action.includes('navigate')) {
     const pageNavigated = await detectPageNavigation();
+    const executor = getExecutor();
     if (pageNavigated) {
       if (enable_content_validation) {
         await performValidation('autoValidatePageContent');
+      }
+      if (startAxeAudits && enable_axe_audit) {
+        try {
+          await new AxeUtils(executor.page).audit({
+            exclude: axe_exclusions,
+          });
+        } catch (error) {
+          const errorMessage = String((error as Error).message || error).toLowerCase();
+          if (errorMessage.includes('execution context was destroyed') || errorMessage.includes('navigation')) {
+            console.warn(`Accessibility audit skipped due to navigation: ${errorMessage}`);
+          } else {
+            throw error;
+          }
+        }
       }
       if (startErrorMessageValidation && enable_error_message_validation) {
         await performAction('triggerErrorMessagesForValidation');
