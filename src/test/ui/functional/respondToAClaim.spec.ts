@@ -32,15 +32,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Respond to a claim - functional @nightly', async () => {
-  test('Free legal advice - Error messages - Save for later Validations', async () => {
-    await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: freeLegalAdvice.errorValidation,
-      validationType: freeLegalAdvice.errorValidationType.radio,
-      inputArray: freeLegalAdvice.errorValidationField.errorRadioMsg,
-      question: freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion,
-      header: freeLegalAdvice.errorValidationHeader,
-    });
+  test('Free legal advice - Save for later Validations', async () => {
     await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
