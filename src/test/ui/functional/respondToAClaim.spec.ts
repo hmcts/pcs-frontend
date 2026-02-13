@@ -209,7 +209,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -246,7 +246,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: noticeDetails.errorValidation,
@@ -282,7 +282,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -322,7 +322,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -361,7 +361,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
@@ -399,7 +399,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -442,7 +442,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
@@ -481,7 +481,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
@@ -518,7 +518,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
@@ -556,7 +556,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
@@ -598,7 +598,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
