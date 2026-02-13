@@ -1,7 +1,9 @@
 import { submitCaseApiData } from '../api-data';
 
-export const correspondenceAddressKnown = {
-  mainHeader: `Is your correspondence address ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.AddressLine1}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostTown}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostCode}?`,
+export const correspondenceAddress = {
+  correspondenceAddressKnownMainHeader: `Is your correspondence address ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.AddressLine1}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostTown}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostCode}?`,
+  correspondenceAddressUnKnownMainHeader: 'What’s your correspondence address?',
+  correspondenceAddressUnKnownParagraph: 'Your correspondence address is your postal address.',
   respondToClaimParagraph: 'Respond to a property possession claim',
   correspondenceAddressConfirmHintText: 'This is the address provided by Treetops Housing',
   yesRadioOption: 'Yes',

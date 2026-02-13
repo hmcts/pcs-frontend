@@ -4,7 +4,7 @@ import config from 'config';
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactPreference,
-  correspondenceAddressKnown,
+  correspondenceAddress,
   counterClaim,
   dateOfBirth,
   defendantNameCapture,
@@ -26,6 +26,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title.includes('@noDefendants')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+    process.env.defendant = 'No';
   } else {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
@@ -56,14 +57,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.yesRadioOption,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -90,9 +91,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.noRadioOption,
-      postcode: correspondenceAddressKnown.walesPostcodeTextInput,
-      addressIndex: correspondenceAddressKnown.addressIndex,
+      radioOption: correspondenceAddress.noRadioOption,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+      addressIndex: correspondenceAddress.addressIndex,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
@@ -101,7 +102,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', registeredLandlord.mainHeader);
     await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     //Added below pages to welsh journey as per english journey
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
@@ -124,9 +125,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddressKnown.englandAddressLine1TextInput,
-      townOrCity: correspondenceAddressKnown.englandTownOrCityTextInput,
-      postcode: correspondenceAddressKnown.englandPostcodeTextInput,
+      addressLine1: correspondenceAddress.englandAddressLine1TextInput,
+      townOrCity: correspondenceAddress.englandTownOrCityTextInput,
+      postcode: correspondenceAddress.englandPostcodeTextInput,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
