@@ -1,0 +1,23 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+  <h1 class="govuk-heading-l">What other regular expenses do you have? (placeholder)</h1>
+  <p class="govuk-body">This is a placeholder for What Other Regular Expenses Do You Have step.</p>
+  <form method="post" action="{{ url }}">
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: continue,
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      {{ govukButton({
+        text: saveForLater,
+        classes: 'govuk-button--secondary',
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
+  </form>
+{% endblock %}

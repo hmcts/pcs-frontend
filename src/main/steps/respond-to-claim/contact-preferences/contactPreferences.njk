@@ -1,23 +1,21 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-
-{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}Contact Preferences - HM Courts & Tribunals Service – GOV.UK{% endblock %}
-
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% block mainContent %}
-  <h1 class="govuk-heading-l">Contact preferences (placeholder)</h1>
-
-  <p class="govuk-body">This is a placeholder page for contact preferences capture.</p>
-
-  <form method="post" action="{{ url }}" novalidate>
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+  <h1 class="govuk-heading-l">Contact Preferences (placeholder)</h1>
+  <p class="govuk-body">This is a placeholder for contact preferences step.</p>
+  <form method="post" action="{{ url }}">
     <div class="govuk-button-group">
       {{ govukButton({
-        text: t('buttons.saveAndContinue', { ns: 'common' }),
+        text: continue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
       {{ govukButton({
-        text: t('buttons.saveForLater', { ns: 'common' }),
-        classes: "govuk-button--secondary",
+        text: saveForLater,
+        classes: 'govuk-button--secondary',
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
