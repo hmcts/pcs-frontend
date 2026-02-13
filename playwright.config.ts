@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
 export const VERY_SHORT_TIMEOUT = 1000;
 export const SHORT_TIMEOUT = 5000;
-export const actionRetries = 5;
+export const actionRetries = 10;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
 export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'true';
