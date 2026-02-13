@@ -9,6 +9,8 @@ import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
 import type { FormError } from './errorUtils';
 
+export { isValidCurrencyAmount } from './currencyValidation';
+
 const logger = Logger.getLogger('form-builder-helpers');
 
 export function getTranslation(

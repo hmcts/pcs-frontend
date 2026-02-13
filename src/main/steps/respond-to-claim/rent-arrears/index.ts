@@ -2,7 +2,7 @@ import type { Request } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { currency } from '../../../modules/nunjucks/filters/currency';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction, isValidCurrencyAmount } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -59,7 +59,7 @@ export const step: StepDefinition = createFormStep({
               name: 'rentArrearsAmountCorrection',
               type: 'text',
               required: true,
-              // Require a numeric amount in 00.00 format
+              // Require a numeric amount in 00.00 format (e.g. 123.45)
               pattern: '^\\d{1,10}\\.\\d{2}$',
               errorMessage: 'errors.rentArrears.rentArrearsAmount',
               translationKey: {
@@ -70,29 +70,12 @@ export const step: StepDefinition = createFormStep({
                 text: '£',
               },
               attributes: {
-                inputmode: 'decimal',
+                // inputmode: 'decimal',
+                inputmode: 'numeric',
                 spellcheck: false,
               },
               // Enforce maximum of £1,000,000,000.00
-              validator: value => {
-                if (typeof value !== 'string') {
-                  return false;
-                }
-                const trimmed = value.trim();
-                if (!trimmed) {
-                  return false;
-                }
-                const match = trimmed.match(/^(\d{1,10})\.(\d{2})$/);
-                if (!match) {
-                  return false;
-                }
-                const numericValue = Number(trimmed);
-                if (Number.isNaN(numericValue)) {
-                  return false;
-                }
-                // Upper limit £1,000,000,000.00
-                return numericValue <= 1000000000;
-              },
+              validator: value => isValidCurrencyAmount(value, { max: 1000000000 }),
             },
           },
         },
