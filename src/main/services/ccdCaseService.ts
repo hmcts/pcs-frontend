@@ -68,6 +68,9 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
   const status = axiosError.response?.status;
 
   logger.error(`Error in ${context}: ${axiosError.message}`);
+  if (axiosError.response?.data) {
+    logger.error(`Error response data: ${JSON.stringify(axiosError.response.data, null, 2)}`);
+  }
 
   if (status === 401 || status === 403) {
     return new HTTPError('Not authorised to access CCD case service', 403);
@@ -91,7 +94,9 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
  */
 async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
+    logger.info(`Calling getEventToken with URL: ${url}`);
     const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
+    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -135,7 +140,10 @@ async function submitEvent(
   };
 
   try {
+    logger.info(`Calling submitEvent with URL: ${url}`);
+    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
+    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');
@@ -147,10 +155,12 @@ export const ccdCaseService = {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
+      logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
       const response = await http.get<{ case_details?: { case_data?: Record<string, unknown> } }>(
         eventUrl,
         getCaseHeaders(accessToken)
       );
+      logger.info(`[ccdCaseService] Case access validated successfully for caseId: ${caseId}`);
 
       return {
         id: caseId,
@@ -170,12 +180,17 @@ export const ccdCaseService = {
       sort: [{ created_date: { order: 'desc' } }],
     };
 
+    logger.info(`Calling ccdCaseService search with URL: ${url}`);
+    logger.info(`Request body: ${JSON.stringify(requestBody, null, 2)}`);
+
     try {
       const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
       const allCases = response?.data?.cases;
+      logger.info(`Response data: ${JSON.stringify(response?.data?.cases, null, 2)}`);
       const draftCase = allCases?.find(c => c.state === CaseState.DRAFT);
 
       if (draftCase) {
+        logger.info(`Draft case found: ${JSON.stringify(draftCase, null, 2)}`);
         return {
           id: draftCase.id,
           data: draftCase.case_data,

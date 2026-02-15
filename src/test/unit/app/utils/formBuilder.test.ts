@@ -904,7 +904,7 @@ describe('formBuilder', () => {
         );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
       });
 
       it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {

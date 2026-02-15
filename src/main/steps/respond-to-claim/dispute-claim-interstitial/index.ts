@@ -24,12 +24,10 @@ export const step: StepDefinition = {
           throw new Error('Translation function not available');
         }
 
-        // Get claimant name from fresh START event data (res.locals.validatedCase)
-        // Session no longer stores full case data, only caseId
-        const claimantName =
-          (req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as
-            | string
-            | undefined) || 'Treetops Housing';
+        // Get claimant name from CCD callback data (res.locals.validatedCase)
+        // Use only data from CCD - no hardcoded fallbacks
+        const claimantName = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
+          ?.value as string | undefined;
 
         return {
           backUrl: await stepNavigation.getBackUrl(req, stepName),
