@@ -198,7 +198,7 @@ describe('stepFlow', () => {
         steps: {
           step1: {},
           step2: {
-            previousStep: (formData: Record<string, unknown>) => {
+            previousStep: (req: Request, formData: Record<string, unknown>) => {
               return formData.condition === true ? 'step1' : 'step3';
             },
           },

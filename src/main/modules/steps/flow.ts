@@ -50,7 +50,7 @@ export async function getPreviousStep(
   // If step has explicit previousStep configuration, use it
   if (stepConfig?.previousStep) {
     if (typeof stepConfig.previousStep === 'function') {
-      return stepConfig.previousStep(formData);
+      return stepConfig.previousStep(req, formData);
     }
     return stepConfig.previousStep;
   }

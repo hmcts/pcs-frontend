@@ -1,0 +1,51 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+
+  {{ govukInsetText({ text: hintText }) }}
+
+  <h3 class="govuk-heading-s">{{ bulletPointLabel }}</h3>
+
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
+    <li>{{ listItem1 }}</li>
+  </ul>
+
+  <form method="post" action="{{ url }}" novalidate>
+
+    {% for field in fields %}
+      {% if field.componentType == 'dateInput' %}
+        {{ govukDateInput(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    <div class="govuk-button-group">
+      {{ govukButton({ 
+        text: saveAndContinue,
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      {{ govukButton({ 
+        text: saveForLater,
+        classes: 'govuk-button--secondary',
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
+  </form>
+
+{% endblock %}
+

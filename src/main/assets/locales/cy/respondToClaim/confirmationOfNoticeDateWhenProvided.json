@@ -1,0 +1,21 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyNotice date",
+  "bulletPointLabel": "cyNotice details given by {{claimantName}}:",
+  "hintText": "cyWhen making the claim, {{claimantName}} had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.",
+  "listItem1": "cyThey served you with a notice seeking possession on {{noticeDate}}",
+  "question": "cyWhen did you receive notice from {{claimantName}} (optional)?",
+  "noticeDateHint": "cyFor example, 27 9 2022",
+  "errors": {
+    "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
+      "notRealDate": "cyThe date you received notice must be a real date",
+      "futureDate": "cyThe date you received notice must either be today’s date or in the past",
+      "invalidValue": "cyThe date you received notice must be a real date",
+      "missingOne": "cyThe date you received notice must include a {{missingField}}",
+      "missingTwo": "cyThe date you received notice must include a {{first}} and {{second}}"
+    }
+  }
+}
