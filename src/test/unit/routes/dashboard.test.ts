@@ -175,6 +175,12 @@ describe('Dashboard Route', () => {
       redirect: jest.Mock;
       status: jest.Mock;
       send: jest.Mock;
+      locals: {
+        validatedCase?: {
+          id: string | number;
+          state?: string;
+        };
+      };
     };
     let mockNext: jest.Mock;
 
@@ -193,6 +199,12 @@ describe('Dashboard Route', () => {
         redirect: jest.fn(),
         status: jest.fn().mockReturnThis(),
         send: jest.fn(),
+        locals: {
+          validatedCase: {
+            id: '1234567890123456',
+            state: 'Open',
+          },
+        },
       };
 
       mockNext = jest.fn();

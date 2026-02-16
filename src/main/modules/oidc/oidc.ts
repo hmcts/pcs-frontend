@@ -191,10 +191,15 @@ export class OIDCModule {
           res.redirect(returnTo);
         });
       } catch (error) {
+        if (error.error_description) {
+          this.logger.error(`Authentication failed: ${error.error_description}`);
+        }
+
         this.logger.error('Authentication error details:', {
           description: error.error_description || 'Authentication error details',
           error: error.message,
           code: error.code,
+          status: error.status,
           name: error.name,
           stack: error.stack,
           url: req.url,
