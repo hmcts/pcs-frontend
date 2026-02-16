@@ -50,9 +50,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   // Wales postcode routing is not implemented yet, e2e test coverage, functional test coverage needs to be reviewed once HDPI-3451 is done
   test('Respond to a claim - Wales postcode @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.mainHeader,
-      option: defendantNameConfirmation.yesRadioOption,
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -87,8 +87,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Rent Arrears claim type = false, Notice Date Provided string = true, and Notice Served boolean = true
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
-    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
-    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    /*await performAction('confirmDefendantDetails', {
+  question: defendantNameConfirmation.mainHeader,
+  option: defendantNameConfirmation.yesRadioOption,
+});*/
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
@@ -117,8 +119,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
   test('Non-RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - NonRentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
-    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
-    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    /*await performAction('confirmDefendantDetails', {
+  question: defendantNameConfirmation.mainHeader,
+  option: defendantNameConfirmation.yesRadioOption,
+});*/
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
@@ -129,9 +133,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.noRadioOption,
-      postcode: correspondenceAddressKnown.englandPostcodeTextInput,
-      addressIndex: correspondenceAddressKnown.addressIndex,
+      radioOption: correspondenceAddress.noRadioOption,
+      postcode: correspondenceAddress.englandPostcodeTextInput,
+      addressIndex: correspondenceAddress.addressIndex,
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
@@ -155,8 +159,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
   test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
-    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    /*await performAction('confirmDefendantDetails', {
+  question: defendantNameConfirmation.mainHeader,
+  option: defendantNameConfirmation.yesRadioOption,
+});*/
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
@@ -167,6 +173,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);

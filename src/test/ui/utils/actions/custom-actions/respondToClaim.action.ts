@@ -120,6 +120,38 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
 
+  private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeGivenData.option,
+    });
+    await performAction('clickButton', noticeDetails.saveAndContinueButton);
+  }
+
+  private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
+    if (noticeData?.day && noticeData?.month && noticeData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+      );
+    }
+    await performAction('clickButton', noticeDateKnown.saveAndContinueButton);
+  }
+
+  private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
+    if (noticeData?.day && noticeData?.month && noticeData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+      );
+    }
+    await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
+  }
+
   // Below changes are temporary will be changed as part of HDPI-3596
   private async inputErrorValidation(validationArr: actionRecord) {
     if (!validationArr || validationArr.validationReq !== 'YES') {
@@ -156,37 +188,5 @@ export class RespondToClaimAction implements IAction {
           throw new Error(`Validation type :"${validationArr.validationType}" is not valid`);
       }
     }
-  }
-
-  private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
-    await performAction('clickRadioButton', {
-      question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeGivenData.option,
-    });
-    await performAction('clickButton', noticeDetails.saveAndContinueButton);
-  }
-
-  private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
-    if (noticeData?.day && noticeData?.month && noticeData?.year) {
-      await performActions(
-        'Enter Date',
-        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
-      );
-    }
-    await performAction('clickButton', noticeDateKnown.saveAndContinueButton);
-  }
-
-  private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
-    if (noticeData?.day && noticeData?.month && noticeData?.year) {
-      await performActions(
-        'Enter Date',
-        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
-      );
-    }
-    await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
   }
 }
