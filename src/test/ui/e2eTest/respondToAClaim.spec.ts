@@ -4,13 +4,13 @@ import config from 'config';
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactPreference,
-  correspondenceAddressKnown,
+  correspondenceAddress,
   counterClaim,
   dateOfBirth,
   defendantNameCapture,
-  defendantNameConfirmation,
+  //defendantNameConfirmation,
   freeLegalAdvice,
-  registeredLandlord,
+  //registeredLandlord,
   repayments,
   startNow,
   tenancyDetails,
@@ -57,7 +57,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.yesRadioOption,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
@@ -73,13 +73,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', repayments.saveAndContinueButton);
   });
 
-  test.skip('Respond to a claim - Wales postcode @noDefendants', async () => {
-    await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
-    await performAction('clickButton', startNow.startNowButton);
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('confirmDefendantDetails', {
+  // Wales postcode routing is not implemented yet, e2e test coverage, functional test coverage needs to be reviewed once HDPI-3451 is done
+  test('Respond to a claim - Wales postcode', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    /*    await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
+    });*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -87,9 +90,43 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.noRadioOption,
-      postcode: correspondenceAddressKnown.englandPostcodeTextInput,
-      addressIndex: correspondenceAddressKnown.addressIndex,
+      radioOption: correspondenceAddress.noRadioOption,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+      addressIndex: correspondenceAddress.addressIndex,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    // The below two lines related to the Wales journey are disabled only to allow this test case to execute.
+    //await performValidation('mainHeader', registeredLandlord.mainHeader);
+    //await performAction('clickButton', registeredLandlord.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    //Added below pages to welsh journey as per english journey
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
+  });
+
+  test('Respond to a claim - England postcode @noDefendants', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddress.englandAddressLine1TextInput,
+      townOrCity: correspondenceAddress.englandTownOrCityTextInput,
+      postcode: correspondenceAddress.englandPostcodeTextInput,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
@@ -97,11 +134,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    //Added below pages to welsh journey as per english journey
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
