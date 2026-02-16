@@ -13,7 +13,7 @@
  */
 
 import { Logger } from '@hmcts/nodejs-logging';
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
 import { ccdCaseService } from '../services/ccdCaseService';
@@ -266,15 +266,4 @@ async function saveToCCD(
   } catch (error) {
     logger.error(`[${stepName}] Failed to save draft to CCD:`, error);
   }
-}
-
-/**
- * DEPRECATED: Do not use this middleware approach.
- * Instead, call autoSaveToCCD() directly in formBuilder's beforeRedirect callback.
- *
- * @deprecated Use autoSaveToCCD() function instead
- */
-export function autoSaveDraftToCCD(_req: Request, _res: Response, next: NextFunction): void {
-  logger.warn('autoSaveDraftToCCD middleware is deprecated. Use autoSaveToCCD() in beforeRedirect callback instead.');
-  next();
 }

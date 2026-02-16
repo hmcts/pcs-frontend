@@ -74,14 +74,6 @@ function gracefulShutdownHandler(signal: string) {
         logger.info('HTTP terminator terminated');
       }
     });
-    if (app.locals.launchDarklyClient) {
-      try {
-        await app.locals.launchDarklyClient.close();
-        logger.info('LaunchDarkly module cleaned up');
-      } catch (error) {
-        logger.error('Error cleaning up LaunchDarkly module:', error);
-      }
-    }
   }, 500);
 }
 

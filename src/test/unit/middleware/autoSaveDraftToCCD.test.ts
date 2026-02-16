@@ -14,7 +14,6 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 import type { Request, Response } from 'express';
 
 import {
-  autoSaveDraftToCCD,
   autoSaveToCCD,
   dateToISO,
   multipleYesNo,
@@ -443,21 +442,6 @@ describe('autoSaveToCCD main function', () => {
         '[free-legal-advice] Failed to save draft to CCD:',
         expect.any(Error)
       );
-    });
-  });
-
-  describe('autoSaveDraftToCCD deprecated middleware', () => {
-    it('should log deprecation warning and call next', () => {
-      const req = {} as Request;
-      const res = {} as Response;
-      const next = jest.fn();
-
-      autoSaveDraftToCCD(req, res, next);
-
-      expect(mockLogger.warn).toHaveBeenCalledWith(
-        'autoSaveDraftToCCD middleware is deprecated. Use autoSaveToCCD() in beforeRedirect callback instead.'
-      );
-      expect(next).toHaveBeenCalled();
     });
   });
 });
