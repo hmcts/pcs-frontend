@@ -40,6 +40,10 @@ jest.mock('../../../../main/modules/steps/flow', () => ({
     getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
     getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
   },
+  createStepNavigation: jest.fn(() => ({
+    getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
+    getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
+  })),
 }));
 
 const mockGetValidatedLanguage = jest.fn();
@@ -117,6 +121,7 @@ describe('formBuilder', () => {
       },
     };
     return {
+      params: {},
       session: { formData: {} },
       language: 'en',
       t: defaultT,
@@ -148,8 +153,8 @@ describe('formBuilder', () => {
       session.formData[stepName] = data;
     });
     mockValidateForm.mockReturnValue({});
-    mockGetNextStepUrl.mockReturnValue('/steps/test-journey/next-step');
-    mockGetBackUrl.mockReturnValue('/steps/test-journey/previous-step');
+    mockGetNextStepUrl.mockResolvedValue('/steps/test-journey/next-step');
+    mockGetBackUrl.mockResolvedValue('/steps/test-journey/previous-step');
     mockGetValidatedLanguage.mockReturnValue('en' as const);
     mockGetRequestLanguage.mockImplementation((req: Request) => req.language || 'en');
     mockGetTranslationFunction.mockImplementation((req: Request) => {
@@ -167,9 +172,31 @@ describe('formBuilder', () => {
     });
 
     it('should handle journeyFolder with camelCase', () => {
-      const config = { ...baseConfig, journeyFolder: 'respondToClaim' };
+      const config = {
+        ...baseConfig,
+        journeyFolder: 'respondToClaim',
+        flowConfig: {
+          basePath: '/case/:caseReference/respond-to-claim',
+          journeyName: 'respondToClaim',
+          stepOrder: [],
+          steps: {},
+        },
+      };
       const step = createFormStep(config);
-      expect(step.url).toBe('/steps/respond-to-claim/test-step');
+      expect(step.url).toBe('/case/:caseReference/respond-to-claim/test-step');
+    });
+
+    it('should fallback to default path when flowConfig.basePath is not provided', () => {
+      const config = {
+        ...baseConfig,
+        journeyFolder: 'testJourney',
+        flowConfig: {
+          stepOrder: [],
+          steps: {},
+        },
+      };
+      const step = createFormStep(config);
+      expect(step.url).toBe('/steps/test-journey/test-step');
     });
 
     it('should create getController that renders with form content', async () => {
@@ -841,6 +868,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -851,7 +880,7 @@ describe('formBuilder', () => {
         );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
       });
 
       it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
@@ -866,6 +895,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -875,7 +906,7 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
       });
 
       it('should show validation errors when saveForLater is clicked with invalid data', async () => {
@@ -944,6 +975,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -979,6 +1012,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1058,6 +1093,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1093,6 +1130,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1180,6 +1219,8 @@ describe('formBuilder', () => {
         } as unknown as Request);
         const res = {
           redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1193,7 +1234,7 @@ describe('formBuilder', () => {
       });
 
       it('should return 500 when no redirect path available', async () => {
-        mockGetNextStepUrl.mockReturnValueOnce(null as unknown as string);
+        mockGetNextStepUrl.mockResolvedValueOnce(null);
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);

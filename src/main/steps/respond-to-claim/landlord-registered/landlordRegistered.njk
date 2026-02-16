@@ -1,0 +1,42 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
+{% block pageTitle %}{{ t('pageTitle') }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block serviceNavigation %}
+  {# Service navigation without serviceName on start now page - only logout button #}
+  {{ govukServiceNavigation({
+    navigation: [
+      {
+        text: t('logout', 'Log out'),
+        href: "/logout"
+      }
+    ],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+  <p class="govuk-body">dummy page</p>
+
+  <form method="post" action="{{ url }}">
+          <div class="govuk-button-group">
+          {{ govukButton({
+              text: t('buttons.continue', { ns: 'common' }),
+              attributes: { type: 'submit', name: 'action', value: 'continue' }
+          }) }}
+          <p class="govuk-body">
+            <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+          </p>
+          </div>
+    </form>
+{% endblock %}
+

@@ -1,0 +1,13 @@
+{
+  "pageTitle": "The claimant’s claim",
+  "caption": "Respond to a property possession claim",
+  "heading": "{{claimantName, pluralPossessive}} claim",
+  "secondaryHeading": "Respond to a property possession claim",
+  "paragraph1": "When they made their claim, {{claimantName}} had to give information about:",
+  "listItem1": "the tenancy, occupation contract or licence agreement",
+  "listItem2": "the notice of their intention to begin possession proceedings, if they served you with one",
+  "listItem3": "their grounds for possession (their reasons for making the claim)",
+
+  "paragraph2": "If any of the information is wrong, or you disagree with it, you can dispute their claim or parts of it. ",
+  "paragraph3": "The claimant will be able to see your answers."
+}

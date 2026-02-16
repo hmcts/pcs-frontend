@@ -165,6 +165,12 @@ describe('Dashboard Route', () => {
       redirect: jest.Mock;
       status: jest.Mock;
       send: jest.Mock;
+      locals: {
+        validatedCase?: {
+          id: string | number;
+          state?: string;
+        };
+      };
     };
     let mockNext: jest.Mock;
 
@@ -183,6 +189,12 @@ describe('Dashboard Route', () => {
         redirect: jest.fn(),
         status: jest.fn().mockReturnThis(),
         send: jest.fn(),
+        locals: {
+          validatedCase: {
+            id: '1234567890123456',
+            state: 'Open',
+          },
+        },
       };
 
       mockNext = jest.fn();
@@ -371,54 +383,6 @@ describe('Dashboard Route', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to fetch dashboard data for case 1234567890123456')
       );
-    });
-
-    it('should render 404 page for invalid case reference parameter', async () => {
-      mockReq.params.caseReference = 'invalid';
-
-      dashboardRoute(mockApp as unknown as Application);
-      // Get the second route handler (index 1) for /dashboard/:caseReference
-      const routeHandler = mockGet.mock.calls[1][2];
-      await routeHandler(mockReq, mockRes, mockNext);
-
-      // Invalid case reference should render 404 page
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRender).toHaveBeenCalledWith('not-found');
-      expect(getDashboardNotifications).not.toHaveBeenCalled();
-      expect(getDashboardTaskGroups).not.toHaveBeenCalled();
-    });
-
-    it('should render 404 page for case reference that is too short', async () => {
-      mockReq.params.caseReference = '12345';
-
-      dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[1][2];
-      await routeHandler(mockReq, mockRes, mockNext);
-
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRender).toHaveBeenCalledWith('not-found');
-    });
-
-    it('should render 404 page for case reference that is too long', async () => {
-      mockReq.params.caseReference = '12345678901234567';
-
-      dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[1][2];
-      await routeHandler(mockReq, mockRes, mockNext);
-
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRender).toHaveBeenCalledWith('not-found');
-    });
-
-    it('should render 404 page for case reference with non-numeric characters', async () => {
-      mockReq.params.caseReference = '123456789012345a';
-
-      dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[1][2];
-      await routeHandler(mockReq, mockRes, mockNext);
-
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRender).toHaveBeenCalledWith('not-found');
     });
 
     it('should handle empty task groups array', async () => {

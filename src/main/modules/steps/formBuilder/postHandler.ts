@@ -2,9 +2,11 @@ import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
-import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
-import { stepNavigation } from '../flow';
+import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
+import { getDashboardUrl } from '../../../routes/dashboard';
+import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
+import type { TranslationContent } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
@@ -25,7 +27,10 @@ export function createPostHandler(
   viewPath: string,
   journeyFolder: string,
   beforeRedirect?: (req: Request) => Promise<void> | void,
-  translationKeys?: TranslationKeys
+  translationKeys?: TranslationKeys,
+  flowConfig?: JourneyFlowConfig,
+  showCancelButton?: boolean,
+  extendGetContent?: (req: Request, content: TranslationContent) => Record<string, unknown>
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -38,6 +43,8 @@ export function createPostHandler(
       translationKeys,
     });
   }
+  // Use provided flowConfig or fall back to default stepNavigation
+  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
@@ -61,14 +68,56 @@ export function createPostHandler(
       // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
       normalizeCheckboxFields(req, fields);
 
-      const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
+      // Get interpolation values from extendGetContent if available (for dynamic translation values)
+      const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
+
+      const fieldsWithLabels = translateFields(
+        fields,
+        t,
+        {},
+        {},
+        false,
+        '',
+        undefined,
+        nunjucksEnv,
+        interpolationValues
+      );
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
-      const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
+      const fieldErrors = getTranslationErrors(t, fields, undefined, interpolationValues);
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
-        const formContent = buildFormContent(fields, t, req.body, errors, translationKeys, nunjucksEnv);
-        renderWithErrors(req, res, viewPath, errors, fields, formContent, stepName, journeyFolder, translationKeys);
+        const formContent = buildFormContent(
+          fields,
+
+          t,
+
+          req.body,
+
+          errors,
+
+          translationKeys,
+
+          nunjucksEnv,
+          interpolationValues,
+          showCancelButton
+        );
+        // Call extendGetContent to get additional translated content (buttons, labels, etc.)
+        const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
+        const fullContent = { ...formContent, ...extendedContent };
+        await renderWithErrors(
+          req,
+          res,
+          viewPath,
+          errors,
+          fields,
+          fullContent,
+          stepName,
+          journeyFolder,
+          navigation,
+          translationKeys,
+          showCancelButton
+        );
         return; // renderWithErrors sends the response, so we return early
       }
 
@@ -78,7 +127,7 @@ export function createPostHandler(
         processFieldData(req, fields);
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, DASHBOARD_ROUTE);
+        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving
@@ -97,7 +146,7 @@ export function createPostHandler(
         }
       }
 
-      const redirectPath = stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
+      const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

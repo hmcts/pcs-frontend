@@ -9,6 +9,7 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '../services/pcsApi';
+import { sanitiseCaseReference } from '../utils/caseReference';
 
 interface MappedTask {
   title: { html: string };
@@ -28,11 +29,6 @@ interface MappedTaskGroup {
 
 export const DASHBOARD_ROUTE = '/dashboard';
 const DEFAULT_DASHBOARD_URL = `${DASHBOARD_ROUTE}/1234567890123456`; // TODO: remove hardcoded fake CCD caseId when CCD backend is setup
-
-function sanitiseCaseReference(caseReference: string | number): string | null {
-  const caseRefStr = String(caseReference);
-  return /^\d{16}$/.test(caseRefStr) ? caseRefStr : null;
-}
 
 export const getDashboardUrl = (caseReference?: string | number): string => {
   if (!caseReference) {
@@ -99,29 +95,18 @@ export default function dashboardRoutes(app: Application): void {
 
   app.get('/dashboard', oidcMiddleware, (req: Request, res: Response) => {
     const caseId = req.session?.ccdCase?.id;
-    const validatedCaseId = caseId ? sanitiseCaseReference(caseId) : null;
-    const redirectUrl = getDashboardUrl(validatedCaseId ?? undefined);
-    const allowedPattern = /^\/dashboard(\/\d{16})?$/;
-    if (!allowedPattern.test(redirectUrl)) {
-      return res.redirect(303, DEFAULT_DASHBOARD_URL);
-    }
+    const redirectUrl = getDashboardUrl(caseId);
     return res.redirect(303, redirectUrl);
   });
 
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
-    const { caseReference } = req.params;
-
-    const sanitisedCaseReference = sanitiseCaseReference(caseReference);
-    if (!sanitisedCaseReference) {
-      return res.status(404).render('not-found');
-    }
-
-    const caseReferenceNumber = Number(sanitisedCaseReference);
+    const validatedCase = res.locals.validatedCase;
+    const caseReferenceNumber = Number(validatedCase.id);
 
     try {
       const [notifications, taskGroups] = await Promise.all([
         getDashboardNotifications(caseReferenceNumber),
-        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, sanitisedCaseReference)),
+        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, validatedCase.id)),
       ]);
 
       return res.render('dashboard', {
@@ -129,7 +114,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
       });
     } catch (e) {
-      logger.error(`Failed to fetch dashboard data for case ${sanitisedCaseReference}. Error was: ${String(e)}`);
+      logger.error(`Failed to fetch dashboard data for case ${validatedCase.id}. Error was: ${String(e)}`);
       throw e;
     }
   });

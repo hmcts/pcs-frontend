@@ -4,9 +4,9 @@ import type { TFunction } from 'i18next';
 
 import type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
+import { getDashboardUrl } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
-import { stepNavigation } from '../flow';
+import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { buildFormContent } from './formContent';
@@ -27,16 +27,30 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   // Validate config in development mode
   validateConfigInDevelopment(config);
 
-  const { stepName, journeyFolder, fields, beforeRedirect, extendGetContent, stepDir, translationKeys } = config;
+  const {
+    stepName,
+    journeyFolder,
+    fields,
+    beforeRedirect,
+    extendGetContent,
+    stepDir,
+    translationKeys,
+    flowConfig,
+    showCancelButton,
+    customTemplate,
+  } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
-  const viewPath = 'formBuilder.njk';
+  const viewPath = customTemplate || 'formBuilder.njk';
+  const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
+  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 
   return {
-    url: path.join('/steps', journeyPath, stepName),
+    url: path.join(basePath, stepName),
     name: stepName,
     view: viewPath,
     stepDir,
+    showCancelButton,
     getController: () => {
       return createGetController(viewPath, stepName, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
@@ -47,20 +61,42 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
-        const formContent = buildFormContent(fields, t, getFormData(req, stepName), {}, translationKeys, nunjucksEnv);
-        const result = extendGetContent ? { ...formContent, ...extendGetContent(req, {}) } : formContent;
+        // Get interpolation values from extendGetContent if available (for dynamic translation values)
+        const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
+        const formContent = buildFormContent(
+          fields,
+          t,
+          getFormData(req, stepName),
+          {},
+          translationKeys,
+          nunjucksEnv,
+          interpolationValues
+        );
+        const result = extendGetContent ? { ...formContent, ...interpolationValues } : formContent;
 
         return {
           ...result,
           ccdId: req.session?.ccdCase?.id,
-          dashboardUrl: DASHBOARD_ROUTE,
+          caseReference: req.res?.locals.validatedCase?.id,
+          dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),
-          backUrl: stepNavigation.getBackUrl(req, stepName),
+          backUrl: await navigation.getBackUrl(req, stepName),
+          showCancelButton,
         };
       });
     },
-    postController: createPostHandler(fields, stepName, viewPath, journeyFolder, beforeRedirect, translationKeys),
+    postController: createPostHandler(
+      fields,
+      stepName,
+      viewPath,
+      journeyFolder,
+      beforeRedirect,
+      translationKeys,
+      flowConfig,
+      showCancelButton,
+      extendGetContent
+    ),
   };
 }

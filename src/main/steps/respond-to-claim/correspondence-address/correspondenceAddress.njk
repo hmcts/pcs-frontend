@@ -1,0 +1,196 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
+{% block pageTitle %}
+  {{ pageTitle }} - HM Courts & Tribunals Service – GOV.UK
+{% endblock %}
+
+{% block mainContent %}
+
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <form method="post" action="{{ url }}" novalidate>
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+  
+    {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
+    {% set postcodeFinderHtml %}
+      <div class="postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
+        <h2 class="govuk-heading-m">{{ labels.enterAddress }}</h2>
+        <div class="govuk-form-group" id="correspondence-postcode-form-group">
+          <label class="govuk-label" for="correspondence-lookupPostcode">
+            {{ labels.enterPostcode }}
+          </label>
+          <p class="govuk-error-message govuk-!-display-none" id="correspondence-lookup-postcode-error">
+            <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.lookupPostcode }}
+          </p>
+          <p class="govuk-error-message govuk-!-display-none" id="correspondence-postcode-error">
+            <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.postcodeNotFound }}
+          </p>
+          <div class="govuk-input__wrapper">
+            <input class="govuk-input govuk-input--width-10" 
+                    id="correspondence-lookupPostcode" 
+                    name="lookupPostcode" 
+                    type="text" 
+                    autocomplete="postal-code"
+                    aria-describedby="correspondence-lookup-postcode-error correspondence-postcode-error"/>
+            <button class="govuk-button govuk-!-margin-left-2 govuk-!-margin-bottom-0" 
+                    id="correspondence-findAddressBtn"
+                    data-module="govuk-button" 
+                    type="button">
+              {{ buttons.findAddress }}
+            </button>
+          </div>
+        </div>
+        
+        <div id="correspondence-addressSelectContainer" hidden>
+          <div class="govuk-form-group govuk-!-margin-bottom-2" id="correspondence-selectedAddress-form-group">
+            <label class="govuk-label" for="correspondence-selectedAddress">
+              {{ labels.selectAddress }}
+            </label>
+            <p class="govuk-error-message govuk-!-display-none" id="correspondence-selectedAddress-error">
+              <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.selectAddress }}
+            </p>
+            <select class="govuk-select govuk-!-width-full" id="correspondence-selectedAddress" name="addressList">
+              <option value="" selected>{{ labels.selectAddressLabel }}</option>
+            </select>
+          </div>
+        </div>
+        
+        <input type="hidden" id="correspondence-addressesFoundFlag" name="addressesFoundFlag" value="false" />
+        
+        {% set manualAddressFieldsHtml %}
+          <p class="govuk-body">{{ labels.enterManuallySubText }}</p>
+          <div class="address-form" id="correspondence-addressForm">
+            <h2 class="govuk-heading-m govuk-!-margin-top-2">{{ labels.addressHeading }}</h2>
+            
+            {{ govukInput({
+            id: 'correspondence-addressLine1',
+            name: 'correspondenceAddressConfirm.addressLine1',
+            label: {
+              text: labels.addressLine1
+            },
+            classes: 'govuk-!-width-two-thirds',
+            autocomplete: 'address-line1',
+            value: correspondenceAddressLine1 if correspondenceAddressLine1 else '',
+            errorMessage: {
+              text: errors['correspondenceAddressConfirm.addressLine1']
+            } if errors['correspondenceAddressConfirm.addressLine1']
+          }) }}
+
+          {{ govukInput({
+            id: 'correspondence-addressLine2',
+            name: 'correspondenceAddressConfirm.addressLine2',
+            label: {
+              text: labels.addressLine2
+            },
+            classes: 'govuk-!-width-two-thirds',
+            autocomplete: 'address-line2',
+            value: correspondenceAddressLine2 if correspondenceAddressLine2 else '',
+            errorMessage: {
+              text: errors['correspondenceAddressConfirm.addressLine2']
+            } if errors['correspondenceAddressConfirm.addressLine2']
+          }) }}
+
+          {{ govukInput({
+            id: 'correspondence-town',
+            name: 'correspondenceAddressConfirm.townOrCity',
+            label: {
+              text: labels.townOrCity
+            },
+            classes: 'govuk-!-width-two-thirds',
+            autocomplete: 'address-level2',
+            value: correspondenceTownOrCity if correspondenceTownOrCity else '',
+            errorMessage: {
+              text: errors['correspondenceAddressConfirm.townOrCity']
+            } if errors['correspondenceAddressConfirm.townOrCity']
+          }) }}
+
+          {{ govukInput({
+            id: 'correspondence-county',
+            name: 'correspondenceAddressConfirm.county',
+            label: {
+              text: labels.county
+            },
+            classes: 'govuk-!-width-two-thirds',
+            value: correspondenceCounty if correspondenceCounty else '',
+            errorMessage: {
+              text: errors['correspondenceAddressConfirm.county']
+            } if errors['correspondenceAddressConfirm.county']
+          }) }}
+
+          {{ govukInput({
+            id: 'correspondence-postcode',
+            name: 'correspondenceAddressConfirm.postcode',
+            label: {
+              text: labels.postcode
+            },
+            classes: 'govuk-!-width-one-third',
+            autocomplete: 'postal-code',
+            value: correspondencePostcode if correspondencePostcode else '',
+            errorMessage: {
+              text: errors['correspondenceAddressConfirm.postcode']
+            } if errors['correspondenceAddressConfirm.postcode']
+          }) }}
+          </div>
+        {% endset %}
+        
+        {{ govukDetails({
+          summaryText: labels.enterManually,
+          html: manualAddressFieldsHtml,
+          id: "correspondence-enterManuallyDetails",
+          open: hasAddressErrors
+        }) }}
+      </div>
+    {% endset %}
+
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {% set updatedItems = [] %}
+        {% for item in field.component.items %}
+          {% if item.value == 'no' %}
+            {% set updatedItems = (updatedItems.push({
+              value: item.value,
+              text: item.text,
+              checked: item.checked,
+              conditional: {
+                html: postcodeFinderHtml
+              }
+            }), updatedItems) %}
+          {% else %}
+            {% set updatedItems = (updatedItems.push(item), updatedItems) %}
+          {% endif %}
+        {% endfor %}
+        {{ govukRadios({
+          name: field.component.name,
+          fieldset: field.component.fieldset,
+          hint: field.component.hint,
+          errorMessage: field.component.errorMessage,
+          items: updatedItems
+        }) }}
+      {% endif %}
+    {% endfor %}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: buttons.saveAndContinue
+      }) }}
+      {{ govukButton({
+        text: buttons.saveForLater,
+        classes: "govuk-button--secondary",
+        attributes: { name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
+  </form>
+
+
+{% endblock %}

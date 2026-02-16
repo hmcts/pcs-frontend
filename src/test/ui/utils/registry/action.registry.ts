@@ -3,6 +3,8 @@ import {
   FetchPINsAndValidateAccessCodeAPIAction,
   LoginAction,
   NavigateToUrlAction,
+  RespondToClaimAction,
+  TriggerErrorMessagesAction,
 } from '../actions/custom-actions';
 import {
   CheckAction,
@@ -35,8 +37,20 @@ export class ActionRegistry {
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['selectLegalAdvice', new RespondToClaimAction()],
+    ['inputDefendantDetails', new RespondToClaimAction()],
+    ['enterDateOfBirthDetails', new RespondToClaimAction()],
+    ['inputErrorValidation', new RespondToClaimAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['selectLegalAdvice', new RespondToClaimAction()],
+    ['inputDefendantDetails', new RespondToClaimAction()],
+    ['enterDateOfBirthDetails', new RespondToClaimAction()],
+    ['confirmDefendantDetails', new RespondToClaimAction()],
+    ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
+    ['disputeClaimInterstitial', new RespondToClaimAction()],
+    ['readPaymentInterstitial', new RespondToClaimAction()],
+    ['triggerErrorMessagesForValidation', new TriggerErrorMessagesAction()],
   ]);
 
   static getAction(actionName: string): IAction {

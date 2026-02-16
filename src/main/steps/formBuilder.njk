@@ -7,23 +7,24 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}
+  {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
 
 {% block mainContent %}
   {% if errorSummary %}
-    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-      <h2 class="govuk-error-summary__title" id="error-summary-title">{{ errorSummary.titleText }}</h2>
-      <div class="govuk-error-summary__body">
-        <ul class="govuk-list govuk-error-summary__list">
-          {% for error in errorSummary.errorList %}
-            <li><a href="{{ error.href }}">{{ error.text }}</a></li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
+    {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if pageTitle %}
-    <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% elif title %}
     <h1 class="govuk-heading-l">{{ title }}</h1>
   {% endif %}
@@ -33,42 +34,74 @@
   {% endif %}
 
   <form method="post" action="{{ url }}">
-    {% for field in fields %}
-      {% if field.component and field.componentType %}
-        {% if field.componentType == 'input' %}
-          {{ govukInput(field.component) }}
-        {% elif field.componentType == 'textarea' %}
-          {{ govukTextarea(field.component) }}
-        {% elif field.componentType == 'characterCount' %}
-          {{ govukCharacterCount(field.component) }}
-        {% elif field.componentType == 'radios' %}
-          {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
-          {{ govukRadios(field.component) }}
-        {% elif field.componentType == 'checkboxes' %}
-          {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
-          {{ govukCheckboxes(field.component) }}
-        {% elif field.componentType == 'dateInput' %}
-          {{ govukDateInput(field.component) }}
+    {# Wrap fields in fieldset with visually-hidden legend for accessibility #}
+    {% if heading %}
+      {% call govukFieldset({
+        legend: {
+          text: heading,
+          classes: "govuk-visually-hidden"
+        }
+      }) %}
+        {% for field in fields %}
+          {% if field.component and field.componentType %}
+            {% if field.componentType == 'input' %}
+              {{ govukInput(field.component) }}
+            {% elif field.componentType == 'textarea' %}
+              {{ govukTextarea(field.component) }}
+            {% elif field.componentType == 'characterCount' %}
+              {{ govukCharacterCount(field.component) }}
+            {% elif field.componentType == 'radios' %}
+              {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
+              {{ govukRadios(field.component) }}
+            {% elif field.componentType == 'checkboxes' %}
+              {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
+              {{ govukCheckboxes(field.component) }}
+            {% elif field.componentType == 'dateInput' %}
+              {{ govukDateInput(field.component) }}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      {% endcall %}
+    {% else %}
+      {# Fallback: render fields without fieldset if no heading #}
+      {% for field in fields %}
+        {% if field.component and field.componentType %}
+          {% if field.componentType == 'input' %}
+            {{ govukInput(field.component) }}
+          {% elif field.componentType == 'textarea' %}
+            {{ govukTextarea(field.component) }}
+          {% elif field.componentType == 'characterCount' %}
+            {{ govukCharacterCount(field.component) }}
+          {% elif field.componentType == 'radios' %}
+            {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
+            {{ govukRadios(field.component) }}
+          {% elif field.componentType == 'checkboxes' %}
+            {# GOV.UK macro automatically creates conditional divs when conditional.html is provided #}
+            {{ govukCheckboxes(field.component) }}
+          {% elif field.componentType == 'dateInput' %}
+            {{ govukDateInput(field.component) }}
+          {% endif %}
         {% endif %}
-      {% endif %}
-    {% endfor %}
+      {% endfor %}
+    {% endif %}
 
-        
+
     <div class="govuk-button-group">
-      {{ govukButton({ 
-        text: continue,
+      {{ govukButton({
+        text: saveAndContinue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
-      {{ govukButton({ 
+      {{ govukButton({
         text: saveForLater,
         classes: 'govuk-button--secondary',
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
-    
-    <p class="govuk-body">
-      <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
-    </p>
+    {% if showCancelButton is not defined or showCancelButton %}
+        <p class="govuk-body">
+          <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+        </p>
+    {% endif %}
+
   </form>
 {% endblock %}
-

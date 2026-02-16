@@ -6,17 +6,22 @@ import { flowConfig as respondToClaimFlowConfig } from '../../steps/respond-to-c
 
 const logger = Logger.getLogger('stepDependencyCheck');
 
-export function getNextStep(
+export async function getNextStep(
+  req: Request,
   currentStepName: string,
   flowConfig: JourneyFlowConfig,
   formData: Record<string, unknown>,
   currentStepData: Record<string, unknown> = {}
-): string | null {
+): Promise<string | null> {
   const stepConfig = flowConfig.steps[currentStepName];
 
   if (stepConfig?.routes) {
     for (const route of stepConfig.routes) {
-      if (!route.condition || route.condition(formData, currentStepData)) {
+      if (!route.condition) {
+        return route.nextStep;
+      }
+      const conditionMet = await route.condition(req, formData, currentStepData);
+      if (conditionMet) {
         return route.nextStep;
       }
     }
@@ -34,11 +39,12 @@ export function getNextStep(
   return null;
 }
 
-export function getPreviousStep(
+export async function getPreviousStep(
+  req: Request,
   currentStepName: string,
   flowConfig: JourneyFlowConfig,
   formData: Record<string, unknown> = {}
-): string | null {
+): Promise<string | null> {
   const stepConfig = flowConfig.steps[currentStepName];
 
   // If step has explicit previousStep configuration, use it
@@ -57,7 +63,11 @@ export function getPreviousStep(
         if (route.nextStep === currentStepName) {
           // If route has condition, check if it matches the form data
           // If no condition, this route always leads to current step
-          if (!route.condition || route.condition(formData, {})) {
+          if (!route.condition) {
+            return stepName;
+          }
+          const conditionMet = await route.condition(req, formData, {});
+          if (conditionMet) {
             return stepName;
           }
         }
@@ -76,16 +86,14 @@ export function getPreviousStep(
   return null;
 }
 
-export function getStepUrl(stepName: string, flowConfig: JourneyFlowConfig): string {
-  if (flowConfig.basePath) {
-    return `${flowConfig.basePath}/${stepName}`;
+export function getStepUrl(stepName: string, flowConfig: JourneyFlowConfig, caseReference?: string): string {
+  let basePath = flowConfig.basePath || '';
+
+  if (caseReference && basePath.includes(':caseReference')) {
+    basePath = basePath.replace(':caseReference', caseReference);
   }
 
-  if (flowConfig.journeyName) {
-    return `/steps/${flowConfig.journeyName}/${stepName}`;
-  }
-
-  return `/${stepName}`;
+  return `${basePath}/${stepName}`;
 }
 
 export function checkStepDependencies(
@@ -108,29 +116,35 @@ export function checkStepDependencies(
 }
 
 export function createStepNavigation(flowConfig: JourneyFlowConfig): {
-  getNextStepUrl: (req: Request, currentStepName: string, currentStepData?: Record<string, unknown>) => string | null;
-  getBackUrl: (req: Request, currentStepName: string) => string | null;
-  getStepUrl: (stepName: string) => string;
+  getNextStepUrl: (
+    req: Request,
+    currentStepName: string,
+    currentStepData?: Record<string, unknown>
+  ) => Promise<string | null>;
+  getBackUrl: (req: Request, currentStepName: string) => Promise<string | null>;
+  getStepUrl: (stepName: string, caseReference?: string) => string;
 } {
   return {
-    getNextStepUrl: (
+    getNextStepUrl: async (
       req: Request,
       currentStepName: string,
       currentStepData: Record<string, unknown> = {}
-    ): string | null => {
+    ): Promise<string | null> => {
       const formData = req.session?.formData || {};
-      const nextStep = getNextStep(currentStepName, flowConfig, formData, currentStepData);
-      return nextStep ? getStepUrl(nextStep, flowConfig) : null;
+      const caseReference = req.res?.locals.validatedCase?.id;
+      const nextStep = await getNextStep(req, currentStepName, flowConfig, formData, currentStepData);
+      return nextStep ? getStepUrl(nextStep, flowConfig, caseReference) : null;
     },
 
-    getBackUrl: (req: Request, currentStepName: string): string | null => {
+    getBackUrl: async (req: Request, currentStepName: string): Promise<string | null> => {
       const formData = req.session?.formData || {};
-      const previousStep = getPreviousStep(currentStepName, flowConfig, formData);
-      return previousStep ? getStepUrl(previousStep, flowConfig) : null;
+      const caseReference = req.res?.locals.validatedCase?.id;
+      const previousStep = await getPreviousStep(req, currentStepName, flowConfig, formData);
+      return previousStep ? getStepUrl(previousStep, flowConfig, caseReference) : null;
     },
 
-    getStepUrl: (stepName: string): string => {
-      return getStepUrl(stepName, flowConfig);
+    getStepUrl: (stepName: string, caseReference?: string): string => {
+      return getStepUrl(stepName, flowConfig, caseReference);
     },
   };
 }

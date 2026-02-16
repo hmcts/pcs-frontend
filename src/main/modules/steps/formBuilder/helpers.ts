@@ -7,12 +7,22 @@ import type { StepFormData } from '../../../interfaces/stepFormData.interface';
 
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
+import type { FormError } from './errorUtils';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
-export function getTranslation(t: TFunction, key: string, fallback?: string): string | undefined {
-  const translation = t(key);
-  return translation !== key ? translation : fallback;
+export function getTranslation(
+  t: TFunction,
+  key: string,
+  fallback?: string,
+  interpolation?: Record<string, unknown>
+): string | undefined {
+  const options = { returnObjects: true, ...interpolation };
+  const result = t(key, options) as unknown;
+  if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
+    return result;
+  }
+  return fallback;
 }
 
 /**
@@ -90,9 +100,18 @@ export function processFieldData(req: Request, fields: FormFieldConfig[]): void 
 export function getTranslationErrors(
   t: TFunction,
   fields: FormFieldConfig[],
-  parentFieldName?: string
+  parentFieldName?: string,
+  interpolation?: Record<string, unknown>
 ): Record<string, string> {
   const translationErrors: Record<string, string> = {};
+
+  const getStringTranslation = (key: string): string | undefined => {
+    // Ask for objects so we can detect object-valued keys safely
+    // Pass interpolation values if provided
+    const options = { returnObjects: true, ...interpolation };
+    const result = t(key, options) as unknown;
+    return typeof result === 'string' && result !== key ? result : undefined;
+  };
 
   for (const field of fields) {
     // Get the nested field name if this is a subField
@@ -104,7 +123,7 @@ export function getTranslationErrors(
       // If errorMessage is a translation key (starts with 'errors.'), translate it
       if (typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
         const subFieldErrorKey = field.errorMessage;
-        const subFieldErrorMsg = t(subFieldErrorKey);
+        const subFieldErrorMsg = getStringTranslation(field.errorMessage);
         if (subFieldErrorMsg && subFieldErrorMsg !== subFieldErrorKey) {
           // Use nested field name as the key (e.g., 'contactMethod.emailAddress')
           translationErrors[fieldName] = subFieldErrorMsg;
@@ -117,15 +136,16 @@ export function getTranslationErrors(
       }
     } else {
       // For top-level fields, check error message translation using the field name
+      // Prefer flat string keys (errors.<field>) used across the service.
       const errorKey = `errors.${field.name}`;
-      const errorMsg = t(errorKey);
-      if (errorMsg && errorMsg !== errorKey) {
+      const errorMsg = getStringTranslation(errorKey);
+      if (errorMsg) {
         translationErrors[field.name] = errorMsg;
       }
 
       // Also check the errorMessage property if set
       if (field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
-        const errorMsgFromProperty = t(field.errorMessage);
+        const errorMsgFromProperty = interpolation ? t(field.errorMessage, interpolation) : t(field.errorMessage);
         if (errorMsgFromProperty && errorMsgFromProperty !== field.errorMessage) {
           translationErrors[field.name] = errorMsgFromProperty;
         }
@@ -139,7 +159,7 @@ export function getTranslationErrors(
           // Recursively collect error translations from subFields
           // Pass the current fieldName (which may already be nested) as the parent
           // But we need to use the simple field.name for the parent, not fieldName
-          const subFieldErrors = getTranslationErrors(t, Object.values(option.subFields), field.name);
+          const subFieldErrors = getTranslationErrors(t, Object.values(option.subFields), field.name, interpolation);
           Object.assign(translationErrors, subFieldErrors);
         }
       }
@@ -189,8 +209,8 @@ export function validateForm(
   translations?: Record<string, string>,
   allFormData?: Record<string, unknown>,
   t?: TFunction
-): Record<string, string> {
-  const errors: Record<string, string> = {};
+): Record<string, FormError> {
+  const errors: Record<string, FormError> = {};
   // Build formData from current request body (before processing date fields)
   const formData: Record<string, unknown> = { ...req.body };
 
@@ -402,7 +422,7 @@ export function validateForm(
       }
 
       for (const option of field.options) {
-        if (option.subFields && isOptionSelected(fieldValue, option.value, field.type)) {
+        if (option.subFields && option.value && isOptionSelected(fieldValue, option.value, field.type)) {
           // Validate each subField recursively
           for (const [subFieldName, subField] of Object.entries(option.subFields)) {
             // Set the name on the subField if not already set

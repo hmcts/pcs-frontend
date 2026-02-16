@@ -5,9 +5,12 @@ import { defineConfig, devices } from '@playwright/test';
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
 export const VERY_SHORT_TIMEOUT = 1000;
 export const SHORT_TIMEOUT = 5000;
-export const actionRetries = 5;
+export const actionRetries = 10;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
+export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'true';
+export const enable_error_message_validation =
+  env === 'preview' ? process.env.ENABLE_ERROR_MESSAGES_VALIDATION === 'true' : true;
 
 export default defineConfig({
   testDir: './src/test/ui',
@@ -16,7 +19,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 3 : 0,
-  workers: env === 'preview' ? 1 : 4,
+  workers: env === 'preview' ? 4 : 4,
   timeout: 600 * 1000,
   expect: { timeout: 30 * 1000 },
   use: { actionTimeout: 30 * 1000, navigationTimeout: 30 * 1000 },

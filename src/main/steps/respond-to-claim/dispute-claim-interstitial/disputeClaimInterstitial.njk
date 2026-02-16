@@ -1,0 +1,36 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% block pageTitle %}
+  {{ pageTitle | safe }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <span class="govuk-caption-xl">{{ caption }}</span>
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+
+  <p class="govuk-body">{{ paragraph1 }}</p>
+  <ol class="govuk-list govuk-list--number govuk-!-margin-bottom-4">
+    <li>{{ listItem1 }}</li>
+    <li>{{ listItem2 }}</li>
+    <li>{{ listItem3 }}</li>
+  </ol>
+  <p class="govuk-body">{{ paragraph2 }}</p>
+  <p class="govuk-body govuk-!-margin-bottom-6">{{ paragraph3 }}</p>
+  <form method="post" action="{{ url }}">
+    <div class="govuk-button-group">
+      {{ govukButton({
+          text: t('buttons.continue', { ns: 'common' }),
+          attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      <p class="govuk-body">
+        <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+      </p>
+    </div>
+  </form>
+{% endblock %}
