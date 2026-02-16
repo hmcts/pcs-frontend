@@ -102,7 +102,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      repaymentOption: repaymentsMade.noRadioOption
+      repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
