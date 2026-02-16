@@ -1,0 +1,15 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyNotice details",
+  "question": "cyDid {{ claimantName }} give you notice of their intention to begin possession proceedings?",
+  "hintText": "cyA notice is a formal document from your landlord or mortgage provider saying they plan to take legal action to repossess the property, which must follow certain legal requirements",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "imNotSure": "cyI’m not sure"
+  },
+  "errors": {
+    "confirmNoticeGiven": "cySelect if {{claimantName}} gave you notice of their intention to begin possession proceedings"
+  }
+}

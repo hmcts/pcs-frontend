@@ -10,6 +10,8 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   freeLegalAdvice,
+  nonRentArrearsDispute,
+  noticeDetails,
   registeredLandlord,
   repaymentsMade,
   startNow,
@@ -46,8 +48,50 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - England postcode', async () => {
+  // Wales postcode routing is not implemented yet, e2e test coverage, functional test coverage needs to be reviewed once HDPI-3451 is done
+  test.skip('Respond to a claim - Wales postcode @noDefendants', async () => {
+    await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
+    await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.noRadioOption,
+      postcode: correspondenceAddressKnown.englandPostcodeTextInput,
+      addressIndex: correspondenceAddressKnown.addressIndex,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+    );
+    await performValidation('mainHeader', registeredLandlord.mainHeader);
+    await performAction('clickButton', registeredLandlord.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    //Added below pages to welsh journey as per english journey
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
+  });
+
+  //Rent Arrears claim type = false, Notice Date Provided string = true, and Notice Served boolean = true
+  test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
@@ -65,6 +109,41 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown');
+    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+  });
+
+  //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
+  test('Non-RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - NonRentArrearsDispute', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.imNotSureRadioOption,
+    });
+    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -107,13 +186,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
-  test.skip('Respond to a claim - Wales postcode @noDefendants', async () => {
-    await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
-    await performAction('clickButton', startNow.startNowButton);
+  //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
+  test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.mainHeader,
-      option: defendantNameConfirmation.yesRadioOption,
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -121,21 +201,18 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.noRadioOption,
-      postcode: correspondenceAddressKnown.englandPostcodeTextInput,
-      addressIndex: correspondenceAddressKnown.addressIndex,
+      radioOption: correspondenceAddressKnown.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
-    );
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    //Added below pages to welsh journey as per english journey
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.noRadioOption,
+    });
+    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
