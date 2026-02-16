@@ -18,7 +18,7 @@
   {% endif %}
 
   <h1 class="govuk-heading-l">{{ title }}</h1>
-  
+
   <p class="govuk-body">
     {{ introParagraph | linkify(introLinkHref) }}
   </p>
@@ -40,8 +40,8 @@
         {% endif %}
       {% endif %}
     {% endfor %}
-    
-   <div class="govuk-button-group">
+
+    <div class="govuk-button-group">
       {{ govukButton({
         text: saveAndContinue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
@@ -53,4 +53,5 @@
       }) }}
     </div>
   </form>
+
 {% endblock %}

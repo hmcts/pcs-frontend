@@ -1,7 +1,14 @@
 import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import { isDefendantNameKnown, isWelshProperty } from '../utils';
+import {
+  getPreviousPageForArrears,
+  isDefendantNameKnown,
+  isNoticeDateProvided,
+  isNoticeServed,
+  isRentArrearsClaim,
+  isWelshProperty,
+} from '../utils';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -21,6 +28,11 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial',
     'landlord-registered',
     'tenancy-details',
+    'confirmation-of-notice-given',
+    'confirmation-of-notice-date-when-provided',
+    'confirmation-of-notice-date-when-not-provided',
+    'rent-arrears-dispute',
+    'non-rent-arrears-dispute',
     'your-household-and-circumstances',
     'do-you-have-any-dependant-children',
     'do-you-have-any-other-dependants',
@@ -95,11 +107,141 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'tenancy-details',
     },
     'tenancy-details': {
+      routes: [
+        {
+          condition: async (req: Request) => isNoticeServed(req),
+          nextStep: 'confirmation-of-notice-given',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
+      previousStep: async (req: Request) => {
+        const welshProperty = await isWelshProperty(req);
+        if (welshProperty) {
+          return 'landlord-registered';
+        }
+        return 'dispute-claim-interstitial';
+      },
+    },
+    'confirmation-of-notice-given': {
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
+            if (!confirmed) {
+              return false;
+            }
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            return noticeDateProvided;
+          },
+          nextStep: 'confirmation-of-notice-date-when-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
+            if (!confirmed) {
+              return false;
+            }
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            return !noticeDateProvided;
+          },
+          nextStep: 'confirmation-of-notice-date-when-not-provided',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+              return false;
+            }
+            const rentArrears = await isRentArrearsClaim(req);
+            return rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+              return false;
+            }
+            const rentArrears = await isRentArrearsClaim(req);
+            return !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
+      previousStep: 'tenancy-details',
+    },
+
+    'confirmation-of-notice-date-when-provided': {
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return noticeDateProvided && rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return noticeDateProvided && !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
+    },
+    'confirmation-of-notice-date-when-not-provided': {
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return !noticeDateProvided && rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const noticeDateProvided = await isNoticeDateProvided(req);
+            const rentArrears = await isRentArrearsClaim(req);
+            return !noticeDateProvided && !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
+    },
+    'rent-arrears-dispute': {
       defaultNext: 'counter-claim',
+      previousStep: req => getPreviousPageForArrears(req),
+    },
+    'non-rent-arrears-dispute': {
+      defaultNext: 'counter-claim',
+      previousStep: req => getPreviousPageForArrears(req),
     },
     'counter-claim': {
-      previousStep: 'tenancy-details',
       defaultNext: 'payment-interstitial',
+      previousStep: async (req: Request) => {
+        const rentArrearsClaim = await isRentArrearsClaim(req);
+        if (rentArrearsClaim) {
+          return 'rent-arrears-dispute';
+        }
+        return 'non-rent-arrears-dispute';
+      },
     },
     'payment-interstitial': {
       previousStep: 'counter-claim',

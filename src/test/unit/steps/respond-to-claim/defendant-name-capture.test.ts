@@ -4,7 +4,7 @@ const t = ((key: string) => {
   const translations: Record<string, string> = {
     // Step translations
     pageTitle: 'Your name',
-    heading: 'What’s your name?',
+    heading: 'Whats your name?',
     caption: 'Respond to a property possession claim',
     contactUs: 'Contact us for help',
     firstNameLabel: 'First name',
@@ -98,9 +98,9 @@ describe('respond-to-claim defendant-name-capture step', () => {
       step.view,
       expect.objectContaining({
         pageTitle: 'Your name',
-        heading: 'What’s your name?',
+        heading: 'Whats your name?',
         caption: 'Respond to a property possession claim',
-        dashboardUrl: '/dashboard',
+        dashboardUrl: '/dashboard/1234567890123456',
         cancel: 'Cancel',
         backUrl: '/previous-step',
         fields: expect.any(Array),

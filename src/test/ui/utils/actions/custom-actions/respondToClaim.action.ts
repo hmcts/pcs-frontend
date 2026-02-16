@@ -1,16 +1,21 @@
 import { Page } from '@playwright/test';
 
+import { submitCaseApiData } from '../../../data/api-data';
 import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
+  disputeClaimInterstitial,
   freeLegalAdvice,
+  noticeDateKnown,
+  noticeDateUnknown,
+  noticeDetails,
   paymentInterstitial,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
-
+export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -20,7 +25,11 @@ export class RespondToClaimAction implements IAction {
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
+      ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
+      ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
+      ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
+      ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -77,6 +86,19 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
+  private async disputeClaimInterstitial(isClaimantNameCorrect: actionData) {
+    if (isClaimantNameCorrect === 'YES') {
+      claimantsName = submitCaseApiData.submitCasePayload.claimantName;
+    } else {
+      claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
+    }
+    const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
+    const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
+    await performValidation('text', { elementType: 'heading', text: mainHeader });
+    await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+  }
+
   private async readPaymentInterstitial(): Promise<void> {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
@@ -118,5 +140,37 @@ export class RespondToClaimAction implements IAction {
           throw new Error(`Validation type :"${validationArr.validationType}" is not valid`);
       }
     }
+  }
+
+  private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeGivenData.option,
+    });
+    await performAction('clickButton', noticeDetails.saveAndContinueButton);
+  }
+
+  private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
+    if (noticeData?.day && noticeData?.month && noticeData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+      );
+    }
+    await performAction('clickButton', noticeDateKnown.saveAndContinueButton);
+  }
+
+  private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
+    if (noticeData?.day && noticeData?.month && noticeData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+      );
+    }
+    await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
   }
 }

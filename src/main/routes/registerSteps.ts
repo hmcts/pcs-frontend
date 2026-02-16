@@ -1,7 +1,7 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 
-import { ccdCaseMiddleware, oidcMiddleware } from '../middleware';
+import { oidcMiddleware } from '../middleware';
 import { getValidatedLanguage, stepDependencyCheckMiddleware } from '../modules/steps';
 import { getStepsForJourney, journeyRegistry } from '../steps';
 
@@ -26,7 +26,8 @@ export default function registerSteps(app: Application): void {
     for (const step of journeySteps) {
       const stepConfig = flowConfig.steps[step.name];
       const requiresAuth = stepConfig?.requiresAuth !== false;
-      const middlewares = requiresAuth ? [oidcMiddleware, ccdCaseMiddleware] : [];
+
+      const middlewares = requiresAuth ? [oidcMiddleware] : [];
 
       // Use journey-specific flow config for dependency checking
       const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);

@@ -11,6 +11,7 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/nonRentArrearsDispute.njk`,
   translationKeys: {
+    title: 'title',
     introParagraph: 'introParagraph',
     introLinkHref: 'introLinkHref',
     includesHeading: 'includesHeading',
@@ -65,3 +66,4 @@ export const step: StepDefinition = createFormStep({
     },
   ],
 });
+

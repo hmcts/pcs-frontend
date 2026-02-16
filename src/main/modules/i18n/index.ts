@@ -12,7 +12,6 @@ import { z } from 'zod';
 import { makeZodI18nMap } from 'zod-i18n-map';
 
 import { pluralPossessive } from './formatters';
-
 function firstExistingPath(paths: string[]): string | null {
   for (const p of paths) {
     if (fs.existsSync(p)) {
