@@ -21,7 +21,8 @@ import { isNonEmpty } from '../utils/objectHelpers';
 
 const logger = Logger.getLogger('autoSaveDraftToCCD');
 
-type ValueMapper = (valueOrFormData: string | string[] | Record<string, unknown>) => Record<string, unknown>;
+type FormFieldValue = string | string[] | Record<string, unknown>;
+type ValueMapper = (valueOrFormData: FormFieldValue) => Record<string, unknown>;
 
 interface StepMapping {
   backendPath: string;
@@ -53,7 +54,7 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
   const ALLOWED_VALUES = ['yes', 'no', 'preferNotToSay'] as const;
   type AllowedValue = (typeof ALLOWED_VALUES)[number]; // 'yes' | 'no' | 'preferNotToSay'
 
-  return (value: string | string[] | Record<string, unknown>) => {
+  return (value: FormFieldValue) => {
     if (typeof value !== 'string') {
       logger.warn('yesNoEnum expects a string, received:', typeof value);
       return { [backendFieldName]: '' };
@@ -86,7 +87,7 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
 
 /** Combines date fields (day/month/year) into ISO date string using luxon */
 export function dateToISO(backendFieldName: string): ValueMapper {
-  return (formData: string | string[] | Record<string, unknown>) => {
+  return (formData: FormFieldValue) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
       logger.warn('dateToISO expects an object, received:', typeof formData);
       return {};
@@ -95,7 +96,7 @@ export function dateToISO(backendFieldName: string): ValueMapper {
     const { day, month, year } = formData;
 
     if (!day || !month || !year) {
-      logger.warn(`Missing date components: day=${day}, month=${month}, year=${year}`);
+      logger.warn(`Missing date components: day=${String(day)}, month=${String(month)}, year=${String(year)}`);
       return {};
     }
 
@@ -107,7 +108,9 @@ export function dateToISO(backendFieldName: string): ValueMapper {
     });
 
     if (!dateTime.isValid) {
-      logger.warn(`Invalid date: ${dateTime.invalidReason} (day=${day}, month=${month}, year=${year})`);
+      logger.warn(
+        `Invalid date: ${dateTime.invalidReason} (day=${String(day)}, month=${String(month)}, year=${String(year)})`
+      );
       return {};
     }
 
@@ -117,7 +120,7 @@ export function dateToISO(backendFieldName: string): ValueMapper {
 
 /** Pass through fields unchanged (1:1 mapping) */
 export function passThrough(fieldNames: readonly string[]): ValueMapper {
-  return (formData: string | string[] | Record<string, unknown>) => {
+  return (formData: FormFieldValue) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
       logger.warn('passThrough expects an object, received:', typeof formData);
       return {};
@@ -132,7 +135,7 @@ export function passThrough(fieldNames: readonly string[]): ValueMapper {
 
 /** Transforms array of checkbox values to uppercase enum array */
 export function multipleYesNo(backendFieldName: string): ValueMapper {
-  return (value: string | string[] | Record<string, unknown>) => {
+  return (value: FormFieldValue) => {
     if (!Array.isArray(value)) {
       logger.warn('multipleYesNo expects an array, received:', typeof value);
       return { [backendFieldName]: [] };
