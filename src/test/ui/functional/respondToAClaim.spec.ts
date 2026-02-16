@@ -644,6 +644,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.imNotSureRadioOption,
+    });
+    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickButton', paymentInterstitial.continueButton);
@@ -667,6 +673,16 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', paymentInterstitial.mainHeader);
     await performAction('clickButton', paymentInterstitial.continueButton);
     await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
+    await performValidation('elementToBeVisible', repaymentsMade.youHave500CharactersHiddenHintText);
+    await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsCharLimitInputText);
+    await performValidation('elementToBeVisible', repaymentsMade.tooManyCharacterHiddenHintText);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: repaymentsMade.errorValidation,
+      validationType: repaymentsMade.errorValidationType.input,
+      inputArray: repaymentsMade.errorValidationField.errorCharLimit,
+      header: repaymentsMade.errorValidationHeader,
+    });
     await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
     await performAction('clickButton', repaymentsMade.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');

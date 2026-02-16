@@ -6,6 +6,9 @@ export const repaymentsMade = {
   giveDetailsHiddenTextLabel: 'Give details about how much you paid and when',
   detailsTextInput: 'Paid £1000 last year',
   saveAndContinueButton: 'Save and continue',
+  detailsCharLimitInputText: 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz1234567',
+  tooManyCharacterHiddenHintText: 'You have 1 character too many',
+  youHave500CharactersHiddenHintText: 'You have 500 characters remaining',
   errorValidation: 'YES',
   errorValidationType: { input: 'textField', radio: 'radioOptions' },
   errorValidationHeader: 'There is a problem',
@@ -16,6 +19,13 @@ export const repaymentsMade = {
         type: 'empty',
         label: 'Give details about how much you paid and when',
         errMessage: 'Give details about how much you paid and when',
+      },
+    ],
+    errorCharLimit: [
+      {
+        type: 'empty',
+        label: 'Give details about how much you paid and when',
+        errMessage: 'Must be 500 characters or fewer',
       },
     ],
   },
