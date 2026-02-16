@@ -47,6 +47,14 @@ describe('Edge Cases and Error Handling', () => {
               data: {
                 // Case data NOW shows England (maybe was Wales before)
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
               },
             },
           },
@@ -71,6 +79,14 @@ describe('Edge Cases and Error Handling', () => {
               data: {
                 // Case data NOW shows England (changed from Wales)
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
               },
             },
           },
@@ -148,6 +164,14 @@ describe('Edge Cases and Error Handling', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'Wales',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
               },
             },
           },
@@ -185,6 +209,14 @@ describe('Edge Cases and Error Handling', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'Wales',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {

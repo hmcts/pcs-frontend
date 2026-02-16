@@ -126,7 +126,14 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: async (req: Request, _formData: Record<string, unknown>) => {
+      previousStep: async (req: Request, formData: Record<string, unknown>) => {
+        // Check formData to see which path was actually taken
+        // This honors the actual journey path even if case data changes mid-journey
+        if ('landlord-registered' in formData) {
+          return 'landlord-registered';
+        }
+
+        // Fallback: check current case data for new journeys
         const welshProperty = await isWelshProperty(req);
         if (welshProperty) {
           return 'landlord-registered';
