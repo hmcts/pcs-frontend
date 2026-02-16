@@ -4,6 +4,7 @@ import {
   LoginAction,
   NavigateToUrlAction,
   RespondToClaimAction,
+  TriggerErrorMessagesAction,
 } from '../actions/custom-actions';
 import {
   CheckAction,
@@ -47,8 +48,10 @@ export class ActionRegistry {
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
     ['confirmDefendantDetails', new RespondToClaimAction()],
     ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
+    ['disputeClaimInterstitial', new RespondToClaimAction()],
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['repaymentsMade', new RespondToClaimAction()],
+    ['triggerErrorMessagesForValidation', new TriggerErrorMessagesAction()],
   ]);
 
   static getAction(actionName: string): IAction {
