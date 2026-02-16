@@ -48,7 +48,7 @@ test.afterEach(async () => {
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   // Wales postcode routing is not implemented yet, e2e test coverage, functional test coverage needs to be reviewed once HDPI-3451 is done
-  test.skip('Respond to a claim - Wales postcode', async () => {
+  test.skip('Respond to a claim - Wales postcode @noDefendants', async () => {
     await performAction('navigateToUrl', home_url + '/case/1234123412341234/respond-to-claim/start-now');
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -68,8 +68,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+    );
     await performValidation('mainHeader', registeredLandlord.mainHeader);
     await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -132,8 +134,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: correspondenceAddressKnown.yesRadioOption,
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
