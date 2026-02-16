@@ -6,5 +6,10 @@ export default {
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'date-of-birth': 'dateOfBirth',
+  'confirmation-of-notice-date-when-not-provided': 'noticeDateUnknown',
+  'confirmation-of-notice-given': 'noticeDetails',
+  'non-rent-arrears-dispute': 'nonRentArrearsDispute',
+  'confirmation-of-notice-date-when-provided': 'noticeDateKnown',
+  'rent-arrears-dispute': 'rentArrearsDispute',
   'payment-interstitial': 'payment-interstitial',
 };
