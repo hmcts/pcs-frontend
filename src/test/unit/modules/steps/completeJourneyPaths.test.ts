@@ -12,6 +12,17 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
+                      code: 'NUISANCE_OR_IMMORAL_USE',
+                      label: 'Nuisance (ground 2)',
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -27,7 +38,7 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
         },
       } as unknown as Request;
 
-      // Expected path for England + Name Known
+      // Expected path for England + Name Known (no notice/arrears features)
       const expectedPath = [
         { from: 'start-now', to: 'free-legal-advice' },
         { from: 'free-legal-advice', to: 'defendant-name-confirmation' }, // Known
@@ -36,7 +47,8 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
         { from: 'correspondence-address', to: 'contact-preferences' },
         { from: 'contact-preferences', to: 'dispute-claim-interstitial' },
         { from: 'dispute-claim-interstitial', to: 'tenancy-details' }, // England - skip landlord-registered
-        { from: 'tenancy-details', to: 'counter-claim' },
+        { from: 'tenancy-details', to: 'non-rent-arrears-dispute' }, // No rent arrears
+        { from: 'non-rent-arrears-dispute', to: 'counter-claim' },
       ];
 
       for (const { from, to } of expectedPath) {
@@ -54,6 +66,17 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
+                      code: 'NUISANCE_OR_IMMORAL_USE',
+                      label: 'Nuisance (ground 2)',
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -67,7 +90,7 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
         },
       } as unknown as Request;
 
-      // Expected path for England + Name Unknown
+      // Expected path for England + Name Unknown (no notice/arrears features)
       const expectedPath = [
         { from: 'start-now', to: 'free-legal-advice' },
         { from: 'free-legal-advice', to: 'defendant-name-capture' }, // Unknown
@@ -76,7 +99,8 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
         { from: 'correspondence-address', to: 'contact-preferences' },
         { from: 'contact-preferences', to: 'dispute-claim-interstitial' },
         { from: 'dispute-claim-interstitial', to: 'tenancy-details' }, // England - skip landlord-registered
-        { from: 'tenancy-details', to: 'counter-claim' },
+        { from: 'tenancy-details', to: 'non-rent-arrears-dispute' }, // No rent arrears
+        { from: 'non-rent-arrears-dispute', to: 'counter-claim' },
       ];
 
       for (const { from, to } of expectedPath) {
@@ -94,6 +118,17 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'Wales',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      category: 'WALES_STANDARD_OTHER_DISCRETIONARY',
+                      code: 'ANTISOCIAL_BEHAVIOUR_S157',
+                      label: 'Antisocial behaviour (section 157)',
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -109,7 +144,7 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
         },
       } as unknown as Request;
 
-      // Expected path for Wales + Name Known
+      // Expected path for Wales + Name Known (no notice/arrears features)
       const expectedPath = [
         { from: 'start-now', to: 'free-legal-advice' },
         { from: 'free-legal-advice', to: 'defendant-name-confirmation' }, // Known
@@ -119,7 +154,8 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
         { from: 'contact-preferences', to: 'dispute-claim-interstitial' },
         { from: 'dispute-claim-interstitial', to: 'landlord-registered' }, // Wales - extra step
         { from: 'landlord-registered', to: 'tenancy-details' },
-        { from: 'tenancy-details', to: 'counter-claim' },
+        { from: 'tenancy-details', to: 'non-rent-arrears-dispute' }, // No rent arrears
+        { from: 'non-rent-arrears-dispute', to: 'counter-claim' },
       ];
 
       for (const { from, to } of expectedPath) {
@@ -137,6 +173,17 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'Wales',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      category: 'WALES_STANDARD_OTHER_DISCRETIONARY',
+                      code: 'ANTISOCIAL_BEHAVIOUR_S157',
+                      label: 'Antisocial behaviour (section 157)',
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -150,7 +197,7 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
         },
       } as unknown as Request;
 
-      // Expected path for Wales + Name Unknown
+      // Expected path for Wales + Name Unknown (no notice/arrears features)
       const expectedPath = [
         { from: 'start-now', to: 'free-legal-advice' },
         { from: 'free-legal-advice', to: 'defendant-name-capture' }, // Unknown
@@ -160,7 +207,8 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
         { from: 'contact-preferences', to: 'dispute-claim-interstitial' },
         { from: 'dispute-claim-interstitial', to: 'landlord-registered' }, // Wales - extra step
         { from: 'landlord-registered', to: 'tenancy-details' },
-        { from: 'tenancy-details', to: 'counter-claim' },
+        { from: 'tenancy-details', to: 'non-rent-arrears-dispute' }, // No rent arrears
+        { from: 'non-rent-arrears-dispute', to: 'counter-claim' },
       ];
 
       for (const { from, to } of expectedPath) {
@@ -178,6 +226,14 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -199,6 +255,14 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'Wales',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -232,6 +296,14 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -253,6 +325,14 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -287,7 +367,16 @@ describe('Complete Journey Paths - End-to-End Navigation', () => {
         res: {
           locals: {
             validatedCase: {
-              data: {},
+              data: {
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
+              },
             },
           },
         },

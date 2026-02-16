@@ -75,7 +75,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-date-of-birth': {
-      previousStep: formData =>
+      previousStep: (_req: Request, formData: Record<string, unknown>) =>
         'defendant-name-confirmation' in formData ? 'defendant-name-confirmation' : 'defendant-name-capture',
       defaultNext: 'correspondence-address',
     },
@@ -126,7 +126,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: async (req: Request) => {
+      previousStep: async (req: Request, _formData: Record<string, unknown>) => {
         const welshProperty = await isWelshProperty(req);
         if (welshProperty) {
           return 'landlord-registered';
@@ -226,15 +226,15 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'rent-arrears-dispute': {
       defaultNext: 'counter-claim',
-      previousStep: req => getPreviousPageForArrears(req),
+      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
     },
     'non-rent-arrears-dispute': {
       defaultNext: 'counter-claim',
-      previousStep: req => getPreviousPageForArrears(req),
+      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
     },
     'counter-claim': {
       defaultNext: 'payment-interstitial',
-      previousStep: async (req: Request) => {
+      previousStep: async (req: Request, _formData: Record<string, unknown>) => {
         const rentArrearsClaim = await isRentArrearsClaim(req);
         if (rentArrearsClaim) {
           return 'rent-arrears-dispute';

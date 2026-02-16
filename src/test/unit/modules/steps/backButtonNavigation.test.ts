@@ -10,7 +10,16 @@ describe('Back Button Navigation', () => {
         res: {
           locals: {
             validatedCase: {
-              data: {},
+              data: {
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
+              },
             },
           },
         },
@@ -26,7 +35,16 @@ describe('Back Button Navigation', () => {
         res: {
           locals: {
             validatedCase: {
-              data: {},
+              data: {
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
+              },
             },
           },
         },
@@ -44,7 +62,16 @@ describe('Back Button Navigation', () => {
         res: {
           locals: {
             validatedCase: {
-              data: {},
+              data: {
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
+              },
             },
           },
         },
@@ -64,7 +91,16 @@ describe('Back Button Navigation', () => {
         res: {
           locals: {
             validatedCase: {
-              data: {},
+              data: {
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
+              },
             },
           },
         },
@@ -88,6 +124,14 @@ describe('Back Button Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'Wales',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
               },
             },
           },
@@ -112,6 +156,14 @@ describe('Back Button Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
               },
             },
           },
@@ -137,6 +189,14 @@ describe('Back Button Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -172,6 +232,14 @@ describe('Back Button Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -205,6 +273,14 @@ describe('Back Button Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'Wales',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -243,6 +319,14 @@ describe('Back Button Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'Wales',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -281,17 +365,25 @@ describe('Back Button Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'England',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
               },
             },
           },
         },
       } as unknown as Request;
 
-      // landlord-registered has explicit defaultNext but tenancy-details doesn't have explicit previousStep
-      // so it should use auto-calculation which checks routes
+      // counter-claim has explicit previousStep function that checks isRentArrearsClaim
+      // When is-rent-arrears-claim is false, previous step should be non-rent-arrears-dispute
       const previousStep = await getPreviousStep(mockReq, 'counter-claim', flowConfig, {});
 
-      expect(previousStep).toBe('tenancy-details');
+      expect(previousStep).toBe('non-rent-arrears-dispute');
     });
   });
 
@@ -301,7 +393,16 @@ describe('Back Button Navigation', () => {
         res: {
           locals: {
             validatedCase: {
-              data: {},
+              data: {
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
+              },
             },
           },
         },
@@ -320,6 +421,14 @@ describe('Back Button Navigation', () => {
           locals: {
             validatedCase: {
               data: {
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -348,6 +457,14 @@ describe('Back Button Navigation', () => {
           locals: {
             validatedCase: {
               data: {
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
                 possessionClaimResponse: {
                   defendantContactDetails: {
                     party: {
@@ -374,6 +491,14 @@ describe('Back Button Navigation', () => {
             validatedCase: {
               data: {
                 legislativeCountry: 'Wales',
+                noticeServed: 'No',
+                claimGroundSummaries: [
+                  {
+                    value: {
+                      isRentArrears: 'No',
+                    },
+                  },
+                ],
               },
             },
           },
