@@ -75,13 +75,9 @@ export class PageContentValidation implements IValidation {
                     label >> text=${value} >> xpath=..//input[@type="checkbox"]`),
     Question: (page: Page, value: string) =>
       page.locator(`
-                    label:text("${value}") ~ input[type="radio"],
-                    label:text("${value}") + input[type="radio"],
-                    .radio:text("${value}") ~ input[type="radio"],
-                    legend:text("${value}") ~ input[type="radio"],
-                    .question:text("${value}") ~ input[type="radio"],
-                    legend:text("${value}"),
-                    label >> text=${value} >> xpath=..//input[@type="radio"]`),
+                    h1:has-text("${value}"),
+                    legend:has-text("${value}"),
+                    label:text("${value}") ~ input[type="radio"]`),
     RadioOption: (page: Page, value: string) =>
       page.locator(`
                     label:text("${value}") ~ input[type="radio"],
@@ -98,7 +94,8 @@ export class PageContentValidation implements IValidation {
                     select option:text("${value}")`),
     HintText: (page: Page, value: string) =>
       page.locator(`
-                    .govuk-hint:text("${value}")`),
+                    .govuk-hint:text("${value}"),
+                    div:text("${value}")`),
     TextLabel: (page: Page, value: string) =>
       page.locator(`
                     label:has-text("${value}"),
@@ -127,6 +124,7 @@ export class PageContentValidation implements IValidation {
   }
 
   async validateCurrentPage(page: Page): Promise<void> {
+    await page.waitForLoadState('load');
     const pageUrl = page.url();
     const pageResults: ValidationResult[] = [];
     const pageData = await this.getPageData(page);
