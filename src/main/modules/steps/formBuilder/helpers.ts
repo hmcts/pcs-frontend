@@ -174,7 +174,7 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
 
   const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate'];
   const commonErrorKeys = ['defaultRequired', 'defaultInvalid', 'defaultMaxLength'];
-  
+
   for (const key of commonErrorKeys) {
     const errorKey = `errors.${key}`;
     const translation = t(errorKey);
