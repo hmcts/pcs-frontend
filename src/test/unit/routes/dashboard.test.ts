@@ -55,6 +55,16 @@ describe('Dashboard Route', () => {
     (Logger.getLogger as jest.Mock).mockReturnValue(mockLogger);
   });
 
+  const getDashboardRouteHandler = () => {
+    const call = mockGet.mock.calls.find((c: unknown[]) => c[0] === '/dashboard');
+    return call?.[2];
+  };
+
+  const getDashboardCaseRefRouteHandler = () => {
+    const call = mockGet.mock.calls.find((c: unknown[]) => c[0] === '/dashboard/:caseReference');
+    return call?.[2];
+  };
+
   it('should register the dashboard routes', () => {
     dashboardRoute(mockApp as unknown as Application);
     expect(mockGet).toHaveBeenCalledWith('/dashboard', oidcMiddleware, expect.any(Function));
@@ -93,7 +103,7 @@ describe('Dashboard Route', () => {
       mockReq.session!.ccdCase = { id: '1234567890123456' };
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[0][2];
+      const routeHandler = getDashboardRouteHandler();
       routeHandler(mockReq, mockRes, mockNext);
 
       expect(mockRes.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
@@ -101,7 +111,7 @@ describe('Dashboard Route', () => {
 
     it('should redirect to default URL when caseId is not provided', () => {
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[0][2];
+      const routeHandler = getDashboardRouteHandler();
       routeHandler(mockReq, mockRes, mockNext);
 
       expect(mockRes.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
@@ -111,7 +121,7 @@ describe('Dashboard Route', () => {
       mockReq.session!.ccdCase = { id: '12345' };
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[0][2];
+      const routeHandler = getDashboardRouteHandler();
       routeHandler(mockReq, mockRes, mockNext);
 
       expect(mockRes.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
@@ -121,7 +131,7 @@ describe('Dashboard Route', () => {
       mockReq.session!.ccdCase = { id: '123456789012345a' };
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[0][2];
+      const routeHandler = getDashboardRouteHandler();
       routeHandler(mockReq, mockRes, mockNext);
 
       expect(mockRes.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
@@ -131,7 +141,7 @@ describe('Dashboard Route', () => {
       mockReq.session!.ccdCase = { id: 1234567890123456 };
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[0][2];
+      const routeHandler = getDashboardRouteHandler();
       routeHandler(mockReq, mockRes, mockNext);
 
       expect(mockRes.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
@@ -143,7 +153,7 @@ describe('Dashboard Route', () => {
       mockReq.session!.ccdCase = { id: '1234567890123456' };
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[0][2];
+      const routeHandler = getDashboardRouteHandler();
       routeHandler(mockReq, mockRes, mockNext);
 
       // Should still redirect to valid URL since getDashboardUrl validates
@@ -214,7 +224,7 @@ describe('Dashboard Route', () => {
 
       dashboardRoute(mockApp as unknown as Application);
       // Get the second route handler (index 1) for /dashboard/:caseReference
-      const routeHandler = mockGet.mock.calls[1][2];
+      const routeHandler = getDashboardCaseRefRouteHandler();
       await routeHandler(mockReq, mockRes, mockNext);
 
       expect(getDashboardNotifications).toHaveBeenCalledWith(1234567890123456);
@@ -277,7 +287,7 @@ describe('Dashboard Route', () => {
 
       dashboardRoute(mockApp as unknown as Application);
       // Get the second route handler (index 1) for /dashboard/:caseReference
-      const routeHandler = mockGet.mock.calls[1][2];
+      const routeHandler = getDashboardCaseRefRouteHandler();
       await routeHandler(mockReq, mockRes, mockNext);
 
       expect(mockRender).toHaveBeenCalledWith('dashboard', {
@@ -354,7 +364,7 @@ describe('Dashboard Route', () => {
 
       dashboardRoute(appWithoutNunjucks as unknown as Application);
       // Get the second route handler (index 1) for /dashboard/:caseReference
-      const routeHandler = mockGet.mock.calls[1][2];
+      const routeHandler = getDashboardCaseRefRouteHandler();
 
       await expect(routeHandler(mockReq, mockRes, mockNext)).rejects.toThrow('Nunjucks environment not initialized');
     });
@@ -365,7 +375,7 @@ describe('Dashboard Route', () => {
 
       dashboardRoute(mockApp as unknown as Application);
       // Get the second route handler (index 1) for /dashboard/:caseReference
-      const routeHandler = mockGet.mock.calls[1][2];
+      const routeHandler = getDashboardCaseRefRouteHandler();
 
       await expect(routeHandler(mockReq, mockRes, mockNext)).rejects.toThrow('Failed to fetch data');
       expect(mockLogger.error).toHaveBeenCalledWith(
@@ -378,7 +388,7 @@ describe('Dashboard Route', () => {
       (getDashboardTaskGroups as jest.Mock).mockResolvedValue([]);
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[1][2];
+      const routeHandler = getDashboardCaseRefRouteHandler();
       await routeHandler(mockReq, mockRes, mockNext);
 
       expect(mockRender).toHaveBeenCalledWith('dashboard', {
@@ -415,7 +425,7 @@ describe('Dashboard Route', () => {
       (getDashboardTaskGroups as jest.Mock).mockResolvedValue(mockTaskGroups);
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[1][2];
+      const routeHandler = getDashboardCaseRefRouteHandler();
       await routeHandler(mockReq, mockRes, mockNext);
 
       expect(mockRender).toHaveBeenCalledWith('dashboard', {
@@ -467,7 +477,7 @@ describe('Dashboard Route', () => {
       (getDashboardTaskGroups as jest.Mock).mockResolvedValue(mockTaskGroups);
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[1][2];
+      const routeHandler = getDashboardCaseRefRouteHandler();
       await routeHandler(mockReq, mockRes, mockNext);
 
       expect(mockRender).toHaveBeenCalledWith('dashboard', {
@@ -507,7 +517,7 @@ describe('Dashboard Route', () => {
       (getDashboardTaskGroups as jest.Mock).mockResolvedValue(mockTaskGroups);
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[1][2];
+      const routeHandler = getDashboardCaseRefRouteHandler();
       await routeHandler(mockReq, mockRes, mockNext);
 
       const renderCall = mockRender.mock.calls[0];
@@ -533,7 +543,7 @@ describe('Dashboard Route', () => {
       (getDashboardTaskGroups as jest.Mock).mockResolvedValue(mockTaskGroups);
 
       dashboardRoute(mockApp as unknown as Application);
-      const routeHandler = mockGet.mock.calls[1][2];
+      const routeHandler = getDashboardCaseRefRouteHandler();
       await routeHandler(mockReq, mockRes, mockNext);
 
       const renderCall = mockRender.mock.calls[0];

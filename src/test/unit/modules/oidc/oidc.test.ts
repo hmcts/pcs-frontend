@@ -1,5 +1,6 @@
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
+import * as jose from 'jose';
 import {
   authorizationCodeGrant,
   buildAuthorizationUrl,
@@ -9,11 +10,13 @@ import {
   fetchUserInfo,
   randomNonce,
   randomPKCECodeVerifier,
+  refreshTokenGrant,
 } from 'openid-client';
 
 import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
 
 jest.mock('config');
+jest.mock('jose');
 jest.mock('openid-client', () => ({
   discovery: jest.fn(),
   randomPKCECodeVerifier: jest.fn(),
@@ -23,11 +26,13 @@ jest.mock('openid-client', () => ({
   authorizationCodeGrant: jest.fn(),
   fetchUserInfo: jest.fn(),
   buildEndSessionUrl: jest.fn(),
+  refreshTokenGrant: jest.fn(),
 }));
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
       info: jest.fn(),
+      warn: jest.fn(),
       error: jest.fn(),
     }),
   },
@@ -153,6 +158,8 @@ describe('OIDCModule', () => {
 
     it('should throw OIDCAuthenticationError when setup fails', async () => {
       (discovery as jest.Mock).mockRejectedValue(new Error('Discovery failed'));
+      oidcModule['clientConfig'] = undefined as unknown as (typeof oidcModule)['clientConfig'];
+      oidcModule['clientConfigPromise'] = null;
 
       await expect(oidcModule['setupClient']()).rejects.toThrow(OIDCAuthenticationError);
     });
@@ -187,6 +194,7 @@ describe('OIDCModule', () => {
 
       it('should call next with error when setup fails', async () => {
         oidcModule['clientConfig'] = undefined as unknown as (typeof oidcModule)['clientConfig'];
+        oidcModule['clientConfigPromise'] = null;
         (discovery as jest.Mock).mockRejectedValue(new Error('Setup failed'));
 
         oidcModule.enableFor(mockApp);
@@ -534,6 +542,97 @@ describe('OIDCModule', () => {
           })
         );
         expect(mockResponse.redirect).toHaveBeenCalledWith(mockLogoutUrl);
+      });
+    });
+
+    describe('refreshUserTokens', () => {
+      beforeEach(async () => {
+        await oidcModule['setupClient']();
+      });
+
+      it('should successfully refresh tokens', async () => {
+        const mockTokens = {
+          access_token: 'new-access-token',
+          id_token: 'new-id-token',
+          refresh_token: 'new-refresh-token',
+        };
+
+        (refreshTokenGrant as jest.Mock).mockResolvedValue(mockTokens);
+        (jose.decodeJwt as jest.Mock).mockReturnValue({
+          exp: Math.floor(Date.now() / 1000) + 3600,
+        });
+
+        const result = await oidcModule.refreshUserTokens('old-refresh-token');
+
+        expect(refreshTokenGrant).toHaveBeenCalledWith(expect.any(Object), 'old-refresh-token');
+        expect(result.accessToken).toBe('new-access-token');
+        expect(result.refreshToken).toBe('new-refresh-token');
+        expect(result.idToken).toBe('new-id-token');
+        expect(result.accessTokenExp).toBeDefined();
+      });
+
+      it('should handle refresh without new refresh token', async () => {
+        const mockTokens = {
+          access_token: 'new-access-token',
+          id_token: 'new-id-token',
+        };
+
+        (refreshTokenGrant as jest.Mock).mockResolvedValue(mockTokens);
+        (jose.decodeJwt as jest.Mock).mockReturnValue({
+          exp: Math.floor(Date.now() / 1000) + 3600,
+        });
+
+        const result = await oidcModule.refreshUserTokens('old-refresh-token');
+
+        expect(result.accessToken).toBe('new-access-token');
+        expect(result.refreshToken).toBeUndefined();
+        expect(result.idToken).toBe('new-id-token');
+      });
+
+      it('should handle token decode failure gracefully', async () => {
+        const mockTokens = {
+          access_token: 'new-access-token',
+        };
+
+        (refreshTokenGrant as jest.Mock).mockResolvedValue(mockTokens);
+        (jose.decodeJwt as jest.Mock).mockImplementation(() => {
+          throw new Error('Decode failed');
+        });
+
+        const result = await oidcModule.refreshUserTokens('old-refresh-token');
+
+        expect(result.accessToken).toBe('new-access-token');
+        expect(result.accessTokenExp).toBeUndefined();
+      });
+
+      it('should throw OIDCAuthenticationError when refresh fails', async () => {
+        (refreshTokenGrant as jest.Mock).mockRejectedValue(new Error('Refresh failed'));
+
+        await expect(oidcModule.refreshUserTokens('invalid-refresh-token')).rejects.toThrow(OIDCAuthenticationError);
+      });
+
+      it('should handle token without exp claim', async () => {
+        const mockTokens = {
+          access_token: 'new-access-token',
+        };
+
+        (refreshTokenGrant as jest.Mock).mockResolvedValue(mockTokens);
+        (jose.decodeJwt as jest.Mock).mockReturnValue({
+          sub: 'test-user',
+          // No exp claim
+        });
+
+        const result = await oidcModule.refreshUserTokens('old-refresh-token');
+
+        expect(result.accessToken).toBe('new-access-token');
+        expect(result.accessTokenExp).toBeUndefined();
+      });
+    });
+
+    describe('enableFor - app.locals storage', () => {
+      it('should store OIDC module instance in app.locals', () => {
+        oidcModule.enableFor(mockApp);
+        expect(mockApp.locals.oidc).toBe(oidcModule);
       });
     });
   });

@@ -1,6 +1,9 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import type { Application, Request, Response } from 'express';
+import config from 'config';
+import type { Application, NextFunction, Request, Response } from 'express';
+import * as jose from 'jose';
 
+import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware/oidc';
 import {
   type DashboardTaskGroup,
@@ -92,6 +95,36 @@ function mapTaskGroups(app: Application, caseReference: string) {
 
 export default function dashboardRoutes(app: Application): void {
   const logger = Logger.getLogger('dashboard');
+
+  // Test route to verify auth failure middleware (remove after testing)
+  // Test route - requires authentication so it goes through normal auth flow
+  // This simulates a downstream service returning 401
+  app.get('/test-error/:errorType', oidcMiddleware, (req: Request, res: Response, next: NextFunction) => {
+    const errorType = req.params.errorType;
+    req.session.returnTo = '/dashboard';
+
+    if (errorType !== '' && errorType !== undefined) {
+      next(new HTTPError('Invalid error type', Number(errorType)));
+    } else {
+      next(new HTTPError('Invalid error type', 400));
+    }
+  });
+
+  app.get('/test-expired-token', async (req: Request, res: Response) => {
+    const user = req.session?.user;
+    if (user) {
+      // decode the access token and set the expiry to a past date, then set the user.accessToken to the new token
+      const decoded = jose.decodeJwt(user.accessToken);
+      decoded.exp = Math.floor(Date.now() / 1000) - 60;
+      user.accessToken = await new jose.SignJWT(decoded)
+        .setProtectedHeader({ alg: 'HS256' })
+        .setExpirationTime('30s')
+        .sign(new TextEncoder().encode(config.get<string>('secrets.pcs.pcs-frontend-idam-secret')));
+      res.redirect('/dashboard');
+    } else {
+      res.redirect('/login');
+    }
+  });
 
   app.get('/dashboard', oidcMiddleware, (req: Request, res: Response) => {
     const caseId = req.session?.ccdCase?.id;
