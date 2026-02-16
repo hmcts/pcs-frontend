@@ -1,12 +1,23 @@
 import type { Request } from 'express';
 
-import { getLaunchDarklyFlag } from '../../utils/getLaunchDarklyFlag';
-
-//TODO need to add logic to check if defendant name is known from CCD case data
+/**
+ * Checks if defendant name is known from CCD case data.
+ *
+ * Uses real CCD callback data path:
+ * possessionClaimResponse.defendantContactDetails.party
+ *
+ * A defendant name is considered "known" when:
+ * 1. nameKnown flag is explicitly "YES"
+ * 2. Both firstName AND lastName are present
+ *
+ * Real data examples:
+ * - Known: { nameKnown: "YES", firstName: "ARUN", lastName: "KUMAR" }
+ * - Unknown: { nameKnown: "NO" } (no firstName/lastName fields)
+ */
 export const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
-  // If the flag does not exist LD will return the default (true) so UI remains visible by default.
-  const result = await getLaunchDarklyFlag<string>(req, 'defendant-name', '');
-  req.session.defendantName = result;
+  const caseData = req.res?.locals?.validatedCase?.data;
+  const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
 
-  return result !== '';
+  // Check both explicit flag AND field presence
+  return party?.nameKnown === 'YES' && !!(party?.firstName && party?.lastName);
 };

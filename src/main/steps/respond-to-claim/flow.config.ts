@@ -94,6 +94,9 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'tenancy-details',
     },
     'tenancy-details': {
+      // Dynamic back button: depends on whether user visited landlord-registered (Wales) or not (England)
+      previousStep: formData =>
+        'landlord-registered' in formData ? 'landlord-registered' : 'dispute-claim-interstitial',
       defaultNext: 'counter-claim',
     },
     'counter-claim': {
