@@ -55,7 +55,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'do-you-have-any-dependant-children': doYouHaveAnyDependantChildren,
   'do-you-have-any-other-dependants': doYouHaveAnyOtherDependants,
   'do-any-other-adults-live-in-your-home': doAnyOtherAdultsLiveInYourHome,
-  'non-rent-arrears-dispute': nonRentArrearsDispute,
   'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home':
     wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   'your-circumstances': yourCircumstances,

@@ -46,7 +46,6 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
-    'non-rent-arrears-dispute',
     'end-now',
     'contact-preferences',
   ],
@@ -301,10 +300,6 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
-      defaultNext: 'end-now',
-    },
-
-    'non-rent-arrears-dispute': {
       defaultNext: 'end-now',
     },
   },
