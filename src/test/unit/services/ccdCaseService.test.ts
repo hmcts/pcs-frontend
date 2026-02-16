@@ -1,5 +1,6 @@
 import config from 'config';
 
+import { HTTPError } from '../../../main/HttpError';
 import { CaseState } from '../../../main/interfaces/ccdCase.interface';
 import { http } from '../../../main/modules/http';
 import { ccdCaseService } from '../../../main/services/ccdCaseService';
@@ -25,6 +26,142 @@ const mockUrl = 'http://ccd.example.com';
 describe('ccdCaseService', () => {
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('getCaseById', () => {
+    it('should retrieve case by ID with default eventId', async () => {
+      const caseId = '1234567890123456';
+      const mockCaseData = { applicantForename: 'John', applicantSurname: 'Doe' };
+
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: mockCaseData,
+          },
+        },
+      });
+
+      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/respondPossessionClaim?ignore-warning=false`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(result).toEqual({
+        id: caseId,
+        data: mockCaseData,
+      });
+    });
+
+    it('should retrieve case by ID with custom eventId', async () => {
+      const caseId = '1234567890123456';
+      const customEventId = 'customEvent';
+      const mockCaseData = { applicantForename: 'Jane' };
+
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: mockCaseData,
+          },
+        },
+      });
+
+      const result = await ccdCaseService.getCaseById(accessToken, caseId, customEventId);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/${customEventId}?ignore-warning=false`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(result).toEqual({
+        id: caseId,
+        data: mockCaseData,
+      });
+    });
+
+    it('should return empty data object when case_details is missing', async () => {
+      const caseId = '1234567890123456';
+
+      mockGet.mockResolvedValue({
+        data: {},
+      });
+
+      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+
+      expect(result).toEqual({
+        id: caseId,
+        data: {},
+      });
+    });
+
+    it('should return empty data object when case_data is missing', async () => {
+      const caseId = '1234567890123456';
+
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {},
+        },
+      });
+
+      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+
+      expect(result).toEqual({
+        id: caseId,
+        data: {},
+      });
+    });
+
+    it('should throw HTTPError with 403 status on unauthorized access', async () => {
+      const caseId = '1234567890123456';
+
+      mockGet.mockRejectedValue({
+        response: { status: 403, data: { message: 'Forbidden' } },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Not authorised');
+    });
+
+    it('should throw HTTPError with 403 status on unauthenticated request', async () => {
+      const caseId = '1234567890123456';
+
+      mockGet.mockRejectedValue({
+        response: { status: 401, data: { message: 'Unauthorized' } },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Not authorised');
+    });
+
+    it('should throw HTTPError on case not found', async () => {
+      const caseId = '1234567890123456';
+
+      mockGet.mockRejectedValue({
+        response: { status: 404, data: { message: 'Not found' } },
+        message: 'Case not found',
+      });
+
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('CCD case service error');
+    });
+
+    it('should throw HTTPError on unexpected error', async () => {
+      const caseId = '1234567890123456';
+
+      mockGet.mockRejectedValue(new Error('Network error'));
+
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('CCD case service error');
+    });
   });
 
   describe('getCase', () => {
@@ -60,10 +197,11 @@ describe('ccdCaseService', () => {
       expect(result).toBeNull();
     });
 
-    it('throws on unexpected error', async () => {
+    it('throws HTTPError on unexpected error', async () => {
       mockPost.mockRejectedValue(new Error('Unexpected'));
 
-      await expect(ccdCaseService.getCase(accessToken)).rejects.toThrow('Unexpected');
+      await expect(ccdCaseService.getCase(accessToken)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCase(accessToken)).rejects.toThrow('CCD case service error');
     });
   });
 
@@ -79,16 +217,18 @@ describe('ccdCaseService', () => {
   });
 
   describe('updateCase', () => {
-    it('throws if case id is missing', async () => {
-      await expect(ccdCaseService.updateCase(accessToken, { id: '', data: {} })).rejects.toEqual(
+    it('throws HTTPError if case id is missing', async () => {
+      await expect(ccdCaseService.updateCase(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.updateCase(accessToken, { id: '', data: {} })).rejects.toThrow(
         'Cannot UPDATE Case, CCD Case Not found'
       );
     });
   });
 
   describe('submitCase', () => {
-    it('throws if case id is missing', async () => {
-      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toEqual(
+    it('throws HTTPError if case id is missing', async () => {
+      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(
         'Cannot SUBMIT Case, CCD Case Not found'
       );
     });

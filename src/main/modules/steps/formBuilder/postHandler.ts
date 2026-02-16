@@ -1,0 +1,157 @@
+import type { NextFunction, Request, Response } from 'express';
+import type { TFunction } from 'i18next';
+
+import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
+import { getDashboardUrl } from '../../../routes/dashboard';
+import { createStepNavigation, stepNavigation } from '../flow';
+import { getTranslationFunction, loadStepNamespace } from '../i18n';
+import type { TranslationContent } from '../i18n';
+
+import { renderWithErrors } from './errorUtils';
+import { translateFields } from './fieldTranslation';
+import { buildFormContent } from './formContent';
+import {
+  getCustomErrorTranslations,
+  getTranslationErrors,
+  normalizeCheckboxFields,
+  processFieldData,
+  setFormData,
+  validateForm,
+} from './helpers';
+import { validateConfigInDevelopment } from './schema';
+
+export function createPostHandler(
+  fields: FormFieldConfig[],
+  stepName: string,
+  viewPath: string,
+  journeyFolder: string,
+  beforeRedirect?: (req: Request) => Promise<void> | void,
+  translationKeys?: TranslationKeys,
+  flowConfig?: JourneyFlowConfig,
+  showCancelButton?: boolean,
+  extendGetContent?: (req: Request, content: TranslationContent) => Record<string, unknown>
+): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
+  // Validate config in development mode
+  if (process.env.NODE_ENV !== 'production') {
+    validateConfigInDevelopment({
+      stepName,
+      journeyFolder,
+      fields,
+      beforeRedirect,
+      stepDir: '',
+      translationKeys,
+    });
+  }
+  // Use provided flowConfig or fall back to default stepNavigation
+  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
+
+  return {
+    post: async (req: Request, res: Response, next: NextFunction) => {
+      await loadStepNamespace(req, stepName, journeyFolder);
+
+      const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+      const action = req.body.action as string | undefined;
+
+      const nunjucksEnv = req.app.locals.nunjucksEnv;
+      if (!nunjucksEnv) {
+        throw new Error('Nunjucks environment not initialized');
+      }
+
+      // Get all form data from session for cross-field validation
+      const allFormData = req.session.formData
+        ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
+        : {};
+
+      // Normalize checkbox fields BEFORE validation to ensure checkbox values are arrays
+      // This is critical because validation functions (like required functions) need normalized checkbox arrays
+      // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
+      normalizeCheckboxFields(req, fields);
+
+      // Get interpolation values from extendGetContent if available (for dynamic translation values)
+      const interpolationValues = extendGetContent ? extendGetContent(req, {}) : {};
+
+      const fieldsWithLabels = translateFields(
+        fields,
+        t,
+        {},
+        {},
+        false,
+        '',
+        undefined,
+        nunjucksEnv,
+        interpolationValues
+      );
+      const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
+      const fieldErrors = getTranslationErrors(t, fields, undefined, interpolationValues);
+      const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
+
+      if (Object.keys(errors).length > 0) {
+        const formContent = buildFormContent(
+          fields,
+
+          t,
+
+          req.body,
+
+          errors,
+
+          translationKeys,
+
+          nunjucksEnv,
+          interpolationValues,
+          showCancelButton
+        );
+        // Call extendGetContent to get additional translated content (buttons, labels, etc.)
+        const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
+        const fullContent = { ...formContent, ...extendedContent };
+        await renderWithErrors(
+          req,
+          res,
+          viewPath,
+          errors,
+          fields,
+          fullContent,
+          stepName,
+          journeyFolder,
+          navigation,
+          translationKeys,
+          showCancelButton
+        );
+        return; // renderWithErrors sends the response, so we return early
+      }
+
+      // Handle saveForLater action after validation passes
+      if (action === 'saveForLater') {
+        // Process field data (normalize checkboxes + consolidate date fields) before saving
+        processFieldData(req, fields);
+        const { action: _, ...bodyWithoutAction } = req.body;
+        setFormData(req, stepName, bodyWithoutAction);
+        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
+      }
+
+      // Process field data (normalize checkboxes + consolidate date fields) before saving
+      processFieldData(req, fields);
+      const { action: _, ...bodyWithoutAction } = req.body;
+      setFormData(req, stepName, bodyWithoutAction);
+
+      if (beforeRedirect) {
+        try {
+          await beforeRedirect(req);
+          if (res.headersSent) {
+            return;
+          }
+        } catch (error) {
+          return next(error);
+        }
+      }
+
+      const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
+      if (!redirectPath) {
+        return res.status(500).send('Unable to determine next step');
+      }
+
+      res.redirect(303, redirectPath);
+    },
+  };
+}

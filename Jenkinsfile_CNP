@@ -32,31 +32,31 @@ withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
   env.NODE_CONFIG_ENV = 'test'
   onPR() {
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_error_messages_validation").size() > 0) {
+      env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
+    }
+    else {
+      env.ENABLE_ERROR_MESSAGES_VALIDATION = 'false'
+    }
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.PCS_API_URL_PREVIEW = "http://pcs-api-aat.service.core-compute-aat.internal"
     def apiLabels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pcs-api-pr:")
     if (apiLabels && apiLabels.size() > 0) {
         def labelName = apiLabels[0]
         env.PCS_API_CHANGE_ID = labelName.replace("pcs-api-pr:", "")
         env.DATA_STORE_URL_BASE = "https://ccd-data-store-api-pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
+        env.PCS_API_URL_PREVIEW = "https://pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
     }
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
     afterAlways('functionalTest:preview') {
-      try {
-        publishHTML([
-          allowMissing         : true,
-          alwaysLinkToLastBuild: true,
-          keepAll              : true,
-          reportDir            : "allure-report",
-          reportFiles          : 'index.html',
-          reportName           : 'PCS Frontend Functional Test Report'
-        ])
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      }
+      archiveFunctionalTestReports()
+    }
+    afterAlways('fullFunctionalTest:preview') {
+      archiveFunctionalTestReports()
     }
   }
 
@@ -68,18 +68,22 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
     afterAlways('functionalTest:aat') {
-      try {
-        publishHTML([
-          allowMissing         : true,
-          alwaysLinkToLastBuild: true,
-          keepAll              : true,
-          reportDir            : "allure-report",
-          reportFiles          : 'index.html',
-          reportName           : 'PCS Frontend Functional Test Report'
-        ])
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      }
+      archiveFunctionalTestReports()
     }
+  }
+}
+
+def archiveFunctionalTestReports() {
+  try {
+    publishHTML([
+      allowMissing: true,
+      alwaysLinkToLastBuild: true,
+      keepAll: true,
+      reportDir: "allure-report",
+      reportFiles: 'index.html',
+      reportName: 'PCS Frontend Functional Test Report'
+    ])
+  } catch (Error) {
+      unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
   }
 }

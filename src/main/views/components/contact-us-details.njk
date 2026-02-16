@@ -1,0 +1,45 @@
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% set contactInformation %}
+  <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Email</h3>
+
+  <p class="govuk-body">
+    Use the
+    <a
+      class="govuk-link"
+      href="https://www.find-court-tribunal.service.gov.uk/"
+      target="_blank"
+      rel="noopener noreferrer">
+      find a court or tribunal service (opens in new tab)
+    </a>
+    to get your local court&rsquo;s email address.
+  </p>
+
+  <p class="govuk-body">
+    If you do not know the name of your local court, select the
+    &lsquo;Money&rsquo; category and then the &lsquo;Housing&rsquo; category to find it.
+  </p>
+
+  <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Telephone</h3>
+
+  <p class="govuk-body">
+    0300 123 7050<br>
+    Monday to Friday, 8.30am to 5pm.
+  </p>
+
+  <p class="govuk-body">
+    <a
+      class="govuk-link"
+      href="https://www.gov.uk/call-charges"
+      target="_blank"
+      rel="noopener noreferrer">
+      Find out about call charges (opens in new tab)
+    </a>
+  </p>
+
+{% endset %}
+
+{{ govukDetails({
+  summaryText: "Contact us for help",
+  html: contactInformation
+}) }}

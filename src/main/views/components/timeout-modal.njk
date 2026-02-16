@@ -1,0 +1,27 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+<div id="timeout-alert" role="status" aria-live="assertive" aria-atomic="true" class="govuk-visually-hidden"></div>
+
+<div id="timeout-modal-container" class="modal" hidden data-inert-container=".govuk-modal-dialogue-inert-container" data-timeout-title="{{ t('timeout.title') }}" data-timeout-subtitle="{{ t('timeout.subtitle') }}" data-timeout-caption="{{ t('timeout.caption') }}" data-time-minute="{{ t('time.minute') }}" data-time-minutes="{{ t('time.minutes') }}" data-time-second="{{ t('time.second') }}" data-time-seconds="{{ t('time.seconds') }}" data-time-remaining="{{ t('time.remaining') }}">
+  <div id="timeout-modal" class="modal-content govuk-width-container" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="timeout-modal-heading" aria-describedby="timeout-modal-description timeout-modal-saved">
+    <h2 id="timeout-modal-heading" class="govuk-heading-m">{{ t('timeout.title') }}</h2>
+    <p id="timeout-modal-description" class="govuk-body">
+      {{ t('timeout.subtitle') }} <strong id="countdown-time"></strong>.
+    </p>
+    <p class="govuk-body govuk-visually-hidden" aria-live="polite" aria-atomic="true">
+      <span id="countdown-message"></span>
+    </p>
+    <p id="timeout-modal-saved" class="govuk-body">
+      {{ t('timeout.caption') }}
+    </p>
+    <div class="govuk-form-group">
+      <div class="timeout-modal-actions">
+        {{ govukButton({
+          text: t('timeout.buttonText'),
+          attributes: { id: 'timeout-modal-close-button' }
+        }) }}
+        <a href="/logout" class="govuk-link timeout-modal-signout-link">{{ t('timeout.signOutLinkText') }}</a>
+      </div>
+    </div>
+  </div>
+</div>

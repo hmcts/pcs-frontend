@@ -1,9 +1,10 @@
-/* eslint-disable no-console */
 import * as fs from 'fs';
 import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
+import { contactUs } from '../../../data/section-data/contactUs.section.data';
+import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
 const ELEMENT_TYPES = [
@@ -19,6 +20,8 @@ const ELEMENT_TYPES = [
   'HintText',
   'TextLabel',
   'Paragraph',
+  'List',
+  'Summary',
 ] as const;
 
 type ValidationResult = { element: string; expected: string; status: 'pass' | 'fail' };
@@ -47,6 +50,10 @@ export class PageContentValidation implements IValidation {
                     button.govuk-js-link:text("${value}"),
                     [role="link"]:text("${value}"),
                     [aria-label*="${value}"]:text("${value}")`),
+    Summary: (page: Page, value: string) =>
+      page.locator(`
+                    summary:has-text("${value}"),
+                    summary .govuk-details__summary-text:text("${value}")`),
     Header: (page: Page, value: string) =>
       page.locator(`
                     h1:text("${value}"),
@@ -73,6 +80,7 @@ export class PageContentValidation implements IValidation {
                     .radio:text("${value}") ~ input[type="radio"],
                     legend:text("${value}") ~ input[type="radio"],
                     .question:text("${value}") ~ input[type="radio"],
+                    legend:text("${value}"),
                     label >> text=${value} >> xpath=..//input[@type="radio"]`),
     RadioOption: (page: Page, value: string) =>
       page.locator(`
@@ -90,21 +98,26 @@ export class PageContentValidation implements IValidation {
                     select option:text("${value}")`),
     HintText: (page: Page, value: string) =>
       page.locator(`
-                    .hint:text("${value}")`),
+                    .govuk-hint:text("${value}")`),
     TextLabel: (page: Page, value: string) =>
       page.locator(`
                     label:has-text("${value}"),
                     .label:has-text("${value}")`),
     Paragraph: (page: Page, value: string) =>
-      page.locator(`
+      page.locator(`span:text("${value}"),
                     .paragraph:text("${value}"),
                     p:text("${value}"),
                     markdown:text("${value}"),
-                    .content:text("${value}"),
+                    .govuk-caption-l:text("${value}"),
                     .body:text("${value}"),
                     .text-content:text("${value}"),
                     .govuk-body:text("${value}"),
                     .govuk-list:text("${value}")`),
+    List: (page: Page, value: string) =>
+      page.locator(`
+                    li:text("${value}"),
+                    ul li:text("${value}"),
+                    ol li:text("${value}")`),
     Text: (page: Page, value: string) => page.locator(`:text("${value}")`),
     Tab: (page: Page, value: string) => page.getByRole('tab', { name: value }),
   };
@@ -123,7 +136,12 @@ export class PageContentValidation implements IValidation {
     }
 
     for (const [key, value] of Object.entries(pageData)) {
-      if (key.includes('Input') || key.includes('Hidden')) {
+      if (
+        key.includes('Input') ||
+        key.includes('Hidden') ||
+        key.includes('Validation') ||
+        key.includes('ErrorMessage')
+      ) {
         continue;
       }
       if (typeof value === 'string' && value.trim() !== '') {
@@ -136,7 +154,7 @@ export class PageContentValidation implements IValidation {
     PageContentValidation.validationResults.set(pageUrl, pageResults);
   }
 
-  private async getPageData(page: Page): Promise<null> {
+  private async getPageData(page: Page): Promise<object | null> {
     const urlSegment = this.getUrlSegment(page.url());
     const fileName = await this.getFileName(urlSegment, page);
 
@@ -147,7 +165,13 @@ export class PageContentValidation implements IValidation {
 
     PageContentValidation.pageToFileNameMap.set(page.url(), fileName);
 
-    return this.loadPageDataFile(fileName);
+    let pageData = this.loadPageDataFile(fileName);
+    const contactUsData = this.loadPageDataFile('contactUs', true);
+    if (this.getUrlSegment(page.url()) !== 'home') {
+      pageData = { ...pageData, ...contactUsData };
+      await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
+    }
+    return pageData;
   }
 
   private getUrlSegment(url: string): string {
@@ -163,7 +187,7 @@ export class PageContentValidation implements IValidation {
 
   private async getFileName(urlSegment: string, page: Page): Promise<string | null> {
     try {
-      const mappingPath = path.join(__dirname, '../../../data/page-data-figma/urlToFileMapping.ts');
+      const mappingPath = path.join(__dirname, '../../../data/page-data/urlToFileMapping.ts');
       if (!fs.existsSync(mappingPath)) {
         return null;
       }
@@ -215,8 +239,11 @@ export class PageContentValidation implements IValidation {
     }
   }
 
-  private async loadPageDataFile(fileName: string): Promise<null> {
-    const filePath = path.join(__dirname, '../../../data/page-data-figma', `${fileName}.page.data.ts`);
+  private loadPageDataFile(fileName: string, sectionFile?: boolean): object | null {
+    let filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
+    if (sectionFile) {
+      filePath = path.join(__dirname, '../../../data/section-data', `${fileName}.section.data.ts`);
+    }
     if (!fs.existsSync(filePath)) {
       return null;
     }
@@ -342,7 +369,7 @@ export class PageContentValidation implements IValidation {
     const segment = segments[segments.length - 1] || 'home';
 
     try {
-      const mappingPath = path.join(__dirname, '../../../data/page-data-figma/urlToFileMapping.ts');
+      const mappingPath = path.join(__dirname, '../../../data/page-data/urlToFileMapping.ts');
       if (!fs.existsSync(mappingPath)) {
         return segment;
       }
@@ -368,7 +395,6 @@ export class PageContentValidation implements IValidation {
     return 'Text';
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   static getValidationResults() {
     return this.validationResults;
   }

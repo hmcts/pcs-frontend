@@ -1,0 +1,63 @@
+// Session timeout modal styles
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.modal-content {
+  background: govuk-colour('white');
+  padding: 30px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: 2px solid govuk-colour('black');
+
+  &:focus {
+    outline: 3px solid govuk-colour('yellow');
+    outline-offset: 0;
+  }
+
+  p {
+    margin-bottom: 20px;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 0;
+  }
+
+  .timeout-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+
+    .govuk-button {
+      margin-bottom: 0;
+    }
+
+    .timeout-modal-signout-link {
+      line-height: 1;
+      font-size: 19px;
+    }
+  }
+}
+
+html.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}

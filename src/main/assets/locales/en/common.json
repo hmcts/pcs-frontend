@@ -1,11 +1,17 @@
 {
-  "serviceName": "Possession claims",
-  "phase": "Alpha",
-  "feedback": "This is a new service – your <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"external noopener noreferrer\">feedback</a> will help us to improve it.",
+  "serviceName": "Respond to a property possession claim",
+  "phase": "ALPHA",
+  "feedback": "This is a new service – your <a href=\"#\" class=\"govuk-link\">feedback</a> will help us to improve it.",
   "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link language\">Cymraeg</a>",
-  "logout": "logout",
+  "logout": "Sign out",
+  "navigationLabel": "Service navigation",
+  "supportAndContactInformation": "Support and contact information",
+  "contactUsForHelp": "Contact us for help",
+  "contactUsForHelpText": "If you need help using this service, contact us.",
   "buttons": {
+    "saveAndContinue": "Save and continue",
     "continue": "Continue",
+    "saveForLater": "Save for later",
     "back": "Back",
     "cancel": "Cancel",
     "finish": "Start a new application",
@@ -13,9 +19,6 @@
     "submit": "Submit"
   },
   "change": "Change",
-  "defaultRequired": "This field is required",
-  "defaultInvalid": "Invalid format",
-  "chooseOption": "Choose an option",
   "back": "Back",
   "date": {
     "day": "Day",
@@ -25,6 +28,10 @@
   "errors": {
     "title": "There is a problem",
     "required": "Enter a value",
+    "defaultRequired": "This field is required",
+    "defaultInvalid": "Invalid format",
+    "defaultMaxLength": "Must be {max} characters or fewer",
+    "chooseOption": "Choose an option",
     "email": {
       "required": "Enter an email address",
       "invalid": "Enter a valid email address"
@@ -37,11 +44,11 @@
       "month": "Month",
       "year": "Year",
       "required": "Enter a date",
-      "notRealDate": "Enter a valid date",
-      "invalidDay": "Enter a valid day",
-      "invalidMonth": "Enter a valid month",
-      "invalidYear": "Enter a valid year",
-      "invalidValue": "Enter a valid value"
+      "notRealDate": "Date must be a real date",
+      "futureDate": "Date must be in the past",
+      "invalidValue": "Enter a valid value",
+      "missingOne": "Date must include a {{missingField}}",
+      "missingTwo": "Date must include a {{first}} and {{second}}"
     }
   },
   "months": {
@@ -58,5 +65,43 @@
     "11": "November",
     "12": "December"
   },
-  "dateFormatLong": "{{day}} {{month}} {{year}}"
+  "dateFormatLong": "{{day}} {{month}} {{year}}",
+  "timeout": {
+    "title": "You'll be signed out soon",
+    "subtitle": "For your security, you'll be signed out in",
+    "caption": "Your previous answers have been saved.",
+    "buttonText": "Stay signed in",
+    "signOutLinkText": "Sign out"
+  },
+  "time": {
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "second",
+    "seconds": "seconds"
+  },
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "You have %{count} character remaining",
+      "other": "You have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "You have reached the limit",
+    "charactersOverLimitText": {
+      "one": "You have %{count} character too many",
+      "other": "You have %{count} characters too many"
+    }
+  },
+  "errorPages": {
+    "403": {
+      "title": "Not Authorised",
+      "paragraph": "Sorry you do not have access to this account."
+    },
+    "404": {
+      "title": "Page not found",
+      "paragraph": "This could be because you’ve followed a broken or outdated link, or because there’s an error on our site. Use the browser back button to go to the previous page."
+    },
+    "500": {
+      "title": "Sorry, we’re having technical problems",
+      "paragraph": "Please try again in a few minutes."
+    }
+  }
 }

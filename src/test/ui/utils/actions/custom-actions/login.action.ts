@@ -1,6 +1,5 @@
 import { IdamUtils } from '@hmcts/playwright-common';
 import { Page } from '@playwright/test';
-import { v4 as uuidv4 } from 'uuid';
 
 import { performAction } from '../../controller';
 import { IAction, actionData } from '../../interfaces';
@@ -8,8 +7,9 @@ import { IAction, actionData } from '../../interfaces';
 export class LoginAction implements IAction {
   async execute(page: Page, action: string, userType?: actionData, roles?: actionData): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['createUserAndLogin', () => this.createUserAndLogin(userType as string, roles as string[])],
+      ['createUser', () => this.createUser(userType as string, roles as string[])],
       ['login', () => this.login()],
+      ['generateCitizenAccessToken', () => this.generateCitizenAccessToken()],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -24,13 +24,13 @@ export class LoginAction implements IAction {
     await performAction('clickButton', 'Sign in');
   }
 
-  private async createUserAndLogin(userType: string, roles: string[]): Promise<void> {
+  private async createUser(userType: string, roles: string[]): Promise<void> {
     const token = process.env.BEARER_TOKEN as string;
     const password = process.env.IDAM_PCS_USER_PASSWORD as string;
-    const uniqueId = uuidv4();
-    const email = (process.env.IDAM_PCS_USER_EMAIL = `TEST_PCS_USER.${userType}.${uniqueId}@test.test`);
-    const forename = 'fn_' + uniqueId.split('-')[0];
-    const surname = 'sn_' + uniqueId.split('-')[1];
+    const random7Digit = Math.floor(1000000 + Math.random() * 9000000);
+    const email = (process.env.IDAM_PCS_USER_EMAIL = `TEST_PCS_USER.${userType}.${random7Digit}@test.test`);
+    const forename = 'fn_' + random7Digit;
+    const surname = 'sn_' + random7Digit;
     await new IdamUtils().createUser({
       bearerToken: token,
       password,
@@ -41,6 +41,17 @@ export class LoginAction implements IAction {
         roleNames: roles,
       },
     });
-    await this.login();
+    await this.generateCitizenAccessToken();
+  }
+
+  private async generateCitizenAccessToken(): Promise<void> {
+    process.env.CITIZEN_ACCESS_TOKEN = await new IdamUtils().generateIdamToken({
+      username: process.env.IDAM_PCS_USER_EMAIL,
+      password: process.env.IDAM_PCS_USER_PASSWORD,
+      grantType: 'password',
+      clientId: 'pcs-frontend',
+      clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,
+      scope: 'profile openid roles',
+    });
   }
 }

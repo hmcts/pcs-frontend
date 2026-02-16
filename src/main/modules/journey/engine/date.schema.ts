@@ -217,7 +217,9 @@ export const buildDateInputSchema = (fieldConfig: FieldConfig, options?: DateFie
             path: [fieldConfig.name || ''],
             message:
               msgs.mustBeAfter?.(options.mustBeAfter.date, options.mustBeAfter.description) ||
-              `${fieldLabel} must be after ${options.mustBeAfter.date.toFormat('d MMMM yyyy')}${options.mustBeAfter.description ? ' ' + options.mustBeAfter.description : ''}`,
+              `${fieldLabel} must be after ${options.mustBeAfter.date.toFormat('d MMMM yyyy')}${
+                options.mustBeAfter.description ? ' ' + options.mustBeAfter.description : ''
+              }`,
             code: 'custom',
           });
         }
@@ -227,7 +229,9 @@ export const buildDateInputSchema = (fieldConfig: FieldConfig, options?: DateFie
             path: [fieldConfig.name || ''],
             message:
               msgs.mustBeSameOrAfter?.(options.mustBeSameOrAfter.date, options.mustBeSameOrAfter.description) ||
-              `${fieldLabel} must be the same as or after ${options.mustBeSameOrAfter.date.toFormat('d MMMM yyyy')}${options.mustBeSameOrAfter.description ? ' ' + options.mustBeSameOrAfter.description : ''}`,
+              `${fieldLabel} must be the same as or after ${options.mustBeSameOrAfter.date.toFormat('d MMMM yyyy')}${
+                options.mustBeSameOrAfter.description ? ' ' + options.mustBeSameOrAfter.description : ''
+              }`,
             code: 'custom',
           });
         }
@@ -237,7 +241,9 @@ export const buildDateInputSchema = (fieldConfig: FieldConfig, options?: DateFie
             path: [fieldConfig.name || ''],
             message:
               msgs.mustBeBefore?.(options.mustBeBefore.date, options.mustBeBefore.description) ||
-              `${fieldLabel} must be before ${options.mustBeBefore.date.toFormat('d MMMM yyyy')}${options.mustBeBefore.description ? ' ' + options.mustBeBefore.description : ''}`,
+              `${fieldLabel} must be before ${options.mustBeBefore.date.toFormat('d MMMM yyyy')}${
+                options.mustBeBefore.description ? ' ' + options.mustBeBefore.description : ''
+              }`,
             code: 'custom',
           });
         }
@@ -247,7 +253,9 @@ export const buildDateInputSchema = (fieldConfig: FieldConfig, options?: DateFie
             path: [fieldConfig.name || ''],
             message:
               msgs.mustBeSameOrBefore?.(options.mustBeSameOrBefore.date, options.mustBeSameOrBefore.description) ||
-              `${fieldLabel} must be the same as or before ${options.mustBeSameOrBefore.date.toFormat('d MMMM yyyy')}${options.mustBeSameOrBefore.description ? ' ' + options.mustBeSameOrBefore.description : ''}`,
+              `${fieldLabel} must be the same as or before ${options.mustBeSameOrBefore.date.toFormat('d MMMM yyyy')}${
+                options.mustBeSameOrBefore.description ? ' ' + options.mustBeSameOrBefore.description : ''
+              }`,
             code: 'custom',
           });
         }
@@ -260,7 +268,9 @@ export const buildDateInputSchema = (fieldConfig: FieldConfig, options?: DateFie
               path: [fieldConfig.name || ''],
               message:
                 msgs.mustBeBetween?.(start, end, options.mustBeBetween.description) ||
-                `${fieldLabel} must be between ${start.toFormat('d MMMM yyyy')} and ${end.toFormat('d MMMM yyyy')}${options.mustBeBetween.description ? ' ' + options.mustBeBetween.description : ''}`,
+                `${fieldLabel} must be between ${start.toFormat('d MMMM yyyy')} and ${end.toFormat('d MMMM yyyy')}${
+                  options.mustBeBetween.description ? ' ' + options.mustBeBetween.description : ''
+                }`,
               code: 'custom',
             });
           }

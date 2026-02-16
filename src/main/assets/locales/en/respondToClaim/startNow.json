@@ -1,0 +1,25 @@
+{
+  "pageTitle": "Start now",
+  "title": "Respond to a property possession claim online",
+  "description": "There’s no fee to respond to a claim. You must respond within 14 days of receiving the claim pack in the post. </p><p class=\"govuk-body\">This service is also available <a href=\"?lang=cy\" class=\"govuk-link language\">in Welsh (Cymraeg)</a>.",
+  "buttons": {
+    "startNow": "Start now"
+  },
+  "completingYourResponse": "Completing your response",
+  "saveDraftInfo": "You can save your response as a draft and return to it later. You’ll be able to review and edit your answers before you submit them.",
+  "uploadDocumentsInfo": "After you finish answering the questions, you can upload any documents to support your response.",
+  "claimantVisibilityInfo": "The claimant will be able to see any documents you upload and your answers.",
+  "whatYouWillNeed": "What you’ll need",
+  "provideDetailsInfo": "You’ll be asked to provide or confirm details, such as:",
+  "listItemName": "your name",
+  "listItemDateOfBirth": "your date of birth",
+  "listItemDependants": "any dependants (people you look after financially)",
+  "listItemCircumstances": "your circumstances and any exceptional hardship you’d experience if you had to leave your home",
+  "shareDetailsInfo": "You can also share details about:",
+  "listItemIncomeExpenses": "your income and expenses",
+  "listItemPriorityDebts": "any priority debts you have",
+  "financialSituationInfo": "You do not have to answer questions about your financial situation, but sharing this information can help a judge understand your circumstances.",
+  "supportToUseHmctsServices": "Support to use HMCTS services",
+  "hmctsSupportInfo": "If you need support to use HMCTS services, like step-free access to a court for your hearing, you can either request this as part of your response, or at a later time.",
+  "previousStepUrl": "/"
+}

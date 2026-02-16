@@ -25,7 +25,7 @@ export function pcqRedirectMiddleware() {
     const serviceId = config.get<string>('pcq.serviceId');
     const actor = config.get<string>('pcq.actor');
 
-    const ccdCase = req.session?.ccdCase;
+    const ccdCase = res.locals.validatedCase;
     const user = req.session?.user;
 
     if (!ccdCase?.id || !user?.accessToken) {
@@ -53,7 +53,8 @@ export function pcqRedirectMiddleware() {
     const pcqId = uuid();
 
     const partyId = encodeURIComponent(user.email || ''); //TODO: Might want to change partyId to IDAM ID instead.
-    const returnUrl = `${req.protocol}://${req.get('host')}/steps/user-journey/summary`;
+    // TODO: Update returnUrl to use the appropriate journey's summary step
+    const returnUrl = `${req.protocol}://${req.get('host')}/respond-to-claim/free-legal-advice`;
 
     const params = {
       serviceId,
@@ -80,7 +81,7 @@ export function pcqRedirectMiddleware() {
         },
       });
 
-      req.session.ccdCase = updatedCase;
+      res.locals.validatedCase = updatedCase;
     } catch (err) {
       logger.error('Failed to update CCD with PCQ ID:', err);
       return next();

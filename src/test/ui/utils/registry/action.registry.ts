@@ -1,8 +1,16 @@
-import { CreateCaseAPIAction, LoginAction, NavigateToUrlAction } from '../actions/custom-actions';
+import {
+  CreateCaseAPIAction,
+  FetchPINsAndValidateAccessCodeAPIAction,
+  LoginAction,
+  NavigateToUrlAction,
+  RespondToClaimAction,
+  TriggerErrorMessagesAction,
+} from '../actions/custom-actions';
 import {
   CheckAction,
   ClickButtonAction,
   ClickRadioButtonAction,
+  ClickSummaryAction,
   ClickTabAction,
   InputTextAction,
   SelectAction,
@@ -16,6 +24,7 @@ export class ActionRegistry {
   private static actions: Map<string, IAction> = new Map([
     ['check', new CheckAction()],
     ['clickButton', new ClickButtonAction()],
+    ['clickSummary', new ClickSummaryAction()],
     ['clickLink', new ClickLinkAction()],
     ['clickLinkAndVerifyNewTabTitle', new clickLinkAndVerifyNewTabTitleAction()],
     ['clickRadioButton', new ClickRadioButtonAction()],
@@ -24,10 +33,24 @@ export class ActionRegistry {
     ['select', new SelectAction()],
     ['UploadFile', new UploadFileAction()],
     ['login', new LoginAction()],
-    ['createUserAndLogin', new LoginAction()],
+    ['createUser', new LoginAction()],
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['selectLegalAdvice', new RespondToClaimAction()],
+    ['inputDefendantDetails', new RespondToClaimAction()],
+    ['enterDateOfBirthDetails', new RespondToClaimAction()],
+    ['inputErrorValidation', new RespondToClaimAction()],
+    ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['selectLegalAdvice', new RespondToClaimAction()],
+    ['inputDefendantDetails', new RespondToClaimAction()],
+    ['enterDateOfBirthDetails', new RespondToClaimAction()],
+    ['confirmDefendantDetails', new RespondToClaimAction()],
+    ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
+    ['disputeClaimInterstitial', new RespondToClaimAction()],
+    ['readPaymentInterstitial', new RespondToClaimAction()],
+    ['triggerErrorMessagesForValidation', new TriggerErrorMessagesAction()],
   ]);
 
   static getAction(actionName: string): IAction {

@@ -1,10 +1,13 @@
 import { Page, test } from '@playwright/test';
 
-import { actionData, actionRecord, validationData, validationRecord } from './interfaces';
+import { enable_content_validation, enable_error_message_validation } from '../../../../playwright.config';
+
+import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
+let startErrorMessageValidation = false;
 
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
@@ -21,7 +24,9 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-
+  if (executor.page.url().includes('free-legal-advice')) {
+    startErrorMessageValidation = true;
+  }
   const pageNavigated = currentUrl !== previousUrl;
 
   if (pageNavigated) {
@@ -32,10 +37,15 @@ async function detectPageNavigation(): Promise<boolean> {
 }
 
 async function validatePageIfNavigated(action: string): Promise<void> {
-  if (action.includes('click')) {
+  if (action.includes('click') || action.includes('navigate')) {
     const pageNavigated = await detectPageNavigation();
     if (pageNavigated) {
-      await performValidation('autoValidatePageContent');
+      if (enable_content_validation) {
+        await performValidation('autoValidatePageContent');
+      }
+      if (startErrorMessageValidation && enable_error_message_validation) {
+        await performAction('triggerErrorMessagesForValidation');
+      }
     }
   }
 }
@@ -60,7 +70,15 @@ export async function performAction(
     displayFieldName = displayValue;
   }
 
-  const stepText = `${action}${displayFieldName !== undefined ? ` - ${typeof displayFieldName === 'object' ? readValuesFromInputObjects(displayFieldName) : displayFieldName}` : ''}${displayValue !== undefined ? ` with value '${typeof displayValue === 'object' ? readValuesFromInputObjects(displayValue) : displayValue}'` : ''}`;
+  const stepText = `${action}${
+    displayFieldName !== undefined
+      ? ` - ${typeof displayFieldName === 'object' ? readValuesFromInputObjects(displayFieldName) : displayFieldName}`
+      : ''
+  }${
+    displayValue !== undefined
+      ? ` with value '${typeof displayValue === 'object' ? readValuesFromInputObjects(displayValue) : displayValue}'`
+      : ''
+  }`;
 
   await test.step(stepText, async () => {
     await actionInstance.execute(executor.page, action, fieldName, value);
@@ -83,8 +101,32 @@ export async function performValidation(
         : ['', inputFieldName];
 
   const validationInstance = ValidationRegistry.getValidation(validation);
-  await test.step(`Validated ${validation}${fieldName ? ` - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'` : ''}${data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''}`, async () => {
+  await test.step(`Validated ${validation}${
+    fieldName ? ` - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'` : ''
+  }${
+    data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''
+  }`, async () => {
     await validationInstance.validate(executor.page, validation, fieldName, data);
+  });
+}
+
+export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {
+  getExecutor();
+  await test.step(`Performed action group: ${groupName}`, async () => {
+    for (const action of actions) {
+      const [actionName, fieldName, value] = action;
+      await performAction(actionName, fieldName, value);
+    }
+  });
+}
+
+export async function performValidations(groupName: string, ...validations: validationTuple[]): Promise<void> {
+  getExecutor();
+  await test.step(`Performed validation group: ${groupName}`, async () => {
+    for (const validation of validations) {
+      const [validationType, fieldName, data] = validation;
+      await performValidation(validationType, fieldName, data);
+    }
   });
 }
 

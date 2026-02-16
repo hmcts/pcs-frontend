@@ -1,0 +1,21 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+
+{% for subField in subFields %}
+  {% if subField.component and subField.componentType %}
+    {% if subField.componentType == 'input' %}
+      {{ govukInput(subField.component) }}
+    {% elif subField.componentType == 'textarea' %}
+      {{ govukTextarea(subField.component) }}
+    {% elif subField.componentType == 'characterCount' %}
+      {{ govukCharacterCount(subField.component) }}
+    {% elif subField.componentType == 'postcodeLookup' %}
+      {% include "components/postcodeLookup.njk" %}
+    {% else %}
+      {# Default to input for unknown types #}
+      {{ govukInput(subField.component) }}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+

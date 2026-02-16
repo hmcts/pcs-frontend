@@ -9,31 +9,42 @@ jest.mock('@hmcts/nodejs-logging', () => ({
   },
 }));
 
-jest.mock('../../../main/app/utils/i18n', () => ({
-  getValidatedLanguage: jest.fn(() => 'en'),
+const mockGetValidatedLanguage = jest.fn((_req: unknown) => 'en');
+
+jest.mock('../../../main/modules/steps/i18n', () => ({
+  getValidatedLanguage: jest.fn((req: unknown) => mockGetValidatedLanguage(req)),
+}));
+
+jest.mock('../../../main/modules/i18n', () => ({
+  getValidatedLanguage: jest.fn((req: unknown) => mockGetValidatedLanguage(req)),
 }));
 
 const mockStepDependencyCheck = jest.fn((req, res, next) => next());
-jest.mock('../../../main/app/utils/stepFlow', () => ({
+jest.mock('../../../main/modules/steps/flow', () => ({
   stepDependencyCheckMiddleware: jest.fn(() => mockStepDependencyCheck),
 }));
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
-  ccdCaseMiddleware: jest.fn((req, res, next) => next()),
 }));
 
-jest.mock('../../../main/steps/userJourney/flow.config', () => ({
-  userJourneyFlowConfig: {
-    steps: {
-      'protected-step': { requiresAuth: true },
-      'unprotected-step': { requiresAuth: false },
-      'function-controller-step': { requiresAuth: true },
-      'middleware-step': { requiresAuth: true },
-    },
+const mockFlowConfig = {
+  basePath: '/respond-to-claim',
+  stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
+  steps: {
+    'protected-step': { requiresAuth: true },
+    'unprotected-step': { requiresAuth: false },
+    'function-controller-step': { requiresAuth: true },
+    'middleware-step': { requiresAuth: true },
   },
+};
+
+jest.mock('../../../main/steps/respond-to-claim/flow.config', () => ({
+  flowConfig: mockFlowConfig,
 }));
 
+// Create step objects that will be shared between mock and tests
+// These are defined before jest.mock so they're available when the mock factory runs
 const protectedStep = {
   url: '/steps/protected',
   name: 'protected-step',
@@ -63,24 +74,50 @@ const stepWithMiddleware = {
   middleware: [jest.fn((req, res, next) => next())],
 };
 
+const allSteps = [protectedStep, unprotectedStep, stepWithFunctionController, stepWithMiddleware];
+
+jest.mock('../../../main/steps', () => ({
+  journeyRegistry: {
+    respondToClaim: {
+      name: 'respondToClaim',
+      flowConfig: {
+        basePath: '/respond-to-claim',
+        stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
+        steps: {
+          'protected-step': { requiresAuth: true },
+          'unprotected-step': { requiresAuth: false },
+          'function-controller-step': { requiresAuth: true },
+          'middleware-step': { requiresAuth: true },
+        },
+      },
+      stepRegistry: {
+        'protected-step': protectedStep,
+        'unprotected-step': unprotectedStep,
+        'function-controller-step': stepWithFunctionController,
+        'middleware-step': stepWithMiddleware,
+      },
+    },
+  },
+  getStepsForJourney: jest.fn((journeyName: string) => {
+    if (journeyName === 'respondToClaim') {
+      return allSteps;
+    }
+    return [];
+  }),
+}));
+
+// Export step objects for use in tests
 const mockStepsData = {
   protectedStep,
   unprotectedStep,
   stepWithFunctionController,
   stepWithMiddleware,
-  allSteps: [protectedStep, unprotectedStep, stepWithFunctionController, stepWithMiddleware],
-  protectedSteps: [protectedStep],
+  allSteps,
 };
-
-jest.mock('../../../main/steps', () => ({
-  stepsWithContent: mockStepsData.allSteps,
-  protectedSteps: mockStepsData.protectedSteps,
-}));
 
 import { Application } from 'express';
 
-import { getValidatedLanguage } from '../../../main/app/utils/i18n';
-import { ccdCaseMiddleware, oidcMiddleware } from '../../../main/middleware';
+import { oidcMiddleware } from '../../../main/middleware';
 import registerSteps from '../../../main/routes/registerSteps';
 
 describe('registerSteps', () => {
@@ -130,20 +167,18 @@ describe('registerSteps', () => {
     const protectedGetCall = mockGet.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedGetCall).toBeDefined();
 
-    expect(protectedGetCall!).toHaveLength(5);
+    expect(protectedGetCall!).toHaveLength(4);
     expect(protectedGetCall![0]).toBe('/steps/protected');
     expect(protectedGetCall![1]).toBe(oidcMiddleware);
-    expect(protectedGetCall![2]).toBe(ccdCaseMiddleware);
-    expect(protectedGetCall![3]).toBe(mockStepDependencyCheck);
-    expect(typeof protectedGetCall![4]).toBe('function');
+    expect(protectedGetCall![2]).toBe(mockStepDependencyCheck);
+    expect(typeof protectedGetCall![3]).toBe('function');
 
     const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedPostCall).toBeDefined();
-    expect(protectedPostCall!).toHaveLength(4);
+    expect(protectedPostCall!).toHaveLength(3);
     expect(protectedPostCall![0]).toBe('/steps/protected');
     expect(protectedPostCall![1]).toBe(oidcMiddleware);
-    expect(protectedPostCall![2]).toBe(ccdCaseMiddleware);
-    expect(protectedPostCall![3]).toBe(mockStepsData.protectedStep.postController.post);
+    expect(protectedPostCall![2]).toBe(mockStepsData.protectedStep.postController.post);
   });
 
   it('registers GET and POST without middlewares for unprotected steps', () => {
@@ -179,13 +214,12 @@ describe('registerSteps', () => {
     const stepWithMiddlewareCall = mockGet.mock.calls.find(call => call[0] === '/steps/with-middleware');
 
     expect(stepWithMiddlewareCall).toBeDefined();
-    expect(stepWithMiddlewareCall!).toHaveLength(6);
+    expect(stepWithMiddlewareCall!).toHaveLength(5);
     expect(stepWithMiddlewareCall![0]).toBe('/steps/with-middleware');
     expect(stepWithMiddlewareCall![1]).toBe(oidcMiddleware);
-    expect(stepWithMiddlewareCall![2]).toBe(ccdCaseMiddleware);
-    expect(stepWithMiddlewareCall![3]).toBe(mockStepDependencyCheck);
-    expect(stepWithMiddlewareCall![4]).toBe(mockStepsData.stepWithMiddleware.middleware![0]);
-    expect(typeof stepWithMiddlewareCall![5]).toBe('function');
+    expect(stepWithMiddlewareCall![2]).toBe(mockStepDependencyCheck);
+    expect(stepWithMiddlewareCall![3]).toBe(mockStepsData.stepWithMiddleware.middleware![0]);
+    expect(typeof stepWithMiddlewareCall![4]).toBe('function');
   });
 
   it('calls getValidatedLanguage for each GET route', () => {
@@ -197,7 +231,7 @@ describe('registerSteps', () => {
 
     const { mockReq, mockRes } = executeHandler('/steps/unprotected', additionalProps);
 
-    expect(getValidatedLanguage).toHaveBeenCalledWith(mockReq);
+    expect(mockGetValidatedLanguage).toHaveBeenCalledWith(mockReq);
     expect(mockStepsData.unprotectedStep.getController.get).toHaveBeenCalledWith(mockReq, mockRes);
   });
 
@@ -213,6 +247,7 @@ describe('registerSteps', () => {
     expect(mockLogger.debug).toHaveBeenCalledWith('Language information', {
       url: '/steps/unprotected',
       step: 'unprotected-step',
+      journey: 'respondToClaim',
       validatedLang: 'en',
       reqLanguage: 'en',
       langCookie: 'en',
@@ -227,8 +262,9 @@ describe('registerSteps', () => {
     registerSteps(app);
 
     expect(mockLogger.info).toHaveBeenCalledWith('Steps registered successfully', {
+      totalJourneys: 1,
       totalSteps: 4,
-      protectedSteps: 3, // protected-step, function-controller-step, middleware-step (unprotected-step has requiresAuth: false)
+      totalProtectedSteps: 3, // protected-step, function-controller-step, middleware-step (unprotected-step has requiresAuth: false)
     });
   });
 
@@ -238,14 +274,28 @@ describe('registerSteps', () => {
       post: jest.fn(),
     } as unknown as Application;
 
+    const stepWithoutControllers = {
+      url: '/steps/no-controllers',
+      name: 'no-controllers',
+    };
+
     jest.doMock('../../../main/steps', () => ({
-      stepsWithContent: [
-        {
-          url: '/steps/no-controllers',
-          name: 'no-controllers',
+      journeyRegistry: {
+        respondToClaim: {
+          name: 'respondToClaim',
+          flowConfig: {
+            basePath: '/respond-to-claim',
+            stepOrder: ['no-controllers'],
+            steps: {
+              'no-controllers': { requiresAuth: true },
+            },
+          },
+          stepRegistry: {
+            'no-controllers': stepWithoutControllers,
+          },
         },
-      ],
-      protectedSteps: [],
+      },
+      getStepsForJourney: jest.fn(() => [stepWithoutControllers]),
     }));
 
     jest.resetModules();

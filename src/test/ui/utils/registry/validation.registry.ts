@@ -3,6 +3,7 @@ import {
   BannerAlertValidation,
   ErrorMessageValidation,
   FormLabelValueValidation,
+  InputErrorValidation,
   MainHeaderValidation,
   OptionListValidation,
   RadioButtonValidation,
@@ -19,6 +20,7 @@ export class ValidationRegistry {
     ['optionList', new OptionListValidation()],
     ['mainHeader', new MainHeaderValidation()],
     ['errorMessage', new ErrorMessageValidation()],
+    ['inputError', new InputErrorValidation()],
     ['radioButtonChecked', new RadioButtonValidation()],
     ['elementToBeVisible', new VisibilityValidation()],
     ['elementNotToBeVisible', new VisibilityValidation()],
@@ -30,7 +32,9 @@ export class ValidationRegistry {
     const validation = this.validations.get(validationType);
     if (!validation) {
       throw new Error(
-        `Validation '${validationType}' is not registered. Available validations: ${Array.from(this.validations.keys()).join(', ')}`
+        `Validation '${validationType}' is not registered. Available validations: ${Array.from(
+          this.validations.keys()
+        ).join(', ')}`
       );
     }
     return validation;

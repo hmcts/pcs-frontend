@@ -7,7 +7,7 @@ describe('createToken', () => {
     actor: 'APPLICANT',
     pcqId: 'abc-123',
     partyId: 'user%40email.com',
-    returnUrl: 'http://localhost:3000/steps/user-journey/summary',
+    returnUrl: 'http://localhost:3000/respond-to-claim/free-legal-advice',
     language: 'en',
     ccdCaseId: '1234567890',
   };

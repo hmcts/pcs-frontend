@@ -1,5 +1,6 @@
-{% extends "template.njk" %}
+{% extends "stepsTemplate.njk" %}
 
-{% block content %}
-  <h1 class="govuk-heading-xl">Something went wrong</h1>
+{% block mainContent %}
+  <h1 class="govuk-heading-l">{{ errorTitle or t('errorPages.500.title') or "Something went wrong" }}</h1>
+  <p class="govuk-body">{{ errorParagraph or t('errorPages.500.paragraph') or "An error occurred while processing your request." }}</p>
 {% endblock %}

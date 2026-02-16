@@ -1,0 +1,91 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
+{% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+
+{% block serviceNavigation %}
+  {# Service navigation without serviceName on start now page - only logout button #}
+  {{ govukServiceNavigation({
+    navigation: [
+      {
+        text: t('logout', 'Sign out'),
+        href: "/logout"
+      }
+    ],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if secondaryHeading %}
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-0 claim-journey-secondary-heading">{{ secondaryHeading }}</h2>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+
+  <p class="govuk-body">{{ description | safe }}</p>
+
+  <h2 class="govuk-heading-m">{{completingYourResponse}}</h2>
+
+  <p class="govuk-body">
+  {{saveDraftInfo}}
+  </p>
+
+  <p class="govuk-body">
+  {{uploadDocumentsInfo}}
+  </p>
+
+  <p class="govuk-body">
+  {{claimantVisibilityInfo}}
+  </p>
+
+  <h2 class="govuk-heading-m">{{whatYouWillNeed}}</h2>
+
+  <p class="govuk-body">
+  {{provideDetailsInfo}}
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{listItemName}}</li>
+    <li>{{listItemDateOfBirth}}</li>
+    <li>{{listItemDependants}}</li>
+    <li>{{listItemCircumstances}}</li>
+  </ul>
+
+  <p class="govuk-body">
+  {{shareDetailsInfo}}
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{listItemIncomeExpenses}}</li>
+    <li>{{listItemPriorityDebts}}</li>
+  </ul>
+
+  <p class="govuk-body">
+  {{financialSituationInfo}}
+  </p>
+
+
+  <h2 class="govuk-heading-m">{{supportToUseHmctsServices}}</h2>
+
+  <p class="govuk-body">
+  {{hmctsSupportInfo}}
+  </p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.startNow', 'Start now'),
+        isStartButton: true,
+        attributes: { type: 'submit' }
+      }) }}
+    </div>
+  </form>
+{% endblock %}
+

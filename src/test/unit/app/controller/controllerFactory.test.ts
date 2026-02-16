@@ -1,28 +1,40 @@
 import type { Request } from 'express';
+import type { TFunction } from 'i18next';
 
 import {
   GetController,
   createGetController,
   createPostController,
   createPostRedirectController,
-  validateAndStoreForm,
-} from '../../../../main/app/controller/controllerFactory';
-import { getFormData, setFormData, validateForm } from '../../../../main/app/controller/formHelpers';
+} from '../../../../main/modules/steps/controller';
 
-jest.mock('../../../../main/app/controller/formHelpers');
-jest.mock('../../../../main/app/utils/i18n', () => ({
-  getValidatedLanguage: jest.fn(() => 'en'),
+const mockGetFormData = jest.fn();
+const mockSetFormData = jest.fn();
+const mockValidateForm = jest.fn();
+
+jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
+  getFormData: (...args: unknown[]) => mockGetFormData(...args),
+  setFormData: (...args: unknown[]) => mockSetFormData(...args),
+  validateForm: (...args: unknown[]) => mockValidateForm(...args),
 }));
-jest.mock('../../../../main/app/utils/stepFlow', () => ({
+
+const mockGetRequestLanguage = jest.fn();
+const mockGetTranslationFunction = jest.fn();
+
+jest.mock('../../../../main/modules/steps/i18n', () => ({
+  getValidatedLanguage: jest.fn(() => 'en'),
+  getRequestLanguage: (...args: unknown[]) => mockGetRequestLanguage(...args),
+  getTranslationFunction: (...args: unknown[]) => mockGetTranslationFunction(...args),
+  getStepNamespace: jest.fn((stepName: string) => stepName),
+  getStepTranslations: jest.fn(() => ({})),
+  loadStepNamespace: jest.fn(),
+}));
+jest.mock('../../../../main/modules/steps/flow', () => ({
   stepNavigation: {
-    getBackUrl: jest.fn(() => null),
-    getNextStepUrl: jest.fn(() => '/next-step'),
+    getBackUrl: jest.fn(() => Promise.resolve(null)),
+    getNextStepUrl: jest.fn(() => Promise.resolve('/next-step')),
   },
 }));
-
-const mockGetFormData = getFormData as jest.Mock;
-const mockSetFormData = setFormData as jest.Mock;
-const mockValidateForm = validateForm as jest.Mock;
 describe('createGetController', () => {
   const mockContent = {
     serviceName: 'Test Service',
@@ -32,77 +44,150 @@ describe('createGetController', () => {
   const stepName = 'page1';
   const viewPath = 'steps/page1.njk';
 
-  const mockGenerateContent = jest.fn((_lang?: string) => mockContent);
+  const mockExtendContent = jest.fn((_req: Request) => mockContent);
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGenerateContent.mockReturnValue(mockContent);
+    mockExtendContent.mockReturnValue(mockContent);
+    mockGetRequestLanguage.mockImplementation((req: Request) => req.language || 'en');
+    mockGetTranslationFunction.mockImplementation((req: Request) => {
+      // Use req.t if available, otherwise create a mock that returns values different from keys
+      // so getCommonTranslations will include them
+      if (req.t) {
+        return req.t as TFunction;
+      }
+      return jest.fn((key: string) => {
+        // Return actual values for common translation keys (values must differ from keys)
+        const commonKeys: Record<string, string> = {
+          serviceName: 'Test Service',
+          phase: 'ALPHA', // Different from key
+          feedback: 'Feedback text', // Different from key
+          back: 'Back', // Different from key
+          languageToggle: 'Language toggle', // Different from key
+          contactUsForHelp: 'Contact us', // Different from key
+          contactUsForHelpText: 'Contact text', // Different from key
+        };
+        return commonKeys[key] || key;
+      }) as unknown as TFunction;
+    });
   });
 
-  it('should merge content with form data from session when available', () => {
+  it('should merge content with form data from session when available', async () => {
+    const mockT = jest.fn((key: string) => {
+      // Return actual translation values for common keys
+      const translations: Record<string, string> = {
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      };
+      return translations[key] || key;
+    });
     const req = {
       body: {},
       originalUrl: '/',
       query: { lang: 'en' },
+      language: 'en',
       session: { formData: { [stepName]: { answer: 'sessionAnswer', choices: ['choice1'] } } },
+      t: mockT,
+      i18n: undefined,
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { render: jest.fn() } as any;
 
     mockGetFormData.mockReturnValue({ answer: 'sessionAnswer', choices: ['choice1'] });
 
-    const controller = createGetController(viewPath, stepName, mockGenerateContent);
-    controller.get(req, res);
+    const controller = createGetController(viewPath, stepName, mockExtendContent);
+    await controller.get(req, res);
 
-    expect(mockGenerateContent).toHaveBeenCalledWith('en');
+    expect(mockExtendContent).toHaveBeenCalledWith(req);
     expect(mockGetFormData).toHaveBeenCalledWith(req, 'page1');
-    expect(res.render).toHaveBeenCalledWith(viewPath, {
-      ...mockContent,
-      selected: 'sessionAnswer',
-      answer: 'sessionAnswer',
-      choices: ['choice1'],
-      error: undefined,
-      lang: 'en',
-      pageUrl: '/',
-      t: undefined,
-      backUrl: null,
-    });
+    expect(res.render).toHaveBeenCalledWith(
+      viewPath,
+      expect.objectContaining({
+        ...mockContent,
+        selected: 'sessionAnswer',
+        answer: 'sessionAnswer',
+        choices: ['choice1'],
+        lang: 'en',
+        pageUrl: '/',
+        backUrl: null,
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      })
+    );
   });
 
-  it('should prioritize post data over session data', () => {
+  it('should prioritize post data over session data', async () => {
+    const mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      };
+      return translations[key] || key;
+    }) as unknown as TFunction;
     const req = {
       body: { answer: 'postAnswer', error: 'Test error' },
       originalUrl: '/',
       query: { lang: 'en' },
+      language: 'en',
       session: { formData: { [stepName]: { answer: 'sessionAnswer' } } },
+      t: mockT,
+      i18n: undefined,
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { render: jest.fn() } as any;
 
     mockGetFormData.mockReturnValue({ answer: 'sessionAnswer' });
 
-    const controller = createGetController(viewPath, stepName, mockGenerateContent);
-    controller.get(req, res);
+    const controller = createGetController(viewPath, stepName, mockExtendContent);
+    await controller.get(req, res);
 
-    expect(mockGenerateContent).toHaveBeenCalledWith('en');
-    expect(res.render).toHaveBeenCalledWith(viewPath, {
-      ...mockContent,
-      selected: 'sessionAnswer',
-      answer: 'postAnswer',
-      choices: undefined,
-      error: 'Test error',
-      lang: 'en',
-      pageUrl: '/',
-      t: undefined,
-      backUrl: null,
-    });
+    expect(mockExtendContent).toHaveBeenCalledWith(req);
+    expect(res.render).toHaveBeenCalledWith(
+      viewPath,
+      expect.objectContaining({
+        ...mockContent,
+        selected: 'sessionAnswer',
+        answer: 'postAnswer',
+        error: 'Test error',
+        lang: 'en',
+        pageUrl: '/',
+        backUrl: null,
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      })
+    );
   });
 
-  it('should handle undefined req.body', () => {
+  it('should handle undefined req.body', async () => {
+    const mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      };
+      return translations[key] || key;
+    }) as unknown as TFunction;
     const req = {
       originalUrl: '/',
       query: { lang: 'en' },
+      language: 'en',
       session: {},
+      t: mockT,
+      i18n: undefined,
     } as unknown as Request;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -110,40 +195,47 @@ describe('createGetController', () => {
 
     mockGetFormData.mockReturnValue({});
 
-    const controller = createGetController(viewPath, stepName, mockGenerateContent);
-    controller.get(req, res);
+    const controller = createGetController(viewPath, stepName, mockExtendContent);
+    await controller.get(req, res);
 
-    expect(mockGenerateContent).toHaveBeenCalledWith('en');
-    expect(res.render).toHaveBeenCalledWith(viewPath, {
-      ...mockContent,
-      selected: undefined,
-      answer: undefined,
-      choices: undefined,
-      error: undefined,
-      lang: 'en',
-      pageUrl: '/',
-      t: undefined,
-      backUrl: null,
-    });
+    expect(mockExtendContent).toHaveBeenCalledWith(req);
+    expect(res.render).toHaveBeenCalledWith(
+      viewPath,
+      expect.objectContaining({
+        ...mockContent,
+        lang: 'en',
+        pageUrl: '/',
+        backUrl: null,
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        feedback: 'Feedback text',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      })
+    );
   });
 
-  it('should call extendContent when provided', () => {
+  it('should call extendContent when provided', async () => {
+    const mockT = jest.fn((key: string) => key);
     const req = {
       body: {},
       originalUrl: '/',
       query: { lang: 'en' },
+      language: 'en',
       session: {},
+      t: mockT,
+      i18n: undefined,
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { render: jest.fn() } as any;
 
-    const extendContent = jest.fn((_req, content) => ({ extended: true, ...content }));
+    const extendContent = jest.fn((_req: Request) => ({ extended: true, ...mockContent }));
     mockGetFormData.mockReturnValue({});
 
-    const controller = createGetController(viewPath, stepName, mockGenerateContent, extendContent);
-    controller.get(req, res);
+    const controller = createGetController(viewPath, stepName, extendContent);
+    await controller.get(req, res);
 
-    expect(extendContent).toHaveBeenCalledWith(req, mockContent);
+    expect(extendContent).toHaveBeenCalledWith(req);
     expect(res.render).toHaveBeenCalledWith(
       viewPath,
       expect.objectContaining({
@@ -154,14 +246,14 @@ describe('createGetController', () => {
 });
 
 describe('GetController', () => {
-  it('should render view with generated content', () => {
+  it('should render view with generated content', async () => {
     const mockGenerateContent = jest.fn(() => ({ title: 'Test' }));
     const controller = new GetController('test.njk', mockGenerateContent);
     const req = {} as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { render: jest.fn() } as any;
 
-    controller.get(req, res);
+    await controller.get(req, res);
 
     expect(mockGenerateContent).toHaveBeenCalledWith(req);
     expect(res.render).toHaveBeenCalledWith('test.njk', { title: 'Test' });
@@ -184,7 +276,6 @@ describe('createPostRedirectController', () => {
 describe('createPostController', () => {
   const stepName = 'test-step';
   const view = 'steps/test.njk';
-  const mockGenerateContent = jest.fn(() => ({ title: 'Test' }));
   const mockGetFields = jest.fn(() => []);
 
   beforeEach(() => {
@@ -196,37 +287,53 @@ describe('createPostController', () => {
   it('should validate form and return errors when validation fails', async () => {
     const errors = { field1: 'Error message' };
     mockValidateForm.mockReturnValue(errors);
+    const mockT = jest.fn((key: string) => key);
 
-    const controller = createPostController(stepName, mockGenerateContent, mockGetFields, view);
+    const controller = createPostController(stepName, mockGetFields, view);
     const req = {
       body: { field1: '' },
+      language: 'en',
+      originalUrl: '/',
       session: {},
+      t: mockT,
+      i18n: undefined,
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(mockValidateForm).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.render).toHaveBeenCalledWith(view, {
-      title: 'Test',
-      field1: '',
-      error: { field: 'field1', text: 'Error message' },
-    });
+    expect(res.render).toHaveBeenCalledWith(
+      view,
+      expect.objectContaining({
+        field1: '',
+        error: { field: 'field1', text: 'Error message' },
+        lang: 'en',
+        pageUrl: '/',
+        backUrl: null,
+      })
+    );
   });
 
   it('should save form data and redirect when validation passes', async () => {
-    const { stepNavigation } = require('../../../../main/app/utils/stepFlow');
-    const controller = createPostController(stepName, mockGenerateContent, mockGetFields, view);
+    const { stepNavigation } = require('../../../../main/modules/steps/flow');
+    const mockT = jest.fn((key: string) => key);
+    const controller = createPostController(stepName, mockGetFields, view);
     const req = {
       body: { field1: 'value1' },
+      language: 'en',
       session: {},
+      t: mockT,
+      i18n: undefined,
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { redirect: jest.fn() } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(mockSetFormData).toHaveBeenCalledWith(req, stepName, { field1: 'value1' });
     expect(stepNavigation.getNextStepUrl).toHaveBeenCalledWith(req, stepName, { field1: 'value1' });
@@ -234,151 +341,66 @@ describe('createPostController', () => {
   });
 
   it('should execute beforeRedirect callback when provided', async () => {
+    const mockT = jest.fn((key: string) => key);
     const beforeRedirect = jest.fn();
-    const controller = createPostController(stepName, mockGenerateContent, mockGetFields, view, beforeRedirect);
+    const controller = createPostController(stepName, mockGetFields, view, beforeRedirect);
     const req = {
       body: { field1: 'value1' },
+      language: 'en',
       session: {},
+      t: mockT,
+      i18n: undefined,
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { redirect: jest.fn(), headersSent: false } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(beforeRedirect).toHaveBeenCalledWith(req, res);
   });
 
   it('should not redirect if beforeRedirect sends response', async () => {
+    const mockT = jest.fn((key: string) => key);
     const beforeRedirect = jest.fn();
-    const controller = createPostController(stepName, mockGenerateContent, mockGetFields, view, beforeRedirect);
+    const controller = createPostController(stepName, mockGetFields, view, beforeRedirect);
     const req = {
       body: { field1: 'value1' },
+      language: 'en',
       session: {},
+      t: mockT,
+      i18n: undefined,
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { redirect: jest.fn(), headersSent: true } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(beforeRedirect).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
   it('should return 500 when next step cannot be determined', async () => {
-    const { stepNavigation } = require('../../../../main/app/utils/stepFlow');
-    stepNavigation.getNextStepUrl.mockReturnValue(null);
+    const { stepNavigation } = require('../../../../main/modules/steps/flow');
+    stepNavigation.getNextStepUrl.mockResolvedValue(null);
+    const mockT = jest.fn((key: string) => key);
 
-    const controller = createPostController(stepName, mockGenerateContent, mockGetFields, view);
+    const controller = createPostController(stepName, mockGetFields, view);
     const req = {
       body: { field1: 'value1' },
+      language: 'en',
       session: {},
+      t: mockT,
+      i18n: undefined,
     } as unknown as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { status: jest.fn().mockReturnThis(), send: jest.fn() } as any;
+    const next = jest.fn();
 
-    await controller.post(req, res);
+    await controller.post(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith('Unable to determine next step');
-  });
-});
-
-describe('validateAndStoreForm', () => {
-  const stepName = 'test-step';
-  const fields = [
-    { name: 'field1', type: 'text' as const, required: true },
-    { name: 'field2', type: 'text' as const, required: false },
-  ];
-  const content = { title: 'Test' };
-  const templatePath = 'steps/test.njk';
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockValidateForm.mockReturnValue({});
-  });
-
-  it('should render error when validation fails', () => {
-    const errors = { field1: 'Error message' };
-    mockValidateForm.mockReturnValue(errors);
-
-    const controller = validateAndStoreForm(stepName, fields, '/next', content, templatePath);
-    const req = {
-      body: { field1: '' },
-      session: {},
-    } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
-
-    controller.post(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.render).toHaveBeenCalledWith(templatePath, {
-      title: 'Test',
-      field1: '',
-      error: 'Error message',
-    });
-  });
-
-  it('should use default template path when not provided', () => {
-    const errors = { field1: 'Error message' };
-    mockValidateForm.mockReturnValue(errors);
-
-    const controller = validateAndStoreForm(stepName, fields, '/next', content);
-    const req = {
-      body: { field1: '' },
-      session: {},
-    } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
-
-    controller.post(req, res);
-
-    expect(res.render).toHaveBeenCalledWith('steps/test-step.njk', expect.any(Object));
-  });
-
-  it('should convert single checkbox value to array', () => {
-    const checkboxFields = [{ name: 'checkbox1', type: 'checkbox' as const, required: false }];
-    const controller = validateAndStoreForm(stepName, checkboxFields, '/next');
-    const req = {
-      body: { checkbox1: 'value1' },
-      session: {},
-    } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-
-    controller.post(req, res);
-
-    expect(req.body.checkbox1).toEqual(['value1']);
-    expect(mockSetFormData).toHaveBeenCalled();
-  });
-
-  it('should redirect to static URL', () => {
-    const controller = validateAndStoreForm(stepName, fields, '/next-page');
-    const req = {
-      body: { field1: 'value1' },
-      session: {},
-    } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-
-    controller.post(req, res);
-
-    expect(res.redirect).toHaveBeenCalledWith('/next-page');
-  });
-
-  it('should redirect to dynamic URL from function', () => {
-    const nextPageFn = jest.fn(body => `/next/${body.field1}`);
-    const controller = validateAndStoreForm(stepName, fields, nextPageFn);
-    const req = {
-      body: { field1: 'value1' },
-      session: {},
-    } as unknown as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-
-    controller.post(req, res);
-
-    expect(nextPageFn).toHaveBeenCalledWith({ field1: 'value1' });
-    expect(res.redirect).toHaveBeenCalledWith('/next/value1');
   });
 });
