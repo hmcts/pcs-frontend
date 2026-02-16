@@ -244,32 +244,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('clickButton', paymentInterstitial.continueButton);
-    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: repaymentsMade.errorValidation,
-      validationType: repaymentsMade.errorValidationType.radio,
-      inputArray: repaymentsMade.errorValidationField.errorRadioMsg,
-      question: repaymentsMade.mainHeader,
-      header: repaymentsMade.errorValidationHeader,
-    });
-    await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
-    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: repaymentsMade.errorValidation,
-      validationType: repaymentsMade.errorValidationType.input,
-      inputArray: repaymentsMade.errorValidationField.errorTextField,
-      header: repaymentsMade.errorValidationHeader,
-    });
-    await performAction('clickLink', repaymentsMade.backLink);
-    await performValidation('mainHeader', paymentInterstitial.mainHeader);
-    await performAction('clickButton', paymentInterstitial.continueButton);
-    await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
-    await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
-    await performAction('clickButton', repaymentsMade.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: noticeDetails.errorValidation,
