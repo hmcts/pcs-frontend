@@ -162,7 +162,7 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
   const keys = path.split('.');
   const result: Record<string, unknown> = {};
 
-  keys.reduce((acc, key, index) => {
+  void keys.reduce((acc, key, index) => {
     if (index === keys.length - 1) {
       acc[key] = value;
     } else {
