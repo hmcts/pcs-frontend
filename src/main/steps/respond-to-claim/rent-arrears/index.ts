@@ -22,7 +22,6 @@ export const step: StepDefinition = createFormStep({
 
     const t = getTranslationFunction(req, 'rent-arrears', ['common']);
 
-    // i18next automatically interpolates variables and applies formatters in translation strings
     const insetIntroText = t('insetIntroText');
     const insetDetailsText = t('insetDetailsText', { claimantName });
     const insetConditionalYesText = t('insetConditionalYesText');
@@ -60,18 +59,19 @@ export const step: StepDefinition = createFormStep({
               type: 'text',
               required: true,
               // Require a numeric amount in 00.00 format (e.g. 123.45)
-              pattern: '^\\d{1,10}\\.\\d{2}$',
+              // pattern: '^\\d{1,10}\\.\\d{2}$',
+              pattern: '^[0-9]*$',
               errorMessage: 'errors.rentArrears.rentArrearsAmount',
               translationKey: {
                 label: 'rentArrearsAmountCorrection.label',
+                hint: 'rentArrearsAmountCorrection.hint',
               },
               classes: 'govuk-input--width-10',
               prefix: {
                 text: '£',
               },
               attributes: {
-                // inputmode: 'decimal',
-                inputmode: 'numeric',
+                inputmode: 'text',
                 spellcheck: false,
               },
               // Enforce maximum of £1,000,000,000.00
