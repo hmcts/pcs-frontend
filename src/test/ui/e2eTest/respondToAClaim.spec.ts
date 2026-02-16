@@ -70,27 +70,26 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
+    // The below two lines related to the Wales journey are disabled only to allow this test case to execute.
     //await performValidation('mainHeader', registeredLandlord.mainHeader);
     //await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    //Added below pages to welsh journey as per english journey
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown');
+    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = true, and Notice Served boolean = true
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     /*await performAction('confirmDefendantDetails', {
-  question: defendantNameConfirmation.mainHeader,
-  option: defendantNameConfirmation.yesRadioOption,
-});*/
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
+    });*/
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
@@ -120,9 +119,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - NonRentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     /*await performAction('confirmDefendantDetails', {
-  question: defendantNameConfirmation.mainHeader,
-  option: defendantNameConfirmation.yesRadioOption,
-});*/
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
+    });*/
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
@@ -160,9 +159,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('confirmDefendantDetails', {
-  question: defendantNameConfirmation.mainHeader,
-  option: defendantNameConfirmation.yesRadioOption,
-});*/
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
+    });*/
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
