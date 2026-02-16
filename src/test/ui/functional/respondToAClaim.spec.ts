@@ -15,12 +15,8 @@ import {
   noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
-<<<<<<< Automation-HDPI-3523
-  repaymentsMade,
-=======
   rentArrearsDispute,
-  repayments,
->>>>>>> HDPI-3523-Repayments-made-screens
+  repaymentsMade,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
@@ -226,15 +222,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-<<<<<<< Automation-HDPI-3523
-  test('madeRepayments - mandatory selection, mandatory text box,save for later and back link ', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-=======
   test('Notice Details - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
->>>>>>> HDPI-3523-Repayments-made-screens
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
@@ -252,7 +243,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-<<<<<<< Automation-HDPI-3523
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickButton', paymentInterstitial.continueButton);
@@ -279,7 +269,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
     await performAction('clickButton', repaymentsMade.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
-=======
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: noticeDetails.errorValidation,
@@ -403,8 +392,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performValidation('mainHeader', repaymentsMade.mainHeader);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = true, and Notice Served boolean = true
@@ -445,8 +434,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performValidation('mainHeader', repaymentsMade.mainHeader);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
@@ -484,8 +473,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performValidation('mainHeader', repaymentsMade.mainHeader);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
@@ -520,8 +509,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performValidation('mainHeader', repaymentsMade.mainHeader);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
@@ -556,8 +545,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performValidation('mainHeader', repaymentsMade.mainHeader);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
@@ -599,8 +588,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performValidation('mainHeader', repaymentsMade.mainHeader);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = false
@@ -630,8 +619,54 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
->>>>>>> HDPI-3523-Repayments-made-screens
+    await performValidation('mainHeader', repaymentsMade.mainHeader);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  });
+
+  test('madeRepayments - mandatory selection, mandatory text box,save for later and back link ', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddressKnown.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('clickButton', paymentInterstitial.continueButton);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: repaymentsMade.errorValidation,
+      validationType: repaymentsMade.errorValidationType.radio,
+      inputArray: repaymentsMade.errorValidationField.errorRadioMsg,
+      question: repaymentsMade.mainHeader,
+      header: repaymentsMade.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: repaymentsMade.errorValidation,
+      validationType: repaymentsMade.errorValidationType.input,
+      inputArray: repaymentsMade.errorValidationField.errorTextField,
+      header: repaymentsMade.errorValidationHeader,
+    });
+    await performAction('clickLink', repaymentsMade.backLink);
+    await performValidation('mainHeader', paymentInterstitial.mainHeader);
+    await performAction('clickButton', paymentInterstitial.continueButton);
+    await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
+    await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
+    await performAction('clickButton', repaymentsMade.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
   });
 });
