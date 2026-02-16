@@ -10,11 +10,11 @@
   <form method="post" action="{{ url }}">
     <div class="govuk-button-group">
       {{ govukButton({
-        text: continue,
+        text: buttons.continue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
       {{ govukButton({
-        text: saveForLater,
+        text: buttons.saveForLater,
         classes: 'govuk-button--secondary',
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
