@@ -1,10 +1,12 @@
 import { Page } from '@playwright/test';
 
+import { submitCaseApiData } from '../../../data/api-data';
 import {
   correspondenceAddressKnown,
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
+  disputeClaimInterstitial,
   freeLegalAdvice,
   noticeDateKnown,
   noticeDateUnknown,
@@ -13,7 +15,7 @@ import {
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
-
+export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -27,6 +29,7 @@ export class RespondToClaimAction implements IAction {
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
+      ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -81,6 +84,19 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  }
+
+  private async disputeClaimInterstitial(isClaimantNameCorrect: actionData) {
+    if (isClaimantNameCorrect === 'YES') {
+      claimantsName = submitCaseApiData.submitCasePayload.claimantName;
+    } else {
+      claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
+    }
+    const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
+    const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
+    await performValidation('text', { elementType: 'heading', text: mainHeader });
+    await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
   private async readPaymentInterstitial(): Promise<void> {
