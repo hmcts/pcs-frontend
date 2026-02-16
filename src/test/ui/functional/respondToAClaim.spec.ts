@@ -674,7 +674,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', paymentInterstitial.continueButton);
     await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
     await performValidation('elementToBeVisible', repaymentsMade.youHave500CharactersHiddenHintText);
-    await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsCharLimitInputText);
+    await performAction(
+      'inputText',
+      repaymentsMade.giveDetailsHiddenTextLabel,
+      repaymentsMade.detailsCharLimitInputText
+    );
     await performValidation('elementToBeVisible', repaymentsMade.tooManyCharacterHiddenHintText);
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
     await performAction('inputErrorValidation', {
