@@ -11,7 +11,17 @@ jest.mock('@hmcts/nodejs-logging', () => ({
   },
 }));
 
-import { dateToISO, multipleYesNo, passThrough, yesNoEnum } from '../../../main/middleware/autoSaveDraftToCCD';
+import type { Request, Response } from 'express';
+
+import {
+  autoSaveDraftToCCD,
+  autoSaveToCCD,
+  dateToISO,
+  multipleYesNo,
+  passThrough,
+  yesNoEnum,
+} from '../../../main/middleware/autoSaveDraftToCCD';
+import { ccdCaseService } from '../../../main/services/ccdCaseService';
 
 describe('autoSaveDraftToCCD value mappers', () => {
   beforeEach(() => {
@@ -181,6 +191,273 @@ describe('autoSaveDraftToCCD value mappers', () => {
       mapper({ not: 'array' });
 
       expect(mockLogger.warn).toHaveBeenCalledWith('multipleYesNo expects an array, received:', 'object');
+    });
+  });
+
+  describe('dateToISO invalid dates', () => {
+    it('should return empty object for invalid date', () => {
+      const mapper = dateToISO('testDate');
+      expect(mapper({ day: '32', month: '13', year: '2024' })).toEqual({});
+    });
+
+    it('should log warning for invalid date', () => {
+      const mapper = dateToISO('testDate');
+      mapper({ day: '32', month: '01', year: '2024' });
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Invalid date'));
+    });
+
+    it('should return empty object for array input', () => {
+      const mapper = dateToISO('testDate');
+      expect(mapper(['2024', '03', '15'])).toEqual({});
+    });
+
+    it('should log warning for array input', () => {
+      const mapper = dateToISO('testDate');
+      mapper(['2024', '03', '15']);
+
+      expect(mockLogger.warn).toHaveBeenCalledWith('dateToISO expects an object, received:', 'object');
+    });
+  });
+
+  describe('passThrough with array input', () => {
+    it('should return empty object for array input', () => {
+      const mapper = passThrough(['field1']);
+      expect(mapper(['value1', 'value2'])).toEqual({});
+    });
+
+    it('should log warning for array input', () => {
+      const mapper = passThrough(['field1']);
+      mapper(['value1']);
+
+      expect(mockLogger.warn).toHaveBeenCalledWith('passThrough expects an object, received:', 'object');
+    });
+  });
+});
+
+jest.mock('../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    updateCase: jest.fn(),
+  },
+}));
+
+describe('autoSaveToCCD main function', () => {
+  const mockUpdateCase = ccdCaseService.updateCase as jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('autoSaveToCCD', () => {
+    it('should skip auto-save when step is not configured', async () => {
+      const req = {
+        session: {
+          formData: {
+            'unconfigured-step': { field: 'value' },
+          },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456' },
+        },
+      } as unknown as Response;
+
+      await autoSaveToCCD(req, res, 'unconfigured-step');
+
+      expect(mockLogger.debug).toHaveBeenCalledWith(
+        '[unconfigured-step] No CCD mapping configured, skipping auto-save'
+      );
+      expect(mockUpdateCase).not.toHaveBeenCalled();
+    });
+
+    it('should skip auto-save when form data is missing', async () => {
+      const req = {
+        session: {
+          formData: {},
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456' },
+        },
+      } as unknown as Response;
+
+      await autoSaveToCCD(req, res, 'free-legal-advice');
+
+      expect(mockLogger.debug).toHaveBeenCalledWith('[free-legal-advice] No form data in session, skipping auto-save');
+      expect(mockUpdateCase).not.toHaveBeenCalled();
+    });
+
+    it('should skip auto-save when form data is empty object', async () => {
+      const req = {
+        session: {
+          formData: {
+            'free-legal-advice': {},
+          },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456' },
+        },
+      } as unknown as Response;
+
+      await autoSaveToCCD(req, res, 'free-legal-advice');
+
+      expect(mockLogger.debug).toHaveBeenCalledWith('[free-legal-advice] No form data in session, skipping auto-save');
+      expect(mockUpdateCase).not.toHaveBeenCalled();
+    });
+
+    it('should skip auto-save when validated case is missing', async () => {
+      const req = {
+        session: {
+          formData: {
+            'free-legal-advice': { hadLegalAdvice: 'yes' },
+          },
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: {},
+      } as unknown as Response;
+
+      await autoSaveToCCD(req, res, 'free-legal-advice');
+
+      expect(mockLogger.warn).toHaveBeenCalledWith('[free-legal-advice] No validated case, skipping draft save');
+      expect(mockUpdateCase).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when access token is missing', async () => {
+      const req = {
+        session: {
+          formData: {
+            'free-legal-advice': { hadLegalAdvice: 'yes' },
+          },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456' },
+        },
+      } as unknown as Response;
+
+      await expect(autoSaveToCCD(req, res, 'free-legal-advice')).rejects.toThrow(
+        'No access token available for CCD update'
+      );
+      expect(mockLogger.error).toHaveBeenCalledWith('[free-legal-advice] No access token in session');
+    });
+
+    it('should save to CCD successfully with frontendField', async () => {
+      mockUpdateCase.mockResolvedValueOnce({
+        id: '1234567890123456',
+        data: { possessionClaimResponse: { defendantResponses: { receivedFreeLegalAdvice: 'YES' } } },
+      });
+
+      const req = {
+        session: {
+          formData: {
+            'free-legal-advice': { hadLegalAdvice: 'yes' },
+          },
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456' },
+        },
+      } as unknown as Response;
+
+      await autoSaveToCCD(req, res, 'free-legal-advice');
+
+      expect(mockUpdateCase).toHaveBeenCalledWith('mock-token', {
+        id: '1234567890123456',
+        data: {
+          submitDraftAnswers: 'No',
+          possessionClaimResponse: {
+            defendantResponses: {
+              receivedFreeLegalAdvice: 'YES',
+            },
+          },
+        },
+      });
+
+      expect(mockLogger.info).toHaveBeenCalledWith('[free-legal-advice] Draft saved successfully to CCD');
+      expect(res.locals.validatedCase).toEqual({
+        id: '1234567890123456',
+        data: { possessionClaimResponse: { defendantResponses: { receivedFreeLegalAdvice: 'YES' } } },
+      });
+    });
+
+    it('should skip save when frontendField is not found in form data', async () => {
+      const req = {
+        session: {
+          formData: {
+            'free-legal-advice': { otherField: 'value' },
+          },
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456' },
+        },
+      } as unknown as Response;
+
+      await autoSaveToCCD(req, res, 'free-legal-advice');
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "[free-legal-advice] Field 'hadLegalAdvice' not found in form data, skipping save"
+      );
+      expect(mockUpdateCase).not.toHaveBeenCalled();
+    });
+
+    it('should handle CCD save errors gracefully', async () => {
+      mockUpdateCase.mockRejectedValueOnce(new Error('CCD API error'));
+
+      const req = {
+        session: {
+          formData: {
+            'free-legal-advice': { hadLegalAdvice: 'yes' },
+          },
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456' },
+        },
+      } as unknown as Response;
+
+      await autoSaveToCCD(req, res, 'free-legal-advice');
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        '[free-legal-advice] Failed to save draft to CCD:',
+        expect.any(Error)
+      );
+    });
+  });
+
+  describe('autoSaveDraftToCCD deprecated middleware', () => {
+    it('should log deprecation warning and call next', () => {
+      const req = {} as Request;
+      const res = {} as Response;
+      const next = jest.fn();
+
+      autoSaveDraftToCCD(req, res, next);
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'autoSaveDraftToCCD middleware is deprecated. Use autoSaveToCCD() in beforeRedirect callback instead.'
+      );
+      expect(next).toHaveBeenCalled();
     });
   });
 });
