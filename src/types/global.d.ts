@@ -40,6 +40,7 @@ interface CustomSessionData extends SessionData {
   noticeServed?: boolean;
   rentarrears?: boolean;
   destroy(callback: (err?: Error) => void): void;
+  returnTo?: string;
 }
 
 declare module 'express-session' {

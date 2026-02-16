@@ -1,5 +1,5 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import { Application } from 'express';
+import type { Application, Request, Response } from 'express';
 import { Environment } from 'nunjucks';
 
 import { oidcMiddleware } from '../../../main/middleware';
@@ -7,6 +7,17 @@ import dashboardRoute from '../../../main/routes/dashboard';
 import { getDashboardNotifications, getDashboardTaskGroups } from '../../../main/services/pcsApi';
 
 jest.mock('../../../main/services/pcsApi');
+jest.mock('config', () => ({
+  get: jest.fn(() => 'mock-secret'),
+}));
+jest.mock('jose', () => ({
+  decodeJwt: jest.fn(() => ({ exp: 0, sub: 'user-1' })),
+  SignJWT: jest.fn().mockImplementation(() => ({
+    setProtectedHeader: jest.fn().mockReturnThis(),
+    setExpirationTime: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue('mock-signed-token'),
+  })),
+}));
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
@@ -65,10 +76,91 @@ describe('Dashboard Route', () => {
     return call?.[2];
   };
 
+  const getTestErrorRouteHandler = () => {
+    const call = mockGet.mock.calls.find((c: unknown[]) => c[0] === '/test-error/:errorType');
+    return call?.[2];
+  };
+
+  const getTestExpiredTokenRouteHandler = () => {
+    const call = mockGet.mock.calls.find((c: unknown[]) => c[0] === '/test-expired-token');
+    return call?.[1]; // only handler, no middleware
+  };
+
   it('should register the dashboard routes', () => {
     dashboardRoute(mockApp as unknown as Application);
+    expect(mockGet).toHaveBeenCalledWith('/test-error/:errorType', oidcMiddleware, expect.any(Function));
+    expect(mockGet).toHaveBeenCalledWith('/test-expired-token', expect.any(Function));
     expect(mockGet).toHaveBeenCalledWith('/dashboard', oidcMiddleware, expect.any(Function));
     expect(mockGet).toHaveBeenCalledWith('/dashboard/:caseReference', oidcMiddleware, expect.any(Function));
+  });
+
+  describe('GET /test-error/:errorType', () => {
+    it('should pass HTTPError with errorType as status when errorType is provided', () => {
+      dashboardRoute(mockApp as unknown as Application);
+      const routeHandler = getTestErrorRouteHandler();
+      const mockReq = {
+        params: { errorType: '401' },
+        session: { returnTo: undefined as string | undefined },
+      } as unknown as Request;
+      const mockRes = {} as unknown as Response;
+      const mockNext = jest.fn();
+
+      routeHandler(mockReq, mockRes, mockNext);
+
+      expect((mockReq.session as { returnTo?: string }).returnTo).toBe('/dashboard');
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Invalid error type',
+          status: 401,
+        })
+      );
+    });
+
+    it('should pass HTTPError with status 400 when errorType is empty or undefined', () => {
+      dashboardRoute(mockApp as unknown as Application);
+      const routeHandler = getTestErrorRouteHandler();
+      const mockReq = {
+        params: { errorType: '' },
+        session: { returnTo: undefined as string | undefined },
+      } as unknown as Request;
+      const mockRes = {} as unknown as Response;
+      const mockNext = jest.fn();
+
+      routeHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Invalid error type',
+          status: 400,
+        })
+      );
+    });
+  });
+
+  describe('GET /test-expired-token', () => {
+    it('should redirect to dashboard when user has session with token', async () => {
+      dashboardRoute(mockApp as unknown as Application);
+      const routeHandler = getTestExpiredTokenRouteHandler();
+      const mockUser = { accessToken: 'existing-token' };
+      const mockReq = { session: { user: mockUser } } as unknown as Request;
+      const mockRes = { redirect: jest.fn() } as unknown as Response;
+
+      await routeHandler(mockReq, mockRes);
+
+      expect(mockRes.redirect).toHaveBeenCalledWith('/dashboard');
+      expect(mockUser.accessToken).toBe('mock-signed-token');
+    });
+
+    it('should redirect to login when user has no session', async () => {
+      dashboardRoute(mockApp as unknown as Application);
+      const routeHandler = getTestExpiredTokenRouteHandler();
+      const mockReq = { session: undefined } as unknown as Request;
+      const mockRes = { redirect: jest.fn() } as unknown as Response;
+
+      await routeHandler(mockReq, mockRes);
+
+      expect(mockRes.redirect).toHaveBeenCalledWith('/login');
+    });
   });
 
   describe('GET /dashboard', () => {

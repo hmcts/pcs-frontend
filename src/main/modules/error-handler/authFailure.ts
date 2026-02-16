@@ -12,7 +12,7 @@ export const authFailure = (err: Error, req: Request, res: Response, next: NextF
   const httpError = err instanceof HTTPError ? err : null;
 
   // only handle 401 errors and if the response has not been sent yet
-  if ((httpError && httpError.status !== 401) || res.headersSent || res.writableEnded) {
+  if (!httpError || httpError.status !== 401 || res.headersSent || res.writableEnded) {
     return next(err);
   }
 
