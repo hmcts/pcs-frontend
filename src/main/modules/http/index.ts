@@ -31,7 +31,6 @@ export class HttpService {
         await this.regenerateToken();
       }
       config.headers['ServiceAuthorization'] = `Bearer ${this.s2sToken}`;
-
       return config;
     });
 
