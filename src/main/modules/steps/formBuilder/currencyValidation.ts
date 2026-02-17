@@ -40,9 +40,12 @@ export function validateCurrencyAmount(
     return undefined;
   }
 
+  // Remove commas to handle user input like 1,234.56
+  const normalized = trimmed.split(',').join('');
+
   // First, try to parse as a number to check value ranges
   // This allows us to give better error messages for large numbers
-  const numericValue = Number(trimmed.replace(/,/g, ''));
+  const numericValue = Number(normalized);
   if (!Number.isNaN(numericValue)) {
     if (numericValue < min) {
       return `${errorPrefix}.rentArrearsNegativeAmount`;
@@ -55,7 +58,7 @@ export function validateCurrencyAmount(
 
   // Then check strict format: 1–10 digits, a decimal point, exactly 2 decimal places
   const formatRegex = /^(\d{1,10})\.(\d{2})$/;
-  if (!formatRegex.exec(trimmed)) {
+  if (!formatRegex.exec(normalized)) {
     return `${errorPrefix}.rentArrearsFormat`;
   }
 
