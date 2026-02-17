@@ -1,5 +1,9 @@
-export const correspondenceAddressKnown = {
-  mainHeader: 'Is your correspondence address 15 Garden Drive, Luton, Bedfordshire, LU1 1AB?',
+import { submitCaseApiData } from '../api-data';
+
+export const correspondenceAddress = {
+  correspondenceAddressKnownMainHeader: `Is your correspondence address ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.AddressLine1}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostTown}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostCode}?`,
+  correspondenceAddressUnKnownMainHeader: 'What’s your correspondence address?',
+  correspondenceAddressUnKnownParagraph: 'Your correspondence address is your postal address.',
   respondToClaimParagraph: 'Respond to a property possession claim',
   correspondenceAddressConfirmHintText: 'This is the address provided by Treetops Housing',
   yesRadioOption: 'Yes',
@@ -11,6 +15,7 @@ export const correspondenceAddressKnown = {
   sectionHiddenTitle: 'Enter correspondence address',
   enterUKPostcodeHiddenTextLabel: 'Enter a UK postcode',
   findAddressHiddenButton: 'Find address',
+  enterAddressManuallyHiddenLink: 'Enter an address manually',
   addressSelectHiddenLabel: 'Select an address',
   whatsYourAddressHiddenQuestion: 'What’s your correspondence address?',
   addressLine1HiddenTextLabel: 'Address Line 1',
