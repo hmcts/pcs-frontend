@@ -10,7 +10,7 @@ Running the application requires the following tools to be installed in your env
 - [yarn](https://yarnpkg.com/)
 - [Docker](https://www.docker.com)
 
-#### NVM
+##### NVM
 
 A better alternative to installing nodejs directly is to use a version manager like [nvm](https://github.com/nvm-sh/nvm)
 then running the command
