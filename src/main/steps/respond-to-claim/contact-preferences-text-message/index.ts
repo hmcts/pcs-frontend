@@ -43,8 +43,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
-      contact_preferences: {
-        contact_by_text: textForm.contactByTextMessage === 'yes' ? 'Yes' : 'No',
+      defendantResponses: {
+        contactByText: textForm.contactByTextMessage === 'yes' ? 'YES' : 'NO',
       },
     };
 
