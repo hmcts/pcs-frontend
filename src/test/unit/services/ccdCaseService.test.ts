@@ -233,4 +233,20 @@ describe('ccdCaseService', () => {
       );
     });
   });
+
+  describe('submitResponseToClaim', () => {
+    it('throws HTTPError if case id is missing', async () => {
+      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(
+        'Cannot Submit Response to Case, CCD Case Not found'
+      );
+    });
+  });
+
+  describe('getExistingCaseData', () => {
+    it('throws if case data errors', async () => {
+      mockGet.mockRejectedValue({ response: { status: 400 } });
+      await expect(ccdCaseService.getExistingCaseData(accessToken, '')).rejects.toThrow(HTTPError);
+    });
+  });
 });
