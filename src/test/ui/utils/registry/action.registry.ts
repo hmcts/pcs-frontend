@@ -48,6 +48,7 @@ export class ActionRegistry {
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
     ['confirmDefendantDetails', new RespondToClaimAction()],
     ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
+    ['selectCorrespondenceAddressUnKnown', new RespondToClaimAction()],
     ['selectNoticeDetails', new RespondToClaimAction()],
     ['enterNoticeDateKnown', new RespondToClaimAction()],
     ['enterNoticeDateUnknown', new RespondToClaimAction()],
