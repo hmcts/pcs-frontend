@@ -7,7 +7,9 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+{% block pageTitle %}
+  {{ pageTitle }} - HM Courts & Tribunals Service – GOV.UK
+{% endblock %}
 
 {% block mainContent %}
 
@@ -16,10 +18,6 @@
   {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
-  {% if caption %}
-    <span class="govuk-caption-xl">{{ caption }}</span>
-  {% endif %}
-  
     {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
     {% set postcodeFinderHtml %}
       <div class="postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
@@ -151,6 +149,10 @@
       </div>
     {% endset %}
 
+    
+    <span class="govuk-caption-xl">{{ caption or serviceName }}</span>
+    {% if isAddressKnown %}
+    {% if subtitle %}<p class="govuk-body">{{ subtitle }}</p>{% endif %}
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
         {% set updatedItems = [] %}
@@ -177,7 +179,15 @@
         }) }}
       {% endif %}
     {% endfor %}
-
+    {% else %}
+    <h1 class="govuk-heading-l">{{ legendNa }}</h1>
+    <p class="govuk-body">{{ legendhintNa }}</p>
+    {# When address is not shown we don't render the radio; send "no" so subField validation (e.g. postcode) still runs #}
+    <input type="hidden" name="correspondenceAddressConfirm" value="no" />
+    <div>
+      {{ postcodeFinderHtml | safe }}
+    </div>
+    {% endif %}
     <div class="govuk-button-group">
       {{ govukButton({
         text: buttons.saveAndContinue

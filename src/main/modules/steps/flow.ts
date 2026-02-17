@@ -50,7 +50,7 @@ export async function getPreviousStep(
   // If step has explicit previousStep configuration, use it
   if (stepConfig?.previousStep) {
     if (typeof stepConfig.previousStep === 'function') {
-      return stepConfig.previousStep(formData);
+      return stepConfig.previousStep(req, formData);
     }
     return stepConfig.previousStep;
   }
@@ -131,14 +131,14 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
       currentStepData: Record<string, unknown> = {}
     ): Promise<string | null> => {
       const formData = req.session?.formData || {};
-      const caseReference = req.params.caseReference;
+      const caseReference = req.res?.locals.validatedCase?.id;
       const nextStep = await getNextStep(req, currentStepName, flowConfig, formData, currentStepData);
       return nextStep ? getStepUrl(nextStep, flowConfig, caseReference) : null;
     },
 
     getBackUrl: async (req: Request, currentStepName: string): Promise<string | null> => {
       const formData = req.session?.formData || {};
-      const caseReference = req.params.caseReference;
+      const caseReference = req.res?.locals.validatedCase?.id;
       const previousStep = await getPreviousStep(req, currentStepName, flowConfig, formData);
       return previousStep ? getStepUrl(previousStep, flowConfig, caseReference) : null;
     },

@@ -35,6 +35,9 @@ interface CustomSessionData extends SessionData {
   _addressLookup?: AddressLookupSessionData;
   //TODO: currently served from LaunchDarkly flag - remove this once CCD case is implemented
   defendantName?: string;
+  noticeDate?: string;
+  noticeServed?: boolean;
+  rentarrears?: boolean;
   destroy(callback: (err?: Error) => void): void;
 }
 
