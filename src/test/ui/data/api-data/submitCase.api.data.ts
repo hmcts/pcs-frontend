@@ -130,9 +130,10 @@ export const submitCaseApiData = {
     isCorrectClaimantContactAddress: 'YES',
     claimantProvidePhoneNumber: 'NO',
     defendant1: {
-      nameKnown: 'NO',
+      nameKnown: 'YES',
+      firstName: 'Test',
+      lastName: 'John',
       addressKnown: 'NO',
-      addressSameAsPossession: 'NO',
     },
     addAnotherDefendant: 'NO',
     tenancy_TypeOfTenancyLicence: 'DEMOTED_TENANCY',
@@ -155,13 +156,18 @@ export const submitCaseApiData = {
     claimingCostsWanted: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
-      reasons: null,
     },
     hasUnderlesseeOrMortgagee: 'NO',
     wantToUploadDocuments: 'NO',
     applicationWithClaim: 'NO',
     languageUsed: 'ENGLISH',
     completionNextStep: 'SUBMIT_AND_PAY_NOW',
+    statementOfTruth: {
+      completedBy: 'CLAIMANT',
+      fullNameClaimant: 'Test',
+      positionClaimant: 'Leah',
+      agreementClaimant: ['BELIEVE_TRUE'],
+    },
   },
   submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };

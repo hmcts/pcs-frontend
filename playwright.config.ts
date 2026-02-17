@@ -11,6 +11,7 @@ const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
 export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'true';
 export const enable_error_message_validation =
   env === 'preview' ? process.env.ENABLE_ERROR_MESSAGES_VALIDATION === 'true' : true;
+export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
 export default defineConfig({
   testDir: './src/test/ui',
