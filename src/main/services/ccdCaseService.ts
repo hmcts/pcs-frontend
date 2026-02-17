@@ -3,7 +3,8 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { HTTPError } from '../HttpError';
-import { CaseState, CcdCase, CcdUserCases } from '../interfaces/ccdCase.interface';
+import { CaseState } from '../interfaces/ccdCase.interface';
+import type { CcdCase, CcdUserCases, StartCallbackData } from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
 
 const logger = Logger.getLogger('ccdCaseService');
@@ -177,5 +178,27 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
     return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
+  },
+
+  async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+    if (!ccdCase.id) {
+      throw new HTTPError('Cannot Submit Response to Case, CCD Case Not found', 500);
+    }
+    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
+    const eventToken = await getEventToken(accessToken || '', eventUrl);
+    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
+
+    return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
+  },
+
+  async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {
+    const eventUrl = `${getBaseUrl()}/cases/${ccdCaseId}/event-triggers/respondPossessionClaim?ignore-warning=false`;
+    logger.info('getExistingCaseData event URL', { eventUrl });
+    try {
+      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
+      return response.data;
+    } catch (error) {
+      throw convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
+    }
   },
 };

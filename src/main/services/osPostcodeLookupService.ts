@@ -20,6 +20,21 @@ const countryCodes = new Map([
   ['N', 'NORTHERN IRELAND'],
 ]);
 
+function toTitleCase(value: string): string {
+  if (!value || !value.trim()) {
+    return value;
+  }
+  return value
+    .trim()
+    .split(/\s+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function formatPostcode(value: string): string {
+  return value ? value.trim().toUpperCase() : value;
+}
+
 export const getAddressesByPostcode = async (postcode: string): Promise<Address[]> => {
   const url = `${getBaseUrl()}/postcode?postcode=${encodeURIComponent(postcode)}&key=${getToken()}`;
   logger.info(`[osPostcodeLookupService] Calling getAddressesByPostcode with URL: ${url}`);
@@ -73,15 +88,15 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
               .trim()
           );
         }
-        const [addressLine1 = '', addressLine2 = '', addressLine3 = ''] = addresses.slice(0, 3);
+        const [rawLine1 = '', rawLine2 = '', rawLine3 = ''] = addresses.slice(0, 3);
 
         const addr = {
-          fullAddress: ADDRESS,
-          addressLine1,
-          addressLine2,
-          addressLine3,
-          town: POST_TOWN,
-          postcode: POSTCODE,
+          fullAddress: toTitleCase(ADDRESS),
+          addressLine1: toTitleCase(rawLine1),
+          addressLine2: toTitleCase(rawLine2),
+          addressLine3: toTitleCase(rawLine3),
+          town: toTitleCase(POST_TOWN ?? ''),
+          postcode: formatPostcode(POSTCODE ?? ''),
           country: countryCodes.get(COUNTRY_CODE),
         };
 

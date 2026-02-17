@@ -1,8 +1,10 @@
 {
   "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyYour correspondence address",
-  "legend": "cyIs your correspondence address 15 Garden Drive, Luton, Bedfordshire, LU1 1AB?",
+  "legend": "cyIs your correspondence address ",
+  "legendNa": "cyWhat’s your correspondence address?",
   "legend.hint": "cyThis is the address provided by Treetops Housing",
+  "legend.hintNa": "cyYour correspondence address is your postal address.",
   "labels": {
     "yes": "cyYes",
     "no": "cyNo",
@@ -12,7 +14,7 @@
     "enterManuallySubText": "cyYou can enter your address details in the fields below.",
     "selectAddress": "cySelect an address",
     "selectAddressLabel": "cySelect an address",
-    "addressHeading": "cyWhat's your correspondence address?",
+    "addressHeading": "cyWhat’s your correspondence address?",
     "addressLine1": "cyAddress line 1",
     "addressLine2": "cyAddress line 2 (optional)",
     "townOrCity": "cyTown or city",
