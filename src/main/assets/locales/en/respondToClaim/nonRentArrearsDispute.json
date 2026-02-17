@@ -19,6 +19,6 @@
   },
   "errors": {
     "disputeClaim": "Select if you want to dispute any other parts of the claim",
-    "disputeDetails": "Explain which parts of the claim you do not agree with"
+    "disputeDetails": "Enter the parts of the claim you do not agree with"
   }
 }
