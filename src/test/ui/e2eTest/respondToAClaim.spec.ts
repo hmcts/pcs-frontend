@@ -13,7 +13,6 @@ import {
   //registeredLandlord,
   nonRentArrearsDispute,
   noticeDetails,
-  registeredLandlord,
   repaymentsMade,
   startNow,
   tenancyDetails,
