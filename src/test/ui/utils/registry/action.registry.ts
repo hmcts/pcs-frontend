@@ -55,6 +55,7 @@ export class ActionRegistry {
     ['disputeClaimInterstitial', new RespondToClaimAction()],
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['triggerErrorMessagesForValidation', new TriggerErrorMessagesAction()],
+    ['disputingOtherPartsOfTheClaim', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
