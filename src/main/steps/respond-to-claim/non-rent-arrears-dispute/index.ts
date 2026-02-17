@@ -48,6 +48,7 @@ export const step: StepDefinition = createFormStep({
               name: 'disputeDetails',
               type: 'character-count',
               required: true,
+              errorMessage: 'errors.disputeDetails',
               maxLength: 6500,
               translationKey: {
                 label: 'disputeDetails.label',

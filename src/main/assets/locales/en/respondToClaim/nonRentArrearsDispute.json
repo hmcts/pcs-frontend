@@ -18,7 +18,7 @@
     "label": "Explain which parts of the claim you do not agree with"
   },
   "errors": {
-    "disputeClaim": "You must select whether you want to dispute any other parts of the claim",
-    "disputeDetails": "You must explain which parts of the claim you do not agree with"
+    "disputeClaim": "Select if you want to dispute any other parts of the claim",
+    "disputeDetails": "Explain which parts of the claim you do not agree with"
   }
 }
