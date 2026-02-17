@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
 import {
-  correspondenceAddressKnown,
+  correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -25,6 +25,7 @@ export class RespondToClaimAction implements IAction {
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
+      ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
@@ -38,7 +39,7 @@ export class RespondToClaimAction implements IAction {
     await actionToPerform();
   }
 
-  private async selectLegalAdvice(legalAdviceData: actionData): Promise<void> {
+  private async selectLegalAdvice(legalAdviceData: actionData) {
     await performAction('clickRadioButton', {
       question: freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion,
       option: legalAdviceData,
@@ -46,13 +47,13 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
   }
 
-  private async inputDefendantDetails(defendantData: actionRecord): Promise<void> {
+  private async inputDefendantDetails(defendantData: actionRecord) {
     await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantData.fName);
     await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantData.lName);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
-  private async enterDateOfBirthDetails(defendantData: actionRecord): Promise<void> {
+  private async enterDateOfBirthDetails(defendantData: actionRecord) {
     await performActions(
       'Defendant Date of Birth Entry',
       ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
@@ -62,7 +63,7 @@ export class RespondToClaimAction implements IAction {
     );
   }
 
-  private async confirmDefendantDetails(confirmDefendantName: actionRecord): Promise<void> {
+  private async confirmDefendantDetails(confirmDefendantName: actionRecord) {
     await performAction('clickRadioButton', {
       question: confirmDefendantName.question,
       option: confirmDefendantName.option,
@@ -70,20 +71,36 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
 
-  private async selectCorrespondenceAddressKnown(addressData: actionRecord): Promise<void> {
+  private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
     await performAction('clickRadioButton', {
-      question: correspondenceAddressKnown.correspondenceAddressConfirmHintText,
+      question: correspondenceAddress.correspondenceAddressConfirmHintText,
       option: addressData.radioOption,
     });
-    if (addressData.radioOption === correspondenceAddressKnown.noRadioOption) {
+    if (addressData.radioOption === correspondenceAddress.noRadioOption) {
+      await this.selectCorrespondenceAddressUnKnown(addressData);
+    } else {
+      await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    }
+  }
+
+  private async selectCorrespondenceAddressUnKnown(addressData: actionRecord) {
+    if (addressData.addressIndex) {
       await performActions(
         'Find Address based on postcode',
-        ['inputText', correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel, addressData.postcode],
-        ['clickButton', correspondenceAddressKnown.findAddressHiddenButton],
-        ['select', correspondenceAddressKnown.addressSelectHiddenLabel, addressData.addressIndex]
+        ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
+        ['clickButton', correspondenceAddress.findAddressHiddenButton],
+        ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
+      );
+    } else if (addressData.addressLine1) {
+      await performActions(
+        'Enter Address Manually',
+        ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
+        ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
+        ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
+        ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
       );
     }
-    await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
   private async disputeClaimInterstitial(isClaimantNameCorrect: actionData) {
@@ -101,45 +118,6 @@ export class RespondToClaimAction implements IAction {
 
   private async readPaymentInterstitial(): Promise<void> {
     await performAction('clickButton', paymentInterstitial.continueButton);
-  }
-
-  // Below changes are temporary will be changed as part of HDPI-3596
-  private async inputErrorValidation(validationArr: actionRecord) {
-    if (!validationArr || validationArr.validationReq !== 'YES') {
-      return;
-    }
-
-    if (!Array.isArray(validationArr.inputArray)) {
-      return;
-    }
-    for (const item of validationArr.inputArray) {
-      switch (validationArr.validationType) {
-        case 'radioOptions':
-          await performValidation(
-            'inputError',
-            !validationArr?.label ? validationArr.question : validationArr.label,
-            item.errMessage
-          );
-          if (validationArr.option) {
-            await performAction('clickRadioButton', { question: validationArr.question, option: validationArr.option });
-          }
-          break;
-        case 'textField':
-          await performValidation('inputError', item.label, item.errMessage);
-          await performValidation('errorMessage', { header: validationArr.header, message: item.errMessage });
-          break;
-        case 'checkBox':
-          await performAction('clickButton', validationArr.button);
-          await performValidation(
-            'inputError',
-            !validationArr?.label ? validationArr.question : validationArr.label,
-            item.errMessage
-          );
-          break;
-        default:
-          throw new Error(`Validation type :"${validationArr.validationType}" is not valid`);
-      }
-    }
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
@@ -172,5 +150,43 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
+  }
+
+  // Below changes are temporary will be changed as part of HDPI-3596
+  private async inputErrorValidation(validationArr: actionRecord) {
+    if (!validationArr || validationArr.validationReq !== 'YES') {
+      return;
+    }
+    if (!Array.isArray(validationArr.inputArray)) {
+      return;
+    }
+    for (const item of validationArr.inputArray) {
+      switch (validationArr.validationType) {
+        case 'radioOptions':
+          await performValidation(
+            'inputError',
+            !validationArr?.label ? validationArr.question : validationArr.label,
+            item.errMessage
+          );
+          if (validationArr.option) {
+            await performAction('clickRadioButton', { question: validationArr.question, option: validationArr.option });
+          }
+          break;
+        case 'textField':
+          await performValidation('inputError', item.label, item.errMessage);
+          await performValidation('errorMessage', { header: validationArr.header, message: item.errMessage });
+          break;
+        case 'checkBox':
+          await performAction('clickButton', validationArr.button);
+          await performValidation(
+            'inputError',
+            !validationArr?.label ? validationArr.question : validationArr.label,
+            item.errMessage
+          );
+          break;
+        default:
+          throw new Error(`Validation type :"${validationArr.validationType}" is not valid`);
+      }
+    }
   }
 }
