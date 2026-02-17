@@ -40,7 +40,7 @@ export const nonRentArrearsDispute = {
       {
         type: 'empty',
         label: 'Explain which parts of the claim you do not agree with',
-        errMessage: 'Explain which parts of the claim you do not agree with',
+        errMessage: 'Enter the parts of the claim you do not agree with',
       },
     ],
     errorCharLimit: [

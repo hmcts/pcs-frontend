@@ -80,7 +80,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = true, and Notice Served boolean = true
