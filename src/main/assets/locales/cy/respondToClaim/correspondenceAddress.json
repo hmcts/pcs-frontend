@@ -1,6 +1,6 @@
 {
   "caption": "cyRespond to a property possession claim",
-  "pageTitle": "cyAddress Confirmation",
+  "pageTitle": "cyYour correspondence address",
   "legend": "cyIs your correspondence address ",
   "legendNa": "cyWhat’s your correspondence address?",
   "legend.hint": "cyThis is the address provided by Treetops Housing",
@@ -14,7 +14,7 @@
     "enterManuallySubText": "cyYou can enter your address details in the fields below.",
     "selectAddress": "cySelect an address",
     "selectAddressLabel": "cySelect an address",
-    "addressHeading": "cyWhat's your correspondence address?",
+    "addressHeading": "cyWhat’s your correspondence address?",
     "addressLine1": "cyAddress line 1",
     "addressLine2": "cyAddress line 2 (optional)",
     "townOrCity": "cyTown or city",

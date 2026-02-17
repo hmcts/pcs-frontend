@@ -7,7 +7,9 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+{% block pageTitle %}
+  {{ pageTitle }} - HM Courts & Tribunals Service – GOV.UK
+{% endblock %}
 
 {% block mainContent %}
 

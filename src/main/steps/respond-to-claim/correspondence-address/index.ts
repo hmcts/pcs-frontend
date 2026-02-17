@@ -103,11 +103,11 @@ const fieldsConfig: FormFieldConfig[] = [
 ];
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'postcode-finder',
+  stepName: 'correspondence-address',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: 'respond-to-claim/postcode-finder/postcodeFinder.njk',
+  customTemplate: 'respond-to-claim/correspondence-address/correspondenceAddress.njk',
   translationKeys: {
     pageTitle: 'pageTitle',
   },
@@ -148,7 +148,7 @@ export const step: StepDefinition = createFormStep({
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
   },
   extendGetContent: async (req, formContent) => {
-    const t = getTranslationFunction(req, 'postcode-finder', ['common']);
+    const t = getTranslationFunction(req, 'correspondence-address', ['common']);
 
     const formattedAddressStr = await getExistingAddress(
       req.session.user?.accessToken || '',

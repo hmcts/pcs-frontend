@@ -10,7 +10,7 @@ export interface StepRoute {
   nextStep: string;
 }
 
-export type PreviousStep = string | ((formData: Record<string, unknown>) => string);
+export type PreviousStep = string | ((req: Request, formData: Record<string, unknown>) => string | Promise<string>);
 
 export interface StepConfig {
   dependencies?: string[];
