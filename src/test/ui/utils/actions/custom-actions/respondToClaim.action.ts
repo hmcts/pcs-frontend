@@ -8,6 +8,7 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  nonRentArrearsDispute,
   noticeDateKnown,
   noticeDateUnknown,
   noticeDetails,
@@ -31,6 +32,7 @@ export class RespondToClaimAction implements IAction {
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -126,6 +128,22 @@ export class RespondToClaimAction implements IAction {
       option: noticeGivenData.option,
     });
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
+  }
+
+  private async disputingOtherPartsOfTheClaim(doYouWantToDisputeOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
+      option: doYouWantToDisputeOption.disputeOption,
+    });
+
+    if (doYouWantToDisputeOption.disputeOption === nonRentArrearsDispute.yesRadioOption) {
+      await performAction(
+        'inputText',
+        nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
+        doYouWantToDisputeOption.disputeInfo
+      );
+    }
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {

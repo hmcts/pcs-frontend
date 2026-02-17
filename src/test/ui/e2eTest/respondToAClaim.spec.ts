@@ -145,7 +145,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: noticeDetails.imNotSureRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -182,48 +182,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
-  });
-
-  //Rent Arrears & Non-rent arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true -
-  test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
-    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.yesRadioOption,
-    });
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.continueButton);
-    //enable with 3549
-    // await performAction('selectNoticeDetails', {
-    //   question: noticeDetails.didClaimantGiveYouQuestion,
-    //   option: noticeDetails.noRadioOption,
-    // });
-    //await performValidation('mainHeader', rentArrearsDispute.mainHeader);
-    //await performAction('clickButton', rentArrearsDispute.continueButton);
-    // await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    // await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);

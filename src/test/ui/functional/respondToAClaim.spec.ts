@@ -208,7 +208,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown', noticeDateKnown.saveAndContinueButton);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickLink', paymentInterstitial.backLink);
@@ -552,7 +552,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       year: '2020',
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -583,7 +583,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
