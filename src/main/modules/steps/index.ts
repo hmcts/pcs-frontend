@@ -23,7 +23,7 @@ export {
   getTranslationErrors,
   getCustomErrorTranslations,
   getTranslation,
-  isValidCurrencyAmount,
+  validateCurrencyAmount,
 } from './formBuilder/helpers';
 
 // Export step flow API

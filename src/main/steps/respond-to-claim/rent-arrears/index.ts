@@ -2,7 +2,7 @@ import type { Request } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { currency } from '../../../modules/nunjucks/filters/currency';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction, validateCurrencyAmount } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -71,40 +71,13 @@ export const step: StepDefinition = createFormStep({
                 inputmode: 'text',
                 spellcheck: false,
               },
-              // Page-specific validation for amount format and limits
-              validate: value => {
-                if (typeof value !== 'string') {
-                  return undefined;
-                }
-
-                const trimmed = value.trim();
-                if (!trimmed) {
-                  // Let the required + errorMessage handle empty values
-                  return undefined;
-                }
-
-                // Require 1–10 digits, a decimal point, then exactly 2 decimal places
-                const match = trimmed.match(/^(\d{1,10})\.(\d{2})$/);
-                if (!match) {
-                  return 'errors.rentArrears.rentArrearsFormat';
-                }
-
-                const numericValue = Number(trimmed);
-                if (Number.isNaN(numericValue)) {
-                  return 'errors.rentArrears.rentArrearsFormat';
-                }
-
-                if (numericValue < 0) {
-                  return 'errors.rentArrears.rentArrearsNegativeAmount';
-                }
-
-                // Upper limit £1,000,000,000.00
-                if (numericValue > 1000000000) {
-                  return 'errors.rentArrears.rentArrearsLargeAmount';
-                }
-
-                return undefined;
-              },
+              // Reusable currency validation with page-specific error messages
+              validate: value =>
+                validateCurrencyAmount(value, {
+                  max: 1000000000,
+                  min: 0,
+                  errorPrefix: 'errors.rentArrears',
+                }),
             },
           },
         },
