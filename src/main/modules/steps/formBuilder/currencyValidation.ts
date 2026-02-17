@@ -54,8 +54,8 @@ export function validateCurrencyAmount(
   }
 
   // Then check strict format: 1–10 digits, a decimal point, exactly 2 decimal places
-  const match = trimmed.match(/^(\d{1,10})\.(\d{2})$/);
-  if (!match) {
+  const formatRegex = /^(\d{1,10})\.(\d{2})$/;
+  if (!formatRegex.exec(trimmed)) {
     return `${errorPrefix}.rentArrearsFormat`;
   }
 

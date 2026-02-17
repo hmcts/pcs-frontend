@@ -358,7 +358,7 @@ export function validateForm(
               if (validatorResult.startsWith('errors.')) {
                 const keyWithoutPrefix = validatorResult.replace('errors.', '');
                 // Prefer translations map, then fall back to i18next if available
-                errorMsg = translations?.[keyWithoutPrefix] || (t ? (t(validatorResult) as string) : undefined);
+                errorMsg = translations?.[keyWithoutPrefix] || (t ? t(validatorResult) : undefined);
               } else {
                 errorMsg = validatorResult;
               }
@@ -413,7 +413,7 @@ export function validateForm(
                 let msg: string = customError;
                 if (typeof customError === 'string' && customError.startsWith('errors.')) {
                   const keyWithoutPrefix = customError.replace('errors.', '');
-                  msg = translations?.[keyWithoutPrefix] || (t ? (t(customError) as string) : customError);
+                  msg = translations?.[keyWithoutPrefix] || (t ? t(customError) : customError);
                 }
                 errors[fieldName] = msg;
               }
@@ -431,7 +431,7 @@ export function validateForm(
               let msg: string = customError;
               if (typeof customError === 'string' && customError.startsWith('errors.')) {
                 const keyWithoutPrefix = customError.replace('errors.', '');
-                msg = translations?.[keyWithoutPrefix] || (t ? (t(customError) as string) : customError);
+                msg = translations?.[keyWithoutPrefix] || (t ? t(customError) : customError);
               }
               errors[fieldName] = msg;
             }
