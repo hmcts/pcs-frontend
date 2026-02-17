@@ -49,7 +49,9 @@ describe('validateCurrencyAmount', () => {
 
     it('should return large amount error for 11-digit numbers', () => {
       // 11-digit numbers exceed the default max of 1 billion, so range check triggers first
-      expect(validateCurrencyAmount('12345678901.00', { errorPrefix })).toBe('errors.rentArrears.rentArrearsLargeAmount');
+      expect(validateCurrencyAmount('12345678901.00', { errorPrefix })).toBe(
+        'errors.rentArrears.rentArrearsLargeAmount'
+      );
     });
   });
 
