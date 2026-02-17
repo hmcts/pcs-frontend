@@ -17,11 +17,14 @@
   },
   "rentArrearsAmountCorrection": {
     "label": "How much do you believe you owe in rent arrears?",
-    "hint": "For example, if you owe £148, enter 148.00"
+    "hint": "For example, £148.00 or £148.50"
   },
   "errors": {
     "rentArrears": "Do you owe this amount in rent arrears?",
     "rentArrearsDetails": "You must explain which parts of the claim you do not agree with",
-    "rentArrears.rentArrearsAmount": "Enter how much you believe you owe in rent arrears up to £1billion, in the correct format (e.g. £148.00)"
+    "rentArrears.rentArrearsAmount": "Enter the amount you believe you owe in rent arrears",
+    "rentArrears.rentArrearsFormat": "Enter an amount in the correct format, for example 148.00 or 148.50",
+    "rentArrears.rentArrearsNegativeAmount": "The amount you believe you owe in rent arrears must be £0.00 or above",
+    "rentArrears.rentArrearsLargeAmount": "The amount you believe you owe in rent arrears must be less than £1 billion"
   }
 }

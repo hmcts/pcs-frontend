@@ -341,8 +341,21 @@ export function validateForm(
             // Use translated error message if available, otherwise use validator result or default
             // Don't use field.errorMessage directly as it's a translation key, not a translated message
             const translatedMsg = translations?.[fieldName];
-            const errorMsg =
-              translatedMsg || (typeof validatorResult === 'string' ? validatorResult : undefined) || 'Invalid value';
+            let errorMsg: string | undefined = translatedMsg;
+
+            if (!errorMsg && typeof validatorResult === 'string') {
+              if (validatorResult.startsWith('errors.')) {
+                const keyWithoutPrefix = validatorResult.replace('errors.', '');
+                // Prefer translations map, then fall back to i18next if available
+                errorMsg = translations?.[keyWithoutPrefix] || (t ? (t(validatorResult) as string) : undefined);
+              } else {
+                errorMsg = validatorResult;
+              }
+            }
+
+            if (!errorMsg) {
+              errorMsg = 'Invalid value';
+            }
             if (!errors[fieldName]) {
               errors[fieldName] = errorMsg;
               // Debug logging
@@ -386,7 +399,12 @@ export function validateForm(
             const customError = field.validate(value, formData, validationAllData);
             if (customError) {
               if (!errors[fieldName]) {
-                errors[fieldName] = customError;
+                let msg: string = customError;
+                if (typeof customError === 'string' && customError.startsWith('errors.')) {
+                  const keyWithoutPrefix = customError.replace('errors.', '');
+                  msg = translations?.[keyWithoutPrefix] || (t ? (t(customError) as string) : customError);
+                }
+                errors[fieldName] = msg;
               }
             }
           } catch (err) {
@@ -399,7 +417,12 @@ export function validateForm(
           const customError = field.validate(value, formData, validationAllData);
           if (customError) {
             if (!errors[fieldName]) {
-              errors[fieldName] = customError;
+              let msg: string = customError;
+              if (typeof customError === 'string' && customError.startsWith('errors.')) {
+                const keyWithoutPrefix = customError.replace('errors.', '');
+                msg = translations?.[keyWithoutPrefix] || (t ? (t(customError) as string) : customError);
+              }
+              errors[fieldName] = msg;
             }
           }
         } catch (err) {
