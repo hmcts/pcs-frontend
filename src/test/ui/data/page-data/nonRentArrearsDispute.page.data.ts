@@ -15,7 +15,7 @@ export const nonRentArrearsDispute = {
   partOfClaimParagraph:
     'You should view the claim (opens in new tab) to see if there’s any other parts of the claim that are incorrect or you disagree with.',
   viewTheClaimLink: 'view the claim (opens in new tab)',
-  mainHeaderGovServiceNewTab: 'Welcome to GOV.UK',
+  mainHeaderGovServiceHiddenNewTab: 'Welcome to GOV.UK',
   thisIncludesParagraph: 'This includes:',
   groundsForPossessionList: 'Treetops Housing’s grounds for possession (their reasons for making the claim)',
   anyDocumentsList: 'any documents they’ve uploaded to support their claim',

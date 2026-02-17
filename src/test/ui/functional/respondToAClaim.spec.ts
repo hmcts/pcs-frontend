@@ -383,7 +383,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction(
       'clickLinkAndVerifyNewTabTitle',
       nonRentArrearsDispute.viewTheClaimLink,
-      nonRentArrearsDispute.mainHeaderGovServiceNewTab
+      nonRentArrearsDispute.mainHeaderGovServiceHiddenNewTab
     );
     await performAction(
       'inputText',
