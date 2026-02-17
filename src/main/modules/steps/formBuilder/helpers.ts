@@ -13,6 +13,21 @@ export { validateCurrencyAmount } from './currencyValidation';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
+/**
+ * Translates an error key or returns the error message as-is
+ * @param error - Error message or translation key (e.g., 'errors.fieldName.required')
+ * @param translations - Map of translation keys to translated messages
+ * @param t - Optional i18next translation function
+ * @returns Translated error message
+ */
+function translateErrorKey(error: string, translations: Record<string, string> | undefined, t?: TFunction): string {
+  if (error.startsWith('errors.')) {
+    const keyWithoutPrefix = error.replace('errors.', '');
+    return translations?.[keyWithoutPrefix] || (t ? t(error) : error);
+  }
+  return error;
+}
+
 export function getTranslation(
   t: TFunction,
   key: string,
@@ -365,13 +380,7 @@ export function validateForm(
             let errorMsg: string | undefined = translatedMsg;
 
             if (!errorMsg && typeof validatorResult === 'string') {
-              if (validatorResult.startsWith('errors.')) {
-                const keyWithoutPrefix = validatorResult.replace('errors.', '');
-                // Prefer translations map, then fall back to i18next if available
-                errorMsg = translations?.[keyWithoutPrefix] || (t ? t(validatorResult) : undefined);
-              } else {
-                errorMsg = validatorResult;
-              }
+              errorMsg = translateErrorKey(validatorResult, translations, t);
             }
 
             if (!errorMsg) {
@@ -420,11 +429,8 @@ export function validateForm(
             const customError = field.validate(value, formData, validationAllData);
             if (customError) {
               if (!errors[fieldName]) {
-                let msg: string = customError;
-                if (typeof customError === 'string' && customError.startsWith('errors.')) {
-                  const keyWithoutPrefix = customError.replace('errors.', '');
-                  msg = translations?.[keyWithoutPrefix] || (t ? t(customError) : customError);
-                }
+                const msg =
+                  typeof customError === 'string' ? translateErrorKey(customError, translations, t) : customError;
                 errors[fieldName] = msg;
               }
             }
@@ -438,11 +444,8 @@ export function validateForm(
           const customError = field.validate(value, formData, validationAllData);
           if (customError) {
             if (!errors[fieldName]) {
-              let msg: string = customError;
-              if (typeof customError === 'string' && customError.startsWith('errors.')) {
-                const keyWithoutPrefix = customError.replace('errors.', '');
-                msg = translations?.[keyWithoutPrefix] || (t ? t(customError) : customError);
-              }
+              const msg =
+                typeof customError === 'string' ? translateErrorKey(customError, translations, t) : customError;
               errors[fieldName] = msg;
             }
           }
