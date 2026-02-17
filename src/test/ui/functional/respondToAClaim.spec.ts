@@ -392,47 +392,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     );
     await performAction('clickButton', nonRentArrearsDispute.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
-
-    // await performValidation('mainHeader', counterClaim.mainHeader);
-    // await performAction('clickButton', counterClaim.saveAndContinueButton);
-    // await performAction('clickButton', paymentInterstitial.continueButton);
-    // await performAction('clickButton', repaymentsMade.saveAndContinueButton);
-    // await performAction('inputErrorValidation', {
-    //   validationReq: repaymentsMade.errorValidation,
-    //   validationType: repaymentsMade.errorValidationType.radio,
-    //   inputArray: repaymentsMade.errorValidationField.errorRadioMsg,
-    //   question: repaymentsMade.mainHeader,
-    //   header: repaymentsMade.errorValidationHeader,
-    // });
-    // await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
-    // await performAction('clickButton', repaymentsMade.saveAndContinueButton);
-    // await performAction('inputErrorValidation', {
-    //   validationReq: repaymentsMade.errorValidation,
-    //   validationType: repaymentsMade.errorValidationType.input,
-    //   inputArray: repaymentsMade.errorValidationField.errorTextField,
-    //   header: repaymentsMade.errorValidationHeader,
-    // });
-    // await performAction('clickLink', repaymentsMade.backLink);
-    // await performValidation('mainHeader', paymentInterstitial.mainHeader);
-    // await performAction('clickButton', paymentInterstitial.continueButton);
-    // await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
-    // await performValidation('elementToBeVisible', repaymentsMade.youHave500CharactersHiddenHintText);
-    // await performAction(
-    //   'inputText',
-    //   repaymentsMade.giveDetailsHiddenTextLabel,
-    //   repaymentsMade.detailsCharLimitInputText
-    // );
-    // await performValidation('elementToBeVisible', repaymentsMade.tooManyCharacterHiddenHintText);
-    // await performAction('clickButton', repaymentsMade.saveAndContinueButton);
-    // await performAction('inputErrorValidation', {
-    //   validationReq: repaymentsMade.errorValidation,
-    //   validationType: repaymentsMade.errorValidationType.input,
-    //   inputArray: repaymentsMade.errorValidationField.errorCharLimit,
-    //   header: repaymentsMade.errorValidationHeader,
-    // });
-    // await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
-    // await performAction('clickButton', repaymentsMade.saveForLaterButton);
-    // await performValidation('mainHeader', 'Dashboard');
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = false
