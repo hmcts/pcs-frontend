@@ -17,6 +17,8 @@ export const step: StepDefinition = createFormStep({
   extendGetContent: (req: Request) => {
     // Pull dynamic claimantName from CCD (same as dispute-claim-interstitial)
     const claimantName = (req.session?.ccdCase?.data?.claimantName as string) || 'Treetops Housing';
+
+    // TO DO: Retrieve amount from CCD
     const amount = (req.session?.ccdCase?.data?.rentArrearsAmountOnStatement as number) || 3250.0;
     const rentArrearsAmount = currency(amount);
 
