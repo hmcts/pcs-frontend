@@ -3,7 +3,8 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { HTTPError } from '../HttpError';
-import { CaseState, CcdCase, CcdUserCases } from '../interfaces/ccdCase.interface';
+import { CaseState } from '../interfaces/ccdCase.interface';
+import type { CcdCase, CcdUserCases, StartCallbackData } from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
 
 const logger = Logger.getLogger('ccdCaseService');
@@ -35,9 +36,9 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
 
-  logger.error(`[ccdCaseService] Error in ${context}: ${axiosError.message}`);
+  logger.error(`Error in ${context}: ${axiosError.message}`);
   if (axiosError.response?.data) {
-    logger.error(`[ccdCaseService] Error response data: ${JSON.stringify(axiosError.response.data, null, 2)}`);
+    logger.error(`Error response data: ${JSON.stringify(axiosError.response.data, null, 2)}`);
   }
 
   if (status === 401 || status === 403) {
@@ -49,9 +50,9 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
 async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
-    logger.info(`[ccdCaseService] Calling getEventToken with URL: ${url}`);
+    logger.info(`Calling getEventToken with URL: ${url}`);
     const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
-    logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response.data, null, 2)}`);
+    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -77,10 +78,10 @@ async function submitEvent(
   };
 
   try {
-    logger.info(`[ccdCaseService] Calling submitEvent with URL: ${url}`);
-    logger.info(`[ccdCaseService] Payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`Calling submitEvent with URL: ${url}`);
+    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response.data, null, 2)}`);
+    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');
@@ -117,16 +118,17 @@ export const ccdCaseService = {
       sort: [{ created_date: { order: 'desc' } }],
     };
 
-    logger.info(`[ccdCaseService] Calling ccdCaseService search with URL: ${url}`);
-    logger.info(`[ccdCaseService] Request body: ${JSON.stringify(requestBody, null, 2)}`);
+    logger.info(`Calling ccdCaseService search with URL: ${url}`);
+    logger.info(`Request body: ${JSON.stringify(requestBody, null, 2)}`);
 
     try {
       const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
       const allCases = response?.data?.cases;
-      logger.info(`[ccdCaseService] Response data: ${JSON.stringify(response?.data?.cases, null, 2)}`);
+      logger.info(`Response data: ${JSON.stringify(response?.data?.cases, null, 2)}`);
       const draftCase = allCases?.find(c => c.state === CaseState.DRAFT);
 
       if (draftCase) {
+        logger.info(`Draft case found: ${JSON.stringify(draftCase, null, 2)}`);
         return {
           id: draftCase.id,
           data: draftCase.case_data,
@@ -137,16 +139,12 @@ export const ccdCaseService = {
     } catch (error) {
       const axiosError = error as AxiosError;
       if (axiosError.response?.status === 404) {
-        logger.warn('[ccdCaseService] No case found, returning null.');
+        logger.warn('No case found, returning null.');
         return null;
       }
       if (axiosError.response?.status === 400) {
         logger.warn(
-          `[ccdCaseService] Bad request (400) when searching for cases. Response: ${JSON.stringify(
-            axiosError.response?.data,
-            null,
-            2
-          )}`
+          `Bad request (400) when searching for cases. Response: ${JSON.stringify(axiosError.response?.data, null, 2)}`
         );
         return null;
       }
@@ -180,5 +178,27 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
     return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
+  },
+
+  async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+    if (!ccdCase.id) {
+      throw new HTTPError('Cannot Submit Response to Case, CCD Case Not found', 500);
+    }
+    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
+    const eventToken = await getEventToken(accessToken || '', eventUrl);
+    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
+
+    return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
+  },
+
+  async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {
+    const eventUrl = `${getBaseUrl()}/cases/${ccdCaseId}/event-triggers/respondPossessionClaim?ignore-warning=false`;
+    logger.info('getExistingCaseData event URL', { eventUrl });
+    try {
+      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
+      return response.data;
+    } catch (error) {
+      throw convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
+    }
   },
 };

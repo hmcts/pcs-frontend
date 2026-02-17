@@ -171,6 +171,7 @@ function checkFutureDate(
   month: string,
   year: string,
   noFutureDate: boolean,
+  noCurrentDate: boolean,
   t?: TFunction,
   translations?: Record<string, string>
 ): string | null {
@@ -191,7 +192,8 @@ function checkFutureDate(
   today.setHours(0, 0, 0, 0);
   inputDate.setHours(0, 0, 0, 0);
 
-  if (inputDate >= today) {
+  const isInvalid = noCurrentDate ? inputDate >= today : inputDate > today;
+  if (isInvalid) {
     return getDateErrorMessage(t, 'futureDate', translations);
   }
 
@@ -211,6 +213,7 @@ export interface DateFieldError {
  * @param requireAllParts - Whether all parts (day, month, year) are required
  * @param t - Translation function for error messages
  * @param noFutureDate - If true, disallows future and current dates
+ * @param noCurrentDate - If true, disallows current/todays date
  * @param translations - Optional translations object for error messages
  * @returns DateFieldError object if validation fails, null if valid
  */
@@ -221,6 +224,7 @@ export function validateDateField(
   requireAllParts: boolean,
   t?: TFunction,
   noFutureDate = false,
+  noCurrentDate = true,
   translations?: Record<string, string>
 ): DateFieldError | null {
   const hasDay = !!day;
@@ -317,7 +321,7 @@ export function validateDateField(
   }
 
   // Check for future dates if restricted
-  const futureDateError = checkFutureDate(day, month, year, noFutureDate, t, translations);
+  const futureDateError = checkFutureDate(day, month, year, noFutureDate, noCurrentDate, t, translations);
   if (futureDateError) {
     // Generic error - anchor to day
     return {

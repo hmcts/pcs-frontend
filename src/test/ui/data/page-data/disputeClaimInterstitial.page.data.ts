@@ -1,7 +1,13 @@
 export const disputeClaimInterstitial = {
-  mainHeader: 'Treetops Housing’s claim',
+  getMainHeader: (claimantName: string): string => {
+    const nameClaimant =
+      claimantName.substring(claimantName.length - 1) === 's' ? `${claimantName}'` : `${claimantName}’s`;
+    return nameClaimant + ' claim';
+  },
+  getWhenTheyMadeTheirClaimParagraph: (claimantName: string): string => {
+    return `When they made their claim, ${claimantName} had to give information about:`;
+  },
   respondToClaimParagraph: 'Respond to a property possession claim',
-  whenTheyMadeTheirClaimParagraph: 'When they made their claim, Treetops Housing had to give information about:',
   theTenancyList: 'the tenancy, occupation contract or licence agreement',
   theNoticeOfTheirIntentionList:
     'the notice of their intention to begin possession proceedings, if they served you with one',

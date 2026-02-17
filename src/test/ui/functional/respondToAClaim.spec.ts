@@ -4,13 +4,19 @@ import config from 'config';
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactPreference,
-  correspondenceAddressKnown,
+  correspondenceAddress,
   counterClaim,
   dateOfBirth,
   defendantNameCapture,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  nonRentArrearsDispute,
+  noticeDateKnown,
+  noticeDateUnknown,
+  noticeDetails,
   paymentInterstitial,
+  rentArrearsDispute,
+  repayments,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
@@ -18,10 +24,15 @@ import { initializeExecutor, performAction, performValidation } from '../utils/c
 
 const home_url = config.get('e2e.testUrl') as string;
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  if (testInfo.title.includes('@noDefendants')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  } else {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  }
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('validateAccessCodeAPI');
@@ -32,15 +43,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Respond to a claim - functional @nightly', async () => {
-  test('Free legal advice - Error messages - Save for later Validations', async () => {
-    await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: freeLegalAdvice.errorValidation,
-      validationType: freeLegalAdvice.errorValidationType.radio,
-      inputArray: freeLegalAdvice.errorValidationField.errorRadioMsg,
-      question: freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion,
-      header: freeLegalAdvice.errorValidationHeader,
-    });
+  test('Free legal advice - Save for later Validations', async () => {
     await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
@@ -87,78 +90,74 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
-    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {
-      validationReq: correspondenceAddressKnown.errorValidation,
-      validationType: correspondenceAddressKnown.errorValidationType.radio,
-      inputArray: correspondenceAddressKnown.errorValidationField.errorRadioMsg,
-      question: correspondenceAddressKnown.mainHeader,
-      header: correspondenceAddressKnown.errorValidationHeader,
+      validationReq: correspondenceAddress.errorValidation,
+      validationType: correspondenceAddress.errorValidationType.radio,
+      inputArray: correspondenceAddress.errorValidationField.errorRadioMsg,
+      question: correspondenceAddress.correspondenceAddressKnownMainHeader,
+      header: correspondenceAddress.errorValidationHeader,
     });
-    await performAction('clickRadioButton', correspondenceAddressKnown.noRadioOption);
-    await performAction('clickButton', correspondenceAddressKnown.findAddressHiddenButton);
+    await performAction('clickRadioButton', correspondenceAddress.noRadioOption);
+    await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
     await performAction('inputErrorValidation', {
-      validationReq: correspondenceAddressKnown.errorValidation,
-      validationType: correspondenceAddressKnown.errorValidationType.input,
-      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField1,
-      header: correspondenceAddressKnown.errorValidationHeader,
+      validationReq: correspondenceAddress.errorValidation,
+      validationType: correspondenceAddress.errorValidationType.input,
+      inputArray: correspondenceAddress.errorValidationField.errorTextField1,
+      header: correspondenceAddress.errorValidationHeader,
     });
-    await performAction('inputText', correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel, '12345');
-    await performAction('clickButton', correspondenceAddressKnown.findAddressHiddenButton);
+    await performAction('inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, '12345');
+    await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
     await performAction('inputErrorValidation', {
-      validationReq: correspondenceAddressKnown.errorValidation,
-      validationType: correspondenceAddressKnown.errorValidationType.input,
-      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField2,
-      header: correspondenceAddressKnown.errorValidationHeader,
-    });
-    await performAction(
-      'inputText',
-      correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel,
-      correspondenceAddressKnown.englandPostcodeTextInput
-    );
-    await performAction('clickButton', correspondenceAddressKnown.findAddressHiddenButton);
-    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: correspondenceAddressKnown.errorValidation,
-      validationType: correspondenceAddressKnown.errorValidationType.input,
-      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField3,
-      header: correspondenceAddressKnown.errorValidationHeader,
-    });
-    await performAction(
-      'select',
-      correspondenceAddressKnown.addressSelectHiddenLabel,
-      correspondenceAddressKnown.addressIndex
-    );
-    await performAction('inputText', correspondenceAddressKnown.addressLine1HiddenTextLabel, '');
-    await performAction('inputText', correspondenceAddressKnown.townOrCityHiddenTextLabel, '');
-    await performAction('inputText', correspondenceAddressKnown.postcodeHiddenTextLabel, '');
-    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: correspondenceAddressKnown.errorValidation,
-      validationType: correspondenceAddressKnown.errorValidationType.input,
-      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField4,
-      header: correspondenceAddressKnown.errorValidationHeader,
+      validationReq: correspondenceAddress.errorValidation,
+      validationType: correspondenceAddress.errorValidationType.input,
+      inputArray: correspondenceAddress.errorValidationField.errorTextField2,
+      header: correspondenceAddress.errorValidationHeader,
     });
     await performAction(
       'inputText',
-      correspondenceAddressKnown.addressLine1HiddenTextLabel,
-      correspondenceAddressKnown.englandAddressLine1TextInput
+      correspondenceAddress.enterUKPostcodeHiddenTextLabel,
+      correspondenceAddress.englandPostcodeTextInput
+    );
+    await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddress.errorValidation,
+      validationType: correspondenceAddress.errorValidationType.input,
+      inputArray: correspondenceAddress.errorValidationField.errorTextField3,
+      header: correspondenceAddress.errorValidationHeader,
+    });
+    await performAction('select', correspondenceAddress.addressSelectHiddenLabel, correspondenceAddress.addressIndex);
+    await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, '');
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: correspondenceAddress.errorValidation,
+      validationType: correspondenceAddress.errorValidationType.input,
+      inputArray: correspondenceAddress.errorValidationField.errorTextField4,
+      header: correspondenceAddress.errorValidationHeader,
+    });
+    await performAction(
+      'inputText',
+      correspondenceAddress.addressLine1HiddenTextLabel,
+      correspondenceAddress.englandAddressLine1TextInput
     );
     await performAction(
       'inputText',
-      correspondenceAddressKnown.townOrCityHiddenTextLabel,
-      correspondenceAddressKnown.englandTownOrCityTextInput
+      correspondenceAddress.townOrCityHiddenTextLabel,
+      correspondenceAddress.englandTownOrCityTextInput
     );
-    await performAction('inputText', correspondenceAddressKnown.postcodeHiddenTextLabel, 'ABED');
-    await performAction('clickButton', correspondenceAddressKnown.saveAndContinueButton);
+    await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, 'ABED');
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {
-      validationReq: correspondenceAddressKnown.errorValidation,
-      validationType: correspondenceAddressKnown.errorValidationType.input,
-      inputArray: correspondenceAddressKnown.errorValidationField.errorTextField1,
-      header: correspondenceAddressKnown.errorValidationHeader,
+      validationReq: correspondenceAddress.errorValidation,
+      validationType: correspondenceAddress.errorValidationType.input,
+      inputArray: correspondenceAddress.errorValidationField.errorTextField1,
+      header: correspondenceAddress.errorValidationHeader,
     });
-    await performAction('clickRadioButton', correspondenceAddressKnown.yesRadioOption);
-    await performAction('clickButton', correspondenceAddressKnown.saveForLaterButton);
+    await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
+    await performAction('clickButton', correspondenceAddress.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
 
@@ -174,7 +173,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.yesRadioOption,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
@@ -197,13 +196,19 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.yesRadioOption,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown', noticeDateKnown.saveAndContinueButton);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickLink', paymentInterstitial.backLink);
@@ -211,5 +216,380 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickLink', paymentInterstitial.cancelLink);
     await performValidation('mainHeader', 'Dashboard');
+  });
+
+  test('Notice Details - Error messages - Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', noticeDetails.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: noticeDetails.errorValidation,
+      validationType: noticeDetails.errorValidationType.radio,
+      inputArray: noticeDetails.errorValidationField.errorRadioMsg,
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      header: noticeDetails.errorValidationHeader,
+    });
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+  });
+
+  test('Notice Date Known - Error messages - Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown', {
+      day: '25',
+      month: '2',
+      year: '2050',
+    });
+    await performAction('inputErrorValidation', {
+      validationReq: noticeDateKnown.errorValidation,
+      validationType: noticeDateKnown.errorValidationType.radio,
+      inputArray: noticeDateKnown.errorValidationField.errorRadioMsg,
+      question: noticeDateKnown.whenDidYouReceiveNoticeQuestion,
+      header: noticeDateKnown.errorValidationHeader,
+    });
+  });
+
+  test('Notice Date Unknown - Error messages - Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown', {
+      day: '25',
+      month: '2',
+      year: '2050',
+    });
+    await performAction('inputErrorValidation', {
+      validationReq: noticeDateUnknown.errorValidation,
+      validationType: noticeDateUnknown.errorValidationType.radio,
+      inputArray: noticeDateUnknown.errorValidationField.errorRadioMsg,
+      question: noticeDateUnknown.whenDidYouReceiveNoticeQuestion,
+      header: noticeDateUnknown.errorValidationHeader,
+    });
+  });
+
+  //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = false
+  test.skip('England - RentArrears - NoticeServed - No - RentArrearsDispute', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.noRadioOption,
+    });
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
+  });
+
+  //Rent Arrears claim type = true, Notice Date Provided string = true, and Notice Served boolean = true
+  test.skip('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown', {
+      day: '25',
+      month: '2',
+      year: '2020',
+    });
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
+  });
+
+  //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
+  test.skip('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', noticeDetails.mainHeader);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknown');
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
+  });
+
+  //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
+  test.skip('RentArrears - NoticeServed - Yes NoticeDetails - No - RentArrearsDispute', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.noRadioOption,
+    });
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
+  });
+
+  //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
+  test.skip('RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - RentArrearsDispute', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.imNotSureRadioOption,
+    });
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
+  });
+
+  //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
+  test.skip('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
+    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', noticeDetails.mainHeader);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknown', {
+      day: '24',
+      month: '2',
+      year: '2020',
+    });
+    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
+  });
+
+  //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = false
+  test.skip('England - NonRentArrears - NoticeServed - No - NonRentArrearsDispute', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', repayments.mainHeader);
+    await performAction('clickButton', repayments.saveAndContinueButton);
   });
 });

@@ -2,6 +2,9 @@ import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
+import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
+import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
+import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
 import { step as contactPreferences } from './contact-preferences';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
@@ -15,6 +18,7 @@ import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
 import { step as landlordRegistered } from './landlord-registered';
+import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
@@ -35,20 +39,24 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
-  'payment-interstitial': paymentInterstitial,
-  repayments,
-  'counter-claim': counterClaim,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
   'tenancy-details': tenancyDetails,
   'contact-preferences': contactPreferences,
+  'confirmation-of-notice-given': confirmationOfNoticeGiven,
+  'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
+  'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,
+  'rent-arrears': rentArrears,
+  'non-rent-arrears-dispute': nonRentArrearsDispute,
+  'counter-claim': counterClaim,
+  'payment-interstitial': paymentInterstitial,
+  repayments,
   'your-household-and-circumstances': yourHouseholdAndCircumstances,
   'do-you-have-any-dependant-children': doYouHaveAnyDependantChildren,
   'do-you-have-any-other-dependants': doYouHaveAnyOtherDependants,
   'do-any-other-adults-live-in-your-home': doAnyOtherAdultsLiveInYourHome,
   'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home':
     wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  'rent-arrears': rentArrears,
   'your-circumstances': yourCircumstances,
   'exceptional-hardship': exceptionalHardship,
   'income-and-expenditure': incomeAndExpenditure,
