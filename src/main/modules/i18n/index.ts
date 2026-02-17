@@ -218,6 +218,7 @@ export class I18n {
         }
       });
 
+    // Register custom formatters
     pluralPossessive(i18next);
 
     app.use(i18nextHandle(i18next));

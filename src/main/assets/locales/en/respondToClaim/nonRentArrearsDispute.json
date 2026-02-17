@@ -1,4 +1,24 @@
 {
-  "caption": "Respond to a property possession claim",
-  "pageTitle": "Non-Rent Arrears Dispute(Placeholder)"
+  "title": "Disputing other parts of the claim",
+  "captionHeading": "Respond to a property possession claim",
+  "introLinkHref": "https://www.gov.uk",
+  "introParagraph": "You should <link>view the claim (opens in new tab)</link> to see if there’s any other parts of the claim that are incorrect or you disagree with.",
+  "includesHeading": "This includes:",
+  "includesList": [
+    "{{claimantName, pluralPossessive}} grounds for possession (their reasons for making the claim)",
+    "any documents they’ve uploaded to support their claim",
+    "any other information they’ve given as part of their claim"
+  ],
+  "disputeQuestion": "Do you want to dispute any other parts of the claim?",
+  "disputeOptions": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "disputeDetails": {
+    "label": "Explain which parts of the claim you do not agree with"
+  },
+  "errors": {
+    "disputeClaim": "Select if you want to dispute any other parts of the claim",
+    "disputeDetails": "Enter the parts of the claim you do not agree with"
+  }
 }
