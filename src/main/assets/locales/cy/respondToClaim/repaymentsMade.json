@@ -1,0 +1,15 @@
+{
+  "pageTitle": "cyHave you paid any money to the claimant since the claim issue date?",
+  "caption": "cyRespond to a property possession claim",
+  "question": "cyHave you paid any money to {{claimantName}} since {{claimIssueDate}}?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
+  "textAreaLabel": "cyGive details about how much you paid and when",
+  "textAreaHint": "cyYou can enter up to 500 characters",
+  "errors": {
+    "repaymentsInfo": "cyGive details about how much you paid and when",
+    "confirmRepaymentsMade": "cySelect if you’ve paid any money to {{claimantName}} since {{claimIssueDate}}"
+  }
+}
