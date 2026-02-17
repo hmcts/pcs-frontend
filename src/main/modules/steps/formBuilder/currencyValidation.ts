@@ -1,23 +1,23 @@
 /**
  * Currency amount validation for form fields (e.g. £123.45 format).
  * Returns undefined if valid, or an error key string if invalid.
- * 
+ *
  * This allows reusable validation logic while each page defines its own error messages.
- * 
+ *
  * @param value - The value to validate
  * @param options - Validation options
  * @param options.max - Maximum allowed value (default: 1,000,000,000)
  * @param options.min - Minimum allowed value (default: 0)
  * @param options.errorPrefix - Prefix for error keys (e.g. 'errors.rentArrears')
  * @returns undefined if valid, or error key string like 'errors.rentArrears.rentArrearsFormat'
- * 
+ *
  * @example
  * validate: value => validateCurrencyAmount(value, {
  *   max: 1000000000,
  *   min: 0,
  *   errorPrefix: 'errors.rentArrears'
  * })
- * 
+ *
  */
 
 export function validateCurrencyAmount(
