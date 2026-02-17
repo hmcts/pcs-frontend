@@ -38,7 +38,6 @@ export const flowConfig: JourneyFlowConfig = {
     'do-you-have-any-other-dependants',
     'do-any-other-adults-live-in-your-home',
     'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
-    'rent-arrears',
     'your-circumstances',
     'exceptional-hardship',
     'income-and-expenditure',

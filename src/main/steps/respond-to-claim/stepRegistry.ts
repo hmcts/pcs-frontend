@@ -25,7 +25,7 @@ import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
 import { step as whatOtherRegularExpensesDoYouHave } from './regular-expenses';
 import { step as whatRegularIncomeDoYouReceive } from './regular-income';
-import { step as rentArrears } from './rent-arrears';
+import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repayments } from './repayments';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
@@ -46,7 +46,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
   'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
   'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,
-  'rent-arrears': rentArrears,
+  'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'counter-claim': counterClaim,
   'payment-interstitial': paymentInterstitial,
