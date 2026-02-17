@@ -132,6 +132,8 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  }
+
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: noticeDetails.didClaimantGiveYouQuestion,
