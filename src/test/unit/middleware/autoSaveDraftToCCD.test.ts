@@ -286,7 +286,6 @@ describe('autoSaveToCCD main function', () => {
 
       await autoSaveToCCD(req, res, 'free-legal-advice');
 
-      expect(mockLogger.debug).toHaveBeenCalledWith('[free-legal-advice] No form data in session, skipping auto-save');
       expect(mockUpdateCase).not.toHaveBeenCalled();
     });
 
@@ -307,7 +306,6 @@ describe('autoSaveToCCD main function', () => {
 
       await autoSaveToCCD(req, res, 'free-legal-advice');
 
-      expect(mockLogger.debug).toHaveBeenCalledWith('[free-legal-advice] No form data in session, skipping auto-save');
       expect(mockUpdateCase).not.toHaveBeenCalled();
     });
 

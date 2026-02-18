@@ -192,7 +192,6 @@ export async function autoSaveToCCD(req: Request, res: Response, stepName: strin
   const formData = req.session.formData?.[stepName];
 
   if (!formData || Object.keys(formData).length === 0) {
-    logger.debug(`[${stepName}] No form data in session, skipping auto-save`);
     return;
   }
 
