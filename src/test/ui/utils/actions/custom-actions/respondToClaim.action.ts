@@ -3,7 +3,6 @@ import { Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import {
   contactByTextMessage,
-  correspondenceAddressKnown,
   correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
