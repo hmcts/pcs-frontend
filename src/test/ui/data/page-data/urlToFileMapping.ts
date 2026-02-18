@@ -12,4 +12,5 @@ export default {
   'confirmation-of-notice-date-when-provided': 'noticeDateKnown',
   'rent-arrears-dispute': 'rentArrearsDispute',
   'payment-interstitial': 'payment-interstitial',
+  'repayments-made': 'repaymentsMade',
 };
