@@ -18,7 +18,6 @@ export const step: StepDefinition = createFormStep({
     caption: 'captionHeading',
   },
   extendGetContent: (req: Request) => {
-    // Pull dynamic claimantName from CCD (same as dispute-claim-interstitial)
     const claimantName = (req.session?.ccdCase?.data?.claimantName as string) || 'Treetops Housing';
 
     const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
@@ -53,6 +52,7 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'disputeDetails.label',
               },
+              enableErrorClearing: true,
               attributes: {
                 rows: 5,
               },
