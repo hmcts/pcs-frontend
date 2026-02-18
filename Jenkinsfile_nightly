@@ -48,7 +48,7 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 withNightlyPipeline(type, product, component) {
   validateInputs()
   handleEnvironmentSetting()
-  enableSlackNotifications('#pcs-tech')
+  enableSlackNotifications('#qa-pipeline-status')
   enableFortifyScan()
   afterSuccess('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true,
