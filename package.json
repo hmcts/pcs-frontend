@@ -27,7 +27,7 @@
     "test:functional": "yarn playwright install && yarn playwright test --project chromium --grep @PR; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:fullfunctional": "yarn playwright install && yarn playwright test --project chromium; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:changed": "yarn playwright install && ts-node ./src/test/functional/helpers/runChangedTestHelper.ts; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
-    "test:E2eChrome": "yarn playwright install && yarn playwright test --project chromium --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:E2eChrome": "yarn playwright install && yarn playwright test --project chromium --grep; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:E2eFirefox": "yarn playwright install && yarn playwright test --project firefox --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:E2eSafari": "yarn playwright install && yarn playwright test --project webkit --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:pact": "jest -c jest.pact.config.ts --runInBand",
