@@ -188,7 +188,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       validationReq: contactByPhone.errorValidation,
       validationType: contactByPhone.errorValidationType.input,
       inputArray: contactByPhone.errorValidationField.errorTextField1,
-      header: defendantNameCapture.errorValidationHeader,
+      header: contactByPhone.errorValidationHeader,
     });
     await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, '7ab00 90*2£&');
     await performAction('clickButton', contactByPhone.saveAndContinueButton);
