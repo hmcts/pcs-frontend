@@ -20,11 +20,11 @@
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">
       {{ govukButton({
-        text: t('buttons.saveAndContinue', { ns: 'common' }),
+        text: t('saveAndContinue', { ns: 'common' }),
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
       {{ govukButton({
-        text: t('buttons.saveForLater', { ns: 'common' }),
+        text: t('saveForLater', { ns: 'common' }),
         classes: "govuk-button--secondary",
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}

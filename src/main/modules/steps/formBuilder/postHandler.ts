@@ -145,7 +145,9 @@ export function createPostHandler(
           }
         }
 
-        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = getDashboardUrl(caseId);
+        return res.redirect(303, dashboardUrl);
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving
