@@ -237,7 +237,9 @@ function isValidWebhookUrl(value: string): boolean {
   if (!trimmed || trimmed.startsWith('#')) return false;
   try {
     const url = new URL(trimmed);
-    return url.protocol === 'https:' && url.hostname.includes('slack.com');
+    const host = url.hostname.toLowerCase();
+    const isSlackHost = host === 'slack.com' || host.endsWith('.slack.com');
+    return url.protocol === 'https:' && isSlackHost;
   } catch {
     return false;
   }
