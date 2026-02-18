@@ -1,7 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as https from 'https';
-import * as http from 'http';
 
 const DEFAULT_SUMMARY_CANDIDATES = [
   'e2e-output/widgets/summary.json',
@@ -232,63 +230,6 @@ function latestResultSummary(tests: AllureTestRecord[]): { failed: number; broke
   return { failed, broken, pass_rate };
 }
 
-function isValidWebhookUrl(value: string): boolean {
-  const trimmed = (value ?? '').trim();
-  if (!trimmed || trimmed.startsWith('#')) return false;
-  try {
-    const url = new URL(trimmed);
-    const host = url.hostname.toLowerCase();
-    const isSlackHost = host === 'slack.com' || host.endsWith('.slack.com');
-    return url.protocol === 'https:' && isSlackHost;
-  } catch {
-    return false;
-  }
-}
-
-export async function postToSlack(
-  webhookUrl: string,
-  text: string,
-  timeoutMs: number = 20000
-): Promise<void> {
-  if (!isValidWebhookUrl(webhookUrl)) {
-    throw new Error(
-      'SLACK_WEBHOOK_URL must be a Slack Incoming Webhook URL (e.g. https://hooks.slack.com/...), not a channel name (e.g. #qa-pipeline-status)'
-    );
-  }
-  const payload = JSON.stringify({ text });
-  const url = new URL(webhookUrl);
-  const isHttps = url.protocol === 'https:';
-  const options: https.RequestOptions = {
-    hostname: url.hostname,
-    port: url.port || (isHttps ? 443 : 80),
-    path: url.pathname + url.search,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(payload, 'utf-8'),
-    },
-  };
-
-  return new Promise((resolve, reject) => {
-    const req = (isHttps ? https : http).request(options, (res) => {
-      if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-        resolve();
-      } else {
-        reject(
-          new Error(`Slack webhook failed: HTTP ${res.statusCode ?? 'unknown'}`)
-        );
-      }
-    });
-    req.on('error', reject);
-    req.setTimeout(timeoutMs, () => {
-      req.destroy();
-      reject(new Error('Slack webhook timeout'));
-    });
-    req.write(payload, 'utf-8');
-    req.end();
-  });
-}
-
 export function buildSlackMessage(
   summary: AllureSummary,
   buildNumber: string,
@@ -408,28 +349,14 @@ export function getSlackMessage(): string {
   }
 }
 
-export async function main(): Promise<void> {
-  const printOnly = process.argv.includes('--print-only');
+/** Builds the message for Slack. With --print-only (used by Jenkins) writes to stdout for slackSend. */
+export function main(): void {
   const msg = getSlackMessage();
-
-  if (printOnly) {
+  if (process.argv.includes('--print-only')) {
     process.stdout.write(msg);
-    return;
+  } else {
+    console.log(msg);
   }
-
-  console.log(msg);
-
-  const webhook = (process.env.SLACK_WEBHOOK_URL ?? '').trim();
-  if (!webhook) {
-    console.log('\n[INFO] No SLACK_WEBHOOK_URL; skipping post.');
-    return;
-  }
-  if (!isValidWebhookUrl(webhook)) {
-    console.warn('\n[WARN] SLACK_WEBHOOK_URL is not a valid webhook URL; skipping post.');
-    return;
-  }
-  await postToSlack(webhook, msg);
-  console.log('\n[INFO] Slack notification sent.');
 }
 
 const isMain =
@@ -437,8 +364,10 @@ const isMain =
   process.argv[1]?.includes('allure-slack-notifier');
 
 if (isMain) {
-  main().catch((err) => {
+  try {
+    main();
+  } catch (err) {
     console.error(err);
     process.exit(1);
-  });
+  }
 }
