@@ -13,10 +13,11 @@ import {
   //registeredLandlord,
   nonRentArrearsDispute,
   noticeDetails,
-  repayments,
+  repaymentsMade,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
+import { repaymentsAgreed } from '../data/page-data/repaymentsAgreed.page.data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/element-validations';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
@@ -117,6 +118,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
@@ -155,9 +164,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.yesRadioOption,
+      repaymentInfo: repaymentsMade.detailsTextInput,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
@@ -195,8 +206,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repayments.mainHeader);
-    await performAction('clickButton', repayments.saveAndContinueButton);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 });

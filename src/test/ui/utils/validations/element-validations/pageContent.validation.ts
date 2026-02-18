@@ -56,6 +56,7 @@ export class PageContentValidation implements IValidation {
                     summary .govuk-details__summary-text:text("${value}")`),
     Header: (page: Page, value: string) =>
       page.locator(`
+                    legend:has-text("${value}"),
                     h1:text("${value}"),
                     h2:text("${value}"),
                     h3:text("${value}")`),
