@@ -1,0 +1,27 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
+{% block pageTitle %}Repayments agreed - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">Repayments agreed (Placeholder)</h1>
+  <p class="govuk-body">dummy page</p>
+  <form method="post" action="{{ url }}">
+  <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.continue', { ns: 'common' }),
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+  </div>
+  </form>
+{% endblock %}
