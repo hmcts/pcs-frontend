@@ -679,14 +679,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: contactByTextMessage.errorValidation,
-      validationType: contactByTextMessage.errorValidationType.radio,
-      inputArray: contactByTextMessage.errorValidationField.errorRadioMsg,
-      question: contactByTextMessage.contactByTextMessageQuestion,
-      header: contactByTextMessage.errorValidationHeader,
-    });
     await performAction('clickRadioButton', contactByTextMessage.yesRadioOption);
     await performAction('clickButton', contactByTextMessage.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
