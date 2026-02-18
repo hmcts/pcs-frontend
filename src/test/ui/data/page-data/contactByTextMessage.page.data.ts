@@ -10,10 +10,6 @@ export const contactByTextMessage = {
   contactUsForHelpLink: 'Contact us for help',
   cymraegLink: 'Cymraeg',
   backLink: 'Back',
-  errorValidation: 'YES', //set it to 'NO' before raising a PR
-  errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
-  errorValidationHeader: 'There is a problem',
-  errorValidationField: {
-    errorRadioMsg: 'You must select an option',
-  },
+  thereIsAProblemErrorMessageHeader: 'There is a problem',
+  SelectIfYouWantErrorMessage: 'Select if you want to be contacted by text message.',
 };

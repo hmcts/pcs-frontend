@@ -106,10 +106,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    //should i add contact preference by telephone?
     await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
-    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mockText);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
@@ -192,10 +190,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    //should i add contact preference by telephone?
     await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
-    await performValidation('mainHeader', disputeClaimInterstitial.mainHeader);
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', registeredLandlord.mockText);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
