@@ -150,6 +150,7 @@ module.exports = defineConfig([
     },
   },
   globalIgnores([
+    'scripts/**/*',
     'src/main/views/govuk/**/*',
     '**/jest.*.config.*',
     '**/__mocks__/**/*',
