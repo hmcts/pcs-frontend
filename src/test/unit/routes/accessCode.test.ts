@@ -107,6 +107,48 @@ describe('accessCode routes', () => {
         error: undefined,
       });
     });
+
+    it('should render error when caseId is not 16 digits', () => {
+      const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => void;
+
+      const req = {
+        params: { caseId: '123' },
+        query: {},
+      } as unknown as Request;
+
+      const res = {
+        render: jest.fn(),
+      } as unknown as Response;
+
+      handler(req, res);
+
+      expect(res.render).toHaveBeenCalledWith('accessCode', {
+        caseId: '123',
+        error: 'Invalid case reference',
+      });
+      expect(mockLogger.warn).toHaveBeenCalledWith('Invalid caseId format: 123');
+    });
+
+    it('should render error when caseId contains non-digits', () => {
+      const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => void;
+
+      const req = {
+        params: { caseId: '../admin/1234567' },
+        query: {},
+      } as unknown as Request;
+
+      const res = {
+        render: jest.fn(),
+      } as unknown as Response;
+
+      handler(req, res);
+
+      expect(res.render).toHaveBeenCalledWith('accessCode', {
+        caseId: '../admin/1234567',
+        error: 'Invalid case reference',
+      });
+      expect(mockLogger.warn).toHaveBeenCalledWith('Invalid caseId format: ../admin/1234567');
+    });
   });
 
   describe('POST /case/:caseId/access-code', () => {
@@ -293,6 +335,50 @@ describe('accessCode routes', () => {
         'Failed to validate access code for case 1234567890123456:',
         expect.any(Error)
       );
+    });
+
+    it('should redirect with error when caseId is not 16 digits', async () => {
+      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      const req = {
+        params: { caseId: '123' },
+        body: { accessCode: 'ABC123' },
+        session: {
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/access-code?error=invalid');
+      expect(mockLogger.warn).toHaveBeenCalledWith('Invalid caseId format: 123');
+      expect(mockValidateAccessCode).not.toHaveBeenCalled();
+    });
+
+    it('should redirect with error when caseId contains path traversal', async () => {
+      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      const req = {
+        params: { caseId: '../admin/1234567' },
+        body: { accessCode: 'ABC123' },
+        session: {
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(res.redirect).toHaveBeenCalledWith(303, '/case/../admin/1234567/access-code?error=invalid');
+      expect(mockLogger.warn).toHaveBeenCalledWith('Invalid caseId format: ../admin/1234567');
+      expect(mockValidateAccessCode).not.toHaveBeenCalled();
     });
   });
 });

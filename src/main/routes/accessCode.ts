@@ -10,6 +10,16 @@ export default function accessCodeRoutes(app: Application): void {
   // GET: Display the validation form
   app.get('/case/:caseId/access-code', oidcMiddleware, (req: Request, res: Response) => {
     const { caseId } = req.params;
+
+    // Validate caseId format (16 digits only) to prevent SSRF
+    if (!/^\d{16}$/.test(caseId)) {
+      logger.warn(`Invalid caseId format: ${caseId}`);
+      return res.render('accessCode', {
+        caseId,
+        error: 'Invalid case reference',
+      });
+    }
+
     const error = req.query.error as string | undefined;
 
     return res.render('accessCode', {
@@ -23,6 +33,12 @@ export default function accessCodeRoutes(app: Application): void {
     const { caseId } = req.params;
     const { accessCode } = req.body;
     const userAccessToken = req.session.user?.accessToken;
+
+    // Validate caseId format (16 digits only) to prevent SSRF
+    if (!/^\d{16}$/.test(caseId)) {
+      logger.warn(`Invalid caseId format: ${caseId}`);
+      return res.redirect(303, `/case/${caseId}/access-code?error=invalid`);
+    }
 
     if (!userAccessToken) {
       logger.error(`No user access token in session for case ${caseId}`);
