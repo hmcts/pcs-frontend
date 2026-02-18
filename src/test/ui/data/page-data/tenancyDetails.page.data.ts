@@ -1,3 +1,5 @@
 export const tenancyDetails = {
-  mockText: 'Tenancy details',
+  mainHeader: 'Tenancy Details(placeholder)',
+  saveForLaterButton: 'Save for later',
+  saveAndContinueButton: 'Save and continue',
 };

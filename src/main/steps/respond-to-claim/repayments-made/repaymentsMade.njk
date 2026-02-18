@@ -1,0 +1,39 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% block pageTitle %}
+  {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
+
+{% block mainContent %}
+
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+   <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: saveAndContinue,
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      {{ govukButton({
+        text: saveForLater,
+        classes: 'govuk-button--secondary',
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
+    </div>
+  </form>
+{% endblock %}

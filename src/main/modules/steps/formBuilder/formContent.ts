@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import type { BuiltFormContent, FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 
 import { type FormError, buildErrorSummary, getErrorMessage } from './errorUtils';
 import { buildFieldValues, translateFields } from './fieldTranslation';
@@ -14,10 +14,12 @@ export function buildFormContent(
   errors: Record<string, FormError> = {},
   translationKeys?: TranslationKeys,
   nunjucksEnv?: Environment,
+  interpolation?: Record<string, unknown>,
   showCancelButton: boolean = true
-): Record<string, unknown> {
+): BuiltFormContent {
   const fieldValues = buildFieldValues(fields, bodyData);
-  const pageTitle = getTranslation(t, 'title', undefined) || getTranslation(t, 'question', undefined);
+  const pageTitle =
+    getTranslation(t, 'title', undefined, interpolation) || getTranslation(t, 'question', undefined, interpolation);
   // Convert FormError to string for translateFields (which expects strings for error messages)
   const stringErrors: Record<string, string> = Object.fromEntries(
     Object.entries(errors).map(([key, error]) => [key, getErrorMessage(error)])
@@ -25,13 +27,21 @@ export function buildFormContent(
   // Pass bodyData as originalData so translateFields can extract nested field values
   const fieldsWithLabels = translateFields(
     fields,
+
     t,
+
     fieldValues,
+
     stringErrors,
+
     !!pageTitle,
+
     '',
+
     bodyData,
-    nunjucksEnv
+
+    nunjucksEnv,
+    interpolation
   );
 
   // Build error summary
@@ -54,6 +64,7 @@ export function buildFormContent(
     title: pageTitle,
     ...translatedContent,
     showCancelButton,
+    saveAndContinue: t('buttons.saveAndContinue'),
     continue: t('buttons.continue'),
     saveForLater: t('buttons.saveForLater'),
     cancel: t('buttons.cancel'),

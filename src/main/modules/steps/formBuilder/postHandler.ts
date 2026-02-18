@@ -1,9 +1,14 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import type {
+  BuiltFormContent,
+  ExtendGetContent,
+  FormFieldConfig,
+  TranslationKeys,
+} from '../../../interfaces/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
-import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
+import { getDashboardUrl } from '../../../routes/dashboard';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -29,7 +34,7 @@ export function createPostHandler(
   translationKeys?: TranslationKeys,
   flowConfig?: JourneyFlowConfig,
   showCancelButton?: boolean,
-  extendGetContent?: (req: Request, content: Record<string, unknown>) => Record<string, unknown>
+  extendGetContent?: ExtendGetContent
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -67,23 +72,43 @@ export function createPostHandler(
       // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
       normalizeCheckboxFields(req, fields);
 
-      const fieldsWithLabels = translateFields(fields, t, {}, {}, false, '', undefined, nunjucksEnv);
+      // Get interpolation values from extendGetContent if available (for dynamic translation values)
+      const emptyFormContent = { fields: [] } as BuiltFormContent;
+      const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
+
+      const fieldsWithLabels = translateFields(
+        fields,
+        t,
+        {},
+        {},
+        false,
+        '',
+        undefined,
+        nunjucksEnv,
+        interpolationValues
+      );
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
-      const fieldErrors = getTranslationErrors(t, fieldsWithLabels);
+      const fieldErrors = getTranslationErrors(t, fields, undefined, interpolationValues);
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
       if (Object.keys(errors).length > 0) {
         const formContent = buildFormContent(
           fields,
+
           t,
+
           req.body,
+
           errors,
+
           translationKeys,
+
           nunjucksEnv,
+          interpolationValues,
           showCancelButton
         );
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
-        const extendedContent = extendGetContent ? extendGetContent(req, formContent) : {};
+        const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
         await renderWithErrors(
           req,
@@ -107,7 +132,7 @@ export function createPostHandler(
         processFieldData(req, fields);
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, DASHBOARD_ROUTE);
+        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving

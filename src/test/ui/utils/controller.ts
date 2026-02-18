@@ -1,10 +1,20 @@
+import { AxeUtils } from '@hmcts/playwright-common';
 import { Page, test } from '@playwright/test';
 
-import { actionData, actionRecord, actionTuple, validationData, validationRecord } from './interfaces';
+import {
+  enable_axe_audit,
+  enable_content_validation,
+  enable_error_message_validation,
+} from '../../../../playwright.config';
+import { axe_exclusions } from '../config/axe-exclusions.config';
+
+import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
+let startErrorMessageValidation = false;
+let startAxeAudit = false;
 
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
@@ -21,7 +31,12 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-
+  if (!startAxeAudit && executor.page.url().includes('start-now')) {
+    startAxeAudit = true;
+  }
+  if (!startErrorMessageValidation && executor.page.url().includes('free-legal-advice')) {
+    startErrorMessageValidation = true;
+  }
   const pageNavigated = currentUrl !== previousUrl;
 
   if (pageNavigated) {
@@ -34,8 +49,28 @@ async function detectPageNavigation(): Promise<boolean> {
 async function validatePageIfNavigated(action: string): Promise<void> {
   if (action.includes('click') || action.includes('navigate')) {
     const pageNavigated = await detectPageNavigation();
+    const executor = getExecutor();
     if (pageNavigated) {
-      await performValidation('autoValidatePageContent');
+      if (enable_content_validation) {
+        await performValidation('autoValidatePageContent');
+      }
+      if (startAxeAudit && enable_axe_audit) {
+        try {
+          await new AxeUtils(executor.page).audit({
+            exclude: axe_exclusions,
+          });
+        } catch (error) {
+          const errorMessage = String((error as Error).message || error).toLowerCase();
+          if (errorMessage.includes('execution context was destroyed') || errorMessage.includes('navigation')) {
+            console.warn(`Accessibility audit skipped due to navigation: ${errorMessage}`);
+          } else {
+            throw error;
+          }
+        }
+      }
+      if (startErrorMessageValidation && enable_error_message_validation) {
+        await performAction('triggerErrorMessagesForValidation');
+      }
     }
   }
 }
@@ -76,16 +111,6 @@ export async function performAction(
   await validatePageIfNavigated(action);
 }
 
-export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {
-  getExecutor();
-  await test.step(`Performed action group: ${groupName}`, async () => {
-    for (const action of actions) {
-      const [actionName, fieldName, value] = action;
-      await performAction(actionName, fieldName, value);
-    }
-  });
-}
-
 export async function performValidation(
   validation: string,
   inputFieldName?: validationData | validationRecord,
@@ -107,6 +132,26 @@ export async function performValidation(
     data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''
   }`, async () => {
     await validationInstance.validate(executor.page, validation, fieldName, data);
+  });
+}
+
+export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {
+  getExecutor();
+  await test.step(`Performed action group: ${groupName}`, async () => {
+    for (const action of actions) {
+      const [actionName, fieldName, value] = action;
+      await performAction(actionName, fieldName, value);
+    }
+  });
+}
+
+export async function performValidations(groupName: string, ...validations: validationTuple[]): Promise<void> {
+  getExecutor();
+  await test.step(`Performed validation group: ${groupName}`, async () => {
+    for (const validation of validations) {
+      const [validationType, fieldName, data] = validation;
+      await performValidation(validationType, fieldName, data);
+    }
   });
 }
 

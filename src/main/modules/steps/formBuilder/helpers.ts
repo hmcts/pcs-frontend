@@ -11,8 +11,14 @@ import type { FormError } from './errorUtils';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
-export function getTranslation(t: TFunction, key: string, fallback?: string): string | undefined {
-  const result = t(key, { returnObjects: true }) as unknown;
+export function getTranslation(
+  t: TFunction,
+  key: string,
+  fallback?: string,
+  interpolation?: Record<string, unknown>
+): string | undefined {
+  const options = { returnObjects: true, ...interpolation };
+  const result = t(key, options) as unknown;
   if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
     return result;
   }
@@ -94,13 +100,16 @@ export function processFieldData(req: Request, fields: FormFieldConfig[]): void 
 export function getTranslationErrors(
   t: TFunction,
   fields: FormFieldConfig[],
-  parentFieldName?: string
+  parentFieldName?: string,
+  interpolation?: Record<string, unknown>
 ): Record<string, string> {
   const translationErrors: Record<string, string> = {};
 
   const getStringTranslation = (key: string): string | undefined => {
     // Ask for objects so we can detect object-valued keys safely
-    const result = t(key, { returnObjects: true }) as unknown;
+    // Pass interpolation values if provided
+    const options = { returnObjects: true, ...interpolation };
+    const result = t(key, options) as unknown;
     return typeof result === 'string' && result !== key ? result : undefined;
   };
 
@@ -114,7 +123,7 @@ export function getTranslationErrors(
       // If errorMessage is a translation key (starts with 'errors.'), translate it
       if (typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
         const subFieldErrorKey = field.errorMessage;
-        const subFieldErrorMsg = t(subFieldErrorKey);
+        const subFieldErrorMsg = getStringTranslation(field.errorMessage);
         if (subFieldErrorMsg && subFieldErrorMsg !== subFieldErrorKey) {
           // Use nested field name as the key (e.g., 'contactMethod.emailAddress')
           translationErrors[fieldName] = subFieldErrorMsg;
@@ -136,7 +145,7 @@ export function getTranslationErrors(
 
       // Also check the errorMessage property if set
       if (field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
-        const errorMsgFromProperty = t(field.errorMessage);
+        const errorMsgFromProperty = interpolation ? t(field.errorMessage, interpolation) : t(field.errorMessage);
         if (errorMsgFromProperty && errorMsgFromProperty !== field.errorMessage) {
           translationErrors[field.name] = errorMsgFromProperty;
         }
@@ -150,7 +159,7 @@ export function getTranslationErrors(
           // Recursively collect error translations from subFields
           // Pass the current fieldName (which may already be nested) as the parent
           // But we need to use the simple field.name for the parent, not fieldName
-          const subFieldErrors = getTranslationErrors(t, Object.values(option.subFields), field.name);
+          const subFieldErrors = getTranslationErrors(t, Object.values(option.subFields), field.name, interpolation);
           Object.assign(translationErrors, subFieldErrors);
         }
       }
@@ -162,7 +171,17 @@ export function getTranslationErrors(
 
 export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
   const stepSpecificErrors: Record<string, string> = {};
+
   const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate'];
+  const commonErrorKeys = ['defaultRequired', 'defaultInvalid', 'defaultMaxLength'];
+
+  for (const key of commonErrorKeys) {
+    const errorKey = `errors.${key}`;
+    const translation = t(errorKey);
+    if (translation && translation !== errorKey) {
+      stepSpecificErrors[key] = translation;
+    }
+  }
 
   for (const field of fields) {
     for (const nestedKey of nestedKeys) {
@@ -273,8 +292,19 @@ export function validateForm(
       const day = req.body[dayKey]?.trim() || '';
       const month = req.body[monthKey]?.trim() || '';
       const year = req.body[yearKey]?.trim() || '';
+      const anyValueProvided = day || month || year;
 
-      const dateError = validateDateField(day, month, year, isRequired, t, field.noFutureDate, translations);
+      const dateError = validateDateField(
+        day,
+        month,
+        year,
+        isRequired || anyValueProvided,
+        t,
+        field.noFutureDate,
+        field.noCurrentDate,
+        translations
+      );
+
       if (dateError) {
         errors[fieldName] = dateError;
       }
