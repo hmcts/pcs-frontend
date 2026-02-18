@@ -13,7 +13,6 @@
     "saveForLater": "cySave for later"
   },
   "errors": {
-    "contactByTextMessage.phoneNumber": "cyPlease enter your UK mobile number before continuing.",
-    "contactByTextMessage.phoneNumber.invalid": "cyEnter a valid UK phone number."
+    "contactByTextMessage": "cySelect if you want to be contacted by text message."
   }
 }
