@@ -28,7 +28,8 @@ import { step as priorityDebts } from './priority-debts';
 import { step as whatOtherRegularExpensesDoYouHave } from './regular-expenses';
 import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
-import { step as repayments } from './repayments';
+import { step as repaymentsAgreed } from './repayments-agreed';
+import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
 import { step as tenancyDetails } from './tenancy-details';
@@ -54,7 +55,8 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'counter-claim': counterClaim,
   'payment-interstitial': paymentInterstitial,
-  repayments,
+  'repayments-made': repaymentsMade,
+  'repayments-agreed': repaymentsAgreed,
   'your-household-and-circumstances': yourHouseholdAndCircumstances,
   'do-you-have-any-dependant-children': doYouHaveAnyDependantChildren,
   'do-you-have-any-other-dependants': doYouHaveAnyOtherDependants,

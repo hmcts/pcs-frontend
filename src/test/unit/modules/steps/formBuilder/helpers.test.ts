@@ -3,6 +3,7 @@ import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
 import {
+  getCustomErrorTranslations,
   getFormData,
   getTranslation,
   getTranslationErrors,
@@ -351,6 +352,71 @@ describe('formBuilder helpers', () => {
 
       const result = getTranslationErrors(mockT, fields);
       expect(result).toEqual({});
+    });
+  });
+
+  describe('getCustomErrorTranslations - common default errors', () => {
+    it('should include all common default error translations when they exist', () => {
+      const mockT = jest.fn((key: string) => {
+        const translations: Record<string, string> = {
+          'errors.defaultRequired': 'This field is required',
+          'errors.defaultInvalid': 'Invalid format',
+          'errors.defaultMaxLength': 'Must be {max} characters or fewer',
+        };
+        return translations[key] || key;
+      }) as unknown as TFunction;
+
+      const result = getCustomErrorTranslations(mockT, []);
+
+      expect(result).toEqual({
+        defaultRequired: 'This field is required',
+        defaultInvalid: 'Invalid format',
+        defaultMaxLength: 'Must be {max} characters or fewer',
+      });
+    });
+
+    it('should only include common errors that have translations', () => {
+      const mockT = jest.fn((key: string) => {
+        if (key === 'errors.defaultMaxLength') {
+          return 'Must be {max} characters or fewer';
+        }
+        return key;
+      }) as unknown as TFunction;
+
+      const result = getCustomErrorTranslations(mockT, []);
+
+      expect(result).toEqual({
+        defaultMaxLength: 'Must be {max} characters or fewer',
+      });
+    });
+
+    it('should include both common errors and field-specific errors', () => {
+      const mockT = jest.fn((key: string) => {
+        const translations: Record<string, string> = {
+          'errors.defaultRequired': 'This field is required',
+          'errors.defaultInvalid': 'Invalid format',
+          'errors.defaultMaxLength': 'Must be {max} characters or fewer',
+          'errors.dateOfBirth.required': 'Enter your date of birth',
+        };
+        return translations[key] || key;
+      }) as unknown as TFunction;
+
+      const fields = [
+        {
+          name: 'dateOfBirth',
+          type: 'date' as const,
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+
+      expect(result).toEqual({
+        defaultRequired: 'This field is required',
+        defaultInvalid: 'Invalid format',
+        defaultMaxLength: 'Must be {max} characters or fewer',
+        dateRequired: 'Enter your date of birth',
+        'dateOfBirth.required': 'Enter your date of birth',
+      });
     });
   });
 

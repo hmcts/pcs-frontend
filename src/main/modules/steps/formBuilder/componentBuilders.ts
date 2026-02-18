@@ -75,6 +75,7 @@ export function buildComponentConfig(
       component.label = {
         text: label,
         isPageHeading: isFirstField,
+        classes: field.labelClasses,
       };
 
       // Add translated character count messages
