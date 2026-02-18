@@ -5,8 +5,6 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactByPhone,
   contactPreference,
-  correspondenceAddressKnown,
-  contactPreference,
   correspondenceAddress,
   counterClaim,
   dateOfBirth,
@@ -660,8 +658,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       inputArray: repaymentsMade.errorValidationField.errorCharLimit,
       header: repaymentsMade.errorValidationHeader,
     });
-    await performAction('clickRadioButton', correspondenceAddressKnown.yesRadioOption);
-    await performAction('clickButton', correspondenceAddressKnown.saveForLaterButton);
+    await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
+    await performAction('clickButton', correspondenceAddress.saveForLaterButton);
   });
 
   test('Contact By Phone  - Error messages - save for later Validations', async () => {
@@ -676,7 +674,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddressKnown.yesRadioOption,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
