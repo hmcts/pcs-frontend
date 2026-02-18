@@ -1,16 +1,24 @@
 import { Page } from '@playwright/test';
 
+import { submitCaseApiData } from '../../../data/api-data';
 import {
   contactByTextMessage,
   correspondenceAddressKnown,
+  correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
+  disputeClaimInterstitial,
   freeLegalAdvice,
+  noticeDateKnown,
+  noticeDateUnknown,
+  noticeDetails,
+  paymentInterstitial,
+  repaymentsMade,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
-
+export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -21,6 +29,13 @@ export class RespondToClaimAction implements IAction {
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
+      ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
+      ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
+      ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
+      ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
+      ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
+      ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
+      ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -29,7 +44,7 @@ export class RespondToClaimAction implements IAction {
     await actionToPerform();
   }
 
-  private async selectLegalAdvice(legalAdviceData: actionData): Promise<void> {
+  private async selectLegalAdvice(legalAdviceData: actionData) {
     await performAction('clickRadioButton', {
       question: freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion,
       option: legalAdviceData,
@@ -37,13 +52,13 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
   }
 
-  private async inputDefendantDetails(defendantData: actionRecord): Promise<void> {
+  private async inputDefendantDetails(defendantData: actionRecord) {
     await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantData.fName);
     await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantData.lName);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
-  private async enterDateOfBirthDetails(defendantData: actionRecord): Promise<void> {
+  private async enterDateOfBirthDetails(defendantData: actionRecord) {
     await performActions(
       'Defendant Date of Birth Entry',
       ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
@@ -53,7 +68,7 @@ export class RespondToClaimAction implements IAction {
     );
   }
 
-  private async confirmDefendantDetails(confirmDefendantName: actionRecord): Promise<void> {
+  private async confirmDefendantDetails(confirmDefendantName: actionRecord) {
     await performAction('clickRadioButton', {
       question: confirmDefendantName.question,
       option: confirmDefendantName.option,
@@ -61,20 +76,97 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
 
-  private async selectCorrespondenceAddressKnown(addressData: actionRecord): Promise<void> {
+  private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
     await performAction('clickRadioButton', {
-      question: correspondenceAddressKnown.correspondenceAddressConfirmHintText,
+      question: correspondenceAddress.correspondenceAddressConfirmHintText,
       option: addressData.radioOption,
     });
-    if (addressData.radioOption === correspondenceAddressKnown.noRadioOption) {
+    if (addressData.radioOption === correspondenceAddress.noRadioOption) {
+      await this.selectCorrespondenceAddressUnKnown(addressData);
+    } else {
+      await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    }
+  }
+
+  private async selectCorrespondenceAddressUnKnown(addressData: actionRecord) {
+    if (addressData.addressIndex) {
       await performActions(
         'Find Address based on postcode',
-        ['inputText', correspondenceAddressKnown.enterUKPostcodeHiddenTextLabel, addressData.postcode],
-        ['clickButton', correspondenceAddressKnown.findAddressHiddenButton],
-        ['select', correspondenceAddressKnown.addressSelectHiddenLabel, addressData.addressIndex]
+        ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
+        ['clickButton', correspondenceAddress.findAddressHiddenButton],
+        ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
+      );
+    } else if (addressData.addressLine1) {
+      await performActions(
+        'Enter Address Manually',
+        ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
+        ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
+        ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
+        ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
       );
     }
-    await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  }
+
+  private async disputeClaimInterstitial(isClaimantNameCorrect: actionData) {
+    if (isClaimantNameCorrect === 'YES') {
+      claimantsName = submitCaseApiData.submitCasePayload.claimantName;
+    } else {
+      claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
+    }
+    const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
+    const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
+    await performValidation('text', { elementType: 'heading', text: mainHeader });
+    await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+  }
+
+  private async readPaymentInterstitial(): Promise<void> {
+    await performAction('clickButton', paymentInterstitial.continueButton);
+  }
+
+  private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: repaymentsMade.mainHeader,
+      option: repaymentsData.repaymentOption,
+    });
+
+    if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
+      await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
+    }
+    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  }
+
+  private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeGivenData.option,
+    });
+    await performAction('clickButton', noticeDetails.saveAndContinueButton);
+  }
+
+  private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
+    if (noticeData?.day && noticeData?.month && noticeData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+      );
+    }
+    await performAction('clickButton', noticeDateKnown.saveAndContinueButton);
+  }
+
+  private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
+    if (noticeData?.day && noticeData?.month && noticeData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+      );
+    }
+    await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
   }
 
   private async selectContactByTextMessage(contactData: actionData): Promise<void> {
@@ -90,7 +182,6 @@ export class RespondToClaimAction implements IAction {
     if (!validationArr || validationArr.validationReq !== 'YES') {
       return;
     }
-
     if (!Array.isArray(validationArr.inputArray)) {
       return;
     }

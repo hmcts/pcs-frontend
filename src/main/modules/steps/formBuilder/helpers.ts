@@ -171,7 +171,17 @@ export function getTranslationErrors(
 
 export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
   const stepSpecificErrors: Record<string, string> = {};
+
   const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate'];
+  const commonErrorKeys = ['defaultRequired', 'defaultInvalid', 'defaultMaxLength'];
+
+  for (const key of commonErrorKeys) {
+    const errorKey = `errors.${key}`;
+    const translation = t(errorKey);
+    if (translation && translation !== errorKey) {
+      stepSpecificErrors[key] = translation;
+    }
+  }
 
   for (const field of fields) {
     for (const nestedKey of nestedKeys) {
@@ -282,8 +292,19 @@ export function validateForm(
       const day = req.body[dayKey]?.trim() || '';
       const month = req.body[monthKey]?.trim() || '';
       const year = req.body[yearKey]?.trim() || '';
+      const anyValueProvided = day || month || year;
 
-      const dateError = validateDateField(day, month, year, isRequired, t, field.noFutureDate, translations);
+      const dateError = validateDateField(
+        day,
+        month,
+        year,
+        isRequired || anyValueProvided,
+        t,
+        field.noFutureDate,
+        field.noCurrentDate,
+        translations
+      );
+
       if (dateError) {
         errors[fieldName] = dateError;
       }

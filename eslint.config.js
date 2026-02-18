@@ -128,6 +128,22 @@ module.exports = defineConfig([
     },
   },
   {
+    files: ['src/test/ui/**/*.ts'],
+    rules: {
+      quotes: [
+        'error',
+        'single',
+        {
+          allowTemplateLiterals: true,
+          avoidEscape: true,
+        },
+      ],
+      'no-console': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+    },
+  },
+  {
     files: ['**/*.js'],
     languageOptions: {
       sourceType: 'commonjs',
