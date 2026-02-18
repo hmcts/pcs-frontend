@@ -333,7 +333,7 @@ export function validateForm(
       const isMissing =
         field.type === 'checkbox'
           ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())
-          : value === undefined || value === null || value === '';
+          : value === undefined || value === null || value === '' || (typeof value === 'string' && !value.trim());
 
       if (isRequired && isMissing) {
         // Check translations first (which contains translated errorMessage), then field.errorMessage, then defaults
