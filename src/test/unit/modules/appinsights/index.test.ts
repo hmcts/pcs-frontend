@@ -32,9 +32,10 @@ describe('AppInsights test', () => {
 
   it('should enable Application Insights when connection string is provided', () => {
     jest.spyOn(config, 'get').mockReturnValue('fake-connection-string');
+    const appInsightsProdMode = new AppInsights(false);
     const appInsightsModule = require('applicationinsights');
 
-    appInsights.enableFor();
+    appInsightsProdMode.enableFor();
 
     expect(appInsightsModule.setup).toHaveBeenCalledWith('fake-connection-string');
     expect(appInsightsModule.setSendLiveMetrics).toHaveBeenCalledWith(true);
@@ -52,5 +53,18 @@ describe('AppInsights test', () => {
     const appInsightsModule = require('applicationinsights');
     expect(appInsightsModule.setup).not.toHaveBeenCalled();
     expect(appInsightsModule.start).not.toHaveBeenCalled();
+  });
+
+  it('should skip setup when already bootstrapped via --require', () => {
+    (process as NodeJS.Process & { __appInsightsBootstrapped?: boolean }).__appInsightsBootstrapped = true;
+    jest.spyOn(config, 'get').mockReturnValue('fake-connection-string');
+    const appInsightsInstance = new AppInsights(false);
+    const appInsightsModule = require('applicationinsights');
+
+    appInsightsInstance.enableFor();
+
+    expect(appInsightsModule.setup).not.toHaveBeenCalled();
+    expect(appInsightsModule.start).not.toHaveBeenCalled();
+    delete (process as NodeJS.Process & { __appInsightsBootstrapped?: boolean }).__appInsightsBootstrapped;
   });
 });

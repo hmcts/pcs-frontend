@@ -37,6 +37,10 @@ RUN yarn build:prod && \
 # Compile TypeScript to JavaScript
 RUN npx tsc
 
+# Copy App Insights bootstrap (plain .cjs, not compiled by tsc)
+RUN mkdir -p dist/main/modules/appinsights && \
+    cp src/main/modules/appinsights/bootstrap.cjs dist/main/modules/appinsights/
+
 # ---- Development image ----
 FROM dependencies AS development
 
