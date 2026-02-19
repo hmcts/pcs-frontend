@@ -54,6 +54,7 @@ export class ActionRegistry {
     ['enterNoticeDateUnknown', new RespondToClaimAction()],
     ['disputeClaimInterstitial', new RespondToClaimAction()],
     ['readPaymentInterstitial', new RespondToClaimAction()],
+    ['repaymentsMade', new RespondToClaimAction()],
     ['triggerErrorMessagesForValidation', new TriggerErrorMessagesAction()],
   ]);
 
