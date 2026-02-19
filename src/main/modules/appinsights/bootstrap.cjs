@@ -28,6 +28,6 @@
     appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = 'pcs-frontend';
     appInsights.start();
     process.__appInsightsBootstrapped = true;
-    console.log('Application Insights setup complete');
+    console.log('Application Insights setup completed');
   }
 })();
