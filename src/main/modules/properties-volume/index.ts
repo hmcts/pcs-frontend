@@ -6,7 +6,11 @@ import { get, set } from 'lodash';
 export class PropertiesVolume {
   enableFor(server: Express): void {
     if (server.locals.ENV !== 'development') {
-      propertiesVolume.addTo(config);
+      // Skip addTo if bootstrap already ran it (before config.get freezes config).
+      // See bootstrap.cjs for the ordering issue.
+      if (!(process as NodeJS.Process & { __propertiesVolumeLoaded?: boolean }).__propertiesVolumeLoaded) {
+        propertiesVolume.addTo(config);
+      }
 
       this.setSecret('secrets.pcs.AppInsightsInstrumentationKey', 'appInsights.instrumentationKey');
     }

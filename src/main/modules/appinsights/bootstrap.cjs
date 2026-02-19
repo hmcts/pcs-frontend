@@ -4,8 +4,26 @@
  * "Module winston has been loaded before @opentelemetry/instrumentation-winston"
  *
  * Uses .cjs and require() only - no imports that could pull in winston.
+ *
+ * IMPORTANT: properties-volume MUST run before config.get() - otherwise the first config.get()
+ * freezes the config (node-config immutability), and properties-volume fails when trying to
+ * merge secrets with "Configuration objects are immutable unless ALLOW_CONFIG_MUTATIONS is set".
  */
 (function () {
+  const isProduction = (process.env.NODE_ENV || 'development') === 'production';
+
+  if (isProduction) {
+    try {
+      const config = require('config');
+      // Load secrets from volume BEFORE any config.get() - which freezes the config.
+      // Must run first so PropertiesVolume.enableFor can skip addTo (config would be frozen by then).
+      require('@hmcts/properties-volume').addTo(config);
+      process.__propertiesVolumeLoaded = true;
+    } catch {
+      // Volume may not exist in all environments; continue
+    }
+  }
+
   const connectionString =
     process.env.APPLICATION_INSIGHTS_CONNECTION_STRING ||
     (() => {
