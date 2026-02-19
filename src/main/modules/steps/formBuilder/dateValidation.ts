@@ -10,7 +10,7 @@ const DEFAULT_DATE_ERROR_MESSAGE = 'Enter a valid date';
 const DATE_PART_CONSTRAINTS = {
   day: { maxLength: 2, min: 1, max: 31 },
   month: { maxLength: 2, min: 1, max: 12 },
-  year: { maxLength: 4, min: 1801, max: 9999, noLeadingZero: true },
+  year: { maxLength: 4, min: 1900, max: 9999, noLeadingZero: true },
 } as const;
 
 const DATE_PARTS = ['day', 'month', 'year'] as const;
@@ -47,6 +47,19 @@ function getDateErrorMessage(
   const key = partSpecificKey === 'futureDate' ? 'errors.date.futureDate' : 'errors.date.notRealDate';
   const translated = t(key);
   return translated !== key ? translated : DEFAULT_DATE_ERROR_MESSAGE;
+}
+
+function getYearMustBeSameOrAfter1900Message(t?: TFunction, translations?: Record<string, string>): string {
+  if (translations?.yearMustBeSameOrAfter1900) {
+    return translations.yearMustBeSameOrAfter1900;
+  }
+  if (t) {
+    const translated = t('errors.date.yearMustBeSameOrAfter1900');
+    if (translated !== 'errors.date.yearMustBeSameOrAfter1900') {
+      return translated;
+    }
+  }
+  return 'The year must be the same as or after 1900';
 }
 
 function getMissingDatePartsError(missingParts: string[], t?: TFunction): string {
@@ -105,6 +118,9 @@ function validateDatePart(
   }
 
   const num = parseInt(value, 10);
+  if (errorKey === 'invalidYear' && num < 1900) {
+    return getYearMustBeSameOrAfter1900Message(t, translations);
+  }
   return num < min || num > max ? getDateErrorMessage(t, undefined, translations) : null;
 }
 

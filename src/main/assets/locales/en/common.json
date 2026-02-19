@@ -47,6 +47,7 @@
       "notRealDate": "Date must be a real date",
       "futureDate": "Date must be in the past",
       "invalidValue": "Enter a valid value",
+      "yearMustBeSameOrAfter1900": "The year must be the same as or after 1900",
       "missingOne": "Date must include a {{missingField}}",
       "missingTwo": "Date must include a {{first}} and {{second}}"
     }
