@@ -41,6 +41,7 @@ export interface PossessionClaimResponse {
       address?: Address;
       phoneNumberProvided?: YesNoValue;
       phoneNumber?: string;
+      emailAddress?: string;
     };
   };
   defendantResponses?: {

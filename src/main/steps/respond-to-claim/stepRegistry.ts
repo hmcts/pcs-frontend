@@ -6,6 +6,7 @@ import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-n
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
 import { step as contactPreferences } from './contact-preferences';
+import { step as contactPreferencesEmailOrPost } from './contact-preferences-email-or-post';
 import { step as contactPreferencesTelephone } from './contact-preferences-telephone';
 import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
@@ -45,6 +46,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'contact-preferences': contactPreferences,
   'contact-preferences-telephone': contactPreferencesTelephone,
   'contact-preferences-text-message': contactPreferencesTextMessage,
+  'contact-preferences-email-or-post': contactPreferencesEmailOrPost,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
   'tenancy-details': tenancyDetails,
