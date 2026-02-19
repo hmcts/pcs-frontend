@@ -386,10 +386,8 @@ describe('autoSaveToCCD main function', () => {
       });
 
       expect(mockLogger.info).toHaveBeenCalledWith('[free-legal-advice] Draft saved successfully to CCD');
-      expect(res.locals.validatedCase).toEqual({
-        id: '1234567890123456',
-        data: { possessionClaimResponse: { defendantResponses: { receivedFreeLegalAdvice: 'YES' } } },
-      });
+      // Implementation doesn't update res.locals.validatedCase (keeps existing complete data)
+      expect(res.locals.validatedCase).toEqual({ id: '1234567890123456' });
     });
 
     it('should skip save when frontendField is not found in form data', async () => {

@@ -1,3 +1,6 @@
+import type { TFunction } from 'i18next';
+import type { Environment } from 'nunjucks';
+
 import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
 import { buildFormContent } from '../../../../../main/modules/steps/formBuilder/formContent';
 
@@ -31,7 +34,14 @@ describe('FormContent - Button Text Fix', () => {
         },
       ];
 
-      const result = buildFormContent(fields, mockT, {}, {}, undefined, mockNunjucksEnv);
+      const result = buildFormContent(
+        fields,
+        mockT as unknown as TFunction,
+        {},
+        {},
+        undefined,
+        mockNunjucksEnv as unknown as Environment
+      );
 
       // Button text should be at top level
       expect(result.saveAndContinue).toBe('Save and continue');
@@ -44,7 +54,14 @@ describe('FormContent - Button Text Fix', () => {
 
     it('should allow templates to access button text directly', () => {
       const fields: FormFieldConfig[] = [];
-      const result = buildFormContent(fields, mockT, {}, {}, undefined, mockNunjucksEnv);
+      const result = buildFormContent(
+        fields,
+        mockT as unknown as TFunction,
+        {},
+        {},
+        undefined,
+        mockNunjucksEnv as unknown as Environment
+      );
 
       // These should work in templates: {{ govukButton({ text: saveAndContinue }) }}
       expect(result.saveAndContinue).toBeDefined();
@@ -56,7 +73,14 @@ describe('FormContent - Button Text Fix', () => {
 
     it('should provide all three button texts consistently', () => {
       const fields: FormFieldConfig[] = [];
-      const result = buildFormContent(fields, mockT, {}, {}, undefined, mockNunjucksEnv);
+      const result = buildFormContent(
+        fields,
+        mockT as unknown as TFunction,
+        {},
+        {},
+        undefined,
+        mockNunjucksEnv as unknown as Environment
+      );
 
       expect(result).toMatchObject({
         saveAndContinue: expect.any(String),

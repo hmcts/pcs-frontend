@@ -1,5 +1,6 @@
 import type { Application, Response } from 'express';
 import express from 'express';
+import type { Environment } from 'nunjucks';
 
 import * as caseReferenceMiddleware from '../../../main/middleware/caseReference';
 import dashboardRoutes, { getDashboardUrl } from '../../../main/routes/dashboard';
@@ -16,7 +17,7 @@ describe('Dashboard Routes - Router Pattern Fix', () => {
     app = express();
     app.locals.nunjucksEnv = {
       render: jest.fn((template: string) => `<div>${template}</div>`),
-    } as typeof app.locals.nunjucksEnv;
+    } as unknown as Environment;
 
     mockResponse = {
       locals: {},

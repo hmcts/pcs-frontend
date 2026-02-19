@@ -23,11 +23,11 @@
     {% endfor %}
     <div class="govuk-button-group">
       {{ govukButton({
-        text: t('saveAndContinue', { ns: 'common' }),
+        text: t('buttons.saveAndContinue', { ns: 'common' }),
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
       {{ govukButton({
-        text: t('saveForLater', { ns: 'common' }),
+        text: t('buttons.saveForLater', { ns: 'common' }),
         classes: "govuk-button--secondary",
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}

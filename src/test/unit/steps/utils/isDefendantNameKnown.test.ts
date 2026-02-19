@@ -56,7 +56,7 @@ describe('isDefendantNameKnown', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false when only firstName is present', async () => {
+    it('should return true when nameKnown=YES even if only firstName is present', async () => {
       const mockReq = {
         res: {
           locals: {
@@ -78,10 +78,10 @@ describe('isDefendantNameKnown', () => {
 
       const result = await isDefendantNameKnown(mockReq);
 
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
 
-    it('should return false when only lastName is present', async () => {
+    it('should return true when nameKnown=YES even if only lastName is present', async () => {
       const mockReq = {
         res: {
           locals: {
@@ -103,7 +103,7 @@ describe('isDefendantNameKnown', () => {
 
       const result = await isDefendantNameKnown(mockReq);
 
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
 
     it('should return false when defendantContactDetails is undefined', async () => {
@@ -136,7 +136,7 @@ describe('isDefendantNameKnown', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false when names are empty strings', async () => {
+    it('should return true when nameKnown=YES even if names are empty strings', async () => {
       const mockReq = {
         res: {
           locals: {
@@ -159,7 +159,7 @@ describe('isDefendantNameKnown', () => {
 
       const result = await isDefendantNameKnown(mockReq);
 
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
   });
 });

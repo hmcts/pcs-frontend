@@ -8,23 +8,8 @@ jest.mock('../../../../../main/routes/dashboard');
 jest.mock('../../../../../main/modules/i18n');
 jest.mock('../../../../../main/modules/steps/flow');
 
-interface MockRequest extends Partial<Request> {
-  res?: {
-    locals: {
-      validatedCase?: { id: string };
-    };
-  };
-  app?: {
-    locals: {
-      nunjucksEnv: {
-        render: jest.Mock;
-      };
-    };
-  };
-}
-
 describe('PostHandler - Save for Later Fix', () => {
-  let mockRequest: MockRequest;
+  let mockRequest: Record<string, unknown>;
   let mockResponse: Partial<Response>;
   let mockNext: NextFunction;
   let fields: FormFieldConfig[];
@@ -34,7 +19,12 @@ describe('PostHandler - Save for Later Fix', () => {
       body: {},
       session: {
         formData: {},
-        user: { accessToken: 'test-token' },
+        user: {
+          accessToken: 'test-token',
+          idToken: 'test-id-token',
+          refreshToken: 'test-refresh-token',
+          sub: 'test-user-id',
+        },
       },
       res: {
         locals: {
@@ -79,8 +69,6 @@ describe('PostHandler - Save for Later Fix', () => {
       .spyOn(require('../../../../../main/modules/i18n'), 'getTranslationFunction')
       .mockReturnValue(jest.fn((key: string) => key));
 
-    jest.spyOn(require('../../../../../main/modules/i18n'), 'loadStepNamespace').mockResolvedValue(undefined);
-
     // Mock getDashboardUrl
     (dashboardModule.getDashboardUrl as jest.Mock) = jest.fn(caseId => {
       return `/dashboard/${caseId || '1234567890123456'}`;
@@ -98,7 +86,7 @@ describe('PostHandler - Save for Later Fix', () => {
       // Empty form + save for later
       mockRequest.body = { action: 'saveForLater' };
 
-      await post(mockRequest as Request, mockResponse as Response, mockNext);
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       // Should show validation errors (NOT redirect)
       expect(mockResponse.redirect).not.toHaveBeenCalled();
@@ -121,7 +109,7 @@ describe('PostHandler - Save for Later Fix', () => {
         action: 'saveForLater',
       };
 
-      await post(mockRequest as Request, mockResponse as Response, mockNext);
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       // Should save to session
       expect(mockRequest.session?.formData?.['free-legal-advice']).toEqual({
@@ -149,7 +137,7 @@ describe('PostHandler - Save for Later Fix', () => {
         },
       };
 
-      await post(mockRequest as Request, mockResponse as Response, mockNext);
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       expect(dashboardModule.getDashboardUrl).toHaveBeenCalledWith('9876543210987654');
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/dashboard/9876543210987654');
@@ -167,7 +155,7 @@ describe('PostHandler - Save for Later Fix', () => {
         locals: {}, // No validatedCase
       };
 
-      await post(mockRequest as Request, mockResponse as Response, mockNext);
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       // Should still redirect (to default dashboard URL)
       expect(dashboardModule.getDashboardUrl).toHaveBeenCalledWith(undefined);
@@ -189,7 +177,7 @@ describe('PostHandler - Save for Later Fix', () => {
         action: 'saveForLater',
       };
 
-      await post(mockRequest as Request, mockResponse as Response, mockNext);
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       expect(mockBeforeRedirect).toHaveBeenCalledWith(mockRequest);
     });
@@ -209,7 +197,7 @@ describe('PostHandler - Save for Later Fix', () => {
         action: 'saveForLater',
       };
 
-      await post(mockRequest as Request, mockResponse as Response, mockNext);
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       // Should call next with error
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));

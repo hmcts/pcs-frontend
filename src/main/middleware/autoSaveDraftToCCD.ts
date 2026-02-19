@@ -253,13 +253,15 @@ async function saveToCCD(
       ...nestedData,
     };
 
-    const updatedCase = await ccdCaseService.updateCase(accessToken, {
+    await ccdCaseService.updateCase(accessToken, {
       id: validatedCase.id,
       data: ccdPayload,
     });
 
-    // Update res.locals with merged case data from CCD
-    res.locals.validatedCase = updatedCase;
+    // Don't update res.locals.validatedCase with CCD response
+    // CCD submit returns incomplete data (only fields in payload, not full merged case)
+    // Keep existing res.locals.validatedCase from start callback (has complete data)
+    // Next page will call start callback and get fresh merged data from CCD
 
     logger.info(`[${stepName}] Draft saved successfully to CCD`);
   } catch (error) {
