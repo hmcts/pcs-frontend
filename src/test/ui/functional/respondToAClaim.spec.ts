@@ -302,7 +302,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
   });
 
-
   test('Notice Date Known - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
@@ -709,6 +708,4 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
     await performAction('clickButton', correspondenceAddress.saveForLaterButton);
   });
-
-
 });
