@@ -86,6 +86,32 @@ function attachErrorClearing(field: HTMLInputElement | HTMLTextAreaElement): voi
 }
 
 /**
+ * Attaches error clearing to radio buttons for conditional fields
+ */
+function attachRadioErrorClearing(): void {
+  const radios = document.querySelectorAll<HTMLInputElement>('input[type="radio"]');
+
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      // Find all conditional content areas
+      const conditionalContents = document.querySelectorAll('.govuk-radios__conditional');
+
+      conditionalContents.forEach(conditional => {
+        // Check if this conditional is hidden
+        if (conditional.classList.contains('govuk-radios__conditional--hidden')) {
+          // Find any error form groups within this hidden conditional
+          const errorFormGroups = conditional.querySelectorAll('.govuk-form-group--error');
+
+          errorFormGroups.forEach(formGroup => {
+            clearFieldError(formGroup as HTMLElement);
+          });
+        }
+      });
+    });
+  });
+}
+
+/**
  * Initializes error clearing for all form fields with errors
  */
 export function initFormErrorClearing(): void {
@@ -100,6 +126,9 @@ export function initFormErrorClearing(): void {
       attachErrorClearing(field);
     }
   });
+
+  // Also attach radio button error clearing for conditional fields
+  attachRadioErrorClearing();
 }
 
 if (document.readyState === 'loading') {
