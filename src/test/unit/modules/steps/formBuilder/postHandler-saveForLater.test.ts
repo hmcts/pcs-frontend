@@ -9,7 +9,7 @@ jest.mock('../../../../../main/modules/i18n');
 jest.mock('../../../../../main/modules/steps/flow');
 
 describe('PostHandler - Save for Later Fix', () => {
-  let mockRequest: Record<string, unknown>;
+  let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: NextFunction;
   let fields: FormFieldConfig[];
@@ -38,7 +38,7 @@ describe('PostHandler - Save for Later Fix', () => {
           },
         },
       },
-    };
+    } as Partial<Request>;
 
     mockResponse = {
       redirect: jest.fn(),
@@ -135,7 +135,7 @@ describe('PostHandler - Save for Later Fix', () => {
         locals: {
           validatedCase: { id: '9876543210987654' },
         },
-      };
+      } as Partial<Response>;
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
@@ -153,7 +153,7 @@ describe('PostHandler - Save for Later Fix', () => {
 
       mockRequest.res = {
         locals: {}, // No validatedCase
-      };
+      } as Partial<Response>;
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
