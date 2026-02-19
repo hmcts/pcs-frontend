@@ -1,8 +1,9 @@
 export const contactByPhone = {
-  mainHeader: 'Contact by telephone',
+  mainHeader: 'Contact preferences telephone',
+  //mainHeader: 'Contact by telephone',
   respondToClaimParagraph: 'Respond to a property possession claim',
   backLink: 'Back',
-  weMightNeedToContactHintText: 'We might need to contact you by telephone with urgent updates about your case',
+  weMightNeedToContactHintText: 'We might need to contact you by telephone with urgent updates about your case.',
   areYouHappyToContactQuestion: 'Are you happy to be contacted by telephone?',
   yesRadioOption: 'Yes',
   noRadioOption: 'No',

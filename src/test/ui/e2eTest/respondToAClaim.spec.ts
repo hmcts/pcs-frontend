@@ -41,6 +41,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url);
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+  console.log('caseId', process.env.CASE_NUMBER);
   await performAction('clickButton', startNow.startNowButton);
 });
 
@@ -107,10 +108,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactByPhone.mainHeader);
     await performAction('selectContactByPhone', {
       radioOption: contactByPhone.yesRadioOption,
       phoneNumber: contactByPhone.inputUkPhoneNumber,
     });
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
     await performValidation('mainHeader', contactByTextMessage.mainHeader);
     await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);

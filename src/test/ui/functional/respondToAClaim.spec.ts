@@ -163,6 +163,53 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
+  test('Contact By Phone  - Error messages - save for later Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: contactByPhone.errorValidation,
+      validationType: contactByPhone.errorValidationType.radio,
+      inputArray: contactByPhone.errorValidationField.errorRadioMsg,
+      question: contactByPhone.areYouHappyToContactQuestion,
+      header: contactByPhone.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', contactByPhone.yesRadioOption);
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: contactByPhone.errorValidation,
+      validationType: contactByPhone.errorValidationType.input,
+      inputArray: contactByPhone.errorValidationField.errorTextField1,
+      header: contactByPhone.errorValidationHeader,
+    });
+    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, '7ab00 90*2£&');
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: contactByPhone.errorValidation,
+      validationType: contactByPhone.errorValidationType.input,
+      inputArray: contactByPhone.errorValidationField.errorTextField2,
+      header: defendantNameCapture.errorValidationHeader,
+    });
+    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhone.inputUkPhoneNumber);
+    await performAction('clickButton', contactByPhone.saveForLaterButton);
+    await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
+    await performAction('clickButton', repaymentsMade.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
+  });
+
   test('Dispute claim interstitial - back and cancel link Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -254,6 +301,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       option: noticeDetails.yesRadioOption,
     });
   });
+
 
   test('Notice Date Known - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -662,50 +710,5 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', correspondenceAddress.saveForLaterButton);
   });
 
-  test('Contact By Phone  - Error messages - save for later Validations', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
-    });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: contactByPhone.errorValidation,
-      validationType: contactByPhone.errorValidationType.radio,
-      inputArray: contactByPhone.errorValidationField.errorRadioMsg,
-      question: contactByPhone.areYouHappyToContactQuestion,
-      header: contactByPhone.errorValidationHeader,
-    });
-    await performAction('clickRadioButton', contactByPhone.yesRadioOption);
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: contactByPhone.errorValidation,
-      validationType: contactByPhone.errorValidationType.input,
-      inputArray: contactByPhone.errorValidationField.errorTextField1,
-      header: contactByPhone.errorValidationHeader,
-    });
-    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, '7ab00 90*2£&');
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: contactByPhone.errorValidation,
-      validationType: contactByPhone.errorValidationType.input,
-      inputArray: contactByPhone.errorValidationField.errorTextField2,
-      header: defendantNameCapture.errorValidationHeader,
-    });
-    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhone.inputUkPhoneNumber);
-    await performAction('clickButton', contactByPhone.saveForLaterButton);
-    await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
-    await performAction('clickButton', repaymentsMade.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
-  });
+
 });

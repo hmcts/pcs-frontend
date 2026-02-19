@@ -1,4 +1,5 @@
 export const contactByTextMessage = {
-  mainHeader: 'contact by text message',
+//  mainHeader: 'contact by text message',
+  mainHeader: 'Are you happy to be contacted by text message?',
   saveAndContinueButton: 'Save and continue',
 };
