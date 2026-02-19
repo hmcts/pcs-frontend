@@ -11,13 +11,16 @@ export class AppInsights {
   }
 
   enableFor(): void {
-    if (config.get<string>('secrets.pcs.app-insights-connection-string') && !this.developmentMode) {
-      this.logger.info('Enabling Application Insights');
-      appInsights.setup(config.get<string>('secrets.pcs.app-insights-connection-string')).setSendLiveMetrics(true);
+    // if (config.get<string>('secrets.pcs.app-insights-connection-string') && !this.developmentMode) {
+    this.logger.info('Enabling Application Insights');
+    this.logger.info('Application Insights connection string', {
+      connectionString: config.get<string>('secrets.pcs.app-insights-connection-string'),
+    });
+    appInsights.setup(config.get<string>('secrets.pcs.app-insights-connection-string')).setSendLiveMetrics(true);
 
-      appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = 'pcs-frontend';
-      appInsights.start();
-      this.logger.info('Application Insights enabled');
-    }
+    appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = 'pcs-frontend';
+    appInsights.start();
+    this.logger.info('Application Insights enabled');
+    // }
   }
 }
