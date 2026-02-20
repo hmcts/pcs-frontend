@@ -20,12 +20,12 @@ export const rentArrears = {
   errorValidationType: { input: 'textField', radio: 'radioOptions' },
   errorValidationHeader: 'There is a problem',
   errorValidationField: {
-    errorRadioMsg: [{ errMessage: 'Select if you want to dispute any other parts of the claim' }],
+    errorRadioMsg: [{ errMessage: 'Do you owe this amount in rent arrears?' }],
     errorTextField: [
       {
         type: 'empty',
         label: 'How much do you believe you owe in rent arrears?',
-        errMessage: 'Enter the parts of the claim you do not agree with',
+        errMessage: 'Enter the amount you believe you owe in rent arrears',
       },
     ],
   },
