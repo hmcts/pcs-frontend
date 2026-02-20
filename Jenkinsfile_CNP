@@ -57,9 +57,6 @@ withPipeline(type, product, component) {
     }
     afterAlways('fullFunctionalTest:preview') {
       archiveFunctionalTestReports()
-      if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-        postAllureResultsToSlack('preview')
-      }
     }
   }
 
@@ -72,9 +69,6 @@ withPipeline(type, product, component) {
     ])
     afterAlways('functionalTest:aat') {
       archiveFunctionalTestReports()
-      if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-          postAllureResultsToSlack('master')
-      }
     }
   }
 }
@@ -91,24 +85,5 @@ def archiveFunctionalTestReports() {
     ])
   } catch (Error) {
       unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-  }
-}
-
-// Allure results Slack notification (when functional/E2E stage fails or is unstable).
-def postAllureResultsToSlack(String pipelineType = 'master') {
-  env.E2E_SERVICE_NAME = 'pcs-frontend'
-  env.E2E_PIPELINE_TYPE = pipelineType
-  def msg = sh(
-    script: "E2E_SERVICE_NAME=pcs-frontend E2E_PIPELINE_TYPE=${pipelineType} ./node_modules/.bin/ts-node scripts/allure-slack-notifier.ts --print-only 2>/dev/null || true",
-    returnStdout: true
-  ).trim()
-  if (!msg) {
-    msg = "Functional Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend  |  *Pipeline:* ${pipelineType}\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}PCS_20Frontend_20Functional_20Test_20Report/"
-  }
-  try {
-    slackSend(channel: '#qa-pipeline-status', message: msg)
-    echo "Allure Slack notification sent to #qa-pipeline-status"
-  } catch (Exception e) {
-    echo "WARNING: Failed to send Allure Slack notification: ${e.message}. Check Jenkins Slack plugin and channel access."
   }
 }
