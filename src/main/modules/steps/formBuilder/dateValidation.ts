@@ -49,17 +49,17 @@ function getDateErrorMessage(
   return translated !== key ? translated : DEFAULT_DATE_ERROR_MESSAGE;
 }
 
-function getYearMustBeSameOrAfter1900Message(t?: TFunction, translations?: Record<string, string>): string {
-  if (translations?.yearMustBeSameOrAfter1900) {
-    return translations.yearMustBeSameOrAfter1900;
+function getYearMinimumMessage(minYear: number, t?: TFunction, translations?: Record<string, string>): string {
+  if (translations?.yearMustBeSameOrAfter) {
+    return translations.yearMustBeSameOrAfter.replace('{{minYear}}', minYear.toString());
   }
   if (t) {
-    const translated = t('errors.date.yearMustBeSameOrAfter1900');
-    if (translated !== 'errors.date.yearMustBeSameOrAfter1900') {
+    const translated = t('errors.date.yearMustBeSameOrAfter', { minYear: minYear.toString() });
+    if (translated !== 'errors.date.yearMustBeSameOrAfter') {
       return translated;
     }
   }
-  return 'The year must be the same as or after 1900';
+  return `The year must be the same as or after ${minYear}`;
 }
 
 function getMissingDatePartsError(missingParts: string[], t?: TFunction): string {
@@ -118,8 +118,8 @@ function validateDatePart(
   }
 
   const num = parseInt(value, 10);
-  if (errorKey === 'invalidYear' && num < 1900) {
-    return getYearMustBeSameOrAfter1900Message(t, translations);
+  if (errorKey === 'invalidYear' && num < min) {
+    return getYearMinimumMessage(min, t, translations);
   }
   return num < min || num > max ? getDateErrorMessage(t, undefined, translations) : null;
 }

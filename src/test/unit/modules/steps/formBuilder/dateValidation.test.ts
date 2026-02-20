@@ -176,7 +176,7 @@ describe('dateValidation', () => {
 
       it('should use translation for year less than 1900 when provided', () => {
         const t = createMockT({
-          'errors.date.yearMustBeSameOrAfter1900': 'cyThe year must be the same as or after 1900',
+          'errors.date.yearMustBeSameOrAfter': 'cyThe year must be the same as or after {{minYear}}',
         });
         const result = validateDateField('15', '06', '1899', true, t);
         expect(result?.message).toBe('cyThe year must be the same as or after 1900');
@@ -184,7 +184,7 @@ describe('dateValidation', () => {
       });
 
       it('should use translations object for year less than 1900 when provided', () => {
-        const translations = { yearMustBeSameOrAfter1900: 'Custom year 1900 message' };
+        const translations = { yearMustBeSameOrAfter: 'Custom year {{minYear}} message' };
         const result = validateDateField('15', '06', '1899', true, undefined, false, true, translations);
         expect(result?.message).toBe('Custom year 1900 message');
         expect(result?.erroneousParts).toEqual(['year']);
