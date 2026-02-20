@@ -61,7 +61,7 @@ export class RespondToClaimAction implements IAction {
         'Defendant Date of Birth Entry',
         ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
         ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
-        ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear],
+        ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear]
       );
     }
     await performAction('clickButton', dateOfBirth.saveAndContinueButton);
