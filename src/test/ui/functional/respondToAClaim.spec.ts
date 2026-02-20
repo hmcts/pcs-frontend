@@ -333,7 +333,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = false
-  test.skip('England - RentArrears - NoticeServed - No - RentArrearsDispute', async () => {
+  test('England - RentArrears - NoticeServed - No - RentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
@@ -352,10 +352,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('selectNoticeDetails', {
-      question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.noRadioOption,
-    });
     await performAction('rentArrears', {
       option: rentArrears.yesRadioOption
     });
@@ -363,13 +359,14 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repaymentsMade.mainHeader);
-    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = true, and Notice Served boolean = true
-  test.skip('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
+  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
@@ -401,19 +398,20 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('rentArrears', {
       option: rentArrears.noRadioOption,
-      rentAmount: rentArrears.rentAmount,
+      rentAmount: rentArrears.rentAmountTextInput,
     });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repaymentsMade.mainHeader);
-    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
-  test.skip('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
+  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
@@ -447,13 +445,14 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repaymentsMade.mainHeader);
-    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
-  test.skip('RentArrears - NoticeServed - Yes NoticeDetails - No - RentArrearsDispute', async () => {
+  test('RentArrears - NoticeServed - Yes NoticeDetails - No - RentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
@@ -484,9 +483,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repaymentsMade.mainHeader);
-    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
@@ -515,15 +515,16 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       option: noticeDetails.imNotSureRadioOption,
     });
     await performAction('rentArrears', {
-      option: rentArrears.yesRadioOption
+      option: rentArrears.imNotSureRadioOption
     });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', repaymentsMade.mainHeader);
-    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
@@ -695,39 +696,54 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('clickButton', rentArrears.saveAndContinueButton);
-    // await performAction('inputErrorValidation', {
-    //   validationReq: nonRentArrearsDispute.errorValidation,
-    //   validationType: nonRentArrearsDispute.errorValidationType.radio,
-    //   inputArray: nonRentArrearsDispute.errorValidationField.errorRadioMsg,
-    //   question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
-    //   header: nonRentArrearsDispute.errorValidationHeader,
-    // });
-    // await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
-    // await performValidation('elementToBeVisible', nonRentArrearsDispute.youHave6500CharactersHiddenHintText);
-    // await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
-    // await performAction('inputErrorValidation', {
-    //   validationReq: nonRentArrearsDispute.errorValidation,
-    //   validationType: nonRentArrearsDispute.errorValidationType.input,
-    //   inputArray: nonRentArrearsDispute.errorValidationField.errorTextField,
-    //   header: nonRentArrearsDispute.errorValidationHeader,
-    // });
+    await performAction('inputErrorValidation', {
+      validationReq: rentArrears.errorValidation,
+      validationType: rentArrears.errorValidationType.radio,
+      inputArray: rentArrears.errorValidationField.errorRadioMsg,
+      question: rentArrears.doYouOweThisQuestion,
+      header: rentArrears.errorValidationHeader,
+    });
+    await performAction('clickRadioButton', {
+      question: rentArrears.doYouOweThisQuestion,
+      option: rentArrears.noRadioOption,
+    });
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: rentArrears.errorValidation,
+      validationType: rentArrears.errorValidationType.input,
+      inputArray: rentArrears.errorValidationField.errorTextField,
+      header: rentArrears.errorValidationHeader,
+    });
+    await performAction(
+      'inputText',
+      rentArrears.howMuchDoYouBelieveHiddenTextLabel,
+      rentArrears.negativeTextInput
+    );
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    await performAction('inputErrorValidation', {
+      validationReq: rentArrears.errorValidation,
+      validationType: rentArrears.errorValidationType.input,
+      inputArray: rentArrears.errorValidationField.errorNegativeTextInput,
+      header: rentArrears.errorValidationHeader,
+    });
     // await performAction(
     //   'inputText',
-    //   nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
-    //   nonRentArrearsDispute.detailsCharLimitInputText
+    //   rentArrears.howMuchDoYouBelieveHiddenTextLabel,
+    //   rentArrears.billionTextInput
     // );
-    // await performValidation('elementToBeVisible', nonRentArrearsDispute.tooManyCharacterHiddenHintText);
-    // await performAction(
-    //   'clickLinkAndVerifyNewTabTitle',
-    //   nonRentArrearsDispute.viewTheClaimLink,
-    //   nonRentArrearsDispute.mainHeaderGovServiceHiddenNewTab
-    // );
-    // await performAction(
-    //   'inputText',
-    //   nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
-    //   nonRentArrearsDispute.explainClaimTextInput
-    // );
-    // await performAction('clickButton', nonRentArrearsDispute.saveForLaterButton);
-    // await performValidation('mainHeader', 'Dashboard');
+    // await performAction('clickButton', rentArrears.saveAndContinueButton);
+    // await performAction('inputErrorValidation', {
+    //   validationReq: rentArrears.errorValidation,
+    //   validationType: rentArrears.errorValidationType.input,
+    //   inputArray: rentArrears.errorValidationField.errorBillionTextInput,
+    //   header: rentArrears.errorValidationHeader,
+    // });
+    await performAction(
+      'inputText',
+      rentArrears.howMuchDoYouBelieveHiddenTextLabel,
+      rentArrears.rentAmountTextInput
+    );
+    await performAction('clickButton', rentArrears.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
   });
 });
