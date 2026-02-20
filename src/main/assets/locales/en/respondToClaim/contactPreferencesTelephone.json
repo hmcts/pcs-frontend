@@ -1,6 +1,7 @@
 {
-  "pageTitle": "Contact preferences telephone",
-  "heading": "Contact preferences telephone",
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Contact by telephone",
+  "heading": "Contact by telephone",
   "subtitle": "We might need to contact you by telephone with urgent updates about your case.",
   "labels": {
     "question": "Are you happy to be contacted by telephone?",

@@ -9,10 +9,12 @@ import { flowConfig } from '../flow.config';
 export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-telephone',
   journeyFolder: 'respondToClaim',
+  showCancelButton: false,
   stepDir: __dirname,
   flowConfig,
 
   translationKeys: {
+    caption: 'caption',
     pageTitle: 'pageTitle',
     heading: 'heading',
     content: 'subtitle',
