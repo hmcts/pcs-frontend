@@ -22,12 +22,7 @@ export const dateOfBirth = {
   dayInputText: randomDOB.day.toString(),
   monthInputText: randomDOB.month.toString(),
   yearInputText: randomDOB.year.toString(),
+  backLink: 'Back',
   saveAndContinueButton: 'Save and continue',
-  saveForLater: 'Save for later',
-  errorValidation: 'YES',
-  errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox', date: 'dateField' },
-  errorValidationHeader: 'There is a problem',
-  errorValidationField: {
-    errorTextField: [{ type: 'empty', label: '', errMessage: 'Enter your date of birth' }],
-  },
+  saveForLaterButton: 'Save for later',
 };
