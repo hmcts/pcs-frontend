@@ -1,6 +1,7 @@
 export const rentArrears = {
   mainHeader: 'Rent arrears',
-  rentArrearsHintText: 'Rent arrears are money you owe in rent payments. \n' +
+  rentArrearsHintText:
+    'Rent arrears are money you owe in rent payments. \n' +
     '\n' +
     'When making their claim, Treetops Housing had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.\n' +
     '\n' +
@@ -9,7 +10,7 @@ export const rentArrears = {
   amountYouOweParagraph: 'Amount you owe in rent arrears given by Treetops Housing:',
   amountParagraph: '£3250.00',
   rentAmountTextInput: '1000.00',
-  negativeTextInput:'-100.00',
+  negativeTextInput: '-100.00',
   billionTextInput: '1000001.00',
   doYouOweThisQuestion: 'Do you owe this amount in rent arrears?',
   howMuchDoYouBelieveHiddenTextLabel: 'How much do you believe you owe in rent arrears?',
@@ -35,14 +36,14 @@ export const rentArrears = {
         type: 'empty',
         label: 'How much do you believe you owe in rent arrears?',
         errMessage: 'The amount you believe you owe in rent arrears must be £0.00 or above',
-      }
+      },
     ],
     errorBillionTextInput: [
       {
         type: 'empty',
         label: 'How much do you believe you owe in rent arrears?',
         errMessage: 'The amount you believe you owe in rent arrears must be less than £1 billion',
-      }
+      },
     ],
   },
 };

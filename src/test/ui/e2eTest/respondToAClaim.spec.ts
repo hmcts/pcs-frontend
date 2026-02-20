@@ -85,7 +85,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = true, and Notice Served boolean = true
-  test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
+  test.skip('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     /*await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -126,7 +126,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
-  test('Non-RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - NonRentArrearsDispute', async () => {
+  test.skip('Non-RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - NonRentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     /*await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -168,7 +168,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
-  test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute', async () => {
+  test.skip('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,

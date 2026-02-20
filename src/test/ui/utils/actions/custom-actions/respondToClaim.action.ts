@@ -34,7 +34,7 @@ export class RespondToClaimAction implements IAction {
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
-      ['rentArrears',  () => this.rentArrears(fieldName as actionRecord)],
+      ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -175,11 +175,7 @@ export class RespondToClaimAction implements IAction {
     });
 
     if (rentArrearsInfo.option === rentArrears.noRadioOption) {
-      await performAction(
-        'inputText',
-        rentArrears.howMuchDoYouBelieveHiddenTextLabel,
-        rentArrearsInfo.rentAmount
-      );
+      await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
     }
     await performAction('clickButton', rentArrears.saveAndContinueButton);
   }

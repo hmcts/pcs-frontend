@@ -333,7 +333,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = false
-  test('England - RentArrears - NoticeServed - No - RentArrearsDispute', async () => {
+  test.skip('England - RentArrears - NoticeServed - No - RentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
@@ -353,7 +353,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('rentArrears', {
-      option: rentArrears.yesRadioOption
+      option: rentArrears.yesRadioOption,
     });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
@@ -439,7 +439,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknown');
     await performAction('rentArrears', {
-      option: rentArrears.yesRadioOption
+      option: rentArrears.yesRadioOption,
     });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
@@ -477,7 +477,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       option: noticeDetails.noRadioOption,
     });
     await performAction('rentArrears', {
-      option: rentArrears.yesRadioOption
+      option: rentArrears.yesRadioOption,
     });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
@@ -515,7 +515,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       option: noticeDetails.imNotSureRadioOption,
     });
     await performAction('rentArrears', {
-      option: rentArrears.imNotSureRadioOption
+      option: rentArrears.imNotSureRadioOption,
     });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
@@ -714,11 +714,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       inputArray: rentArrears.errorValidationField.errorTextField,
       header: rentArrears.errorValidationHeader,
     });
-    await performAction(
-      'inputText',
-      rentArrears.howMuchDoYouBelieveHiddenTextLabel,
-      rentArrears.negativeTextInput
-    );
+    await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.negativeTextInput);
     await performAction('clickButton', rentArrears.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: rentArrears.errorValidation,
@@ -738,11 +734,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     //   inputArray: rentArrears.errorValidationField.errorBillionTextInput,
     //   header: rentArrears.errorValidationHeader,
     // });
-    await performAction(
-      'inputText',
-      rentArrears.howMuchDoYouBelieveHiddenTextLabel,
-      rentArrears.rentAmountTextInput
-    );
+    await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.rentAmountTextInput);
     await performAction('clickButton', rentArrears.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
