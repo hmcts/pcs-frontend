@@ -1,7 +1,7 @@
 /**
  * Form Error Clearing Module
  * Implements real-time error clearing when users start correcting invalid inputs
- * Follows GDS pattern for better user experience
+ * Follows GDS pattern for better user experience - https://design-system.service.gov.uk/components/error-message/
  */
 
 /**
