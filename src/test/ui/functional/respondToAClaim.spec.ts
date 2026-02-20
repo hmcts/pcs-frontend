@@ -15,7 +15,7 @@ import {
   noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
-  rentArrearsDispute,
+  rentArrears,
   repaymentsMade,
   startNow,
   tenancyDetails,
@@ -356,8 +356,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
     });
-    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
-    await performAction('clickButton', rentArrearsDispute.continueButton);
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -398,8 +399,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       month: '2',
       year: '2020',
     });
-    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
-    await performAction('clickButton', rentArrearsDispute.continueButton);
+    await performAction('rentArrears', {
+      option: rentArrears.noRadioOption,
+      rentAmount: rentArrears.rentAmount,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -437,8 +440,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
-    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
-    await performAction('clickButton', rentArrearsDispute.continueButton);
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -473,8 +477,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
     });
-    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
-    await performAction('clickButton', rentArrearsDispute.continueButton);
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -485,7 +490,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
-  test.skip('RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - RentArrearsDispute', async () => {
+  test('RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - RentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
@@ -509,8 +514,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
     });
-    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
-    await performAction('clickButton', rentArrearsDispute.continueButton);
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -660,5 +666,68 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
     await performAction('clickButton', repaymentsMade.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
+  });
+
+  test('RentArrears - mandatory selection, mandatory text box,save for later, character limit and back link ', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.imNotSureRadioOption,
+    });
+    await performAction('clickLink', rentArrears.backLink);
+    await performValidation('mainHeader', noticeDetails.mainHeader);
+    await performAction('clickButton', noticeDetails.saveAndContinueButton);
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    // await performAction('inputErrorValidation', {
+    //   validationReq: nonRentArrearsDispute.errorValidation,
+    //   validationType: nonRentArrearsDispute.errorValidationType.radio,
+    //   inputArray: nonRentArrearsDispute.errorValidationField.errorRadioMsg,
+    //   question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
+    //   header: nonRentArrearsDispute.errorValidationHeader,
+    // });
+    // await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
+    // await performValidation('elementToBeVisible', nonRentArrearsDispute.youHave6500CharactersHiddenHintText);
+    // await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+    // await performAction('inputErrorValidation', {
+    //   validationReq: nonRentArrearsDispute.errorValidation,
+    //   validationType: nonRentArrearsDispute.errorValidationType.input,
+    //   inputArray: nonRentArrearsDispute.errorValidationField.errorTextField,
+    //   header: nonRentArrearsDispute.errorValidationHeader,
+    // });
+    // await performAction(
+    //   'inputText',
+    //   nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
+    //   nonRentArrearsDispute.detailsCharLimitInputText
+    // );
+    // await performValidation('elementToBeVisible', nonRentArrearsDispute.tooManyCharacterHiddenHintText);
+    // await performAction(
+    //   'clickLinkAndVerifyNewTabTitle',
+    //   nonRentArrearsDispute.viewTheClaimLink,
+    //   nonRentArrearsDispute.mainHeaderGovServiceHiddenNewTab
+    // );
+    // await performAction(
+    //   'inputText',
+    //   nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
+    //   nonRentArrearsDispute.explainClaimTextInput
+    // );
+    // await performAction('clickButton', nonRentArrearsDispute.saveForLaterButton);
+    // await performValidation('mainHeader', 'Dashboard');
   });
 });
