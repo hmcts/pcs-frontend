@@ -47,7 +47,7 @@ test.afterEach(async () => {
   ErrorMessageValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim - e2e Journey @nightly', async () => {
+test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
   // Wales postcode routing is not implemented yet, e2e test coverage, functional test coverage needs to be reviewed once HDPI-3451 is done
   test('Respond to a claim - Wales postcode @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
