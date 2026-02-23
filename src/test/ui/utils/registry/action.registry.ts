@@ -49,6 +49,8 @@ export class ActionRegistry {
     ['confirmDefendantDetails', new RespondToClaimAction()],
     ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
     ['selectCorrespondenceAddressUnKnown', new RespondToClaimAction()],
+    ['selectContactByPhone', new RespondToClaimAction()],
+    ['selectContactByTextMessage', new RespondToClaimAction()],
     ['selectNoticeDetails', new RespondToClaimAction()],
     ['enterNoticeDateKnown', new RespondToClaimAction()],
     ['enterNoticeDateUnknown', new RespondToClaimAction()],

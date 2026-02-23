@@ -13,4 +13,6 @@ export default {
   'rent-arrears-dispute': 'rentArrearsDispute',
   'payment-interstitial': 'payment-interstitial',
   'repayments-made': 'repaymentsMade',
+  'contact-by-phone': 'contactByPhone',
+  'contact-by-text-message': 'contactByTextMessage',
 };
