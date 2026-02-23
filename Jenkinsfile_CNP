@@ -94,7 +94,7 @@ def archiveFunctionalTestReports() {
   }
 }
 
-// Allure results Slack notification (when functional/E2E stage fails or is unstable).
+// Allure results Slack notification
 def postAllureResultsToSlack(String pipelineType = 'master') {
   env.E2E_SERVICE_NAME = 'pcs-frontend'
   env.E2E_PIPELINE_TYPE = pipelineType
