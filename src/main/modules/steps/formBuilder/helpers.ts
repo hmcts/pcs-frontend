@@ -9,7 +9,24 @@ import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
 import type { FormError } from './errorUtils';
 
+export { validateCurrencyAmount } from './currencyValidation';
+
 const logger = Logger.getLogger('form-builder-helpers');
+
+/**
+ * Translates an error key or returns the error message as-is
+ * @param error - Error message or translation key (e.g., 'errors.fieldName.required')
+ * @param translations - Map of translation keys to translated messages
+ * @param t - Optional i18next translation function
+ * @returns Translated error message
+ */
+function translateErrorKey(error: string, translations: Record<string, string> | undefined, t?: TFunction): string {
+  if (error.startsWith('errors.')) {
+    const keyWithoutPrefix = error.replace('errors.', '');
+    return translations?.[keyWithoutPrefix] || (t ? t(error) : error);
+  }
+  return error;
+}
 
 export function getTranslation(
   t: TFunction,
@@ -360,8 +377,15 @@ export function validateForm(
             // Use translated error message if available, otherwise use validator result or default
             // Don't use field.errorMessage directly as it's a translation key, not a translated message
             const translatedMsg = translations?.[fieldName];
-            const errorMsg =
-              translatedMsg || (typeof validatorResult === 'string' ? validatorResult : undefined) || 'Invalid value';
+            let errorMsg: string | undefined = translatedMsg;
+
+            if (!errorMsg && typeof validatorResult === 'string') {
+              errorMsg = translateErrorKey(validatorResult, translations, t);
+            }
+
+            if (!errorMsg) {
+              errorMsg = 'Invalid value';
+            }
             if (!errors[fieldName]) {
               errors[fieldName] = errorMsg;
               // Debug logging
@@ -405,7 +429,9 @@ export function validateForm(
             const customError = field.validate(value, formData, validationAllData);
             if (customError) {
               if (!errors[fieldName]) {
-                errors[fieldName] = customError;
+                const msg =
+                  typeof customError === 'string' ? translateErrorKey(customError, translations, t) : customError;
+                errors[fieldName] = msg;
               }
             }
           } catch (err) {
@@ -418,7 +444,9 @@ export function validateForm(
           const customError = field.validate(value, formData, validationAllData);
           if (customError) {
             if (!errors[fieldName]) {
-              errors[fieldName] = customError;
+              const msg =
+                typeof customError === 'string' ? translateErrorKey(customError, translations, t) : customError;
+              errors[fieldName] = msg;
             }
           }
         } catch (err) {

@@ -307,5 +307,8 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
     },
+    'rent-arrears': {
+      defaultNext: 'end-now',
+    },
   },
 };
