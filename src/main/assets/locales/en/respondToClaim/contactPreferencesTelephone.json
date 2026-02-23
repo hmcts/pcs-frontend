@@ -9,14 +9,14 @@
       "yes": "Yes",
       "no": "No"
     },
-    "phoneNumberLabel": "UK telephone number"
+    "phoneNumberLabel": "UK phone number"
   },
   "buttons": {
     "saveAndContinue": "Save and continue",
     "saveForLater": "Save for later"
   },
   "errors": {
-    "contactByTelephone": "Select whether you're happy to be contacted by telephone",
+    "contactByTelephone": "Select whether you’re happy to be contacted by telephone",
     "contactByTelephone.phoneNumber": "Enter a UK phone number",
     "contactByTelephone.phoneNumber.invalid": "Enter a phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192"
   }

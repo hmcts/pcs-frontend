@@ -38,6 +38,7 @@ export const step: StepDefinition = createFormStep({
               name: 'phoneNumber',
               type: 'text',
               required: true,
+              labelClasses: 'govuk-!-font-weight-bold',
               translationKey: {
                 label: 'labels.phoneNumberLabel',
               },
