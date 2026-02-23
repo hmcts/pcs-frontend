@@ -32,7 +32,9 @@ interface AllureTestRecord {
 function findSummaryJson(baseDir: string): string {
   for (const p of SUMMARY_CANDIDATES) {
     const fullPath = path.join(baseDir, p);
-    if (fs.existsSync(fullPath)) {return fullPath;}
+    if (fs.existsSync(fullPath)) {
+      return fullPath;
+    }
   }
   throw new Error(
     `Allure summary.json not found. Checked: ${SUMMARY_CANDIDATES.map(c => path.join(baseDir, c)).join(', ')}`
@@ -65,7 +67,9 @@ function parseSummary(summaryPath: string): AllureSummary {
 }
 
 function parseResults(resultsDir: string): AllureTestRecord[] {
-  if (!fs.existsSync(resultsDir)) {return [];}
+  if (!fs.existsSync(resultsDir)) {
+    return [];
+  }
   const files = fs.readdirSync(resultsDir).filter(f => f.endsWith('-result.json'));
   const tests: AllureTestRecord[] = [];
 
@@ -104,7 +108,9 @@ function latestResultByKey(tests: AllureTestRecord[]): AllureTestRecord[] {
   for (const t of tests) {
     const key = (t.historyId ?? t.fullName ?? t.name).trim() || t.name;
     const existing = byKey.get(key);
-    if (!existing || (t.start ?? 0) >= (existing.start ?? 0)) {byKey.set(key, t);}
+    if (!existing || (t.start ?? 0) >= (existing.start ?? 0)) {
+      byKey.set(key, t);
+    }
   }
   return Array.from(byKey.values());
 }
@@ -130,21 +136,33 @@ function countSlow(tests: AllureTestRecord[], thresholdSec: number): number {
 
 function formatDuration(seconds: number): string {
   const s = Math.round(seconds);
-  if (s < 60) {return `${s}s`;}
+  if (s < 60) {
+    return `${s}s`;
+  }
   const m = Math.floor(s / 60);
   const sec = s % 60;
-  if (m < 60) {return sec > 0 ? `${m}m ${sec}s` : `${m}m`;}
+  if (m < 60) {
+    return sec > 0 ? `${m}m ${sec}s` : `${m}m`;
+  }
   const h = Math.floor(m / 60);
   const min = m % 60;
   const parts = [`${h}h`];
-  if (min > 0) {parts.push(`${min}m`);}
-  if (sec > 0) {parts.push(`${sec}s`);}
+  if (min > 0) {
+    parts.push(`${min}m`);
+  }
+  if (sec > 0) {
+    parts.push(`${sec}s`);
+  }
   return parts.join(' ');
 }
 
 function ragStatus(summary: AllureSummary): string {
-  if (summary.failed > 0 || summary.pass_rate < 95) {return '🔴 RED';}
-  if (summary.broken > 0 || summary.pass_rate < 98) {return '🟠 AMBER';}
+  if (summary.failed > 0 || summary.pass_rate < 95) {
+    return '🔴 RED';
+  }
+  if (summary.broken > 0 || summary.pass_rate < 98) {
+    return '🟠 AMBER';
+  }
   return '🟢 GREEN';
 }
 
