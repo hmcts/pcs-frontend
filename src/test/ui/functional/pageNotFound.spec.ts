@@ -21,6 +21,7 @@ test.afterEach(async () => {
 test.describe('Error page to indicate Page Not Found error @PR @nightly', () => {
   test('Content Validation on Page not found page', async () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
+    await performAction('login');
   });
 
   // This test was written as part of the story HDPI-3883. A new story will update the error message screen with a “Contact Us” link.
