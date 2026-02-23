@@ -96,6 +96,9 @@ export default function dashboardRoutes(app: Application): void {
   app.get('/dashboard', oidcMiddleware, (req: Request, res: Response) => {
     const caseId = req.session?.ccdCase?.id;
     const redirectUrl = getDashboardUrl(caseId);
+    if (!redirectUrl?.startsWith('/')) {
+      return res.redirect(303, '/error');
+    }
     return res.redirect(303, redirectUrl);
   });
 

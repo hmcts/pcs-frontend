@@ -132,7 +132,11 @@ export function createPostHandler(
         processFieldData(req, fields);
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
+        const dashboardUrl = getDashboardUrl(req.res?.locals.validatedCase?.id);
+        if (!dashboardUrl?.startsWith('/')) {
+          return res.redirect(303, '/error');
+        }
+        return res.redirect(303, dashboardUrl);
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving
@@ -156,6 +160,9 @@ export function createPostHandler(
         return res.status(500).send('Unable to determine next step');
       }
 
+      if (!redirectPath.startsWith('/')) {
+        return res.redirect(303, '/error');
+      }
       res.redirect(303, redirectPath);
     },
   };
