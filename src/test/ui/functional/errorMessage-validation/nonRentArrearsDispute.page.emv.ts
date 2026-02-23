@@ -2,7 +2,6 @@ import { nonRentArrearsDispute, noticeDetails } from '../../data/page-data';
 import { performAction, performValidation } from '../../utils/controller';
 
 export default async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
-
   await performAction('clickLink', nonRentArrearsDispute.backLink);
   await performValidation('mainHeader', noticeDetails.mainHeader);
   await performAction('clickButton', noticeDetails.saveAndContinueButton);
