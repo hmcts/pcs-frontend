@@ -5,15 +5,12 @@ import type { Request } from 'express';
  *
  * Uses notice_NoticeHandedOverDateTime field from CCD case data.
  * Returns true if notice date is provided, false otherwise.
- * Also stores the date in session for use in subsequent steps.
  */
 export const isNoticeDateProvided = async (req: Request): Promise<boolean> => {
+  // Read from CCD (fresh data from START callback via res.locals.validatedCase)
+  // Same pattern as free-legal-advice - no session dependency
   const caseData = req.res?.locals?.validatedCase?.data;
   const noticeDate = caseData?.notice_NoticeHandedOverDateTime;
-
-  if (noticeDate) {
-    req.session.noticeDate = noticeDate;
-  }
 
   return !!noticeDate;
 };
