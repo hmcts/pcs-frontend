@@ -10,6 +10,7 @@ import {
   getDashboardTaskGroups,
 } from '../services/pcsApi';
 import { sanitiseCaseReference } from '../utils/caseReference';
+import { safeRedirect303 } from '../utils/safeRedirect';
 
 interface MappedTask {
   title: { html: string };
@@ -96,7 +97,7 @@ export default function dashboardRoutes(app: Application): void {
   app.get('/dashboard', oidcMiddleware, (req: Request, res: Response) => {
     const caseId = req.session?.ccdCase?.id;
     const redirectUrl = getDashboardUrl(caseId);
-    return res.redirect(303, redirectUrl);
+    return safeRedirect303(res, redirectUrl, '/', ['/dashboard']);
   });
 
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {

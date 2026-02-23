@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { getDashboardUrl } from '../../../routes/dashboard';
+import { safeRedirect303 } from '../../../utils/safeRedirect';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
 const stepName = 'tenancy-details';
@@ -35,7 +36,7 @@ export const step: StepDefinition = {
 
       // Handle saveForLater action
       if (action === 'saveForLater') {
-        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
+        return safeRedirect303(res, getDashboardUrl(req.res?.locals.validatedCase?.id), '/', ['/dashboard']);
       }
 
       // Handle continue action - go to next step
@@ -51,7 +52,7 @@ export const step: StepDefinition = {
         return res.status(404).render('not-found');
       }
 
-      res.redirect(303, redirectPath);
+      safeRedirect303(res, redirectPath, '/', ['/case/']);
     },
   },
 };
