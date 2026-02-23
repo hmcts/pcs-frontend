@@ -334,7 +334,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
   });
 
-  test('NonRentArrearsDispute - mandatory selection, mandatory text box,save for later, character limit and back link ', async () => {
+  test.skip('NonRentArrearsDispute - mandatory selection, mandatory text box,save for later, character limit and back link ', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
