@@ -1,12 +1,18 @@
+import { submitCaseApiData } from '../api-data';
+
 export const noticeDetails = {
   mainHeader: 'Notice details',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
   noticeIsAFormalHintText:
     'A notice is a formal document from your landlord or mortgage provider saying they plan to take legal action to repossess the property, which must follow certain legal requirements',
   backLink: 'Back',
-  didClaimantGiveYouQuestion:
-    'Did Possession Claims Solicitor Org give you notice of their intention to begin possession proceedings?',
-  imNotSureRadioOption: 'I’m not sure',
+  get didClaimantGiveYouQuestion(): string {
+    const claimantName =
+      submitCaseApiData.submitCasePayloadNoDefendants?.overriddenClaimantName ||
+      submitCaseApiData.submitCasePayload.claimantName;
+    return `Did ${claimantName} give you notice of their intention to begin possession proceedings?`;
+  },
+  imNotSureRadioOption: "I'm not sure",
   noRadioOption: 'No',
   orHintText: 'or',
   saveAndContinueButton: 'Save and continue',
@@ -19,8 +25,12 @@ export const noticeDetails = {
   errorValidationField: {
     errorRadioMsg: [
       {
-        errMessage:
-          'Select if Possession Claims Solicitor Org gave you notice of their intention to begin possession proceedings',
+        get errMessage(): string {
+          const claimantName =
+            submitCaseApiData.submitCasePayloadNoDefendants?.overriddenClaimantName ||
+            submitCaseApiData.submitCasePayload.claimantName;
+          return `Select if ${claimantName} gave you notice of their intention to begin possession proceedings`;
+        },
       },
     ],
   },
