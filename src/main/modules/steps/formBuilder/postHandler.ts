@@ -157,7 +157,8 @@ export function createPostHandler(
         return res.status(500).send('Unable to determine next step');
       }
 
-      safeRedirect303(res, redirectPath, '/', ['/case/', '/dashboard']);
+      // Allow all internal paths since this is a generic form builder
+      safeRedirect303(res, redirectPath, '/', ['/']);
     },
   };
 }
