@@ -41,7 +41,6 @@ test.afterEach(async () => {
 
 //Following test is skipped due to accessibility issue in the registered landlord page which is blocking the flow.
 test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
-  // Registered landlord is specific to wales journey and is not present in England journey, hence creating a separate test.
   test('Respond to a claim - Wales postcode @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
