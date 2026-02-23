@@ -5,7 +5,7 @@ export const noticeDetails = {
     'A notice is a formal document from your landlord or mortgage provider saying they plan to take legal action to repossess the property, which must follow certain legal requirements',
   backLink: 'Back',
   didClaimantGiveYouQuestion:
-    'Did Treetops Housing give you notice of their intention to begin possession proceedings?',
+    'Did Possession Claims Solicitor Org give you notice of their intention to begin possession proceedings?',
   imNotSureRadioOption: 'I’m not sure',
   noRadioOption: 'No',
   orHintText: 'or',
@@ -18,7 +18,10 @@ export const noticeDetails = {
   errorValidationHeader: 'There is a problem',
   errorValidationField: {
     errorRadioMsg: [
-      { errMessage: 'Select if Treetops Housing gave you notice of their intention to begin possession proceedings' },
+      {
+        errMessage:
+          'Select if Possession Claims Solicitor Org gave you notice of their intention to begin possession proceedings',
+      },
     ],
   },
 };

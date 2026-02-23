@@ -8,6 +8,7 @@ import {
   counterClaim,
   dateOfBirth,
   defendantNameCapture,
+  defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
   nonRentArrearsDispute,
@@ -50,7 +51,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Defendant name capture - Error messages - save for later Validations', async () => {
+  test('Defendant name capture - Error messages - save for later Validations @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
     await performAction('inputErrorValidation', {
@@ -65,7 +66,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Defendant Date of birth - Error messages - save for later Validations', async () => {
+  test('Defendant Date of birth - Error messages - save for later Validations @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
@@ -82,9 +83,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
 
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -164,9 +165,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
 
   test('Dispute claim interstitial - back and cancel link Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -187,9 +188,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
 
   test('Payment interstitial - back and cancel link Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -221,11 +222,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
 
   test('Notice Details - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
-    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -256,11 +255,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
 
   test('Notice Date Known - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
-    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -295,11 +292,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
 
   test('Notice Date Unknown - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
-    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -595,11 +590,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   });
 
-  test('madeRepayments - mandatory selection, mandatory text box,save for later and back link ', async () => {
+  test('madeRepayments - mandatory selection, mandatory text box,save for later and back link', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,

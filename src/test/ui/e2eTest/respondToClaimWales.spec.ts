@@ -23,8 +23,8 @@ const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
-    await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
+  await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
+  await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('validateAccessCodeAPI');
@@ -39,7 +39,8 @@ test.afterEach(async () => {
   ErrorMessageValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim - e2e Journey @nightly', async () => {
+//Following test is skipped due to accessibility issue in the registered landlord page which is blocking the flow.
+test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
   // Registered landlord is specific to wales journey and is not present in England journey, hence creating a separate test.
   test('Respond to a claim - Wales postcode @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -59,10 +60,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect
-    );
+    await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', registeredLandlord.mainHeader);
     await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);

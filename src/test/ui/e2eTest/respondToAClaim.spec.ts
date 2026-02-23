@@ -16,7 +16,7 @@ import {
   startNow,
   tenancyDetails,
   // eslint-disable-next-line sort-imports
-  repaymentsAgreed
+  repaymentsAgreed,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/element-validations';
@@ -49,7 +49,6 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-
   test('Respond to a claim - Wales postcode @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {

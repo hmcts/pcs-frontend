@@ -22,7 +22,7 @@ export const submitCaseApiDataWales = {
 
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
-    claimantNamePossessiveForm: 'Possession Claims Solicitor Org\'s',
+    claimantNamePossessiveForm: "Possession Claims Solicitor Org's",
 
     claimantContactEmail: 'pcs-solicitor1@test.com',
     isCorrectClaimantContactEmail: 'YES',
@@ -38,8 +38,7 @@ export const submitCaseApiDataWales = {
       Country: 'United Kingdom',
     },
 
-    formattedClaimantContactAddress:
-      'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
+    formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
 
     isCorrectClaimantContactAddress: 'YES',
     claimantProvidePhoneNumber: 'NO',
@@ -151,6 +150,5 @@ export const submitCaseApiDataWales = {
     },
   },
 
-  submitCaseApiEndPoint: (): string =>
-    `/cases/${process.env.CASE_NUMBER}/events`,
+  submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };
