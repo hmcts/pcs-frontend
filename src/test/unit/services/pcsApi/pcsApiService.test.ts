@@ -4,6 +4,7 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
   getRootGreeting,
+  validateAccessCode,
 } from '../../../../main/services/pcsApi/pcsApiService';
 
 jest.mock('config', () => ({
@@ -115,5 +116,62 @@ describe('pcsApiService', () => {
     const caseReference = 999999;
     await expect(getDashboardTaskGroups(caseReference)).rejects.toThrow('Case not found');
     expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/dashboard/${caseReference}/tasks`);
+  });
+
+  test('should validate access code successfully', async () => {
+    mockHttp.post.mockResolvedValue({ status: 200, data: { success: true } });
+
+    const accessToken = 'test-access-token';
+    const caseId = '1234567890123456';
+    const accessCode = 'ABC123';
+
+    const result = await validateAccessCode(accessToken, caseId, accessCode);
+
+    expect(result).toBe(true);
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      `${testApiBase}/cases/${caseId}/validate-access-code`,
+      { accessCode },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  });
+
+  test('should return false when access code validation fails', async () => {
+    const error = new Error('Invalid access code');
+    mockHttp.post.mockRejectedValue(error);
+
+    const accessToken = 'test-access-token';
+    const caseId = '1234567890123456';
+    const accessCode = 'INVALID';
+
+    const result = await validateAccessCode(accessToken, caseId, accessCode);
+
+    expect(result).toBe(false);
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      `${testApiBase}/cases/${caseId}/validate-access-code`,
+      { accessCode },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  });
+
+  test('should return false when API error occurs during access code validation', async () => {
+    mockHttp.post.mockRejectedValue(new Error('Network error'));
+
+    const accessToken = 'test-access-token';
+    const caseId = '1234567890123456';
+    const accessCode = 'XYZ789';
+
+    const result = await validateAccessCode(accessToken, caseId, accessCode);
+
+    expect(result).toBe(false);
   });
 });
