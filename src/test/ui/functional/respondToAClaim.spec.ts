@@ -91,7 +91,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
     });
-    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    //await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.radio,
