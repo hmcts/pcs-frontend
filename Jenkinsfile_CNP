@@ -103,8 +103,8 @@ def postAllureResultsToSlack(String pipelineType = 'master') {
     msg = "Functional Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend  |  *Pipeline:* ${pipelineType}\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}PCS_20Frontend_20Functional_20Test_20Report/"
   }
   try {
-    slackSend(channel: '#qa-pipeline-status', message: msg)
-    echo "Allure Slack notification sent to #qa-pipeline-status"
+    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    echo "Allure Slack notification sent to #hdp-qa-e2e-test-results"
   } catch (Exception e) {
     echo "WARNING: Failed to send Allure Slack notification: ${e.message}. Check Jenkins Slack plugin and channel access."
   }
