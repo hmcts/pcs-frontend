@@ -24,7 +24,7 @@
     "test:a11y": "echo 'Accessibility tests implemented later in the pipeline'",
     "test:accessibility": "yarn playwright install && yarn playwright test --project chromium --grep @accessibility; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:smoke": "NODE_TLS_REJECT_UNAUTHORIZED=0 jest -c jest.smoke.config.ts",
-    "test:functional": "yarn playwright install && yarn playwright test --project chromium --grep @PR; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE=$?",
+    "test:functional": "yarn playwright install && yarn playwright test --project chromium --grep @PR; EXIT_CODE=$?; allure generate --clean; exit $EXIT_CODE=$?",
     "test:fullfunctional": "yarn playwright install && yarn playwright test --project chromium; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:changed": "yarn playwright install && ts-node ./src/test/functional/helpers/runChangedTestHelper.ts; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:E2eChrome": "yarn playwright install && yarn playwright test --project chromium --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
