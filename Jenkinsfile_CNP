@@ -99,7 +99,7 @@ def postAllureResultsToSlack(String pipelineType = 'master') {
   env.E2E_SERVICE_NAME = 'pcs-frontend'
   env.E2E_PIPELINE_TYPE = pipelineType
   def msg = sh(
-    script: "E2E_SERVICE_NAME=pcs-frontend E2E_PIPELINE_TYPE=${pipelineType} ./node_modules/.bin/ts-node scripts/allure-slack-notifier.ts --print-only 2>/dev/null || true",
+    script: "E2E_SERVICE_NAME=pcs-frontend E2E_PIPELINE_TYPE=${pipelineType} ./node_modules/.bin/ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only 2>/dev/null || true",
     returnStdout: true
   ).trim()
   if (!msg) {
