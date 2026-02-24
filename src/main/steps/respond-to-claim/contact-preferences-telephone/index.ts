@@ -26,6 +26,7 @@ export const step: StepDefinition = createFormStep({
       translationKey: {
         label: 'labels.question',
       },
+      isPageHeading: false,
       options: [
         {
           value: 'yes',
