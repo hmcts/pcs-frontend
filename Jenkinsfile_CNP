@@ -54,9 +54,6 @@ withPipeline(type, product, component) {
     ])
     afterAlways('functionalTest:preview') {
       archiveFunctionalTestReports()
-            if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-                postAllureResultsToSlack('master')
-            }
     }
     afterAlways('fullFunctionalTest:preview') {
       archiveFunctionalTestReports()
