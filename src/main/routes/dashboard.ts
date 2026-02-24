@@ -9,7 +9,8 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '../services/pcsApi';
-import { sanitiseCaseReference } from '../utils/caseReference';
+import { DEFAULT_CASE_REFERENCE, sanitiseCaseReference, toCaseReference16 } from '../utils/caseReference';
+import { safeRedirect303 } from '../utils/safeRedirect';
 
 interface MappedTask {
   title: { html: string };
@@ -28,13 +29,7 @@ interface MappedTaskGroup {
 }
 
 export const DASHBOARD_ROUTE = '/dashboard';
-const DEFAULT_CASE_REFERENCE = '1234567890123456'; // TODO: remove hardcoded fake CCD caseId when CCD backend is setup
 const DEFAULT_DASHBOARD_URL = `${DASHBOARD_ROUTE}/${DEFAULT_CASE_REFERENCE}`; // TODO: remove hardcoded fake CCD caseId when CCD backend is setup
-
-function toCaseReference16(value: unknown): string {
-  const strValue = String(value ?? '').trim();
-  return /^\d{16}$/.test(strValue) ? strValue : DEFAULT_CASE_REFERENCE;
-}
 
 export const getDashboardUrl = (caseReference?: string | number): string => {
   if (!caseReference) {
@@ -101,7 +96,7 @@ export default function dashboardRoutes(app: Application): void {
 
   app.get('/dashboard', oidcMiddleware, (req: Request, res: Response) => {
     const caseReference = toCaseReference16(req.session?.ccdCase?.id);
-    return res.redirect(303, getDashboardUrl(caseReference));
+    return safeRedirect303(res, getDashboardUrl(caseReference), '/', ['/dashboard']);
   });
 
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
