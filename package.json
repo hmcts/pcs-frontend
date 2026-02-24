@@ -167,7 +167,6 @@
     "webpack-node-externals": "^3.0.0"
   },
   "resolutions": {
-    "ajv": "^8.18.0",
     "@opentelemetry/instrumentation-redis-4": "npm:@opentelemetry/instrumentation-redis@^0.57.0",
     "@opentelemetry/instrumentation": "0.208.0",
     "semver": "^7.5.2",
