@@ -40,7 +40,7 @@ test.afterEach(async () => {
   ErrorMessageValidation.finaliseTest();
 });
 
-//Following test is skipped due to accessibility issue in the registered landlord page which is blocking the flow.
+//Following test is skipped due to accessibility issue(HDPI-4571) in the registered landlord page which is blocking the flow.
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim - Wales postcode @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
