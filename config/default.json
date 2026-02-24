@@ -32,7 +32,7 @@
   },
   "ccd": {
     "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
-    "caseTypeId": "PCS"
+    "caseTypeId": "PCS-1418"
   },
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
