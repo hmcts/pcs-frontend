@@ -41,12 +41,14 @@ withPipeline(type, product, component) {
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     env.PCS_API_URL_PREVIEW = "http://pcs-api-aat.service.core-compute-aat.internal"
+    env.CASE_TYPE_ID_PREVIEW = "PCS"
     def apiLabels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pcs-api-pr:")
     if (apiLabels && apiLabels.size() > 0) {
         def labelName = apiLabels[0]
         env.PCS_API_CHANGE_ID = labelName.replace("pcs-api-pr:", "")
         env.DATA_STORE_URL_BASE = "https://ccd-data-store-api-pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
         env.PCS_API_URL_PREVIEW = "https://pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
+        env.CASE_TYPE_ID_PREVIEW = "PCS-${env.PCS_API_CHANGE_ID}"
     }
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,
