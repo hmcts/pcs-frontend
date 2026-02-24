@@ -1,8 +1,5 @@
 {
   "useCSRFProtection": true,
-  "appInsights": {
-    "instrumentationKey": false
-  },
   "node-env": "development",
   "use-ssl": false,
   "session": {
