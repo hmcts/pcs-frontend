@@ -17,5 +17,3 @@ export * from './nonRentArrearsDispute.page.data';
 export * from './counterClaim.page.data';
 export * from './repaymentsMade.page.data';
 export * from './paymentInterstitial.page.data';
-export * from './contactByPhone.page.data';
-export * from './contactByTextMessage.page.data';
