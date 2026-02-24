@@ -245,9 +245,13 @@ function buildMessage(
 function parsePipelineTypeFromArgv(): string | null {
   const argv = process.argv;
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--pipeline-type' && argv[i + 1]) {return argv[i + 1].trim();}
+    if (argv[i] === '--pipeline-type' && argv[i + 1]) {
+      return argv[i + 1].trim();
+    }
     const match = argv[i].match(/^--pipeline-type=(.+)$/);
-    if (match) {return match[1].trim();}
+    if (match) {
+      return match[1].trim();
+    }
   }
   return null;
 }
