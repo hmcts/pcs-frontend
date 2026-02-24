@@ -1,12 +1,23 @@
+import fs from 'fs';
+import path from 'path';
+
 import { IdamUtils, ServiceAuthUtils } from '@hmcts/playwright-common';
 
 import { accessTokenApiData, s2STokenApiData } from '../data/api-data';
 import { user } from '../data/user-data';
 
 async function globalSetupConfig(): Promise<void> {
+  if (!process.env.CI) {
+    clearEmvLocks();
+  }
   await getS2SToken();
   await getAccessToken();
 }
+
+const clearEmvLocks = (): void => {
+  const lockDir = path.join(process.cwd(), 'test-results', 'emv-locks');
+  fs.rmSync(lockDir, { recursive: true, force: true });
+};
 
 export const getS2SToken = async (): Promise<void> => {
   process.env.S2S_URL = s2STokenApiData.s2sUrl;
