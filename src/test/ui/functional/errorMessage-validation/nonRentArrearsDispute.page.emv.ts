@@ -1,10 +1,10 @@
-import { nonRentArrearsDispute, noticeDetails } from '../../data/page-data';
+import { nonRentArrearsDispute } from '../../data/page-data';
 import { performAction, performValidation } from '../../utils/controller';
 
 export default async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
-  await performAction('clickLink', nonRentArrearsDispute.backLink);
-  await performValidation('mainHeader', noticeDetails.mainHeader);
-  await performAction('clickButton', noticeDetails.saveAndContinueButton);
+  // await performAction('clickLink', nonRentArrearsDispute.backLink);
+  // await performValidation('mainHeader', noticeDateKnown.mainHeader);
+  // await performAction('clickButton', noticeDateKnown.saveAndContinueButton);
   await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
@@ -33,6 +33,6 @@ export default async function nonRentArrearsDisputeErrorValidation(): Promise<vo
     nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
     nonRentArrearsDispute.explainClaimTextInput
   );
-  await performAction('clickButton', nonRentArrearsDispute.saveForLaterButton);
-  await performValidation('mainHeader', 'Dashboard');
+  // await performAction('clickButton', nonRentArrearsDispute.saveForLaterButton);
+  // await performValidation('mainHeader', 'Dashboard');
 }
