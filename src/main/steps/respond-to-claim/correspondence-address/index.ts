@@ -234,9 +234,12 @@ export const step: StepDefinition = createFormStep({
 function getExistingAddress(req: Request): { formattedAddress: string } {
   // Read from res.locals.validatedCase (already fetched by caseReference middleware via START callback)
   const caseData = req.res?.locals.validatedCase?.data;
-  const address = caseData?.possessionClaimResponse?.defendantContactDetails?.party?.address;
+  const defendantContactDetails = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
+  const addressKnown = defendantContactDetails?.addressKnown;
+  const address = defendantContactDetails?.address;
 
-  if (address) {
+  // Check addressKnown field from CCD - if "YES" then address exists
+  if (addressKnown === 'YES' && address) {
     const formattedAddress =
       [
         address.AddressLine1,

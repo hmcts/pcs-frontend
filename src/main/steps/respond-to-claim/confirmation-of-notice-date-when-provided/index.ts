@@ -33,9 +33,11 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    //TODO: get claimantName/noticeDate from CCD case - currently hardcoded/served from LaunchDarkly flag
-    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
-    const noticeDate = req.session.noticeDate ?? '';
+    // Read from CCD (fresh data from START callback via res.locals.validatedCase)
+    // Same pattern as free-legal-advice - no session dependency
+    const caseData = req.res?.locals.validatedCase?.data;
+    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
+    const noticeDate = caseData?.notice_NoticeHandedOverDateTime ?? '';
 
     const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-provided', ['common']);
 
