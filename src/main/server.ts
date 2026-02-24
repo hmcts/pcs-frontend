@@ -3,11 +3,12 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as path from 'path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import { type HttpTerminator, createHttpTerminator } from 'http-terminator';
 
 import { app } from './app';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('server');
 

@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import { Express } from 'express';
 import { Redis } from 'ioredis';
@@ -8,6 +7,8 @@ import { TOTP } from 'totp-generator';
 import { http } from '../http';
 
 import { type S2SConfig } from './s2s.interface';
+
+import { Logger } from '@modules/logger';
 
 export class S2S {
   logger = Logger.getLogger('s2s');

@@ -1,7 +1,8 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Environment } from 'nunjucks';
 
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('form-builder-subFieldsRenderer');
 /**

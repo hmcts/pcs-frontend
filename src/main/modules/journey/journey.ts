@@ -1,11 +1,12 @@
 import path from 'path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import { Express } from 'express';
 import { glob } from 'glob';
 
 import { WizardEngine } from './engine/engine';
 import { JourneyConfig } from './engine/schema';
+
+import { Logger } from '@modules/logger';
 
 export class Journey {
   logger = Logger.getLogger('journey');

@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { getLaunchDarklyFlag } from '../../utils/getLaunchDarklyFlag';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 
 //TODO need to add logic to check if defendant name is known from CCD case data
 export const isDefendantNameKnown = async (req: Request): Promise<boolean> => {

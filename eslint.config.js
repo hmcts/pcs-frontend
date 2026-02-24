@@ -41,6 +41,18 @@ module.exports = defineConfig([
       import: fixupPluginRules(_import),
     },
 
+    settings: {
+      'import/parsers': {
+        '@typescript-eslint/parser': ['.ts', '.tsx'],
+      },
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: './tsconfig.eslint.json',
+        },
+      },
+    },
+
     extends: fixupConfigRules(
       compat.extends(
         'eslint:recommended',

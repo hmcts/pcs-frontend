@@ -1,7 +1,8 @@
 import { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware';
-import { getRootGreeting } from '../services/pcsApi/pcsApiService';
+
+import { getRootGreeting } from '@services/pcsApi/pcsApiService';
 
 export default function (app: Application): void {
   app.get('/', oidcMiddleware, async (req: Request, res: Response) => {

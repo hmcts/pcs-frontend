@@ -33,7 +33,7 @@ jest.mock('axios', () => {
 });
 
 // Mock logger to avoid errors
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
       error: jest.fn(),

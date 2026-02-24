@@ -1,7 +1,6 @@
 import fs, { promises as fsPromises } from 'fs';
 import path from 'path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Express, NextFunction, Request, Response } from 'express';
 type ExpressRequest = Request;
 import i18next, { type InitOptions, type TFunction } from 'i18next';
@@ -12,6 +11,9 @@ import { z } from 'zod';
 import { makeZodI18nMap } from 'zod-i18n-map';
 
 import { pluralPossessive } from './formatters';
+
+import { Logger } from '@modules/logger';
+
 function firstExistingPath(paths: string[]): string | null {
   for (const p of paths) {
     if (fs.existsSync(p)) {

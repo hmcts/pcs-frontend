@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'openid-client';
@@ -6,6 +5,8 @@ import * as client from 'openid-client';
 
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
+
+import { Logger } from '@modules/logger';
 
 export class OIDCModule {
   private clientConfig!: Configuration;

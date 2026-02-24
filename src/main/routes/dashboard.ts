@@ -1,15 +1,16 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware/oidc';
+
+import { Logger } from '@modules/logger';
 import {
   type DashboardTaskGroup,
   STATUS_MAP,
   TASK_GROUP_MAP,
   getDashboardNotifications,
   getDashboardTaskGroups,
-} from '../services/pcsApi';
-import { sanitiseCaseReference } from '../utils/caseReference';
+} from '@services/pcsApi';
+import { sanitiseCaseReference } from '@utils/caseReference';
 
 interface MappedTask {
   title: { html: string };

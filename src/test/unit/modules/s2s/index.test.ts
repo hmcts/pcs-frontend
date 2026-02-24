@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import { Express } from 'express';
 import { TOTP } from 'totp-generator';
@@ -6,7 +5,9 @@ import { TOTP } from 'totp-generator';
 import { http } from '../../../../main/modules/http';
 import { S2S } from '../../../../main/modules/s2s';
 
-jest.mock('@hmcts/nodejs-logging', () => ({
+import { Logger } from '@modules/logger';
+
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
       error: jest.fn(),

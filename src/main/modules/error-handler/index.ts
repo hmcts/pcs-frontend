@@ -1,9 +1,10 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Express, NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../../HttpError';
 import { getTranslationFunction, populateCommonTranslations } from '../i18n';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('error-handler');
 

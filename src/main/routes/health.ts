@@ -1,8 +1,9 @@
 import healthcheck from '@hmcts/nodejs-healthcheck';
-import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 
 import { app as myApp } from '../app';
+
+import { Logger } from '@modules/logger';
 
 function shutdownCheck(): boolean {
   return myApp.locals.shutdown;
@@ -24,7 +25,7 @@ export default function (app: Application): void {
             return healthcheck.status(_ === 'PONG');
           })
           .catch((error: Error) => {
-            logger.errorWithReq(null, 'health_check_error', 'Health check failed on redis', error);
+            logger.error('Health check failed on redis', error);
             return healthcheck.status(false);
           });
       }),

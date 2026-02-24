@@ -33,7 +33,7 @@ jest.mock(
   { virtual: true }
 );
 
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn(() => mockLogger),
   },

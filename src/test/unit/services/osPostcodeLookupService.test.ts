@@ -5,7 +5,7 @@ import { getAddressesByPostcode } from '../../../main/services/osPostcodeLookupS
 
 jest.mock('axios');
 jest.mock('config');
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: () => ({
       info: jest.fn(),
