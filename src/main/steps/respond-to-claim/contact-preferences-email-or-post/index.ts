@@ -17,13 +17,13 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     pageTitle: 'pageTitle',
     heading: 'heading',
-    content: 'content'
+    content: 'content',
   },
   fields: [
     {
       name: 'contactByEmailOrPost',
       type: 'radio',
-      required: true,
+      required: false,
       legendClasses: 'govuk-!-font-weight-bold govuk-!-font-size-24',
       translationKey: {
         label: 'labels.question',
@@ -38,6 +38,7 @@ export const step: StepDefinition = createFormStep({
               name: 'email',
               type: 'text',
               required: true,
+              labelClasses: 'govuk-!-font-weight-bold',
               translationKey: {
                 label: 'labels.emailLabel',
               },

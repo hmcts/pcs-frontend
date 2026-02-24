@@ -26,7 +26,6 @@ export const flowConfig: JourneyFlowConfig = {
     'repayments-made',
     'repayments-agreed',
     'correspondence-address',
-    'contact-preferences',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
     'contact-preferences-text-message',
@@ -87,17 +86,14 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'defendant-date-of-birth',
       defaultNext: 'contact-preferences',
     },
-    'contact-preferences': {
+    'contact-preferences-email-or-post': {
+      previousStep: 'correspondence-address',
       defaultNext: 'contact-preferences-telephone',
     },
     'contact-preferences-telephone': {
       defaultNext: 'contact-preferences-text-message',
     },
     'contact-preferences-text-message': {
-      defaultNext: 'dispute-claim-interstitial',
-    },
-    'contact-preferences-email-or-post': {
-      previousStep: 'contact-preferences',
       defaultNext: 'dispute-claim-interstitial',
     },
     'dispute-claim-interstitial': {
