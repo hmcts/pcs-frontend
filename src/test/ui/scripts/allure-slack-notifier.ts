@@ -4,6 +4,7 @@ import * as path from 'path';
 const SUMMARY_CANDIDATES = ['allure-report/widgets/summary.json', 'allure-report/data/widgets/summary.json'];
 
 const DEFAULT_REPORT_PATH = 'PCS_20Frontend_20Functional_20Test_20Report/';
+const DEFAULT_SERVICE_NAME = 'pcs-frontend';
 const SLOW_THRESHOLD_SEC = 5 * 60;
 const TOP_SLOW_N = 5;
 const MAX_FAILURES_LIST = 8;
@@ -240,6 +241,36 @@ function buildMessage(
   return lines.join('\n').trim();
 }
 
+/** Parse --pipeline-type <value> or --pipeline-type=value from argv (for Jenkins CNP vs nightly). */
+function parsePipelineTypeFromArgv(): string | null {
+  const argv = process.argv;
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--pipeline-type' && argv[i + 1]) {return argv[i + 1].trim();}
+    const match = argv[i].match(/^--pipeline-type=(.+)$/);
+    if (match) {return match[1].trim();}
+  }
+  return null;
+}
+
+function getFallbackMessage(
+  buildNumber: string,
+  buildUrl: string,
+  reportSuffix: string,
+  serviceName: string,
+  pipelineType: string
+): string {
+  const reportUrl = buildUrl ? `${buildUrl}${reportSuffix}` : '';
+  return [
+    `Functional Test Results — Build #${buildNumber}`,
+    `*Service:* ${serviceName}  |  *Pipeline:* ${pipelineType}`,
+    '',
+    'Allure report not available – check build logs.',
+    reportUrl ? `*Allure report:* ${reportUrl}` : buildUrl ? `*Build:* ${buildUrl}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
 function getSlackMessage(): string {
   const baseDir = process.cwd();
   const resultsDir = path.join(baseDir, 'allure-results');
@@ -247,10 +278,12 @@ function getSlackMessage(): string {
   const buildUrl = (process.env.BUILD_URL ?? '').trim();
   const jobName = (process.env.JOB_NAME ?? 'e2e').trim();
   const reportSuffix = (process.env.ALLURE_REPORT_PATH_SUFFIX ?? DEFAULT_REPORT_PATH).trim() || DEFAULT_REPORT_PATH;
-  const serviceName = (process.env.E2E_SERVICE_NAME ?? 'pcs-frontend').trim() || 'pcs-frontend';
+  const serviceName = (process.env.E2E_SERVICE_NAME ?? DEFAULT_SERVICE_NAME).trim() || DEFAULT_SERVICE_NAME;
+  const pipelineTypeArg = parsePipelineTypeFromArgv();
   const pipelineType =
-    (process.env.E2E_PIPELINE_TYPE ?? (jobName.toLowerCase().includes('nightly') ? 'nightly' : 'master')).trim() ||
-    'master';
+    pipelineTypeArg ??
+    ((process.env.E2E_PIPELINE_TYPE ?? (jobName.toLowerCase().includes('nightly') ? 'nightly' : 'master')).trim() ||
+      'master');
 
   try {
     const summary = parseSummary(findSummaryJson(baseDir));
@@ -260,22 +293,14 @@ function getSlackMessage(): string {
     }
     return buildMessage(summary, buildNumber, buildUrl, reportSuffix, tests, serviceName, pipelineType);
   } catch {
-    const reportUrl = buildUrl ? `${buildUrl}${reportSuffix}` : '';
-    return [
-      `E2E Test Results — Build #${buildNumber}`,
-      `*Service:* ${serviceName}  |  *Pipeline:* ${pipelineType}`,
-      '',
-      'Allure report not available – check build logs.',
-      reportUrl ? `*Allure report:* ${reportUrl}` : buildUrl ? `*Build:* ${buildUrl}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n');
+    return getFallbackMessage(buildNumber, buildUrl, reportSuffix, serviceName, pipelineType);
   }
 }
 
 function main(): void {
+  const printOnly = process.argv.includes('--print-only');
   const msg = getSlackMessage();
-  if (process.argv.includes('--print-only')) {
+  if (printOnly) {
     process.stdout.write(msg);
   } else {
     console.log(msg);
@@ -283,10 +308,22 @@ function main(): void {
 }
 
 if (require.main === module || process.argv[1]?.includes('allure-slack-notifier')) {
+  const printOnly = process.argv.includes('--print-only');
   try {
     main();
   } catch (err) {
-    console.error(err);
-    process.exit(1);
+    if (printOnly) {
+      const buildNumber = (process.env.BUILD_NUMBER ?? 'unknown').trim();
+      const buildUrl = (process.env.BUILD_URL ?? '').trim();
+      const reportSuffix = (process.env.ALLURE_REPORT_PATH_SUFFIX ?? DEFAULT_REPORT_PATH).trim() || DEFAULT_REPORT_PATH;
+      const serviceName = (process.env.E2E_SERVICE_NAME ?? DEFAULT_SERVICE_NAME).trim() || DEFAULT_SERVICE_NAME;
+      const pipelineType = parsePipelineTypeFromArgv() ?? process.env.E2E_PIPELINE_TYPE ?? 'master';
+      process.stdout.write(
+        getFallbackMessage(buildNumber, buildUrl, reportSuffix, serviceName, String(pipelineType).trim())
+      );
+    } else {
+      console.error(err);
+      process.exit(1);
+    }
   }
 }

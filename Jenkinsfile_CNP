@@ -54,6 +54,9 @@ withPipeline(type, product, component) {
     ])
     afterAlways('functionalTest:preview') {
       archiveFunctionalTestReports()
+      if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
+         postAllureResultsToSlack('preview')
+      }
     }
     afterAlways('fullFunctionalTest:preview') {
       archiveFunctionalTestReports()
@@ -91,21 +94,11 @@ def archiveFunctionalTestReports() {
   }
 }
 
-// Allure results Slack notification
 def postAllureResultsToSlack(String pipelineType = 'master') {
-  env.E2E_SERVICE_NAME = 'pcs-frontend'
-  env.E2E_PIPELINE_TYPE = pipelineType
-  def msg = sh(
-    script: "E2E_SERVICE_NAME=pcs-frontend E2E_PIPELINE_TYPE=${pipelineType} ./node_modules/.bin/ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only 2>/dev/null || true",
-    returnStdout: true
-  ).trim()
-  if (!msg) {
-    msg = "Functional Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend  |  *Pipeline:* ${pipelineType}\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}PCS_20Frontend_20Functional_20Test_20Report/"
-  }
+  def msg = sh(script: "./node_modules/.bin/ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType}", returnStdout: true).trim()
   try {
     slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
-    echo "Allure Slack notification sent to #hdp-qa-e2e-test-results"
   } catch (Exception e) {
-    echo "WARNING: Failed to send Allure Slack notification: ${e.message}. Check Jenkins Slack plugin and channel access."
+    echo "WARNING: Allure Slack notification failed: ${e.message}"
   }
 }
