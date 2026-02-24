@@ -186,7 +186,7 @@ export class PageContentValidation implements IValidation {
 
   private async getFileName(urlSegment: string, page: Page): Promise<string | null> {
     try {
-      const mappingPath = path.join(__dirname, '../../../data/page-data/urlToFileMapping.ts');
+      const mappingPath = path.join(__dirname, '../../../config/urlToFileMapping.ts');
       if (!fs.existsSync(mappingPath)) {
         return null;
       }
@@ -368,7 +368,7 @@ export class PageContentValidation implements IValidation {
     const segment = segments[segments.length - 1] || 'home';
 
     try {
-      const mappingPath = path.join(__dirname, '../../../data/page-data/urlToFileMapping.ts');
+      const mappingPath = path.join(__dirname, '../../../config/urlToFileMapping.ts');
       if (!fs.existsSync(mappingPath)) {
         return segment;
       }
