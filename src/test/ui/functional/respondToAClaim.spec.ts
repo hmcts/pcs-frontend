@@ -164,6 +164,33 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
+  test('Contact By Text Message - Error messages - Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByPhone', {
+      radioOption: contactByPhone.noRadioOption,
+    });
+    await performValidation('mainHeader', contactByTextMessage.mainHeader);
+    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
+    await performValidation('errorMessage', {
+      header: contactByTextMessage.thereIsAProblemErrorMessageHeader,
+      message: contactByTextMessage.selectIfYouWantErrorMessage,
+    });
+  });
+
   test('Contact By Text Message - Back link and save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
