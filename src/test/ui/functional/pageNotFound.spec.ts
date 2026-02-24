@@ -16,7 +16,6 @@ test.beforeEach(async ({ page }) => {
 
 test.afterEach(async () => {
   PageContentValidation.finaliseTest();
-  await performAction('login');
 });
 
 test.describe('Error page to indicate Page Not Found error @PR @nightly', () => {
