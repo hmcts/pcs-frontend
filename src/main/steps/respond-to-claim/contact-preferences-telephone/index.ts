@@ -1,5 +1,3 @@
-import { isMobilePhone } from 'validator';
-
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
@@ -47,10 +45,21 @@ export const step: StepDefinition = createFormStep({
                 autocomplete: 'tel',
               },
               validator: (value: unknown) => {
-                if (!isMobilePhone(value as string, 'en-GB')) {
-                  return 'errors.contactByTelephone.phoneNumber.invalid';
+                const phone = (value as string)?.trim();
+
+                const normalized = phone.replace(/\s+/g, '');
+
+                const mobileRegex = /^07\d{9}$/;
+
+                const landlineRegex = /^0[12]\d{8,9}$/;
+
+                const businessRegex = /^0[389]\d{8}$/;
+
+                if (mobileRegex.test(normalized) || landlineRegex.test(normalized) || businessRegex.test(normalized)) {
+                  return true;
                 }
-                return true;
+
+                return 'errors.contactByTelephone.phoneNumber.invalid';
               },
             },
           },
