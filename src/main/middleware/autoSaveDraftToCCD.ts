@@ -252,7 +252,7 @@ async function saveToCCD(
       ...nestedData,
     };
 
-   await ccdCaseService.updateDraftRespondToClaim(accessToken, validatedCase.id, ccdPayload);
+    await ccdCaseService.updateDraftRespondToClaim(accessToken, validatedCase.id, ccdPayload);
 
     // Don't update res.locals.validatedCase with CCD response
     // CCD submit returns incomplete data (only fields in payload, not full merged case)

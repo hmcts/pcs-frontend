@@ -284,10 +284,14 @@ export const ccdCaseService = {
     }
   },
 
-  async updateDraftRespondToClaim(accessToken: string | undefined, caseId: string, data: Record<string, unknown>): Promise<CcdCase> {
-      if (!caseId) {
-    throw new HTTPError('Cannot UPDATE Case, CCD Case Not found', 500);
-  }
+  async updateDraftRespondToClaim(
+    accessToken: string | undefined,
+    caseId: string,
+    data: Record<string, unknown>
+  ): Promise<CcdCase> {
+    if (!caseId) {
+      throw new HTTPError('Cannot UPDATE Case, CCD Case Not found', 500);
+    }
 
     const url = `${getApiUrl()}/callbacks/mid-event?page=respondToPossessionDraftSavePage`;
 
@@ -300,15 +304,14 @@ export const ccdCaseService = {
       },
     };
 
-   try {
-    logger.info(`Calling Draft save event with URL: ${url}`);
-    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
-    const response = await http.post<CcdCase>(url, payload, getCaseHeaders(accessToken || ''));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
-    return response.data;
-  } catch (error) {
-    throw convertAxiosErrorToHttpError(error, 'save draft response to claim');
-  }
+    try {
+      logger.info(`Calling Draft save event with URL: ${url}`);
+      logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
+      const response = await http.post<CcdCase>(url, payload, getCaseHeaders(accessToken || ''));
+      logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
+      return response.data;
+    } catch (error) {
+      throw convertAxiosErrorToHttpError(error, 'save draft response to claim');
+    }
   },
-
 };
