@@ -126,15 +126,6 @@ export function createPostHandler(
         return; // renderWithErrors sends the response, so we return early
       }
 
-      // Handle saveForLater action after validation passes
-      if (action === 'saveForLater') {
-        // Process field data (normalize checkboxes + consolidate date fields) before saving
-        processFieldData(req, fields);
-        const { action: _, ...bodyWithoutAction } = req.body;
-        setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
-      }
-
       // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
       const { action: _, ...bodyWithoutAction } = req.body;
@@ -149,6 +140,10 @@ export function createPostHandler(
         } catch (error) {
           return next(error);
         }
+      }
+
+      if (action === 'saveForLater') {
+        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
       }
 
       const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
