@@ -221,7 +221,7 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
 
       await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(
-        'Cannot UPDATE Case, CCD Case Not found'
+        'Cannot UPDATE draft, CCD Case Not found'
       );
     });
   });
