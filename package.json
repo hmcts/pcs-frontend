@@ -167,6 +167,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "resolutions": {
+    "ajv": "^8.18.0",
     "@opentelemetry/instrumentation-redis-4": "npm:@opentelemetry/instrumentation-redis@^0.57.0",
     "@opentelemetry/instrumentation": "0.208.0",
     "semver": "^7.5.2",
@@ -175,7 +176,7 @@
     "chai": "6.2.1",
     "@types/node": "22.19.3",
     "glob": "^13.0.1",
-    "glob/minimatch": "9.0.5",
+    "minimatch": "^10.2.1",
     "js-yaml": "^4.1.1",
     "@azure/msal-browser": "4.27.0",
     "@azure/functions": "4.11.0",
