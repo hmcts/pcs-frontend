@@ -249,14 +249,10 @@ async function saveToCCD(
     const nestedData = pathToNested(config.backendPath, transformedData);
 
     const ccdPayload = {
-      submitDraftAnswers: 'No',
       ...nestedData,
     };
 
-    await ccdCaseService.updateCase(accessToken, {
-      id: validatedCase.id,
-      data: ccdPayload,
-    });
+   await ccdCaseService.updateDraftRespondToClaim(accessToken, validatedCase.id, ccdPayload);
 
     // Don't update res.locals.validatedCase with CCD response
     // CCD submit returns incomplete data (only fields in payload, not full merged case)

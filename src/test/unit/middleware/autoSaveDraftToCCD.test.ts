@@ -236,12 +236,12 @@ describe('autoSaveDraftToCCD value mappers', () => {
 
 jest.mock('../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
-    updateCase: jest.fn(),
+    updateDraftRespondToClaim: jest.fn(),
   },
 }));
 
 describe('autoSaveToCCD main function', () => {
-  const mockUpdateCase = ccdCaseService.updateCase as jest.Mock;
+  const mockUpdateCase = ccdCaseService.updateDraftRespondToClaim as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -350,45 +350,43 @@ describe('autoSaveToCCD main function', () => {
       expect(mockLogger.error).toHaveBeenCalledWith('[free-legal-advice] No access token in session');
     });
 
-    it('should save to CCD successfully with frontendField', async () => {
-      mockUpdateCase.mockResolvedValueOnce({
-        id: '1234567890123456',
-        data: { possessionClaimResponse: { defendantResponses: { receivedFreeLegalAdvice: 'YES' } } },
-      });
+  it('should save to CCD successfully with frontendField', async () => {
+  mockUpdateCase.mockResolvedValueOnce({
+    id: '1234567890123456',
+    data: {
+      possessionClaimResponse: {
+        defendantResponses: { receivedFreeLegalAdvice: 'YES' },
+      },
+    },
+  });
 
-      const req = {
-        session: {
-          formData: {
-            'free-legal-advice': { hadLegalAdvice: 'yes' },
-          },
-          user: { accessToken: 'mock-token' },
-        },
-      } as unknown as Request;
+  const req = {
+    session: {
+      formData: { 'free-legal-advice': { hadLegalAdvice: 'yes' } },
+      user: { accessToken: 'mock-token' },
+    },
+  } as unknown as Request;
 
-      const res = {
-        locals: {
-          validatedCase: { id: '1234567890123456' },
-        },
-      } as unknown as Response;
+  const res = {
+    locals: { validatedCase: { id: '1234567890123456' } },
+  } as unknown as Response;
 
-      await autoSaveToCCD(req, res, 'free-legal-advice');
+  await autoSaveToCCD(req, res, 'free-legal-advice');
 
-      expect(mockUpdateCase).toHaveBeenCalledWith('mock-token', {
-        id: '1234567890123456',
-        data: {
-          submitDraftAnswers: 'No',
-          possessionClaimResponse: {
-            defendantResponses: {
-              receivedFreeLegalAdvice: 'YES',
-            },
-          },
-        },
-      });
+  expect(mockUpdateCase).toHaveBeenCalledWith(
+    'mock-token',
+    '1234567890123456',
+    {
+      possessionClaimResponse: {
+        defendantResponses: { receivedFreeLegalAdvice: 'YES' },
+      },
+    }
+  );
 
-      expect(mockLogger.info).toHaveBeenCalledWith('[free-legal-advice] Draft saved successfully to CCD');
+  expect(mockLogger.info).toHaveBeenCalledWith('[free-legal-advice] Draft saved successfully to CCD');
       // Implementation doesn't update res.locals.validatedCase (keeps existing complete data)
-      expect(res.locals.validatedCase).toEqual({ id: '1234567890123456' });
-    });
+  expect(res.locals.validatedCase).toEqual({ id: '1234567890123456' });
+});
 
     it('should skip save when frontendField is not found in form data', async () => {
       const req = {

@@ -216,14 +216,14 @@ describe('ccdCaseService', () => {
     });
   });
 
-  describe('updateCase', () => {
-    it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.updateCase(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.updateCase(accessToken, { id: '', data: {} })).rejects.toThrow(
-        'Cannot UPDATE Case, CCD Case Not found'
-      );
-    });
+describe('updateCase', () => {
+  it('throws HTTPError if case id is missing', async () => {
+
+    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
+
+    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow('Cannot UPDATE Case, CCD Case Not found');
   });
+});
 
   describe('submitCase', () => {
     it('throws HTTPError if case id is missing', async () => {

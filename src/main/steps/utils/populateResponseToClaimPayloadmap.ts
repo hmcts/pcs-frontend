@@ -7,14 +7,12 @@ import { ccdCaseService } from '../../services/ccdCaseService';
 export const buildCcdCaseForPossessionClaimResponse = async (
   req: Request,
   possessionClaimResponse: PossessionClaimResponse,
-  submitDraftAnswers: boolean
 ): Promise<CcdCase> => {
   const ccdCase: CcdCase = {
     id: req.res?.locals.validatedCase?.id,
     data: {
       possessionClaimResponse,
-      submitDraftAnswers: submitDraftAnswers ? 'Yes' : 'No',
     },
   };
-  return ccdCaseService.submitResponseToClaim(req.session?.user?.accessToken, ccdCase);
+  return ccdCaseService.updateDraftRespondToClaim(req.session?.user?.accessToken, ccdCase.id, ccdCase.data);
 };
