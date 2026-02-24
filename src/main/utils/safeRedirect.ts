@@ -3,74 +3,65 @@ import type { Response } from 'express';
 
 const logger = Logger.getLogger('safeRedirect');
 
-/**
- * Safely redirects to a URL with validation to prevent open redirect vulnerabilities (CWE-601).
- *
- * This function validates that the target URL is:
- * 1. A relative path (starts with '/')
- * 2. Not a protocol-relative URL (doesn't start with '//')
- * 3. Not an absolute URL (doesn't contain '://')
- * 4. Matches one of the allowed path prefixes
- *
- * If validation fails, redirects to the fallback URL instead and logs a security warning.
- *
- * @param res - Express Response object
- * @param target - The target URL to redirect to (should be validated)
- * @param fallback - Fallback URL if target is invalid (default: '/')
- * @param allowedPrefixes - Array of allowed path prefixes (default: ['/'])
- * @returns void
- *
- * @example
- * // Redirect to dashboard with validation
- * safeRedirect303(res, '/dashboard/1234567890123456', '/', ['/dashboard']);
- *
- * @example
- * // Blocks malicious redirects
- * safeRedirect303(res, 'http://evil.com', '/'); // Redirects to '/' instead
- * safeRedirect303(res, '//evil.com', '/'); // Redirects to '/' instead
- */
+const INTERNAL_BASE = 'http://localhost'; // parsing anchor only
+
 export function safeRedirect303(
   res: Response,
   target: unknown,
   fallback = '/',
   allowedPrefixes: string[] = ['/']
 ): void {
-  // Type check: target must be a string
   if (typeof target !== 'string') {
-    logger.warn('safeRedirect303: Invalid target type, using fallback', {
-      targetType: typeof target,
-      fallback,
-    });
-    res.redirect(303, fallback);
-    return;
+    logger.warn('safeRedirect303: Non-string target');
+    return res.redirect(303, fallback);
   }
 
-  // Security validation: Must be an internal relative path
-  // Blocks: http://evil.com, https://evil.com, //evil.com, javascript:alert(1)
-  const isRelative = target.startsWith('/') && !target.startsWith('//') && !target.includes('://');
+  let decoded: string;
 
-  if (!isRelative) {
-    logger.warn('safeRedirect303: Blocked non-relative URL redirect attempt', {
-      attempted: target,
-      fallback,
-    });
-    res.redirect(303, fallback);
-    return;
+  try {
+    decoded = decodeURIComponent(target.trim());
+  } catch {
+    logger.warn('safeRedirect303: Malformed encoding', { target });
+    return res.redirect(303, fallback);
   }
 
-  // Allowlist validation: Must match one of the allowed prefixes
-  const isAllowed = allowedPrefixes.some(prefix => target.startsWith(prefix));
-
-  if (!isAllowed) {
-    logger.warn('safeRedirect303: Blocked redirect to disallowed path', {
-      attempted: target,
-      allowedPrefixes,
-      fallback,
-    });
-    res.redirect(303, fallback);
-    return;
+  // Block CRLF injection
+  if (/[\r\n]/.test(decoded)) {
+    logger.warn('safeRedirect303: CRLF detected', { target });
+    return res.redirect(303, fallback);
   }
 
-  // All validations passed - safe to redirect
-  res.redirect(303, target);
+  // Must be a single-slash relative path
+  if (!decoded.startsWith('/') || decoded.startsWith('//')) {
+    logger.warn('safeRedirect303: Non-relative path blocked', { target });
+    return res.redirect(303, fallback);
+  }
+
+  try {
+    const parsed = new URL(decoded, INTERNAL_BASE);
+
+    // If origin changed, it was absolute
+    if (parsed.origin !== INTERNAL_BASE) {
+      logger.warn('safeRedirect303: External origin blocked', { target });
+      return res.redirect(303, fallback);
+    }
+
+    const normalizedPath = parsed.pathname + parsed.search;
+
+    // Optional allowlist support (keeps your existing behaviour)
+    const isAllowed = allowedPrefixes.some(prefix => normalizedPath.startsWith(prefix));
+
+    if (!isAllowed) {
+      logger.warn('safeRedirect303: Prefix not allowed', {
+        target,
+        allowedPrefixes,
+      });
+      return res.redirect(303, fallback);
+    }
+
+    return res.redirect(303, normalizedPath);
+  } catch {
+    logger.warn('safeRedirect303: URL parsing failed', { target });
+    return res.redirect(303, fallback);
+  }
 }
