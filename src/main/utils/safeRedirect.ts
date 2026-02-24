@@ -25,13 +25,11 @@ export function safeRedirect303(
     return res.redirect(303, fallback);
   }
 
-  // Block CRLF injection
   if (/[\r\n]/.test(decoded)) {
     logger.warn('safeRedirect303: CRLF detected', { target });
     return res.redirect(303, fallback);
   }
 
-  // Must be a single-slash relative path
   if (!decoded.startsWith('/') || decoded.startsWith('//')) {
     logger.warn('safeRedirect303: Non-relative path blocked', { target });
     return res.redirect(303, fallback);
@@ -40,7 +38,6 @@ export function safeRedirect303(
   try {
     const parsed = new URL(decoded, INTERNAL_BASE);
 
-    // If origin changed, it was absolute
     if (parsed.origin !== INTERNAL_BASE) {
       logger.warn('safeRedirect303: External origin blocked', { target });
       return res.redirect(303, fallback);
@@ -48,7 +45,6 @@ export function safeRedirect303(
 
     const normalizedPath = parsed.pathname + parsed.search;
 
-    // Optional allowlist support (keeps your existing behaviour)
     const isAllowed = allowedPrefixes.some(prefix => normalizedPath.startsWith(prefix));
 
     if (!isAllowed) {
