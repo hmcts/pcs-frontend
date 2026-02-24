@@ -34,12 +34,16 @@ export interface Address {
 }
 
 export interface PossessionClaimResponse {
-  defendantContactDetails: {
-    party: {
+  defendantContactDetails?: {
+    party?: {
       firstName?: string;
       lastName?: string;
       address?: Address;
     };
+  };
+  defendantResponses?: {
+    oweRentArrears?: 'yes' | 'no' | 'notSure';
+    rentArrearsAmount?: string;
   };
 }
 
