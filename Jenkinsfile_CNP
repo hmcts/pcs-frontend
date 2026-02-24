@@ -103,7 +103,7 @@ def postAllureResultsToSlack(String pipelineType = 'master') {
     msg = "Functional Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend  |  *Pipeline:* ${pipelineType}\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}PCS_20Frontend_20Functional_20Test_20Report/"
   }
   try {
-    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    slackSend(channel: '#qa-pipeline-status', message: msg)
   } catch (Exception e) {
     echo "WARNING: Allure Slack notification failed: ${e.message}"
   }
