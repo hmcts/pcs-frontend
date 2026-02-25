@@ -9,6 +9,7 @@ import type {
 } from '../../../interfaces/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
+import { safeRedirect303 } from '../../../utils/safeRedirect';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -132,7 +133,7 @@ export function createPostHandler(
         processFieldData(req, fields);
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
+        return safeRedirect303(res, getDashboardUrl(req.res?.locals.validatedCase?.id), '/', ['/dashboard']);
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving
@@ -156,7 +157,8 @@ export function createPostHandler(
         return res.status(500).send('Unable to determine next step');
       }
 
-      res.redirect(303, redirectPath);
+      // Allow all internal paths since this is a generic form builder
+      safeRedirect303(res, redirectPath, '/', ['/']);
     },
   };
 }
