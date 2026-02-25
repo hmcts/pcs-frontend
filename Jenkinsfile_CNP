@@ -54,6 +54,9 @@ withPipeline(type, product, component) {
     ])
     afterAlways('functionalTest:preview') {
       archiveFunctionalTestReports()
+            if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
+                postAllureResultsToSlack('master')
+            }
     }
     afterAlways('fullFunctionalTest:preview') {
       archiveFunctionalTestReports()
@@ -93,7 +96,7 @@ def archiveFunctionalTestReports() {
 
 def postAllureResultsToSlack(String pipelineType = 'master') {
   def msg = sh(
-    script: "npx ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true",
+    script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true",
     returnStdout: true
   ).trim()
   if (!msg) {
