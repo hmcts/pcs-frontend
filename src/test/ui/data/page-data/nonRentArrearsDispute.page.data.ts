@@ -34,24 +34,4 @@ export const nonRentArrearsDispute = {
   thereIsAProblemErrorMessageHeader: 'There is a problem',
   selectIfYouWantToDisputeErrorMessage: 'Select if you want to dispute any other parts of the claim',
   partsOfClaimDoNotAgreeErrorMessage: 'Enter the parts of the claim you do not agree with',
-  errorValidation: 'YES',
-  errorValidationType: { input: 'textField', radio: 'radioOptions' },
-  errorValidationHeader: 'There is a problem',
-  errorValidationField: {
-    errorRadioMsg: [{ errMessage: 'Select if you want to dispute any other parts of the claim' }],
-    errorTextField: [
-      {
-        type: 'empty',
-        label: 'Explain which parts of the claim you do not agree with',
-        errMessage: 'Enter the parts of the claim you do not agree with',
-      },
-    ],
-    errorCharLimit: [
-      {
-        type: 'empty',
-        label: 'Explain which parts of the claim you do not agree with',
-        errMessage: 'Must be 6500 characters or fewer',
-      },
-    ],
-  },
 };

@@ -334,69 +334,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
   });
 
-  test.skip('NonRentArrearsDispute - mandatory selection, mandatory text box,save for later, character limit and back link ', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
-    });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('selectNoticeDetails', {
-      question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.imNotSureRadioOption,
-    });
-    await performAction('clickLink', nonRentArrearsDispute.backLink);
-    await performValidation('mainHeader', noticeDetails.mainHeader);
-    await performAction('clickButton', noticeDetails.saveAndContinueButton);
-    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: nonRentArrearsDispute.errorValidation,
-      validationType: nonRentArrearsDispute.errorValidationType.radio,
-      inputArray: nonRentArrearsDispute.errorValidationField.errorRadioMsg,
-      question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
-      header: nonRentArrearsDispute.errorValidationHeader,
-    });
-    await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
-    await performValidation('elementToBeVisible', nonRentArrearsDispute.youHave6500CharactersHiddenHintText);
-    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: nonRentArrearsDispute.errorValidation,
-      validationType: nonRentArrearsDispute.errorValidationType.input,
-      inputArray: nonRentArrearsDispute.errorValidationField.errorTextField,
-      header: nonRentArrearsDispute.errorValidationHeader,
-    });
-    await performAction(
-      'inputText',
-      nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
-      nonRentArrearsDispute.detailsCharLimitInputText
-    );
-    await performValidation('elementToBeVisible', nonRentArrearsDispute.tooManyCharacterHiddenHintText);
-    await performAction(
-      'clickLinkAndVerifyNewTabTitle',
-      nonRentArrearsDispute.viewTheClaimLink,
-      nonRentArrearsDispute.mainHeaderGovServiceHiddenNewTab
-    );
-    await performAction(
-      'inputText',
-      nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
-      nonRentArrearsDispute.explainClaimTextInput
-    );
-    await performAction('clickButton', nonRentArrearsDispute.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
-  });
-
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = false
   test.skip('England - RentArrears - NoticeServed - No - RentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
