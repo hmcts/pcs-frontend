@@ -1,5 +1,5 @@
-import { nonRentArrearsDispute } from '../../data/page-data';
-import { performAction, performValidation } from '../../utils/controller';
+import { nonRentArrearsDispute } from '../data/page-data';
+import { performAction, performValidation } from '../utils/controller';
 
 export default async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
   await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
