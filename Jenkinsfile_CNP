@@ -54,15 +54,9 @@ withPipeline(type, product, component) {
     ])
     afterAlways('functionalTest:preview') {
       archiveFunctionalTestReports()
-            if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-                postAllureResultsToSlack('preview')
-            }
     }
     afterAlways('fullFunctionalTest:preview') {
       archiveFunctionalTestReports()
-            if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-                postAllureResultsToSlack('preview')
-            }
     }
   }
 
@@ -106,7 +100,7 @@ def postAllureResultsToSlack(String pipelineType = 'master') {
     msg = "Functional Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend  |  *Pipeline:* ${pipelineType}\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}PCS_20Frontend_20Functional_20Test_20Report/"
   }
   try {
-    slackSend(channel: '#qa-pipeline-status', message: msg)
+    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
   } catch (Exception e) {
     echo "WARNING: Allure Slack notification failed: ${e.message}"
   }
