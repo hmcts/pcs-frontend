@@ -9,7 +9,7 @@ export const noticeDetails = {
   getDidClaimantGiveYouQuestion(claimantName: string): string {
     return `Did ${claimantName} give you notice of their intention to begin possession proceedings?`;
   },
-  imNotSureRadioOption: "I'm not sure",
+  imNotSureRadioOption: 'I’m not sure',
   noRadioOption: 'No',
   orHintText: 'or',
   saveAndContinueButton: 'Save and continue',

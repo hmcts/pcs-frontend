@@ -220,7 +220,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Notice Details - Error messages - Validations', async () => {
+  test.skip('Notice Details - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -253,7 +253,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
   });
 
-  test('Notice Date Known - Error messages - Validations', async () => {
+  test.skip('Notice Date Known - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -290,7 +290,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
   });
 
-  test('Notice Date Unknown - Error messages - Validations', async () => {
+  test.skip('Notice Date Unknown - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,

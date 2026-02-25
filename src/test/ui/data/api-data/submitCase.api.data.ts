@@ -70,7 +70,7 @@ export const submitCaseApiData = {
     mediationAttempted: 'NO',
     settlementAttempted: 'NO',
     noticeServed: 'YES',
-    notice_NoticePostedDate: '1990-11-10',
+    notice_NoticePostedDate: '2025-11-10',
     notice_NoticeDocuments: [],
     notice_NoticeServiceMethod: 'FIRST_CLASS_POST',
     claimantNamePossessiveForm: null,
