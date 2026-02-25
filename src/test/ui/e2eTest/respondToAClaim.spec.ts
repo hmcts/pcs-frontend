@@ -7,7 +7,7 @@ import {
   correspondenceAddress,
   counterClaim,
   dateOfBirth,
-  defendantNameCapture,
+  defendantNameCapture, defendantNameConfirmation,
   //defendantNameConfirmation,
   freeLegalAdvice,
   //registeredLandlord,
@@ -87,13 +87,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Rent Arrears claim type = false, Notice Date Provided string = true, and Notice Served boolean = true
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
-    /*await performAction('confirmDefendantDetails', {
+    await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
-    });*/
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
