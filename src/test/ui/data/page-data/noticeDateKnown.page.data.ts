@@ -29,23 +29,6 @@ export function convertDateFormat(dateString: string): string {
   const day = date.getDate();
   const month = date.toLocaleString('en-US', { month: 'long' });
 
-  const daySuffix = getDaySuffix(day);
-
-  return `${day}${daySuffix} ${month} ${date.getFullYear()}`;
+  return `${day} ${month} ${date.getFullYear()}`;
 }
 
-function getDaySuffix(day: number): string {
-  if (day > 3 && day < 21) {
-    return 'th';
-  }
-  switch (day % 10) {
-    case 1:
-      return 'st';
-    case 2:
-      return 'nd';
-    case 3:
-      return 'rd';
-    default:
-      return 'th';
-  }
-}
