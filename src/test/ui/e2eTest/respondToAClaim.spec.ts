@@ -12,9 +12,9 @@ import {
   defendantNameCapture,
   //defendantNameConfirmation,
   freeLegalAdvice,
-  //registeredLandlord,
   nonRentArrearsDispute,
   noticeDetails,
+  registeredLandlord,
   repaymentsMade,
   startNow,
   tenancyDetails,
@@ -79,8 +79,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
     // The below two lines related to the Wales journey are disabled only to allow this test case to execute.
-    //await performValidation('mainHeader', registeredLandlord.mainHeader);
-    //await performAction('clickButton', registeredLandlord.continueButton);
+    await performValidation('mainHeader', registeredLandlord.mainHeader);
+    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
@@ -118,6 +118,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', registeredLandlord.mainHeader);
+    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
@@ -158,12 +160,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       postcode: correspondenceAddress.englandPostcodeTextInput,
       addressIndex: correspondenceAddress.addressIndex,
     });
+    await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
       radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', registeredLandlord.mainHeader);
+    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
@@ -202,12 +206,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
+    await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
       radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performValidation('mainHeader', registeredLandlord.mainHeader);
+    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
