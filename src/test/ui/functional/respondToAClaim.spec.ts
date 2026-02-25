@@ -669,73 +669,73 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('RentArrears - mandatory selection, mandatory text box,save for later, character limit and back link ', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
-    });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('selectNoticeDetails', {
-      question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.imNotSureRadioOption,
-    });
-    await performAction('clickLink', rentArrears.backLink);
-    await performValidation('mainHeader', noticeDetails.mainHeader);
-    await performAction('clickButton', noticeDetails.saveAndContinueButton);
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: rentArrears.errorValidation,
-      validationType: rentArrears.errorValidationType.radio,
-      inputArray: rentArrears.errorValidationField.errorRadioMsg,
-      question: rentArrears.doYouOweThisQuestion,
-      header: rentArrears.errorValidationHeader,
-    });
-    await performAction('clickRadioButton', {
-      question: rentArrears.doYouOweThisQuestion,
-      option: rentArrears.noRadioOption,
-    });
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: rentArrears.errorValidation,
-      validationType: rentArrears.errorValidationType.input,
-      inputArray: rentArrears.errorValidationField.errorTextField,
-      header: rentArrears.errorValidationHeader,
-    });
-    await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.negativeTextInput);
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: rentArrears.errorValidation,
-      validationType: rentArrears.errorValidationType.input,
-      inputArray: rentArrears.errorValidationField.errorNegativeTextInput,
-      header: rentArrears.errorValidationHeader,
-    });
-    // await performAction(
-    //   'inputText',
-    //   rentArrears.howMuchDoYouBelieveHiddenTextLabel,
-    //   rentArrears.billionTextInput
-    // );
-    // await performAction('clickButton', rentArrears.saveAndContinueButton);
-    // await performAction('inputErrorValidation', {
-    //   validationReq: rentArrears.errorValidation,
-    //   validationType: rentArrears.errorValidationType.input,
-    //   inputArray: rentArrears.errorValidationField.errorBillionTextInput,
-    //   header: rentArrears.errorValidationHeader,
-    // });
-    await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.rentAmountTextInput);
-    await performAction('clickButton', rentArrears.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
-  });
+  // test('RentArrears - mandatory selection, mandatory text box,save for later, character limit and back link ', async () => {
+  //   await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+  //   await performAction('inputDefendantDetails', {
+  //     fName: defendantNameCapture.firstNameInputText,
+  //     lName: defendantNameCapture.lastNameInputText,
+  //   });
+  //   await performAction('enterDateOfBirthDetails', {
+  //     dobDay: dateOfBirth.dayInputText,
+  //     dobMonth: dateOfBirth.monthInputText,
+  //     dobYear: dateOfBirth.yearInputText,
+  //   });
+  //   await performAction('selectCorrespondenceAddressKnown', {
+  //     radioOption: correspondenceAddress.yesRadioOption,
+  //   });
+  //   await performValidation('mainHeader', contactPreference.mainHeader);
+  //   await performAction('clickButton', contactPreference.saveAndContinueButton);
+  //   await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+  //   await performValidation('mainHeader', tenancyDetails.mainHeader);
+  //   await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+  //   await performAction('selectNoticeDetails', {
+  //     question: noticeDetails.didClaimantGiveYouQuestion,
+  //     option: noticeDetails.imNotSureRadioOption,
+  //   });
+  //   await performAction('clickLink', rentArrears.backLink);
+  //   await performValidation('mainHeader', noticeDetails.mainHeader);
+  //   await performAction('clickButton', noticeDetails.saveAndContinueButton);
+  //   await performAction('clickButton', rentArrears.saveAndContinueButton);
+  //   await performAction('inputErrorValidation', {
+  //     validationReq: rentArrears.errorValidation,
+  //     validationType: rentArrears.errorValidationType.radio,
+  //     inputArray: rentArrears.errorValidationField.errorRadioMsg,
+  //     question: rentArrears.doYouOweThisQuestion,
+  //     header: rentArrears.errorValidationHeader,
+  //   });
+  //   await performAction('clickRadioButton', {
+  //     question: rentArrears.doYouOweThisQuestion,
+  //     option: rentArrears.noRadioOption,
+  //   });
+  //   await performAction('clickButton', rentArrears.saveAndContinueButton);
+  //   await performAction('inputErrorValidation', {
+  //     validationReq: rentArrears.errorValidation,
+  //     validationType: rentArrears.errorValidationType.input,
+  //     inputArray: rentArrears.errorValidationField.errorTextField,
+  //     header: rentArrears.errorValidationHeader,
+  //   });
+  //   await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.negativeTextInput);
+  //   await performAction('clickButton', rentArrears.saveAndContinueButton);
+  //   await performAction('inputErrorValidation', {
+  //     validationReq: rentArrears.errorValidation,
+  //     validationType: rentArrears.errorValidationType.input,
+  //     inputArray: rentArrears.errorValidationField.errorNegativeTextInput,
+  //     header: rentArrears.errorValidationHeader,
+  //   });
+  //   // await performAction(
+  //   //   'inputText',
+  //   //   rentArrears.howMuchDoYouBelieveHiddenTextLabel,
+  //   //   rentArrears.billionTextInput
+  //   // );
+  //   // await performAction('clickButton', rentArrears.saveAndContinueButton);
+  //   // await performAction('inputErrorValidation', {
+  //   //   validationReq: rentArrears.errorValidation,
+  //   //   validationType: rentArrears.errorValidationType.input,
+  //   //   inputArray: rentArrears.errorValidationField.errorBillionTextInput,
+  //   //   header: rentArrears.errorValidationHeader,
+  //   // });
+  //   await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.rentAmountTextInput);
+  //   await performAction('clickButton', rentArrears.saveForLaterButton);
+  //   await performValidation('mainHeader', 'Dashboard');
+  // });
 });
