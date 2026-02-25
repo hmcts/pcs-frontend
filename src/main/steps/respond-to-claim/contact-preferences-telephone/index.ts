@@ -78,11 +78,19 @@ export const step: StepDefinition = createFormStep({
     if (!telephoneForm) {
       return;
     }
+
+    const existingPhoneNumber =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.phoneNumber;
+
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {
         party: {
           phoneNumber:
-            telephoneForm.contactByTelephone === 'yes' ? telephoneForm['contactByTelephone.phoneNumber'] : undefined,
+            telephoneForm.contactByTelephone === 'yes'
+              ? telephoneForm['contactByTelephone.phoneNumber']
+              : existingPhoneNumber
+                ? ''
+                : undefined,
         },
       },
       defendantResponses: {
