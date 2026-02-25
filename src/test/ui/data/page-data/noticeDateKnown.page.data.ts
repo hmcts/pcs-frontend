@@ -4,7 +4,8 @@ export const noticeDateKnown = {
   mainHeader: 'Notice date',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
   backLink: 'Back',
-  whenMakingClaimHintText: 'When making the claim, Possession Claims Solicitor Org had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.',
+  whenMakingClaimHintText:
+    'When making the claim, Possession Claims Solicitor Org had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.',
   noticeDetailsGivenLabel: 'Notice details given by Possession Claims Solicitor Org:',
   noticeGivenDateLabel: `They served you with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCasePayload.notice_NoticePostedDate)}`,
   whenDidYouReceiveNoticeQuestion: 'When did you receive notice from Possession Claims Solicitor Org (optional)?',
@@ -34,11 +35,17 @@ export function convertDateFormat(dateString: string): string {
 }
 
 function getDaySuffix(day: number): string {
-  if (day > 3 && day < 21) {return 'th';}
+  if (day > 3 && day < 21) {
+    return 'th';
+  }
   switch (day % 10) {
-    case 1: return 'st';
-    case 2: return 'nd';
-    case 3: return 'rd';
-    default: return 'th';
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
   }
 }
