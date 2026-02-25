@@ -70,6 +70,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactByPhone.mainHeader);
+
+    await performAction('clickRadioButton', contactByPhone.noRadioOption);
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -108,12 +112,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performValidation('mainHeader', contactByPhone.mainHeader);
+   await performValidation('mainHeader', contactByPhone.mainHeader);
     await performAction('selectContactByPhone', {
       radioOption: contactByPhone.yesRadioOption,
       phoneNumber: contactByPhone.inputUkPhoneNumber,
     });
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
     await performValidation('mainHeader', contactByTextMessage.mainHeader);
     await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
@@ -158,6 +161,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       addressIndex: correspondenceAddress.addressIndex,
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByPhone', {
+      radioOption: contactByPhone.yesRadioOption,
+      phoneNumber: contactByPhone.inputUkPhoneNumber,
+    });
+    await performAction('clickRadioButton', contactByTextMessage.noRadioOption);
+    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);

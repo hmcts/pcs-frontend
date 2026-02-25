@@ -1,0 +1,20 @@
+export const contactByPhone = {
+  mainHeader: 'Contact by telephone',
+  respondToClaimParagraph: 'Respond to a property possession claim',
+  backLink: 'Back',
+  weMightNeedToContactHintText: 'We might need to contact you by telephone with urgent updates about your case.',
+  //areYouHappyToContactHeader: 'Are you happy to be contacted by telephone?',
+  areYouHappyToContactQuestion: 'Are you happy to be contacted by telephone?',
+  yesRadioOption: 'Yes',
+  noRadioOption: 'No',
+  ukPhoneNumberHiddenTextLabel: 'UK Phone Number',
+  inputUkPhoneNumber: '07700900123',
+  saveAndContinueButton: 'Save and continue',
+  saveForLaterButton: 'Save for later',
+  cymraegLink: 'Cymraeg',
+  thereIsAProblemErrorMessageHeader: 'There is a problem',
+  selectWhetherHappyToBeContactedByTelephoneErrorMessage: 'Select whether you`re happy to be contacted by telephone',
+  enterUKPhoneNumberErrorMessage: 'Enter UK Phone Number',
+  uKPhoneNumberFormatErrorMessage: 'Enter a phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192',
+
+};

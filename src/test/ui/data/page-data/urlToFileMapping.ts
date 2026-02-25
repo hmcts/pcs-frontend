@@ -4,7 +4,7 @@ export default {
   home: 'home',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
-  'contact-by-phone': 'contactByPhone',
+  'contact-preferences-telephone': 'contactByTelephone',
   'contact-by-text-message': 'contactByTextMessage',
   'dispute-claim-interstitial': 'disputeClaimInterstitial',
   'date-of-birth': 'dateOfBirth',

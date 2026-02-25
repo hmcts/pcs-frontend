@@ -3,7 +3,7 @@ export * from './startNow.page.data';
 export * from './disputeClaimInterstitial.page.data';
 export * from './freeLegalAdvice.page.data';
 export * from './defendantNameCapture.page.data';
-export * from './contactByPhone.page.data';
+export * from './contactByTelephone.page.data';
 export * from './dateOfBirth.page.data';
 export * from './correspondenceAddress.page.data';
 export * from './tenancyDetails.page.data';
