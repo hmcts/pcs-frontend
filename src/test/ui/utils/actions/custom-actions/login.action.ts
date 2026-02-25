@@ -22,6 +22,8 @@ export class LoginAction implements IAction {
     await performAction('inputText', 'Email address', process.env.IDAM_PCS_USER_EMAIL);
     await performAction('inputText', 'Password', process.env.IDAM_PCS_USER_PASSWORD);
     await performAction('clickButton', 'Sign in');
+    console.log( process.env.IDAM_PCS_USER_EMAIL);
+    console.log( process.env.IDAM_PCS_USER_PASSWORD);
   }
 
   private async createUser(userType: string, roles: string[]): Promise<void> {
