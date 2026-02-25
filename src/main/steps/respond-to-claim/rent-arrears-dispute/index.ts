@@ -1,8 +1,10 @@
 import type { Request } from 'express';
 
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { createFormStep, getTranslationFunction, validateCurrencyAmount } from '../../../modules/steps';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -14,8 +16,21 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     caption: 'captionHeading',
   },
+  beforeRedirect: async (req: Request) => {
+    const oweRentArrears = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
+    const rentArrearsAmount = req.body?.['rentArrears.rentArrearsAmountCorrection'] as string | undefined;
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        oweRentArrears,
+        ...(rentArrearsAmount && { rentArrearsAmount }),
+      },
+    };
+
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, true);
+  },
   extendGetContent: (req: Request) => {
-    // Pull dynamic claimantName from CCD (same as dispute-claim-interstitial)
+    // Pull dynamic claimantName from CCD
     const claimantName = (req.session?.ccdCase?.data?.claimantName as string) || 'Treetops Housing';
 
     // TO DO: Retrieve amount from CCD
