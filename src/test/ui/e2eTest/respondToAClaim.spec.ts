@@ -74,7 +74,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown');
@@ -102,7 +101,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown');
@@ -140,7 +138,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.imNotSureRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
@@ -176,7 +173,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.noRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);

@@ -206,7 +206,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown', noticeDateKnown.saveAndContinueButton);
@@ -244,11 +243,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       validationReq: noticeDetails.errorValidation,
       validationType: noticeDetails.errorValidationType.radio,
       inputArray: noticeDetails.errorValidationField.errorRadioMsg,
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
+
       header: noticeDetails.errorValidationHeader,
     });
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
     });
   });
@@ -273,7 +271,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown', {
@@ -310,7 +307,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown', {
@@ -348,7 +344,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.noRadioOption,
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
@@ -385,7 +380,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown', {
@@ -428,7 +422,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
@@ -465,7 +458,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.noRadioOption,
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
@@ -501,7 +493,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.imNotSureRadioOption,
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
@@ -539,7 +530,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown', {
@@ -610,7 +600,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayload.isClaimantNameCorrect,
       option: noticeDetails.imNotSureRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);

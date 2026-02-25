@@ -135,16 +135,8 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
-    let claimantName: string;
-
-    if (noticeGivenData.isClaimantNameCorrect === 'YES') {
-      claimantName = submitCaseApiData.submitCasePayload.claimantName;
-    } else {
-      claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
-    }
-
     await performAction('clickRadioButton', {
-      question: noticeDetails.getDidClaimantGiveYouQuestion(claimantName),
+      question: noticeDetails.getDidClaimantGiveYouQuestion(claimantsName),
       option: noticeGivenData.option,
     });
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
