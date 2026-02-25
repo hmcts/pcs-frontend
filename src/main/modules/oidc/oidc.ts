@@ -23,7 +23,7 @@ export class OIDCModule {
     try {
       const issuer = new URL(this.oidcConfig.issuer);
 
-      this.logger.info('Fetching OIDC configuration from:', this.oidcConfig.issuer);
+      this.logger.info('Fetching OIDC configuration from:', { issuer: this.oidcConfig.issuer });
 
       // Create client with the actual issuer
       const clientId = this.oidcConfig.clientId;
