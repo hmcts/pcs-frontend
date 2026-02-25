@@ -6,7 +6,7 @@ export const noticeDateKnown = {
   backLink: 'Back',
   whenMakingClaimHintText: 'When making the claim, Possession Claims Solicitor Org had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.',
   noticeDetailsGivenLabel: 'Notice details given by Possession Claims Solicitor Org:',
-  noticeGivenDateLabel: `They served you with a notice seeking possession on ${submitCaseApiData.submitCasePayload.notice_NoticePostedDate}`,
+  noticeGivenDateLabel: `They served you with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCasePayload.notice_NoticePostedDate)}`,
   whenDidYouReceiveNoticeQuestion: 'When did you receive notice from Possession Claims Solicitor Org (optional)?',
   exampleHintText: 'For example, 27 9 2022',
   dayTextLabel: 'Day',
@@ -22,3 +22,23 @@ export const noticeDateKnown = {
     errorRadioMsg: [{ errMessage: 'The date you received notice must either be today’s date or in the past' }],
   },
 };
+
+export function convertDateFormat(dateString: string): string {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.toLocaleString('en-US', { month: 'long' });
+
+  const daySuffix = getDaySuffix(day);
+
+  return `${day}${daySuffix} ${month} ${date.getFullYear()}`;
+}
+
+function getDaySuffix(day: number): string {
+  if (day > 3 && day < 21) {return 'th';}
+  switch (day % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+}
