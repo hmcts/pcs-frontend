@@ -133,7 +133,16 @@ export function createPostHandler(
         processFieldData(req, fields);
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
-        return safeRedirect303(res, getDashboardUrl(req.res?.locals.validatedCase?.id), '/', ['/dashboard']);
+
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
+
+        if (!dashboardUrl) {
+          // No valid case reference - redirect to home
+          return safeRedirect303(res, '/', '/', ['/']);
+        }
+
+        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving

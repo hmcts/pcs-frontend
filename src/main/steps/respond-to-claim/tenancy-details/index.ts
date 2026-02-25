@@ -36,7 +36,15 @@ export const step: StepDefinition = {
 
       // Handle saveForLater action
       if (action === 'saveForLater') {
-        return safeRedirect303(res, getDashboardUrl(req.res?.locals.validatedCase?.id), '/', ['/dashboard']);
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
+
+        if (!dashboardUrl) {
+          // No valid case reference - redirect to home
+          return safeRedirect303(res, '/', '/', ['/']);
+        }
+
+        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
       }
 
       // Handle continue action - go to next step
