@@ -8,11 +8,11 @@ export class PropertiesVolume {
   }
 
   enableFor(): void {
-    if (this.developmentMode) {
+    if (!this.developmentMode) {
       propertiesVolume.addTo(config);
-      if (config.has('secrets.pcs')) {
-        this.setSecret('secrets.pcs.app-insights-connection-string', 'appInsights.connectionString');
-      }
+    }
+    if (config.has('secrets.pcs')) {
+      this.setSecret('secrets.pcs.app-insights-connection-string', 'appInsights.connectionString');
     }
   }
 
