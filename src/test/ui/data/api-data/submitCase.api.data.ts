@@ -67,9 +67,9 @@ export const submitCaseApiData = {
           firstName: 'Peter',
           lastName: 'Parker',
           addressKnown: 'YES',
-          addressSameAsPossession: 'YES'
+          addressSameAsPossession: 'YES',
         },
-        id: null
+        id: null,
       },
       {
         value: {
@@ -77,9 +77,9 @@ export const submitCaseApiData = {
           firstName: 'Jen',
           lastName: 'Parker',
           addressKnown: 'YES',
-          addressSameAsPossession: 'YES'
+          addressSameAsPossession: 'YES',
         },
-        id: null
+        id: null,
       },
     ],
     tenancy_TypeOfTenancyLicence: 'DEMOTED_TENANCY',

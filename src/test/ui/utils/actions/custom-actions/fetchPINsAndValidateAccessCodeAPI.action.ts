@@ -32,9 +32,9 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
       const fetchedPins = Object.keys(response.data);
       if (fetchedPins.length > 0) {
         pins = fetchedPins;
-          const pinData = response.data[pins[0]];
-          firstName = pinData.firstName;
-          lastName = pinData.lastName;
+        const pinData = response.data[pins[0]];
+        firstName = pinData.firstName;
+        lastName = pinData.lastName;
         return;
       }
       await new Promise(res => setTimeout(res, delayMs));
