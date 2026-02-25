@@ -10,7 +10,7 @@ export const rentArrears = {
   amountYouOweParagraph: 'Amount you owe in rent arrears given by Treetops Housing:',
   amountParagraph: '£3250.00',
   rentAmountTextInput: '1000.00',
-  incorrectFormatTextInput:'1000',
+  incorrectFormatTextInput: '1000',
   negativeTextInput: '-100.00',
   billionTextInput: '1000001.00',
   doYouOweThisQuestion: 'Do you owe this amount in rent arrears?',
@@ -26,5 +26,5 @@ export const rentArrears = {
   theAmountYouBelieveErrorMessage: 'The amount you believe you owe in rent arrears must be £0.00 or above',
   lessThanBillionErrorMessage: 'The amount you believe you owe in rent arrears must be less than £1 billion',
   doYouOweThisAmountErrorMessage: 'Do you owe this amount in rent arrears?',
-  enterAmountInCorrectFormat:'Enter an amount in the correct format, for example 148.00 or 148.50',
+  enterAmountInCorrectFormat: 'Enter an amount in the correct format, for example 148.00 or 148.50',
 };

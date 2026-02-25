@@ -22,7 +22,11 @@ export async function rentArrearsErrorValidation(): Promise<void> {
     header: rentArrears.thereIsAProblemErrorMessageHeader,
     message: rentArrears.theAmountYouBelieveErrorMessage,
   });
-  await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.incorrectFormatTextInput);
+  await performAction(
+    'inputText',
+    rentArrears.howMuchDoYouBelieveHiddenTextLabel,
+    rentArrears.incorrectFormatTextInput
+  );
   await performAction('clickButton', rentArrears.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: rentArrears.thereIsAProblemErrorMessageHeader,
