@@ -48,7 +48,7 @@ test.afterEach(async () => {
   ErrorMessageValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim - e2e Journey @nightly', async () => {
+test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
   test('Respond to a claim - Wales postcode @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
