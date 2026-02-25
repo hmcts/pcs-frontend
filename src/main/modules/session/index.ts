@@ -10,7 +10,7 @@ export class Session {
   logger = Logger.getLogger('session');
   enableFor(app: Express): void {
     const redisConnectionString = config.get<string>('secrets.pcs.redis-connection-string');
-    this.logger.info('Connecting to Redis at:', redisConnectionString);
+    this.logger.info('Connecting to Redis');
 
     const redis = new Redis(redisConnectionString);
 

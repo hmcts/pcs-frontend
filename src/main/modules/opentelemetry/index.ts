@@ -6,6 +6,21 @@ import config from 'config';
 
 let isTelemetryInitialized = false;
 let telemetryShutdownPromise: Promise<void> | null = null;
+const ignoredIncomingUrlPattern = /\/assets\/|\.js(?:$|\?)|\.css(?:$|\?)/;
+
+interface HttpTelemetryConfig {
+  enabled: boolean;
+  ignoreIncomingRequestHook: (request: { method?: string; url?: string }) => boolean;
+  ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
+}
+
+function getServiceName(): string {
+  try {
+    return config.get<string>('appInsights.insightname');
+  } catch {
+    return 'pcs-frontend';
+  }
+}
 
 function toLogMessage(value: unknown): string {
   if (typeof value === 'string') {
@@ -86,19 +101,34 @@ const winstonTelemetryConfig: WinstonInstrumentationConfig = {
   },
 };
 
+const httpTelemetryConfig: HttpTelemetryConfig = {
+  enabled: true,
+  ignoreIncomingRequestHook: request => {
+    if (request.method === 'OPTIONS') {
+      return true;
+    }
+    const requestUrl = request.url ?? '';
+    return ignoredIncomingUrlPattern.test(requestUrl);
+  },
+  ignoreOutgoingRequestHook: options => {
+    const requestPath = typeof options.path === 'string' ? options.path : '';
+    return requestPath === '/health' || requestPath.startsWith('/health?');
+  },
+};
+
 export function initializeTelemetry(): void {
   if (isTelemetryInitialized) {
     return;
   }
+
+  process.env.OTEL_SERVICE_NAME = getServiceName();
 
   useAzureMonitor({
     azureMonitorExporterOptions: {
       connectionString: config.get('appInsights.connectionString'),
     },
     instrumentationOptions: {
-      http: {
-        enabled: true,
-      },
+      http: httpTelemetryConfig,
       redis: {
         enabled: false,
       },

@@ -1,5 +1,8 @@
 {
   "useCSRFProtection": true,
+  "appInsights": {
+    "insightname": "pcs-frontend"
+  },
   "node-env": "development",
   "use-ssl": false,
   "session": {
