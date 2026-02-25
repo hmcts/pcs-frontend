@@ -31,4 +31,3 @@ export function convertDateFormat(dateString: string): string {
 
   return `${day} ${month} ${date.getFullYear()}`;
 }
-
