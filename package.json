@@ -7,8 +7,8 @@
   },
   "scripts": {
     "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development USE_SSL=true OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback yarn start:dev",
-    "start:dev": "node --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register -r ./src/main/bootstrap.ts src/main/server.ts",
-    "start": "NODE_ENV=production node -r ./dist/main/bootstrap.js dist/main/server.js",
+    "start:dev": "node --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/bootstrap.ts",
+    "start": "NODE_ENV=production node dist/main/bootstrap.js",
     "createIdamUser": "./bin/dev/createIdamUser.sh",
     "start:watch": "nodemon --config nodemon.json",
     "docker:dev": "docker compose up",

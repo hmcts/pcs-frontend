@@ -59,7 +59,12 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
     const shouldSkipLogging = status === 404 && (url.startsWith('/.well-known/') || url.startsWith('/favicon.ico'));
 
     if (!shouldSkipLogging) {
-      logger.error(`${err.stack || err}`);
+      logger.error('Request failed', {
+        error: err,
+        method: req.method,
+        status,
+        url,
+      });
     }
 
     const t = getTranslationFunction(req, ['common']);

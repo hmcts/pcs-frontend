@@ -1,14 +1,17 @@
 import * as propertiesVolume from '@hmcts/properties-volume';
 import config from 'config';
-import { Express } from 'express';
 import { get, set } from 'lodash';
 
 export class PropertiesVolume {
-  enableFor(server: Express): void {
-    if (server.locals.ENV !== 'development') {
+  constructor(public developmentMode: boolean) {
+    this.developmentMode = developmentMode;
+  }
+
+  enableFor(): void {
+    if (this.developmentMode) {
       propertiesVolume.addTo(config);
       if (config.has('secrets.pcs')) {
-        this.setSecret('secrets.pcs.app-insights-connection-string', 'secrets.pcs.app-insights-connection-string');
+        this.setSecret('secrets.pcs.app-insights-connection-string', 'appInsights.connectionString');
       }
     }
   }

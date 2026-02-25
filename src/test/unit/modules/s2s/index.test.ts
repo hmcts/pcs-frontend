@@ -46,7 +46,7 @@ describe('S2S', () => {
     quit: jest.Mock;
     unsubscribe: jest.Mock;
   };
-  let mockLogger: Logger;
+  let mockLogger: ReturnType<typeof Logger.getLogger>;
 
   beforeEach(() => {
     s2s = new S2S();

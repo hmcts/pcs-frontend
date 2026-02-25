@@ -4,6 +4,7 @@
  */
 
 const mockAxiosCreate = jest.fn();
+const mockIsAxiosError = jest.fn().mockImplementation(error => !!error?.isAxiosError);
 const mockAxiosInstance = {
   interceptors: {
     request: { use: jest.fn() },
@@ -28,7 +29,8 @@ jest.mock('axios', () => {
   mockAxiosCreate.mockReturnValue(mockAxiosInstance);
   return {
     create: mockAxiosCreate,
-    default: { create: mockAxiosCreate },
+    isAxiosError: mockIsAxiosError,
+    default: { create: mockAxiosCreate, isAxiosError: mockIsAxiosError },
   };
 });
 

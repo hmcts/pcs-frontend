@@ -1,6 +1,6 @@
 import { StepConfig } from '../../../../../main/modules/journey/engine/schema';
 
-const loggerMock = { info: jest.fn(), error: jest.fn(), warn: jest.fn() };
+const loggerMock = { info: jest.fn(), error: jest.fn(), warn: jest.fn(), log: jest.fn() };
 
 jest.mock('@modules/logger', () => ({
   Logger: { getLogger: jest.fn(() => loggerMock) },
