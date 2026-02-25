@@ -23,7 +23,7 @@ export const step: StepDefinition = createFormStep({
     {
       name: 'contactByEmailOrPost',
       type: 'radio',
-      required: false,
+      required: true,
       legendClasses: 'govuk-!-font-weight-bold govuk-!-font-size-24',
       translationKey: {
         label: 'labels.question',
@@ -63,27 +63,36 @@ export const step: StepDefinition = createFormStep({
     },
   ],
 
-  beforeRedirect: async req => {
-    const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
-    if (!emailForm) {
-      return;
-    }
+ beforeRedirect: async req => {
+   const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
+   if (!emailForm) {
+     return;
+   }
 
-    const emailSelected = emailForm.contactByEmailOrPost === 'email';
-    const postSelected = emailForm.contactByEmailOrPost === 'post';
+   const emailSelected = emailForm.contactByEmailOrPost === 'email';
+   const postSelected = emailForm.contactByEmailOrPost === 'post';
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantContactDetails: {
-        party: {
-          emailAddress: emailSelected ? emailForm['contactByEmailOrPost.email'] : undefined,
-        },
-      },
-      defendantResponses: {
-        contactByEmail: emailSelected ? 'YES' : 'NO',
-        contactByPost: postSelected ? 'YES' : 'NO',
-      },
-    };
+   const existingEmailAddress =
+     req.res?.locals?.validatedCase?.data?.possessionClaimResponse
+       ?.defendantContactDetails?.party?.emailAddress;
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
-  },
+   const possessionClaimResponse: PossessionClaimResponse = {
+     defendantContactDetails: {
+       party: {
+         emailAddress: emailSelected
+           ? emailForm['contactByEmailOrPost.email']
+           : existingEmailAddress
+           ? ''
+           : undefined,
+       },
+     },
+     defendantResponses: {
+       contactByEmail: emailSelected ? 'YES' : 'NO',
+       contactByPost: postSelected ? 'YES' : 'NO',
+     },
+   };
+
+   await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+ },
+
 });

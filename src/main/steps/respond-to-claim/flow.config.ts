@@ -84,7 +84,7 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'correspondence-address': {
       previousStep: 'defendant-date-of-birth',
-      defaultNext: 'contact-preferences',
+      defaultNext: 'contact-preferences-email-or-post',
     },
     'contact-preferences-email-or-post': {
       previousStep: 'correspondence-address',
