@@ -8,7 +8,7 @@
   "scripts": {
     "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development USE_SSL=true OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback yarn start:dev",
     "start:dev": "node --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/bootstrap.ts",
-    "start": "NODE_ENV=production node dist/main/bootstrap.js",
+    "start": "NODE_ENV=production node -r module-alias/register dist/main/bootstrap.js",
     "createIdamUser": "./bin/dev/createIdamUser.sh",
     "start:watch": "nodemon --config nodemon.json",
     "docker:dev": "docker compose up",
@@ -17,6 +17,7 @@
     "lint:fix": "prettier --write . .github && eslint --fix",
     "build": "yarn webpack --config webpack.config.js",
     "build:prod": "NODE_ENV=production yarn webpack --mode production --config webpack.config.js",
+    "build:server": "tsc",
     "test": "npx if-env CI=true && exit 0 || yarn test:unit",
     "test:unit": "jest",
     "test:coverage": "jest --coverage",
@@ -37,6 +38,11 @@
     "test:openAllureReport": "yarn allure open allure-report",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"
+  },
+  "_moduleAliases": {
+    "@modules": "dist/main/modules",
+    "@services": "dist/main/services",
+    "@utils": "dist/main/utils"
   },
   "dependencies": {
     "@azure/monitor-opentelemetry": "^1.15.1",
@@ -71,12 +77,14 @@
     "jquery": "^3.7.0",
     "lodash": "^4.17.23",
     "luxon": "^3.6.1",
+    "module-alias": "^2.3.4",
     "nunjucks": "^3.2.4",
     "oauth4webapi": "^3.3.1",
     "openid-client": "^6.3.4",
     "require-directory": "^2.1.1",
     "serve-favicon": "^2.5.0",
     "totp-generator": "^1.0.0",
+    "tsconfig-paths": "^4.2.0",
     "validator": "^13.15.15",
     "winston": "^3.19.0",
     "zod": "^3.25.32",
@@ -162,7 +170,6 @@
     "ts-jest": "^29.2.6",
     "ts-loader": "^9.4.4",
     "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.2.0",
     "typescript": ">=4.7.4 <5.10.0",
     "webpack": "^5.88.2",
     "webpack-cli": "^6.0.0",

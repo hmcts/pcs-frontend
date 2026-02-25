@@ -12163,6 +12163,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"module-alias@npm:^2.3.4":
+  version: 2.3.4
+  resolution: "module-alias@npm:2.3.4"
+  checksum: 10/32386c3dc8de3527aa636dfa5bfa75339929296562468491445768b5607310586856f510bea32a179a5425f21f484cc50ba2727f3ee96acb0d30d032dbb2bc11
+  languageName: node
+  linkType: hard
+
 "module-details-from-path@npm:^1.0.3":
   version: 1.0.4
   resolution: "module-details-from-path@npm:1.0.4"
@@ -12970,6 +12977,7 @@ __metadata:
     lodash: "npm:^4.17.23"
     luxon: "npm:^3.6.1"
     mini-css-extract-plugin: "npm:^2.7.6"
+    module-alias: "npm:^2.3.4"
     nock: "npm:^14.0.0"
     nodemon: "npm:^3.0.0"
     nunjucks: "npm:^3.2.4"

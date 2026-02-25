@@ -35,7 +35,7 @@ RUN yarn build:prod && \
     rm -rf webpack/ webpack.config.js
 
 # Compile TypeScript to JavaScript
-RUN npx tsc
+RUN yarn build:server
 
 # ---- Development image ----
 FROM dependencies AS development
