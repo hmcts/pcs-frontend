@@ -41,7 +41,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url);
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  console.log('caseId', process.env.CASE_NUMBER);
   await performAction('clickButton', startNow.startNowButton);
 });
 
