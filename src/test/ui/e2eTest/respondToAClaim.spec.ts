@@ -112,7 +112,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-   await performValidation('mainHeader', contactByPhone.mainHeader);
+    await performValidation('mainHeader', contactByPhone.mainHeader);
     await performAction('selectContactByPhone', {
       radioOption: contactByPhone.yesRadioOption,
       phoneNumber: contactByPhone.inputUkPhoneNumber,

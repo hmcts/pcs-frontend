@@ -4,5 +4,5 @@ export const contactByTextMessage = {
   saveAndContinueButton: 'Save and continue',
   noRadioOption: 'No',
   saveForLaterButton: 'Save For Later',
-  yesRadioOption: 'Yes'
+  yesRadioOption: 'Yes',
 };

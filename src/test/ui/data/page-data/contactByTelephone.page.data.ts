@@ -16,5 +16,4 @@ export const contactByPhone = {
   selectWhetherHappyToBeContactedByTelephoneErrorMessage: 'Select whether you`re happy to be contacted by telephone',
   enterUKPhoneNumberErrorMessage: 'Enter UK Phone Number',
   uKPhoneNumberFormatErrorMessage: 'Enter a phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192',
-
 };

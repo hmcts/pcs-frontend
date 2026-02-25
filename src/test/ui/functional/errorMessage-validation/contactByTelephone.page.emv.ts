@@ -19,5 +19,4 @@ export default async function contactByTelephoneErrorValidation(): Promise<void>
     header: contactByPhone.thereIsAProblemErrorMessageHeader,
     message: contactByPhone.enterUKPhoneNumberErrorMessage,
   });
-
 }
