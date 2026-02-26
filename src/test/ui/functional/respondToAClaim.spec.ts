@@ -22,10 +22,10 @@ import {
   tenancyDetails,
 } from '../data/page-data';
 import { repaymentsAgreed } from '../data/page-data/repaymentsAgreed.page.data';
-import { claimantsName } from '../utils/actions/custom-actions';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
+const claimantsName = submitCaseApiData.submitCasePayload.claimantName;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -283,7 +283,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       validationReq: noticeDateKnown.errorValidation,
       validationType: noticeDateKnown.errorValidationType.radio,
       inputArray: noticeDateKnown.errorValidationField.errorRadioMsg,
-      question: noticeDateKnown.whenDidYouReceiveNoticeQuestion,
+      question: noticeDateKnown.getWhenDidYouReceiveNoticeQuestion(claimantsName),
       header: noticeDateKnown.errorValidationHeader,
     });
   });
@@ -319,7 +319,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       validationReq: noticeDateUnknown.errorValidation,
       validationType: noticeDateUnknown.errorValidationType.radio,
       inputArray: noticeDateUnknown.errorValidationField.errorRadioMsg,
-      question: noticeDateUnknown.whenDidYouReceiveNoticeQuestion,
+      question: noticeDateUnknown.getWhenDidYouReceiveNoticeQuestion(claimantsName),
       header: noticeDateUnknown.errorValidationHeader,
     });
   });
