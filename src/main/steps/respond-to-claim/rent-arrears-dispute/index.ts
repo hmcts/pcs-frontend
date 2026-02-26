@@ -5,6 +5,7 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { createFormStep, getTranslationFunction, validateCurrencyAmount } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getClaimantName } from '../../utils';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -42,8 +43,8 @@ export const step: StepDefinition = createFormStep({
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, true);
   },
   extendGetContent: (req: Request) => {
-    // Pull dynamic claimantName from CCD
-    const claimantName = (req.session?.ccdCase?.data?.claimantName as string) || 'Treetops Housing';
+    // Pull dynamic claimantName from CCD - check multiple sources for robustness
+    const claimantName = getClaimantName(req);
 
     // TO DO: Retrieve amount from CCD
     const amount = (req.session?.ccdCase?.data?.rentArrearsAmountOnStatement as number) || 3250.0;
