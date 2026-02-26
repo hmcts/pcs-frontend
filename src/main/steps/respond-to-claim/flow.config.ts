@@ -28,6 +28,7 @@ export const flowConfig: JourneyFlowConfig = {
     'correspondence-address',
     'dispute-claim-interstitial',
     'landlord-registered',
+    'tenancy-date-unknown',
     'tenancy-details',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
@@ -91,20 +92,22 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial': {
       routes: [
         {
-          // Route to defendant name confirmation if defendant is known
           condition: async (req: Request) => isWelshProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          // Route to defendant name capture if defendant is unknown
           condition: async (req: Request) => !isWelshProperty(req),
-          nextStep: 'tenancy-details',
+          nextStep: 'tenancy-date-unknown',
         },
       ],
-      defaultNext: 'tenancy-details',
+      defaultNext: 'tenancy-date-unknown',
     },
     'landlord-registered': {
+      defaultNext: 'tenancy-date-unknown',
+    },
+    'tenancy-date-unknown': {
       defaultNext: 'tenancy-details',
+      previousStep: 'dispute-claim-interstitial',
     },
     'tenancy-details': {
       routes: [

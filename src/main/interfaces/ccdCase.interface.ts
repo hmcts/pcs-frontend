@@ -34,14 +34,18 @@ export interface Address {
 }
 
 export interface PossessionClaimResponse {
-  defendantContactDetails: {
+  defendantContactDetails?: {
     party: {
       firstName?: string;
       lastName?: string;
       address?: Address;
     };
   };
+  defendantResponses?: {
+    tenancyStartDate?: string;
+  };
 }
+
 
 export interface StartCallbackData {
   case_details: {

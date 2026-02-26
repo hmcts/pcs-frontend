@@ -31,6 +31,7 @@ import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
 import { step as tenancyDetails } from './tenancy-details';
+import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 
 export const stepRegistry: Record<string, StepDefinition> = {
@@ -43,6 +44,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'contact-preferences': contactPreferences,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
+  'tenancy-date-unknown': tenancyDateUnknown,
   'tenancy-details': tenancyDetails,
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
   'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
