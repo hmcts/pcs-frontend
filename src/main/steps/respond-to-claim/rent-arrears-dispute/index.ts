@@ -17,13 +17,25 @@ export const step: StepDefinition = createFormStep({
     caption: 'captionHeading',
   },
   beforeRedirect: async (req: Request) => {
-    const oweRentArrears = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
-    const rentArrearsAmount = req.body?.['rentArrears.rentArrearsAmountCorrection'] as string | undefined;
+    const oweRentArrearsRaw = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
+    const rentArrearsAmountRaw = req.body?.rentArrearsAmountCorrection as string | undefined;
+
+    // Convert lowercase enum to uppercase format expected by CCD (YES, NO, NOT_SURE)
+    const oweRentArrears = oweRentArrearsRaw === 'yes' ? 'YES' : 
+                           oweRentArrearsRaw === 'no' ? 'NO' : 
+                           oweRentArrearsRaw === 'notSure' ? 'NOT_SURE' : undefined;
+
+    // Convert currency from pounds to pence (e.g., "155.00" -> 15500)
+    let rentArrearsAmount: number | undefined;
+    if (rentArrearsAmountRaw) {
+      const amountInPounds = parseFloat(rentArrearsAmountRaw.replace(/,/g, ''));
+      rentArrearsAmount = Math.round(amountInPounds * 100);
+    }
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         oweRentArrears,
-        ...(rentArrearsAmount && { rentArrearsAmount }),
+        ...(rentArrearsAmount !== undefined && { rentArrearsAmount }),
       },
     };
 
