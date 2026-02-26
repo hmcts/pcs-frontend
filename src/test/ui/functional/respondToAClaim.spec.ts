@@ -17,7 +17,6 @@ import {
   noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
-  //registeredLandlord,
   rentArrearsDispute,
   repaymentsMade,
   startNow,
@@ -668,10 +667,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('selectNoticeDetails', {
-      question: noticeDetails.didClaimantGiveYouQuestion,
-      option: noticeDetails.noRadioOption,
-    });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
