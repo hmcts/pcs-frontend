@@ -12,11 +12,10 @@ import {
   freeLegalAdvice,
   nonRentArrearsDispute,
   noticeDetails,
+  repaymentsAgreed,
   repaymentsMade,
   startNow,
   tenancyDetails,
-  // eslint-disable-next-line sort-imports
-  repaymentsAgreed,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/element-validations';
