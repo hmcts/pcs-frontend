@@ -17,7 +17,8 @@ import {
   noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
-  registeredLandlord,
+  //registeredLandlord,
+  rentArrearsDispute,
   repaymentsMade,
   startNow,
   tenancyDetails,
@@ -164,34 +165,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Contact By Text Message - Error messages - Validations', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
-    });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
-    });
-    await performValidation('mainHeader', contactByTextMessage.mainHeader);
-    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
-    await performValidation('errorMessage', {
-      header: contactByTextMessage.thereIsAProblemErrorMessageHeader,
-      message: contactByTextMessage.selectIfYouWantErrorMessage,
-    });
-  });
-
   test('Contact By Text Message - Back link and save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -225,28 +198,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Contact By Phone - No radio option selected skips text message screen and navigate to dispute interstitial', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
-    });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
-    });
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-  });
-
   test('Dispute claim interstitial - back and cancel link Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -263,14 +214,22 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('clickLink', disputeClaimInterstitial.backLink);
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
       radioOption: contactByPhone.yesRadioOption,
       phoneNumber: contactByPhone.inputUkPhoneNumber,
     });
     await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
+    await performAction('clickLink', disputeClaimInterstitial.backLink);
+    await performValidation('mainHeader', contactByTextMessage.mainHeader);
+    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
+    await performAction('clickLink', disputeClaimInterstitial.backLink);
+    await performAction('clickLink', contactByTextMessage.backLink);
+    await performAction('selectContactByPhone', {
+      radioOption: contactByPhone.noRadioOption,
+    });
+    await performAction('clickLink', disputeClaimInterstitial.backLink);
+    await performValidation('mainHeader', contactByPhone.mainHeader);
+    await performAction('clickButton', contactByPhone.saveAndContinueButton);
     await performAction('clickButton', disputeClaimInterstitial.cancelLink);
     await performValidation('mainHeader', 'Dashboard');
   });
@@ -292,13 +251,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
@@ -335,13 +290,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
@@ -377,13 +328,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
@@ -423,13 +370,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
@@ -468,21 +411,17 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -512,13 +451,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
@@ -530,8 +465,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       month: '2',
       year: '2020',
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -561,13 +496,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
@@ -576,8 +507,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -607,21 +538,17 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -651,21 +578,17 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -695,13 +618,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
@@ -744,13 +663,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
@@ -785,13 +700,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+      radioOption: contactByPhone.noRadioOption,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {

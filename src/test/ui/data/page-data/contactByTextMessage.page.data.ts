@@ -7,7 +7,6 @@ export const contactByTextMessage = {
   noRadioOption: 'No',
   saveAndContinueButton: 'Save and continue',
   saveForLaterButton: 'Save for later',
-  contactUsForHelpLink: 'Contact us for help',
   cymraegLink: 'Cymraeg',
   backLink: 'Back',
   thereIsAProblemErrorMessageHeader: 'There is a problem',

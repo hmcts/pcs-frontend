@@ -11,12 +11,4 @@ export const contactByPhone = {
   saveAndContinueButton: 'Save and continue',
   saveForLaterButton: 'Save for later',
   cymraegLink: 'Cymraeg',
-  errorValidation: 'YES',
-  errorValidationType: { input: 'textField', radio: 'radioOptions' },
-  errorValidationHeader: 'There is a problem',
-  errorValidationField: {
-    errorRadioMsg: [{ errMessage: 'Please confirm your Contact by selecting the options below' }],
-    errorTextField1: [{ type: 'empty', label: 'UK phone number', errMessage: 'Enter a UK phone number' }],
-    errorTextField2: [{ type: 'empty', label: 'UK phone number', errMessage: 'Enter a UK phone number' }],
-  },
 };
