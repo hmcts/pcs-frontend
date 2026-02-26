@@ -7,6 +7,7 @@ import {
   isNoticeDateProvided,
   isNoticeServed,
   isRentArrearsClaim,
+  isTenancyStartDateKnown,
   isWelshProperty,
 } from '../utils';
 
@@ -28,7 +29,9 @@ export const flowConfig: JourneyFlowConfig = {
     'correspondence-address',
     'dispute-claim-interstitial',
     'landlord-registered',
-    'tenancy-details',
+    'tenancy-type-details',
+    'confirm-tenancy-start-date',
+    'tenancy-date-unknown',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
     'confirmation-of-notice-date-when-not-provided',
@@ -98,26 +101,23 @@ export const flowConfig: JourneyFlowConfig = {
         {
           // Route to defendant name capture if defendant is unknown
           condition: async (req: Request) => !isWelshProperty(req),
-          nextStep: 'tenancy-details',
+          nextStep: 'tenancy-type-details',
         },
       ],
-      defaultNext: 'tenancy-details',
+      defaultNext: 'tenancy-type-details',
     },
     'landlord-registered': {
-      defaultNext: 'tenancy-details',
+      defaultNext: 'tenancy-type-details',
     },
-    'tenancy-details': {
+    'tenancy-type-details': {
       routes: [
         {
-          condition: async (req: Request) => isNoticeServed(req),
-          nextStep: 'confirmation-of-notice-given',
+          condition: async (req: Request): Promise<boolean> => isTenancyStartDateKnown(req),
+          nextStep: 'confirm-tenancy-start-date',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
-            return rentArrears;
-          },
-          nextStep: 'rent-arrears-dispute',
+          condition: async (req: Request): Promise<boolean> => !(await isTenancyStartDateKnown(req)),
+          nextStep: 'tenancy-date-unknown',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
@@ -134,6 +134,26 @@ export const flowConfig: JourneyFlowConfig = {
         }
         return 'dispute-claim-interstitial';
       },
+    },
+    'confirm-tenancy-start-date': {
+      routes: [
+        {
+          condition: async (req: Request) => isNoticeServed(req),
+          nextStep: 'confirmation-of-notice-given',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+      ],
+      previousStep: 'tenancy-type-details',
+    },
+    'tenancy-date-unknown': {
+      defaultNext: 'confirmation-of-notice-given',
+      previousStep: 'tenancy-type-details',
     },
     'confirmation-of-notice-given': {
       routes: [
@@ -182,7 +202,10 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: 'tenancy-details',
+      previousStep: async (req: Request) => {
+        const tenancyStartDateKnown = await isTenancyStartDateKnown(req);
+        return tenancyStartDateKnown ? 'confirm-tenancy-start-date' : 'tenancy-date-unknown';
+      },
     },
 
     'confirmation-of-notice-date-when-provided': {

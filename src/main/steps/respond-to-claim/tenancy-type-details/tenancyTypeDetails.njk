@@ -1,0 +1,42 @@
+{# Tenancy Details template (matches GOV.UK layout shown) #}
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}
+  {{ pageTitle }} - HM Courts & Tribunals Service – GOV.UK
+{% endblock %}
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+  <span class="govuk-caption-xl">{{ caption or serviceName }}</span>
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+  <form method="post" action="{{ url }}" novalidate>
+    {% if insetText %}
+      {{ govukInsetText({ text: insetText }) }}
+    {% endif %}
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">{{ detailsHeading }}</p>
+      <ul class="govuk-list govuk-list--bullet">
+          <li>{{ tenancyType }}</li>
+      </ul>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
+    <div class="govuk-button-group">
+      {{ govukButton({ text: saveAndContinue }) }}
+      {{ govukButton({
+        text: saveForLater,
+        classes: "govuk-button--secondary",
+        attributes: { name: "action", value: "saveForLater" }
+      }) }}
+    </div>
+    <p class="govuk-body">
+      <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+    </p>
+  </form>
+{% endblock %}
