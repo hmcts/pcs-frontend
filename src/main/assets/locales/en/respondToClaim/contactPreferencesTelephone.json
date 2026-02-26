@@ -18,6 +18,6 @@
   "errors": {
     "contactByTelephone": "Select whether you’re happy to be contacted by telephone",
     "contactByTelephone.phoneNumber": "Enter a UK phone number",
-    "contactByTelephone.phoneNumber.invalid": "Enter a phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192"
+    "contactByTelephone.phoneNumber.invalid": "Enter a phone number, like 01632 960 001 or 07700 900 982"
   }
 }
