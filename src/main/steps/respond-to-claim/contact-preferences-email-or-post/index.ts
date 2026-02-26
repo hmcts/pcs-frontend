@@ -63,11 +63,11 @@ export const step: StepDefinition = createFormStep({
     },
   ],
 
- beforeRedirect: async req => {
-   const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
-   if (!emailForm) {
-     return;
-   }
+  beforeRedirect: async req => {
+    const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
+    if (!emailForm) {
+      return;
+    }
 
    const emailSelected = emailForm.contactByEmailOrPost === 'email';
    const postSelected = emailForm.contactByEmailOrPost === 'post';
@@ -96,4 +96,3 @@ export const step: StepDefinition = createFormStep({
  },
 
 });
-
