@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
@@ -33,9 +35,22 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    //TODO: get claimantName/noticeDate from CCD case - currently hardcoded/served from LaunchDarkly flag
-    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
-    const noticeDate = req.session.noticeDate ?? '';
+    // Read from CCD (fresh data from START callback via res.locals.validatedCase)
+    // Same pattern as free-legal-advice - no session dependency
+    const caseData = req.res?.locals.validatedCase?.data;
+    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
+
+    // Check all possible notice date fields (different service methods use different fields)
+    const noticeDateRaw =
+      caseData?.notice_NoticeHandedOverDateTime || // Hand delivered
+      caseData?.notice_NoticePostedDate || // Posted
+      caseData?.notice_NoticeOtherElectronicDateTime || // Electronic
+      '';
+
+    // Format the date for display (e.g., "1 January 2024")
+    const noticeDate = noticeDateRaw
+      ? DateTime.fromISO(noticeDateRaw).setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y')
+      : '';
 
     const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-provided', ['common']);
 

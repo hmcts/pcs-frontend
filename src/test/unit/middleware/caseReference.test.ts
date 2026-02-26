@@ -46,6 +46,7 @@ describe('caseReferenceParamMiddleware', () => {
     mockReq = {
       params: {},
       session: {} as unknown as Request['session'],
+      originalUrl: '/case/1234567890123456/some-page',
     };
 
     mockRes = {

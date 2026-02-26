@@ -208,9 +208,17 @@ describe('formBuilder', () => {
           },
           ccdCase: { id: '1765881343803991' },
         },
+        res: {
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
+        },
       } as unknown as Request);
       const res = {
         render: jest.fn(),
+        locals: {
+          validatedCase: { id: '1765881343803991' },
+        },
       } as unknown as Response;
 
       expect(step.getController).toBeDefined();
@@ -237,9 +245,17 @@ describe('formBuilder', () => {
           formData: {},
           ccdCase: { id: '1765881343803992' },
         },
+        res: {
+          locals: {
+            validatedCase: { id: '1765881343803992' },
+          },
+        },
       } as unknown as Request);
       const res = {
         render: jest.fn(),
+        locals: {
+          validatedCase: { id: '1765881343803992' },
+        },
       } as unknown as Response;
 
       expect(step.getController).toBeDefined();
@@ -857,15 +873,6 @@ describe('formBuilder', () => {
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);
-        const res = {
-          redirect: jest.fn(),
-          status: jest.fn().mockReturnThis(),
-          render: jest.fn(),
-          locals: {
-            validatedCase: { id: '1765881343803991' },
-          },
-        } as unknown as Response;
-
         const req = createMockRequest({
           body: {
             action: 'saveForLater',
@@ -874,8 +881,20 @@ describe('formBuilder', () => {
           session: {
             ccdCase: { id: '1765881343803991' },
           },
-          res, // Link the response to the request
+          res: {
+            locals: {
+              validatedCase: { id: '1765881343803991' },
+            },
+          },
         } as unknown as Request);
+        const res = {
+          redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
+        } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
         await step.postController!.post(
@@ -888,7 +907,7 @@ describe('formBuilder', () => {
         expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
       });
 
-      it('should redirect to home when ccdId not available for saveForLater', async () => {
+      it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);
@@ -911,7 +930,7 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        expect(res.redirect).toHaveBeenCalledWith(303, '/');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
       });
 
       it('should show validation errors when saveForLater is clicked with invalid data', async () => {
@@ -926,12 +945,20 @@ describe('formBuilder', () => {
           session: {
             ccdCase: { id: '1765881343803991' },
           },
+          res: {
+            locals: {
+              validatedCase: { id: '1765881343803991' },
+            },
+          },
           originalUrl: '/test-url',
         } as unknown as Request);
         const res = {
           status: jest.fn().mockReturnThis(),
           render: jest.fn(),
           redirect: jest.fn(),
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
@@ -1045,12 +1072,20 @@ describe('formBuilder', () => {
           session: {
             ccdCase: { id: '1765881343803991' },
           },
+          res: {
+            locals: {
+              validatedCase: { id: '1765881343803991' },
+            },
+          },
           originalUrl: '/test-url',
         } as unknown as Request);
         const res = {
           status: jest.fn().mockReturnThis(),
           render: jest.fn(),
           redirect: jest.fn(), // Add redirect in case validation somehow passes
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
         } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();

@@ -1,6 +1,8 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import type { Application, Request, Response } from 'express';
+import { Router } from 'express';
 
+import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import {
   type DashboardTaskGroup,
@@ -9,8 +11,7 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '../services/pcsApi';
-import { sanitiseCaseReference, toCaseReference16 } from '../utils/caseReference';
-import { safeRedirect303 } from '../utils/safeRedirect';
+import { sanitiseCaseReference } from '../utils/caseReference';
 
 interface MappedTask {
   title: { html: string };
@@ -29,18 +30,20 @@ interface MappedTaskGroup {
 }
 
 export const DASHBOARD_ROUTE = '/dashboard';
+const DEFAULT_DASHBOARD_URL = `${DASHBOARD_ROUTE}/1234567890123456`; // TODO: remove hardcoded fake CCD caseId when CCD backend is setup
 
-export const getDashboardUrl = (caseReference?: string | number): string | null => {
+export const getDashboardUrl = (caseReference?: string | number): string => {
   if (!caseReference) {
-    return null;
+    return DEFAULT_DASHBOARD_URL;
   }
 
   const sanitised = sanitiseCaseReference(caseReference);
   if (!sanitised) {
-    return null;
+    return DEFAULT_DASHBOARD_URL;
   }
 
-  return `${DASHBOARD_ROUTE}/${sanitised}`;
+  const url = `${DASHBOARD_ROUTE}/${sanitised}`;
+  return /^\/dashboard\/\d{16}$/.test(url) ? url : DEFAULT_DASHBOARD_URL;
 };
 
 function mapTaskGroups(app: Application, caseReference: string) {
@@ -92,20 +95,31 @@ function mapTaskGroups(app: Application, caseReference: string) {
 export default function dashboardRoutes(app: Application): void {
   const logger = Logger.getLogger('dashboard');
 
-  app.get('/dashboard', oidcMiddleware, (req: Request, res: Response) => {
-    const caseReference = toCaseReference16(req.session?.ccdCase?.id);
-    const dashboardUrl = caseReference ? getDashboardUrl(caseReference) : null;
+  // Create dedicated router for dashboard routes
+  const dashboardRouter = Router({ mergeParams: true });
 
-    if (!dashboardUrl) {
-      // No valid case reference - redirect to home
-      return safeRedirect303(res, '/', '/', ['/']);
-    }
+  // Apply param middleware - dashboard owns this dependency
+  // This ensures res.locals.validatedCase is set for routes with :caseReference
+  dashboardRouter.param('caseReference', caseReferenceParamMiddleware);
 
-    return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
+  // Route: /dashboard (redirect to case-specific dashboard)
+  dashboardRouter.get('/', oidcMiddleware, (req: Request, res: Response) => {
+    const caseId = req.session?.ccdCase?.id;
+    const redirectUrl = getDashboardUrl(caseId);
+    return res.redirect(303, redirectUrl);
   });
 
-  app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
+  // Route: /dashboard/:caseReference (main dashboard page)
+  dashboardRouter.get('/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
     const validatedCase = res.locals.validatedCase;
+
+    if (!validatedCase) {
+      logger.error('Dashboard: validatedCase is undefined - middleware not executed');
+      return res.status(500).render('error', {
+        error: 'Case validation failed - validatedCase not set',
+      });
+    }
+
     const caseReferenceNumber = Number(validatedCase.id);
 
     try {
@@ -123,4 +137,7 @@ export default function dashboardRoutes(app: Application): void {
       throw e;
     }
   });
+
+  // Mount the dashboard router at /dashboard
+  app.use('/dashboard', dashboardRouter);
 }
