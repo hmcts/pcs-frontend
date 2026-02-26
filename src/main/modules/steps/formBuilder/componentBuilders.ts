@@ -54,6 +54,9 @@ export function buildComponentConfig(
   switch (field.type) {
     case 'text': {
       component.value = (fieldValue as string) || '';
+      if (field.maxLength) {
+        component.attributes = { ...(component.attributes || {}), maxlength: field.maxLength };
+      }
       componentType = 'input';
       break;
     }
