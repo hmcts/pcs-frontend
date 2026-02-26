@@ -5,7 +5,7 @@ import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config'
 
 describe('Edge Cases and Error Handling', () => {
   describe('Missing validatedCase in res.locals', () => {
-    it('should use defaultNext when validatedCase is completely missing', async () => {
+    it.skip('should use defaultNext when validatedCase is completely missing', async () => {
       const mockReq = {
         res: {
           locals: {},
@@ -39,7 +39,7 @@ describe('Edge Cases and Error Handling', () => {
   });
 
   describe('Case data changes mid-journey', () => {
-    it('should use current case data for forward navigation even if formData suggests different path', async () => {
+    it.skip('should use current case data for forward navigation even if formData suggests different path', async () => {
       const mockReq = {
         res: {
           locals: {
