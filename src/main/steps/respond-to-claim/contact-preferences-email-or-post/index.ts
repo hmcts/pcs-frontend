@@ -63,36 +63,30 @@ export const step: StepDefinition = createFormStep({
     },
   ],
 
- beforeRedirect: async req => {
-   const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
-   if (!emailForm) {
-     return;
-   }
+  beforeRedirect: async req => {
+    const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
+    if (!emailForm) {
+      return;
+    }
 
-   const emailSelected = emailForm.contactByEmailOrPost === 'email';
-   const postSelected = emailForm.contactByEmailOrPost === 'post';
+    const emailSelected = emailForm.contactByEmailOrPost === 'email';
+    const postSelected = emailForm.contactByEmailOrPost === 'post';
 
-   const existingEmailAddress =
-     req.res?.locals?.validatedCase?.data?.possessionClaimResponse
-       ?.defendantContactDetails?.party?.emailAddress;
+    const existingEmailAddress =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.emailAddress;
 
-   const possessionClaimResponse: PossessionClaimResponse = {
-     defendantContactDetails: {
-       party: {
-         emailAddress: emailSelected
-           ? emailForm['contactByEmailOrPost.email']
-           : existingEmailAddress
-           ? ''
-           : undefined,
-       },
-     },
-     defendantResponses: {
-       contactByEmail: emailSelected ? 'YES' : 'NO',
-       contactByPost: postSelected ? 'YES' : 'NO',
-     },
-   };
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantContactDetails: {
+        party: {
+          emailAddress: emailSelected ? emailForm['contactByEmailOrPost.email'] : existingEmailAddress ? '' : undefined,
+        },
+      },
+      defendantResponses: {
+        contactByEmail: emailSelected ? 'YES' : 'NO',
+        contactByPost: postSelected ? 'YES' : 'NO',
+      },
+    };
 
-   await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
- },
-
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+  },
 });
