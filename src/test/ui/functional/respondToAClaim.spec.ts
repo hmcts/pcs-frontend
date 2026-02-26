@@ -22,6 +22,7 @@ import {
   tenancyDetails,
 } from '../data/page-data';
 import { repaymentsAgreed } from '../data/page-data/repaymentsAgreed.page.data';
+import { claimantsName } from '../utils/actions/custom-actions';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -219,7 +220,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test.skip('Notice Details - Error messages - Validations', async () => {
+  test('Notice Details - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -243,7 +244,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       validationReq: noticeDetails.errorValidation,
       validationType: noticeDetails.errorValidationType.radio,
       inputArray: noticeDetails.errorValidationField.errorRadioMsg,
-
+      question: noticeDetails.getDidClaimantGiveYouQuestion(claimantsName),
       header: noticeDetails.errorValidationHeader,
     });
     await performAction('selectNoticeDetails', {
@@ -251,7 +252,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
   });
 
-  test.skip('Notice Date Known - Error messages - Validations', async () => {
+  test('Notice Date Known - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -287,7 +288,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
   });
 
-  test.skip('Notice Date Unknown - Error messages - Validations', async () => {
+  test('Notice Date Unknown - Error messages - Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,

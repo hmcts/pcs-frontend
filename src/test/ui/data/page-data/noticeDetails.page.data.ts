@@ -1,5 +1,3 @@
-import { submitCaseApiData } from '../api-data';
-
 export const noticeDetails = {
   mainHeader: 'Notice details',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
@@ -23,10 +21,7 @@ export const noticeDetails = {
     errorRadioMsg: [
       {
         get errMessage(): string {
-          const claimantName =
-            submitCaseApiData.submitCasePayloadNoDefendants?.overriddenClaimantName ||
-            submitCaseApiData.submitCasePayload.claimantName;
-          return `Select if ${claimantName} gave you notice of their intention to begin possession proceedings`;
+          return `Select if Possession Claims Solicitor Org gave you notice of their intention to begin possession proceedings`;
         },
       },
     ],
