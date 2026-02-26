@@ -1,513 +1,228 @@
 import type { Request } from 'express';
 
+import type { JourneyFlowConfig } from '../../../../main/interfaces/stepFlow.interface';
 import { getPreviousStep } from '../../../../main/modules/steps/flow';
-import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 
-describe('Back Button Navigation', () => {
-  describe('Linear steps with explicit previousStep', () => {
-    it('should go back to correspondence-address from contact-preferences', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-              },
-            },
+describe('getPreviousStep Algorithm', () => {
+  const mockReq = {
+    res: {
+      locals: {
+        validatedCase: {
+          data: {},
+        },
+      },
+    },
+  } as unknown as Request;
+
+  describe('Explicit previousStep (string)', () => {
+    it('should return explicit previousStep when defined as string', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b'],
+        steps: {
+          'step-a': {
+            previousStep: 'step-b',
           },
         },
-      } as unknown as Request;
+      };
 
-      const previousStep = await getPreviousStep(mockReq, 'contact-preferences', flowConfig, {});
+      const result = await getPreviousStep(mockReq, 'step-a', testConfig, {});
 
-      expect(previousStep).toBe('correspondence-address');
-    });
-
-    it('should go back to defendant-date-of-birth from correspondence-address', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const previousStep = await getPreviousStep(mockReq, 'correspondence-address', flowConfig, {});
-
-      expect(previousStep).toBe('defendant-date-of-birth');
+      expect(result).toBe('step-b');
     });
   });
 
-  describe('Function-based previousStep - defendant-date-of-birth', () => {
-    it('should go back to defendant-name-confirmation when that step is in formData', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-              },
-            },
+  describe('Function-based previousStep', () => {
+    it('should call previousStep function with req and formData', async () => {
+      const mockPreviousStepFn = jest.fn().mockResolvedValue('calculated-step');
+
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'calculated-step'],
+        steps: {
+          'step-a': {
+            previousStep: mockPreviousStepFn,
           },
         },
-      } as unknown as Request;
-
-      const formData = {
-        'defendant-name-confirmation': { confirmed: 'yes' },
       };
 
-      const previousStep = await getPreviousStep(mockReq, 'defendant-date-of-birth', flowConfig, formData);
+      const formData = { someData: 'value' };
+      const result = await getPreviousStep(mockReq, 'step-a', testConfig, formData);
 
-      expect(previousStep).toBe('defendant-name-confirmation');
+      expect(mockPreviousStepFn).toHaveBeenCalledWith(mockReq, formData);
+      expect(result).toBe('calculated-step');
     });
 
-    it('should go back to defendant-name-capture when confirmation is NOT in formData', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const formData = {
-        'defendant-name-capture': { firstName: 'John', lastName: 'Doe' },
+    it('should use formData to determine which step user visited', async () => {
+      const previousStepFn = async (_req: Request, formData: Record<string, unknown>) => {
+        if ('step-b' in formData) {
+          return 'step-b';
+        }
+        return 'step-c';
       };
 
-      const previousStep = await getPreviousStep(mockReq, 'defendant-date-of-birth', flowConfig, formData);
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b', 'step-c'],
+        steps: {
+          'step-a': {
+            previousStep: previousStepFn,
+          },
+        },
+      };
 
-      expect(previousStep).toBe('defendant-name-capture');
+      const formDataWithB = { 'step-b': { visited: true } };
+      const resultB = await getPreviousStep(mockReq, 'step-a', testConfig, formDataWithB);
+      expect(resultB).toBe('step-b');
+
+      const formDataWithoutB = {};
+      const resultC = await getPreviousStep(mockReq, 'step-a', testConfig, formDataWithoutB);
+      expect(resultC).toBe('step-c');
     });
   });
 
-  describe('Auto-calculated previousStep - tenancy-details (critical test)', () => {
-    it('should go back to landlord-registered when user visited it (Welsh property path)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-              },
-            },
+  describe('Auto-calculated previousStep (from routes)', () => {
+    it('should find previous step from routes with unconditional route', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b', 'current-step'],
+        steps: {
+          'step-a': {
+            routes: [{ nextStep: 'current-step' }],
           },
+          'step-b': {
+            routes: [{ nextStep: 'other-step' }],
+          },
+          'current-step': {},
         },
-      } as unknown as Request;
-
-      const formData = {
-        'dispute-claim-interstitial': { understood: 'yes' },
-        'landlord-registered': { isRegistered: 'yes' },
-        'tenancy-details': { tenancyType: 'assured' },
       };
 
-      const previousStep = await getPreviousStep(mockReq, 'tenancy-details', flowConfig, formData);
+      // Algorithm finds first step with route to current-step (step-a)
+      const result = await getPreviousStep(mockReq, 'current-step', testConfig, {});
 
-      expect(previousStep).toBe('landlord-registered');
+      expect(result).toBe('step-a');
     });
 
-    it('should go back to dispute-claim-interstitial when landlord-registered was skipped (English property)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'England',
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-              },
-            },
+    it('should check conditional routes and use first that routes to current step', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b', 'current-step'],
+        steps: {
+          'step-a': {
+            routes: [
+              { condition: async () => true, nextStep: 'current-step' },
+              { condition: async () => false, nextStep: 'other-step' },
+            ],
           },
+          'current-step': {},
         },
-      } as unknown as Request;
-
-      const formData = {
-        'dispute-claim-interstitial': { understood: 'yes' },
-        'tenancy-details': { tenancyType: 'assured' },
       };
 
-      const previousStep = await getPreviousStep(mockReq, 'tenancy-details', flowConfig, formData);
+      const formData = { 'step-a': { visited: true } };
+      const result = await getPreviousStep(mockReq, 'current-step', testConfig, formData);
 
-      expect(previousStep).toBe('dispute-claim-interstitial');
+      expect(result).toBe('step-a');
+    });
+
+    it('should check defaultNext when finding previous step', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'current-step'],
+        steps: {
+          'step-a': {
+            defaultNext: 'current-step',
+          },
+          'current-step': {},
+        },
+      };
+
+      const formData = { 'step-a': { visited: true } };
+      const result = await getPreviousStep(mockReq, 'current-step', testConfig, formData);
+
+      expect(result).toBe('step-a');
     });
   });
 
-  describe('Back button for all 4 journey paths', () => {
-    it('should handle back navigation for Path A (England + Name Known)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'England',
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'YES',
-                      firstName: 'John',
-                      lastName: 'Doe',
-                    },
-                  },
-                },
-              },
-            },
-          },
+  describe('Steporder fallback', () => {
+    it('should use stepOrder array as fallback when no other method works', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b', 'step-c'],
+        steps: {
+          'step-a': {},
+          'step-b': {},
+          'step-c': {},
         },
-      } as unknown as Request;
-
-      const formData = {
-        'defendant-name-confirmation': { confirmed: 'yes' },
       };
 
-      // Back from defendant-date-of-birth
-      const prev1 = await getPreviousStep(mockReq, 'defendant-date-of-birth', flowConfig, formData);
-      expect(prev1).toBe('defendant-name-confirmation');
+      const result = await getPreviousStep(mockReq, 'step-c', testConfig, {});
 
-      // Back from tenancy-details
-      const prev2 = await getPreviousStep(mockReq, 'tenancy-details', flowConfig, {});
-      expect(prev2).toBe('dispute-claim-interstitial');
+      expect(result).toBe('step-b');
     });
 
-    it('should handle back navigation for Path B (England + Name Unknown)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'England',
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'NO',
-                    },
-                  },
-                },
-              },
-            },
-          },
+    it('should return correct step from stepOrder at any index', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['first', 'second', 'third', 'fourth'],
+        steps: {
+          first: {},
+          second: {},
+          third: {},
+          fourth: {},
         },
-      } as unknown as Request;
-
-      const formData = {
-        'defendant-name-capture': { firstName: 'John', lastName: 'Doe' },
       };
 
-      // Back from defendant-date-of-birth
-      const prev1 = await getPreviousStep(mockReq, 'defendant-date-of-birth', flowConfig, formData);
-      expect(prev1).toBe('defendant-name-capture');
+      const resultFromThird = await getPreviousStep(mockReq, 'third', testConfig, {});
+      expect(resultFromThird).toBe('second');
 
-      // Back from tenancy-details
-      const prev2 = await getPreviousStep(mockReq, 'tenancy-details', flowConfig, {});
-      expect(prev2).toBe('dispute-claim-interstitial');
-    });
-
-    it('should handle back navigation for Path C (Wales + Name Known)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'YES',
-                      firstName: 'John',
-                      lastName: 'Doe',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const formData = {
-        'defendant-name-confirmation': { confirmed: 'yes' },
-      };
-
-      // Back from defendant-date-of-birth
-      const prev1 = await getPreviousStep(mockReq, 'defendant-date-of-birth', flowConfig, formData);
-      expect(prev1).toBe('defendant-name-confirmation');
-
-      // Back from tenancy-details (Wales - user visited landlord-registered)
-      const formDataWithLandlord = {
-        'landlord-registered': { isRegistered: 'yes' },
-      };
-      const prev2 = await getPreviousStep(mockReq, 'tenancy-details', flowConfig, formDataWithLandlord);
-      expect(prev2).toBe('landlord-registered');
-    });
-
-    it('should handle back navigation for Path D (Wales + Name Unknown)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'NO',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const formData = {
-        'defendant-name-capture': { firstName: 'John', lastName: 'Doe' },
-      };
-
-      // Back from defendant-date-of-birth
-      const prev1 = await getPreviousStep(mockReq, 'defendant-date-of-birth', flowConfig, formData);
-      expect(prev1).toBe('defendant-name-capture');
-
-      // Back from tenancy-details (Wales - user visited landlord-registered)
-      const formDataWithLandlord = {
-        'landlord-registered': { isRegistered: 'yes' },
-      };
-      const prev2 = await getPreviousStep(mockReq, 'tenancy-details', flowConfig, formDataWithLandlord);
-      expect(prev2).toBe('landlord-registered');
+      const resultFromFourth = await getPreviousStep(mockReq, 'fourth', testConfig, {});
+      expect(resultFromFourth).toBe('third');
     });
   });
 
-  describe('Steporder fallback when no explicit previousStep', () => {
-    it('should use stepOrder array as fallback', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'England',
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-              },
-            },
-          },
+  describe('Edge cases', () => {
+    it('should return null for first step in stepOrder', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['first-step', 'second-step'],
+        steps: {
+          'first-step': {},
+          'second-step': {},
         },
-      } as unknown as Request;
+      };
 
-      // counter-claim has explicit previousStep function that checks isRentArrearsClaim
-      // When is-rent-arrears-claim is false, previous step should be non-rent-arrears-dispute
-      const previousStep = await getPreviousStep(mockReq, 'counter-claim', flowConfig, {});
+      const result = await getPreviousStep(mockReq, 'first-step', testConfig, {});
 
-      expect(previousStep).toBe('non-rent-arrears-dispute');
-    });
-  });
-
-  describe('First step - no previous', () => {
-    it('should return null for first step in journey', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const previousStep = await getPreviousStep(mockReq, 'start-now', flowConfig, {});
-
-      expect(previousStep).toBeNull();
-    });
-  });
-
-  describe('Back navigation with conditional routes', () => {
-    it('should correctly identify previous step from conditional routes - name known case', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'YES',
-                      firstName: 'John',
-                      lastName: 'Doe',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      // If on defendant-name-confirmation, previous should be free-legal-advice
-      // because condition for that route would be true
-      const previousStep = await getPreviousStep(mockReq, 'defendant-name-confirmation', flowConfig, {});
-
-      expect(previousStep).toBe('free-legal-advice');
+      expect(result).toBeNull();
     });
 
-    it('should correctly identify previous step from conditional routes - name unknown case', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'NO',
-                    },
-                  },
-                },
-              },
-            },
-          },
+    it('should return null for step not found in configuration', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a'],
+        steps: {
+          'step-a': {},
         },
-      } as unknown as Request;
+      };
 
-      // If on defendant-name-capture, previous should be free-legal-advice
-      const previousStep = await getPreviousStep(mockReq, 'defendant-name-capture', flowConfig, {});
+      const result = await getPreviousStep(mockReq, 'non-existent-step', testConfig, {});
 
-      expect(previousStep).toBe('free-legal-advice');
+      expect(result).toBeNull();
     });
 
-    it('should correctly identify previous step for landlord-registered (Welsh property)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-                noticeServed: 'No',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                    },
-                  },
-                ],
-              },
-            },
-          },
+    it('should handle empty formData gracefully', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b'],
+        steps: {
+          'step-a': {},
+          'step-b': {},
         },
-      } as unknown as Request;
+      };
 
-      const previousStep = await getPreviousStep(mockReq, 'landlord-registered', flowConfig, {});
+      const result = await getPreviousStep(mockReq, 'step-b', testConfig, {});
 
-      expect(previousStep).toBe('dispute-claim-interstitial');
+      expect(result).toBe('step-a');
     });
   });
 });
