@@ -1,4 +1,4 @@
-import { DEFAULT_CASE_REFERENCE, sanitiseCaseReference, toCaseReference16 } from '../../../main/utils/caseReference';
+import { sanitiseCaseReference, toCaseReference16 } from '../../../main/utils/caseReference';
 
 describe('caseReference utilities', () => {
   describe('sanitiseCaseReference', () => {
@@ -85,96 +85,96 @@ describe('caseReference utilities', () => {
       });
     });
 
-    describe('Invalid inputs - returns default', () => {
-      it('should return default for null', () => {
+    describe('Invalid inputs - returns null', () => {
+      it('should return null for null', () => {
         const result = toCaseReference16(null);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for undefined', () => {
+      it('should return null for undefined', () => {
         const result = toCaseReference16(undefined);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for empty string', () => {
+      it('should return null for empty string', () => {
         const result = toCaseReference16('');
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for whitespace-only string', () => {
+      it('should return null for whitespace-only string', () => {
         const result = toCaseReference16('   ');
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for case reference with less than 16 digits', () => {
+      it('should return null for case reference with less than 16 digits', () => {
         const result = toCaseReference16('123456789012345');
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for case reference with more than 16 digits', () => {
+      it('should return null for case reference with more than 16 digits', () => {
         const result = toCaseReference16('12345678901234567');
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for case reference with letters', () => {
+      it('should return null for case reference with letters', () => {
         const result = toCaseReference16('123456789012345a');
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for case reference with special characters', () => {
+      it('should return null for case reference with special characters', () => {
         const result = toCaseReference16('1234567890123-56');
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for boolean true', () => {
+      it('should return null for boolean true', () => {
         const result = toCaseReference16(true);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for boolean false', () => {
+      it('should return null for boolean false', () => {
         const result = toCaseReference16(false);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for object', () => {
+      it('should return null for object', () => {
         const result = toCaseReference16({ id: '1234567890123456' });
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for array', () => {
+      it('should return null for array', () => {
         const result = toCaseReference16(['1234567890123456']);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should return default for NaN', () => {
+      it('should return null for NaN', () => {
         const result = toCaseReference16(NaN);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
     });
 
     describe('Edge cases', () => {
-      it('should handle negative number', () => {
+      it('should return null for negative number', () => {
         const result = toCaseReference16(-1234567890123456);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should handle zero', () => {
+      it('should return null for zero', () => {
         const result = toCaseReference16(0);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
     });
 
     describe('Real-world scenarios', () => {
-      it('should handle session data that is null', () => {
+      it('should return null for session data that is null', () => {
         const sessionCaseId = null;
         const result = toCaseReference16(sessionCaseId);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
-      it('should handle session data that is undefined', () => {
+      it('should return null for session data that is undefined', () => {
         const session: { ccdCase?: { id?: string } } = {};
         const result = toCaseReference16(session.ccdCase?.id);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
 
       it('should handle valid session data', () => {
@@ -183,25 +183,11 @@ describe('caseReference utilities', () => {
         expect(result).toBe('9876543210987654');
       });
 
-      it('should handle malformed session data', () => {
+      it('should return null for malformed session data', () => {
         const session = { ccdCase: { id: 'invalid-case-id' } };
         const result = toCaseReference16(session.ccdCase.id);
-        expect(result).toBe(DEFAULT_CASE_REFERENCE);
+        expect(result).toBeNull();
       });
-    });
-  });
-
-  describe('DEFAULT_CASE_REFERENCE constant', () => {
-    it('should be a valid 16-digit case reference', () => {
-      expect(DEFAULT_CASE_REFERENCE).toMatch(/^\d{16}$/);
-    });
-
-    it('should be exactly 16 characters long', () => {
-      expect(DEFAULT_CASE_REFERENCE).toHaveLength(16);
-    });
-
-    it('should be the expected default value', () => {
-      expect(DEFAULT_CASE_REFERENCE).toBe('1234567890123456');
     });
   });
 });

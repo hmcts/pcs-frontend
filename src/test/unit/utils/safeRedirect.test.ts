@@ -65,6 +65,23 @@ describe('safeRedirect303', () => {
     });
   });
 
+  describe('Security: URL encoding attacks', () => {
+    it('should block CRLF injection attempts with encoded newlines', () => {
+      safeRedirect303(mockRes as Response, '/dashboard%0D%0ALocation:http://script.com', '/', ['/dashboard']);
+      expect(redirectSpy).toHaveBeenCalledWith(303, '/');
+    });
+
+    it('should block double-slash attempts with encoded slashes', () => {
+      safeRedirect303(mockRes as Response, '%2F%2Fscript.com', '/', ['/']);
+      expect(redirectSpy).toHaveBeenCalledWith(303, '/');
+    });
+
+    it('should block absolute URLs with encoded protocol', () => {
+      safeRedirect303(mockRes as Response, 'http%3A%2F%2Fscript.com', '/', ['/']);
+      expect(redirectSpy).toHaveBeenCalledWith(303, '/');
+    });
+  });
+
   describe('Type validation', () => {
     [null, undefined, 123, { url: '/dashboard' }].forEach(value => {
       it(`should handle non-string target ${JSON.stringify(value)} and redirect to fallback`, () => {
