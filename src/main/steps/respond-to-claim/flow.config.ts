@@ -110,17 +110,16 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial': {
       routes: [
         {
-          // Route to defendant name confirmation if defendant is known
           condition: async (req: Request) => isWelshProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          // Route to defendant name capture if defendant is unknown
-          condition: async (req: Request) => !isWelshProperty(req),
+          condition: async (req: Request) => !(await isWelshProperty(req)),
           nextStep: 'tenancy-details',
         },
       ],
     },
+
     'landlord-registered': {
       defaultNext: 'tenancy-details',
     },
