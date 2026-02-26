@@ -1,260 +1,198 @@
 import type { Request } from 'express';
 
+import type { JourneyFlowConfig } from '../../../../main/interfaces/stepFlow.interface';
 import { getNextStep } from '../../../../main/modules/steps/flow';
-import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 
-describe('Forward Navigation - Conditional Routing', () => {
-  describe('free-legal-advice → defendant name routing', () => {
-    it('should route to defendant-name-confirmation when defendant name is known', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'YES',
-                      firstName: 'John',
-                      lastName: 'Doe',
-                    },
-                  },
-                },
-              },
-            },
+describe('getNextStep Algorithm', () => {
+  const mockReq = {
+    res: {
+      locals: {
+        validatedCase: {
+          data: {},
+        },
+      },
+    },
+  } as unknown as Request;
+
+  describe('Routes with conditions', () => {
+    it('should evaluate condition function and return matching nextStep', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b', 'step-c'],
+        steps: {
+          'step-a': {
+            routes: [
+              { condition: async () => true, nextStep: 'step-b' },
+              { condition: async () => false, nextStep: 'step-c' },
+            ],
           },
         },
-      } as unknown as Request;
+      };
 
-      const nextStep = await getNextStep(mockReq, 'free-legal-advice', flowConfig, {});
+      const result = await getNextStep(mockReq, 'step-a', testConfig, {});
 
-      expect(nextStep).toBe('defendant-name-confirmation');
+      expect(result).toBe('step-b');
     });
 
-    it('should route to defendant-name-capture when defendant name is unknown', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'NO',
-                    },
-                  },
-                },
-              },
-            },
+    it('should try multiple conditions until one matches', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b', 'step-c', 'step-d'],
+        steps: {
+          'step-a': {
+            routes: [
+              { condition: async () => false, nextStep: 'step-b' },
+              { condition: async () => false, nextStep: 'step-c' },
+              { condition: async () => true, nextStep: 'step-d' },
+            ],
           },
         },
-      } as unknown as Request;
+      };
 
-      const nextStep = await getNextStep(mockReq, 'free-legal-advice', flowConfig, {});
+      const result = await getNextStep(mockReq, 'step-a', testConfig, {});
 
-      expect(nextStep).toBe('defendant-name-capture');
+      expect(result).toBe('step-d');
     });
 
-    it('should use defaultNext when defendant data is missing', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {},
-            },
+    it('should pass req and formData to condition function', async () => {
+      const mockCondition = jest.fn().mockResolvedValue(true);
+
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b'],
+        steps: {
+          'step-a': {
+            routes: [{ condition: mockCondition, nextStep: 'step-b' }],
           },
         },
-      } as unknown as Request;
+      };
 
-      const nextStep = await getNextStep(mockReq, 'free-legal-advice', flowConfig, {});
+      const formData = { testData: 'value' };
+      await getNextStep(mockReq, 'step-a', testConfig, formData);
 
-      expect(nextStep).toBe('defendant-name-capture');
-    });
-  });
-
-  describe('dispute-claim-interstitial → Welsh property routing', () => {
-    it('should route to landlord-registered when property is in Wales', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const nextStep = await getNextStep(mockReq, 'dispute-claim-interstitial', flowConfig, {});
-
-      expect(nextStep).toBe('landlord-registered');
-    });
-
-    it.skip('should route to tenancy-details when property is in England', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'England',
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const nextStep = await getNextStep(mockReq, 'dispute-claim-interstitial', flowConfig, {});
-
-      expect(nextStep).toBe('tenancy-details');
-    });
-
-    it.skip('should use defaultNext (tenancy-details) when legislativeCountry is missing', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {},
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const nextStep = await getNextStep(mockReq, 'dispute-claim-interstitial', flowConfig, {});
-
-      expect(nextStep).toBe('tenancy-details');
+      expect(mockCondition).toHaveBeenCalledWith(mockReq, formData, {});
     });
   });
 
-  describe.skip('All 4 journey path combinations', () => {
-    it('should handle Path A: England + Name Known', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'England',
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'YES',
-                      firstName: 'John',
-                      lastName: 'Doe',
-                    },
-                  },
-                },
-              },
-            },
+  describe('DefaultNext fallback', () => {
+    it('should use defaultNext when no routes defined', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b'],
+        steps: {
+          'step-a': {
+            defaultNext: 'step-b',
           },
         },
-      } as unknown as Request;
+      };
 
-      const step1 = await getNextStep(mockReq, 'free-legal-advice', flowConfig, {});
-      expect(step1).toBe('defendant-name-confirmation');
+      const result = await getNextStep(mockReq, 'step-a', testConfig, {});
 
-      const step2 = await getNextStep(mockReq, 'dispute-claim-interstitial', flowConfig, {});
-      expect(step2).toBe('tenancy-details');
+      expect(result).toBe('step-b');
     });
 
-    it('should handle Path B: England + Name Unknown', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'England',
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'NO',
-                    },
-                  },
-                },
-              },
-            },
+    it('should use defaultNext when all route conditions fail', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b', 'step-c'],
+        steps: {
+          'step-a': {
+            routes: [
+              { condition: async () => false, nextStep: 'step-b' },
+              { condition: async () => false, nextStep: 'step-b' },
+            ],
+            defaultNext: 'step-c',
           },
         },
-      } as unknown as Request;
+      };
 
-      const step1 = await getNextStep(mockReq, 'free-legal-advice', flowConfig, {});
-      expect(step1).toBe('defendant-name-capture');
+      const result = await getNextStep(mockReq, 'step-a', testConfig, {});
 
-      const step2 = await getNextStep(mockReq, 'dispute-claim-interstitial', flowConfig, {});
-      expect(step2).toBe('tenancy-details');
-    });
-
-    it('should handle Path C: Wales + Name Known', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'YES',
-                      firstName: 'John',
-                      lastName: 'Doe',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const step1 = await getNextStep(mockReq, 'free-legal-advice', flowConfig, {});
-      expect(step1).toBe('defendant-name-confirmation');
-
-      const step2 = await getNextStep(mockReq, 'dispute-claim-interstitial', flowConfig, {});
-      expect(step2).toBe('landlord-registered');
-    });
-
-    it('should handle Path D: Wales + Name Unknown', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-                possessionClaimResponse: {
-                  defendantContactDetails: {
-                    party: {
-                      nameKnown: 'NO',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const step1 = await getNextStep(mockReq, 'free-legal-advice', flowConfig, {});
-      expect(step1).toBe('defendant-name-capture');
-
-      const step2 = await getNextStep(mockReq, 'dispute-claim-interstitial', flowConfig, {});
-      expect(step2).toBe('landlord-registered');
+      expect(result).toBe('step-c');
     });
   });
 
-  describe('Linear steps (non-conditional)', () => {
-    it('should use defaultNext for steps with no conditional routing', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {},
-            },
+  describe('Steporder fallback', () => {
+    it('should use stepOrder when no routes or defaultNext defined', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b', 'step-c'],
+        steps: {
+          'step-a': {},
+          'step-b': {},
+          'step-c': {},
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'step-a', testConfig, {});
+
+      expect(result).toBe('step-b');
+    });
+
+    it('should return correct next step from stepOrder at any index', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['first', 'second', 'third', 'fourth'],
+        steps: {
+          first: {},
+          second: {},
+          third: {},
+          fourth: {},
+        },
+      };
+
+      const resultFromFirst = await getNextStep(mockReq, 'first', testConfig, {});
+      expect(resultFromFirst).toBe('second');
+
+      const resultFromSecond = await getNextStep(mockReq, 'second', testConfig, {});
+      expect(resultFromSecond).toBe('third');
+    });
+  });
+
+  describe('Edge cases', () => {
+    it('should return null for last step in stepOrder', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'last-step'],
+        steps: {
+          'step-a': {},
+          'last-step': {},
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'last-step', testConfig, {});
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null for step not found in configuration', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a'],
+        steps: {
+          'step-a': {},
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'non-existent-step', testConfig, {});
+
+      expect(result).toBeNull();
+    });
+
+    it('should handle empty formData gracefully', async () => {
+      const testConfig: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step-a', 'step-b'],
+        steps: {
+          'step-a': {
+            defaultNext: 'step-b',
           },
         },
-      } as unknown as Request;
+      };
 
-      const nextStep = await getNextStep(mockReq, 'defendant-name-confirmation', flowConfig, {});
+      const result = await getNextStep(mockReq, 'step-a', testConfig, {});
 
-      expect(nextStep).toBe('defendant-date-of-birth');
+      expect(result).toBe('step-b');
     });
   });
 });

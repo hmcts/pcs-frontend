@@ -157,9 +157,8 @@ describe('PostHandler - Save for Later Fix', () => {
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
-      // Should still redirect (to default dashboard URL)
-      expect(dashboardModule.getDashboardUrl).toHaveBeenCalledWith(undefined);
-      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
+      // Should redirect to home when no valid case ID
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/');
     });
 
     it('should save data to CCD via beforeRedirect', async () => {
