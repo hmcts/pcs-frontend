@@ -1,32 +1,26 @@
+import type { NextFunction } from 'express';
 import type { Environment } from 'nunjucks';
 
-const t = ((key: string) => {
-  const translations: Record<string, string> = {
-    // Step translations
-    pageTitle: 'Your name',
-    heading: 'Whats your name?',
-    caption: 'Respond to a property possession claim',
-    contactUs: 'Contact us for help',
-    firstNameLabel: 'First name',
-    lastNameLabel: 'Last name',
-    'errors.firstName.required': 'Enter your first name',
-    'errors.lastName.required': 'Enter your last name',
-    'errors.firstName.maxLength': 'First name must be 60 characters or less',
-    'errors.lastName.maxLength': 'Last name must be 60 characters or less',
+// ============================================================================
+// Test Mocks (hoisted by Jest)
+// ============================================================================
 
-    // Common translations used by buildFormContent
-    'buttons.continue': 'Continue',
-    'buttons.saveForLater': 'Save for later',
-    'buttons.cancel': 'Cancel',
-    'errors.title': 'There is a problem',
-    serviceName: 'Test service',
-    phase: 'ALPHA',
-    feedback: 'Feedback',
-    back: 'Back',
-    languageToggle: 'Language toggle',
-  };
-  return translations[key] || key;
-}) as unknown as (key: string, options?: unknown) => string;
+const mockTranslations: Record<string, string> = {
+  pageTitle: 'Your name',
+  heading: 'Whats your name?',
+  caption: 'Respond to a property possession claim',
+  firstNameLabel: 'First name',
+  lastNameLabel: 'Last name',
+  'errors.firstName.required': 'Enter your first name',
+  'errors.lastName.required': 'Enter your last name',
+  'errors.firstName.maxLength': 'First name must be 60 characters or less',
+  'errors.lastName.maxLength': 'Last name must be 60 characters or less',
+  'buttons.continue': 'Continue',
+  'buttons.cancel': 'Cancel',
+  'errors.title': 'There is a problem',
+};
+
+const t = ((key: string) => mockTranslations[key] || key) as unknown as (key: string, options?: unknown) => string;
 
 jest.mock('../../../../main/modules/steps/i18n', () => ({
   loadStepNamespace: jest.fn(),
@@ -50,152 +44,138 @@ jest.mock('../../../../main/modules/steps/flow', () => ({
   })),
 }));
 
-jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
-  const actual = jest.requireActual('../../../../main/modules/steps/formBuilder/helpers');
-  return {
-    ...actual,
-    validateForm: jest.fn(),
-  };
-});
+jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
+  ...jest.requireActual('../../../../main/modules/steps/formBuilder/helpers'),
+  validateForm: jest.fn(),
+}));
+
+// ============================================================================
+// Imports (after mocks)
+// ============================================================================
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
 
-describe('respond-to-claim defendant-name-capture step', () => {
+// ============================================================================
+// Tests
+// ============================================================================
+
+describe('defendant-name-capture', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
-  // Keep req/res loosely typed to avoid Express/i18n type augmentation conflicts in tests
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const createReq = (overrides: Record<string, unknown> = {}): any =>
-    ({
-      body: {},
-      originalUrl: '/respond-to-claim/defendant-name-capture',
-      query: { lang: 'en' },
-      params: {},
-      session: { formData: {}, ccdCase: { id: '123' } },
-      app: { locals: { nunjucksEnv } },
-      i18n: { getResourceBundle: jest.fn(() => ({})) },
-      ...overrides,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
+  const mockReq = (overrides = {}): any => ({
+    body: {},
+    originalUrl: '/respond-to-claim/defendant-name-capture',
+    query: { lang: 'en' },
+    params: {},
+    session: { formData: {}, ccdCase: { id: '123' } },
+    app: { locals: { nunjucksEnv } },
+    i18n: { getResourceBundle: jest.fn(() => ({})) },
+    ...overrides,
   });
 
-  it('exposes correct step url and view', () => {
-    expect(step.name).toBe('defendant-name-capture');
-    expect(step.url).toBe('/case/:caseReference/respond-to-claim/defendant-name-capture');
-    expect(step.view).toContain('formBuilder.njk');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mockRes = (): any => ({
+    render: jest.fn(),
+    redirect: jest.fn(),
+    status: jest.fn().mockReturnThis(),
   });
 
-  it('GET renders translated content and input attributes', async () => {
-    const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { render: jest.fn() } as any;
+  const mockNext = (): NextFunction => jest.fn();
 
-    await controller.get(createReq(), res);
+  beforeEach(() => jest.clearAllMocks());
 
-    expect(res.render).toHaveBeenCalledWith(
-      step.view,
-      expect.objectContaining({
-        pageTitle: 'Your name',
-        heading: 'Whats your name?',
-        caption: 'Respond to a property possession claim',
-        dashboardUrl: '/dashboard/1234567890123456',
-        cancel: 'Cancel',
-        backUrl: '/previous-step',
-        fields: expect.any(Array),
-      })
-    );
-
-    const viewModel = res.render.mock.calls[0][1] as { fields: Record<string, unknown>[] };
-    const firstNameField = viewModel.fields.find(f => f.name === 'firstName') as
-      | { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } }
-      | undefined;
-    const lastNameField = viewModel.fields.find(f => f.name === 'lastName') as
-      | { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } }
-      | undefined;
-
-    expect(firstNameField?.component?.label?.classes).toBe('govuk-label--s');
-    expect(firstNameField?.component?.attributes).toEqual(
-      expect.objectContaining({
-        autocomplete: 'given-name',
-        spellcheck: false,
-      })
-    );
-
-    expect(lastNameField?.component?.attributes).toEqual(
-      expect.objectContaining({
-        autocomplete: 'family-name',
-        spellcheck: false,
-      })
-    );
+  describe('configuration', () => {
+    it('has correct name, url and view', () => {
+      expect(step.name).toBe('defendant-name-capture');
+      expect(step.url).toBe('/case/:caseReference/respond-to-claim/defendant-name-capture');
+      expect(step.view).toContain('formBuilder.njk');
+    });
   });
 
-  it('POST renders errors when validation fails', async () => {
-    (validateForm as jest.Mock).mockReturnValue({ firstName: 'Enter your first name' });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
-    const next = jest.fn();
+  describe('GET', () => {
+    it('renders form with correct content and field attributes', async () => {
+      const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
+      const res = mockRes();
 
-    await step.postController!.post(
-      createReq({ body: { action: 'continue', firstName: '', lastName: '' } }),
-      res,
-      next
-    );
+      await controller.get(mockReq(), res);
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
+      expect(res.render).toHaveBeenCalledWith(
+        step.view,
+        expect.objectContaining({
+          pageTitle: 'Your name',
+          heading: 'Whats your name?',
+          caption: 'Respond to a property possession claim',
+          dashboardUrl: '/dashboard/1234567890123456',
+          cancel: 'Cancel',
+          backUrl: '/previous-step',
+          fields: expect.any(Array),
+        })
+      );
+
+      const viewModel = (res.render as jest.Mock).mock.calls[0][1];
+      const firstNameField = viewModel.fields.find((f: { name: string }) => f.name === 'firstName');
+      const lastNameField = viewModel.fields.find((f: { name: string }) => f.name === 'lastName');
+
+      expect(firstNameField.component.label.classes).toBe('govuk-label--s');
+      expect(firstNameField.component.attributes).toMatchObject({ autocomplete: 'given-name', spellcheck: false });
+      expect(lastNameField.component.attributes).toMatchObject({ autocomplete: 'family-name', spellcheck: false });
+    });
   });
 
-  it('POST saves data and redirects when validation passes', async () => {
-    (validateForm as jest.Mock).mockReturnValue({});
+  describe('POST', () => {
+    it('renders error when validation fails', async () => {
+      (validateForm as jest.Mock).mockReturnValue({ firstName: 'Enter your first name' });
+      const res = mockRes();
 
-    const req = createReq({ body: { action: 'continue', firstName: 'Jane', lastName: 'Doe' } });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    const next = jest.fn();
+      await step.postController!.post(
+        mockReq({ body: { action: 'continue', firstName: '', lastName: '' } }),
+        res,
+        mockNext()
+      );
 
-    await step.postController!.post(req, res, next);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
+    });
 
-    expect(req.session.formData?.['defendant-name-capture']).toEqual({ firstName: 'Jane', lastName: 'Doe' });
-    expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
-  });
+    it('saves data and redirects when validation passes', async () => {
+      (validateForm as jest.Mock).mockReturnValue({});
+      const req = mockReq({ body: { action: 'continue', firstName: 'Jane', lastName: 'Doe' } });
+      const res = mockRes();
 
-  it('POST renders error when firstName exceeds 60 characters', async () => {
-    const longFirstName = 'A'.repeat(61);
-    (validateForm as jest.Mock).mockReturnValue({ firstName: 'First name must be 60 characters or less' });
+      await step.postController!.post(req, res, mockNext());
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
-    const next = jest.fn();
+      expect(req.session.formData['defendant-name-capture']).toEqual({ firstName: 'Jane', lastName: 'Doe' });
+      expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
+    });
 
-    await step.postController!.post(
-      createReq({ body: { action: 'continue', firstName: longFirstName, lastName: 'Doe' } }),
-      res,
-      next
-    );
+    it('renders error when firstName exceeds 60 characters', async () => {
+      (validateForm as jest.Mock).mockReturnValue({ firstName: 'First name must be 60 characters or less' });
+      const res = mockRes();
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
-  });
+      await step.postController!.post(
+        mockReq({ body: { action: 'continue', firstName: 'A'.repeat(61), lastName: 'Doe' } }),
+        res,
+        mockNext()
+      );
 
-  it('POST renders error when lastName exceeds 60 characters', async () => {
-    const longLastName = 'B'.repeat(61);
-    (validateForm as jest.Mock).mockReturnValue({ lastName: 'Last name must be 60 characters or less' });
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
+    });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
-    const next = jest.fn();
+    it('renders error when lastName exceeds 60 characters', async () => {
+      (validateForm as jest.Mock).mockReturnValue({ lastName: 'Last name must be 60 characters or less' });
+      const res = mockRes();
 
-    await step.postController!.post(
-      createReq({ body: { action: 'continue', firstName: 'Jane', lastName: longLastName } }),
-      res,
-      next
-    );
+      await step.postController!.post(
+        mockReq({ body: { action: 'continue', firstName: 'Jane', lastName: 'B'.repeat(61) } }),
+        res,
+        mockNext()
+      );
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
+    });
   });
 });
