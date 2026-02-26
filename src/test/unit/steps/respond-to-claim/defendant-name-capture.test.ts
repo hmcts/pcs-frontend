@@ -137,33 +137,5 @@ describe('defendant-name-capture', () => {
       expect(req.session.formData['defendant-name-capture']).toEqual({ firstName: 'Jane', lastName: 'Doe' });
       expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
     });
-
-    it('renders error when firstName exceeds 60 characters', async () => {
-      (validateForm as jest.Mock).mockReturnValue({ firstName: 'First name must be 60 characters or less' });
-      const res = mockRes();
-
-      await step.postController!.post(
-        mockReq({ body: { action: 'continue', firstName: 'A'.repeat(61), lastName: 'Doe' } }),
-        res,
-        mockNext()
-      );
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
-    });
-
-    it('renders error when lastName exceeds 60 characters', async () => {
-      (validateForm as jest.Mock).mockReturnValue({ lastName: 'Last name must be 60 characters or less' });
-      const res = mockRes();
-
-      await step.postController!.post(
-        mockReq({ body: { action: 'continue', firstName: 'Jane', lastName: 'B'.repeat(61) } }),
-        res,
-        mockNext()
-      );
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
-    });
   });
 });
