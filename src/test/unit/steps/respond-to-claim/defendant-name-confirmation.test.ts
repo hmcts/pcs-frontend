@@ -1,10 +1,6 @@
 import type { NextFunction } from 'express';
 import type { Environment } from 'nunjucks';
 
-// ============================================================================
-// Test Mocks (hoisted by Jest)
-// ============================================================================
-
 const mockTranslations: Record<string, string> = {
   pageTitle: 'Your name',
   caption: 'Respond to a property possession claim',
@@ -52,16 +48,8 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
   validateForm: jest.fn(),
 }));
 
-// ============================================================================
-// Imports (after mocks)
-// ============================================================================
-
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/defendant-name-confirmation';
-
-// ============================================================================
-// Tests
-// ============================================================================
 
 describe('defendant-name-confirmation', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;

@@ -1,10 +1,6 @@
 import type { NextFunction } from 'express';
 import type { Environment } from 'nunjucks';
 
-// ============================================================================
-// Test Mocks (hoisted by Jest)
-// ============================================================================
-
 const mockTranslations: Record<string, string> = {
   pageTitle: 'Free legal advice',
   heading: 'Free legal advice',
@@ -49,16 +45,8 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
   validateForm: jest.fn(),
 }));
 
-// ============================================================================
-// Imports (after mocks)
-// ============================================================================
-
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/free-legal-advice';
-
-// ============================================================================
-// Tests
-// ============================================================================
 
 describe('free-legal-advice', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -182,9 +170,8 @@ describe('free-legal-advice', () => {
 
       const viewModel = (res.render as jest.Mock).mock.calls[0][1];
       const radioField = viewModel.fields.find((f: { name: string }) => f.name === 'hadLegalAdvice');
-
-      // Should not prepopulate from CCD when body data exists (checked should be false, not the CCD value)
       const noOption = radioField.component.items.find((item: { value: string }) => item.value === 'no');
+
       expect(noOption.checked).toBe(false);
     });
   });
