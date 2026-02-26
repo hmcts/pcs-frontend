@@ -17,6 +17,7 @@
     "saveForLater": "cySave for later"
   },
   "errors": {
+    "contactByEmailOrPost": "cySelect how you want to receive updates",
     "contactByEmailOrPost.email": "cyEnter your email address",
     "contactByEmailOrPost.email.invalid": "cyEnter an email address in the correct format, like name@example.com"
   }

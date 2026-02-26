@@ -9,6 +9,7 @@ import type {
 } from '../../../interfaces/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
+import { safeRedirect303 } from '../../../utils/safeRedirect';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -143,7 +144,15 @@ export function createPostHandler(
       }
 
       if (action === 'saveForLater') {
-        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
+
+        if (!dashboardUrl) {
+          // No valid case reference - redirect to home
+          return safeRedirect303(res, '/', '/', ['/']);
+        }
+
+        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
       }
 
       const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
@@ -151,7 +160,8 @@ export function createPostHandler(
         return res.status(500).send('Unable to determine next step');
       }
 
-      res.redirect(303, redirectPath);
+      // Allow all internal paths since this is a generic form builder
+      safeRedirect303(res, redirectPath, '/', ['/']);
     },
   };
 }
