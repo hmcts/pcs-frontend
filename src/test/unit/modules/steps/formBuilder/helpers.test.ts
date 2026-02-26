@@ -420,6 +420,59 @@ describe('formBuilder helpers', () => {
     });
   });
 
+  describe('getCustomErrorTranslations - field-specific maxLength', () => {
+    const createMockT = (translations: Record<string, string> = {}) => {
+      return jest.fn((key: string) => translations[key] || key) as unknown as TFunction;
+    };
+
+    it('should map errors.<field>MaxLength to <field>.maxLength', () => {
+      const mockT = createMockT({
+        'errors.firstNameMaxLength': 'First name must be 60 characters or less',
+      });
+
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'firstName',
+          type: 'text',
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+      expect(result).toEqual({
+        'firstName.maxLength': 'First name must be 60 characters or less',
+      });
+    });
+
+    it('should map maxLength for nested subFields using nested field name', () => {
+      const mockT = createMockT({
+        'errors.firstNameMaxLength': 'First name must be 60 characters or less',
+      });
+
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'nameConfirmation',
+          type: 'radio',
+          options: [
+            {
+              value: 'no',
+              subFields: {
+                firstName: {
+                  name: 'firstName',
+                  type: 'text',
+                },
+              },
+            },
+          ],
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+      expect(result).toEqual({
+        'nameConfirmation.firstName.maxLength': 'First name must be 60 characters or less',
+      });
+    });
+  });
+
   describe('getFormData', () => {
     it('should return form data from session', () => {
       const req = {
@@ -1047,6 +1100,60 @@ describe('formBuilder helpers', () => {
 
         const errors = validateForm(req, fields, translations);
         expect(errors.name).toBe('Must be 10 characters or fewer');
+      });
+
+      it('should use field-specific maxLength translation when available', () => {
+        const req = createMockRequest({
+          name: 'This is a very long name',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'name',
+            type: 'text',
+            maxLength: 10,
+          },
+        ];
+
+        const translations = {
+          'name.maxLength': 'Name must be 10 characters or less',
+          defaultMaxLength: 'Must be {max} characters or fewer',
+        };
+
+        const errors = validateForm(req, fields, translations);
+        expect(errors.name).toBe('Name must be 10 characters or less');
+      });
+
+      it('should use nested field-specific maxLength translation for subFields when available', () => {
+        const req = createMockRequest({
+          contactMethod: 'email',
+          'contactMethod.emailAddress': '123456',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'contactMethod',
+            type: 'radio',
+            options: [
+              {
+                value: 'email',
+                subFields: {
+                  emailAddress: {
+                    name: 'emailAddress',
+                    type: 'text',
+                    maxLength: 5,
+                  },
+                },
+              },
+            ],
+          },
+        ];
+
+        const translations = {
+          'contactMethod.emailAddress.maxLength': 'Email address must be 5 characters or less',
+          defaultMaxLength: 'Must be {max} characters or fewer',
+        };
+
+        const errors = validateForm(req, fields, translations);
+        expect(errors['contactMethod.emailAddress']).toBe('Email address must be 5 characters or less');
       });
     });
 
