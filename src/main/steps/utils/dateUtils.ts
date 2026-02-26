@@ -1,10 +1,6 @@
 import { DateTime } from 'luxon';
 
-export function formatDatePartsToDDMMYYYY(
-  day: string,
-  month: string,
-  year: string
-): string | undefined {
+export function formatDatePartsToDDMMYYYY(day: string, month: string, year: string): string | undefined {
   const d = day?.trim();
   const m = month?.trim();
   const y = year?.trim();

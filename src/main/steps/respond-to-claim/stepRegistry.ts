@@ -30,8 +30,8 @@ import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
-import { step as tenancyDetails } from './tenancy-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
+import { step as tenancyDetails } from './tenancy-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 
 export const stepRegistry: Record<string, StepDefinition> = {

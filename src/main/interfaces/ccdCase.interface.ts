@@ -46,7 +46,6 @@ export interface PossessionClaimResponse {
   };
 }
 
-
 export interface StartCallbackData {
   case_details: {
     case_data: {

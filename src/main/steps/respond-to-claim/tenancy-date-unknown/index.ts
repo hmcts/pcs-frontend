@@ -36,12 +36,9 @@ export const step: StepDefinition = createFormStep({
   ],
   beforeRedirect: async req => {
     const dateObject = req.body?.tenancyStartDate;
-    const day =
-      (dateObject?.day !== undefined ? String(dateObject.day).trim() : '');
-    const month =
-      (dateObject?.month !== undefined ? String(dateObject.month).trim() : '');
-    const year =
-      (dateObject?.year !== undefined ? String(dateObject.year).trim() : '');
+    const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
+    const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
+    const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
     const tenancyStartDateIso = formatDatePartsToDDMMYYYY(day, month, year);
     console.log('tenancyStartDateIso', tenancyStartDateIso);
 
