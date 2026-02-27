@@ -59,7 +59,29 @@ export const submitCaseApiData = {
         PostCode: 'W3 7RX',
       },
     },
-    addAnotherDefendant: 'NO',
+    addAnotherDefendant: 'YES',
+    additionalDefendants: [
+      {
+        value: {
+          nameKnown: 'YES',
+          firstName: 'Peter',
+          lastName: 'Parker',
+          addressKnown: 'YES',
+          addressSameAsPossession: 'YES',
+        },
+        id: null,
+      },
+      {
+        value: {
+          nameKnown: 'YES',
+          firstName: 'Jen',
+          lastName: 'Parker',
+          addressKnown: 'YES',
+          addressSameAsPossession: 'YES',
+        },
+        id: null,
+      },
+    ],
     tenancy_TypeOfTenancyLicence: 'DEMOTED_TENANCY',
     tenancy_TenancyLicenceDate: null,
     tenancy_TenancyLicenceDocuments: [],

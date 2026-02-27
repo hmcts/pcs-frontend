@@ -1,5 +1,9 @@
+import { firstName, lastName } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+
 export const defendantNameConfirmation = {
-  mainHeader: 'Is your name Test John?',
+  get mainHeader(): string {
+    return `Is your name ${firstName} ${lastName}?`;
+  },
   respondToClaimParagraph: 'Respond to a property possession claim',
   thisIsTheNameParagraph: 'This is the name on the claim form.',
   yesRadioOption: 'Yes',

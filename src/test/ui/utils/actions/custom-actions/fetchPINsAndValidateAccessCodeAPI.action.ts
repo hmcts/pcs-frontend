@@ -7,6 +7,8 @@ import { fetchPINsApiData, validateAccessCodeApiData } from '../../../data/api-d
 import { IAction } from '../../interfaces';
 
 export let pins: string[] = [];
+export let firstName: string = '';
+export let lastName: string = '';
 
 export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
   async execute(page: Page, action: string): Promise<void> {
@@ -30,6 +32,9 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
       const fetchedPins = Object.keys(response.data);
       if (fetchedPins.length > 0) {
         pins = fetchedPins;
+        const pinData = response.data[pins[0]];
+        firstName = pinData.firstName;
+        lastName = pinData.lastName;
         return;
       }
       await new Promise(res => setTimeout(res, delayMs));
