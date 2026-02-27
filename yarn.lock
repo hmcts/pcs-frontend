@@ -1991,16 +1991,16 @@ __metadata:
   version: 1.8.6
   resolution: "@hmcts/nodejs-healthcheck@npm:1.8.6"
   dependencies:
-    "@modules/logger": "npm:^4.0.4"
+    "@hmcts/nodejs-logging": "npm:^4.0.4"
     js-yaml: "npm:^4.0.0"
     superagent: "npm:^10.2.2"
   checksum: 10/baa0fcb6885938014465297feb4d5b1215874458fd24219202f87449aa5e2e0e25549405af0db7103f784337d98aa60313d86f6c23bb448001bb5175d5f2e48d
   languageName: node
   linkType: hard
 
-"@modules/logger@npm:^4.0.4":
+"@hmcts/nodejs-logging@npm:^4.0.4":
   version: 4.0.4
-  resolution: "@modules/logger@npm:4.0.4"
+  resolution: "@hmcts/nodejs-logging@npm:4.0.4"
   dependencies:
     moment: "npm:^2.29.4"
     on-finished: "npm:^2.3.0"
@@ -2043,7 +2043,7 @@ __metadata:
   dependencies:
     "@azure/identity": "npm:^4.13.0"
     "@azure/keyvault-secrets": "npm:^4.10.0"
-    "@modules/logger": "npm:^4.0.4"
+    "@hmcts/nodejs-logging": "npm:^4.0.4"
     js-yaml: "npm:^4.1.1"
     lodash: "npm:^4.17.23"
   checksum: 10/ec3a8be6010221dd66016056eac876a65f2eca6e94d4e382b4d47db6603e8d27ef1699762cc6b9fed2cf7ce180f03561e35e4e029ea1c14e7ae9163e071b1ad6
