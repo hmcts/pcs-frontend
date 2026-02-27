@@ -1,7 +1,7 @@
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { formatDatePartsToDDMMYYYY } from '../../utils/dateUtils';
+import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -39,7 +39,7 @@ export const step: StepDefinition = createFormStep({
     const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
     const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
     const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
-    const tenancyStartDateIso = formatDatePartsToDDMMYYYY(day, month, year);
+    const tenancyStartDateIso = formatDatePartsToISODate(day, month, year);
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
