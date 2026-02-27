@@ -196,41 +196,39 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
-            const noticeDateProvided = await isNoticeDateProvided(req);
             const rentArrears = await isRentArrearsClaim(req);
-            return noticeDateProvided && rentArrears;
+            return rentArrears;
           },
           nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const noticeDateProvided = await isNoticeDateProvided(req);
             const rentArrears = await isRentArrearsClaim(req);
-            return noticeDateProvided && !rentArrears;
+            return !rentArrears;
           },
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
+      previousStep: 'confirmation-of-notice-given',
     },
     'confirmation-of-notice-date-when-not-provided': {
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
-            const noticeDateProvided = await isNoticeDateProvided(req);
             const rentArrears = await isRentArrearsClaim(req);
-            return !noticeDateProvided && rentArrears;
+            return rentArrears;
           },
           nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const noticeDateProvided = await isNoticeDateProvided(req);
             const rentArrears = await isRentArrearsClaim(req);
-            return !noticeDateProvided && !rentArrears;
+            return !rentArrears;
           },
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
+      previousStep: 'confirmation-of-notice-given',
     },
     'rent-arrears-dispute': {
       defaultNext: 'counter-claim',
