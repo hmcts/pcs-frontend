@@ -49,6 +49,10 @@ function getBaseUrl(): string {
   return config.get('ccd.url');
 }
 
+function getApiUrl(): string {
+  return config.get('api.url');
+}
+
 function getCaseTypeId(): string {
   return config.get('ccd.caseTypeId');
 }
@@ -235,30 +239,6 @@ export const ccdCaseService = {
   },
 
   /**
-   * Update a case in CCD (draft mode)
-   *
-   * Follows CCD's two-phase START → SUBMIT pattern.
-   * Both API calls are necessary and cannot be optimized away.
-   *
-   * @param accessToken - User's OIDC access token
-   * @param ccdCase - Case to update (only include changed fields in data)
-   * @returns Merged case data from CCD
-   */
-  async updateCase(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
-    if (!ccdCase.id) {
-      throw new HTTPError('Cannot UPDATE Case, CCD Case Not found', 500);
-    }
-
-    // Phase 1: START - Get event token (required by CCD for security)
-    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
-
-    // Phase 2: SUBMIT - Send incremental changes, receive merged result
-    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-    return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
-  },
-
-  /**
    * Submit a case to CCD (finalize draft)
    *
    * Follows CCD's two-phase START → SUBMIT pattern.
@@ -301,6 +281,37 @@ export const ccdCaseService = {
       return response.data;
     } catch (error) {
       throw convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
+    }
+  },
+
+  async updateDraftRespondToClaim(
+    accessToken: string | undefined,
+    caseId: string,
+    data: Record<string, unknown>
+  ): Promise<CcdCase> {
+    if (!caseId) {
+      throw new HTTPError('Cannot UPDATE draft, CCD Case Not found', 500);
+    }
+
+    const url = `${getApiUrl()}/callbacks/mid-event?page=respondToPossessionDraftSavePage`;
+
+    const payload = {
+      event_id: 'respondPossessionClaim',
+      case_details: {
+        id: caseId,
+        case_type_id: getCaseTypeId(),
+        data,
+      },
+    };
+
+    try {
+      logger.info(`Calling Draft save event with URL: ${url}`);
+      logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
+      const response = await http.post<CcdCase>(url, payload, getCaseHeaders(accessToken || ''));
+      logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
+      return response.data;
+    } catch (error) {
+      throw convertAxiosErrorToHttpError(error, 'save draft response to claim');
     }
   },
 };

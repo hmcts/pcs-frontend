@@ -14,6 +14,7 @@ nodejs:
     OIDC_REDIRECT_URI: 'https://${SERVICE_FQDN}/oauth2/callback'
     PCS_API_URL: '${PCS_API_URL_PREVIEW}'
     CCD_URL: '${DATA_STORE_URL_BASE}'
+    CASE_TYPE_ID: '${CASE_TYPE_ID_PREVIEW}'
 redis:
   image:
     registry: hmctspublic.azurecr.io

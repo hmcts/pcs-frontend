@@ -39,7 +39,8 @@
     "key": "S2S_KEY"
   },
   "ccd": {
-    "url": "CCD_URL"
+    "url": "CCD_URL",
+    "caseTypeId": "CASE_TYPE_ID"
   },
   "oidc": {
     "issuer": "OIDC_ISSUER",
