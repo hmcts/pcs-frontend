@@ -1,5 +1,5 @@
 export const defendantNameConfirmation = {
-  mainHeader: 'Is your name Joe Smith?',
+  mainHeader: 'Is your name Test John?',
   respondToClaimParagraph: 'Respond to a property possession claim',
   thisIsTheNameParagraph: 'This is the name on the claim form.',
   yesRadioOption: 'Yes',
