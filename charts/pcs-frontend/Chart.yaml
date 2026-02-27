@@ -3,7 +3,7 @@ appVersion: '1.0'
 description: A Helm chart for pcs-frontend App
 name: pcs-frontend
 home: https://github.com/hmcts/pcs-frontend
-version: 0.0.58
+version: 0.0.59
 dependencies:
   - name: nodejs
     version: 3.2.0

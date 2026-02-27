@@ -1,9 +1,10 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { DateTime } from 'luxon';
 import isPostalCode from 'validator/lib/isPostalCode';
 import { superRefine, z } from 'zod/v4';
 
 import { buildDateInputSchema } from './date.schema';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('journey-engine-schema');
 

@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware/oidc';
@@ -9,8 +8,10 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '../services/pcsApi';
-import { sanitiseCaseReference, toCaseReference16 } from '../utils/caseReference';
-import { safeRedirect303 } from '../utils/safeRedirect';
+
+import { Logger } from '@modules/logger';
+import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
+import { safeRedirect303 } from '@utils/safeRedirect';
 
 interface MappedTask {
   title: { html: string };

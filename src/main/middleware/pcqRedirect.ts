@@ -1,11 +1,11 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import axios from 'axios';
 import config from 'config';
 import { NextFunction, Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 
-import { ccdCaseService } from '../services/ccdCaseService';
-import { createToken } from '../services/pcq/createToken';
+import { Logger } from '@modules/logger';
+import { ccdCaseService } from '@services/ccdCaseService';
+import { createToken } from '@services/pcq/createToken';
 
 const logger = Logger.getLogger('pcqRedirectMiddleware');
 

@@ -1,5 +1,6 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Response } from 'express';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('safeRedirect');
 

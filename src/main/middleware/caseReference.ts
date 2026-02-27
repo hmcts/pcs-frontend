@@ -1,8 +1,8 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { NextFunction, Request, Response } from 'express';
 
-import { ccdCaseService } from '../services/ccdCaseService';
-import { sanitiseCaseReference } from '../utils/caseReference';
+import { Logger } from '@modules/logger';
+import { ccdCaseService } from '@services/ccdCaseService';
+import { sanitiseCaseReference } from '@utils/caseReference';
 
 const logger = Logger.getLogger('caseReferenceMiddleware');
 

@@ -1,7 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -11,6 +10,8 @@ import {
   getRequestLanguage as getMainRequestLanguage,
   getTranslationFunction as getMainTranslationFunction,
 } from '../i18n';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('i18n');
 

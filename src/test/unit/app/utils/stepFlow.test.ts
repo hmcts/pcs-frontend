@@ -10,7 +10,7 @@ import {
   stepDependencyCheckMiddleware,
 } from '../../../../main/modules/steps/flow';
 
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn(() => ({
       debug: jest.fn(),

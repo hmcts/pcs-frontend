@@ -1,7 +1,7 @@
 {
   "useCSRFProtection": true,
   "appInsights": {
-    "instrumentationKey": false
+    "insightname": "pcs-frontend"
   },
   "node-env": "development",
   "use-ssl": false,

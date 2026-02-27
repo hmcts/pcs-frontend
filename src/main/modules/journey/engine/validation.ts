@@ -1,6 +1,6 @@
-import { Logger } from '@hmcts/nodejs-logging';
-
 import { StepConfig, createFieldValidationSchema } from './schema';
+
+import { Logger } from '@modules/logger';
 
 export interface ValidationResult {
   success: boolean;
@@ -12,7 +12,7 @@ export interface ValidationResult {
 }
 
 export class JourneyValidator {
-  private readonly logger: Logger = Logger.getLogger('JourneyValidator');
+  private readonly logger = Logger.getLogger('JourneyValidator');
 
   validate(step: StepConfig, submission: Record<string, unknown>, allData?: Record<string, unknown>): ValidationResult {
     if (!step.fields) {
@@ -186,7 +186,7 @@ export class JourneyValidator {
         try {
           errors[fieldName] = { message: custom(firstIssue?.code || 'unknown') };
         } catch (err) {
-          this.logger.error('customMessage function error', err);
+          this.logger.log('customMessage function error', err);
           errors[fieldName] = { message: fallbackMessage };
         }
       } else if (typeof custom === 'string') {

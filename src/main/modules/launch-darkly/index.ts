@@ -1,7 +1,8 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import * as ld from '@launchdarkly/node-server-sdk';
 import config from 'config';
 import * as express from 'express';
+
+import { Logger } from '@modules/logger';
 
 export class LaunchDarkly {
   private readonly logger = Logger.getLogger('launch-darkly');

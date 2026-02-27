@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import express, { NextFunction, Request, Response, Router } from 'express';
 import type { TFunction } from 'i18next';
@@ -9,14 +8,16 @@ import i18next from 'i18next';
 import { DateTime } from 'luxon';
 
 import { oidcMiddleware } from '../../../middleware/oidc';
-import { getAddressesByPostcode } from '../../../services/osPostcodeLookupService';
-import { TTLCache } from '../../../utils/ttlCache';
 import { type I18nRequest, getRequestLanguage, getTranslationFunction, setupNunjucksGlobals } from '../../i18n';
 
 import { processErrorsForTemplate } from './errorUtils';
 import { FieldConfig, JourneyConfig, JourneyDraft, JourneySchema, StepConfig } from './schema';
 import { type JourneyStore } from './storage/index';
 import { JourneyValidator } from './validation';
+
+import { Logger } from '@modules/logger';
+import { getAddressesByPostcode } from '@services/osPostcodeLookupService';
+import { TTLCache } from '@utils/ttlCache';
 
 // Extend Express Request interface
 interface RequestWithStep extends Request {

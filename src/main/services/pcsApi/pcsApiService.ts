@@ -1,9 +1,9 @@
 import config from 'config';
 
-import { http } from '../../modules/http';
-
 import { type DashboardNotification } from './dashboardNotification.interface';
 import { type DashboardTaskGroup } from './dashboardTaskGroup.interface';
+
+import { http } from '@modules/http';
 
 function getBaseUrl(): string {
   return config.get('api.url');

@@ -1,0 +1,169 @@
+import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-opentelemetry';
+import { SpanStatusCode } from '@opentelemetry/api';
+import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
+import type { WinstonInstrumentationConfig } from '@opentelemetry/instrumentation-winston';
+import config from 'config';
+
+let isTelemetryInitialized = false;
+let telemetryShutdownPromise: Promise<void> | null = null;
+const ignoredIncomingUrlPattern = /\/assets\/|\.js(?:$|\?)|\.css(?:$|\?)/;
+
+interface HttpTelemetryConfig {
+  enabled: boolean;
+  ignoreIncomingRequestHook: (request: { method?: string; url?: string }) => boolean;
+  ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
+}
+
+function getServiceName(): string {
+  try {
+    return config.get<string>('appInsights.insightname');
+  } catch {
+    return 'pcs-frontend';
+  }
+}
+
+function toLogMessage(value: unknown): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (value instanceof Error) {
+    return value.message;
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function toLogLevel(record: Record<string, unknown>): string {
+  const candidate = record.level ?? record.severityText ?? record.severity;
+  return String(candidate ?? '').toLowerCase();
+}
+
+function toRecordMessage(record: Record<string, unknown>): string {
+  const candidate = record.message ?? record.body;
+  return toLogMessage(candidate);
+}
+
+function toContextSuffix(record: Record<string, unknown>): string {
+  const contextParts: string[] = [];
+  if (typeof record.url === 'string' && record.url.length > 0) {
+    contextParts.push(`url=${record.url}`);
+  }
+  if (typeof record.caseReference === 'string' && record.caseReference.length > 0) {
+    contextParts.push(`caseReference=${record.caseReference}`);
+  }
+  if (typeof record.error === 'string' && record.error.length > 0) {
+    contextParts.push(`error=${record.error}`);
+  }
+
+  return contextParts.length > 0 ? ` | ${contextParts.join(' ')}` : '';
+}
+
+function toException(record: Record<string, unknown>): Error | { name: string; message: string; stack?: string } {
+  if (record.error instanceof Error) {
+    return record.error;
+  }
+  if (record.message instanceof Error) {
+    return record.message;
+  }
+
+  const message = `${toRecordMessage(record)}${toContextSuffix(record)}`;
+  const name = typeof record.name === 'string' ? record.name : 'Error';
+  const stack =
+    typeof record.stack === 'string' && record.stack.length > 0 && record.stack !== 'undefined'
+      ? record.stack
+      : undefined;
+
+  // Avoid creating synthetic Error stacks at this callsite when no original stack exists.
+  return { name, message, stack };
+}
+
+const winstonTelemetryConfig: WinstonInstrumentationConfig = {
+  enabled: true,
+  logHook: (span, record) => {
+    try {
+      const level = toLogLevel(record);
+      if (level !== 'error') {
+        return;
+      }
+
+      const exception = toException(record);
+      span.recordException(exception);
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: exception.message,
+      });
+    } catch {
+      // Never allow telemetry enrichment to break application logging.
+    }
+  },
+};
+
+const httpTelemetryConfig: HttpTelemetryConfig = {
+  enabled: true,
+  ignoreIncomingRequestHook: request => {
+    if (request.method === 'OPTIONS') {
+      return true;
+    }
+    const requestUrl = request.url ?? '';
+    return ignoredIncomingUrlPattern.test(requestUrl);
+  },
+  ignoreOutgoingRequestHook: options => {
+    const requestPath = typeof options.path === 'string' ? options.path : '';
+    return requestPath === '/health' || requestPath.startsWith('/health?');
+  },
+};
+
+export function initializeTelemetry(): void {
+  if (isTelemetryInitialized) {
+    return;
+  }
+
+  process.env.OTEL_SERVICE_NAME = getServiceName();
+
+  useAzureMonitor({
+    azureMonitorExporterOptions: {
+      connectionString: config.get('appInsights.connectionString'),
+    },
+    instrumentationOptions: {
+      http: httpTelemetryConfig,
+      redis: {
+        enabled: false,
+      },
+      winston: winstonTelemetryConfig as InstrumentationConfig,
+    },
+    enableLiveMetrics: true,
+  });
+
+  isTelemetryInitialized = true;
+}
+
+export async function flushTelemetry(timeoutMs = 3000): Promise<void> {
+  if (!isTelemetryInitialized) {
+    return;
+  }
+
+  if (!telemetryShutdownPromise) {
+    telemetryShutdownPromise = new Promise<void>(resolve => {
+      const timeout = setTimeout(() => {
+        // eslint-disable-next-line no-console
+        console.error(`Telemetry shutdown timed out after ${timeoutMs}ms`);
+        resolve();
+      }, timeoutMs);
+
+      shutdownAzureMonitor()
+        .catch(error => {
+          // eslint-disable-next-line no-console
+          console.error('Failed to flush telemetry cleanly', error);
+        })
+        .finally(() => {
+          clearTimeout(timeout);
+          resolve();
+        });
+    });
+  }
+
+  await telemetryShutdownPromise;
+}

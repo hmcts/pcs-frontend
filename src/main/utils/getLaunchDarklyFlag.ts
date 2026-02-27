@@ -1,6 +1,7 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import * as LDClient from '@launchdarkly/node-server-sdk';
 import type { Request } from 'express';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('getLaunchDarklyFlag');
 

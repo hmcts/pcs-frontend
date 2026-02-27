@@ -1,9 +1,10 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Express, NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../../HttpError';
 import { getTranslationFunction, populateCommonTranslations } from '../i18n';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('error-handler');
 
@@ -58,7 +59,12 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
     const shouldSkipLogging = status === 404 && (url.startsWith('/.well-known/') || url.startsWith('/favicon.ico'));
 
     if (!shouldSkipLogging) {
-      logger.error(`${err.stack || err}`);
+      logger.error('Request failed', {
+        error: err,
+        method: req.method,
+        status,
+        url,
+      });
     }
 
     const t = getTranslationFunction(req, ['common']);

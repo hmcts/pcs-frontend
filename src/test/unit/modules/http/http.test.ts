@@ -4,6 +4,7 @@
  */
 
 const mockAxiosCreate = jest.fn();
+const mockIsAxiosError = jest.fn().mockImplementation(error => !!error?.isAxiosError);
 const mockAxiosInstance = {
   interceptors: {
     request: { use: jest.fn() },
@@ -28,12 +29,13 @@ jest.mock('axios', () => {
   mockAxiosCreate.mockReturnValue(mockAxiosInstance);
   return {
     create: mockAxiosCreate,
-    default: { create: mockAxiosCreate },
+    isAxiosError: mockIsAxiosError,
+    default: { create: mockAxiosCreate, isAxiosError: mockIsAxiosError },
   };
 });
 
 // Mock logger to avoid errors
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
       error: jest.fn(),
