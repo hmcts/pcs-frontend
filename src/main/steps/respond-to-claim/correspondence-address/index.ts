@@ -1,16 +1,14 @@
+import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import type { Address, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
-import { ccdCaseService } from '../../../services/ccdCaseService';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 const STEP_NAME = 'postcode-finder';
-
-let prepopulateAddress: Address | undefined;
 
 // Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
 // Session is set in extendGetContent; validation reads it via allData on POST.
@@ -115,6 +113,10 @@ export const step: StepDefinition = createFormStep({
     let possessionClaimResponse: PossessionClaimResponse;
     //prepopulate address is correct
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
+      // Read fresh CCD data from middleware (available on both GET and POST)
+      const caseData = req.res?.locals.validatedCase?.data;
+      const prepopulateAddress = caseData?.possessionClaimResponse?.defendantContactDetails?.party?.address;
+
       possessionClaimResponse = {
         defendantContactDetails: {
           party: {
@@ -150,10 +152,7 @@ export const step: StepDefinition = createFormStep({
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'correspondence-address', ['common']);
 
-    const formattedAddressStr = await getExistingAddress(
-      req.session.user?.accessToken || '',
-      req.res?.locals.validatedCase?.id || ''
-    );
+    const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
 
     const isAddressKnown = formattedAddressStr !== '?';
     setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
@@ -232,28 +231,30 @@ export const step: StepDefinition = createFormStep({
   fields: fieldsConfig,
 });
 
-async function getExistingAddress(accessToken: string, caseReference: string): Promise<string> {
-  // Pull data from API
-  const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
-  prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.defendantContactDetails?.party?.address;
+function getExistingAddress(req: Request): { formattedAddress: string } {
+  // Read from res.locals.validatedCase (already fetched by caseReference middleware via START callback)
+  const caseData = req.res?.locals.validatedCase?.data;
+  const defendantContactDetails = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
+  const addressKnown = defendantContactDetails?.addressKnown;
+  const address = defendantContactDetails?.address;
 
-  if (prepopulateAddress) {
+  // Check addressKnown field from CCD - if "YES" then address exists
+  if (addressKnown === 'YES' && address) {
     const formattedAddress =
       [
-        prepopulateAddress.AddressLine1,
-        prepopulateAddress.AddressLine2,
-        prepopulateAddress.AddressLine3,
-        prepopulateAddress.PostTown,
-        prepopulateAddress.County,
-        prepopulateAddress.PostCode,
-        prepopulateAddress.Country,
+        address.AddressLine1,
+        address.AddressLine2,
+        address.AddressLine3,
+        address.PostTown,
+        address.County,
+        address.PostCode,
+        address.Country,
       ]
         .map(v => (v ?? '').trim())
         .filter(Boolean)
         .join(', ') + '?';
 
-    return formattedAddress;
-  } else {
-    return '?'; //no address
+    return { formattedAddress };
   }
+  return { formattedAddress: '?' };
 }

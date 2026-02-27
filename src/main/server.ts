@@ -56,6 +56,16 @@ function gracefulShutdownHandler(signal: string) {
       }
     }
 
+    // Clean up LaunchDarkly client
+    if (app.locals.launchDarklyClient) {
+      try {
+        await app.locals.launchDarklyClient.close();
+        logger.info('LaunchDarkly client closed');
+      } catch (error) {
+        logger.error('Error closing LaunchDarkly client:', error);
+      }
+    }
+
     app.locals.redisClient?.quit(async (err: Error | null) => {
       if (err) {
         logger.error('Error quitting Redis client', err);
@@ -74,14 +84,6 @@ function gracefulShutdownHandler(signal: string) {
         logger.info('HTTP terminator terminated');
       }
     });
-    if (app.locals.launchDarklyClient) {
-      try {
-        await app.locals.launchDarklyClient.close();
-        logger.info('LaunchDarkly module cleaned up');
-      } catch (error) {
-        logger.error('Error cleaning up LaunchDarkly module:', error);
-      }
-    }
   }, 500);
 }
 

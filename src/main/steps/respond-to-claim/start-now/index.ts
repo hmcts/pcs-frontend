@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, stepNavigation } from '../../../modules/steps';
-import { DASHBOARD_ROUTE } from '../../../routes/dashboard';
+import { getDashboardUrl } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
 const stepName = 'start-now';
@@ -16,9 +16,9 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/start-now/startNow.njk',
       stepName,
-      (_req: Request) => {
+      (req: Request) => {
         return {
-          backUrl: DASHBOARD_ROUTE,
+          backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
         };
       },
       'respondToClaim'

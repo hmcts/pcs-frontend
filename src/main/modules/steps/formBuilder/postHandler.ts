@@ -132,7 +132,22 @@ export function createPostHandler(
         processFieldData(req, fields);
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
+
+        // Call beforeRedirect to save to CCD (e.g., autoSaveToCCD)
+        if (beforeRedirect) {
+          try {
+            await beforeRedirect(req);
+            if (res.headersSent) {
+              return;
+            }
+          } catch (error) {
+            return next(error);
+          }
+        }
+
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = getDashboardUrl(caseId);
+        return res.redirect(303, dashboardUrl);
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving

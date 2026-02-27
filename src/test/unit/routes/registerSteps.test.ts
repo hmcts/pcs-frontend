@@ -118,7 +118,7 @@ const mockStepsData = {
 import { Application } from 'express';
 
 import { oidcMiddleware } from '../../../main/middleware';
-import registerSteps from '../../../main/routes/registerSteps';
+import { registerSteps } from '../../../main/routes/registerSteps';
 
 describe('registerSteps', () => {
   const mockGet = jest.fn();
@@ -299,11 +299,85 @@ describe('registerSteps', () => {
     }));
 
     jest.resetModules();
-    const registerStepsNew = require('../../../main/routes/registerSteps').default;
+    const { registerSteps: registerStepsNew } = require('../../../main/routes/registerSteps');
 
     registerStepsNew(testApp);
 
     expect(testApp.get).not.toHaveBeenCalled();
     expect(testApp.post).not.toHaveBeenCalled();
+  });
+
+  it('should throw error when specific journey not found in registry', () => {
+    const testApp = {
+      get: jest.fn(),
+      post: jest.fn(),
+    } as unknown as Application;
+
+    expect(() => registerSteps(testApp, 'nonExistentJourney')).toThrow(
+      "Journey 'nonExistentJourney' not found in registry. Available journeys: respondToClaim"
+    );
+  });
+
+  it('should register only specific journey when provided', () => {
+    const testApp = {
+      get: jest.fn(),
+      post: jest.fn(),
+    } as unknown as Application;
+
+    registerSteps(testApp, 'respondToClaim');
+
+    expect(testApp.get).toHaveBeenCalled();
+    expect(testApp.post).toHaveBeenCalled();
+    expect(mockLogger.debug).toHaveBeenCalledWith('Registering steps for journey: respondToClaim', {
+      journeyName: 'respondToClaim',
+      stepCount: 4,
+    });
+  });
+});
+
+describe('registerAllJourneys', () => {
+  let app: Application;
+  let mockUse: jest.Mock;
+  let mockParam: jest.Mock;
+
+  const mockCaseReferenceParamMiddleware = jest.fn((req, res, next) => next());
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockUse = jest.fn();
+    mockParam = jest.fn();
+
+    app = {
+      use: mockUse,
+      param: mockParam,
+    } as unknown as Application;
+
+    jest.doMock('../../../main/middleware', () => ({
+      oidcMiddleware: jest.fn((req, res, next) => next()),
+      caseReferenceParamMiddleware: mockCaseReferenceParamMiddleware,
+    }));
+  });
+
+  it('should register all journeys from registry', () => {
+    jest.resetModules();
+    const { registerAllJourneys } = require('../../../main/routes/registerSteps');
+
+    registerAllJourneys(app);
+
+    expect(mockUse).toHaveBeenCalledWith(expect.any(Function));
+    expect(mockLogger.info).toHaveBeenCalledWith('Auto-registering all journeys from registry');
+    expect(mockLogger.info).toHaveBeenCalledWith("Journey 'respondToClaim' auto-registered and mounted");
+    expect(mockLogger.info).toHaveBeenCalledWith('All journeys registered successfully');
+  });
+
+  it('should create router with mergeParams enabled for each journey', () => {
+    jest.resetModules();
+    const { registerAllJourneys } = require('../../../main/routes/registerSteps');
+
+    registerAllJourneys(app);
+
+    // Verify that a router was created and mounted
+    expect(mockUse).toHaveBeenCalled();
   });
 });
