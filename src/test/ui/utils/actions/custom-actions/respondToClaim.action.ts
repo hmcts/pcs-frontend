@@ -3,7 +3,6 @@ import { Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import {
   contactByTelephone,
-  contactByPhone,
   contactByTextMessage,
   correspondenceAddress,
   dateOfBirth,
@@ -26,12 +25,11 @@ export class RespondToClaimAction implements IAction {
       ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
-      ['selectContactByPhone', () => this.selectContactByPhone(fieldName as actionRecord)],
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
       ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
-      ['selectContactByPhone', () => this.selectContactByPhone(fieldName as actionRecord)],
+      ['selectContactByTelephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
       ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionData)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
@@ -113,15 +111,15 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
-  private async selectContactByPhone(contactByPhoneData: actionRecord): Promise<void> {
+  private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: contactByPhone.areYouHappyToContactQuestion,
+      question: contactByTelephone.areYouHappyToContactQuestion,
       option: contactByPhoneData.radioOption,
     });
-    if (contactByPhoneData.radioOption === contactByPhone.yesRadioOption) {
-      await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.phoneNumber);
+    if (contactByPhoneData.radioOption === contactByTelephone.yesRadioOption) {
+      await performAction('inputText', contactByTelephone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.phoneNumber);
     }
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performAction('clickButton', contactByTelephone.saveAndContinueButton);
   }
 
   private async selectContactByTextMessage(contactData: actionData): Promise<void> {
@@ -191,21 +189,6 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
-  }
-
-  private async selectContactByPhone(contactByPhoneData: actionRecord): Promise<void> {
-    await performAction('clickRadioButton', {
-      question: contactByTelephone.areYouHappyToContactQuestion,
-      option: contactByPhoneData,
-    });
-    if (contactByPhoneData.radioOption === contactByTelephone.yesRadioOption) {
-      await performAction(
-        'inputText',
-        contactByTelephone.ukPhoneNumberHiddenTextLabel,
-        contactByPhoneData.UkPhoneNumber
-      );
-    }
-    await performAction('clickButton', contactByTelephone.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

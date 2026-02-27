@@ -3,7 +3,7 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
-  contactByPhone,
+  contactByTelephone,
   contactByTextMessage,
   contactPreference,
   correspondenceAddress,
@@ -187,13 +187,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction(
       'inputText',
       contactByTelephone.ukPhoneNumberHiddenTextLabel,
-      contactByTelephone.inputUkPhoneNumber
+      contactByTelephone.ukPhoneNumberTextInput
     );
     await performAction('clickButton', contactByTelephone.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Dispute claim interstitial - back and cancel link Validations', async () => {
   test('Contact By Text Message - Back link and save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -210,14 +209,14 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.yesRadioOption,
+      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
     });
     await performAction('clickRadioButton', contactByTextMessage.yesRadioOption);
     await performAction('clickLink', contactByTextMessage.backLink);
-    await performValidation('mainHeader', contactByPhone.mainHeader);
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performValidation('mainHeader', contactByTelephone.mainHeader);
+    await performAction('clickButton', contactByTelephone.saveAndContinueButton);
     await performValidation('mainHeader', contactByTextMessage.mainHeader);
     await performAction('clickRadioButton', {
       question: contactByTextMessage.contactByTextMessageQuestion,
@@ -243,9 +242,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.yesRadioOption,
-      phoneNumber: contactByPhone.inputUkPhoneNumber,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.yesRadioOption,
+      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
     });
     await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction('clickLink', disputeClaimInterstitial.backLink);
@@ -253,12 +252,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
     await performAction('clickLink', disputeClaimInterstitial.backLink);
     await performAction('clickLink', contactByTextMessage.backLink);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('clickLink', disputeClaimInterstitial.backLink);
-    await performValidation('mainHeader', contactByPhone.mainHeader);
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performValidation('mainHeader', contactByTelephone.mainHeader);
+    await performAction('clickButton', contactByTelephone.saveAndContinueButton);
     await performAction('clickButton', disputeClaimInterstitial.cancelLink);
     await performValidation('mainHeader', 'Dashboard');
   });
@@ -279,8 +278,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -318,8 +317,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -356,8 +355,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -398,8 +397,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -439,8 +438,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -479,8 +478,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -524,8 +523,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -566,8 +565,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -606,8 +605,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -646,8 +645,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -691,8 +690,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -724,8 +723,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByPhone', {
-      radioOption: contactByPhone.noRadioOption,
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -773,7 +772,5 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       inputArray: repaymentsMade.errorValidationField.errorCharLimit,
       header: repaymentsMade.errorValidationHeader,
     });
-    await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
-    await performAction('clickButton', correspondenceAddress.saveForLaterButton);
   });
 });

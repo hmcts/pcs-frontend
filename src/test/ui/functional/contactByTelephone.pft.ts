@@ -16,31 +16,31 @@ export async function contactByTelephoneErrorValidation(): Promise<void> {
   await performAction(
     'inputText',
     contactByTelephone.ukPhoneNumberHiddenTextLabel,
-    contactByTelephone.inputInvalidUkPhoneNumber
+    contactByTelephone.invalidUkPhoneNumberTextInput
   );
   await performAction('clickButton', contactByTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactByTelephone.thereIsAProblemErrorMessageHeader,
-    message: contactByTelephone.enterUKPhoneNumberErrorMessage,
+    message: contactByTelephone.enterUKPhoneNumberFormatErrorMessage,
   });
   await performAction(
     'inputText',
     contactByTelephone.ukPhoneNumberHiddenTextLabel,
-    contactByTelephone.inputUkPhoneNumberMoreThan11Digit
+    contactByTelephone.ukPhoneNumberMoreThan11DigitTextInput
   );
   await performAction('clickButton', contactByTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactByTelephone.thereIsAProblemErrorMessageHeader,
-    message: contactByTelephone.enterUKPhoneNumberErrorMessage,
+    message: contactByTelephone.enterUKPhoneNumberFormatErrorMessage,
   });
   await performAction(
     'inputText',
     contactByTelephone.ukPhoneNumberHiddenTextLabel,
-    contactByTelephone.inputUkIncorrectNumber
+    contactByTelephone.ukPhoneNumberWithCountryCodeTextInput
   );
   await performAction('clickButton', contactByTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactByTelephone.thereIsAProblemErrorMessageHeader,
-    message: contactByTelephone.enterUKPhoneNumberErrorMessage,
+    message: contactByTelephone.enterUKPhoneNumberFormatErrorMessage,
   });
 }
