@@ -2,6 +2,7 @@ import type { Request } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { getClaimantName } from '../../utils';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -18,7 +19,8 @@ export const step: StepDefinition = createFormStep({
     caption: 'captionHeading',
   },
   extendGetContent: (req: Request) => {
-    const claimantName = (req.session?.ccdCase?.data?.claimantName as string) || 'Treetops Housing';
+    
+    const claimantName = getClaimantName(req); 
 
     const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
 
