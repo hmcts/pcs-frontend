@@ -183,20 +183,51 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
     }
   }
 
-  for (const field of fields) {
-    for (const nestedKey of nestedKeys) {
-      const nestedErrorKey = `errors.${field.name}.${nestedKey}`;
-      const nestedError = t(nestedErrorKey);
-      if (nestedError && nestedError !== nestedErrorKey) {
-        if (field.type === 'date') {
-          const dateKey = getDateTranslationKey(nestedKey);
-          if (dateKey) {
-            stepSpecificErrors[dateKey] = nestedError;
+  const addMaxLengthTranslation = (fieldName: string): void => {
+    const baseFieldName = fieldName.split('.').pop() || fieldName;
+    const translationKey = `errors.${baseFieldName}MaxLength`;
+    const translation = t(translationKey);
+    if (translation && translation !== translationKey) {
+      stepSpecificErrors[`${fieldName}.maxLength`] = translation;
+    }
+  };
+
+  const visitField = (field: FormFieldConfig): void => {
+    addMaxLengthTranslation(field.name);
+
+    // Keep existing nested error support for non-nested names (e.g., date fields)
+    if (!field.name.includes('.')) {
+      for (const nestedKey of nestedKeys) {
+        const nestedErrorKey = `errors.${field.name}.${nestedKey}`;
+        const nestedError = t(nestedErrorKey);
+        if (nestedError && nestedError !== nestedErrorKey) {
+          if (field.type === 'date') {
+            const dateKey = getDateTranslationKey(nestedKey);
+            if (dateKey) {
+              stepSpecificErrors[dateKey] = nestedError;
+            }
           }
+          stepSpecificErrors[`${field.name}.${nestedKey}`] = nestedError;
         }
-        stepSpecificErrors[`${field.name}.${nestedKey}`] = nestedError;
       }
     }
+
+    if ((field.type === 'radio' || field.type === 'checkbox') && field.options) {
+      for (const option of field.options) {
+        if (!option.subFields) {
+          continue;
+        }
+
+        for (const subField of Object.values(option.subFields)) {
+          const nestedName = subField.name.includes('.') ? subField.name : `${field.name}.${subField.name}`;
+          visitField({ ...subField, name: nestedName });
+        }
+      }
+    }
+  };
+
+  for (const field of fields) {
+    visitField(field);
   }
 
   return stepSpecificErrors;
@@ -394,8 +425,10 @@ export function validateForm(
         // MaxLength validation
         if (field.maxLength && typeof value === 'string' && value.length > field.maxLength) {
           if (!errors[fieldName]) {
-            const maxLengthMsg = translations?.defaultMaxLength?.replace('{max}', field.maxLength.toString());
-            errors[fieldName] = maxLengthMsg || `Must be ${field.maxLength} characters or fewer`;
+            const fieldSpecificMaxLengthMsg = translations?.[`${fieldName}.maxLength`];
+            const defaultMaxLengthMsg = translations?.defaultMaxLength?.replace('{max}', field.maxLength.toString());
+            errors[fieldName] =
+              fieldSpecificMaxLengthMsg || defaultMaxLengthMsg || `Must be ${field.maxLength} characters or less`;
           }
         }
 
