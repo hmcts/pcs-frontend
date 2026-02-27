@@ -30,7 +30,7 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial',
     'landlord-registered',
     'tenancy-type-details',
-    'confirm-tenancy-start-date',
+    'tenancy-date-details',
     'tenancy-date-unknown',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
@@ -113,7 +113,7 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => isTenancyStartDateKnown(req),
-          nextStep: 'confirm-tenancy-start-date',
+          nextStep: 'tenancy-date-details',
         },
         {
           condition: async (req: Request): Promise<boolean> => !(await isTenancyStartDateKnown(req)),
@@ -135,7 +135,7 @@ export const flowConfig: JourneyFlowConfig = {
         return 'dispute-claim-interstitial';
       },
     },
-    'confirm-tenancy-start-date': {
+    'tenancy-date-details': {
       routes: [
         {
           condition: async (req: Request) => isNoticeServed(req),
@@ -204,7 +204,7 @@ export const flowConfig: JourneyFlowConfig = {
       ],
       previousStep: async (req: Request) => {
         const tenancyStartDateKnown = await isTenancyStartDateKnown(req);
-        return tenancyStartDateKnown ? 'confirm-tenancy-start-date' : 'tenancy-date-unknown';
+        return tenancyStartDateKnown ? 'tenancy-date-details' : 'tenancy-date-unknown';
       },
     },
 
