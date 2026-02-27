@@ -3,7 +3,6 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
-
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'tenancyTypeConfirm',
@@ -11,12 +10,12 @@ const fieldsConfig: FormFieldConfig[] = [
     required: true,
     legendClasses: 'govuk-fieldset__legend--m govuk-heading-m',
     translationKey: {
-      label: 'legend'
+      label: 'legend',
     },
     options: [
       {
         value: 'yes',
-        translationKey: 'yes'
+        translationKey: 'yes',
       },
       {
         value: 'no',
@@ -31,23 +30,23 @@ const fieldsConfig: FormFieldConfig[] = [
             labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
             maxLength: 60,
             translationKey: {
-              label: 'correctTypeLabel'
+              label: 'correctTypeLabel',
             },
-          }
-        }
+          },
+        },
       },
       {
-        divider: 'or'
+        divider: 'or',
       },
       {
         value: 'notSure',
-        translationKey: 'notSure'
-      }
-    ]
-  }
+        translationKey: 'notSure',
+      },
+    ],
+  },
 ];
 
-export const step: StepDefinition =createFormStep({
+export const step: StepDefinition = createFormStep({
   stepName: 'tenancy-type-details',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
@@ -65,7 +64,8 @@ export const step: StepDefinition =createFormStep({
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
   extendGetContent: async (req, formContent) => {
-    const orgName =  req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]?.value || 'Unknown';
+    const orgName =
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]?.value || 'Unknown';
 
     const insetText =
       typeof formContent.insetText === 'string'
@@ -83,7 +83,7 @@ export const step: StepDefinition =createFormStep({
       ...formContent,
       insetText,
       detailsHeading,
-      organisationName: orgName
+      organisationName: orgName,
     };
-  }
+  },
 });
