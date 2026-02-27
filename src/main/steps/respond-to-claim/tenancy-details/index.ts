@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
+import { safeRedirect303 } from '../../../utils/safeRedirect';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
 import { createGetController, createStepNavigation } from '@modules/steps';
@@ -36,7 +37,15 @@ export const step: StepDefinition = {
 
       // Handle saveForLater action
       if (action === 'saveForLater') {
-        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
+
+        if (!dashboardUrl) {
+          // No valid case reference - redirect to home
+          return safeRedirect303(res, '/', '/', ['/']);
+        }
+
+        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
       }
 
       // Handle continue action - go to next step
@@ -46,13 +55,7 @@ export const step: StepDefinition = {
         return res.status(404).render('not-found');
       }
 
-      // Validate redirect path to prevent open redirect vulnerability
-      // Ensure it's a relative path starting with /case/ (respond-to-claim journey)
-      if (!redirectPath.startsWith('/case/')) {
-        return res.status(404).render('not-found');
-      }
-
-      res.redirect(303, redirectPath);
+      safeRedirect303(res, redirectPath, '/', ['/case/']);
     },
   },
 };
