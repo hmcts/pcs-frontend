@@ -4,7 +4,7 @@ import {
   LoginAction,
   NavigateToUrlAction,
   RespondToClaimAction,
-  TriggerErrorMessagesAction,
+  TriggerPageFunctionalTestsAction,
 } from '../actions/custom-actions';
 import {
   CheckAction,
@@ -55,7 +55,7 @@ export class ActionRegistry {
     ['disputeClaimInterstitial', new RespondToClaimAction()],
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['repaymentsMade', new RespondToClaimAction()],
-    ['triggerErrorMessagesForValidation', new TriggerErrorMessagesAction()],
+    ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
   ]);
 
   static getAction(actionName: string): IAction {

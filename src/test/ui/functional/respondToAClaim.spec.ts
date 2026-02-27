@@ -22,6 +22,11 @@ import {
 } from '../data/page-data';
 import { repaymentsAgreed } from '../data/page-data/repaymentsAgreed.page.data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
+import {
+  ErrorMessageValidation,
+  PageContentValidation,
+  PageNavigationValidation,
+} from '../utils/validations/custom-validations';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -41,6 +46,12 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
+});
+
+test.afterEach(async () => {
+  PageContentValidation.finaliseTest();
+  ErrorMessageValidation.finaliseTest();
+  PageNavigationValidation.finaliseTest();
 });
 
 test.describe('Respond to a claim - functional @nightly', async () => {
