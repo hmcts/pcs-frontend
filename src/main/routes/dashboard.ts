@@ -9,7 +9,8 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '../services/pcsApi';
-import { sanitiseCaseReference } from '../utils/caseReference';
+import { sanitiseCaseReference, toCaseReference16 } from '../utils/caseReference';
+import { safeRedirect303 } from '../utils/safeRedirect';
 
 interface MappedTask {
   title: { html: string };
@@ -28,20 +29,18 @@ interface MappedTaskGroup {
 }
 
 export const DASHBOARD_ROUTE = '/dashboard';
-const DEFAULT_DASHBOARD_URL = `${DASHBOARD_ROUTE}/1234567890123456`; // TODO: remove hardcoded fake CCD caseId when CCD backend is setup
 
-export const getDashboardUrl = (caseReference?: string | number): string => {
+export const getDashboardUrl = (caseReference?: string | number): string | null => {
   if (!caseReference) {
-    return DEFAULT_DASHBOARD_URL;
+    return null;
   }
 
   const sanitised = sanitiseCaseReference(caseReference);
   if (!sanitised) {
-    return DEFAULT_DASHBOARD_URL;
+    return null;
   }
 
-  const url = `${DASHBOARD_ROUTE}/${sanitised}`;
-  return /^\/dashboard\/\d{16}$/.test(url) ? url : DEFAULT_DASHBOARD_URL;
+  return `${DASHBOARD_ROUTE}/${sanitised}`;
 };
 
 function mapTaskGroups(app: Application, caseReference: string) {
@@ -94,9 +93,15 @@ export default function dashboardRoutes(app: Application): void {
   const logger = Logger.getLogger('dashboard');
 
   app.get('/dashboard', oidcMiddleware, (req: Request, res: Response) => {
-    const caseId = req.session?.ccdCase?.id;
-    const redirectUrl = getDashboardUrl(caseId);
-    return res.redirect(303, redirectUrl);
+    const caseReference = toCaseReference16(req.session?.ccdCase?.id);
+    const dashboardUrl = caseReference ? getDashboardUrl(caseReference) : null;
+
+    if (!dashboardUrl) {
+      // No valid case reference - redirect to home
+      return safeRedirect303(res, '/', '/', ['/']);
+    }
+
+    return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
   });
 
   app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {

@@ -9,6 +9,7 @@ import type {
 } from '../../../interfaces/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
+import { safeRedirect303 } from '../../../utils/safeRedirect';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -126,15 +127,6 @@ export function createPostHandler(
         return; // renderWithErrors sends the response, so we return early
       }
 
-      // Handle saveForLater action after validation passes
-      if (action === 'saveForLater') {
-        // Process field data (normalize checkboxes + consolidate date fields) before saving
-        processFieldData(req, fields);
-        const { action: _, ...bodyWithoutAction } = req.body;
-        setFormData(req, stepName, bodyWithoutAction);
-        return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id));
-      }
-
       // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
       const { action: _, ...bodyWithoutAction } = req.body;
@@ -151,12 +143,25 @@ export function createPostHandler(
         }
       }
 
+      if (action === 'saveForLater') {
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
+
+        if (!dashboardUrl) {
+          // No valid case reference - redirect to home
+          return safeRedirect303(res, '/', '/', ['/']);
+        }
+
+        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
+      }
+
       const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }
 
-      res.redirect(303, redirectPath);
+      // Allow all internal paths since this is a generic form builder
+      safeRedirect303(res, redirectPath, '/', ['/']);
     },
   };
 }

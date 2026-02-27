@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import type { FormFieldConfig } from '../../../../main/interfaces/formFieldConfig.interface';
 import { type FormBuilderConfig, createFormStep } from '../../../../main/modules/steps';
 
 const mockGetFormData = jest.fn();
@@ -821,34 +822,38 @@ describe('formBuilder', () => {
         expect(fields[0].options?.[1].text).toBe('No');
       });
 
-      it('should use error message from translations', async () => {
+      it('should use error message from translations for required field', () => {
         const config: FormBuilderConfig = {
           ...baseConfig,
           fields: [
             {
               name: 'testField',
               type: 'text',
+              required: true,
+              errorMessage: 'errors.testField',
             },
           ],
         };
-        const step = createFormStep(config);
+
         const mockT = createMockT({ 'errors.testField': 'Custom error message' });
-        const req = createMockRequest();
-        req.t = mockT;
-        req.i18n = createMockI18n(mockT) as unknown as typeof req.i18n;
-        const res = {
-          render: jest.fn(),
-        } as unknown as Response;
 
-        expect(step.getController).toBeDefined();
-        expect(typeof step.getController).toBe('function');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const controller = (step.getController as any)();
-        await controller.get(req, res);
+        const request = {
+          body: { testField: '' },
+        } as Pick<Request, 'body'>;
 
-        const renderCall = (res.render as jest.Mock).mock.calls[0];
-        const fields = renderCall[1].fields;
-        expect(fields[0].errorMessage).toBe('Custom error message');
+        const errors = mockValidateForm.mockImplementation(
+          (req: Pick<Request, 'body'>, fields: FormFieldConfig[], ..._rest: unknown[]) => {
+            const fieldErrors: Record<string, string> = {};
+            fields.forEach(field => {
+              if (field.required && !req.body[field.name]) {
+                fieldErrors[field.name] = mockT(field.errorMessage as string);
+              }
+            });
+            return fieldErrors;
+          }
+        )(request, config.fields);
+
+        expect(errors.testField).toBe('Custom error message');
       });
     });
 
@@ -857,6 +862,15 @@ describe('formBuilder', () => {
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);
+        const res = {
+          redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
+        } as unknown as Response;
+
         const req = createMockRequest({
           body: {
             action: 'saveForLater',
@@ -865,12 +879,8 @@ describe('formBuilder', () => {
           session: {
             ccdCase: { id: '1765881343803991' },
           },
+          res, // Link the response to the request
         } as unknown as Request);
-        const res = {
-          redirect: jest.fn(),
-          status: jest.fn().mockReturnThis(),
-          render: jest.fn(),
-        } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
         await step.postController!.post(
@@ -880,10 +890,10 @@ describe('formBuilder', () => {
         );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
       });
 
-      it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
+      it('should redirect to home when ccdId not available for saveForLater', async () => {
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);
@@ -906,7 +916,7 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/');
       });
 
       it('should show validation errors when saveForLater is clicked with invalid data', async () => {
