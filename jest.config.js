@@ -17,6 +17,7 @@ module.exports = {
     '^@services/(.*)$': '<rootDir>/src/main/services/$1',
     '^@utils/(.*)$': '<rootDir>/src/main/utils/$1',
     '^jose$': '<rootDir>/src/test/unit/modules/s2s/__mocks__/jose.ts',
+    '^uuid$': '<rootDir>/src/test/unit/__mocks__/uuid.ts',
   },
   testPathIgnorePatterns: ['/__mocks__/'],
   coverageProvider: 'v8',
