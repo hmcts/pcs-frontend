@@ -45,7 +45,8 @@
     "issuer": "OIDC_ISSUER",
     "clientId": "OIDC_CLIENT_ID",
     "redirectUri": "OIDC_REDIRECT_URI",
-    "scope": "OIDC_SCOPE"
+    "scope": "OIDC_SCOPE",
+    "accessTokenEarlyRefreshSeconds": "OIDC_ACCESS_TOKEN_EARLY_REFRESH_SECONDS"
   },
   "e2e": {
     "testUrl": "TEST_URL",

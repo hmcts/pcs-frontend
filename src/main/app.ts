@@ -10,7 +10,6 @@ import { setupDev } from './development';
 import { caseReferenceParamMiddleware, sessionTimeoutMiddleware } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
-import registerSteps from './routes/registerSteps';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
@@ -44,8 +43,6 @@ app.use(sessionTimeoutMiddleware);
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);
-
-registerSteps(app);
 
 glob
   .sync(__dirname + '/routes/**/*.+(ts|js)')

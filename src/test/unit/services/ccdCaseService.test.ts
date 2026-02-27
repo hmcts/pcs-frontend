@@ -130,18 +130,6 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Not authorised');
     });
 
-    it('should throw HTTPError with 403 status on unauthenticated request', async () => {
-      const caseId = '1234567890123456';
-
-      mockGet.mockRejectedValue({
-        response: { status: 401, data: { message: 'Unauthorized' } },
-        message: 'Request failed',
-      });
-
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Not authorised');
-    });
-
     it('should throw HTTPError on case not found', async () => {
       const caseId = '1234567890123456';
 

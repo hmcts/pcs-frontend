@@ -18,6 +18,7 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 }));
 
 import { createErrorHandler, createNotFoundHandler, setupErrorHandlers } from '../../../../main/modules/error-handler';
+import { authFailure } from '../../../../main/modules/error-handler/authFailure';
 
 describe('error-handler', () => {
   let app: Express;
@@ -47,6 +48,137 @@ describe('error-handler', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('authFailure', () => {
+    it('should redirect to login and clear session when 401 HTTPError', () => {
+      const err = new HTTPError('Unauthorised', 401);
+      const req = {
+        originalUrl: '/dashboard',
+        session: {
+          returnTo: undefined as string | undefined,
+          user: { uid: 'user-123' },
+          ccdCase: { id: 'case-1' },
+          codeVerifier: 'verifier',
+          nonce: 'nonce',
+        },
+      } as any;
+      const res = {
+        headersSent: false,
+        writableEnded: false,
+        redirect: jest.fn(),
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      authFailure(err, req, res, next);
+
+      expect(mockLogger.info).toHaveBeenCalledWith('Redirecting to login due to invalid session', {
+        event: 'redirect_to_login',
+        reason: 'invalid_session',
+        path: '/dashboard',
+        userId: 'user-123',
+      });
+      expect(req.session.returnTo).toBe('/dashboard');
+      expect(req.session.user).toBeUndefined();
+      expect(req.session.ccdCase).toBeUndefined();
+      expect(req.session.codeVerifier).toBeUndefined();
+      expect(req.session.nonce).toBeUndefined();
+      expect(res.redirect).toHaveBeenCalledWith('/login');
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should pass non-401 HTTPError to next', () => {
+      const err = new HTTPError('Forbidden', 403);
+      const req = {} as any;
+      const res = { headersSent: false, writableEnded: false } as any;
+      const next = jest.fn() as NextFunction;
+
+      authFailure(err, req, res, next);
+
+      expect(next).toHaveBeenCalledWith(err);
+      expect(mockLogger.info).not.toHaveBeenCalled();
+    });
+
+    it('should pass non-HTTPError to next', () => {
+      const err = new Error('Generic error');
+      const req = {} as any;
+      const res = { headersSent: false, writableEnded: false } as any;
+      const next = jest.fn() as NextFunction;
+
+      authFailure(err, req, res, next);
+
+      expect(next).toHaveBeenCalledWith(err);
+      expect(mockLogger.info).not.toHaveBeenCalled();
+    });
+
+    it('should pass to next when headers already sent', () => {
+      const err = new HTTPError('Unauthorised', 401);
+      const req = {} as any;
+      const res = { headersSent: true, writableEnded: false, redirect: jest.fn() } as any;
+      const next = jest.fn() as NextFunction;
+
+      authFailure(err, req, res, next);
+
+      expect(next).toHaveBeenCalledWith(err);
+      expect(res.redirect).not.toHaveBeenCalled();
+    });
+
+    it('should pass to next when response writableEnded', () => {
+      const err = new HTTPError('Unauthorised', 401);
+      const req = {} as any;
+      const res = { headersSent: false, writableEnded: true, redirect: jest.fn() } as any;
+      const next = jest.fn() as NextFunction;
+
+      authFailure(err, req, res, next);
+
+      expect(next).toHaveBeenCalledWith(err);
+      expect(res.redirect).not.toHaveBeenCalled();
+    });
+
+    it('should redirect when no session exists', () => {
+      const err = new HTTPError('Unauthorised', 401);
+      const req = { originalUrl: '/some-path', session: undefined } as any;
+      const res = {
+        headersSent: false,
+        writableEnded: false,
+        redirect: jest.fn(),
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      authFailure(err, req, res, next);
+
+      expect(mockLogger.info).toHaveBeenCalledWith('Redirecting to login due to invalid session', {
+        event: 'redirect_to_login',
+        reason: 'invalid_session',
+        path: '/some-path',
+        userId: undefined,
+      });
+      expect(res.redirect).toHaveBeenCalledWith('/login');
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should redirect when session has no user', () => {
+      const err = new HTTPError('Unauthorised', 401);
+      const req = {
+        originalUrl: '/dashboard',
+        session: { returnTo: undefined as string | undefined },
+      } as any;
+      const res = {
+        headersSent: false,
+        writableEnded: false,
+        redirect: jest.fn(),
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      authFailure(err, req, res, next);
+
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Redirecting to login due to invalid session',
+        expect.objectContaining({ userId: undefined })
+      );
+      expect(req.session.returnTo).toBe('/dashboard');
+      expect(res.redirect).toHaveBeenCalledWith('/login');
+    });
   });
 
   describe('setupErrorHandlers', () => {
@@ -144,6 +276,48 @@ describe('error-handler', () => {
       expect(res.locals.errorTitle).toBe("Sorry, we're having technical problems");
     });
 
+    it('should use fallback message when error has no message', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new Error();
+      const req = {
+        i18n: { getFixedT: () => createMockTranslation() },
+        language: 'en',
+      } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t: createMockTranslation() },
+        headersSent: false,
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      errorHandler(err, req, res, next);
+
+      expect(res.locals.message).toBe('Internal server error');
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('should expose error details when env is development', () => {
+      const errorHandler = createErrorHandler('development');
+      const err = new HTTPError('Test error', 500);
+      const req = {
+        i18n: { getFixedT: () => createMockTranslation() },
+        language: 'en',
+      } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t: createMockTranslation() },
+        headersSent: false,
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      errorHandler(err, req, res, next);
+
+      expect(res.locals.error).toEqual(err);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
     it('should set template variables for stepsTemplate', () => {
       const errorHandler = createErrorHandler('test');
       const err = new HTTPError('Test error', 500);
@@ -184,6 +358,91 @@ describe('error-handler', () => {
 
       expect(res.render).not.toHaveBeenCalled();
       expect(next).toHaveBeenCalledWith(err);
+    });
+
+    it('should pass to next when response writableEnded', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Test error', 500);
+      const req = {} as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: {},
+        headersSent: false,
+        writableEnded: true,
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      errorHandler(err, req, res, next);
+
+      expect(res.render).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(err);
+    });
+
+    it('should pass to next when response is finished', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Test error', 500);
+      const req = {} as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: {},
+        headersSent: false,
+        writableEnded: false,
+        finished: true,
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      errorHandler(err, req, res, next);
+
+      expect(res.render).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(err);
+    });
+
+    it('should skip logging for 404 on /.well-known/ URLs', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Page not found', 404);
+      const req = {
+        originalUrl: '/.well-known/openid-configuration',
+        i18n: { getFixedT: () => createMockTranslation() },
+        language: 'en',
+      } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t: createMockTranslation() },
+        headersSent: false,
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      errorHandler(err, req, res, next);
+
+      expect(mockLogger.error).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.render).toHaveBeenCalledWith('error');
+    });
+
+    it('should skip logging for 404 on favicon.ico requests', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Page not found', 404);
+      const req = {
+        originalUrl: '/favicon.ico',
+        i18n: { getFixedT: () => createMockTranslation() },
+        language: 'en',
+      } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t: createMockTranslation() },
+        headersSent: false,
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      errorHandler(err, req, res, next);
+
+      expect(mockLogger.error).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.render).toHaveBeenCalledWith('error');
     });
 
     it('should handle 400 status as 403 error message', () => {

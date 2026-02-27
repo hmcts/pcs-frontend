@@ -33,6 +33,11 @@ function getCaseHeaders(token: string) {
 }
 
 function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPError {
+  // HttpService throws HTTPError(401) directly for user-token 401s - propagate as-is
+  if (error instanceof HTTPError) {
+    return error;
+  }
+
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
 
@@ -41,7 +46,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
     logger.error(`Error response data: ${JSON.stringify(axiosError.response.data, null, 2)}`);
   }
 
-  if (status === 401 || status === 403) {
+  if (status === 403) {
     return new HTTPError('Not authorised to access CCD case service', 403);
   }
 
