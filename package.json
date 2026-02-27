@@ -178,7 +178,6 @@
     "chai": "6.2.1",
     "@types/node": "22.19.3",
     "glob": "^13.0.1",
-    "glob/minimatch": "9.0.9",
     "minimatch": "9.0.9",
     "js-yaml": "^4.1.1",
     "@azure/msal-browser": "4.27.0",
