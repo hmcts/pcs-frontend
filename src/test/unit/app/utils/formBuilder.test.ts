@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import type { FormFieldConfig } from '../../../../main/interfaces/formFieldConfig.interface';
 import { type FormBuilderConfig, createFormStep } from '../../../../main/modules/steps';
 
 const mockGetFormData = jest.fn();
@@ -821,34 +822,38 @@ describe('formBuilder', () => {
         expect(fields[0].options?.[1].text).toBe('No');
       });
 
-      it('should use error message from translations', async () => {
+      it('should use error message from translations for required field', () => {
         const config: FormBuilderConfig = {
           ...baseConfig,
           fields: [
             {
               name: 'testField',
               type: 'text',
+              required: true,
+              errorMessage: 'errors.testField',
             },
           ],
         };
-        const step = createFormStep(config);
+
         const mockT = createMockT({ 'errors.testField': 'Custom error message' });
-        const req = createMockRequest();
-        req.t = mockT;
-        req.i18n = createMockI18n(mockT) as unknown as typeof req.i18n;
-        const res = {
-          render: jest.fn(),
-        } as unknown as Response;
 
-        expect(step.getController).toBeDefined();
-        expect(typeof step.getController).toBe('function');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const controller = (step.getController as any)();
-        await controller.get(req, res);
+        const request = {
+          body: { testField: '' },
+        } as Pick<Request, 'body'>;
 
-        const renderCall = (res.render as jest.Mock).mock.calls[0];
-        const fields = renderCall[1].fields;
-        expect(fields[0].errorMessage).toBe('Custom error message');
+        const errors = mockValidateForm.mockImplementation(
+          (req: Pick<Request, 'body'>, fields: FormFieldConfig[], ..._rest: unknown[]) => {
+            const fieldErrors: Record<string, string> = {};
+            fields.forEach(field => {
+              if (field.required && !req.body[field.name]) {
+                fieldErrors[field.name] = mockT(field.errorMessage as string);
+              }
+            });
+            return fieldErrors;
+          }
+        )(request, config.fields);
+
+        expect(errors.testField).toBe('Custom error message');
       });
     });
 

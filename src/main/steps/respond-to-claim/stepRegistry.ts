@@ -5,7 +5,9 @@ import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
-import { step as contactPreferences } from './contact-preferences';
+import { step as contactPreferencesEmailOrPost } from './contact-preferences-email-or-post';
+import { step as contactPreferencesTelephone } from './contact-preferences-telephone';
+import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
 import { step as yourCircumstances } from './current-circumstances';
@@ -40,7 +42,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
-  'contact-preferences': contactPreferences,
+  'contact-preferences-email-or-post': contactPreferencesEmailOrPost,
+  'contact-preferences-telephone': contactPreferencesTelephone,
+  'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
   'tenancy-details': tenancyDetails,
