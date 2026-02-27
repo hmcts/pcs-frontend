@@ -1,22 +1,46 @@
-import { contactByPhone } from '../data/page-data';
+import { contactByTelephone } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactByTelephoneErrorValidation(): Promise<void> {
-  await performAction('clickButton', contactByPhone.saveAndContinueButton);
+  await performAction('clickButton', contactByTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: contactByPhone.thereIsAProblemErrorMessageHeader,
-    message: contactByPhone.selectWhetherHappyToBeContactedByTelephoneErrorMessage,
+    header: contactByTelephone.thereIsAProblemErrorMessageHeader,
+    message: contactByTelephone.selectWhetherHappyToBeContactedByTelephoneErrorMessage,
   });
-  await performAction('clickRadioButton', contactByPhone.yesRadioOption);
-  await performAction('clickButton', contactByPhone.saveAndContinueButton);
+  await performAction('clickRadioButton', contactByTelephone.yesRadioOption);
+  await performAction('clickButton', contactByTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: contactByPhone.thereIsAProblemErrorMessageHeader,
-    message: contactByPhone.enterUKPhoneNumberErrorMessage,
+    header: contactByTelephone.thereIsAProblemErrorMessageHeader,
+    message: contactByTelephone.enterUKPhoneNumberErrorMessage,
   });
-  await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, '7ab00 90*2£&');
-  await performAction('clickButton', contactByPhone.saveAndContinueButton);
+  await performAction(
+    'inputText',
+    contactByTelephone.ukPhoneNumberHiddenTextLabel,
+    contactByTelephone.inputInvalidUkPhoneNumber
+  );
+  await performAction('clickButton', contactByTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: contactByPhone.thereIsAProblemErrorMessageHeader,
-    message: contactByPhone.enterUKPhoneNumberErrorMessage,
+    header: contactByTelephone.thereIsAProblemErrorMessageHeader,
+    message: contactByTelephone.enterUKPhoneNumberErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    contactByTelephone.ukPhoneNumberHiddenTextLabel,
+    contactByTelephone.inputUkPhoneNumberMoreThan11Digit
+  );
+  await performAction('clickButton', contactByTelephone.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: contactByTelephone.thereIsAProblemErrorMessageHeader,
+    message: contactByTelephone.enterUKPhoneNumberErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    contactByTelephone.ukPhoneNumberHiddenTextLabel,
+    contactByTelephone.inputUkIncorrectNumber
+  );
+  await performAction('clickButton', contactByTelephone.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: contactByTelephone.thereIsAProblemErrorMessageHeader,
+    message: contactByTelephone.enterUKPhoneNumberErrorMessage,
   });
 }

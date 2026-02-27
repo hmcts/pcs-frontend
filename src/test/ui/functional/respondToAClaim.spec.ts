@@ -3,7 +3,7 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
-  contactByPhone,
+  contactByTelephone,
   contactPreference,
   correspondenceAddress,
   counterClaim,
@@ -163,7 +163,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Contact By Phone - save for later Validations', async () => {
+  test('Contact By Telephone - back and save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
@@ -178,12 +178,18 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactByPhone.backLink);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactByTelephone.mainHeader);
+    await performAction('clickButton', contactByTelephone.backLink);
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('clickRadioButton', contactByPhone.yesRadioOption);
-    await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhone.inputUkPhoneNumber);
-    await performAction('clickButton', contactByPhone.saveForLaterButton);
+    await performAction('clickRadioButton', contactByTelephone.yesRadioOption);
+    await performAction(
+      'inputText',
+      contactByTelephone.ukPhoneNumberHiddenTextLabel,
+      contactByTelephone.inputUkPhoneNumber
+    );
+    await performAction('clickButton', contactByTelephone.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
 

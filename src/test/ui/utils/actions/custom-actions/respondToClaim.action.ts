@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
 import {
-  contactByPhone,
+  contactByTelephone,
   correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
@@ -170,13 +170,17 @@ export class RespondToClaimAction implements IAction {
 
   private async selectContactByPhone(contactByPhoneData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: contactByPhone.areYouHappyToContactQuestion,
+      question: contactByTelephone.areYouHappyToContactQuestion,
       option: contactByPhoneData,
     });
-    if (contactByPhoneData.radioOption === contactByPhone.yesRadioOption) {
-      await performAction('inputText', contactByPhone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.UkPhoneNumber);
+    if (contactByPhoneData.radioOption === contactByTelephone.yesRadioOption) {
+      await performAction(
+        'inputText',
+        contactByTelephone.ukPhoneNumberHiddenTextLabel,
+        contactByPhoneData.UkPhoneNumber
+      );
     }
-    await performAction('clickButton', contactByPhone.saveAndContinueButton);
+    await performAction('clickButton', contactByTelephone.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
