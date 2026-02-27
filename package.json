@@ -175,7 +175,7 @@
     "semver": "^7.5.2",
     "axios": "^1.13.5",
     "@types/express-serve-static-core": "*",
-    "chai": "6.2.1",
+    "chai": "6.2.2",
     "@types/node": "22.19.3",
     "glob": "^13.0.1",
     "minimatch": "9.0.9",
