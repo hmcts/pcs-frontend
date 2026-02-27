@@ -179,16 +179,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performValidation('mainHeader', contactByTelephone.mainHeader);
-    await performAction('clickButton', contactByTelephone.backLink);
+    await performAction('clickLink', contactByTelephone.backLink);
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('clickRadioButton', contactByTelephone.yesRadioOption);
-    await performAction(
-      'inputText',
-      contactByTelephone.ukPhoneNumberHiddenTextLabel,
-      contactByTelephone.ukPhoneNumberTextInput
-    );
+    await performValidation('mainHeader', contactByTelephone.mainHeader);
+    await performAction('clickRadioButton', contactByTelephone.noRadioOption);
     await performAction('clickButton', contactByTelephone.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
@@ -772,5 +767,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       inputArray: repaymentsMade.errorValidationField.errorCharLimit,
       header: repaymentsMade.errorValidationHeader,
     });
+    await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
+    await performAction('clickButton', repaymentsMade.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
   });
 });
