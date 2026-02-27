@@ -201,6 +201,12 @@ describe('formBuilder', () => {
 
     it('should create getController that renders with form content', async () => {
       const step = createFormStep(baseConfig);
+      const res = {
+        render: jest.fn(),
+        locals: {
+          validatedCase: { id: '1765881343803991' },
+        },
+      } as unknown as Response;
       const req = createMockRequest({
         session: {
           formData: {
@@ -208,10 +214,8 @@ describe('formBuilder', () => {
           },
           ccdCase: { id: '1765881343803991' },
         },
+        res,
       } as unknown as Request);
-      const res = {
-        render: jest.fn(),
-      } as unknown as Response;
 
       expect(step.getController).toBeDefined();
       expect(typeof step.getController).toBe('function');
@@ -232,15 +236,19 @@ describe('formBuilder', () => {
 
     it('should include ccdId in getController response', async () => {
       const step = createFormStep(baseConfig);
+      const res = {
+        render: jest.fn(),
+        locals: {
+          validatedCase: { id: '1765881343803992' },
+        },
+      } as unknown as Response;
       const req = createMockRequest({
         session: {
           formData: {},
           ccdCase: { id: '1765881343803992' },
         },
+        res,
       } as unknown as Request);
-      const res = {
-        render: jest.fn(),
-      } as unknown as Response;
 
       expect(step.getController).toBeDefined();
       expect(typeof step.getController).toBe('function');
@@ -918,6 +926,14 @@ describe('formBuilder', () => {
         mockValidateForm.mockReturnValueOnce({ testField: 'This field is required' });
 
         const step = createFormStep(baseConfig);
+        const res = {
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
+          redirect: jest.fn(),
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
+        } as unknown as Response;
         const req = createMockRequest({
           body: {
             action: 'saveForLater',
@@ -927,12 +943,8 @@ describe('formBuilder', () => {
             ccdCase: { id: '1765881343803991' },
           },
           originalUrl: '/test-url',
+          res,
         } as unknown as Request);
-        const res = {
-          status: jest.fn().mockReturnThis(),
-          render: jest.fn(),
-          redirect: jest.fn(),
-        } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
         await step.postController!.post(
@@ -1037,6 +1049,14 @@ describe('formBuilder', () => {
         mockValidateForm.mockReturnValueOnce({ testField: 'Error message' });
 
         const step = createFormStep(baseConfig);
+        const res = {
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
+          redirect: jest.fn(), // Add redirect in case validation somehow passes
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
+        } as unknown as Response;
         const req = createMockRequest({
           body: {
             action: 'continue',
@@ -1046,12 +1066,8 @@ describe('formBuilder', () => {
             ccdCase: { id: '1765881343803991' },
           },
           originalUrl: '/test-url',
+          res,
         } as unknown as Request);
-        const res = {
-          status: jest.fn().mockReturnThis(),
-          render: jest.fn(),
-          redirect: jest.fn(), // Add redirect in case validation somehow passes
-        } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
         await step.postController!.post(

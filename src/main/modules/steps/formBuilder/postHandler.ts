@@ -134,6 +134,18 @@ export function createPostHandler(
         const { action: _, ...bodyWithoutAction } = req.body;
         setFormData(req, stepName, bodyWithoutAction);
 
+        // Call beforeRedirect to save to CCD (e.g., autoSaveToCCD)
+        if (beforeRedirect) {
+          try {
+            await beforeRedirect(req);
+            if (res.headersSent) {
+              return;
+            }
+          } catch (error) {
+            return next(error);
+          }
+        }
+
         const caseId = req.res?.locals.validatedCase?.id;
         const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
 

@@ -131,8 +131,8 @@ export async function renderWithErrors(
     lang,
     pageUrl: req.originalUrl || '/',
     t,
-    ccdId: req.session?.ccdCase?.id,
-    dashboardUrl: getDashboardUrl(req.session?.ccdCase?.id),
+    ccdId: req.res?.locals.validatedCase?.id,
+    dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
     languageToggle: t('languageToggle'),
     showCancelButton,
   });

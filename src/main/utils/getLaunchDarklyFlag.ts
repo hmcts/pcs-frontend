@@ -21,8 +21,6 @@ export const getLaunchDarklyFlag = async <T>(req: Request, flagName: string, def
       },
     };
 
-    // If the flag does not exist LD will return the default (empty string) so we route to capture.
-    // If LaunchDarkly client is not initialized or variation returns null/undefined, default to empty string.
     result = (await ldClient?.variation(flagName, context, defaultValue)) ?? defaultValue;
     logger.info('-------Flag from LaunchDarkly----------', { result, flagName });
   } catch (err: unknown) {

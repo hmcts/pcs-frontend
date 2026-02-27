@@ -1,6 +1,8 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import type { Application, Request, Response } from 'express';
+import { Router } from 'express';
 
+import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import {
   type DashboardTaskGroup,
@@ -92,7 +94,15 @@ function mapTaskGroups(app: Application, caseReference: string) {
 export default function dashboardRoutes(app: Application): void {
   const logger = Logger.getLogger('dashboard');
 
-  app.get('/dashboard', oidcMiddleware, (req: Request, res: Response) => {
+  // Create dedicated router for dashboard routes
+  const dashboardRouter = Router({ mergeParams: true });
+
+  // Apply param middleware - dashboard owns this dependency
+  // This ensures res.locals.validatedCase is set for routes with :caseReference
+  dashboardRouter.param('caseReference', caseReferenceParamMiddleware);
+
+  // Route: /dashboard (redirect to case-specific dashboard)
+  dashboardRouter.get('/', oidcMiddleware, (req: Request, res: Response) => {
     const caseReference = toCaseReference16(req.session?.ccdCase?.id);
     const dashboardUrl = caseReference ? getDashboardUrl(caseReference) : null;
 
@@ -104,8 +114,17 @@ export default function dashboardRoutes(app: Application): void {
     return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
   });
 
-  app.get('/dashboard/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
+  // Route: /dashboard/:caseReference (main dashboard page)
+  dashboardRouter.get('/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
     const validatedCase = res.locals.validatedCase;
+
+    if (!validatedCase) {
+      logger.error('Dashboard: validatedCase is undefined - middleware not executed');
+      return res.status(500).render('error', {
+        error: 'Case validation failed - validatedCase not set',
+      });
+    }
+
     const caseReferenceNumber = Number(validatedCase.id);
 
     try {
@@ -123,4 +142,7 @@ export default function dashboardRoutes(app: Application): void {
       throw e;
     }
   });
+
+  // Mount the dashboard router at /dashboard
+  app.use('/dashboard', dashboardRouter);
 }

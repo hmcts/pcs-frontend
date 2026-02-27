@@ -1,7 +1,7 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import * as ld from '@launchdarkly/node-server-sdk';
 import config from 'config';
-import * as express from 'express';
+import type * as express from 'express';
 
 export class LaunchDarkly {
   private readonly logger = Logger.getLogger('launch-darkly');
@@ -14,6 +14,7 @@ export class LaunchDarkly {
     try {
       await client.waitForInitialization({ timeout: 10 });
       app.locals.launchDarklyClient = client;
+      this.logger.info('LaunchDarkly client initialized successfully');
     } catch (err) {
       this.logger.error('LaunchDarkly client initialization failed', err);
     }
