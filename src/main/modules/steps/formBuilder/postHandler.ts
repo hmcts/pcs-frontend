@@ -127,24 +127,6 @@ export function createPostHandler(
         return; // renderWithErrors sends the response, so we return early
       }
 
-      // Handle saveForLater action after validation passes
-      if (action === 'saveForLater') {
-        // Process field data (normalize checkboxes + consolidate date fields) before saving
-        processFieldData(req, fields);
-        const { action: _, ...bodyWithoutAction } = req.body;
-        setFormData(req, stepName, bodyWithoutAction);
-
-        const caseId = req.res?.locals.validatedCase?.id;
-        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
-
-        if (!dashboardUrl) {
-          // No valid case reference - redirect to home
-          return safeRedirect303(res, '/', '/', ['/']);
-        }
-
-        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
-      }
-
       // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
       const { action: _, ...bodyWithoutAction } = req.body;
@@ -159,6 +141,18 @@ export function createPostHandler(
         } catch (error) {
           return next(error);
         }
+      }
+
+      if (action === 'saveForLater') {
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
+
+        if (!dashboardUrl) {
+          // No valid case reference - redirect to home
+          return safeRedirect303(res, '/', '/', ['/']);
+        }
+
+        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
       }
 
       const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);

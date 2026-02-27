@@ -26,6 +26,9 @@ export const flowConfig: JourneyFlowConfig = {
     'repayments-made',
     'repayments-agreed',
     'correspondence-address',
+    'contact-preferences',
+    'contact-preferences-telephone',
+    'contact-preferences-text-message',
     'dispute-claim-interstitial',
     'landlord-registered',
     'tenancy-details',
@@ -48,7 +51,6 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'end-now',
-    'contact-preferences',
   ],
   steps: {
     'start-now': {
@@ -85,24 +87,39 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'contact-preferences',
     },
     'contact-preferences': {
-      previousStep: 'correspondence-address',
+      defaultNext: 'contact-preferences-telephone',
+    },
+    'contact-preferences-telephone': {
+      routes: [
+        {
+          condition: async (req: Request) =>
+            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'yes',
+          nextStep: 'contact-preferences-text-message',
+        },
+        {
+          condition: async (req: Request) =>
+            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'no',
+          nextStep: 'dispute-claim-interstitial',
+        },
+      ],
+      previousStep: 'contact-preferences',
+    },
+    'contact-preferences-text-message': {
       defaultNext: 'dispute-claim-interstitial',
     },
     'dispute-claim-interstitial': {
       routes: [
         {
-          // Route to defendant name confirmation if defendant is known
           condition: async (req: Request) => isWelshProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          // Route to defendant name capture if defendant is unknown
-          condition: async (req: Request) => !isWelshProperty(req),
+          condition: async (req: Request) => !(await isWelshProperty(req)),
           nextStep: 'tenancy-details',
         },
       ],
-      defaultNext: 'tenancy-details',
     },
+
     'landlord-registered': {
       defaultNext: 'tenancy-details',
     },

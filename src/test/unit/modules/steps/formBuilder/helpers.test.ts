@@ -1107,21 +1107,25 @@ describe('formBuilder helpers', () => {
 
       it('should use translations for validator error messages', () => {
         const req = createMockRequest({
-          age: '15',
+          age: '15', // under 18
         });
+
         const fields: FormFieldConfig[] = [
           {
             name: 'age',
             type: 'text',
-            validator: () => false,
+            validator: value => (parseInt(value as string, 10) >= 18 ? true : 'errors.age'),
           },
         ];
 
-        const translations = {
+        const translations: Record<string, string> = {
           age: 'Age validation failed',
         };
 
-        const errors = validateForm(req, fields, translations);
+        const mockT = ((key: string) => translations[key.replace('errors.', '')] || key) as unknown as TFunction;
+
+        const errors = validateForm(req, fields, translations, undefined, mockT);
+
         expect(errors.age).toBe('Age validation failed');
       });
 
