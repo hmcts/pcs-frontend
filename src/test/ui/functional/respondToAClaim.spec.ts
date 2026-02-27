@@ -208,7 +208,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       option: noticeDetails.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown', noticeDateKnown.saveAndContinueButton);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickLink', paymentInterstitial.backLink);
@@ -551,8 +553,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       month: '2',
       year: '2020',
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -583,8 +586,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -617,8 +621,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickButton', paymentInterstitial.continueButton);
