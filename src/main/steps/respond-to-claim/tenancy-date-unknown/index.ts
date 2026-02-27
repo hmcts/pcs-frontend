@@ -40,7 +40,6 @@ export const step: StepDefinition = createFormStep({
     const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
     const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
     const tenancyStartDateIso = formatDatePartsToDDMMYYYY(day, month, year);
-    console.log('tenancyStartDateIso', tenancyStartDateIso);
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
