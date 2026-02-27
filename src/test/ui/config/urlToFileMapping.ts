@@ -1,10 +1,12 @@
 export default {
   'start-now': 'startNow',
   'free-legal-advice': 'freeLegalAdvice',
-  'dispute-claim-interstitial': 'disputeClaimInterstitial',
   home: 'home',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
+  'contact-preferences-telephone': 'contactByTelephone',
+  'contact-preferences-text-message': 'contactByTextMessage',
+  'dispute-claim-interstitial': 'disputeClaimInterstitial',
   'date-of-birth': 'dateOfBirth',
   'confirmation-of-notice-date-when-not-provided': 'noticeDateUnknown',
   'confirmation-of-notice-given': 'noticeDetails',
@@ -13,5 +15,4 @@ export default {
   'rent-arrears-dispute': 'rentArrearsDispute',
   'payment-interstitial': 'payment-interstitial',
   'repayments-made': 'repaymentsMade',
-  'contact-preferences-text-message': 'contactByTextMessage',
 };
