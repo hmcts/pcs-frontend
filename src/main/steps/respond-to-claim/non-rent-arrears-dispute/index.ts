@@ -19,8 +19,7 @@ export const step: StepDefinition = createFormStep({
     caption: 'captionHeading',
   },
   extendGetContent: (req: Request) => {
-    
-    const claimantName = getClaimantName(req); 
+    const claimantName = getClaimantName(req);
 
     const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
 
