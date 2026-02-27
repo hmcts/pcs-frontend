@@ -75,7 +75,7 @@ test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
-    await performAction('enterNoticeDateKnown');
+    await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 
