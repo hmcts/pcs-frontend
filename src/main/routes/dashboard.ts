@@ -1,8 +1,6 @@
 import type { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware/oidc';
-
-import { Logger } from '@modules/logger';
 import {
   type DashboardTaskGroup,
   STATUS_MAP,
@@ -10,6 +8,8 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '../services/pcsApi';
+
+import { Logger } from '@modules/logger';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
