@@ -8,3 +8,5 @@ export async function freeLegalAdviceErrorValidation(): Promise<void> {
     message: freeLegalAdvice.youMustSayAboutFreeLegalAdviceErrorMessage,
   });
 }
+
+export async function freeLegalAdviceNavigationTests(): Promise<void> {}

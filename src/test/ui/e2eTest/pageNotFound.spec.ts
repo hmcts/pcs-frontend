@@ -3,7 +3,11 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
+import {
+  ErrorMessageValidation,
+  PageContentValidation,
+  PageNavigationValidation,
+} from '../utils/validations/custom-validations';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -16,6 +20,8 @@ test.beforeEach(async ({ page }) => {
 
 test.afterEach(async () => {
   PageContentValidation.finaliseTest();
+  ErrorMessageValidation.finaliseTest();
+  PageNavigationValidation.finaliseTest();
 });
 
 test.describe('Error page to indicate Page Not Found error @PR @nightly', () => {

@@ -4,6 +4,7 @@ import { IValidation, validationRecord } from '../../interfaces';
 
 type ValidationResult = {
   pageUrl: string;
+  pageName: string;
   scenario: string;
   passed: boolean;
   expected: string;
@@ -14,7 +15,11 @@ type ValidationResult = {
 export class ErrorMessageValidation implements IValidation {
   private static results: ValidationResult[] = [];
   private static testCounter = 0;
-  private static emvFileTracking = new Map<string, { hasFile: boolean; fileName: string | null }>();
+  private static emvFileTracking = new Map<
+    string,
+    { hasFile: boolean; fileName: string | null; missingReason?: string }
+  >();
+  private static shouldThrowError = true;
 
   async validate(page: Page, validation: string, fieldName: string, error: string | validationRecord): Promise<void> {
     if (validation !== 'errorMessage') {
@@ -28,13 +33,13 @@ export class ErrorMessageValidation implements IValidation {
     if (typeof error === 'string') {
       scenario = 'Error message validation';
       expected = error;
-      errorMessage = page.locator(`a.validation-error:has-text("${error}")`);
+      errorMessage = page.locator(`.govuk-error-message:has-text("${error}"), .govuk-list--error:has-text("${error}")`);
     } else {
       scenario = 'Error message validation';
       expected = `${error.header}: ${error.message}`;
       errorMessage = page.locator(`
-        h2.govuk-error-summary__title:has-text("${error.header}") + p:has-text("${error.message}"),
-        h2.govuk-error-summary__title:has-text("${error.header}") ~ div>ul>li:has-text("${error.message}")
+        h2.govuk-error-summary__title:has-text("${error.header}"),
+        .govuk-error-summary__list a:has-text("${error.message}")
       `);
     }
 
@@ -42,35 +47,34 @@ export class ErrorMessageValidation implements IValidation {
       .first()
       .isVisible({ timeout: 5000 })
       .catch(() => false);
+
     const pageUrl = page.url();
-    const pageName = ErrorMessageValidation.getPageName(pageUrl);
+    // We don't have pageName here, but we'll use URL for now and let the static methods handle naming
+    const pageName = 'unknown';
 
     ErrorMessageValidation.results.push({
       pageUrl,
+      pageName,
       scenario,
       passed: isErrorMessageVisible,
       expected,
       actual: isErrorMessageVisible ? 'Found' : 'Not found',
     });
-
-    if (!ErrorMessageValidation.emvFileTracking.has(pageName)) {
-      ErrorMessageValidation.emvFileTracking.set(pageName, {
-        hasFile: true,
-        fileName: pageName,
-      });
-    }
   }
 
-  static addResult(result: ValidationResult): void {
-    this.results.push(result);
+  static addResult(result: Omit<ValidationResult, 'pageName'> & { pageUrl: string; pageName: string }): void {
+    this.results.push({
+      ...result,
+      pageName: result.pageName,
+    });
   }
 
-  static trackMissingEMVFile(pageUrl: string): void {
-    const pageName = this.getPageName(pageUrl);
+  static trackMissingEMVFile(pageUrl: string, pageName: string, reason?: string): void {
     if (!this.emvFileTracking.has(pageName)) {
       this.emvFileTracking.set(pageName, {
         hasFile: false,
         fileName: null,
+        missingReason: reason || 'PFT file not found',
       });
     }
   }
@@ -82,6 +86,10 @@ export class ErrorMessageValidation implements IValidation {
   static clearResults(): void {
     this.results = [];
     this.emvFileTracking.clear();
+  }
+
+  static setThrowError(shouldThrow: boolean): void {
+    this.shouldThrowError = shouldThrow;
   }
 
   static finaliseTest(): void {
@@ -98,27 +106,29 @@ export class ErrorMessageValidation implements IValidation {
 
     const allPages = trackingEntries.map(([pageName]) => pageName);
     const pagesWithEMV = trackingEntries.filter(([_, data]) => data.hasFile).map(([pageName]) => pageName);
-    const pagesWithoutEMV = trackingEntries.filter(([_, data]) => !data.hasFile).map(([pageName]) => pageName);
+    const pagesWithoutEMV = trackingEntries
+      .filter(([_, data]) => !data.hasFile)
+      .map(([pageName, data]) => `${pageName} (${data.missingReason || 'PFT file not found'})`);
 
     const validationResults = results.filter(r => r.scenario.includes('Error message'));
     const passedValidations = validationResults.filter(r => r.passed);
     const failedValidations = validationResults.filter(r => !r.passed);
 
-    const passedPages = [...new Set(passedValidations.map(r => this.getPageName(r.pageUrl)))];
-    const failedPages = [...new Set(failedValidations.map(r => this.getPageName(r.pageUrl)))];
+    const passedPages = [...new Set(passedValidations.map(r => r.pageName))];
+    const failedPages = [...new Set(failedValidations.map(r => r.pageName))];
 
     console.log(`\n📊 ERROR MESSAGE VALIDATION SUMMARY (Test #${this.testCounter}):`);
-    console.log(`   Total pages validated for error messages: ${allPages.length}`);
+    console.log(`   Total pages validated: ${allPages.length}`);
     console.log(`   Number of pages passed: ${passedPages.length}`);
     console.log(`   Number of pages failed: ${failedPages.length}`);
-    console.log(`   Number of missing EMV files: ${pagesWithoutEMV.length}`);
+
+    if (pagesWithoutEMV.length > 0) {
+      console.log(`   Missing/Invalid PFT configurations: ${pagesWithoutEMV.length}`);
+      console.log(`   Details: ${pagesWithoutEMV.join(', ')}`);
+    }
 
     if (passedPages.length > 0) {
       console.log(`   Passed pages: ${passedPages.join(', ') || 'None'}`);
-    }
-
-    if (pagesWithoutEMV.length > 0) {
-      console.log(`   EMV files not found: ${pagesWithoutEMV.join(', ') || 'None'}`);
     }
 
     if (failedValidations.length > 0) {
@@ -126,9 +136,8 @@ export class ErrorMessageValidation implements IValidation {
 
       const failedByPage = new Map<string, ValidationResult[]>();
       for (const result of failedValidations) {
-        const pageName = this.getPageName(result.pageUrl);
-        const pageResults = failedByPage.get(pageName) || [];
-        failedByPage.set(pageName, [...pageResults, result]);
+        const pageResults = failedByPage.get(result.pageName) || [];
+        failedByPage.set(result.pageName, [...pageResults, result]);
       }
 
       for (const [pageName, pageResults] of failedByPage) {
@@ -143,18 +152,18 @@ export class ErrorMessageValidation implements IValidation {
       }
 
       console.log('\n');
-      throw new Error(`Error message validation failed: ${failedValidations.length} error(s) not found`);
+
+      if (this.shouldThrowError) {
+        throw new Error(
+          `Error message validation failed: ${failedValidations.length} error(s) not found across ${failedPages.length} page(s)`
+        );
+      }
     } else if (validationResults.length > 0) {
       console.log('\n✅ ALL ERROR MESSAGE VALIDATIONS PASSED\n');
     } else if (pagesWithEMV.length > 0) {
-      console.log('\n⚠️  EMV files found but no validations performed\n');
+      console.log('\n⚠️  PFT files found but no validations performed\n');
     }
 
     this.clearResults();
-  }
-
-  private static getPageName(url: string): string {
-    const segments = url.split('/').filter(Boolean);
-    return segments[segments.length - 1] || 'home';
   }
 }

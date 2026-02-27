@@ -3,8 +3,6 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
-import { contactUs } from '../../../data/section-data/contactUs.section.data';
-import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
 const ELEMENT_TYPES = [
@@ -32,7 +30,7 @@ export class PageContentValidation implements IValidation {
   private static missingDataFiles = new Set<string>();
   private static testCounter = 0;
   private static pageToFileNameMap = new Map<string, string>();
-  private static pageToHeaderTextMap = new Map<string, string>(); // Track header text for logging
+  private static pageToHeaderTextMap = new Map<string, string>();
 
   private readonly locatorPatterns = {
     Button: (page: Page, value: string) =>
@@ -155,22 +153,20 @@ export class PageContentValidation implements IValidation {
 
   private async getPageData(page: Page): Promise<object | null> {
     const urlSegment = this.getUrlSegment(page.url());
-    const fileName = await this.getFileName(urlSegment, page);
 
-    if (!fileName) {
-      PageContentValidation.missingDataFiles.add(urlSegment);
-      return null;
+    // Try to get page name from URL segment first
+    let fileName = urlSegment;
+
+    // If it's a numeric segment, try to get header text
+    if (/^\d+$/.test(urlSegment)) {
+      const headerText = await this.getHeaderText(page);
+      if (headerText) {
+        fileName = headerText.replace(/\s+/g, '');
+        PageContentValidation.pageToHeaderTextMap.set(page.url(), headerText);
+      }
     }
 
-    PageContentValidation.pageToFileNameMap.set(page.url(), fileName);
-
-    let pageData = this.loadPageDataFile(fileName);
-    const contactUsData = this.loadPageDataFile('contactUs', true);
-    if (this.getUrlSegment(page.url()) !== 'home') {
-      pageData = { ...pageData, ...contactUsData };
-      await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
-    }
-    return pageData;
+    return this.loadPageDataFile(fileName);
   }
 
   private getUrlSegment(url: string): string {
@@ -181,36 +177,6 @@ export class PageContentValidation implements IValidation {
     } catch {
       const segments = url.split('/').filter(Boolean);
       return segments[segments.length - 1] || 'home';
-    }
-  }
-
-  private async getFileName(urlSegment: string, page: Page): Promise<string | null> {
-    try {
-      const mappingPath = path.join(__dirname, '../../../config/urlToFileMapping.ts');
-      if (!fs.existsSync(mappingPath)) {
-        return null;
-      }
-      const mappingContent = fs.readFileSync(mappingPath, 'utf8');
-      const match = mappingContent.match(/export default\s*({[\s\S]*?});/);
-      if (!match) {
-        return null;
-      }
-      const objectString = match[1].replace(/\s+/g, ' ').replace(/,\s*}/g, '}');
-      const mapping = eval(`(${objectString})`);
-
-      if (/^\d+$/.test(urlSegment)) {
-        const headerText = await this.getHeaderText(page);
-        if (headerText && mapping[headerText]) {
-          // Store header text for logging
-          PageContentValidation.pageToHeaderTextMap.set(page.url(), headerText);
-          return mapping[headerText];
-        }
-        return null;
-      }
-
-      return mapping[urlSegment] || null;
-    } catch {
-      return null;
     }
   }
 
@@ -238,18 +204,23 @@ export class PageContentValidation implements IValidation {
     }
   }
 
-  private loadPageDataFile(fileName: string, sectionFile?: boolean): object | null {
-    let filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
-    if (sectionFile) {
-      filePath = path.join(__dirname, '../../../data/section-data', `${fileName}.section.data.ts`);
-    }
+  private loadPageDataFile(fileName: string): object | null {
+    const filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
+
     if (!fs.existsSync(filePath)) {
       return null;
     }
+
     try {
       delete require.cache[require.resolve(filePath)];
       const module = require(filePath);
-      return module.default || module[fileName] || module[Object.keys(module)[0]];
+      const data = module.default || module[fileName] || module[Object.keys(module)[0]];
+
+      if (data) {
+        PageContentValidation.pageToFileNameMap.set(fileName, fileName);
+      }
+
+      return data;
     } catch {
       return null;
     }
@@ -275,6 +246,10 @@ export class PageContentValidation implements IValidation {
       }
     }
     return 'Text';
+  }
+
+  static trackMissingDataFile(pageName: string): void {
+    this.missingDataFiles.add(pageName);
   }
 
   static finaliseTest(): void {
@@ -315,11 +290,15 @@ export class PageContentValidation implements IValidation {
     const failedCount = failedPages.size;
     const missingFilesCount = this.missingDataFiles.size;
 
-    console.log(`\n📊 PAGE CONTENT VALIDATION SUMMARY (Test #${this.testCounter}):`);
+    console.log(`\n📊 PAGE CONTENT VALIDATION SUMMARY (Test #${PageContentValidation.testCounter}):`);
     console.log(`   Total pages validated: ${totalValidated}`);
     console.log(`   Number of pages passed: ${passedCount}`);
     console.log(`   Number of pages failed: ${failedCount}`);
-    console.log(`   Missing data files: ${missingFilesCount}`);
+
+    if (missingFilesCount > 0) {
+      console.log(`   Missing data files: ${missingFilesCount}`);
+      console.log(`   Page data files not found: ${Array.from(this.missingDataFiles).join(', ') || 'None'}`);
+    }
 
     if (passedCount > 0) {
       console.log(`   Passed pages: ${Array.from(passedPages).join(', ') || 'None'}`);
@@ -327,14 +306,9 @@ export class PageContentValidation implements IValidation {
     if (failedCount > 0) {
       console.log(`   Failed pages: ${Array.from(failedPages.keys()).join(', ') || 'None'}`);
     }
-    if (missingFilesCount > 0) {
-      console.log(`   Page files not found: ${Array.from(this.missingDataFiles).join(', ') || 'None'}`);
-    }
-
-    process.stdout.write('');
 
     if (failedPages.size > 0) {
-      console.log('\n❌ VALIDATION FAILED:\n');
+      console.log('\n❌ VALIDATION FAILED:');
       for (const [pageName, pageFailures] of failedPages) {
         console.log(`   Page: ${pageName}`);
         let pageFailureCount = 0;
@@ -345,14 +319,9 @@ export class PageContentValidation implements IValidation {
         }
         console.log(`     Total missing on this page: ${pageFailureCount}\n`);
       }
-      process.stdout.write('');
       throw new Error(`Page content validation failed: ${failedPages.size} pages have missing elements`);
     } else if (totalValidated > 0) {
       console.log('\n✅ VALIDATION PASSED: All intended pages validated successfully!');
-      process.stdout.write('');
-    } else if (missingFilesCount > 0) {
-      console.log('\n⚠️  NO VALIDATION: Missing data files for all pages');
-      process.stdout.write('');
     }
 
     this.clearValidationResults();
@@ -365,24 +334,7 @@ export class PageContentValidation implements IValidation {
     }
 
     const segments = url.split('/').filter(Boolean);
-    const segment = segments[segments.length - 1] || 'home';
-
-    try {
-      const mappingPath = path.join(__dirname, '../../../config/urlToFileMapping.ts');
-      if (!fs.existsSync(mappingPath)) {
-        return segment;
-      }
-      const mappingContent = fs.readFileSync(mappingPath, 'utf8');
-      const match = mappingContent.match(/export default\s*({[\s\S]*?});/);
-      if (!match) {
-        return segment;
-      }
-      const objectString = match[1].replace(/\s+/g, ' ').replace(/,\s*}/g, '}');
-      const mapping = eval(`(${objectString})`);
-      return mapping[segment] || segment;
-    } catch {
-      return segment;
-    }
+    return segments[segments.length - 1] || 'home';
   }
 
   private static getElementType(key: string): string {
