@@ -65,19 +65,18 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Defendant Date of birth - Error messages - save for later Validations', async () => {
+  test('Defendant Date of birth - Back link and Save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
       lName: defendantNameCapture.lastNameInputText,
     });
-    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: dateOfBirth.errorValidation,
-      validationType: dateOfBirth.errorValidationType.input,
-      inputArray: dateOfBirth.errorValidationField.errorTextField,
-      header: dateOfBirth.errorValidationHeader,
-    });
+    await performAction('clickLink', dateOfBirth.backLink);
+    await performValidation('mainHeader', defendantNameCapture.mainHeader);
+    await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+    await performValidation('mainHeader', dateOfBirth.mainHeader);
+    await performAction('clickButton', dateOfBirth.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
   });
 
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
