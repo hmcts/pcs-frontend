@@ -428,7 +428,7 @@ export function validateForm(
             const fieldSpecificMaxLengthMsg = translations?.[`${fieldName}.maxLength`];
             const defaultMaxLengthMsg = translations?.defaultMaxLength?.replace('{max}', field.maxLength.toString());
             errors[fieldName] =
-              fieldSpecificMaxLengthMsg || defaultMaxLengthMsg || `Must be ${field.maxLength} characters or fewer`;
+              fieldSpecificMaxLengthMsg || defaultMaxLengthMsg || `Must be ${field.maxLength} characters or less`;
           }
         }
 
