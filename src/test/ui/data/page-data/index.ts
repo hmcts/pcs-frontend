@@ -12,7 +12,7 @@ export * from './contactPreference.page.data';
 export * from './noticeDetails.page.data';
 export * from './noticeDateKnown.page.data';
 export * from './noticeDateUnknown.page.data';
-export * from './rentArrearsDispute.page.data';
+export * from './rentArrears.page.data';
 export * from './nonRentArrearsDispute.page.data';
 export * from './counterClaim.page.data';
 export * from './repaymentsMade.page.data';

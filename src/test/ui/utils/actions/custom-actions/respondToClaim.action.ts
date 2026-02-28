@@ -12,6 +12,7 @@ import {
   noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
+  rentArrears,
   repaymentsMade,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -33,6 +34,7 @@ export class RespondToClaimAction implements IAction {
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -164,6 +166,18 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
+  }
+
+  private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: rentArrears.doYouOweThisQuestion,
+      option: rentArrearsInfo.option,
+    });
+
+    if (rentArrearsInfo.option === rentArrears.noRadioOption) {
+      await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
+    }
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
