@@ -39,9 +39,9 @@ describe('getPreviousPageForArrears', () => {
     expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
   });
 
-  it('returns tenancy-details when notice not served', async () => {
+  it('returns tenancy-type-details when notice not served', async () => {
     (isNoticeServed as jest.Mock).mockResolvedValue(false);
 
-    expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+    expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-type-details');
   });
 });
