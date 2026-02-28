@@ -34,12 +34,16 @@ export interface Address {
 }
 
 export interface PossessionClaimResponse {
-  defendantContactDetails: {
-    party: {
+  defendantContactDetails?: {
+    party?: {
       firstName?: string;
       lastName?: string;
       address?: Address;
     };
+  };
+  defendantResponses?: {
+    oweRentArrears?: 'YES' | 'NO' | 'NOT_SURE';
+    rentArrearsAmount?: number;
   };
 }
 
@@ -55,4 +59,9 @@ export interface StartCallbackData {
       };
     };
   };
+}
+
+export interface CcdCaseData {
+  claimDueToRentArrears?: 'Yes' | 'No';
+  hasOtherAdditionalGrounds?: 'Yes' | 'No';
 }
