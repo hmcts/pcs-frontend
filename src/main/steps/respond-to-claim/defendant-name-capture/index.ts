@@ -21,6 +21,7 @@ export const step: StepDefinition = createFormStep({
       name: 'firstName',
       type: 'text',
       required: true,
+      maxLength: 60,
       translationKey: {
         label: 'firstNameLabel',
       },
@@ -34,6 +35,7 @@ export const step: StepDefinition = createFormStep({
       name: 'lastName',
       type: 'text',
       required: true,
+      maxLength: 60,
       translationKey: {
         label: 'lastNameLabel',
       },
