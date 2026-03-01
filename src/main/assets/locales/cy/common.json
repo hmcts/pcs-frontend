@@ -50,6 +50,7 @@
       "invalidYear": "cyEnter a valid year",
       "futureDate": "cyDate must be in the past",
       "invalidValue": "cyEnter a valid value",
+      "yearMustBeSameOrAfter": "cyThe year must be the same as or after {{minYear}}",
       "missingOne": "cyDate must include a {{missingField}}",
       "missingTwo": "cyDate must include a {{first}} and {{second}}"
     }
