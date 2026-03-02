@@ -1,7 +1,7 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware/oidc';
+import { Logger } from '@modules/logger';
 import { validateAccessCode } from '../services/pcsApi/pcsApiService';
 
 const logger = Logger.getLogger('accessCode');

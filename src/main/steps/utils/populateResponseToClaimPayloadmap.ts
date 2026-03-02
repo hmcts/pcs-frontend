@@ -1,7 +1,8 @@
 import { Request } from 'express';
 
 import { CcdCase, PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
-import { ccdCaseService } from '../../services/ccdCaseService';
+
+import { ccdCaseService } from '@services/ccdCaseService';
 
 // Wrap the possession claim response in a ccd case object and submit via ccdCaseService
 export const buildCcdCaseForPossessionClaimResponse = async (

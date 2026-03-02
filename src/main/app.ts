@@ -7,7 +7,7 @@ import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
-import { sessionTimeoutMiddleware } from './middleware';
+import { sessionTimeoutMiddleware, caseReferenceParamMiddleware } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import { registerAllJourneys } from './routes/registerSteps';
@@ -41,6 +41,9 @@ app.use((req, res, next) => {
 
 // timeout config available to all templates
 app.use(sessionTimeoutMiddleware);
+
+// param middleware for caseReference
+app.param('caseReference', caseReferenceParamMiddleware);
 
 // Auto-register all journeys from the journey registry
 // This creates a dedicated router for each journey with journey-specific middleware

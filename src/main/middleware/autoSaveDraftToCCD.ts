@@ -12,10 +12,10 @@
  *   );
  */
 
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
+import { Logger } from '@modules/logger';
 import { ccdCaseService } from '../services/ccdCaseService';
 import { isNonEmpty } from '../utils/objectHelpers';
 
