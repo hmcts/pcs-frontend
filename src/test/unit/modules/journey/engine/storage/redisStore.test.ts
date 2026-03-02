@@ -2,7 +2,7 @@ import type { Request } from 'express';
 import { type Redis } from 'ioredis';
 
 // Mock logger to keep console clean
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: { getLogger: jest.fn(() => ({ info: jest.fn(), error: jest.fn(), warn: jest.fn() })) },
 }));
 

@@ -1,11 +1,12 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { AxiosError } from 'axios';
 import config from 'config';
 
 import { HTTPError } from '../HttpError';
 import { CaseState } from '../interfaces/ccdCase.interface';
 import type { CcdCase, CcdUserCases, StartCallbackData } from '../interfaces/ccdCase.interface';
-import { http } from '../modules/http';
+
+import { http } from '@modules/http';
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('ccdCaseService');
 

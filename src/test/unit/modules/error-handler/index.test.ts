@@ -11,7 +11,7 @@ const mockLogger = {
   debug: jest.fn(),
 };
 
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn(() => mockLogger),
   },
@@ -488,7 +488,10 @@ describe('error-handler', () => {
       const errorHandler = createErrorHandler('test');
       const err = new HTTPError('Test error', 500);
       err.stack = 'Error stack trace';
-      const req = {} as any;
+      const req = {
+        method: 'GET',
+        originalUrl: '/test-url',
+      } as any;
       const res = {
         status: jest.fn().mockReturnThis(),
         render: jest.fn().mockReturnThis(),
@@ -499,7 +502,12 @@ describe('error-handler', () => {
 
       errorHandler(err, req, res, next);
 
-      expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Error stack trace'));
+      expect(mockLogger.error).toHaveBeenCalledWith('Request failed', {
+        error: err,
+        method: 'GET',
+        status: 500,
+        url: '/test-url',
+      });
     });
 
     it('should create 404 error for unmatched routes', () => {

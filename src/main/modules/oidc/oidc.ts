@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import * as jose from 'jose';
@@ -14,6 +13,8 @@ export interface RefreshTokenResult {
   idToken?: string;
   accessTokenExp?: number;
 }
+
+import { Logger } from '@modules/logger';
 
 export class OIDCModule {
   private clientConfig!: Configuration;
@@ -36,7 +37,7 @@ export class OIDCModule {
       try {
         const issuer = new URL(this.oidcConfig.issuer);
 
-        this.logger.info('Fetching OIDC configuration from:', this.oidcConfig.issuer);
+        this.logger.info('Fetching OIDC configuration from:', { issuer: this.oidcConfig.issuer });
 
         // Create client with the actual issuer
         const clientId = this.oidcConfig.clientId;

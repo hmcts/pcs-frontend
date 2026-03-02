@@ -1,10 +1,11 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Application, Request, Response } from 'express';
 import { Environment } from 'nunjucks';
 
 import { oidcMiddleware } from '../../../main/middleware';
 import dashboardRoute from '../../../main/routes/dashboard';
 import { getDashboardNotifications, getDashboardTaskGroups } from '../../../main/services/pcsApi';
+
+import { Logger } from '@modules/logger';
 
 jest.mock('../../../main/services/pcsApi');
 jest.mock('config', () => ({
@@ -18,7 +19,7 @@ jest.mock('jose', () => ({
     sign: jest.fn().mockResolvedValue('mock-signed-token'),
   })),
 }));
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
       error: jest.fn(),
@@ -201,32 +202,32 @@ describe('Dashboard Route', () => {
       expect(mockRes.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
     });
 
-    it('should redirect to default URL when caseId is not provided', () => {
+    it('should redirect to home when caseId is not provided', () => {
       dashboardRoute(mockApp as unknown as Application);
       const routeHandler = getDashboardRouteHandler();
       routeHandler(mockReq, mockRes, mockNext);
 
-      expect(mockRes.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
+      expect(mockRes.redirect).toHaveBeenCalledWith(303, '/');
     });
 
-    it('should redirect to default URL when caseId is invalid (too short)', () => {
+    it('should redirect to home when caseId is invalid (too short)', () => {
       mockReq.session!.ccdCase = { id: '12345' };
 
       dashboardRoute(mockApp as unknown as Application);
       const routeHandler = getDashboardRouteHandler();
       routeHandler(mockReq, mockRes, mockNext);
 
-      expect(mockRes.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
+      expect(mockRes.redirect).toHaveBeenCalledWith(303, '/');
     });
 
-    it('should redirect to default URL when caseId is invalid (contains letters)', () => {
+    it('should redirect to home when caseId is invalid (contains letters)', () => {
       mockReq.session!.ccdCase = { id: '123456789012345a' };
 
       dashboardRoute(mockApp as unknown as Application);
       const routeHandler = getDashboardRouteHandler();
       routeHandler(mockReq, mockRes, mockNext);
 
-      expect(mockRes.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
+      expect(mockRes.redirect).toHaveBeenCalledWith(303, '/');
     });
 
     it('should redirect to default URL when caseId is a number', () => {

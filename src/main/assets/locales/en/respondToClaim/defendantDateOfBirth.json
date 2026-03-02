@@ -2,7 +2,7 @@
   "caption": "Respond to a property possession claim",
   "pageTitle": "Your date of birth",
   "dateOfBirthHint": "For example, 31 3 1980",
-  "dateOfBirthLabel": "What’s your date of birth?",
+  "dateOfBirthLabel": "What’s your date of birth? (Optional)",
   "errors": {
     "date": {
       "day": "Day",
