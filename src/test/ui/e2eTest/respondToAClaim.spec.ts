@@ -69,23 +69,23 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    // await performValidation('mainHeader', contactPreference.mainHeader);
-    // await performAction('clickButton', contactPreference.saveAndContinueButton);
-    // await performAction(
-    //   'disputeClaimInterstitial',
-    //   submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
-    // );
-    // // The below two lines related to the Wales journey are disabled only to allow this test case to execute.
-    // //await performValidation('mainHeader', registeredLandlord.mainHeader);
-    // //await performAction('clickButton', registeredLandlord.continueButton);
-    // await performValidation('mainHeader', tenancyDetails.mainHeader);
-    // await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    // await performAction('selectNoticeDetails', {
-    //   question: noticeDetails.didClaimantGiveYouQuestion,
-    //   option: noticeDetails.yesRadioOption,
-    // });
-    // await performAction('enterNoticeDateKnown');
-    // await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+    );
+    // The below two lines related to the Wales journey are disabled only to allow this test case to execute.
+    //await performValidation('mainHeader', registeredLandlord.mainHeader);
+    //await performAction('clickButton', registeredLandlord.continueButton);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      question: noticeDetails.didClaimantGiveYouQuestion,
+      option: noticeDetails.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown');
+    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = true, and Notice Served boolean = true

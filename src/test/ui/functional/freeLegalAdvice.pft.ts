@@ -12,8 +12,9 @@ export async function freeLegalAdviceErrorValidation(): Promise<void> {
 }
 
 export async function freeLegalAdviceNavigationTests(page: Page): Promise<void> {
+  const currentPage = page.url();
   await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
   await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
   await performValidation('pageNavigation', 'Dashboard');
-  await page.goBack();
+  await performAction('navigateToUrl', currentPage);
 }

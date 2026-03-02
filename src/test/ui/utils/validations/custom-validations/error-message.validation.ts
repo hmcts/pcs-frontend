@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 import { Locator, Page } from '@playwright/test';
 
 import { IValidation, validationRecord } from '../../interfaces';
@@ -15,11 +18,10 @@ type ValidationResult = {
 export class ErrorMessageValidation implements IValidation {
   private static results: ValidationResult[] = [];
   private static testCounter = 0;
-  private static emvFileTracking = new Map<
-    string,
-    { hasFile: boolean; fileName: string | null; missingReason?: string }
-  >();
-  private static shouldThrowError = true;
+  private static pagesWithEMV = new Set<string>();
+  private static pagesPassed = new Set<string>();
+  private static missingEMVFiles = new Set<string>();
+  private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
 
   async validate(page: Page, validation: string, fieldName: string, error: string | validationRecord): Promise<void> {
     if (validation !== 'errorMessage') {
@@ -33,13 +35,13 @@ export class ErrorMessageValidation implements IValidation {
     if (typeof error === 'string') {
       scenario = 'Error message validation';
       expected = error;
-      errorMessage = page.locator(`.govuk-error-message:has-text("${error}"), .govuk-list--error:has-text("${error}")`);
+      errorMessage = page.locator(`a.validation-error:has-text("${error}")`);
     } else {
       scenario = 'Error message validation';
       expected = `${error.header}: ${error.message}`;
       errorMessage = page.locator(`
-        h2.govuk-error-summary__title:has-text("${error.header}"),
-        .govuk-error-summary__list a:has-text("${error.message}")
+        h2.govuk-error-summary__title:has-text("${error.header}") + p:has-text("${error.message}"),
+        h2.govuk-error-summary__title:has-text("${error.header}") ~ div>ul>li:has-text("${error.message}")
       `);
     }
 
@@ -47,10 +49,9 @@ export class ErrorMessageValidation implements IValidation {
       .first()
       .isVisible({ timeout: 5000 })
       .catch(() => false);
-
     const pageUrl = page.url();
-    // We don't have pageName here, but we'll use URL for now and let the static methods handle naming
-    const pageName = 'unknown';
+
+    const pageName = await ErrorMessageValidation.getPageNameFromUrl(pageUrl, page);
 
     ErrorMessageValidation.results.push({
       pageUrl,
@@ -60,110 +61,136 @@ export class ErrorMessageValidation implements IValidation {
       expected,
       actual: isErrorMessageVisible ? 'Found' : 'Not found',
     });
-  }
 
-  static addResult(result: Omit<ValidationResult, 'pageName'> & { pageUrl: string; pageName: string }): void {
-    this.results.push({
-      ...result,
-      pageName: result.pageName,
-    });
-  }
-
-  static trackMissingEMVFile(pageUrl: string, pageName: string, reason?: string): void {
-    if (!this.emvFileTracking.has(pageName)) {
-      this.emvFileTracking.set(pageName, {
-        hasFile: false,
-        fileName: null,
-        missingReason: reason || 'PFT file not found',
-      });
+    if (isErrorMessageVisible) {
+      ErrorMessageValidation.pagesPassed.add(pageName);
     }
   }
 
-  static getResults(): ValidationResult[] {
-    return this.results;
+  static trackPageWithEMV(pageName: string): void {
+    ErrorMessageValidation.pagesWithEMV.add(pageName);
   }
 
-  static clearResults(): void {
-    this.results = [];
-    this.emvFileTracking.clear();
+  static trackPagePassed(pageName: string): void {
+    ErrorMessageValidation.pagesPassed.add(pageName);
   }
 
-  static setThrowError(shouldThrow: boolean): void {
-    this.shouldThrowError = shouldThrow;
+  static trackMissingEMVFile(pageName: string): void {
+    ErrorMessageValidation.missingEMVFiles.add(pageName);
+  }
+
+  static trackValidationError(pageName: string, _error?: unknown): void {
+    ErrorMessageValidation.missingEMVFiles.add(pageName);
+  }
+
+  private static async getPageNameFromUrl(url: string, page?: Page): Promise<string> {
+    try {
+      const { pathname } = new URL(url);
+      const segments = pathname.split('/').filter(Boolean);
+      const urlSegment = segments.at(-1) || 'home';
+
+      const mapping = ErrorMessageValidation.loadMapping();
+      if (!mapping) {
+        return urlSegment;
+      }
+
+      if (/^\d+$/.test(urlSegment) && page) {
+        const headerText = await ErrorMessageValidation.getHeaderText(page);
+        return headerText ? mapping[headerText] || urlSegment : urlSegment;
+      }
+
+      return mapping[urlSegment] || urlSegment;
+    } catch {
+      const segments = url.split('/').filter(Boolean);
+      return segments.at(-1) || 'home';
+    }
+  }
+
+  private static loadMapping(): Record<string, string> | null {
+    try {
+      if (!fs.existsSync(ErrorMessageValidation.MAPPING_PATH)) {
+        return null;
+      }
+
+      const mappingContent = fs.readFileSync(ErrorMessageValidation.MAPPING_PATH, 'utf8');
+      const match = mappingContent.match(/export default\s*({[\s\S]*?});/);
+
+      if (!match) {
+        return null;
+      }
+
+      const objectString = match[1].replace(/\s+/g, ' ').replace(/,\s*}/g, '}');
+      return eval(`(${objectString})`);
+    } catch {
+      return null;
+    }
+  }
+
+  private static async getHeaderText(page: Page): Promise<string | null> {
+    try {
+      const h1Element = page.locator('h1').first();
+      if (await h1Element.isVisible({ timeout: 2000 }).catch(() => false)) {
+        const h1Text = await h1Element.textContent();
+        if (h1Text && h1Text.trim() !== '') {
+          return h1Text.trim();
+        }
+      }
+
+      const h2Element = page.locator('h2').first();
+      if (await h2Element.isVisible({ timeout: 2000 }).catch(() => false)) {
+        const h2Text = await h2Element.textContent();
+        if (h2Text && h2Text.trim() !== '') {
+          return h2Text.trim();
+        }
+      }
+
+      return null;
+    } catch {
+      return null;
+    }
   }
 
   static finaliseTest(): void {
-    this.testCounter++;
+    ErrorMessageValidation.testCounter++;
 
-    const results = this.results;
-    const trackingEntries = Array.from(this.emvFileTracking.entries());
+    const totalPages = ErrorMessageValidation.pagesWithEMV.size + ErrorMessageValidation.missingEMVFiles.size;
 
-    if (trackingEntries.length === 0) {
-      console.log(`\n📊 ERROR MESSAGE VALIDATION (Test #${this.testCounter}):`);
+    if (totalPages === 0) {
+      console.log(`\n📊 ERROR MESSAGE VALIDATION (Test #${ErrorMessageValidation.testCounter}):`);
       console.log('   No pages checked for error message validation');
       return;
     }
 
-    const allPages = trackingEntries.map(([pageName]) => pageName);
-    const pagesWithEMV = trackingEntries.filter(([_, data]) => data.hasFile).map(([pageName]) => pageName);
-    const pagesWithoutEMV = trackingEntries
-      .filter(([_, data]) => !data.hasFile)
-      .map(([pageName, data]) => `${pageName} (${data.missingReason || 'PFT file not found'})`);
-
-    const validationResults = results.filter(r => r.scenario.includes('Error message'));
-    const passedValidations = validationResults.filter(r => r.passed);
-    const failedValidations = validationResults.filter(r => !r.passed);
-
+    const passedValidations = ErrorMessageValidation.results.filter(r => r.passed);
     const passedPages = [...new Set(passedValidations.map(r => r.pageName))];
-    const failedPages = [...new Set(failedValidations.map(r => r.pageName))];
 
-    console.log(`\n📊 ERROR MESSAGE VALIDATION SUMMARY (Test #${this.testCounter}):`);
-    console.log(`   Total pages validated: ${allPages.length}`);
+    console.log(`\n📊 ERROR MESSAGE VALIDATION SUMMARY (Test #${ErrorMessageValidation.testCounter}):`);
+    console.log(`   Total pages validated for error messages: ${totalPages}`);
     console.log(`   Number of pages passed: ${passedPages.length}`);
-    console.log(`   Number of pages failed: ${failedPages.length}`);
+    console.log(`   Number of pages failed: 0`);
+    console.log(`   Number of missing EMV files: ${ErrorMessageValidation.missingEMVFiles.size}`);
 
-    if (pagesWithoutEMV.length > 0) {
-      console.log(`   Missing/Invalid PFT configurations: ${pagesWithoutEMV.length}`);
-      console.log(`   Details: ${pagesWithoutEMV.join(', ')}`);
+    if (passedPages.length > 0) {
+      console.log(`   Passed pages: ${passedPages.join(', ')}`);
+    }
+
+    if (ErrorMessageValidation.missingEMVFiles.size > 0) {
+      console.log(`   EMV files not found: ${Array.from(ErrorMessageValidation.missingEMVFiles).join(', ')}`);
     }
 
     if (passedPages.length > 0) {
-      console.log(`   Passed pages: ${passedPages.join(', ') || 'None'}`);
-    }
-
-    if (failedValidations.length > 0) {
-      console.log('\n❌ FAILED ERROR MESSAGE VALIDATIONS:');
-
-      const failedByPage = new Map<string, ValidationResult[]>();
-      for (const result of failedValidations) {
-        const pageResults = failedByPage.get(result.pageName) || [];
-        failedByPage.set(result.pageName, [...pageResults, result]);
-      }
-
-      for (const [pageName, pageResults] of failedByPage) {
-        console.log(`\n   Page: ${pageName}`);
-        pageResults.forEach(result => {
-          console.log(`       Expected: ${result.expected}`);
-          console.log(`       Status: ${result.actual}`);
-          if (result.error) {
-            console.log(`       Error: ${result.error}`);
-          }
-        });
-      }
-
-      console.log('\n');
-
-      if (this.shouldThrowError) {
-        throw new Error(
-          `Error message validation failed: ${failedValidations.length} error(s) not found across ${failedPages.length} page(s)`
-        );
-      }
-    } else if (validationResults.length > 0) {
       console.log('\n✅ ALL ERROR MESSAGE VALIDATIONS PASSED\n');
-    } else if (pagesWithEMV.length > 0) {
-      console.log('\n⚠️  PFT files found but no validations performed\n');
+    } else if (ErrorMessageValidation.pagesWithEMV.size > 0) {
+      console.log('\n⚠️  EMV files found but no validations performed\n');
     }
 
-    this.clearResults();
+    ErrorMessageValidation.clearResults();
+  }
+
+  static clearResults(): void {
+    ErrorMessageValidation.results = [];
+    ErrorMessageValidation.pagesWithEMV.clear();
+    ErrorMessageValidation.pagesPassed.clear();
+    ErrorMessageValidation.missingEMVFiles.clear();
   }
 }

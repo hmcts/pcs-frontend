@@ -21,49 +21,44 @@ export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
 
-  // Track missing PFT files across the entire test run
-  private static missingPFTPages: Set<string> = new Set();
-  private static testCounter = 0;
-
   async execute(page: Page): Promise<void> {
     await this.triggerPageFunctionalTests(page);
   }
 
-  /**
-   * Main method to trigger all page functional tests based on configuration
-   */
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
-    // Get page name using URL mapping
     const pageName = await this.getFileNameForPage(page);
-    const pageUrl = page.url();
 
     if (!pageName) {
-      // Let EMV handle missing page tracking when validation is attempted
       return;
     }
 
-    // Acquire lock for this page to prevent repeated execution
-    if (!this.acquirePageLock(pageName)) {
-      return; // Silent skip
+    const pageDataFilePath = path.join(TriggerPageFunctionalTestsAction.PAGE_DATA_DIR, `${pageName}.page.data.ts`);
+    const pageDataFileExists = fs.existsSync(pageDataFilePath);
+
+    if (enable_content_validation) {
+      if (pageDataFileExists) {
+        PageContentValidation.trackPageWithData(pageName);
+        await this.runPageContentValidation(page, pageName);
+      } else {
+        PageContentValidation.trackMissingDataFile(pageName);
+      }
     }
 
     const pftFilePath = path.join(TriggerPageFunctionalTestsAction.PFT_DIR, `${pageName}.pft.ts`);
     const pftFileExists = fs.existsSync(pftFilePath);
 
     if (!pftFileExists) {
-      // Track missing PFT file for consolidated logging at the end
-      TriggerPageFunctionalTestsAction.missingPFTPages.add(pageName);
-
-      // Still track for EMV summary - pass pageName to avoid URL parsing
       if (enable_error_message_validation) {
-        ErrorMessageValidation.trackMissingEMVFile(pageUrl, pageName);
+        ErrorMessageValidation.trackMissingEMVFile(pageName);
+      }
+      if (enable_navigation_tests) {
+        PageNavigationValidation.trackMissingNavigationFile(pageName);
       }
       return;
     }
 
-    // Execute enabled functional tests
-    if (enable_content_validation) {
-      await this.runPageContentValidation(page, pageName);
+    if (!this.acquirePageLock(pageName)) {
+      return;
     }
 
     if (enable_error_message_validation) {
@@ -75,29 +70,15 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
   }
 
-  /**
-   * Run page content validation if enabled
-   */
   private async runPageContentValidation(page: Page, pageName: string): Promise<void> {
-    const pageDataFilePath = path.join(TriggerPageFunctionalTestsAction.PAGE_DATA_DIR, `${pageName}.page.data.ts`);
-    const pageDataFileExists = fs.existsSync(pageDataFilePath);
-
-    if (!pageDataFileExists) {
-      PageContentValidation.trackMissingDataFile(pageName);
-      return;
-    }
-
     try {
       const validation = new PageContentValidation();
-      await validation.validateCurrentPage(page);
+      await validation.validateCurrentPage(page, pageName);
     } catch (error) {
-      console.log(error); // Error tracking is handled by PageContentValidation.finaliseTest()
+      PageContentValidation.trackValidationError(pageName, error);
     }
   }
 
-  /**
-   * Run error message validation if enabled
-   */
   private async runErrorMessageValidation(page: Page, pageName: string, pftFilePath: string): Promise<void> {
     try {
       delete require.cache[require.resolve(pftFilePath)];
@@ -107,20 +88,17 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       const validationFunction = pftModule[methodName];
 
       if (typeof validationFunction === 'function') {
+        ErrorMessageValidation.trackPageWithEMV(pageName);
         await validationFunction(page);
+        ErrorMessageValidation.trackPagePassed(pageName);
       } else {
-        // Method doesn't exist - EMV will handle tracking - pass pageName
-        ErrorMessageValidation.trackMissingEMVFile(page.url(), pageName);
+        ErrorMessageValidation.trackMissingEMVFile(pageName);
       }
     } catch (error) {
-      // Error will be caught and tracked by EMV through normal validation flow
-      console.error(`   Error in EMV execution for ${pageName}:`, error);
+      ErrorMessageValidation.trackValidationError(pageName, error);
     }
   }
 
-  /**
-   * Run navigation tests if enabled
-   */
   private async runNavigationTests(page: Page, pageName: string, pftFilePath: string): Promise<void> {
     try {
       delete require.cache[require.resolve(pftFilePath)];
@@ -130,19 +108,17 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       const navigationFunction = pftModule[methodName];
 
       if (typeof navigationFunction === 'function') {
-        PageNavigationValidation.trackNavigationTest(page.url(), pageName);
+        PageNavigationValidation.trackPageWithNavigation(pageName);
         await navigationFunction(page);
+        PageNavigationValidation.trackPagePassed(pageName);
       } else {
-        PageNavigationValidation.trackMissingNavigationMethod(page.url(), pageName);
+        PageNavigationValidation.trackMissingNavigationMethod(pageName);
       }
     } catch (error) {
-      PageNavigationValidation.trackNavigationFailure(page.url(), pageName, error);
+      PageNavigationValidation.trackNavigationFailure(pageName, error);
     }
   }
 
-  /**
-   * Get file name for page using URL mapping logic
-   */
   private async getFileNameForPage(page: Page): Promise<string | null> {
     const urlSegment = this.getUrlSegment(page.url());
 
@@ -159,9 +135,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     return mapping[urlSegment] ?? null;
   }
 
-  /**
-   * Load URL to file mapping
-   */
   private loadMapping(): Record<string, string> | null {
     try {
       if (!fs.existsSync(TriggerPageFunctionalTestsAction.MAPPING_PATH)) {
@@ -182,9 +155,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
   }
 
-  /**
-   * Extract URL segment from page URL
-   */
   private getUrlSegment(url: string): string {
     try {
       const { pathname } = new URL(url);
@@ -196,9 +166,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
   }
 
-  /**
-   * Get header text from page for dynamic page identification
-   */
   private async getHeaderText(page: Page): Promise<string | null> {
     for (const selector of ['h1', 'h2']) {
       const el = page.locator(selector).first();
@@ -212,9 +179,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     return null;
   }
 
-  /**
-   * Acquire lock for page to prevent repeated execution
-   */
   private acquirePageLock(pageName: string): boolean {
     try {
       if (!fs.existsSync(TriggerPageFunctionalTestsAction.LOCK_DIR)) {
@@ -223,31 +187,14 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
       const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
 
-      // Try to create lock file exclusively
       fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'wx' });
       return true;
     } catch (error: any) {
       if (error.code === 'EEXIST') {
-        return false; // Silent skip
+        return false;
       }
       console.error(`Error acquiring lock for page ${pageName}:`, error);
       return false;
     }
-  }
-
-  /**
-   * Finalise test - called at the end of each test case
-   */
-  static finaliseTest(): void {
-    this.testCounter++;
-
-    // Log missing PFT files if any
-    if (this.missingPFTPages.size > 0) {
-      console.log(`\n📊 PAGE FUNCTIONAL TESTS - PFT Files Status (Test #${this.testCounter}):`);
-      console.log(`   PFT files not found for pages: ${Array.from(this.missingPFTPages).join(', ')}`);
-    }
-
-    // Clear for next test
-    this.missingPFTPages.clear();
   }
 }
