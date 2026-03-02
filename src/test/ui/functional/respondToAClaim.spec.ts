@@ -181,7 +181,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('clickRadioButton', correspondenceAddress.yesRadioOption);
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('clickRadioButton',contactPreference.byPostRadioOption);
+    await performAction('clickRadioButton', contactPreference.byPostRadioOption);
     await performAction('clickButton', contactPreference.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });

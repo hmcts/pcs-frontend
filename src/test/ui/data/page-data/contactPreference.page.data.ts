@@ -3,7 +3,8 @@ export const contactPreference = {
   respondToClaimParagraph: 'Respond to a property possession claim',
   backLink: 'Back',
   importantDocumentSentByPostParagraph: 'Important documents like orders will always be sent by post.',
-  youCanChooseToReceiveUpdatesParagraph: 'You can choose to receive updates about your case by post or email. For example, when a hearing has been scheduled or a document is ready to view online.',
+  youCanChooseToReceiveUpdatesParagraph:
+    'You can choose to receive updates about your case by post or email. For example, when a hearing has been scheduled or a document is ready to view online.',
   howDoYouWantReceiveUpdatesQuestion: 'How do you want to receive updates??',
   byPostRadioOption: 'By email',
   byEmailRadioOption: 'By post',
@@ -18,5 +19,5 @@ export const contactPreference = {
   thereIsAProblemErrorMessageHeader: 'There is a problem',
   selectHowYouWantToReceiveUpdatesErrorMessage: `Select how you want to receive updates`,
   enterEmailAddressErrorMessage: 'Enter your email address',
-  invalidEmailAddressErrorMessage:'Enter an email address in the correct format, like name@example.com'
+  invalidEmailAddressErrorMessage: 'Enter an email address in the correct format, like name@example.com',
 };
