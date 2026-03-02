@@ -581,7 +581,7 @@ describe('formHelpers', () => {
         body: {
           'dateField-day': '01',
           'dateField-month': '01',
-          'dateField-year': '1899',
+          'dateField-year': '1900',
         },
         session: {},
       } as unknown as Request;

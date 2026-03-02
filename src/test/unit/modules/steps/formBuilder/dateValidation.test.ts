@@ -168,9 +168,31 @@ describe('dateValidation', () => {
         expect(result?.message).toBe('Date must be a real date');
       });
 
-      it('should accept year up to 9999', () => {
-        const result = validateDateField('15', '06', '9999', true);
-        expect(result).toBeNull();
+      it('should return error for year less than 1900', () => {
+        const result = validateDateField('15', '06', '1899', true);
+        expect(result?.message).toBe('The year must be the same as or after 1900');
+        expect(result?.erroneousParts).toEqual(['year']);
+      });
+
+      it('should use translation for year less than 1900 when provided', () => {
+        const t = createMockT({
+          'errors.date.yearMustBeSameOrAfter': 'cyThe year must be the same as or after {{minYear}}',
+        });
+        const result = validateDateField('15', '06', '1899', true, t);
+        expect(result?.message).toBe('cyThe year must be the same as or after 1900');
+        expect(result?.erroneousParts).toEqual(['year']);
+      });
+
+      it('should use translations object for year less than 1900 when provided', () => {
+        const translations = { yearMustBeSameOrAfter: 'Custom year {{minYear}} message' };
+        const result = validateDateField('15', '06', '1899', true, undefined, false, true, translations);
+        expect(result?.message).toBe('Custom year 1900 message');
+        expect(result?.erroneousParts).toEqual(['year']);
+      });
+
+      it('should accept year 1900 or later', () => {
+        expect(validateDateField('15', '06', '1900', true)).toBeNull();
+        expect(validateDateField('15', '06', '9999', true)).toBeNull();
       });
     });
 
