@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { Application, IRouter, Router } from 'express';
 import type { RequestHandler } from 'express';
 
@@ -7,6 +6,8 @@ import type { StepDefinition } from '../interfaces/stepFormData.interface';
 import { caseReferenceParamMiddleware, oidcMiddleware } from '../middleware';
 import { getValidatedLanguage, stepDependencyCheckMiddleware } from '../modules/steps';
 import { getStepsForJourney, journeyRegistry } from '../steps';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('registerSteps');
 

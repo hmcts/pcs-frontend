@@ -1,9 +1,10 @@
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+
+import { createGetController, createStepNavigation } from '@modules/steps';
 
 const stepName = 'dispute-claim-interstitial';
 const stepNavigation = createStepNavigation(flowConfig);
