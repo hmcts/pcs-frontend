@@ -15,7 +15,7 @@ import {
   noticeDetails,
   repaymentsMade,
   startNow,
-  tenancyDetails,
+  tenancyOccupationContractLicenseAgreement,
 } from '../data/page-data';
 import { repaymentsAgreed } from '../data/page-data/repaymentsAgreed.page.data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -74,8 +74,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // The below two lines related to the Wales journey are disabled only to allow this test case to execute.
     //await performValidation('mainHeader', registeredLandlord.mainHeader);
     //await performAction('clickButton', registeredLandlord.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -106,8 +106,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.yesRadioOption,
+    });
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -148,8 +150,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
@@ -188,8 +190,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,

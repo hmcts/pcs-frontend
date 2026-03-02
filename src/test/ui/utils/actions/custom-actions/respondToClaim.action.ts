@@ -33,6 +33,7 @@ export class RespondToClaimAction implements IAction {
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -203,4 +204,33 @@ export class RespondToClaimAction implements IAction {
       }
     }
   }
+
+  private async tenancyOrContractTypeDetails(tenancyTypeDetails: actionRecord) {
+    const tenancyType = formatText(tenancyTypeDetails.tenancyType);
+    if (tenancyType === 'assured tenancy' || tenancyType === 'introductory tenancy') {
+      await performValidation('text', {
+        elementType: 'paragraph',
+        text: `The property is let under an ${tenancyType} agreement`,
+      });
+    } else if (tenancyType === 'secure tenancy' || tenancyType === 'flexible tenancy') {
+      await performValidation('text', {
+        elementType: 'paragraph',
+        text: `The property is let under a ${tenancyType} agreement`,
+      });
+    } else if (tenancyType === 'demoted tenancy') {
+      await performValidation('text', {
+        elementType: 'paragraph',
+        text: `The property is let under a ${tenancyType} agreement`,
+      });
+    } else if (tenancyType === 'other') {
+      await performValidation('text', {
+        elementType: 'paragraph',
+        text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+      });
+    }
+  }
+}
+
+export function formatText(value: string | number | boolean | string[] | object): string {
+  return typeof value === 'string' ? value.toLowerCase().replace(/_/g, ' ').trim() : String(value);
 }

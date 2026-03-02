@@ -18,7 +18,7 @@ import {
   rentArrearsDispute,
   repaymentsMade,
   startNow,
-  tenancyDetails,
+  tenancyOccupationContractLicenseAgreement,
 } from '../data/page-data';
 import { repaymentsAgreed } from '../data/page-data/repaymentsAgreed.page.data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -202,8 +202,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -238,8 +238,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: noticeDetails.errorValidation,
@@ -273,8 +273,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -312,8 +312,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -350,8 +350,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
@@ -387,8 +387,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.yesRadioOption,
@@ -429,8 +429,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
@@ -449,7 +449,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
-  test.skip('RentArrears - NoticeServed - Yes NoticeDetails - No - RentArrearsDispute', async () => {
+  test('RentArrears - NoticeServed - Yes NoticeDetails - No - RentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
@@ -467,8 +467,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.noRadioOption,
@@ -503,8 +503,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
@@ -540,8 +540,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
@@ -582,8 +582,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
@@ -612,8 +612,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       question: noticeDetails.didClaimantGiveYouQuestion,
       option: noticeDetails.imNotSureRadioOption,
