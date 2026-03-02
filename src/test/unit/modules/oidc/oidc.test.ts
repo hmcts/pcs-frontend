@@ -24,7 +24,7 @@ jest.mock('openid-client', () => ({
   fetchUserInfo: jest.fn(),
   buildEndSessionUrl: jest.fn(),
 }));
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
       info: jest.fn(),

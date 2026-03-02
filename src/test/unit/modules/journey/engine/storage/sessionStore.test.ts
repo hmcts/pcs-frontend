@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 // Silence logger
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: { getLogger: jest.fn(() => ({ info: jest.fn(), error: jest.fn(), warn: jest.fn() })) },
 }));
 

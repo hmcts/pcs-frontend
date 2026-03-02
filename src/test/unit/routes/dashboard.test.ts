@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { Application } from 'express';
 import { Environment } from 'nunjucks';
 
@@ -6,8 +5,10 @@ import { oidcMiddleware } from '../../../main/middleware';
 import dashboardRoute from '../../../main/routes/dashboard';
 import { getDashboardNotifications, getDashboardTaskGroups } from '../../../main/services/pcsApi';
 
+import { Logger } from '@modules/logger';
+
 jest.mock('../../../main/services/pcsApi');
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
       error: jest.fn(),
