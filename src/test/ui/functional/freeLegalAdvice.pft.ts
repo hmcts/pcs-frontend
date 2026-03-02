@@ -1,3 +1,5 @@
+import { Page } from '@playwright/test';
+
 import { defendantNameCapture, freeLegalAdvice } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -9,4 +11,9 @@ export async function freeLegalAdviceErrorValidation(): Promise<void> {
   });
 }
 
-export async function freeLegalAdviceNavigationTests(): Promise<void> {}
+export async function freeLegalAdviceNavigationTests(page: Page): Promise<void> {
+  await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
+  await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
+  await performValidation('pageNavigation', 'Dashboard');
+  await page.goBack();
+}
