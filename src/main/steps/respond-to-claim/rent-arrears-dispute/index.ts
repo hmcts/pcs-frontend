@@ -4,6 +4,7 @@ import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { createFormStep, getTranslationFunction, validateCurrencyAmount } from '../../../modules/steps';
+import { getClaimantName } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -17,21 +18,38 @@ export const step: StepDefinition = createFormStep({
     caption: 'captionHeading',
   },
   beforeRedirect: async (req: Request) => {
-    const oweRentArrears = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
-    const rentArrearsAmount = req.body?.['rentArrears.rentArrearsAmountCorrection'] as string | undefined;
+    const oweRentArrearsRaw = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
+    const rentArrearsAmountRaw = req.body?.rentArrearsAmountCorrection as string | undefined;
+
+    // Convert lowercase enum to uppercase format expected by CCD (YES, NO, NOT_SURE)
+    const oweRentArrears =
+      oweRentArrearsRaw === 'yes'
+        ? 'YES'
+        : oweRentArrearsRaw === 'no'
+          ? 'NO'
+          : oweRentArrearsRaw === 'notSure'
+            ? 'NOT_SURE'
+            : undefined;
+
+    // Convert currency from pounds to pence (e.g., "155.00" -> 15500)
+    let rentArrearsAmount: number | undefined;
+    if (rentArrearsAmountRaw) {
+      const amountInPounds = parseFloat(rentArrearsAmountRaw.replace(/,/g, ''));
+      rentArrearsAmount = Math.round(amountInPounds * 100);
+    }
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         oweRentArrears,
-        ...(rentArrearsAmount && { rentArrearsAmount }),
+        ...(rentArrearsAmount !== undefined && { rentArrearsAmount }),
       },
     };
 
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, true);
   },
   extendGetContent: (req: Request) => {
-    // Pull dynamic claimantName from CCD
-    const claimantName = (req.session?.ccdCase?.data?.claimantName as string) || 'Treetops Housing';
+    // Pull dynamic claimantName from CCD - check multiple sources for robustness
+    const claimantName = getClaimantName(req);
 
     // TO DO: Retrieve amount from CCD
     const amount = (req.session?.ccdCase?.data?.rentArrearsAmountOnStatement as number) || 3250.0;
