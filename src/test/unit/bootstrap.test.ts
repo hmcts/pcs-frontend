@@ -28,7 +28,7 @@ describe('bootstrap', () => {
 
     expect(mockPropertiesVolumeConstructor).toHaveBeenCalledWith(true);
     expect(mockEnablePropertiesVolume).toHaveBeenCalledTimes(1);
-    expect(mockInitializeTelemetry).toHaveBeenCalledTimes(1);
+    expect(mockInitializeTelemetry).not.toHaveBeenCalled();
   });
 
   it('uses production mode when NODE_ENV is production', async () => {
@@ -41,7 +41,9 @@ describe('bootstrap', () => {
     expect(mockInitializeTelemetry).toHaveBeenCalledTimes(1);
   });
 
-  it('enables properties volume before telemetry initialization', async () => {
+  it('enables properties volume before telemetry initialization in production', async () => {
+    process.env.NODE_ENV = 'production';
+
     await loadBootstrapModule();
 
     const enablePropertiesVolumeCallOrder = mockEnablePropertiesVolume.mock.invocationCallOrder[0];
