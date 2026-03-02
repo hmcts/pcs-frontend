@@ -14,7 +14,7 @@ import { ActionRegistry, ValidationRegistry } from './registry';
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
-let startErrorMessageValidation = false;
+let startFunctionalTests = false;
 let startAxeAudit = false;
 
 export function initializeExecutor(page: Page): void {
@@ -35,8 +35,8 @@ async function detectPageNavigation(): Promise<boolean> {
   if (!startAxeAudit && executor.page.url().includes('start-now')) {
     startAxeAudit = true;
   }
-  if (!startErrorMessageValidation && executor.page.url().includes('free-legal-advice')) {
-    startErrorMessageValidation = true;
+  if (!startFunctionalTests && executor.page.url().includes('free-legal-advice')) {
+    startFunctionalTests = true;
   }
   const pageNavigated = currentUrl !== previousUrl;
 
@@ -67,7 +67,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
         }
       }
       if (
-        startErrorMessageValidation &&
+        startFunctionalTests &&
         (enable_content_validation || enable_error_message_validation || enable_navigation_tests)
       ) {
         await performAction('triggerFunctionalTests');
