@@ -33,6 +33,7 @@ export class RespondToClaimAction implements IAction {
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['enterTenancyStartDetails', () => this.enterTenancyStartDetails(fieldName as actionRecord)]
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -166,6 +167,18 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
+  }
+
+  private async enterTenancyStartDetails(defendantData: actionRecord) {
+    if (defendantData?.dobDay && defendantData?.dobMonth && defendantData?.dobYear) {
+      await performActions(
+        'Tenancy occupation contract or licence agreement',
+        ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
+        ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
+        ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear]
+      );
+    }
+    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
