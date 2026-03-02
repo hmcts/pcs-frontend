@@ -1,8 +1,10 @@
 import winston from 'winston';
 
+// @ts-ignore - winston types may be incomplete in some environments
 const { combine, label, timestamp, colorize, json, printf, splat } = winston.format;
 const splatSymbol = Symbol.for('splat');
 
+// @ts-ignore - winston types may be incomplete in some environments
 const container = new winston.Container();
 
 function stringifyLogValue(value: unknown): string {
@@ -52,7 +54,7 @@ function extractMergedStringMetadata(metadata: Record<string, unknown>): string 
   return characters.join('');
 }
 
-const myFormat = printf(info => {
+const myFormat = printf((info: any) => {
   const { level, message, timestamp: logTimestamp, ...rawMetadata } = info;
   const metadata = { ...rawMetadata };
   const additionalValues = Array.isArray(info[splatSymbol] as unknown[]) ? (info[splatSymbol] as unknown[]) : [];
@@ -92,7 +94,7 @@ function transport(name: string) {
 }
 
 export class Logger {
-  public static getLogger(name: string): winston.Logger {
+  public static getLogger(name: string): ReturnType<typeof container.add> {
     return container.add(name, { transports: [transport(name)] });
   }
 }

@@ -9,7 +9,7 @@ const logger = Logger.getLogger('accessCode');
 export default function accessCodeRoutes(app: Application): void {
   // GET: Display the validation form
   app.get('/case/:caseId/access-code', oidcMiddleware, (req: Request, res: Response) => {
-    const { caseId } = req.params;
+    const caseId = req.params.caseId as string;
 
     // Validate caseId format (16 digits only) to prevent SSRF
     if (!/^\d{16}$/.test(caseId)) {
@@ -30,7 +30,7 @@ export default function accessCodeRoutes(app: Application): void {
 
   // POST: Validate the access code
   app.post('/case/:caseId/access-code', oidcMiddleware, async (req: Request, res: Response) => {
-    const { caseId } = req.params;
+    const caseId = req.params.caseId as string;
     const { accessCode } = req.body;
     const userAccessToken = req.session.user?.accessToken;
 
