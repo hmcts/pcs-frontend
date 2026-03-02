@@ -20,7 +20,7 @@ interface CustomSession extends Session {
 
 jest.mock('config');
 jest.mock('jose');
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue({
       info: jest.fn(),

@@ -1,7 +1,8 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import * as jose from 'jose';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('oidcMiddleware');
 

@@ -1,7 +1,8 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { NextFunction, Request, Response } from 'express';
 
 import { HTTPError } from '../../HttpError';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('authFailure');
 
