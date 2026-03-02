@@ -1,4 +1,3 @@
-
 export const submitCaseApiData = {
   submitCaseEventName: 'resumePossessionClaim',
   get submitCasePayload() {
