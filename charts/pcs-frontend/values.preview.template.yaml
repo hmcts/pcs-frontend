@@ -9,6 +9,7 @@ nodejs:
         - pcs-frontend-idam-secret
         - launchdarkly-sdk-key
         - pcs-os-client-lookup-key
+        - app-insights-connection-string
   environment:
     REDIS_CONNECTION_STRING: redis://${SERVICE_NAME}-redis-master:6379
     OIDC_REDIRECT_URI: 'https://${SERVICE_FQDN}/oauth2/callback'

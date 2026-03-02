@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'confirmation-of-notice-date-when-provided',
