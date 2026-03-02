@@ -1,5 +1,5 @@
 // Mock logger to capture logging without real output
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn(),
   },
@@ -17,12 +17,13 @@ jest.mock('@launchdarkly/node-server-sdk', () => ({
   init: jest.fn(() => mockLdClient),
 }));
 
-import { Logger } from '@hmcts/nodejs-logging';
 import * as ld from '@launchdarkly/node-server-sdk';
 import config from 'config';
 import { Express } from 'express';
 
 import { LaunchDarkly } from '../../../../main/modules/launch-darkly';
+
+import { Logger } from '@modules/logger';
 
 describe('LaunchDarkly', () => {
   let launchDarkly: LaunchDarkly;

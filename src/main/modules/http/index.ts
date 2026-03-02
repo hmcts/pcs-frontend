@@ -1,11 +1,18 @@
-import { Logger } from '@hmcts/nodejs-logging';
+import { type Span, SpanKind, SpanStatusCode, trace } from '@opentelemetry/api';
 import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from 'axios';
+
+import { Logger } from '@modules/logger';
+
 type TokenRegenerator = () => Promise<void>;
+interface TracedRequestConfig extends InternalAxiosRequestConfig {
+  __otelSpan?: Span;
+  __isRetryRequest?: boolean;
+}
 
 export class HttpService {
   private instance: AxiosInstance;
@@ -15,6 +22,7 @@ export class HttpService {
   private tokenRegenerationPromise: Promise<void> | null = null;
   private readonly TOKEN_WAIT_TIMEOUT = 5000; // 5 seconds
   private readonly TOKEN_WAIT_INTERVAL = 100; // 100ms
+  private readonly tracer = trace.getTracer('http-service');
   logger = Logger.getLogger('http');
 
   constructor() {
@@ -22,24 +30,36 @@ export class HttpService {
 
     // Request interceptor
     this.instance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
-      if ((!this.s2sToken || this.isTokenExpired()) && !this.tokenRegenerator) {
-        this.logger.error('No token regenerator configured!');
-        throw new Error('No valid S2S token available and no regenerator configured');
-      }
+      const tracedConfig = config as TracedRequestConfig;
+      this.startOutboundSpan(tracedConfig);
 
-      if (!this.s2sToken || this.isTokenExpired()) {
-        await this.regenerateToken();
+      try {
+        if ((!this.s2sToken || this.isTokenExpired()) && !this.tokenRegenerator) {
+          this.logger.error('No token regenerator configured!');
+          throw new Error('No valid S2S token available and no regenerator configured');
+        }
+
+        if (!this.s2sToken || this.isTokenExpired()) {
+          await this.regenerateToken();
+        }
+        tracedConfig.headers['ServiceAuthorization'] = `Bearer ${this.s2sToken}`;
+        return tracedConfig;
+      } catch (error) {
+        this.endSpanWithError(tracedConfig, error);
+        throw error;
       }
-      config.headers['ServiceAuthorization'] = `Bearer ${this.s2sToken}`;
-      return config;
     });
 
     // Response interceptor for handling 401s
     this.instance.interceptors.response.use(
-      response => response,
+      response => {
+        this.endSpanWithStatus(response.config as TracedRequestConfig, response.status);
+        return response;
+      },
       async error => {
-        const originalRequest = error.config;
+        const originalRequest = error.config as TracedRequestConfig;
         if (error.response?.status === 401 && !originalRequest.__isRetryRequest) {
+          this.endSpanWithStatus(originalRequest, 401);
           this.logger.warn('Received 401, attempting token regeneration and retry...');
           try {
             await this.regenerateToken();
@@ -50,6 +70,7 @@ export class HttpService {
             return Promise.reject(retryError);
           }
         }
+        this.endSpanWithError(originalRequest, error);
         return Promise.reject(error);
       }
     );
@@ -184,6 +205,92 @@ export class HttpService {
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
     return this.instance.patchForm<T, R, D>(url, data, config);
+  }
+
+  private resolveRequestUrl(url: string, baseUrl?: string): string {
+    if (!baseUrl) {
+      return url;
+    }
+
+    try {
+      return new URL(url, baseUrl).toString();
+    } catch {
+      return url;
+    }
+  }
+
+  private startOutboundSpan(config: TracedRequestConfig): void {
+    const method = config.method?.toUpperCase() || 'GET';
+    const url = this.resolveRequestUrl(config.url || '', config.baseURL);
+    const spanName = `${method} ${url}`;
+    const span = this.tracer.startSpan(spanName, { kind: SpanKind.CLIENT });
+    span.setAttribute('http.request.method', method);
+    span.setAttribute('url.full', url);
+    config.__otelSpan = span;
+  }
+
+  private getRequestContext(config: TracedRequestConfig | undefined): { method: string; url: string } {
+    if (!config) {
+      return { method: 'UNKNOWN', url: 'UNKNOWN_URL' };
+    }
+
+    return {
+      method: config.method?.toUpperCase() || 'GET',
+      url: this.resolveRequestUrl(config.url || '', config.baseURL),
+    };
+  }
+
+  private endSpanWithStatus(config: TracedRequestConfig | undefined, statusCode: number): void {
+    const span = config?.__otelSpan;
+    if (!span) {
+      return;
+    }
+
+    span.setAttribute('http.response.status_code', statusCode);
+    if (statusCode >= 400) {
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: `HTTP ${statusCode}`,
+      });
+    }
+    span.end();
+    if (config) {
+      config.__otelSpan = undefined;
+    }
+  }
+
+  private endSpanWithError(config: TracedRequestConfig | undefined, error: unknown): void {
+    const span = config?.__otelSpan;
+    if (!span) {
+      return;
+    }
+
+    const { method, url } = this.getRequestContext(config);
+    const statusCode = axios.isAxiosError(error) ? error.response?.status : undefined;
+    if (statusCode) {
+      span.setAttribute('http.response.status_code', statusCode);
+    }
+
+    const baseError = error instanceof Error ? error : new Error(String(error));
+    const statusLabel = statusCode ?? 'UNKNOWN_STATUS';
+    const enrichedMessage = `${method} ${url} failed with status ${statusLabel}: ${baseError.message}`;
+    const exception = new Error(enrichedMessage);
+    exception.name = baseError.name;
+    exception.stack = baseError.stack;
+
+    span.setAttribute('error.type', baseError.name || 'Error');
+    span.setAttribute('error.message', enrichedMessage);
+    span.setAttribute('http.request.method', method);
+    span.setAttribute('url.full', url);
+    span.recordException(exception);
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: enrichedMessage,
+    });
+    span.end();
+    if (config) {
+      config.__otelSpan = undefined;
+    }
   }
 }
 
