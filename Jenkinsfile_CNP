@@ -32,11 +32,14 @@ withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
   env.NODE_CONFIG_ENV = 'test'
   onPR() {
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_all_page_functional_tests").size() > 0) {
+      env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
+    }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_error_messages_validation").size() > 0) {
       env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
     }
-    else {
-      env.ENABLE_ERROR_MESSAGES_VALIDATION = 'false'
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_navigation_tests").size() > 0) {
+      env.ENABLE_NAVIGATION_TESTS = 'true'
     }
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
