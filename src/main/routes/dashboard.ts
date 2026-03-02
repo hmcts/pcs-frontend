@@ -1,7 +1,7 @@
 import config from 'config';
 import type { Application, NextFunction, Request, Response } from 'express';
-import * as jose from 'jose';
 import { Router } from 'express';
+import * as jose from 'jose';
 
 import { HTTPError } from '../HttpError';
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
@@ -120,6 +120,7 @@ export default function dashboardRoutes(app: Application): void {
   });
 
   dashboardRouter.get('/test-expired-token', async (req: Request, res: Response) => {
+    // eslint-disable-next-line no-console
     console.log('req.session', JSON.stringify(req.session, null, 2));
 
     logger.info('Testing expired token', {

@@ -1,4 +1,4 @@
-import type type { Application, Request, Response, Response } from 'express';
+import type { Application, Response } from 'express';
 import express from 'express';
 import type { Environment } from 'nunjucks';
 
