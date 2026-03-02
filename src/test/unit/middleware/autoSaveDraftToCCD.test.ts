@@ -5,7 +5,7 @@ const mockLogger = {
   debug: jest.fn(),
 };
 
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn(() => mockLogger),
   },

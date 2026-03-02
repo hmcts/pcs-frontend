@@ -1,8 +1,9 @@
 import type { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware/oidc';
-import { Logger } from '@modules/logger';
 import { validateAccessCode } from '../services/pcsApi/pcsApiService';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('accessCode');
 
