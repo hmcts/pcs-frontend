@@ -52,10 +52,10 @@ function extractMergedStringMetadata(metadata: Record<string, unknown>): string 
   return characters.join('');
 }
 
-const myFormat = printf(info => {
+const myFormat = printf((info: Record<string, unknown> & { [key: symbol]: unknown }) => {
   const { level, message, timestamp: logTimestamp, ...rawMetadata } = info;
   const metadata = { ...rawMetadata };
-  const additionalValues = Array.isArray(info[splatSymbol] as unknown[]) ? (info[splatSymbol] as unknown[]) : [];
+  const additionalValues = Array.isArray(info[splatSymbol]) ? (info[splatSymbol] as unknown[]) : [];
   const mergedStringValue = extractMergedStringMetadata(metadata);
   const allAdditionalValues = mergedStringValue ? [mergedStringValue, ...additionalValues] : additionalValues;
   const jsonMetadata = JSON.stringify(metadata);
@@ -92,7 +92,7 @@ function transport(name: string) {
 }
 
 export class Logger {
-  public static getLogger(name: string): winston.Logger {
+  public static getLogger(name: string): ReturnType<typeof container.add> {
     return container.add(name, { transports: [transport(name)] });
   }
 }
