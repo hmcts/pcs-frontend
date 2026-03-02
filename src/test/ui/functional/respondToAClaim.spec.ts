@@ -161,6 +161,31 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
+  test('Contact Preference By Email or Post - back and save for later Validations', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: dateOfBirth.dayInputText,
+      dobMonth: dateOfBirth.monthInputText,
+      dobYear: dateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickLink', contactPreference.backLink);
+    await performValidation('mainHeader', correspondenceAddress.correspondenceAddressKnownMainHeader);
+    await performValidation('clickRadioButton', correspondenceAddress.yesRadioOption);
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('clickRadioButton',contactPreference.byPostRadioOption);
+    await performAction('clickButton', contactPreference.saveForLaterButton);
+    await performValidation('mainHeader', 'Dashboard');
+  });
+
   test('Dispute claim interstitial - back and cancel link Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
