@@ -1,5 +1,6 @@
 export const createCaseApiData = {
   createCaseEventName: 'createPossessionClaim',
+  createCaseDataPrefix: 'cpc',
   createCasePayload: {
     feeAmount: '£404',
     propertyAddress: {

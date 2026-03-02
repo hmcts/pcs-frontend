@@ -13,6 +13,22 @@ import { IAction, actionData, actionRecord } from '../../interfaces';
 export const caseInfo: { id: string; fid: string; state: string } = { id: '', fid: '', state: '' };
 
 export class CreateCaseAPIAction implements IAction {
+  private mapToPrefixedEventData(data: actionData): actionData {
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+      return data;
+    }
+
+    const prefix = createCaseApiData.createCaseDataPrefix;
+    if (!prefix) {
+      return data;
+    }
+
+    const typedData = data as Record<string, unknown>;
+    return Object.fromEntries(
+      Object.entries(typedData).map(([key, value]) => [prefix + key.charAt(0).toUpperCase() + key.slice(1), value])
+    );
+  }
+
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['createCaseAPI', () => this.createCaseAPI(fieldName)],
@@ -30,8 +46,9 @@ export class CreateCaseAPIAction implements IAction {
     const CREATE_EVENT_TOKEN = (await createCaseApi.get(createCaseEventTokenApiData.createCaseEventTokenApiEndPoint))
       .data.token;
     const createCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
+    const createCaseEventData = this.mapToPrefixedEventData(createCasePayloadData);
     const createResponse = await createCaseApi.post(createCaseApiData.createCaseApiEndPoint, {
-      data: createCasePayloadData,
+      data: createCaseEventData,
       event: { id: createCaseApiData.createCaseEventName },
       event_token: CREATE_EVENT_TOKEN,
     });
