@@ -1,15 +1,16 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import RedisStore from 'connect-redis';
 import type { Express } from 'express';
 import session from 'express-session';
 import { Redis } from 'ioredis';
 
+import { Logger } from '@modules/logger';
+
 export class Session {
   logger = Logger.getLogger('session');
   enableFor(app: Express): void {
     const redisConnectionString = config.get<string>('secrets.pcs.redis-connection-string');
-    this.logger.info('Connecting to Redis at:', redisConnectionString);
+    this.logger.info('Connecting to Redis');
 
     const redis = new Redis(redisConnectionString);
 
@@ -58,11 +59,11 @@ export class Session {
     app.use(session(sessionMiddleware));
 
     // Make timeout config available to templates
-    app.locals.sessionTimeout = {
+    app.locals.nunjucksEnv?.addGlobal('sessionTimeout', {
       sessionWarningMinutes,
       sessionTimeoutMinutes,
       checkIntervalSeconds,
-    };
+    });
 
     this.logger.info('Session middleware configured with Redis store');
     this.logger.info(
