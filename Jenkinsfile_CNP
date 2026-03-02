@@ -33,7 +33,7 @@ withPipeline(type, product, component) {
   env.NODE_CONFIG_ENV = 'test'
   onPR() {
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_all_page_functional_tests").size() > 0) {
-      env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
+      env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
     }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_error_messages_validation").size() > 0) {
       env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
