@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { z } from 'zod';
 
 import type {
@@ -6,6 +5,8 @@ import type {
   FormFieldConfig,
   FormFieldOption,
 } from '../../../interfaces/formFieldConfig.interface';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('form-builder-schema');
 

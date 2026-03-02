@@ -3,13 +3,48 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as path from 'path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import config from 'config';
 import { type HttpTerminator, createHttpTerminator } from 'http-terminator';
 
 import { app } from './app';
 
+import { Logger } from '@modules/logger';
+import { flushTelemetry } from '@modules/opentelemetry';
+
 const logger = Logger.getLogger('server');
+
+let isFatalTelemetryHandlerRegistered = false;
+let isFatalShutdownInProgress = false;
+
+async function handleFatalShutdown(message: string, error: unknown): Promise<void> {
+  if (isFatalShutdownInProgress) {
+    logger.warn('Fatal shutdown already in progress, ignoring subsequent process error');
+    return;
+  }
+
+  isFatalShutdownInProgress = true;
+  logger.error(message, error);
+  await flushTelemetry();
+  process.exit(1);
+}
+
+function registerFatalTelemetryHandlers(): void {
+  if (isFatalTelemetryHandlerRegistered) {
+    return;
+  }
+
+  process.on('uncaughtException', async error => {
+    await handleFatalShutdown('Uncaught exception, flushing telemetry before exit', error);
+  });
+
+  process.on('unhandledRejection', async reason => {
+    await handleFatalShutdown('Unhandled rejection, flushing telemetry before exit', reason);
+  });
+
+  isFatalTelemetryHandlerRegistered = true;
+}
+
+registerFatalTelemetryHandlers();
 
 let server: https.Server | ReturnType<typeof app.listen> | null = null;
 let httpTerminator: HttpTerminator | null = null;

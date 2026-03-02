@@ -55,14 +55,14 @@ describe('Dashboard Routes - Router Pattern Fix', () => {
       expect(result).toBe('/dashboard/1234567890123456');
     });
 
-    it('should return default URL for invalid case reference', () => {
+    it('should return null for invalid case reference', () => {
       const result = getDashboardUrl('invalid');
-      expect(result).toBe('/dashboard/1234567890123456');
+      expect(result).toBeNull();
     });
 
-    it('should return default URL when case reference is undefined', () => {
+    it('should return null when case reference is undefined', () => {
       const result = getDashboardUrl(undefined);
-      expect(result).toBe('/dashboard/1234567890123456');
+      expect(result).toBeNull();
     });
 
     it('should handle numeric case IDs', () => {

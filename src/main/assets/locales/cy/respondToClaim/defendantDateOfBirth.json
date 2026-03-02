@@ -2,7 +2,7 @@
   "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyYour date of birth",
   "dateOfBirthHint": "cyFor example, 31 3 1980",
-  "dateOfBirthLabel": "cyWhat’s your date of birth?",
+  "dateOfBirthLabel": "cyWhat’s your date of birth? (Optional)",
   "errors": {
     "date": {
       "day": "cyDay",

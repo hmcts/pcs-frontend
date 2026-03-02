@@ -13,7 +13,7 @@ function getRandomDateOfBirth() {
 const randomDOB = getRandomDateOfBirth();
 
 export const dateOfBirth = {
-  mainHeader: "What's your date of birth?",
+  mainHeader: 'What’s your date of birth? (Optional)',
   respondToClaimParagraph: 'Respond to a property possession claim',
   forExampleParagraph: 'For example, 27 9 2022',
   dayTextLabel: 'Day',
@@ -22,12 +22,7 @@ export const dateOfBirth = {
   dayInputText: randomDOB.day.toString(),
   monthInputText: randomDOB.month.toString(),
   yearInputText: randomDOB.year.toString(),
+  backLink: 'Back',
   saveAndContinueButton: 'Save and continue',
-  saveForLater: 'Save for later',
-  errorValidation: 'YES',
-  errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox', date: 'dateField' },
-  errorValidationHeader: 'There is a problem',
-  errorValidationField: {
-    errorTextField: [{ type: 'empty', label: '', errMessage: 'Enter your date of birth' }],
-  },
+  saveForLaterButton: 'Save for later',
 };
