@@ -1,7 +1,8 @@
 {
   "useCSRFProtection": true,
   "appInsights": {
-    "insightname": "pcs-frontend"
+    "insightname": "pcs-frontend",
+    "enabled": false
   },
   "node-env": "development",
   "use-ssl": false,

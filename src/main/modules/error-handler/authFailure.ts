@@ -25,7 +25,9 @@ export const authFailure = (err: Error, req: Request, res: Response, next: NextF
   });
 
   if (req.session) {
-    req.session.returnTo = req.originalUrl;
+    if (!req.session.returnTo) {
+      req.session.returnTo = req.originalUrl;
+    }
     const authSessionKeys = ['user', 'ccdCase', 'codeVerifier', 'nonce'] as const;
     for (const key of authSessionKeys) {
       delete req.session[key];

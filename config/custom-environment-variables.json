@@ -22,6 +22,10 @@
   },
   "node-env": "NODE_ENV",
   "use-ssl": "USE_SSL",
+  "appInsights": {
+    "insightname": "OTEL_SERVICE_NAME",
+    "enabled": "OTEL_ENABLED"
+  },
   "session": {
     "prefix": "REDIS_SESSION_PREFIX",
     "redis": {

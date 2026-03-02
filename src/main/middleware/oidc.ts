@@ -27,7 +27,7 @@ export const oidcMiddleware: RequestHandler = async (
   try {
     // Only set returnTo when about to redirect to login (avoids overwriting on every request which can cause loops)
     const setReturnToAndRedirectToLogin = (): void => {
-      if (req.session) {
+      if (req.session && !req.session.returnTo) {
         req.session.returnTo = req.originalUrl;
       }
       res.redirect('/login');

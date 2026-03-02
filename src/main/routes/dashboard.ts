@@ -104,13 +104,21 @@ export default function dashboardRoutes(app: Application): void {
     req.session.returnTo = '/dashboard';
 
     if (errorType !== '' && errorType !== undefined) {
-      next(new HTTPError('Invalid error type', Number(errorType)));
+      next(new HTTPError('Throwing error with error type: ' + errorType, Number(errorType)));
     } else {
       next(new HTTPError('Invalid error type', 400));
     }
   });
 
   app.get('/test-expired-token', async (req: Request, res: Response) => {
+    console.log('req.session', JSON.stringify(req.session, null, 2));
+
+    logger.info('Testing expired token', {
+      event: 'testing_expired_token',
+      returnTo: req.session.returnTo,
+      originalUrl: req.originalUrl,
+      userId: req.session?.user?.uid,
+    });
     const user = req.session?.user;
     if (user) {
       // decode the access token and set the expiry to a past date, then set the user.accessToken to the new token
@@ -120,6 +128,13 @@ export default function dashboardRoutes(app: Application): void {
         .setProtectedHeader({ alg: 'HS256' })
         .setExpirationTime('30s')
         .sign(new TextEncoder().encode(config.get<string>('secrets.pcs.pcs-frontend-idam-secret')));
+      logger.info('Setting access token to expired token', {
+        event: 'setting_access_token_to_expired_token',
+        userId: user.uid,
+        path: req.originalUrl,
+        accessToken: user.accessToken,
+        decoded,
+      });
       res.redirect('/dashboard');
     } else {
       res.redirect('/login');
