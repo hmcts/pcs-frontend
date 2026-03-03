@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const Module = require('module');
 const nodeResolver = require('eslint-import-resolver-node');
 const path = require('path');
 const { createMatchPath, loadConfig } = require('tsconfig-paths');
@@ -8,6 +9,17 @@ const { createMatchPath, loadConfig } = require('tsconfig-paths');
 const DEFAULT_EXTENSIONS = ['.ts', '.tsx', '.d.ts', '.js', '.jsx', '.json', '.node', '.mjs'];
 
 exports.interfaceVersion = 2;
+
+const createRequire =
+  Module.createRequire ||
+  Module.createRequireFromPath ||
+  function (filename) {
+    const mod = new Module(filename);
+    mod.filename = filename;
+    mod.paths = Module._nodeModulePaths(path.dirname(filename));
+    mod._compile('module.exports = require;', filename);
+    return mod.exports;
+  };
 
 function getMatcher(config) {
   const project = typeof config?.project === 'string' ? config.project : './tsconfig.json';
@@ -34,6 +46,15 @@ exports.resolve = function resolve(source, file, config = {}) {
   const resolvedFromNode = nodeResolver.resolve(source, file, nodeConfig);
   if (resolvedFromNode.found) {
     return resolvedFromNode;
+  }
+
+  try {
+    const resolvedFromRequire = createRequire(path.resolve(file)).resolve(source);
+    if (resolvedFromRequire) {
+      return { found: true, path: resolvedFromRequire };
+    }
+  } catch {
+    // Fall through to TS path alias resolution.
   }
 
   const matchPath = getMatcher(config);
