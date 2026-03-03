@@ -51,6 +51,9 @@ test.afterEach(async () => {
   ErrorMessageValidation.finaliseTest();
 });
 
+//@noDefendants(submitCasePayloadNoDefendants) represents all unknown pages and non-rent arrears
+//All known pages and Rent-arrears routing is covered in submitCasePayload
+//Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type etc.)
 test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
   test('Respond to a claim @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
