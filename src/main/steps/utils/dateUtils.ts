@@ -21,4 +21,3 @@ export function formatDatePartsToISODate(day: string, month: string, year: strin
 
   return dt.toISODate() ?? undefined;
 }
-

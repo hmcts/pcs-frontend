@@ -3,8 +3,8 @@ import { format, parseISO } from 'date-fns';
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { formatDatePartsToISODate } from '../../utils';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -48,29 +48,37 @@ export const step: StepDefinition = createFormStep({
           },
         },
         { divider: 'options.or' },
-        { value: 'imNotSure', translationKey: 'options.imNotSure' },
+        { value: 'notSure', translationKey: 'options.notSure' },
       ],
     },
   ],
   beforeRedirect: async req => {
-    const originalTenancyStartDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as string | undefined;
+    const originalTenancyStartDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as
+      | string
+      | undefined;
     const confirmValue = req.body?.confirmTenancyDate as string | undefined;
 
+    const defendantResponses: Record<string, unknown> = {};
     let tenancyStartDate: string | undefined;
-    if (confirmValue === 'no') {
+
+    if (confirmValue === 'yes') {
+      defendantResponses.tenancyStartDateCorrect = 'YES';
+      tenancyStartDate = originalTenancyStartDate;
+    } else if (confirmValue === 'no') {
+      defendantResponses.tenancyStartDateCorrect = 'NO';
       const day = (req.body?.['confirmTenancyDate.tenancyStartDate-day'] as string | undefined) ?? '';
       const month = (req.body?.['confirmTenancyDate.tenancyStartDate-month'] as string | undefined) ?? '';
       const year = (req.body?.['confirmTenancyDate.tenancyStartDate-year'] as string | undefined) ?? '';
-
-      tenancyStartDate = formatDatePartsToISODate(day, month, year);
-    } else {
+      tenancyStartDate = formatDatePartsToISODate(day, month, year) ?? undefined;
+    } else if (confirmValue === 'notSure') {
+      defendantResponses.tenancyStartDateCorrect = 'NOT_SURE';
       tenancyStartDate = originalTenancyStartDate;
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        tenancyStartDateCorrect: confirmValue,
-        ...(tenancyStartDate && { tenancyStartDate: tenancyStartDate }),
+        ...defendantResponses,
+        ...(tenancyStartDate && { tenancyStartDate }),
       },
     };
 
