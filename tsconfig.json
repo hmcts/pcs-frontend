@@ -22,7 +22,10 @@
       "interfaces/*": ["main/interfaces/*"],
       "router/*": ["router/*"],
       "routes/*": ["routes/*"],
-      "steps": ["steps/index.ts"]
+      "steps": ["steps/index.ts"],
+      "@modules/*": ["modules/*"],
+      "@services/*": ["services/*"],
+      "@utils/*": ["utils/*"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["jest", "node", "express", "express-session"]

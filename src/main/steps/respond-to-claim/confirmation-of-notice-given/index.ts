@@ -1,6 +1,7 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+
+import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'confirmation-of-notice-given',
@@ -30,7 +31,10 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
+    // Read from CCD (fresh data from START callback via res.locals.validatedCase)
+    // Same pattern as free-legal-advice - no session dependency
+    const caseData = req.res?.locals.validatedCase?.data;
+    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
 
     return {
       claimantName,
