@@ -8,7 +8,6 @@ import {
   counterClaim,
   dateOfBirth,
   defendantNameCapture,
-  defendantNameConfirmation,
   freeLegalAdvice,
   nonRentArrearsDispute,
   noticeDetails,
