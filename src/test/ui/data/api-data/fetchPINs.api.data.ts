@@ -2,7 +2,7 @@ import { AxiosRequestConfig } from 'axios';
 
 export const fetchPINsApiData = {
   fetchPINSApiInstance: (): AxiosRequestConfig => ({
-    baseURL: process.env.PCS_API_URL_PREVIEW,
+    baseURL: process.env.PCS_API_URL,
     headers: {
       ServiceAuthorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}`,
       'Content-Type': 'application/json',

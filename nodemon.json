@@ -2,7 +2,7 @@
   "watch": ["src", "config", "webpack"],
   "ext": "ts,js,json,scss,css,njk",
   "ignore": ["src/**/*.spec.ts", "**/*.test.ts", "**/*.test.js", "dist", "node_modules"],
-  "exec": "ts-node -r tsconfig-paths/register --files src/main/server.ts",
+  "exec": "ts-node -r tsconfig-paths/register --files src/main/bootstrap.ts",
   "delay": "500",
   "env": {
     "NODE_ENV": "dev"
