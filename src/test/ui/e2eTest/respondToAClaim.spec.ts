@@ -25,13 +25,20 @@ const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+
+  let submitPayload: any = submitCaseApiData.submitCasePayload;
+
   if (testInfo.title.includes('@noDefendants')) {
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
-  } else {
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+    submitPayload = submitCaseApiData.submitCasePayloadNoDefendants;
+  } else if (testInfo.title.includes('@otherTenancyDate')) {
+    submitPayload = submitCaseApiData.submitCasePayloadOtherTenancyDate;
+  } else if (testInfo.title.includes('@assuredTenancyDate')) {
+    submitPayload = submitCaseApiData.submitCasePayloadAssuredTenancyDate;
+  } else if (testInfo.title.includes('@secureTenancy')) {
+    submitPayload = submitCaseApiData.submitCasePayloadSecureTenancy;
   }
+  await performAction('submitCaseAPI', { data: submitPayload });
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
@@ -48,7 +55,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
-  test('Respond to a claim @noDefendants', async () => {
+  test('Introductory tenancy - tenancy start date not provided - Respond to a claim @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
@@ -83,7 +90,7 @@ test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = true, and Notice Served boolean = true
-  test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
+  test('Other tenancy - tenancy start date provided - Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @otherTenancyDate', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -97,9 +104,10 @@ test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
+      tenancyType: submitCaseApiData.submitCasePayloadOtherTenancyDate.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyOccupationContractLicenseAgreement.yesRadioOption,
     });
+
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -117,7 +125,7 @@ test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
-  test('Non-RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - NonRentArrearsDispute', async () => {
+  test('Assured tenancy - tenancy start date provided - Non-RentArrears - NoticeServed - Yes NoticeDetails - Im not sure - NonRentArrearsDispute @assuredTenancyDate', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -135,8 +143,11 @@ test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancyDate.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.noRadioOption,
+      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
@@ -154,7 +165,7 @@ test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
   });
 
   //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
-  test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute', async () => {
+  test('Secure tenancy - tenancy start date not provided- Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute @secureTenancy', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -166,8 +177,10 @@ test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadSecureTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.imNotSureRadioOption,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.noRadioOption,
     });

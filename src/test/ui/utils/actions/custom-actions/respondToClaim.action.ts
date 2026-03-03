@@ -210,32 +210,30 @@ export class RespondToClaimAction implements IAction {
 
   private async tenancyOrContractTypeDetails(tenancyTypeDetails: actionRecord) {
     const tenancyType = formatText(tenancyTypeDetails.tenancyType);
-    if (tenancyType === 'assured tenancy' || tenancyType === 'introductory tenancy') {
+    const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
+
+    if (
+      tenancyType === 'assured tenancy' ||
+      tenancyType === 'introductory tenancy' ||
+      tenancyType === 'secure tenancy' ||
+      tenancyType === 'flexible tenancy' ||
+      tenancyType === 'demoted tenancy'
+    ) {
       await performValidation('text', {
         elementType: 'paragraph',
-        text: `The property is let under an ${tenancyType} agreement`,
-      });
-    } else if (tenancyType === 'secure tenancy' || tenancyType === 'flexible tenancy') {
-      await performValidation('text', {
-        elementType: 'paragraph',
-        text: `The property is let under a ${tenancyType} agreement`,
-      });
-    } else if (tenancyType === 'demoted tenancy') {
-      await performValidation('text', {
-        elementType: 'paragraph',
-        text: `The property is let under a ${tenancyType} agreement`,
+        text: `The property is let under ${article} ${tenancyType} agreement`,
       });
     } else if (tenancyType === 'other') {
       await performValidation('text', {
         elementType: 'paragraph',
-        text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+        text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancyDate.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
       });
     }
     await performAction('clickRadioButton', {
       question: tenancyOccupationContractLicenseAgreement.isTenancyTypeCorrectQuestion,
       option: tenancyTypeDetails.tenancyOption,
     });
-    if (tenancyTypeDetails.tenancyOption === 'no') {
+    if (tenancyTypeDetails.tenancyOption === 'no' && tenancyTypeDetails.tenancyTypeInfo) {
       await performAction(
         'inputText',
         tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeHiddenTextLabel,
