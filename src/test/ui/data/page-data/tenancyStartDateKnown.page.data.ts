@@ -25,9 +25,9 @@ export const tenancyStartDateKnown = {
   errorValidationHeader: 'There is a problem',
   selectIfTheseTenancyDetailsAreCorrectErrorMessage:
     'Select if these tenancy, licence or occupation contract details are correct',
-  tenancyStartDateMustBeRealDateErrorMessage: 'Tenancy start date must be a real date',
-  tenancyStartDateWithDayMissingErrorMessage: 'Your tenancy start date must include a day',
-  tenancyStartDateWithMonthMissingErrorMessage: 'Your tenancy start date must include a month',
-  tenancyStartDateWithYearMissingErrorMessage: 'Your tenancy start date must include a year',
-  tenancyStartDateWithFutureDateErrorMessage: 'Tenancy start date must be in the past',
+  RealDateErrorMessage: 'Tenancy start date must be a real date',
+  DayMissingErrorMessage: 'Your tenancy start date must include a day',
+  MonthMissingErrorMessage: 'Your tenancy start date must include a month',
+  YearMissingErrorMessage: 'Your tenancy start date must include a year',
+  FutureDateErrorMessage: 'Tenancy start date must be in the past',
 };

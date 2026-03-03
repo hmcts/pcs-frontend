@@ -14,7 +14,7 @@ export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
     year: '2025',
   });
   await performValidation('errorMessage', {
-    message: tenancyStartDateKnown.tenancyStartDateMustBeRealDateErrorMessage,
+    message: tenancyStartDateKnown.RealDateErrorMessage,
   });
   await performAction('selectTenancyStartDateKnown', {
     option: tenancyStartDateKnown.noRadioOption,
@@ -23,7 +23,7 @@ export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
     year: '2025',
   });
   await performValidation('errorMessage', {
-    message: tenancyStartDateKnown.tenancyStartDateWithDayMissingErrorMessage,
+    message: tenancyStartDateKnown.DayMissingErrorMessage,
   });
   await performAction('selectTenancyStartDateKnown', {
     option: tenancyStartDateKnown.noRadioOption,
@@ -32,7 +32,7 @@ export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
     year: '2025',
   });
   await performValidation('errorMessage', {
-    message: tenancyStartDateKnown.tenancyStartDateWithMonthMissingErrorMessage,
+    message: tenancyStartDateKnown.MonthMissingErrorMessage,
   });
   await performAction('selectTenancyStartDateKnown', {
     option: tenancyStartDateKnown.noRadioOption,
@@ -41,6 +41,6 @@ export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
     year: '',
   });
   await performValidation('errorMessage', {
-    message: tenancyStartDateKnown.tenancyStartDateWithYearMissingErrorMessage,
+    message: tenancyStartDateKnown.YearMissingErrorMessage,
   });
 }
