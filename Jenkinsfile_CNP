@@ -32,6 +32,7 @@ withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
   env.NODE_CONFIG_ENV = 'test'
   env.PCS_API_URL = "http://pcs-api-aat.service.core-compute-aat.internal"
+  env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
   onPR() {
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_error_messages_validation").size() > 0) {
       env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
@@ -40,7 +41,6 @@ withPipeline(type, product, component) {
       env.ENABLE_ERROR_MESSAGES_VALIDATION = 'false'
     }
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     def apiLabels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pcs-api-pr:")
     if (apiLabels && apiLabels.size() > 0) {
         def labelName = apiLabels[0]
@@ -62,7 +62,6 @@ withPipeline(type, product, component) {
 
   onMaster() {
     env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
-    env.DATA_STORE_URL_BASE="http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
