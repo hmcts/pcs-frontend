@@ -51,9 +51,12 @@ export const step: StepDefinition = createFormStep({
     // Pull dynamic claimantName from CCD - check multiple sources for robustness
     const claimantName = getClaimantName(req);
 
-    // TO DO: Retrieve amount from CCD
-    const amount = (req.session?.ccdCase?.data?.rentArrearsAmountOnStatement as number) || 3250.0;
-    const rentArrearsAmount = currency(amount);
+    // Retrieve rent arrears amount from CCD case data
+    // rentArrears_Total is stored in pence (e.g., 350000 = £3,500.00)
+    const caseData = req.res?.locals.validatedCase?.data;
+    const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
+    const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
+    const rentArrearsAmount = currency(amountInPounds);
 
     const t = getTranslationFunction(req, 'rent-arrears-dispute', ['common']);
 
