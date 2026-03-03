@@ -58,13 +58,15 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterDateOfBirthDetails(defendantData: actionRecord) {
-    await performActions(
-      'Defendant Date of Birth Entry',
-      ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
-      ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
-      ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear],
-      ['clickButton', dateOfBirth.saveAndContinueButton]
-    );
+    if (defendantData?.dobDay && defendantData?.dobMonth && defendantData?.dobYear) {
+      await performActions(
+        'Defendant Date of Birth Entry',
+        ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
+        ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
+        ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear]
+      );
+    }
+    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
   }
 
   private async confirmDefendantDetails(confirmDefendantName: actionRecord) {
@@ -138,7 +140,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: noticeDetails.didClaimantGiveYouQuestion,
+      question: noticeDetails.getDidClaimantGiveYouQuestion(claimantsName),
       option: noticeGivenData.option,
     });
     await performAction('clickButton', noticeDetails.saveAndContinueButton);

@@ -5,7 +5,7 @@ const mockLogger = {
   debug: jest.fn(),
 };
 
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('@modules/logger', () => ({
   Logger: {
     getLogger: jest.fn(() => mockLogger),
   },
@@ -46,6 +46,7 @@ describe('caseReferenceParamMiddleware', () => {
     mockReq = {
       params: {},
       session: {} as unknown as Request['session'],
+      originalUrl: '/case/1234567890123456/some-page',
     };
 
     mockRes = {
