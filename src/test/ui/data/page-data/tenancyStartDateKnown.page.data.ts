@@ -4,7 +4,7 @@ import { convertDateFormat } from './noticeDateKnown.page.data';
 export const tenancyStartDateKnown = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
-  detailsGivenByParagraph: (claimantName: string): string => {
+  getDetailsGivenByParagraph:(claimantName: string): string => {
     return `Details given by : ${claimantName} `;
   },
   yourTenancyOccupationContractOrLicenceDateParagraph: `Your tenancy, occupation contract or licence began on ${convertDateFormat(submitCaseApiData.submitCasePayload.tenancy_TenancyLicenceDate)}`,
@@ -22,8 +22,6 @@ export const tenancyStartDateKnown = {
   saveForLaterButton: 'Save for later',
   signOutLink: 'Sign out',
   cymraegLink: 'Cymraeg',
-  //errorValidation: 'YES',
-  //errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
   errorValidationHeader: 'There is a problem',
   selectIfTheseTenancyDetailsAreCorrectErrorMessage:
     'Select if these tenancy, licence or occupation contract details are correct',
