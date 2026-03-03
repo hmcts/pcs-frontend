@@ -857,6 +857,15 @@ describe('formBuilder', () => {
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);
+        const res = {
+          redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
+        } as unknown as Response;
+
         const req = createMockRequest({
           body: {
             action: 'saveForLater',
@@ -865,12 +874,8 @@ describe('formBuilder', () => {
           session: {
             ccdCase: { id: '1765881343803991' },
           },
+          res, // Link the response to the request
         } as unknown as Request);
-        const res = {
-          redirect: jest.fn(),
-          status: jest.fn().mockReturnThis(),
-          render: jest.fn(),
-        } as unknown as Response;
 
         expect(step.postController?.post).toBeDefined();
         await step.postController!.post(
@@ -880,10 +885,10 @@ describe('formBuilder', () => {
         );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
       });
 
-      it('should redirect to /dashboard when ccdId not available for saveForLater', async () => {
+      it('should redirect to home when ccdId not available for saveForLater', async () => {
         mockValidateForm.mockReturnValueOnce({});
 
         const step = createFormStep(baseConfig);
@@ -906,7 +911,7 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1234567890123456');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/');
       });
 
       it('should show validation errors when saveForLater is clicked with invalid data', async () => {

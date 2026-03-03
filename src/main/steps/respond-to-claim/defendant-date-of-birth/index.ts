@@ -19,7 +19,7 @@ export const step: StepDefinition = createFormStep({
       legendClasses: 'govuk-fieldset__legend--l govuk-!-margin-bottom-9',
       name: 'dateOfBirth',
       type: 'date',
-      required: true,
+      required: false,
       noFutureDate: true,
       translationKey: {
         label: 'dateOfBirthLabel',

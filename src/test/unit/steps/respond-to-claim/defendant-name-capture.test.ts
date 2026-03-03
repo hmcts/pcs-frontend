@@ -100,7 +100,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
         pageTitle: 'Your name',
         heading: 'Whats your name?',
         caption: 'Respond to a property possession claim',
-        dashboardUrl: '/dashboard/1234567890123456',
+        dashboardUrl: null,
         cancel: 'Cancel',
         backUrl: '/previous-step',
         fields: expect.any(Array),
