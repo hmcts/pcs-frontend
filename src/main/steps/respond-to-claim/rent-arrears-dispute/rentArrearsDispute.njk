@@ -15,12 +15,12 @@
   <form method="post" action="{{ url }}" novalidate>
 
     <div class="govuk-button-group">
-      {{ govukButton({ 
-        text: continue,
+      {{ govukButton({
+        text: t('buttons.continue', { ns: 'common' }),
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
-      {{ govukButton({ 
-        text: saveForLater,
+      {{ govukButton({
+        text: t('buttons.saveForLater', { ns: 'common' }),
         classes: 'govuk-button--secondary',
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
