@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -9,6 +8,8 @@ import { getCommonTranslations, getRequestLanguage } from '../i18n';
 import { stepNavigation } from './flow';
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
 import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
+
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('controllerFactory');
 
