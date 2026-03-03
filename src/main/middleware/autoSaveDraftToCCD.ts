@@ -159,6 +159,37 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
     frontendField: 'hadLegalAdvice',
     valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
   },
+  'defendant-date-of-birth': {
+    backendPath: 'possessionClaimResponse.defendantResponses',
+    frontendFields: ['day', 'month', 'year'],
+    valueMapper: dateToISO('dateOfBirth'),
+  },
+  'defendant-name-capture': {
+    backendPath: 'possessionClaimResponse.defendantContactDetails.party',
+    frontendFields: ['firstName', 'lastName'],
+    valueMapper: passThrough(['firstName', 'lastName']),
+  },
+  'defendant-name-confirmation': {
+    backendPath: 'possessionClaimResponse.defendantContactDetails.party',
+    frontendFields: ['firstName', 'lastName', 'nameConfirmation'],
+    valueMapper: (formData: FormFieldValue) => {
+      const data = formData as Record<string, unknown>;
+      const result: Record<string, unknown> = {};
+
+      // Only save if user selected "no" (correcting the name)
+      if (data.nameConfirmation === 'no') {
+        if (data.firstName) {
+          result.firstName = data.firstName;
+        }
+        if (data.lastName) {
+          result.lastName = data.lastName;
+        }
+      }
+      // If user selected "yes", name already correct - don't save
+
+      return result;
+    },
+  },
 };
 
 /** Converts dot-path to nested object (e.g., 'a.b.c' → { a: { b: { c: value } } }) */

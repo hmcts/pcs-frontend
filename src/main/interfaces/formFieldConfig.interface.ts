@@ -52,6 +52,8 @@ export interface FormFieldConfig {
   // Pre-processed component configuration for template rendering
   component?: Record<string, unknown>;
   componentType?: ComponentType;
+  // Field value (used for prepopulation from CCD)
+  value?: unknown;
   // Cross-field validation function
   // Returns error message string if validation fails, undefined if valid
   validate?: (
@@ -78,10 +80,10 @@ export interface TranslationKeys {
 }
 
 export type BuiltFormContent = {
-  fields: {
+  fields: (FormFieldConfig & {
     componentType?: string;
     component?: Record<string, unknown>;
-  }[];
+  })[];
   errorSummary?: unknown;
   errors?: Record<string, string>;
   [key: string]: unknown;

@@ -17,6 +17,28 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     contactUs: 'contactUs',
   },
+  extendGetContent: async (req, formContent) => {
+    // Read from CCD (fresh data via res.locals.validatedCase)
+    const caseData = req.res?.locals.validatedCase?.data;
+    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
+    const existingFirstName = party?.firstName;
+    const existingLastName = party?.lastName;
+
+    // Only prepopulate on GET (not POST with validation errors)
+    if (!req.body?.firstName && (existingFirstName || existingLastName)) {
+      formContent.fields = formContent.fields.map(field => {
+        if (field.name === 'firstName' && existingFirstName) {
+          return { ...field, value: existingFirstName };
+        }
+        if (field.name === 'lastName' && existingLastName) {
+          return { ...field, value: existingLastName };
+        }
+        return field;
+      });
+    }
+
+    return formContent;
+  },
   fields: [
     {
       name: 'firstName',
