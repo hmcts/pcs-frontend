@@ -1,14 +1,16 @@
+import { submitCaseApiData } from '../api-data';
+
 export const rentArrears = {
   mainHeader: 'Rent arrears',
   rentArrearsHintText:
-    'Rent arrears are money you owe in rent payments. \n' +
+    `Rent arrears are money you owe in rent payments. \n' +
     '\n' +
-    'When making their claim, Treetops Housing had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.\n' +
+    'When making their claim, ${submitCaseApiData.submitCasePayloadAssuredRentNoticeDate.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.\n' +
     '\n' +
-    'The rent statement will have been included in the pack you received in the post letting you know a claim had been made against you, and is also available to view from ‘View the claim’ on your case overview.',
+    'The rent statement will have been included in the pack you received in the post letting you know a claim had been made against you, and is also available to view from ‘View the claim’ on your case overview.`,
   saveAndContinueButton: 'Save and continue',
-  amountYouOweParagraph: 'Amount you owe in rent arrears given by Treetops Housing:',
-  amountParagraph: '£3250.00',
+  amountYouOweParagraph: `Amount you owe in rent arrears given by ${submitCaseApiData.submitCasePayloadAssuredRentNoticeDate.claimantName}:`,
+  amountParagraph: `${submitCaseApiData.submitCasePayloadAssuredRentNoticeDate.rentArrears_Total}`,
   rentAmountTextInput: '1000.00',
   incorrectFormatTextInput: '1000',
   negativeTextInput: '-100.00',

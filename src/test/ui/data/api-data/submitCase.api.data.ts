@@ -169,5 +169,119 @@ export const submitCaseApiData = {
       agreementClaimant: ['BELIEVE_TRUE'],
     },
   },
+  submitCasePayloadAssuredRentNoticeDate:{
+    legislativeCountry: 'England',
+    claimantType: {
+      value: {
+        code: 'PROVIDER_OF_SOCIAL_HOUSING',
+        label: 'Registered provider of social housing'
+      },
+      list_items: [
+        {
+          code: 'PRIVATE_LANDLORD',
+          label: 'Private landlord'
+        },
+        {
+          code: 'PROVIDER_OF_SOCIAL_HOUSING',
+          label: 'Registered provider of social housing'
+        },
+        {
+          code: 'MORTGAGE_LENDER',
+          label: 'Mortgage lender'
+        },
+        {
+          code: 'OTHER',
+          label: 'Other'
+        }
+      ],
+      valueCode: 'PROVIDER_OF_SOCIAL_HOUSING'
+    },
+    claimAgainstTrespassers: 'NO',
+    orgNameFound: 'Yes',
+    claimantName: 'Possession Claims Solicitor Org',
+    isClaimantNameCorrect: 'YES',
+    claimantContactEmail: 'pcs-solicitor1@test.com',
+    isCorrectClaimantContactEmail: 'YES',
+    orgAddressFound: 'Yes',
+    organisationAddress: {
+      AddressLine1: 'Ministry Of Justice',
+      AddressLine2: 'Seventh Floor 102 Petty France',
+      PostTown: 'London',
+      PostCode: 'SW1H 9AJ',
+      Country: 'United Kingdom'
+    },
+    formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
+    isCorrectClaimantContactAddress: 'YES',
+    claimantProvidePhoneNumber: 'NO',
+    addAnotherDefendant: 'NO',
+    tenancy_TypeOfTenancyLicence: 'ASSURED_TENANCY',
+    tenancy_TenancyLicenceDate: '2020-05-20',
+    defendant1: {
+      nameKnown: 'YES',
+      firstName: 'Jermiah',
+      lastName: 'Fisher',
+      addressKnown: 'YES',
+      addressSameAsPossession: 'YES'
+    },
+    tenancy_TenancyLicenceDocuments: [],
+    claimDueToRentArrears: 'Yes',
+    rentArrears_RentArrearsGrounds: [
+      'RENT_ARREARS_GROUND10'
+    ],
+    hasOtherAdditionalGrounds: 'No',
+    preActionProtocolCompleted: 'YES',
+    mediationAttempted: 'NO',
+    settlementAttempted: 'NO',
+    noticeServed: 'Yes',
+    notice_NoticeServiceMethod: 'FIRST_CLASS_POST',
+    notice_NoticePostedDate: '2021-05-30',
+    notice_NoticeDocuments: [],
+    rentDetails_CurrentRent: '100000',
+    rentDetails_Frequency: 'MONTHLY',
+    rentDetails_CalculatedDailyCharge: 3285,
+    rentSectionPaymentFrequency: 'MONTHLY',
+    rentDetails_FormattedCalculatedDailyCharge: '£32.85',
+    rentDetails_PerDayCorrect: 'YES',
+    showRentArrearsPage: 'Yes',
+    rentArrears_StatementDocuments: [
+      {
+        id: '49b369ca-3387-4a6c-98f4-6001bed70519',
+        value: {
+          document_url: 'http://dm-store-aat.service.core-compute-aat.internal/documents/349f2bf9-9fb6-484c-9389-b5a3431a404a',
+          document_binary_url: 'http://dm-store-aat.service.core-compute-aat.internal/documents/349f2bf9-9fb6-484c-9389-b5a3431a404a/binary',
+          document_filename: 'Screenshot 2026-01-29 at 09.49.45.png',
+          document_hash: '9e3425d81e0eb444c5638c066e78af41094568cb5894432d4c167f279dc740bf'
+        }
+      }
+    ],
+    rentArrears_Total: '500000',
+    rentArrears_ThirdPartyPayments: 'NO',
+    arrearsJudgmentWanted: 'NO',
+    claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
+    claimantCircumstancesSelect: 'NO',
+    hasDefendantCircumstancesInfo: 'NO',
+    suspensionOfRTB_ShowHousingActsPage: 'No',
+    demotionOfTenancy_ShowHousingActsPage: 'No',
+    suspensionToBuyDemotionOfTenancyPages: 'No',
+    alternativesToPossession: [],
+    claimingCostsWanted: 'NO',
+    additionalReasonsForPossession: {
+      hasReasons: 'NO'
+    },
+    hasUnderlesseeOrMortgagee: 'NO',
+    wantToUploadDocuments: 'NO',
+    applicationWithClaim: 'NO',
+    languageUsed: 'ENGLISH',
+    completionNextStep: 'SUBMIT_AND_PAY_NOW',
+    statementOfTruth: {
+      completedBy: 'CLAIMANT',
+      fullNameClaimant: 'Claimant fullname',
+      positionClaimant: 'sdjhsk',
+      agreementClaimant: [
+        'BELIEVE_TRUE'
+      ]
+    }
+  },
+
   submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };
