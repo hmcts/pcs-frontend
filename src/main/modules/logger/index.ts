@@ -1,9 +1,8 @@
+import util from 'util';
+
 import winston from 'winston';
 
-const { combine, label, timestamp, colorize, json, printf, splat } = winston.format;
-const splatSymbol = Symbol.for('splat');
-
-const container = new winston.Container();
+const container = new winston.Container({});
 
 function stringifyLogValue(value: unknown): string {
   if (typeof value === 'string') {
@@ -22,77 +21,53 @@ function stringifyLogValue(value: unknown): string {
   }
 }
 
-function extractMergedStringMetadata(metadata: Record<string, unknown>): string | null {
-  const numericKeys = Object.keys(metadata)
-    .filter(key => /^\d+$/.test(key))
-    .sort((a, b) => Number(a) - Number(b));
-  if (numericKeys.length === 0 || numericKeys[0] !== '0') {
-    return null;
+function formatMetadata(metadata: unknown): string {
+  if (metadata === null || typeof metadata === 'undefined') {
+    return '';
   }
-
-  const characters: string[] = [];
-  for (let index = 0; index < numericKeys.length; index += 1) {
-    const key = String(index);
-    if (numericKeys[index] !== key) {
-      return null;
-    }
-
-    const character = metadata[key];
-    if (typeof character !== 'string' || character.length !== 1) {
-      return null;
-    }
-
-    characters.push(character);
+  if (Array.isArray(metadata)) {
+    const rendered = metadata.map(stringifyLogValue).filter(Boolean).join(' ');
+    return rendered ? ` ${rendered}` : '';
   }
-
-  numericKeys.forEach(key => {
-    delete metadata[key];
-  });
-
-  return characters.join('');
+  if (typeof metadata === 'object') {
+    const keys = Object.keys(metadata as Record<string, unknown>);
+    if (keys.length === 0) {
+      return '';
+    }
+  }
+  return ` ${stringifyLogValue(metadata)}`;
 }
 
-const myFormat = printf((info: Record<string, unknown> & { [key: symbol]: unknown }) => {
-  const { level, message, timestamp: logTimestamp, ...rawMetadata } = info;
-  const metadata = { ...rawMetadata };
-  const additionalValues = Array.isArray(info[splatSymbol]) ? (info[splatSymbol] as unknown[]) : [];
-  const mergedStringValue = extractMergedStringMetadata(metadata);
-  const allAdditionalValues = mergedStringValue ? [mergedStringValue, ...additionalValues] : additionalValues;
-  const jsonMetadata = JSON.stringify(metadata);
-  const deduplicatedExtraValues = allAdditionalValues.filter(value => {
-    const stringifiedValue = stringifyLogValue(value);
-    if (stringifiedValue.length === 0) {
-      return false;
-    }
-    if (typeof message === 'string' && message.includes(stringifiedValue)) {
-      return false;
-    }
-    if (jsonMetadata !== '{}' && stringifiedValue === jsonMetadata) {
-      return false;
-    }
-    return true;
-  });
-  const extraValues =
-    deduplicatedExtraValues.length > 0 ? ` ${deduplicatedExtraValues.map(stringifyLogValue).join(' ')}` : '';
-  const extraMetadata = jsonMetadata !== '{}' ? ` ${jsonMetadata}` : '';
-  return `${logTimestamp} ${level}: ${message}${extraValues}${extraMetadata}`;
-});
+function createFormatter(name: string): winston.TransportOptions['formatter'] {
+  return options => {
+    const timestamp =
+      typeof options.timestamp === 'function'
+        ? String(options.timestamp())
+        : typeof options.timestamp === 'string'
+          ? options.timestamp
+          : new Date().toISOString();
+    const message = typeof options.message === 'string' ? options.message : util.format('%s', options.message ?? '');
+    const metadata = formatMetadata(options.meta);
+    return `${timestamp} - ${options.level}: [${name}] ${message}${metadata}`;
+  };
+}
 
-function transport(name: string) {
+function transport(name: string): winston.TransportInstance {
   return new winston.transports.Console({
     level: (process.env.LOG_LEVEL || 'INFO').toLowerCase(),
-    format: combine(
-      label({ label: name, message: true }),
-      timestamp(),
-      splat(),
-      colorize({ all: true }),
-      process.env.JSON_PRINT ? json() : myFormat
-    ),
+    colorize: process.env.JSON_PRINT ? false : 'all',
+    json: Boolean(process.env.JSON_PRINT),
+    timestamp: () => new Date().toISOString(),
+    formatter: createFormatter(name),
   });
 }
 
 export class Logger {
-  public static getLogger(name: string): ReturnType<typeof container.add> {
+  public static getLogger(name: string): winston.LoggerInstance {
+    if (container.has(name)) {
+      return container.get(name);
+    }
+
     return container.add(name, { transports: [transport(name)] });
   }
 }

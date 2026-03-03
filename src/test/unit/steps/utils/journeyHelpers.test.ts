@@ -102,7 +102,6 @@ describe('getPreviousPageForArrears', () => {
     });
   });
 
-
   describe('Priority 4: No notice served (default fallback)', () => {
     it('returns tenancy-type-details when notice not served', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
@@ -192,11 +191,11 @@ describe('getPreviousPageForArrears', () => {
     });
 
     it('handles no notice served scenario', async () => {
-      // Real scenario: CCD has notice=No, goes straight to rent-arrears-dispute from tenancy-details
+      // Real scenario: CCD has notice=No, goes straight to rent-arrears-dispute from tenancy-type-details
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-type-details');
     });
   });
 });

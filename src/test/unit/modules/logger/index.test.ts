@@ -18,11 +18,20 @@ describe('logger module', () => {
     transportLogSpy = jest
       .spyOn(winston.transports.Console.prototype, 'log')
       .mockImplementation((...args: unknown[]) => {
+        const next = args.find((arg): arg is () => void => typeof arg === 'function');
+
+        if (typeof args[0] === 'string' && typeof args[1] === 'string') {
+          const meta = args[2];
+          formattedLines.push(`${args[1]}${meta ? ` ${JSON.stringify(meta)}` : ''}`);
+          next?.();
+          return true;
+        }
+
         const info = (args[0] ?? {}) as Record<PropertyKey, unknown>;
-        const next = args[1] as (() => void) | undefined;
         const message = typeof info[messageSymbol] === 'string' ? info[messageSymbol] : info.message;
         formattedLines.push(String(message ?? ''));
         next?.();
+        return true;
       });
   });
 
