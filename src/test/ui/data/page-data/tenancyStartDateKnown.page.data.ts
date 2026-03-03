@@ -4,7 +4,7 @@ import { convertDateFormat } from './noticeDateKnown.page.data';
 export const tenancyStartDateKnown = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
-  getDetailsGivenByParagraph:(claimantName: string): string => {
+  getDetailsGivenByParagraph: (claimantName: string): string => {
     return `Details given by : ${claimantName} `;
   },
   yourTenancyOccupationContractOrLicenceDateParagraph: `Your tenancy, occupation contract or licence began on ${convertDateFormat(submitCaseApiData.submitCasePayload.tenancy_TenancyLicenceDate)}`,
