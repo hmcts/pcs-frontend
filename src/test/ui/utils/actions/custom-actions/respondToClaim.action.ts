@@ -13,6 +13,7 @@ import {
   noticeDetails,
   paymentInterstitial,
   repaymentsMade,
+  tenancyOccupationContractLicenseAgreement,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -228,6 +229,18 @@ export class RespondToClaimAction implements IAction {
         text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
       });
     }
+    await performAction('clickRadioButton', {
+      question: tenancyOccupationContractLicenseAgreement.isTenancyTypeCorrectQuestion,
+      option: tenancyTypeDetails.tenancyOption,
+    });
+    if (tenancyTypeDetails.tenancyOption === 'no') {
+      await performAction(
+        'inputText',
+        tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeHiddenTextLabel,
+        tenancyTypeDetails.tenancyTypeInfo
+      );
+    }
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
   }
 }
 

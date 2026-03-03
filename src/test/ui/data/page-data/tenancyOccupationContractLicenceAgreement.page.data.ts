@@ -20,6 +20,8 @@ export const tenancyOccupationContractLicenseAgreement = {
     ' agreement'
   ),
   isTenancyTypeCorrectQuestion: 'Is the tenancy, occupation contract or licence agreement type correct?',
+  giveCorrectTenancyTypeHiddenTextLabel: 'Give the correct tenancy, occupation contract or licence type',
+  giveCorrectTenancyTypeTextInput: 'Short term tenancy',
   imNotSureRadioOption: 'I’m not sure',
   noRadioOption: 'No',
   orHintText: 'or',
