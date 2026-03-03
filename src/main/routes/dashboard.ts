@@ -120,15 +120,6 @@ export default function dashboardRoutes(app: Application): void {
   });
 
   dashboardRouter.get('/test-expired-token', async (req: Request, res: Response) => {
-    // eslint-disable-next-line no-console
-    console.log('req.session', JSON.stringify(req.session, null, 2));
-
-    logger.info('Testing expired token', {
-      event: 'testing_expired_token',
-      returnTo: req.session.returnTo,
-      originalUrl: req.originalUrl,
-      userId: req.session?.user?.uid,
-    });
     const user = req.session?.user;
     if (user) {
       // decode the access token and set the expiry to a past date, then set the user.accessToken to the new token
@@ -142,8 +133,6 @@ export default function dashboardRoutes(app: Application): void {
         event: 'setting_access_token_to_expired_token',
         userId: user.uid,
         path: req.originalUrl,
-        accessToken: user.accessToken,
-        decoded,
       });
       res.redirect('/dashboard');
     } else {

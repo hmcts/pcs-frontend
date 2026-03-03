@@ -127,6 +127,12 @@ export const oidcMiddleware: RequestHandler = async (
 
           const refreshResult = await oidcModule.refreshUserTokens(refreshToken);
 
+          logger.info('Token refresh successful', {
+            event: 'token_refresh_success',
+            userId: user.uid,
+            path: req.originalUrl,
+          });
+
           // Update session with new tokens
           req.session.user = {
             ...user,
