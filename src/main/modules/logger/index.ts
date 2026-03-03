@@ -65,7 +65,9 @@ function createTextFormat(name: string): winston.Logform.Format {
     winston.format.errors({ stack: true }),
     normaliseInfo(),
     winston.format.timestamp(),
-    winston.format.printf(info => `${info.timestamp} - ${info.level}: [${name}] ${info.message}${formatMetadata(info.metadata)}`)
+    winston.format.printf(
+      info => `${info.timestamp} - ${info.level}: [${name}] ${info.message}${formatMetadata(info.metadata)}`
+    )
   );
 }
 
