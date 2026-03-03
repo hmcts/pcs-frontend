@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -10,6 +9,7 @@ import { getDateTranslationKey, validateDateField } from './dateValidation';
 import type { FormError } from './errorUtils';
 
 export { validateCurrencyAmount } from './currencyValidation';
+import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
