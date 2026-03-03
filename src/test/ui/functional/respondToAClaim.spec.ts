@@ -179,7 +179,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
+      radioOption: correspondenceAddress.noRadioOption,
+      postcode: correspondenceAddress.englandPostcodeTextInput,
+      addressIndex: correspondenceAddress.addressIndex,
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
@@ -553,8 +555,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
+    await performAction('clickButton', rentArrearsDispute.continueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickButton', paymentInterstitial.continueButton);
