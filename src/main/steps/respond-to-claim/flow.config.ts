@@ -49,6 +49,7 @@ export const flowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have',
     'end-now',
     'contact-preferences',
+    'installment-payments',
   ],
   steps: {
     'start-now': {
@@ -259,11 +260,23 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'repayments-agreed',
     },
     'repayments-agreed': {
+      routes: [
+        {
+          condition: async (req: Request) => req.session?.formData?.['repayments-agreed']?.repaymentsAgreed === 'no',
+          nextStep: 'installment-payments', //create this page?
+        },
+        {
+          condition: async (req: Request) =>
+            req.session?.formData?.['repayments-agreed']?.repaymentsAgreed === 'yes' ||
+            req.session?.formData?.['repayments-agreed']?.repaymentsAgreed === 'imNotSure',
+          nextStep: 'your-household-and-circumstances',
+        },
+      ],
       previousStep: 'repayments-made',
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
-      previousStep: 'repayments',
+      previousStep: 'repayments-agreed',
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {
@@ -313,6 +326,10 @@ export const flowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
+    },
+    'installment-payments': {
+      previousStep: 'repayments-agreed',
+      defaultNext: 'your-household-and-circumstances',
     },
   },
 };
