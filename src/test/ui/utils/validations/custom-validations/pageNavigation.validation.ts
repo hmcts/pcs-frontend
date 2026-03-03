@@ -190,8 +190,18 @@ export class PageNavigationValidation implements IValidation {
   static finaliseTest(): void {
     PageNavigationValidation.testCounter++;
 
+    const pagesWithNavigationMethods = new Set<string>();
+
+    for (const pageName of PageNavigationValidation.pagesWithNavigation) {
+      pagesWithNavigationMethods.add(pageName);
+    }
+
+    for (const result of PageNavigationValidation.navigationResults) {
+      pagesWithNavigationMethods.add(result.pageName);
+    }
+
     const totalPages =
-      PageNavigationValidation.pagesWithNavigation.size +
+      pagesWithNavigationMethods.size +
       PageNavigationValidation.missingNavigationMethods.size +
       PageNavigationValidation.missingNavigationFiles.size;
 
@@ -201,19 +211,27 @@ export class PageNavigationValidation implements IValidation {
       return;
     }
 
-    const passedTests = PageNavigationValidation.navigationResults.filter(r => r.passed);
-    const passedPages = [...new Set(passedTests.map(r => r.pageName))];
+    const passedPages = new Set<string>();
+    for (const result of PageNavigationValidation.navigationResults) {
+      if (result.passed) {
+        passedPages.add(result.pageName);
+      }
+    }
+
+    for (const pageName of PageNavigationValidation.pagesPassed) {
+      passedPages.add(pageName);
+    }
 
     console.log(`\n📊 NAVIGATION TESTS SUMMARY (Test #${PageNavigationValidation.testCounter}):`);
     console.log(`   Total pages with navigation tests: ${totalPages}`);
-    console.log(`   Number of pages passed: ${passedPages.length}`);
+    console.log(`   Number of pages passed: ${passedPages.size}`);
     console.log(`   Number of pages failed: 0`);
     console.log(
       `   Missing navigation methods: ${PageNavigationValidation.missingNavigationMethods.size + PageNavigationValidation.missingNavigationFiles.size}`
     );
 
-    if (passedPages.length > 0) {
-      console.log(`   Passed pages: ${passedPages.join(', ')}`);
+    if (passedPages.size > 0) {
+      console.log(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
     }
 
     if (PageNavigationValidation.missingNavigationMethods.size > 0) {
@@ -228,9 +246,9 @@ export class PageNavigationValidation implements IValidation {
       );
     }
 
-    if (passedPages.length > 0) {
+    if (passedPages.size > 0) {
       console.log('\n✅ ALL NAVIGATION TESTS PASSED\n');
-    } else if (PageNavigationValidation.pagesWithNavigation.size > 0) {
+    } else if (pagesWithNavigationMethods.size > 0) {
       console.log('\n⚠️  Navigation files found but no tests performed\n');
     }
 
