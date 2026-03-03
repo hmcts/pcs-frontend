@@ -2,7 +2,13 @@ import util from 'util';
 
 import winston from 'winston';
 
-const container = new winston.Container({});
+const container = new winston.Container();
+const splatSymbol = Symbol.for('splat');
+const reservedKeys = new Set(['level', 'message', 'timestamp', 'metadata']);
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Error);
+}
 
 function stringifyLogValue(value: unknown): string {
   if (typeof value === 'string') {
@@ -38,36 +44,60 @@ function formatMetadata(metadata: unknown): string {
   return ` ${stringifyLogValue(metadata)}`;
 }
 
-function createFormatter(name: string): winston.TransportOptions['formatter'] {
-  return options => {
-    const timestamp =
-      typeof options.timestamp === 'function'
-        ? String(options.timestamp())
-        : typeof options.timestamp === 'string'
-          ? options.timestamp
-          : new Date().toISOString();
-    const message = typeof options.message === 'string' ? options.message : util.format('%s', options.message ?? '');
-    const metadata = formatMetadata(options.meta);
-    return `${timestamp} - ${options.level}: [${name}] ${message}${metadata}`;
-  };
+const normaliseInfo = winston.format(info => {
+  const splatValues = Array.isArray(info[splatSymbol]) ? (info[splatSymbol] as unknown[]) : [];
+  const messageArgs = splatValues.filter(value => !isPlainObject(value));
+  const metadataArgs = splatValues.filter(isPlainObject);
+
+  if (typeof info.message === 'string' && messageArgs.length > 0) {
+    info.message = util.format(info.message, ...messageArgs);
+  }
+
+  const extraFields = Object.fromEntries(Object.entries(info).filter(([key]) => !reservedKeys.has(key)));
+  const metadata = Object.assign({}, ...metadataArgs, extraFields);
+  info.metadata = Object.keys(metadata).length > 0 ? metadata : undefined;
+
+  return info;
+});
+
+function createTextFormat(name: string): winston.Logform.Format {
+  return winston.format.combine(
+    winston.format.errors({ stack: true }),
+    normaliseInfo(),
+    winston.format.timestamp(),
+    winston.format.printf(info => `${info.timestamp} - ${info.level}: [${name}] ${info.message}${formatMetadata(info.metadata)}`)
+  );
 }
 
-function transport(name: string): winston.TransportInstance {
+function createJsonFormat(name: string): winston.Logform.Format {
+  return winston.format.combine(
+    winston.format.errors({ stack: true }),
+    normaliseInfo(),
+    winston.format.timestamp(),
+    winston.format(info => {
+      info.logger = name;
+      return info;
+    })(),
+    winston.format.json()
+  );
+}
+
+function transport(name: string): winston.transport {
   return new winston.transports.Console({
-    level: (process.env.LOG_LEVEL || 'INFO').toLowerCase(),
-    colorize: process.env.JSON_PRINT ? false : 'all',
-    json: Boolean(process.env.JSON_PRINT),
-    timestamp: () => new Date().toISOString(),
-    formatter: createFormatter(name),
+    level: (process.env.LOG_LEVEL || 'info').toLowerCase(),
+    format: process.env.JSON_PRINT ? createJsonFormat(name) : createTextFormat(name),
   });
 }
 
 export class Logger {
-  public static getLogger(name: string): winston.LoggerInstance {
+  public static getLogger(name: string): winston.Logger {
     if (container.has(name)) {
       return container.get(name);
     }
 
-    return container.add(name, { transports: [transport(name)] });
+    return container.add(name, {
+      level: (process.env.LOG_LEVEL || 'info').toLowerCase(),
+      transports: [transport(name)],
+    });
   }
 }
