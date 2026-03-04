@@ -176,8 +176,10 @@ Missing elements: Submit button, Continue link
 
 ## 9. Functional test automation for pcs-frontend
 
+### Categories covered:
+
 - Page content validation
 - Error Message Validation
 - Page Navigation tests
 
-Please follow this confluence page - https://tools.hmcts.net/confluence/x/14FLd
+Please follow this confluence page for detailed instructions and guidelines- https://tools.hmcts.net/confluence/x/14FLd
