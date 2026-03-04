@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
+import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
 type NavigationTestResult = {
@@ -26,16 +27,34 @@ export class PageNavigationValidation implements IValidation {
   private static shouldThrowError = true;
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
+  private static currentPageUrl: string = '';
 
-  async validate(page: Page, validation: string, fieldName: string): Promise<void> {
+  async validate(page: Page, validation: string, navigateButton: string, fieldName: string): Promise<void> {
+    PageNavigationValidation.currentPageUrl = page.url();
+    if (navigateButton) {
+      if (navigateButton.includes('Back')) {
+        await performAction('clickLink', navigateButton);
+      } else {
+        await performAction('clickButton', navigateButton);
+      }
+    }
     if (validation !== 'mainHeader' && validation !== 'pageNavigation') {
+      if (PageNavigationValidation.currentPageUrl) {
+        await performAction('navigateToUrl', PageNavigationValidation.currentPageUrl);
+      }
       return;
     }
 
-    if (validation === 'mainHeader') {
-      await this.validateMainHeader(page, fieldName);
-    } else if (validation === 'pageNavigation') {
-      await this.validatePageNavigation(page, fieldName);
+    try {
+      if (validation === 'mainHeader') {
+        await this.validateMainHeader(page, fieldName);
+      } else if (validation === 'pageNavigation') {
+        await this.validatePageNavigation(page, fieldName);
+      }
+    } finally {
+      if (PageNavigationValidation.currentPageUrl) {
+        await performAction('navigateToUrl', PageNavigationValidation.currentPageUrl);
+      }
     }
   }
 
@@ -374,5 +393,6 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.pagesPassed.clear();
     PageNavigationValidation.missingNavigationMethods.clear();
     PageNavigationValidation.missingNavigationFiles.clear();
+    PageNavigationValidation.currentPageUrl = '';
   }
 }
