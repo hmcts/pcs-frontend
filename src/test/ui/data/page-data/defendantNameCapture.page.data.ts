@@ -9,13 +9,12 @@ export const defendantNameCapture = {
   cymraegLink: 'Cymraeg',
   firstNameInputText: 'John',
   lastNameInputText: 'Doe',
+  thereIsAProblemErrorMessageHeader: 'There is a problem',
+  enterYourFirstNameErrorMessage: 'Enter your first name',
+  enterYourLastNameErrorMessage: 'Enter your last name',
+  enterFirstNameMaxLengthErrorMessage: 'First name must be 60 characters or less',
+  enterLastNameMaxLengthErrorMessage: 'Last name must be 60 characters or less',
   errorValidation: 'YES',
-  errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
+  errorValidationType: { input: 'textField', radio: 'radioOptions' },
   errorValidationHeader: 'There is a problem',
-  errorValidationField: {
-    errorTextField: [
-      { type: 'empty', label: 'First name', errMessage: 'Enter your first name' },
-      { type: 'empty', label: 'Last name', errMessage: 'Enter your last name' },
-    ],
-  },
 };
