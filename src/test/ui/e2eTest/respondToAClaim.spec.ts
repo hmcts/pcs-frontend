@@ -107,7 +107,6 @@ test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
       tenancyType: submitCaseApiData.submitCasePayloadOtherTenancyDate.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyOccupationContractLicenseAgreement.yesRadioOption,
     });
-
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
