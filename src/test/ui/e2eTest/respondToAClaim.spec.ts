@@ -51,7 +51,7 @@ test.afterEach(async () => {
   PageNavigationValidation.finaliseTest();
 });
 
-test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
+test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
