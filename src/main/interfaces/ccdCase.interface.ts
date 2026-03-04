@@ -43,7 +43,7 @@ export interface PossessionClaimResponse {
   };
   defendantResponses?: {
     oweRentArrears?: 'YES' | 'NO' | 'NOT_SURE';
-    rentArrearsAmount?: number;
+    rentArrearsAmount?: string;
   };
 }
 

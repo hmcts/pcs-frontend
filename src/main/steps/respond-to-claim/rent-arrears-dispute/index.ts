@@ -19,9 +19,8 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async (req: Request) => {
     const oweRentArrearsRaw = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
-    const rentArrearsAmountRaw = req.body?.rentArrearsAmountCorrection as string | undefined;
+    const rentArrearsAmountRaw = req.body?.['rentArrears.rentArrearsAmountCorrection'] as string | undefined;
 
-    // Convert lowercase enum to uppercase format expected by CCD (YES, NO, NOT_SURE)
     const oweRentArrears =
       oweRentArrearsRaw === 'yes'
         ? 'YES'
@@ -31,11 +30,12 @@ export const step: StepDefinition = createFormStep({
             ? 'NOT_SURE'
             : undefined;
 
-    // Convert currency from pounds to pence (e.g., "155.00" -> 15500)
-    let rentArrearsAmount: number | undefined;
-    if (rentArrearsAmountRaw) {
+    let rentArrearsAmount: string | undefined;
+    if (oweRentArrearsRaw === 'no' && rentArrearsAmountRaw) {
       const amountInPounds = parseFloat(rentArrearsAmountRaw.replace(/,/g, ''));
-      rentArrearsAmount = Math.round(amountInPounds * 100);
+      if (!Number.isNaN(amountInPounds)) {
+        rentArrearsAmount = String(Math.round(amountInPounds * 100));
+      }
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
@@ -45,14 +45,11 @@ export const step: StepDefinition = createFormStep({
       },
     };
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, true);
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
   },
   extendGetContent: (req: Request) => {
-    // Pull dynamic claimantName from CCD - check multiple sources for robustness
     const claimantName = getClaimantName(req);
 
-    // Retrieve rent arrears amount from CCD case data
-    // rentArrears_Total is stored in pence (e.g., 350000 = £3,500.00)
     const caseData = req.res?.locals.validatedCase?.data;
     const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
     const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
@@ -109,7 +106,6 @@ export const step: StepDefinition = createFormStep({
                 inputmode: 'text',
                 spellcheck: false,
               },
-              // Reusable currency validation with page-specific error messages
               validate: value =>
                 validateCurrencyAmount(value, {
                   max: 1000000000,
