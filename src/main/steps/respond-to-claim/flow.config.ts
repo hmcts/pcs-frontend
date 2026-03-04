@@ -150,7 +150,17 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'tenancy-type-details',
     },
     'tenancy-date-unknown': {
-      defaultNext: 'confirmation-of-notice-given',
+      routes: [
+        {
+          condition: (req: Request) => isNoticeServed(req),
+          nextStep: 'confirmation-of-notice-given',
+        },
+        {
+          condition: (req: Request) => isRentArrearsClaim(req),
+          nextStep: 'rent-arrears-dispute',
+        },
+      ],
+      defaultNext: 'non-rent-arrears-dispute',
       previousStep: 'tenancy-type-details',
     },
     'confirmation-of-notice-given': {
