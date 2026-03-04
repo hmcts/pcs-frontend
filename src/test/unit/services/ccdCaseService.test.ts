@@ -21,6 +21,9 @@ const mockUrl = 'http://ccd.example.com';
   if (key === 'ccd.caseTypeId') {
     return 'PCS';
   }
+  if (key === 'api.url') {
+    return mockUrl;
+  }
 });
 
 describe('ccdCaseService', () => {
@@ -249,5 +252,70 @@ describe('ccdCaseService', () => {
       mockGet.mockRejectedValue({ response: { status: 400 } });
       await expect(ccdCaseService.getExistingCaseData(accessToken, '')).rejects.toThrow(HTTPError);
     });
+  });
+});
+
+describe('updateCase', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should throw HTTPError if case id is missing', async () => {
+    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
+    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(
+      'Cannot UPDATE draft, CCD Case Not found'
+    );
+  });
+
+  it('should call mid-event draft save endpoint and return response data', async () => {
+    const caseId = '1234567890123456';
+    const mockData = { defendantName: 'John Doe' };
+
+    const mockResponse = {
+      id: caseId,
+      data: mockData,
+    };
+
+    mockPost.mockResolvedValue({
+      data: mockResponse,
+    });
+
+    const result = await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, mockData);
+
+    expect(mockPost).toHaveBeenCalledWith(
+      `${mockUrl}/callbacks/mid-event?page=respondToPossessionDraftSavePage`,
+      {
+        event_id: 'respondPossessionClaim',
+        case_details: {
+          id: caseId,
+          case_type_id: 'PCS',
+          data: mockData,
+        },
+      },
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: `Bearer ${accessToken}`,
+        }),
+      })
+    );
+
+    expect(result).toEqual(mockResponse);
+  });
+
+  it('should throw HTTPError when draft save fails', async () => {
+    const caseId = '1234567890123456';
+
+    mockPost.mockRejectedValue({
+      response: { status: 500 },
+      message: 'Server exploded',
+    });
+
+    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
+      HTTPError
+    );
+
+    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
+      'CCD case service error'
+    );
   });
 });
