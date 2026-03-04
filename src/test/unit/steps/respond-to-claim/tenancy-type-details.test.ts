@@ -6,15 +6,13 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
   buildCcdCaseForPossessionClaimResponse: jest.fn(),
 }));
 
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
+import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 type TestedStep = {
   stepName: string;
   customTemplate: string;
-  beforeRedirect: (req: {
-    body?: Record<string, unknown>;
-  }) => Promise<void>;
+  beforeRedirect: (req: { body?: Record<string, unknown> }) => Promise<void>;
   extendGetContent: (
     req: {
       body?: Record<string, unknown>;
