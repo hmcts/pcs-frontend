@@ -2,7 +2,7 @@
   "secrets": {
     "pcs": {
       "redis-connection-string": "REDIS_CONNECTION_STRING",
-      "app-insights-connection-string": "APPLICATION_INSIGHTS_CONNECTION_STRING",
+      "app-insights-connection-string": "APPLICATIONINSIGHTS_CONNECTION_STRING",
       "pcs-frontend-s2s-secret": "S2S_SECRET",
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET",
       "pcs-frontend-idam-system-username": "IDAM_SYSTEM_USERNAME",

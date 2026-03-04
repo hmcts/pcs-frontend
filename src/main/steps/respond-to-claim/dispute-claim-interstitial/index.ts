@@ -1,9 +1,10 @@
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+
+import { createGetController, createStepNavigation } from '@modules/steps';
 
 const stepName = 'dispute-claim-interstitial';
 const stepNavigation = createStepNavigation(flowConfig);
@@ -24,12 +25,10 @@ export const step: StepDefinition = {
           throw new Error('Translation function not available');
         }
 
-        const claimantNameFromValidatedCase = req.res?.locals?.validatedCase?.data?.possessionClaimResponse
-          ?.claimantOrganisations?.[0]?.value as string | undefined;
-
-        const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
-
-        const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops Housing';
+        // Get claimant name from CCD callback data (res.locals.validatedCase)
+        // Use only data from CCD - no hardcoded fallbacks
+        const claimantName = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
+          ?.value as string | undefined;
 
         return {
           backUrl: await stepNavigation.getBackUrl(req, stepName),

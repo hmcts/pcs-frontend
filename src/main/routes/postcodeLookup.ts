@@ -1,7 +1,8 @@
 import { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware';
-import { getAddressesByPostcode } from '../services/osPostcodeLookupService';
+
+import { getAddressesByPostcode } from '@services/osPostcodeLookupService';
 
 export default function postcodeLookupRoutes(app: Application): void {
   // Auth-protected API endpoint to fetch addresses for a postcode
