@@ -388,5 +388,4 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
-
 });
