@@ -1,8 +1,9 @@
 import type { Request } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+
+import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'defendant-name-confirmation',
@@ -17,10 +18,13 @@ export const step: StepDefinition = createFormStep({
     contactUs: 'contactUs',
   },
   extendGetContent: (req: Request) => {
-    //TODO: get defendant name from CCD case - currently served from LaunchDarkly flag
-    const defendantName = req.session.defendantName ?? '';
-    //TODO: get organisation name from CCD case - placeholder for now
-    const organisationName = 'Treetops';
+    // Get defendant name from CCD case data
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
+    const defendantName = party?.firstName && party?.lastName ? `${party.firstName} ${party.lastName}` : '';
+
+    // Get organisation name from CCD case data
+    const organisationName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
 
     return {
       defendantName,
