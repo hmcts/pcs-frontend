@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express';
 import { Router } from 'express';
 
+import type { CcdCase } from '../interfaces/ccdCase.interface';
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import {
@@ -23,6 +24,37 @@ interface MappedTask {
     text?: string;
     tag?: { text: string; classes?: string };
   };
+}
+
+function getPropertyAddressFromValidatedCase(validatedCase: CcdCase): string | null {
+  const address = (validatedCase.data as { propertyAddress?: unknown })?.propertyAddress as
+    | {
+        AddressLine1?: string;
+        AddressLine2?: string;
+        AddressLine3?: string;
+        PostTown?: string;
+        County?: string;
+        PostCode?: string;
+      }
+    | undefined;
+
+  if (!address) {
+    return null;
+  }
+
+  const formatted = [
+    address.AddressLine1,
+    address.AddressLine2,
+    address.AddressLine3,
+    address.PostTown,
+    address.County,
+    address.PostCode,
+  ]
+    .map(part => (part ?? '').trim())
+    .filter(Boolean)
+    .join(', ');
+
+  return formatted || null;
 }
 
 interface MappedTaskGroup {
@@ -117,7 +149,7 @@ export default function dashboardRoutes(app: Application): void {
 
   // Route: /dashboard/:caseReference (main dashboard page)
   dashboardRouter.get('/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
-    const validatedCase = res.locals.validatedCase;
+    const validatedCase = res.locals.validatedCase as CcdCase | undefined;
 
     if (!validatedCase) {
       logger.error('Dashboard: validatedCase is undefined - middleware not executed');
@@ -127,6 +159,8 @@ export default function dashboardRoutes(app: Application): void {
     }
 
     const caseReferenceNumber = Number(validatedCase.id);
+    const propertyAddress = getPropertyAddressFromValidatedCase(validatedCase);
+    const dashboardCaseReference = toCaseReference16(validatedCase.id);
 
     try {
       const [notifications, taskGroups] = await Promise.all([
@@ -137,6 +171,8 @@ export default function dashboardRoutes(app: Application): void {
       return res.render('dashboard', {
         notifications,
         taskGroups,
+        propertyAddress,
+        dashboardCaseReference,
       });
     } catch (e) {
       logger.error(`Failed to fetch dashboard data for case ${validatedCase.id}. Error was: ${String(e)}`);

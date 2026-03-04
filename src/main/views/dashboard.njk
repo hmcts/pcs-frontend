@@ -3,7 +3,18 @@
 {%- from "components/taskGroup/macro.njk" import taskGroup -%}
 
 {% block content %}
-  <h1 class="govuk-heading-l">Dashboard</h1>
+
+  {% if propertyAddress %}
+    <p class="govuk-heading-m govuk-!-margin-bottom-1">
+      {{ propertyAddress }}
+    </p>
+  {% endif %}
+
+  {% if dashboardCaseReference %}
+    <p class="govuk-body">
+      Case number: {{ dashboardCaseReference }}
+    </p>
+  {% endif %}
 
   {% for dashboardNotification in notifications %}
     {{ notification(dashboardNotification.templateId, dashboardNotification.templateValues)
