@@ -6,8 +6,8 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
   buildCcdCaseForPossessionClaimResponse: jest.fn(),
 }));
 
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
+import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 type TenancyTypeDetailsStep = {
   beforeRedirect: (req: { body?: Record<string, unknown> }) => Promise<void>;
@@ -20,7 +20,7 @@ type TenancyTypeDetailsStep = {
           validatedCase?: {
             data?: {
               possessionClaimResponse?: {
-                claimantOrganisations?: Array<{ value?: string }>;
+                claimantOrganisations?: { value?: string }[];
               };
             };
           };
