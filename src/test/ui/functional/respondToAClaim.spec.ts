@@ -385,7 +385,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', rentArrearsDispute.continueButton);
   });
 
-  //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = true
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -423,8 +422,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
   });
 
-  //Rent Arrears claim type = false, Notice Date Provided string = false, and Notice Served boolean = false
-  test('England - NonRentArrears - NoticeServed - No - NonRentArrearsDispute @noDefendants', async () => {
+  test('England - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
