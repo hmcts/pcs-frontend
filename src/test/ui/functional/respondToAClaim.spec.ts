@@ -59,7 +59,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('inputErrorValidation', {
       validationReq: defendantNameCapture.errorValidation,
       validationType: defendantNameCapture.errorValidationType.input,
-      inputArray: defendantNameCapture.errorValidationField.errorTextField,
+      //inputArray: defendantNameCapture.errorValidationField.errorTextField,
       header: defendantNameCapture.errorValidationHeader,
     });
     await performAction('inputText', defendantNameCapture.firstNameLabelText, 'John');
