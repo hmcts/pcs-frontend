@@ -13,6 +13,7 @@ type NavigationTestResult = {
   expected?: string;
   actual?: string;
   error?: string;
+  hasPFTFile: boolean;
 };
 
 export class PageNavigationValidation implements IValidation {
@@ -22,7 +23,9 @@ export class PageNavigationValidation implements IValidation {
   private static pagesPassed = new Set<string>();
   private static missingNavigationMethods = new Set<string>();
   private static missingNavigationFiles = new Set<string>();
+  private static shouldThrowError = true;
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
+  private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
 
   async validate(page: Page, validation: string, fieldName: string): Promise<void> {
     if (validation !== 'mainHeader' && validation !== 'pageNavigation') {
@@ -42,6 +45,7 @@ export class PageNavigationValidation implements IValidation {
       await expect(locator).toHaveText(expectedHeader);
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
+      const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
 
       PageNavigationValidation.navigationResults.push({
         pageUrl: page.url(),
@@ -50,9 +54,12 @@ export class PageNavigationValidation implements IValidation {
         passed: true,
         expected: expectedHeader,
         actual: expectedHeader,
+        hasPFTFile,
       });
 
-      PageNavigationValidation.pagesPassed.add(pageName);
+      if (hasPFTFile) {
+        PageNavigationValidation.pagesPassed.add(pageName);
+      }
     } catch (error) {
       const actualText = await page
         .locator('h1')
@@ -61,6 +68,7 @@ export class PageNavigationValidation implements IValidation {
         .catch(() => 'Not found');
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
+      const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
 
       PageNavigationValidation.navigationResults.push({
         pageUrl: page.url(),
@@ -69,34 +77,53 @@ export class PageNavigationValidation implements IValidation {
         passed: false,
         expected: expectedHeader,
         actual: actualText || 'Not found',
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message.split('\n')[0] : String(error),
+        hasPFTFile,
       });
     }
   }
 
-  private async validatePageNavigation(page: Page, expectedUrl: string): Promise<void> {
+  private async validatePageNavigation(page: Page, expectedHeader: string): Promise<void> {
     try {
-      const currentUrl = page.url();
-      const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
+      const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
+      await expect(locator).toHaveText(expectedHeader);
 
-      const urlPassed = currentUrl.includes(expectedUrl);
+      const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
+      const actualText = await locator.first().textContent();
+      const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
 
       PageNavigationValidation.navigationResults.push({
-        pageUrl: currentUrl,
+        pageUrl: page.url(),
         pageName,
         testName: 'Page Navigation Validation',
-        passed: urlPassed,
-        expected: expectedUrl,
-        actual: currentUrl,
+        passed: true,
+        expected: expectedHeader,
+        actual: actualText || '',
+        hasPFTFile,
       });
 
-      if (urlPassed) {
+      if (hasPFTFile) {
         PageNavigationValidation.pagesPassed.add(pageName);
       }
     } catch (error) {
-      if (!(error instanceof Error && error.message.includes('Expected URL'))) {
-        throw error;
-      }
+      const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
+      const actualText = await page
+        .locator('h1')
+        .first()
+        .textContent()
+        .catch(() => 'Not found');
+      const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
+
+      PageNavigationValidation.navigationResults.push({
+        pageUrl: page.url(),
+        pageName,
+        testName: 'Page Navigation Validation',
+        passed: false,
+        expected: expectedHeader,
+        actual: actualText || 'Not found',
+        error: error instanceof Error ? error.message.split('\n')[0] : String(error),
+        hasPFTFile,
+      });
     }
   }
 
@@ -116,8 +143,25 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.missingNavigationFiles.add(pageName);
   }
 
-  static trackNavigationFailure(pageName: string, _error?: unknown): void {
-    PageNavigationValidation.missingNavigationMethods.add(pageName);
+  static trackNavigationFailure(pageName: string, error?: unknown): void {
+    PageNavigationValidation.navigationResults.push({
+      pageUrl: '',
+      pageName,
+      testName: 'Navigation Tests Execution',
+      passed: false,
+      expected: 'Navigation tests should execute successfully',
+      actual: 'Execution failed',
+      error: error instanceof Error ? error.message.split('\n')[0] : String(error),
+      hasPFTFile: true,
+    });
+  }
+
+  private static async hasPFTFile(pageName: string): Promise<boolean> {
+    if (!pageName || pageName === 'home' || pageName === 'Dashboard') {
+      return false;
+    }
+    const pftPath = path.join(PageNavigationValidation.PFT_DIR, `${pageName}.pft.ts`);
+    return fs.existsSync(pftPath);
   }
 
   private static async getPageNameFromUrl(url: string, page?: Page): Promise<string> {
@@ -126,6 +170,10 @@ export class PageNavigationValidation implements IValidation {
       const segments = pathname.split('/').filter(Boolean);
       const urlSegment = segments.at(-1) || 'home';
 
+      if (urlSegment.toLowerCase() === 'dashboard') {
+        return 'Dashboard';
+      }
+
       const mapping = PageNavigationValidation.loadMapping();
       if (!mapping) {
         return urlSegment;
@@ -133,7 +181,14 @@ export class PageNavigationValidation implements IValidation {
 
       if (/^\d+$/.test(urlSegment) && page) {
         const headerText = await PageNavigationValidation.getHeaderText(page);
-        return headerText ? mapping[headerText] || urlSegment : urlSegment;
+        if (headerText) {
+          for (const value of Object.values(mapping)) {
+            if (value === headerText.replace(/\s+/g, '')) {
+              return value;
+            }
+          }
+          return headerText.replace(/\s+/g, '');
+        }
       }
 
       return mapping[urlSegment] || urlSegment;
@@ -196,10 +251,6 @@ export class PageNavigationValidation implements IValidation {
       pagesWithNavigationMethods.add(pageName);
     }
 
-    for (const result of PageNavigationValidation.navigationResults) {
-      pagesWithNavigationMethods.add(result.pageName);
-    }
-
     const totalPages =
       pagesWithNavigationMethods.size +
       PageNavigationValidation.missingNavigationMethods.size +
@@ -211,27 +262,67 @@ export class PageNavigationValidation implements IValidation {
       return;
     }
 
+    // Track failures by the page that has the PFT file
+    const failureDetails = new Map<string, { expected: string; actual: string }>();
+    const failedPages = new Set<string>();
     const passedPages = new Set<string>();
+
+    // First, identify all pages with PFT files that have any failures
     for (const result of PageNavigationValidation.navigationResults) {
-      if (result.passed) {
+      if (!result.passed) {
+        // If this failure is on a page with a PFT file, mark it as failed
+        if (result.hasPFTFile) {
+          failedPages.add(result.pageName);
+          if (result.expected && result.actual) {
+            failureDetails.set(result.pageName, {
+              expected: result.expected,
+              actual: result.actual,
+            });
+          }
+        } else {
+          // If the failure is on a page without a PFT file (like Dashboard),
+          // we need to find which page with a PFT file led us here
+          for (const pageWithPFT of PageNavigationValidation.pagesWithNavigation) {
+            failedPages.add(pageWithPFT);
+            if (result.expected && result.actual) {
+              failureDetails.set(pageWithPFT, {
+                expected: result.expected,
+                actual: result.actual,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // A page passes only if it has no failures and has a PFT file
+    for (const result of PageNavigationValidation.navigationResults) {
+      if (result.passed && result.hasPFTFile && !failedPages.has(result.pageName)) {
         passedPages.add(result.pageName);
       }
     }
 
+    // Add pages that were explicitly marked as passed (and haven't failed)
     for (const pageName of PageNavigationValidation.pagesPassed) {
-      passedPages.add(pageName);
+      if (!failedPages.has(pageName)) {
+        passedPages.add(pageName);
+      }
     }
 
     console.log(`\n📊 NAVIGATION TESTS SUMMARY (Test #${PageNavigationValidation.testCounter}):`);
     console.log(`   Total pages with navigation tests: ${totalPages}`);
     console.log(`   Number of pages passed: ${passedPages.size}`);
-    console.log(`   Number of pages failed: 0`);
+    console.log(`   Number of pages failed: ${failedPages.size}`);
     console.log(
       `   Missing navigation methods: ${PageNavigationValidation.missingNavigationMethods.size + PageNavigationValidation.missingNavigationFiles.size}`
     );
 
     if (passedPages.size > 0) {
       console.log(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
+    }
+
+    if (failedPages.size > 0) {
+      console.log(`   Failed pages: ${Array.from(failedPages).join(', ')}`);
     }
 
     if (PageNavigationValidation.missingNavigationMethods.size > 0) {
@@ -246,7 +337,29 @@ export class PageNavigationValidation implements IValidation {
       );
     }
 
-    if (passedPages.size > 0) {
+    // Show failure details
+    if (failedPages.size > 0) {
+      console.log('\n❌ FAILED NAVIGATION TESTS:');
+
+      for (const pageName of Array.from(failedPages).sort()) {
+        const details = failureDetails.get(pageName);
+        console.log(`   Page: ${pageName}`);
+        if (details) {
+          console.log(`       Expected: ${details.expected}`);
+          console.log(`       Actual: ${details.actual}`);
+        }
+        console.log('');
+      }
+    }
+
+    // Throw error if there were any failures on pages with PFT files
+    if (failedPages.size > 0 && PageNavigationValidation.shouldThrowError) {
+      throw new Error(`Navigation tests failed: ${failedPages.size} page(s) have failures`);
+    }
+
+    if (failedPages.size > 0) {
+      console.log('❌ NAVIGATION TESTS FAILED\n');
+    } else if (passedPages.size > 0) {
       console.log('\n✅ ALL NAVIGATION TESTS PASSED\n');
     } else if (pagesWithNavigationMethods.size > 0) {
       console.log('\n⚠️  Navigation files found but no tests performed\n');

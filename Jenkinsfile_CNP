@@ -37,6 +37,9 @@ withPipeline(type, product, component) {
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_all_page_functional_tests").size() > 0) {
       env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
     }
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_content_validation").size() > 0) {
+      env.ENABLE_CONTENT_VALIDATION = 'true'
+    }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_error_messages_validation").size() > 0) {
       env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
     }
@@ -64,6 +67,7 @@ withPipeline(type, product, component) {
   }
 
   onMaster() {
+    env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'false'
     env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,

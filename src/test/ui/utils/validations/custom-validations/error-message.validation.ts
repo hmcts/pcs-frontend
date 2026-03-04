@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Locator, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 
-import { IValidation, validationRecord } from '../../interfaces';
+import { IValidation, validationData, validationRecord } from '../../interfaces';
 
 type ValidationResult = {
   pageUrl: string;
@@ -21,48 +21,100 @@ export class ErrorMessageValidation implements IValidation {
   private static pagesWithEMV = new Set<string>();
   private static pagesPassed = new Set<string>();
   private static missingEMVFiles = new Set<string>();
+  private static shouldThrowError = true;
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
 
-  async validate(page: Page, validation: string, fieldName: string, error: string | validationRecord): Promise<void> {
-    if (validation !== 'errorMessage') {
+  async validate(
+    page: Page,
+    validation: string,
+    fieldName: string,
+    error?: validationData | validationRecord
+  ): Promise<void> {
+    if (validation !== 'errorMessage' || !error) {
       return;
     }
 
-    let scenario: string;
-    let expected: string;
-    let errorMessage: Locator;
+    const scenario = 'Error message validation';
+    let expected = '';
+    let actualText: string | null = null;
+    let passed = false;
 
-    if (typeof error === 'string') {
-      scenario = 'Error message validation';
-      expected = error;
-      errorMessage = page.locator(`a.validation-error:has-text("${error}")`);
-    } else {
-      scenario = 'Error message validation';
-      expected = `${error.header}: ${error.message}`;
-      errorMessage = page.locator(`
-        h2.govuk-error-summary__title:has-text("${error.header}") + p:has-text("${error.message}"),
-        h2.govuk-error-summary__title:has-text("${error.header}") ~ div>ul>li:has-text("${error.message}")
-      `);
+    try {
+      // Handle string error message
+      if (typeof error === 'string' || typeof error === 'number' || typeof error === 'boolean') {
+        const errorStr = String(error);
+        expected = errorStr;
+
+        // Try different error message selectors
+        const errorMessage = page.locator(`
+          .govuk-error-message:has-text("${errorStr}"),
+          .govuk-list--error:has-text("${errorStr}"),
+          a.validation-error:has-text("${errorStr}")
+        `);
+
+        const count = await errorMessage.count();
+        if (count > 0) {
+          actualText = await errorMessage.first().textContent();
+          passed = actualText?.includes(errorStr) || false;
+        } else {
+          actualText = 'No error message found';
+          passed = false;
+        }
+      }
+      // Handle error record with header and message
+      else if (typeof error === 'object') {
+        const errorRecord = error as validationRecord;
+        const header = String(errorRecord.header || '');
+        const message = String(errorRecord.message || '');
+
+        expected = `${header}: ${message}`;
+
+        // Check for error summary header
+        const headerLocator = page.locator(`h2.govuk-error-summary__title:has-text("${header}")`);
+        const headerCount = await headerLocator.count();
+
+        if (headerCount === 0) {
+          actualText = `Header "${header}" not found`;
+          passed = false;
+        } else {
+          // Check for error message in the list
+          const messageLocator = page.locator(`
+            .govuk-error-summary__list a:has-text("${message}"),
+            .govuk-error-summary__list li:has-text("${message}"),
+            ul.govuk-list--error li:has-text("${message}")
+          `);
+
+          const messageCount = await messageLocator.count();
+          if (messageCount > 0) {
+            actualText = await messageLocator.first().textContent();
+            passed = actualText?.includes(message) || false;
+          } else {
+            actualText = `Message "${message}" not found in error summary`;
+            passed = false;
+          }
+        }
+      } else {
+        return;
+      }
+    } catch (e) {
+      actualText = `Error during validation: ${e instanceof Error ? e.message : String(e)}`;
+      passed = false;
     }
 
-    const isErrorMessageVisible = await errorMessage
-      .first()
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
     const pageUrl = page.url();
-
     const pageName = await ErrorMessageValidation.getPageNameFromUrl(pageUrl, page);
 
     ErrorMessageValidation.results.push({
       pageUrl,
       pageName,
       scenario,
-      passed: isErrorMessageVisible,
+      passed,
       expected,
-      actual: isErrorMessageVisible ? 'Found' : 'Not found',
+      actual: actualText || 'Not found',
+      error: passed ? undefined : `Expected "${expected}" but found "${actualText || 'nothing'}"`,
     });
 
-    if (isErrorMessageVisible) {
+    if (passed) {
       ErrorMessageValidation.pagesPassed.add(pageName);
     }
   }
@@ -96,7 +148,14 @@ export class ErrorMessageValidation implements IValidation {
 
       if (/^\d+$/.test(urlSegment) && page) {
         const headerText = await ErrorMessageValidation.getHeaderText(page);
-        return headerText ? mapping[headerText] || urlSegment : urlSegment;
+        if (headerText) {
+          for (const value of Object.values(mapping)) {
+            if (value === headerText.replace(/\s+/g, '')) {
+              return value;
+            }
+          }
+          return headerText.replace(/\s+/g, '');
+        }
       }
 
       return mapping[urlSegment] || urlSegment;
@@ -161,24 +220,71 @@ export class ErrorMessageValidation implements IValidation {
       return;
     }
 
-    const passedValidations = ErrorMessageValidation.results.filter(r => r.passed);
-    const passedPages = [...new Set(passedValidations.map(r => r.pageName))];
+    // Track failures
+    const failureDetails = new Map<string, { expected: string; actual: string }>();
+    const failedPages = new Set<string>();
+    const passedPages = new Set<string>();
+
+    for (const result of ErrorMessageValidation.results) {
+      if (!result.passed) {
+        failedPages.add(result.pageName);
+        if (result.expected && result.actual) {
+          failureDetails.set(result.pageName, {
+            expected: result.expected,
+            actual: result.actual,
+          });
+        }
+      } else {
+        passedPages.add(result.pageName);
+      }
+    }
+
+    // Remove any passed pages that also failed
+    for (const pageName of failedPages) {
+      passedPages.delete(pageName);
+    }
 
     console.log(`\n📊 ERROR MESSAGE VALIDATION SUMMARY (Test #${ErrorMessageValidation.testCounter}):`);
     console.log(`   Total pages validated for error messages: ${totalPages}`);
-    console.log(`   Number of pages passed: ${passedPages.length}`);
-    console.log(`   Number of pages failed: 0`);
+    console.log(`   Number of pages passed: ${passedPages.size}`);
+    console.log(`   Number of pages failed: ${failedPages.size}`);
     console.log(`   Number of missing EMV files: ${ErrorMessageValidation.missingEMVFiles.size}`);
 
-    if (passedPages.length > 0) {
-      console.log(`   Passed pages: ${passedPages.join(', ')}`);
+    if (passedPages.size > 0) {
+      console.log(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
+    }
+
+    if (failedPages.size > 0) {
+      console.log(`   Failed pages: ${Array.from(failedPages).join(', ')}`);
     }
 
     if (ErrorMessageValidation.missingEMVFiles.size > 0) {
       console.log(`   EMV files not found: ${Array.from(ErrorMessageValidation.missingEMVFiles).join(', ')}`);
     }
 
-    if (passedPages.length > 0) {
+    // Show failure details
+    if (failedPages.size > 0) {
+      console.log('\n❌ FAILED ERROR MESSAGE VALIDATIONS:');
+
+      for (const pageName of Array.from(failedPages).sort()) {
+        const details = failureDetails.get(pageName);
+        console.log(`   Page: ${pageName}`);
+        if (details) {
+          console.log(`       Expected: ${details.expected}`);
+          console.log(`       Actual: ${details.actual}`);
+        }
+        console.log('');
+      }
+    }
+
+    // Throw error if there were failures
+    if (failedPages.size > 0 && ErrorMessageValidation.shouldThrowError) {
+      throw new Error(`Error message validation failed: ${failedPages.size} page(s) have failures`);
+    }
+
+    if (failedPages.size > 0) {
+      console.log('❌ ERROR MESSAGE VALIDATIONS FAILED\n');
+    } else if (passedPages.size > 0) {
       console.log('\n✅ ALL ERROR MESSAGE VALIDATIONS PASSED\n');
     } else if (ErrorMessageValidation.pagesWithEMV.size > 0) {
       console.log('\n⚠️  EMV files found but no validations performed\n');
