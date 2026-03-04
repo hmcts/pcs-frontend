@@ -17,41 +17,41 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     contactUs: 'contactUs',
   },
-  extendGetContent: (req: Request, formContent) => {
-    // Get defendant name from CCD case data
+  getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
+    const defendantResponses = caseData?.possessionClaimResponse?.defendantResponses;
     const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
-    const defendantName = party?.firstName && party?.lastName ? `${party.firstName} ${party.lastName}` : '';
+
+    const existingAnswer = defendantResponses?.defendantNameConfirmation;
+    const formValue = existingAnswer === 'YES' ? 'yes' : existingAnswer === 'NO' ? 'no' : undefined;
+
+    if (!formValue) {
+      return {};
+    }
+
+    if (formValue === 'yes') {
+      return { nameConfirmation: 'yes' };
+    }
+
+    const initial: Record<string, unknown> = { nameConfirmation: 'no' };
+    if (party?.firstName) {
+      initial['nameConfirmation.firstName'] = party.firstName;
+    }
+    if (party?.lastName) {
+      initial['nameConfirmation.lastName'] = party.lastName;
+    }
+
+    return initial;
+  },
+  extendGetContent: (req: Request) => {
+    // Get defendant name from claimantEnteredDefendantDetails (what claimant entered)
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
+    const defendantName =
+      claimantEntry?.firstName && claimantEntry?.lastName ? `${claimantEntry.firstName} ${claimantEntry.lastName}` : '';
 
     // Get organisation name from CCD case data
     const organisationName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
-
-    // Prepopulate subFields when user previously corrected name
-    const existingFirstName = party?.firstName;
-    const existingLastName = party?.lastName;
-
-    // Only prepopulate on GET (not POST with validation errors)
-    if (!req.body?.nameConfirmation && (existingFirstName || existingLastName)) {
-      // Find the nameConfirmation radio field
-      const nameConfirmationField = formContent.fields.find(f => f.name === 'nameConfirmation');
-
-      if (nameConfirmationField && nameConfirmationField.options) {
-        // Find the "no" option which has subFields
-        const noOption = nameConfirmationField.options.find(opt => opt.value === 'no');
-
-        if (noOption && noOption.subFields) {
-          // Prepopulate firstName subField
-          if (noOption.subFields.firstName && existingFirstName) {
-            noOption.subFields.firstName.value = existingFirstName;
-          }
-
-          // Prepopulate lastName subField
-          if (noOption.subFields.lastName && existingLastName) {
-            noOption.subFields.lastName.value = existingLastName;
-          }
-        }
-      }
-    }
 
     return {
       defendantName,

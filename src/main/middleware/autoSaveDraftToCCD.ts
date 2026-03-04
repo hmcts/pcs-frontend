@@ -134,6 +134,41 @@ export function passThrough(fieldNames: readonly string[]): ValueMapper {
   };
 }
 
+/** Transforms yes/no values to uppercase YES/NO for VerticalYesNo enum */
+export function verticalYesNo(backendFieldName: string): ValueMapper {
+  const ALLOWED_VALUES = ['yes', 'no'] as const;
+  type AllowedValue = (typeof ALLOWED_VALUES)[number]; // 'yes' | 'no'
+
+  return (value: FormFieldValue) => {
+    if (typeof value !== 'string') {
+      logger.warn('verticalYesNo expects a string, received:', typeof value);
+      return { [backendFieldName]: '' };
+    }
+
+    // Type-safe mapping: only allowed values as keys
+    const enumMapping: Record<AllowedValue, string> = {
+      yes: 'YES',
+      no: 'NO',
+    };
+
+    // Validate that value is one of the allowed enum values
+    const isAllowedValue = (ALLOWED_VALUES as readonly string[]).includes(value);
+
+    if (!isAllowedValue) {
+      const allowedStr = ALLOWED_VALUES.join(', ');
+      logger.error(
+        `verticalYesNo: Invalid value "${value}" for field "${backendFieldName}". ` +
+          `Allowed values: ${allowedStr}. This indicates a bug in form validation or incorrect mapper usage.`
+      );
+      // Return empty string to prevent invalid data in CCD
+      return { [backendFieldName]: '' };
+    }
+
+    // Type assertion safe here because isAllowedValue check guarantees it
+    return { [backendFieldName]: enumMapping[value as AllowedValue] };
+  };
+}
+
 /** Transforms array of checkbox values to uppercase enum array */
 export function multipleYesNo(backendFieldName: string): ValueMapper {
   return (value: FormFieldValue) => {
@@ -161,8 +196,39 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
   },
   'defendant-date-of-birth': {
     backendPath: 'possessionClaimResponse.defendantResponses',
-    frontendFields: ['day', 'month', 'year'],
-    valueMapper: dateToISO('dateOfBirth'),
+    frontendField: 'dateOfBirth',
+    valueMapper: (formData: FormFieldValue) => {
+      const dateValue = formData as Record<string, unknown>;
+      const result: Record<string, unknown> = {};
+
+      const day = dateValue.day;
+      const month = dateValue.month;
+      const year = dateValue.year;
+
+      if (!day || !month || !year) {
+        logger.warn('[defendant-date-of-birth] Missing date components, skipping save');
+        return result;
+      }
+
+      // Use luxon for proper date validation and formatting
+      const dateTime = DateTime.fromObject({
+        year: Number(year),
+        month: Number(month),
+        day: Number(day),
+      });
+
+      if (!dateTime.isValid) {
+        logger.warn(
+          `[defendant-date-of-birth] Invalid date: ${dateTime.invalidReason} (day=${String(day)}, month=${String(month)}, year=${String(year)})`
+        );
+        return result;
+      }
+
+      const isoDate = dateTime.toISODate();
+
+      result.dateOfBirth = isoDate;
+      return result;
+    },
   },
   'defendant-name-capture': {
     backendPath: 'possessionClaimResponse.defendantContactDetails.party',
@@ -170,22 +236,46 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
     valueMapper: passThrough(['firstName', 'lastName']),
   },
   'defendant-name-confirmation': {
-    backendPath: 'possessionClaimResponse.defendantContactDetails.party',
-    frontendFields: ['firstName', 'lastName', 'nameConfirmation'],
+    backendPath: 'possessionClaimResponse',
+    frontendFields: ['nameConfirmation', 'nameConfirmation.firstName', 'nameConfirmation.lastName'],
     valueMapper: (formData: FormFieldValue) => {
       const data = formData as Record<string, unknown>;
-      const result: Record<string, unknown> = {};
+      const result: Record<string, unknown> = {
+        defendantResponses: {},
+        defendantContactDetails: { party: {} },
+      };
 
-      // Only save if user selected "no" (correcting the name)
-      if (data.nameConfirmation === 'no') {
-        if (data.firstName) {
-          result.firstName = data.firstName;
+      const nameConfirmation = data.nameConfirmation as string;
+
+      // Always save the yes/no selection using verticalYesNo mapper
+      const yesNoMapper = verticalYesNo('defendantNameConfirmation');
+      const yesNoResult = yesNoMapper(nameConfirmation);
+
+      if (yesNoResult.defendantNameConfirmation) {
+        (result.defendantResponses as Record<string, unknown>).defendantNameConfirmation =
+          yesNoResult.defendantNameConfirmation;
+      }
+
+      // Always save names to defendantContactDetails.party
+      // - If YES: copy from claimantEnteredDefendantDetails (available in req context)
+      // - If NO: save corrected names from subFields
+      const party = (result.defendantContactDetails as Record<string, unknown>).party as Record<string, unknown>;
+
+      if (nameConfirmation === 'yes') {
+        // User confirmed the name is correct - frontend should send the claimant's name
+        // This will be injected in saveToCCD function which has access to res.locals.validatedCase
+      } else if (nameConfirmation === 'no') {
+        // User corrected the name - save the corrected values
+        const firstName = data['nameConfirmation.firstName'];
+        const lastName = data['nameConfirmation.lastName'];
+
+        if (firstName) {
+          party.firstName = firstName;
         }
-        if (data.lastName) {
-          result.lastName = data.lastName;
+        if (lastName) {
+          party.lastName = lastName;
         }
       }
-      // If user selected "yes", name already correct - don't save
 
       return result;
     },
@@ -224,6 +314,7 @@ export async function autoSaveToCCD(req: Request, res: Response, stepName: strin
   const formData = req.session.formData?.[stepName];
 
   if (!formData || Object.keys(formData).length === 0) {
+    logger.debug(`[${stepName}] No form data in session, skipping auto-save`);
     return;
   }
 
@@ -278,6 +369,31 @@ async function saveToCCD(
     }
 
     const transformedData = config.valueMapper(relevantData);
+
+    // Special handling for defendant-name-confirmation when YES is selected
+    if (stepName === 'defendant-name-confirmation' && formData.nameConfirmation === 'yes') {
+      // Copy firstName/lastName from claimantEnteredDefendantDetails to defendantContactDetails.party
+      const caseData = validatedCase?.data;
+      const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
+
+      if (claimantEntry?.firstName && claimantEntry?.lastName) {
+        const party = (transformedData.defendantContactDetails as Record<string, unknown>)?.party as Record<
+          string,
+          unknown
+        >;
+        if (party) {
+          party.firstName = claimantEntry.firstName;
+          party.lastName = claimantEntry.lastName;
+        }
+      }
+    }
+
+    // Skip save if transformed data is empty (nothing to update)
+    if (Object.keys(transformedData).length === 0) {
+      logger.debug(`[${stepName}] Transformed data is empty, skipping CCD save`);
+      return;
+    }
+
     const nestedData = pathToNested(config.backendPath, transformedData);
 
     const ccdPayload = {

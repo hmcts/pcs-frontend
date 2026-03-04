@@ -18,11 +18,12 @@ export const step: StepDefinition = createFormStep({
     contactUs: 'contactUs',
   },
   extendGetContent: async (req, formContent) => {
-    // Read from CCD (fresh data via res.locals.validatedCase)
+    // Read from claimantEnteredDefendantDetails (what claimant entered)
+    // UNIFORM: Same data source as defendant-name-confirmation
     const caseData = req.res?.locals.validatedCase?.data;
-    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
-    const existingFirstName = party?.firstName;
-    const existingLastName = party?.lastName;
+    const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
+    const existingFirstName = claimantEntry?.firstName;
+    const existingLastName = claimantEntry?.lastName;
 
     // Only prepopulate on GET (not POST with validation errors)
     if (!req.body?.firstName && (existingFirstName || existingLastName)) {

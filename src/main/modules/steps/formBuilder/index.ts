@@ -35,6 +35,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     fields,
     beforeRedirect,
     extendGetContent,
+    getInitialFormData,
     stepDir,
     translationKeys,
     flowConfig,
@@ -81,10 +82,11 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         // Get interpolation values from extendGetContent if available (for dynamic translation values)
         const emptyFormContent = { fields: [] } as BuiltFormContent;
         const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
+        const initialFormData = getInitialFormData ? await getInitialFormData(req) : undefined;
         const formContent = buildFormContent(
           fields,
           t,
-          getFormData(req, stepName),
+          initialFormData || getFormData(req, stepName),
           {},
           translationKeys,
           nunjucksEnv,

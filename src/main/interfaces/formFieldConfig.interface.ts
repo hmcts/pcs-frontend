@@ -95,12 +95,19 @@ export type ExtendGetContent = (
   formContent: BuiltFormContent
 ) => MaybePromise<Partial<BuiltFormContent> & Record<string, unknown>>;
 
+export type GetInitialFormData = (req: Request) => MaybePromise<Record<string, unknown>>;
+
 export interface FormBuilderConfig {
   stepName: string;
   journeyFolder: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
+  /**
+   * Optional: provide initial field values on GET (e.g., from CCD).
+   * This is GET-only and must not overwrite POST body values during validation rerenders.
+   */
+  getInitialFormData?: GetInitialFormData;
   stepDir: string;
   translationKeys?: TranslationKeys;
   customTemplate?: string;
