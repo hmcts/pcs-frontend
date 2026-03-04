@@ -87,7 +87,9 @@ export const step: StepDefinition = createFormStep({
   extendGetContent: req => {
     const claimantNameFromValidatedCase = req.res?.locals?.validatedCase?.data?.possessionClaimResponse
       ?.claimantOrganisations?.[0]?.value as string | undefined;
+
     const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
+
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops housing';
 
     const rawTenancyDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as string | undefined;
