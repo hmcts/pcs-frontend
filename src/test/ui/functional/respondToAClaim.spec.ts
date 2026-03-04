@@ -17,11 +17,11 @@ import {
   noticeDetails,
   paymentInterstitial,
   rentArrears,
+  repaymentsAgreed,
   repaymentsMade,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
-import { repaymentsAgreed } from '../data/page-data/repaymentsAgreed.page.data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -29,6 +29,11 @@ const claimantsName = submitCaseApiData.submitCasePayload.claimantName;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  if (testInfo.title.includes('RentArrears - Yes')) {
+    process.env.RENT_ARREARS = 'YES';
+  } else {
+    process.env.RENT_ARREARS = 'NO';
+  }
   if (testInfo.title.includes('@noDefendants')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
@@ -324,11 +329,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = false
-  test.skip('England - RentArrears - NoticeServed - No - RentArrearsDispute', async () => {
+  test('Introductory - tenancy start date not provided - England - RentArrears - NoticeServed - No - RentArrearsDispute', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -357,13 +362,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = true, and Notice Served boolean = true
-  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known', async () => {
+  test('Flexible tenancy - tenancy start date provided - RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @flexibleTenancyDate', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
-    await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -401,7 +404,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   });
 
   //Rent Arrears claim type = true, Notice Date Provided string = false, and Notice Served boolean = true
-  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
+  test('Demoted tenancy - tenancy start date not provided - RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     /*await performAction('clickRadioButton', defendantNameCapture.yesRadioOption);
     await performAction ('clickButton', defendantNameCapture.saveAndContinueButton);*/
