@@ -224,7 +224,7 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
 
       await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(
-        'Cannot UPDATE draft, CCD Case Not found'
+        'Cannot UPDATE draft, Case Id not specified'
       );
     });
   });
@@ -263,7 +263,7 @@ describe('updateCase', () => {
   it('should throw HTTPError if case id is missing', async () => {
     await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
     await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(
-      'Cannot UPDATE draft, CCD Case Not found'
+      'Cannot UPDATE draft, Case Id not specified'
     );
   });
 

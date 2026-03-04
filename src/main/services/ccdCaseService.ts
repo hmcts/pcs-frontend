@@ -291,7 +291,7 @@ export const ccdCaseService = {
     data: Record<string, unknown>
   ): Promise<CcdCase> {
     if (!caseId) {
-      throw new HTTPError('Cannot UPDATE draft, CCD Case Not found', 500);
+      throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
     }
 
     const url = `${getApiUrl()}/callbacks/mid-event?page=respondToPossessionDraftSavePage`;
