@@ -306,10 +306,7 @@ export const ccdCaseService = {
     };
 
     try {
-      logger.info(`Calling Draft save event with URL: ${url}`);
-      logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
       const response = await http.post<CcdCase>(url, payload, getCaseHeaders(accessToken || ''));
-      logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
       return response.data;
     } catch (error) {
       throw convertAxiosErrorToHttpError(error, 'save draft response to claim');
