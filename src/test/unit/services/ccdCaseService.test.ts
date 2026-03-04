@@ -197,6 +197,13 @@ describe('ccdCaseService', () => {
       expect(result).toBeNull();
     });
 
+    it('returns null on 400 error', async () => {
+      mockPost.mockRejectedValue({ response: { status: 400, data: { message: 'Bad request' } } });
+
+      const result = await ccdCaseService.getCase(accessToken);
+      expect(result).toBeNull();
+    });
+
     it('throws HTTPError on unexpected error', async () => {
       mockPost.mockRejectedValue(new Error('Unexpected'));
 
@@ -214,6 +221,25 @@ describe('ccdCaseService', () => {
 
       expect(result).toEqual({ id: '999', data: { applicantForename: 'bar' } });
     });
+
+    it('throws HTTPError when getEventToken fails', async () => {
+      mockGet.mockRejectedValue({ response: { status: 500 }, message: 'Token failed' });
+
+      await expect(ccdCaseService.createCase(accessToken, { applicantForename: 'bar' })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.createCase(accessToken, { applicantForename: 'bar' })).rejects.toThrow(
+        'CCD case service error'
+      );
+    });
+
+    it('throws HTTPError when submitEvent fails', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockRejectedValue({ response: { status: 500 }, message: 'Submit failed' });
+
+      await expect(ccdCaseService.createCase(accessToken, { applicantForename: 'bar' })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.createCase(accessToken, { applicantForename: 'bar' })).rejects.toThrow(
+        'CCD case service error'
+      );
+    });
   });
 
   describe('updateCase', () => {
@@ -222,6 +248,36 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.updateCase(accessToken, { id: '', data: {} })).rejects.toThrow(
         'Cannot UPDATE Case, CCD Case Not found'
       );
+    });
+
+    it('updates a case when case id is present', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockResolvedValue({ data: { id: '123', data: { field: 'value' } } });
+
+      const result = await ccdCaseService.updateCase(accessToken, { id: '123', data: { field: 'value' } });
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/123/event-triggers/respondPossessionClaim`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(mockPost).toHaveBeenCalledWith(
+        `${mockUrl}/cases/123/events`,
+        expect.objectContaining({
+          data: { field: 'value' },
+          event: expect.objectContaining({ id: 'respondPossessionClaim' }),
+          event_token: 'event-token',
+        }),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(result).toEqual({ id: '123', data: { field: 'value' } });
     });
   });
 
@@ -232,6 +288,36 @@ describe('ccdCaseService', () => {
         'Cannot SUBMIT Case, CCD Case Not found'
       );
     });
+
+    it('submits a case when case id is present', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockResolvedValue({ data: { id: '123', data: { field: 'value' } } });
+
+      const result = await ccdCaseService.submitCase(accessToken, { id: '123', data: { field: 'value' } });
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/123/event-triggers/citizenSubmitApplication`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(mockPost).toHaveBeenCalledWith(
+        `${mockUrl}/cases/123/events`,
+        expect.objectContaining({
+          data: { field: 'value' },
+          event: expect.objectContaining({ id: 'citizenSubmitApplication' }),
+          event_token: 'event-token',
+        }),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(result).toEqual({ id: '123', data: { field: 'value' } });
+    });
   });
 
   describe('submitResponseToClaim', () => {
@@ -241,9 +327,67 @@ describe('ccdCaseService', () => {
         'Cannot Submit Response to Case, CCD Case Not found'
       );
     });
+
+    it('submits the response to claim when case id is present', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockResolvedValue({ data: { id: '123', data: { claim: 'response' } } });
+
+      const result = await ccdCaseService.submitResponseToClaim(accessToken, {
+        id: '123',
+        data: { claim: 'response' },
+      });
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/123/event-triggers/respondPossessionClaim`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(mockPost).toHaveBeenCalledWith(
+        `${mockUrl}/cases/123/events`,
+        expect.objectContaining({
+          data: { claim: 'response' },
+          event: expect.objectContaining({ id: 'respondPossessionClaim' }),
+          event_token: 'event-token',
+        }),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(result).toEqual({ id: '123', data: { claim: 'response' } });
+    });
   });
 
   describe('getExistingCaseData', () => {
+    it('returns existing case data when the request succeeds', async () => {
+      const responseData = {
+        case_details: {
+          case_data: {
+            possessionClaimResponse: {
+              claimantOrganisations: [{ value: 'Acme Housing' }],
+            },
+          },
+        },
+      };
+      mockGet.mockResolvedValue({ data: responseData });
+
+      const result = await ccdCaseService.getExistingCaseData(accessToken, '1234567890123456');
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/1234567890123456/event-triggers/respondPossessionClaim?ignore-warning=false`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(result).toEqual(responseData);
+    });
+
     it('throws if case data errors', async () => {
       mockGet.mockRejectedValue({ response: { status: 400 } });
       await expect(ccdCaseService.getExistingCaseData(accessToken, '')).rejects.toThrow(HTTPError);
