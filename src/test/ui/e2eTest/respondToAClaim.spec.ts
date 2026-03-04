@@ -379,6 +379,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
 });
