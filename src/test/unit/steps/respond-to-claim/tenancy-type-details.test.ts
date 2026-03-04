@@ -6,168 +6,397 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
   buildCcdCaseForPossessionClaimResponse: jest.fn(),
 }));
 
-import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
 import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
+import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
 
-type TestedStep = {
-  stepName: string;
-  customTemplate: string;
+type TenancyTypeDetailsStep = {
   beforeRedirect: (req: { body?: Record<string, unknown> }) => Promise<void>;
   extendGetContent: (
     req: {
       body?: Record<string, unknown>;
       session?: { formData?: Record<string, Record<string, unknown>> };
-      res?: { locals?: { validatedCase?: { data?: Record<string, unknown> } } };
+      res?: {
+        locals?: {
+          validatedCase?: {
+            data?: {
+              possessionClaimResponse?: {
+                claimantOrganisations?: Array<{ value?: string }>;
+              };
+            };
+          };
+        };
+      };
     },
     formContent: Record<string, unknown>
   ) => Promise<Record<string, unknown>>;
 };
 
 describe('respond-to-claim tenancy-type-details step', () => {
-  const testedStep = step as unknown as TestedStep;
+  const testedStep = step as unknown as TenancyTypeDetailsStep;
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('defines the expected step metadata', () => {
-    expect(testedStep.stepName).toBe('tenancy-type-details');
-    expect(testedStep.customTemplate).toBe('respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk');
+  describe('beforeRedirect', () => {
+    it.each([
+      ['yes', 'YES'],
+      ['no', 'NO'],
+      ['notSure', 'NOT_SURE'],
+      ['maybe', null],
+      [undefined, null],
+    ])('maps tenancyTypeConfirm=%s to tenancyTypeCorrect=%s', async (tenancyTypeConfirm, tenancyTypeCorrect) => {
+      const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
+
+      await testedStep.beforeRedirect(req);
+
+      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+        req,
+        {
+          defendantResponses: {
+            tenancyTypeCorrect,
+          },
+        },
+        false
+      );
+    });
   });
 
-  it.each([
-    ['yes', 'YES'],
-    ['no', 'NO'],
-    ['notSure', 'NOT_SURE'],
-    [undefined, null],
-  ])('beforeRedirect maps %s to %s and submits it', async (tenancyTypeConfirm, tenancyTypeCorrect) => {
-    await testedStep.beforeRedirect({
-      body: tenancyTypeConfirm ? { tenancyTypeConfirm } : {},
+  describe('extendGetContent', () => {
+    const formContent = {
+      insetText: 'Treetops Housing gave these details.',
+      detailsHeading: 'Details from Treetops Housing',
+    };
+
+    it('uses tenancyTypeConfirm from body over savedStepData', async () => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: { tenancyTypeConfirm: 'no' },
+          session: { formData: { 'tenancy-type-details': { tenancyTypeConfirm: 'yes' } } },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+        formContent
+      );
+
+      expect(content).toEqual(
+        expect.objectContaining({
+          tenancyTypeConfirm: 'no',
+          organisationName: 'Acme Housing',
+        })
+      );
     });
 
-    expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-      expect.anything(),
-      {
-        defendantResponses: {
-          tenancyTypeCorrect,
-        },
-      },
-      false
-    );
-  });
-
-  it('extendGetContent prefers request body values and replaces claimant name text', async () => {
-    const content = await testedStep.extendGetContent(
-      {
-        body: {
-          tenancyTypeConfirm: 'no',
-          'tenancyTypeConfirm.correctType': 'Licence agreement',
-        },
-        session: { formData: { 'tenancy-type-details': { tenancyTypeConfirm: 'yes', correctType: 'Ignored' } } },
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                possessionClaimResponse: {
-                  claimantOrganisations: [{ value: 'Acme Housing' }],
+    it('uses correctType from req.body["tenancyTypeConfirm.correctType"] first', async () => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: {
+            'tenancyTypeConfirm.correctType': 'Body subfield value',
+            correctType: 'Body direct value',
+          },
+          session: {
+            formData: {
+              'tenancy-type-details': {
+                'tenancyTypeConfirm.correctType': 'Session subfield value',
+                correctType: 'Session direct value',
+              },
+            },
+          },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
                 },
               },
             },
           },
         },
-      },
-      {
-        insetText: 'Treetops Housing gave these details.',
-        detailsHeading: 'Details from Treetops Housing',
-      }
-    );
+        formContent
+      );
 
-    expect(content).toEqual(
-      expect.objectContaining({
-        tenancyTypeConfirm: 'no',
-        correctType: 'Licence agreement',
-        organisationName: 'Acme Housing',
-        insetText: 'Acme Housing gave these details.',
-        detailsHeading: 'Details from Acme Housing',
-      })
-    );
-  });
+      expect(content.correctType).toBe('Body subfield value');
+    });
 
-  it('extendGetContent falls back to alternate body and session values and appends the organisation name', async () => {
-    const content = await testedStep.extendGetContent(
-      {
-        body: {
-          correctType: 'Occupancy contract',
-        },
-        session: { formData: { 'tenancy-type-details': { tenancyTypeConfirm: 'notSure' } } },
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                possessionClaimResponse: {
-                  claimantOrganisations: [{ value: 'Delta Homes' }],
+    it('falls back to req.body.correctType when subfield body value is missing', async () => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: {
+            correctType: 'Body direct value',
+          },
+          session: {
+            formData: {
+              'tenancy-type-details': {
+                'tenancyTypeConfirm.correctType': 'Session subfield value',
+                correctType: 'Session direct value',
+              },
+            },
+          },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
                 },
               },
             },
           },
         },
-      },
-      {
-        insetText: 'No replacement needed',
-        detailsHeading: 'Details given by ',
-      }
-    );
+        formContent
+      );
 
-    expect(content).toEqual(
-      expect.objectContaining({
-        tenancyTypeConfirm: 'notSure',
-        correctType: 'Occupancy contract',
-        organisationName: 'Delta Homes',
-        insetText: 'No replacement needed',
-        detailsHeading: 'Details given by Delta Homes:',
-      })
-    );
-  });
+      expect(content.correctType).toBe('Body direct value');
+    });
 
-  it('extendGetContent falls back to session subfield values and Unknown when claimant organisation is missing', async () => {
-    const nonStringInset = { text: 'unchanged' };
-    const nonStringHeading = { text: 'unchanged' };
-
-    const content = await testedStep.extendGetContent(
-      {
-        body: {},
-        session: {
-          formData: {
-            'tenancy-type-details': {
-              tenancyTypeConfirm: 'yes',
-              'tenancyTypeConfirm.correctType': 'Session tenancy',
+    it('falls back to savedStepData["tenancyTypeConfirm.correctType"] when body values are missing', async () => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          session: {
+            formData: {
+              'tenancy-type-details': {
+                'tenancyTypeConfirm.correctType': 'Session subfield value',
+                correctType: 'Session direct value',
+              },
             },
           },
-        },
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                possessionClaimResponse: {},
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
+                },
               },
             },
           },
         },
-      },
-      {
-        insetText: nonStringInset,
-        detailsHeading: nonStringHeading,
-      }
-    );
+        formContent
+      );
 
-    expect(content).toEqual(
-      expect.objectContaining({
-        tenancyTypeConfirm: 'yes',
-        correctType: 'Session tenancy',
-        organisationName: 'Unknown',
-        insetText: nonStringInset,
-        detailsHeading: nonStringHeading,
-      })
-    );
+      expect(content.correctType).toBe('Session subfield value');
+    });
+
+    it('falls back to savedStepData.correctType last', async () => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          session: {
+            formData: {
+              'tenancy-type-details': {
+                correctType: 'Session direct value',
+              },
+            },
+          },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+        formContent
+      );
+
+      expect(content.correctType).toBe('Session direct value');
+    });
+
+    it('uses claimant organisation name when claimantOrganisations[0].value exists', async () => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          session: { formData: { 'tenancy-type-details': {} } },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+        formContent
+      );
+
+      expect(content.organisationName).toBe('Acme Housing');
+    });
+
+    it.each([
+      ['missing claimantOrganisations', { possessionClaimResponse: {} }],
+      ['missing claimant organisation value', { possessionClaimResponse: { claimantOrganisations: [{}] } }],
+    ])('falls back to Unknown for orgName when %s', async (_label, caseData) => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          session: { formData: { 'tenancy-type-details': {} } },
+          res: {
+            locals: {
+              validatedCase: {
+                data: caseData,
+              },
+            },
+          },
+        },
+        formContent
+      );
+
+      expect(content.organisationName).toBe('Unknown');
+    });
+
+    it('replaces Treetops Housing in insetText when insetText is a string', async () => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          session: { formData: { 'tenancy-type-details': {} } },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          insetText: 'Treetops Housing gave these details.',
+          detailsHeading: 'Details given by ',
+        }
+      );
+
+      expect(content.insetText).toBe('Acme Housing gave these details.');
+    });
+
+    it('leaves insetText unchanged when it is not a string', async () => {
+      const insetText = { text: 'unchanged' };
+
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          session: { formData: { 'tenancy-type-details': {} } },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          insetText,
+          detailsHeading: 'Details given by ',
+        }
+      );
+
+      expect(content.insetText).toBe(insetText);
+    });
+
+    it('replaces Treetops Housing in detailsHeading when detailsHeading contains it', async () => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          session: { formData: { 'tenancy-type-details': {} } },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          insetText: 'No change',
+          detailsHeading: 'Details from Treetops Housing',
+        }
+      );
+
+      expect(content.detailsHeading).toBe('Details from Acme Housing');
+    });
+
+    it('appends orgName and colon when detailsHeading does not contain Treetops Housing', async () => {
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          session: { formData: { 'tenancy-type-details': {} } },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Delta Homes' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          insetText: 'No change',
+          detailsHeading: 'Details given by ',
+        }
+      );
+
+      expect(content.detailsHeading).toBe('Details given by Delta Homes:');
+    });
+
+    it('leaves detailsHeading unchanged when it is not a string', async () => {
+      const detailsHeading = { text: 'unchanged' };
+
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          session: { formData: { 'tenancy-type-details': {} } },
+          res: {
+            locals: {
+              validatedCase: {
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          insetText: 'No change',
+          detailsHeading,
+        }
+      );
+
+      expect(content.detailsHeading).toBe(detailsHeading);
+    });
   });
 });

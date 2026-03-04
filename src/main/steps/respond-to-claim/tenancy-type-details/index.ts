@@ -95,7 +95,8 @@ export const step: StepDefinition = createFormStep({
       (req.body?.correctType as string | undefined) ||
       (savedStepData?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
       (savedStepData?.correctType as string | undefined);
-    const orgName =
+    
+      const orgName =
       req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]?.value || 'Unknown';
 
     const insetText =
