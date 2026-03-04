@@ -87,6 +87,6 @@ export const step: StepDefinition = createFormStep({
       },
     };
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
 });
