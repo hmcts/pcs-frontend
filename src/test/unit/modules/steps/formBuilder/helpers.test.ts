@@ -1366,6 +1366,86 @@ describe('formBuilder helpers', () => {
       });
     });
 
+    describe('nested date subField validation', () => {
+      const nestedDateFields: FormFieldConfig[] = [
+        {
+          name: 'confirmTenancyDate',
+          type: 'radio',
+          options: [
+            {
+              value: 'no',
+              subFields: {
+                tenancyStartDate: {
+                  name: 'tenancyStartDate',
+                  type: 'date',
+                  required: true,
+                  noFutureDate: true,
+                },
+              },
+            },
+          ],
+        },
+      ];
+
+      it('should return error for nested date subfield when parent option is selected and date is empty', () => {
+        const req = createMockRequest({
+          confirmTenancyDate: 'no',
+          'confirmTenancyDate.tenancyStartDate-day': '',
+          'confirmTenancyDate.tenancyStartDate-month': '',
+          'confirmTenancyDate.tenancyStartDate-year': '',
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeDefined();
+      });
+
+      it('should pass validation for nested date subfield when date is valid', () => {
+        const req = createMockRequest({
+          confirmTenancyDate: 'no',
+          'confirmTenancyDate.tenancyStartDate-day': '15',
+          'confirmTenancyDate.tenancyStartDate-month': '6',
+          'confirmTenancyDate.tenancyStartDate-year': '2020',
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeUndefined();
+      });
+
+      it('should not validate nested date subfield when parent option is not selected', () => {
+        const req = createMockRequest({
+          confirmTenancyDate: 'yes',
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeUndefined();
+      });
+
+      it('should return error for incomplete nested date (missing day)', () => {
+        const req = createMockRequest({
+          confirmTenancyDate: 'no',
+          'confirmTenancyDate.tenancyStartDate-day': '',
+          'confirmTenancyDate.tenancyStartDate-month': '6',
+          'confirmTenancyDate.tenancyStartDate-year': '2020',
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeDefined();
+      });
+
+      it('should return error for future nested date when noFutureDate is set', () => {
+        const futureYear = new Date().getFullYear() + 1;
+        const req = createMockRequest({
+          confirmTenancyDate: 'no',
+          'confirmTenancyDate.tenancyStartDate-day': '15',
+          'confirmTenancyDate.tenancyStartDate-month': '6',
+          'confirmTenancyDate.tenancyStartDate-year': futureYear.toString(),
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeDefined();
+      });
+    });
+
     describe('allFormData parameter', () => {
       it('should use allFormData for validation context', () => {
         const req = createMockRequest({
