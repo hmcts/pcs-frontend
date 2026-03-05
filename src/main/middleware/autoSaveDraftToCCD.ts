@@ -1,36 +1,32 @@
 /**
  * Auto-save form data to CCD draft for configured steps.
  *
- * Usage: Call autoSaveToCCD() in formBuilder's beforeRedirect callback.
- * Add steps to STEP_FIELD_MAPPING to enable auto-save.
+ * Usage: formBuilder auto-injects this when a step defines `ccdMapping`.
+ * You can also call it manually from a step's `beforeRedirect` if needed.
  *
  * Example:
  *   const step = createFormStep(
  *     { ... },
  *     templatePath,
- *     async (req, res) => { await autoSaveToCCD(req, res, 'step-name'); }
+ *     async (req, res) => { await autoSaveToCCD(req, res, { stepName: 'step-name', ccdMapping }); }
  *   );
  */
 
 import type { Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
+import type {
+  CcdFieldMapping,
+  CcdMappingContext,
+  FormFieldValue,
+  ValueMapper,
+} from '../interfaces/formFieldConfig.interface';
 import { ccdCaseService } from '../services/ccdCaseService';
 import { isNonEmpty } from '../utils/objectHelpers';
 
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('autoSaveDraftToCCD');
-
-type FormFieldValue = string | string[] | Record<string, unknown>;
-type ValueMapper = (valueOrFormData: FormFieldValue) => Record<string, unknown>;
-
-interface StepMapping {
-  backendPath: string;
-  frontendField?: string;
-  frontendFields?: string[];
-  valueMapper: ValueMapper;
-}
 
 /**
  * Transforms yes/no/preferNotToSay enum values to CCD uppercase format.
@@ -153,69 +149,6 @@ export function multipleYesNo(backendFieldName: string): ValueMapper {
   };
 }
 
-export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
-  'free-legal-advice': {
-    backendPath: 'possessionClaimResponse.defendantResponses',
-    frontendField: 'hadLegalAdvice',
-    valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
-  },
-  'defendant-date-of-birth': {
-    backendPath: 'possessionClaimResponse.defendantResponses',
-    frontendField: 'dateOfBirth',
-    valueMapper: dateToISO('dateOfBirth'),
-  },
-  'defendant-name-capture': {
-    backendPath: 'possessionClaimResponse.defendantContactDetails.party',
-    frontendFields: ['firstName', 'lastName'],
-    valueMapper: passThrough(['firstName', 'lastName']),
-  },
-  'defendant-name-confirmation': {
-    backendPath: 'possessionClaimResponse',
-    frontendFields: ['nameConfirmation', 'nameConfirmation.firstName', 'nameConfirmation.lastName'],
-    valueMapper: (formData: FormFieldValue) => {
-      const data = formData as Record<string, unknown>;
-      const result: Record<string, unknown> = {
-        defendantResponses: {},
-        defendantContactDetails: { party: {} },
-      };
-
-      const nameConfirmation = data.nameConfirmation as string;
-
-      // Always save the yes/no selection using yesNoEnum mapper
-      const yesNoMapper = yesNoEnum('defendantNameConfirmation');
-      const yesNoResult = yesNoMapper(nameConfirmation);
-
-      if (yesNoResult.defendantNameConfirmation) {
-        (result.defendantResponses as Record<string, unknown>).defendantNameConfirmation =
-          yesNoResult.defendantNameConfirmation;
-      }
-
-      // Always save names to defendantContactDetails.party
-      // - If YES: copy from claimantEnteredDefendantDetails (available in req context)
-      // - If NO: save corrected names from subFields
-      const party = (result.defendantContactDetails as Record<string, unknown>).party as Record<string, unknown>;
-
-      if (nameConfirmation === 'yes') {
-        // User confirmed the name is correct - frontend should send the claimant's name
-        // This will be injected in saveToCCD function which has access to res.locals.validatedCase
-      } else if (nameConfirmation === 'no') {
-        // User corrected the name - save the corrected values
-        const firstName = data['nameConfirmation.firstName'];
-        const lastName = data['nameConfirmation.lastName'];
-
-        if (firstName) {
-          party.firstName = firstName;
-        }
-        if (lastName) {
-          party.lastName = lastName;
-        }
-      }
-
-      return result;
-    },
-  },
-};
-
 /** Converts dot-path to nested object (e.g., 'a.b.c' → { a: { b: { c: value } } }) */
 function pathToNested(path: string, value: Record<string, unknown>): Record<string, unknown> {
   const keys = path.split('.');
@@ -234,13 +167,16 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
 }
 
 /**
- * Auto-saves form data to CCD draft if step is configured in STEP_FIELD_MAPPING.
- * Use this in formBuilder's beforeRedirect callback instead of middleware.
+ * Auto-saves form data to CCD draft using the provided `ccdMapping`.
  */
-export async function autoSaveToCCD(req: Request, res: Response, stepName: string): Promise<void> {
-  const config = STEP_FIELD_MAPPING[stepName];
+export async function autoSaveToCCD(
+  req: Request,
+  res: Response,
+  config: { stepName: string; ccdMapping?: CcdFieldMapping }
+): Promise<void> {
+  const { stepName, ccdMapping } = config;
 
-  if (!config) {
+  if (!ccdMapping) {
     logger.debug(`[${stepName}] No CCD mapping configured, skipping auto-save`);
     return;
   }
@@ -252,7 +188,7 @@ export async function autoSaveToCCD(req: Request, res: Response, stepName: strin
     return;
   }
 
-  await saveToCCD(req, res, stepName, formData, config);
+  await saveToCCD(req, res, stepName, formData, ccdMapping);
 }
 
 async function saveToCCD(
@@ -260,10 +196,11 @@ async function saveToCCD(
   res: Response,
   stepName: string,
   formData: Record<string, unknown>,
-  config: StepMapping
+  ccdMapping: CcdFieldMapping
 ): Promise<void> {
   const validatedCase = res.locals.validatedCase;
   const accessToken = req.session.user?.accessToken;
+  const ctx: CcdMappingContext = { caseData: validatedCase?.data as Record<string, unknown> | undefined };
 
   if (!validatedCase?.id) {
     logger.warn(`[${stepName}] No validated case, skipping draft save`);
@@ -279,16 +216,16 @@ async function saveToCCD(
     logger.debug(`[${stepName}] Auto-saving to CCD draft`);
 
     let relevantData: string | string[] | Record<string, unknown>;
-    if (config.frontendField) {
-      const fieldValue = formData[config.frontendField];
+    if (ccdMapping.frontendField) {
+      const fieldValue = formData[ccdMapping.frontendField];
       if (fieldValue === undefined) {
-        logger.warn(`[${stepName}] Field '${config.frontendField}' not found in form data, skipping save`);
+        logger.warn(`[${stepName}] Field '${ccdMapping.frontendField}' not found in form data, skipping save`);
         return;
       }
       relevantData = fieldValue as string | string[];
-    } else if (config.frontendFields) {
+    } else if (ccdMapping.frontendFields) {
       const multiFieldData: Record<string, unknown> = {};
-      for (const fieldName of config.frontendFields) {
+      for (const fieldName of ccdMapping.frontendFields) {
         if (formData[fieldName] !== undefined) {
           multiFieldData[fieldName] = formData[fieldName];
         }
@@ -302,25 +239,7 @@ async function saveToCCD(
       relevantData = formData;
     }
 
-    const transformedData = config.valueMapper(relevantData);
-
-    // Special handling for defendant-name-confirmation when YES is selected
-    if (stepName === 'defendant-name-confirmation' && formData.nameConfirmation === 'yes') {
-      // Copy firstName/lastName from claimantEnteredDefendantDetails to defendantContactDetails.party
-      const caseData = validatedCase?.data;
-      const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
-
-      if (claimantEntry?.firstName && claimantEntry?.lastName) {
-        const party = (transformedData.defendantContactDetails as Record<string, unknown>)?.party as Record<
-          string,
-          unknown
-        >;
-        if (party) {
-          party.firstName = claimantEntry.firstName;
-          party.lastName = claimantEntry.lastName;
-        }
-      }
-    }
+    const transformedData = ccdMapping.valueMapper(relevantData, ctx);
 
     // Skip save if transformed data is empty (nothing to update)
     if (Object.keys(transformedData).length === 0) {
@@ -328,7 +247,7 @@ async function saveToCCD(
       return;
     }
 
-    const nestedData = pathToNested(config.backendPath, transformedData);
+    const nestedData = pathToNested(ccdMapping.backendPath, transformedData);
 
     const ccdPayload = {
       ...nestedData,

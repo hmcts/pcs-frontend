@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { dateToISO } from '../../../middleware/autoSaveDraftToCCD';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -12,6 +13,11 @@ export const step: StepDefinition = createFormStep({
   basePath: '/respond-to-claim',
   flowConfig,
   showCancelButton: false,
+  ccdMapping: {
+    backendPath: 'possessionClaimResponse.defendantResponses',
+    frontendField: 'dateOfBirth',
+    valueMapper: dateToISO('dateOfBirth'),
+  },
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',

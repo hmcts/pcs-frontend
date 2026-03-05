@@ -1,6 +1,8 @@
 import type { Request } from 'express';
 
+import type { CcdMappingContext, FormFieldValue } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { yesNoEnum } from '../../../middleware/autoSaveDraftToCCD';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -12,6 +14,69 @@ export const step: StepDefinition = createFormStep({
   basePath: '/respond-to-claim',
   flowConfig,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
+  ccdMapping: {
+    backendPath: 'possessionClaimResponse',
+    frontendFields: ['nameConfirmation', 'nameConfirmation.firstName', 'nameConfirmation.lastName'],
+    valueMapper: (valueOrFormData: FormFieldValue, ctx?: CcdMappingContext) => {
+      if (typeof valueOrFormData === 'string' || Array.isArray(valueOrFormData)) {
+        return {};
+      }
+
+      const formData = valueOrFormData as Record<string, unknown>;
+      const nameConfirmation = formData.nameConfirmation;
+
+      if (nameConfirmation !== 'yes' && nameConfirmation !== 'no') {
+        return {};
+      }
+
+      const mappedAnswer = yesNoEnum('defendantNameConfirmation')(nameConfirmation);
+      const defendantNameConfirmation = mappedAnswer.defendantNameConfirmation;
+
+      const defendantResponses: Record<string, unknown> = {};
+      if (defendantNameConfirmation) {
+        defendantResponses.defendantNameConfirmation = defendantNameConfirmation;
+      }
+
+      const party: Record<string, unknown> = {};
+      if (nameConfirmation === 'no') {
+        const firstName = formData['nameConfirmation.firstName'];
+        const lastName = formData['nameConfirmation.lastName'];
+        if (typeof firstName === 'string' && firstName.trim()) {
+          party.firstName = firstName;
+        }
+        if (typeof lastName === 'string' && lastName.trim()) {
+          party.lastName = lastName;
+        }
+      }
+
+      if (nameConfirmation === 'yes') {
+        const caseData = ctx?.caseData as Record<string, unknown> | undefined;
+        const possessionClaimResponse = caseData?.possessionClaimResponse as Record<string, unknown> | undefined;
+        const claimantEntry = possessionClaimResponse?.claimantEnteredDefendantDetails as
+          | Record<string, unknown>
+          | undefined;
+
+        const firstName = claimantEntry?.firstName;
+        const lastName = claimantEntry?.lastName;
+        if (typeof firstName === 'string' && firstName.trim()) {
+          party.firstName = firstName;
+        }
+        if (typeof lastName === 'string' && lastName.trim()) {
+          party.lastName = lastName;
+        }
+      }
+
+      const result: Record<string, unknown> = {};
+      if (Object.keys(defendantResponses).length > 0) {
+        result.defendantResponses = defendantResponses;
+      }
+      if (Object.keys(party).length > 0) {
+        result.defendantContactDetails = { party };
+      }
+
+      return result;
+    },
+  },
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',

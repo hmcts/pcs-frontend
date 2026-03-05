@@ -1,4 +1,5 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { passThrough } from '../../../middleware/autoSaveDraftToCCD';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -9,6 +10,11 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   showCancelButton: false,
+  ccdMapping: {
+    backendPath: 'possessionClaimResponse.defendantContactDetails.party',
+    frontendFields: ['firstName', 'lastName'],
+    valueMapper: passThrough(['firstName', 'lastName']),
+  },
   translationKeys: {
     // Browser/tab title
     pageTitle: 'pageTitle',

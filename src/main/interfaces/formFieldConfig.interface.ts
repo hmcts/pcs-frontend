@@ -97,6 +97,25 @@ export type ExtendGetContent = (
 
 export type GetInitialFormData = (req: Request) => MaybePromise<Record<string, unknown>>;
 
+export type FormFieldValue = string | string[] | Record<string, unknown>;
+
+export interface CcdMappingContext {
+  /**
+   * CCD case data snapshot available during POST (from START callback middleware).
+   * Keep this as plain data to avoid coupling mappers to Express `req/res`.
+   */
+  caseData?: Record<string, unknown>;
+}
+
+export type ValueMapper = (valueOrFormData: FormFieldValue, ctx?: CcdMappingContext) => Record<string, unknown>;
+
+export interface CcdFieldMapping {
+  backendPath: string;
+  frontendField?: string;
+  frontendFields?: string[];
+  valueMapper: ValueMapper;
+}
+
 export interface FormBuilderConfig {
   stepName: string;
   journeyFolder: string;
@@ -108,6 +127,11 @@ export interface FormBuilderConfig {
    * This is GET-only and must not overwrite POST body values during validation rerenders.
    */
   getInitialFormData?: GetInitialFormData;
+  /**
+   * Optional: declarative CCD draft persistence mapping.
+   * When provided, formBuilder auto-injects auto-save on POST before any custom `beforeRedirect`.
+   */
+  ccdMapping?: CcdFieldMapping;
   stepDir: string;
   translationKeys?: TranslationKeys;
   customTemplate?: string;

@@ -1,4 +1,5 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { yesNoEnum } from '../../../middleware/autoSaveDraftToCCD';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -9,6 +10,11 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/freeLegalAdvice.njk`,
+  ccdMapping: {
+    backendPath: 'possessionClaimResponse.defendantResponses',
+    frontendField: 'hadLegalAdvice',
+    valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
+  },
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',

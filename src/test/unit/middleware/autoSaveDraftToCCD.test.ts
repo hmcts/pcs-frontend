@@ -243,6 +243,12 @@ jest.mock('../../../main/services/ccdCaseService', () => ({
 describe('autoSaveToCCD main function', () => {
   const mockUpdateCase = ccdCaseService.updateDraftRespondToClaim as jest.Mock;
 
+  const freeLegalAdviceMapping = {
+    backendPath: 'possessionClaimResponse.defendantResponses',
+    frontendField: 'hadLegalAdvice',
+    valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -263,7 +269,7 @@ describe('autoSaveToCCD main function', () => {
         },
       } as unknown as Response;
 
-      await autoSaveToCCD(req, res, 'unconfigured-step');
+      await autoSaveToCCD(req, res, { stepName: 'unconfigured-step' });
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
         '[unconfigured-step] No CCD mapping configured, skipping auto-save'
@@ -284,7 +290,7 @@ describe('autoSaveToCCD main function', () => {
         },
       } as unknown as Response;
 
-      await autoSaveToCCD(req, res, 'free-legal-advice');
+      await autoSaveToCCD(req, res, { stepName: 'free-legal-advice', ccdMapping: freeLegalAdviceMapping });
 
       expect(mockUpdateCase).not.toHaveBeenCalled();
     });
@@ -304,7 +310,7 @@ describe('autoSaveToCCD main function', () => {
         },
       } as unknown as Response;
 
-      await autoSaveToCCD(req, res, 'free-legal-advice');
+      await autoSaveToCCD(req, res, { stepName: 'free-legal-advice', ccdMapping: freeLegalAdviceMapping });
 
       expect(mockUpdateCase).not.toHaveBeenCalled();
     });
@@ -323,7 +329,7 @@ describe('autoSaveToCCD main function', () => {
         locals: {},
       } as unknown as Response;
 
-      await autoSaveToCCD(req, res, 'free-legal-advice');
+      await autoSaveToCCD(req, res, { stepName: 'free-legal-advice', ccdMapping: freeLegalAdviceMapping });
 
       expect(mockLogger.warn).toHaveBeenCalledWith('[free-legal-advice] No validated case, skipping draft save');
       expect(mockUpdateCase).not.toHaveBeenCalled();
@@ -344,9 +350,9 @@ describe('autoSaveToCCD main function', () => {
         },
       } as unknown as Response;
 
-      await expect(autoSaveToCCD(req, res, 'free-legal-advice')).rejects.toThrow(
-        'No access token available for CCD update'
-      );
+      await expect(
+        autoSaveToCCD(req, res, { stepName: 'free-legal-advice', ccdMapping: freeLegalAdviceMapping })
+      ).rejects.toThrow('No access token available for CCD update');
       expect(mockLogger.error).toHaveBeenCalledWith('[free-legal-advice] No access token in session');
     });
 
@@ -371,7 +377,7 @@ describe('autoSaveToCCD main function', () => {
         locals: { validatedCase: { id: '1234567890123456' } },
       } as unknown as Response;
 
-      await autoSaveToCCD(req, res, 'free-legal-advice');
+      await autoSaveToCCD(req, res, { stepName: 'free-legal-advice', ccdMapping: freeLegalAdviceMapping });
 
       expect(mockUpdateCase).toHaveBeenCalledWith('mock-token', '1234567890123456', {
         possessionClaimResponse: {
@@ -400,12 +406,73 @@ describe('autoSaveToCCD main function', () => {
         },
       } as unknown as Response;
 
-      await autoSaveToCCD(req, res, 'free-legal-advice');
+      await autoSaveToCCD(req, res, { stepName: 'free-legal-advice', ccdMapping: freeLegalAdviceMapping });
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
         "[free-legal-advice] Field 'hadLegalAdvice' not found in form data, skipping save"
       );
       expect(mockUpdateCase).not.toHaveBeenCalled();
+    });
+
+    it('should allow valueMapper to use CCD caseData context', async () => {
+      const defendantNameConfirmationMapping = {
+        backendPath: 'possessionClaimResponse',
+        frontendFields: ['nameConfirmation'],
+        valueMapper: (valueOrFormData: unknown, ctx?: { caseData?: Record<string, unknown> }) => {
+          if (typeof valueOrFormData === 'string' || Array.isArray(valueOrFormData)) {
+            return {};
+          }
+          const data = valueOrFormData as Record<string, unknown>;
+          if (data.nameConfirmation !== 'yes') {
+            return {};
+          }
+          const possessionClaimResponse = ctx?.caseData?.possessionClaimResponse as Record<string, unknown> | undefined;
+          const claimantEntry = possessionClaimResponse?.claimantEnteredDefendantDetails as
+            | Record<string, unknown>
+            | undefined;
+          const firstName = claimantEntry?.firstName;
+          const lastName = claimantEntry?.lastName;
+          if (typeof firstName !== 'string' || typeof lastName !== 'string') {
+            return {};
+          }
+          return {
+            defendantResponses: { defendantNameConfirmation: 'YES' },
+            defendantContactDetails: { party: { firstName, lastName } },
+          };
+        },
+      };
+
+      const req = {
+        session: {
+          formData: { 'defendant-name-confirmation': { nameConfirmation: 'yes' } },
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: {
+          validatedCase: {
+            id: '1234567890123456',
+            data: {
+              possessionClaimResponse: {
+                claimantEnteredDefendantDetails: { firstName: 'AAA', lastName: 'BBB' },
+              },
+            },
+          },
+        },
+      } as unknown as Response;
+
+      await autoSaveToCCD(req, res, {
+        stepName: 'defendant-name-confirmation',
+        ccdMapping: defendantNameConfirmationMapping,
+      });
+
+      expect(mockUpdateCase).toHaveBeenCalledWith('mock-token', '1234567890123456', {
+        possessionClaimResponse: {
+          defendantResponses: { defendantNameConfirmation: 'YES' },
+          defendantContactDetails: { party: { firstName: 'AAA', lastName: 'BBB' } },
+        },
+      });
     });
 
     it('should handle CCD save errors gracefully', async () => {
@@ -426,7 +493,7 @@ describe('autoSaveToCCD main function', () => {
         },
       } as unknown as Response;
 
-      await autoSaveToCCD(req, res, 'free-legal-advice');
+      await autoSaveToCCD(req, res, { stepName: 'free-legal-advice', ccdMapping: freeLegalAdviceMapping });
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         '[free-legal-advice] Failed to save draft to CCD:',
