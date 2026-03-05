@@ -22,10 +22,10 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async (req: Request) => {
     const disputeClaimRaw = req.body?.disputeClaim as 'yes' | 'no' | undefined;
-    const disputeDetailsRaw = req.body?.['disputeDetails'] as string | undefined;
+    // Sub-field is submitted with dotted name: parentField.subField
+    const disputeDetailsRaw = req.body?.['disputeClaim.disputeDetails'] as string | undefined;
 
-    const disputeClaim =
-      disputeClaimRaw === 'yes' ? 'YES' : disputeClaimRaw === 'no' ? 'NO' : undefined;
+    const disputeClaim = disputeClaimRaw === 'yes' ? 'YES' : disputeClaimRaw === 'no' ? 'NO' : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
@@ -34,7 +34,7 @@ export const step: StepDefinition = createFormStep({
       },
     };
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: (req: Request) => {
     const claimantName = getClaimantName(req);
