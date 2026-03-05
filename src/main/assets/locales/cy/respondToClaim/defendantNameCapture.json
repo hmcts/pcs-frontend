@@ -7,6 +7,8 @@
   "contactUs": "cyContact us for help",
   "errors": {
     "firstName": "cyEnter your first name",
-    "lastName": "cyEnter your last name"
+    "firstNameMaxLength": "cyFirst name must be 60 characters or less",
+    "lastName": "cyEnter your last name",
+    "lastNameMaxLength": "cyLast name must be 60 characters or less"
   }
 }
