@@ -1,9 +1,38 @@
 import type { Application, Response } from 'express';
-import express from 'express';
 import type { Environment } from 'nunjucks';
 
 import * as caseReferenceMiddleware from '../../../main/middleware/caseReference';
+import { Logger } from '../../../main/modules/logger';
 import dashboardRoutes, { getDashboardUrl } from '../../../main/routes/dashboard';
+import { getDashboardNotifications, getDashboardTaskGroups } from '../../../main/services/pcsApi';
+
+jest.mock('../../../main/modules/logger', () => {
+  const errorFn = jest.fn();
+  const loggerInstance = { error: errorFn };
+  return {
+    Logger: {
+      getLogger: jest.fn(() => loggerInstance),
+    },
+  };
+});
+
+const mockRouterParam = jest.fn();
+const mockRouterGet = jest.fn();
+
+const mockRouter = {
+  param: mockRouterParam,
+  get: mockRouterGet,
+};
+
+jest.mock('express', () => {
+  const actual = jest.requireActual('express');
+
+  return {
+    __esModule: true,
+    ...actual,
+    Router: jest.fn(() => mockRouter),
+  };
+});
 
 jest.mock('../../../main/middleware/caseReference', () => ({
   caseReferenceParamMiddleware: jest.fn((req, res, next, caseReference) => {
@@ -33,6 +62,7 @@ jest.mock('../../../main/middleware/oidc', () => ({
 jest.mock('../../../main/services/pcsApi', () => {
   const STATUS_MAP = {
     AVAILABLE: { text: 'Available' },
+    NOT_AVAILABLE: { text: 'Not available' },
   };
 
   const TASK_GROUP_MAP = {
@@ -49,8 +79,13 @@ jest.mock('../../../main/services/pcsApi', () => {
         tasks: [
           {
             templateId: 'task-1',
-            templateValues: {},
+            templateValues: { dueDate: '2025-01-01' },
             status: 'AVAILABLE',
+          },
+          {
+            templateId: 'task-2',
+            templateValues: {},
+            status: 'NOT_AVAILABLE',
           },
         ],
       },
@@ -60,20 +95,24 @@ jest.mock('../../../main/services/pcsApi', () => {
 
 describe('Dashboard Routes', () => {
   let app: Application;
-  let mockResponse: Partial<Response>;
+  let logger: { error: jest.Mock };
 
   beforeEach(() => {
-    app = express();
-    app.locals.nunjucksEnv = {
-      render: jest.fn((template: string) => `<div>${template}</div>`),
-    } as unknown as Environment;
+    mockRouterGet.mockClear();
+    mockRouterParam.mockClear();
+    (getDashboardNotifications as jest.Mock).mockClear();
+    (getDashboardTaskGroups as jest.Mock).mockClear();
+    logger = (Logger.getLogger as jest.Mock)();
+    logger.error.mockClear();
 
-    mockResponse = {
-      locals: {},
-      redirect: jest.fn(),
-      render: jest.fn(),
-      status: jest.fn().mockReturnThis(),
-    };
+    app = {
+      locals: {
+        nunjucksEnv: {
+          render: jest.fn((template: string) => `<div>${template}</div>`),
+        } as unknown as Environment,
+      },
+      use: jest.fn(),
+    } as unknown as Application;
   });
 
   afterEach(() => {
@@ -84,17 +123,129 @@ describe('Dashboard Routes', () => {
     it('should create dashboard router with param middleware', () => {
       dashboardRoutes(app);
 
-      // Verify middleware module is imported (indicates router pattern used)
-      expect(caseReferenceMiddleware.caseReferenceParamMiddleware).toBeDefined();
+      expect(mockRouterParam).toHaveBeenCalledWith(
+        'caseReference',
+        caseReferenceMiddleware.caseReferenceParamMiddleware
+      );
+      expect((app.use as jest.Mock).mock.calls[0][0]).toBe('/dashboard');
+      expect((app.use as jest.Mock).mock.calls[0][1]).toBe(mockRouter);
     });
 
     it('should handle validatedCase being undefined gracefully', async () => {
-      mockResponse.locals = {}; // No validatedCase set
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[2] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: {},
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.render).toHaveBeenCalledWith('error', {
+        error: 'Case validation failed - validatedCase not set',
+      });
+      expect(logger.error).toHaveBeenCalledWith('Dashboard: validatedCase is undefined - middleware not executed');
+    });
+
+    it('should render dashboard view with mapped task groups', async () => {
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[2] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: {
+          validatedCase: {
+            id: '1234567890123456',
+            data: {
+              propertyAddress: {
+                AddressLine1: '10 Second Avenue',
+                AddressLine2: '',
+                AddressLine3: '',
+                PostTown: 'London',
+                County: '',
+                PostCode: 'W3 7RX',
+              },
+            },
+          },
+        },
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      expect(getDashboardNotifications).toHaveBeenCalledWith(1234567890123456);
+      expect(getDashboardTaskGroups).toHaveBeenCalledWith(1234567890123456);
+
+      expect(res.render).toHaveBeenCalledWith(
+        'dashboard',
+        expect.objectContaining({
+          propertyAddress: '10 Second Avenue, London, W3 7RX',
+          dashboardCaseReference: '1234567890123456',
+        })
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: {
+          title: string;
+          tasks: {
+            title: { html: string };
+            hint?: { html: string };
+            href?: string;
+            status: unknown;
+          }[];
+        }[];
+      };
+
+      const [firstGroup] = renderArgs.taskGroups;
+      expect(firstGroup.title).toBe('Group one title');
+
+      const [availableTask, notAvailableTask] = firstGroup.tasks;
+
+      expect(availableTask.title.html).toContain('components/taskGroup/group_one/task-1.njk');
+      expect(availableTask.hint?.html).toContain('components/taskGroup/group_one/task-1-hint.njk');
+      expect(availableTask.href).toBe('/dashboard/1234567890123456/group_one/task-1');
+
+      expect(notAvailableTask.hint).toBeUndefined();
+      expect(notAvailableTask.href).toBeUndefined();
+    });
+
+    it('should log and rethrow when dashboard data fetch fails', async () => {
+      (getDashboardTaskGroups as jest.Mock).mockRejectedValueOnce(new Error('API failure'));
 
       dashboardRoutes(app);
 
-      // Verify validatedCase can be undefined
-      expect(mockResponse.locals.validatedCase).toBeUndefined();
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[2] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: {
+          validatedCase: {
+            id: '1234567890123456',
+            data: {},
+          },
+        },
+      } as unknown as Response;
+
+      await expect(handler({}, res)).rejects.toThrow('API failure');
+
+      expect(logger.error).toHaveBeenCalledWith(
+        'Failed to fetch dashboard data for case 1234567890123456. Error was: Error: API failure'
+      );
     });
   });
 
