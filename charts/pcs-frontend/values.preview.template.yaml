@@ -9,11 +9,13 @@ nodejs:
         - pcs-frontend-idam-secret
         - launchdarkly-sdk-key
         - pcs-os-client-lookup-key
+        - app-insights-connection-string
   environment:
     REDIS_CONNECTION_STRING: redis://${SERVICE_NAME}-redis-master:6379
     OIDC_REDIRECT_URI: 'https://${SERVICE_FQDN}/oauth2/callback'
-    PCS_API_URL: '${PCS_API_URL_PREVIEW}'
+    PCS_API_URL: '${PCS_API_URL}'
     CCD_URL: '${DATA_STORE_URL_BASE}'
+    CASE_TYPE_ID: '${CASE_TYPE_ID}'
 redis:
   image:
     registry: hmctspublic.azurecr.io
