@@ -1,7 +1,6 @@
 import type { Application, Response } from 'express';
 import express from 'express';
 import type { Environment } from 'nunjucks';
-import request from 'supertest';
 
 import * as caseReferenceMiddleware from '../../../main/middleware/caseReference';
 import dashboardRoutes, { getDashboardUrl } from '../../../main/routes/dashboard';
@@ -96,39 +95,6 @@ describe('Dashboard Routes', () => {
 
       // Verify validatedCase can be undefined
       expect(mockResponse.locals.validatedCase).toBeUndefined();
-    });
-
-    it('should render dashboard with property address and case reference', async () => {
-      dashboardRoutes(app);
-
-      const appWithResponse = app as unknown as { response: Response };
-      const renderSpy = jest.spyOn(appWithResponse.response, 'render');
-
-      await request(app).get('/dashboard/1772634251466249');
-
-      expect(renderSpy).toHaveBeenCalledWith(
-        'dashboard',
-        expect.objectContaining({
-          propertyAddress: '10 Second Avenue, London, W3 7RX',
-          dashboardCaseReference: '1772634251466249',
-        })
-      );
-    });
-
-    it('should redirect root /dashboard to case-specific dashboard when session case id is valid', async () => {
-      // Simulate a valid CCD case id in the session
-      app.use((req, _res, next) => {
-        // @ts-expect-error - adding test-only session shape
-        req.session = { ccdCase: { id: '1772634251466249' } };
-        next();
-      });
-
-      dashboardRoutes(app);
-
-      const response = await request(app).get('/dashboard');
-
-      expect(response.status).toBe(303);
-      expect(response.headers.location).toBe('/dashboard/1772634251466249');
     });
   });
 

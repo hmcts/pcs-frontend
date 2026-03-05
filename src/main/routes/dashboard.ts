@@ -1,7 +1,7 @@
 import type { Application, Request, Response } from 'express';
 import { Router } from 'express';
 
-import type { CcdCase } from '../interfaces/ccdCase.interface';
+import type { Address, CcdCase } from '../interfaces/ccdCase.interface';
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import {
@@ -13,6 +13,7 @@ import {
 } from '../services/pcsApi';
 
 import { Logger } from '@modules/logger';
+import { formatAddressParts } from '@utils/addressFormatter';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -27,32 +28,20 @@ interface MappedTask {
 }
 
 function getPropertyAddressFromValidatedCase(validatedCase: CcdCase): string | null {
-  const address = (validatedCase.data as { propertyAddress?: unknown })?.propertyAddress as
-    | {
-        AddressLine1?: string;
-        AddressLine2?: string;
-        AddressLine3?: string;
-        PostTown?: string;
-        County?: string;
-        PostCode?: string;
-      }
-    | undefined;
+  const address = (validatedCase.data as { propertyAddress?: Address | undefined })?.propertyAddress;
 
   if (!address) {
     return null;
   }
 
-  const formatted = [
+  const formatted = formatAddressParts([
     address.AddressLine1,
     address.AddressLine2,
     address.AddressLine3,
     address.PostTown,
     address.County,
     address.PostCode,
-  ]
-    .map(part => (part ?? '').trim())
-    .filter(Boolean)
-    .join(', ');
+  ]);
 
   return formatted || null;
 }
