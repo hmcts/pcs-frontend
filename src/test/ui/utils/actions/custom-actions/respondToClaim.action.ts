@@ -171,11 +171,32 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
+    let rentArrears_Total: string | null = null;
+    let claimantName: string | null = null;
+    if (rentArrearsInfo.tenancy === 'flexible') {
+      rentArrears_Total = `${submitCaseApiData.submitCasePayloadFlexibleTenancyDate.rentArrears_Total}`;
+      claimantName = `${submitCaseApiData.submitCasePayloadFlexibleTenancyDate.claimantName}`;
+    }
+    if (rentArrearsInfo.tenancy === 'introductory') {
+      rentArrears_Total = `${submitCaseApiData.submitCasePayloadIntroductoryTenancy.rentArrears_Total}`;
+      claimantName = `${submitCaseApiData.submitCasePayloadIntroductoryTenancy.claimantName}`;
+    }
+
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `Amount you owe in rent arrears given by ${claimantName}:`,
+    });
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `Rent arrears are money you owe in rent payments.
+When making their claim, ${claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.
+The rent statement will have been included in the pack you received in the post letting you know a claim had been made against you, and is also available to view from ‘View the claim’ on your case overview.`,
+    });
+    await performValidation('text', { elementType: 'heading', text: rentArrears_Total });
     await performAction('clickRadioButton', {
       question: rentArrears.doYouOweThisQuestion,
       option: rentArrearsInfo.option,
     });
-
     if (rentArrearsInfo.option === rentArrears.noRadioOption) {
       await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
     }

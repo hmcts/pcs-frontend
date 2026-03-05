@@ -32,16 +32,12 @@ export async function rentArrearsErrorValidation(): Promise<void> {
     header: rentArrears.thereIsAProblemErrorMessageHeader,
     message: rentArrears.enterAmountInCorrectFormat,
   });
-  // await performAction(
-  //   'inputText',
-  //   rentArrears.howMuchDoYouBelieveHiddenTextLabel,
-  //   rentArrears.billionTextInput
-  // );
-  // await performAction('clickButton', rentArrears.saveAndContinueButton);
-  // await performValidation('errorMessage', {
-  //   header: rentArrears.thereIsAProblemErrorMessageHeader,
-  //   message: rentArrears.lessThanBillionErrorMessage,
-  // });
+  await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.billionTextInput);
+  await performAction('clickButton', rentArrears.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: rentArrears.thereIsAProblemErrorMessageHeader,
+    message: rentArrears.lessThanBillionErrorMessage,
+  });
   await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.rentAmountTextInput);
   await performAction('clickButton', rentArrears.saveAndContinueButton);
 }
