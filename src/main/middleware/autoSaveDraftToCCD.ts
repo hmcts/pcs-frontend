@@ -134,41 +134,6 @@ export function passThrough(fieldNames: readonly string[]): ValueMapper {
   };
 }
 
-/** Transforms yes/no values to uppercase YES/NO for VerticalYesNo enum */
-export function verticalYesNo(backendFieldName: string): ValueMapper {
-  const ALLOWED_VALUES = ['yes', 'no'] as const;
-  type AllowedValue = (typeof ALLOWED_VALUES)[number]; // 'yes' | 'no'
-
-  return (value: FormFieldValue) => {
-    if (typeof value !== 'string') {
-      logger.warn('verticalYesNo expects a string, received:', typeof value);
-      return { [backendFieldName]: '' };
-    }
-
-    // Type-safe mapping: only allowed values as keys
-    const enumMapping: Record<AllowedValue, string> = {
-      yes: 'YES',
-      no: 'NO',
-    };
-
-    // Validate that value is one of the allowed enum values
-    const isAllowedValue = (ALLOWED_VALUES as readonly string[]).includes(value);
-
-    if (!isAllowedValue) {
-      const allowedStr = ALLOWED_VALUES.join(', ');
-      logger.error(
-        `verticalYesNo: Invalid value "${value}" for field "${backendFieldName}". ` +
-          `Allowed values: ${allowedStr}. This indicates a bug in form validation or incorrect mapper usage.`
-      );
-      // Return empty string to prevent invalid data in CCD
-      return { [backendFieldName]: '' };
-    }
-
-    // Type assertion safe here because isAllowedValue check guarantees it
-    return { [backendFieldName]: enumMapping[value as AllowedValue] };
-  };
-}
-
 /** Transforms array of checkbox values to uppercase enum array */
 export function multipleYesNo(backendFieldName: string): ValueMapper {
   return (value: FormFieldValue) => {
@@ -247,8 +212,8 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
 
       const nameConfirmation = data.nameConfirmation as string;
 
-      // Always save the yes/no selection using verticalYesNo mapper
-      const yesNoMapper = verticalYesNo('defendantNameConfirmation');
+      // Always save the yes/no selection using yesNoEnum mapper
+      const yesNoMapper = yesNoEnum('defendantNameConfirmation');
       const yesNoResult = yesNoMapper(nameConfirmation);
 
       if (yesNoResult.defendantNameConfirmation) {
