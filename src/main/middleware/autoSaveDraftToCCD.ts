@@ -162,38 +162,7 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
   'defendant-date-of-birth': {
     backendPath: 'possessionClaimResponse.defendantResponses',
     frontendField: 'dateOfBirth',
-    valueMapper: (formData: FormFieldValue) => {
-      const dateValue = formData as Record<string, unknown>;
-      const result: Record<string, unknown> = {};
-
-      const day = dateValue.day;
-      const month = dateValue.month;
-      const year = dateValue.year;
-
-      if (!day || !month || !year) {
-        logger.warn('[defendant-date-of-birth] Missing date components, skipping save');
-        return result;
-      }
-
-      // Use luxon for proper date validation and formatting
-      const dateTime = DateTime.fromObject({
-        year: Number(year),
-        month: Number(month),
-        day: Number(day),
-      });
-
-      if (!dateTime.isValid) {
-        logger.warn(
-          `[defendant-date-of-birth] Invalid date: ${dateTime.invalidReason} (day=${String(day)}, month=${String(month)}, year=${String(year)})`
-        );
-        return result;
-      }
-
-      const isoDate = dateTime.toISODate();
-
-      result.dateOfBirth = isoDate;
-      return result;
-    },
+    valueMapper: dateToISO('dateOfBirth'),
   },
   'defendant-name-capture': {
     backendPath: 'possessionClaimResponse.defendantContactDetails.party',
