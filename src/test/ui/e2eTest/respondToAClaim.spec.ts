@@ -16,6 +16,7 @@ import {
   repaymentsMade,
   startNow,
   tenancyDetails,
+  tenancyStartDateKnown,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/element-validations';
@@ -95,6 +96,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyStartDateKnown.mainHeader);
+    await performAction('tenancyStartDateKnown', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyStartDateKnown.yesRadioOption,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -132,6 +138,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyStartDateKnown.noRadioOption,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
@@ -163,6 +172,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyStartDateKnown.noRadioOption,
+      day: '01',
+      month: '12',
+      year: '2025',
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.noRadioOption,
     });

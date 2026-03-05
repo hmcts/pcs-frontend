@@ -11,6 +11,7 @@ export * from './defendantNameConfirmation.page.data';
 export * from './contactPreference.page.data';
 export * from './noticeDetails.page.data';
 export * from './noticeDateKnown.page.data';
+export * from './tenancyStartDateKnown.page.data';
 export * from './noticeDateUnknown.page.data';
 export * from './rentArrearsDispute.page.data';
 export * from './nonRentArrearsDispute.page.data';
