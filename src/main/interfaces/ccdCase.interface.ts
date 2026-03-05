@@ -23,7 +23,7 @@ export interface CcdCase {
   data: Record<string, unknown>;
 }
 
-export interface Address {
+export interface CcdCaseAddress {
   AddressLine1: string;
   AddressLine2?: string;
   AddressLine3?: string;
@@ -38,7 +38,7 @@ export interface PossessionClaimResponse {
     party?: {
       firstName?: string;
       lastName?: string;
-      address?: Address;
+      address?: CcdCaseAddress;
       phoneNumberProvided?: YesNoValue;
       phoneNumber?: string;
     };
@@ -57,7 +57,7 @@ export interface StartCallbackData {
       possessionClaimResponse?: {
         defendantContactDetails?: {
           party?: {
-            address?: Address;
+            address?: CcdCaseAddress;
           };
         };
       };

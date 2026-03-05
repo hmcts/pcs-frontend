@@ -1,4 +1,4 @@
-import { sanitiseCaseReference, toCaseReference16 } from '../../../main/utils/caseReference';
+import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 
 describe('caseReference utilities', () => {
   describe('sanitiseCaseReference', () => {

@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
