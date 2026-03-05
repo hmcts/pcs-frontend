@@ -17,7 +17,7 @@ jest.mock('@modules/logger', () => ({
   },
 }));
 
-import { createErrorHandler, createNotFoundHandler, setupErrorHandlers } from '../../../../main/modules/error-handler';
+import { createErrorHandler, createNotFoundHandler, setupErrorHandlers } from '@modules/error-handler';
 
 describe('error-handler', () => {
   let app: Express;

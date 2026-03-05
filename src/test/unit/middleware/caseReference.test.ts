@@ -11,7 +11,7 @@ jest.mock('@modules/logger', () => ({
   },
 }));
 
-jest.mock('../../../main/utils/caseReference', () => ({
+jest.mock('@utils/caseReference', () => ({
   sanitiseCaseReference: jest.fn((input: string | number) => {
     const str = String(input);
     // Only return valid if it's exactly 16 digits
@@ -21,7 +21,7 @@ jest.mock('../../../main/utils/caseReference', () => ({
 
 const mockGetCaseById = jest.fn();
 
-jest.mock('../../../main/services/ccdCaseService', () => ({
+jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
     getCaseById: (...args: unknown[]) => mockGetCaseById(...args),
   },

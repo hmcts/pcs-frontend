@@ -1,15 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type {
-  BuiltFormContent,
-  ExtendGetContent,
-  FormFieldConfig,
-  TranslationKeys,
-} from '../../../interfaces/formFieldConfig.interface';
-import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
-import { getDashboardUrl } from '../../../routes/dashboard';
-import { safeRedirect303 } from '../../../utils/safeRedirect';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -25,6 +16,16 @@ import {
   validateForm,
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
+
+import type {
+  BuiltFormContent,
+  ExtendGetContent,
+  FormFieldConfig,
+  TranslationKeys,
+} from '@interfaces/formFieldConfig.interface';
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
+import { getDashboardUrl } from '@routes/dashboard';
+import { safeRedirect303 } from '@utils/safeRedirect';
 
 export function createPostHandler(
   fields: FormFieldConfig[],

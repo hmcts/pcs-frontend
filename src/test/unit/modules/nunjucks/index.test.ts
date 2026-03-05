@@ -4,7 +4,7 @@ import * as express from 'express';
 import { glob } from 'glob';
 import * as nunjucks from 'nunjucks';
 
-import { Nunjucks } from '../../../../main/modules/nunjucks';
+import { Nunjucks } from '@modules/nunjucks';
 
 jest.mock('nunjucks');
 jest.mock('glob');

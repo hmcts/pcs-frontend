@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
+import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
 import {
   getCustomErrorTranslations,
   getFormData,
@@ -10,7 +10,7 @@ import {
   processFieldData,
   setFormData,
   validateForm,
-} from '../../../../../main/modules/steps/formBuilder/helpers';
+} from '@modules/steps/formBuilder/helpers';
 
 describe('formBuilder helpers', () => {
   describe('getTranslation', () => {

@@ -42,7 +42,13 @@
   "_moduleAliases": {
     "@modules": "dist/main/modules",
     "@services": "dist/main/services",
-    "@utils": "dist/main/utils"
+    "@utils": "dist/main/utils",
+    "@routes": "dist/main/routes",
+    "@middleware": "dist/main/middleware",
+    "@steps": "dist/main/steps",
+    "@app": "dist/main/app",
+    "@interfaces": "dist/main/interfaces",
+    "@router": "dist/main/router"
   },
   "dependencies": {
     "@azure/monitor-opentelemetry": "^1.15.1",

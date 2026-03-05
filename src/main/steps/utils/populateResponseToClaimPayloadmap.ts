@@ -1,7 +1,6 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 
-import { CcdCase, PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
-
+import type { CcdCase, PossessionClaimResponse } from '@interfaces/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 // Wrap the possession claim response in a ccd case object and submit via ccdCaseService
