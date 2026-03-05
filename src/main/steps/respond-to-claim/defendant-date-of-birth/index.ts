@@ -16,32 +16,26 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
   },
-  extendGetContent: async (req, formContent) => {
+  getInitialFormData: req => {
     const caseData = req.res?.locals.validatedCase?.data;
     const dateOfBirth = caseData?.possessionClaimResponse?.defendantResponses?.dateOfBirth;
 
-    // Only prepopulate on GET (not POST with validation errors)
-    if (!req.body?.day && dateOfBirth && typeof dateOfBirth === 'string' && dateOfBirth.length > 0) {
-      const dateTime = DateTime.fromISO(dateOfBirth);
-
-      if (dateTime.isValid) {
-        const day = String(dateTime.day);
-        const month = String(dateTime.month);
-        const year = String(dateTime.year);
-
-        formContent.fields = formContent.fields.map(field => {
-          if (field.name === 'dateOfBirth') {
-            return {
-              ...field,
-              value: { day, month, year },
-            };
-          }
-          return field;
-        });
-      }
+    if (!dateOfBirth || typeof dateOfBirth !== 'string') {
+      return {};
     }
 
-    return formContent;
+    const dateTime = DateTime.fromISO(dateOfBirth);
+    if (!dateTime.isValid) {
+      return {};
+    }
+
+    return {
+      dateOfBirth: {
+        day: dateTime.toFormat('dd'),
+        month: dateTime.toFormat('MM'),
+        year: dateTime.toFormat('yyyy'),
+      },
+    };
   },
   fields: [
     {

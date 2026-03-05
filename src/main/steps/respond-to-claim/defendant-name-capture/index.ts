@@ -17,28 +17,30 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     contactUs: 'contactUs',
   },
-  extendGetContent: async (req, formContent) => {
-    // Read from claimantEnteredDefendantDetails (what claimant entered)
-    // UNIFORM: Same data source as defendant-name-confirmation
+  getInitialFormData: req => {
     const caseData = req.res?.locals.validatedCase?.data;
+    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
     const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
-    const existingFirstName = claimantEntry?.firstName;
-    const existingLastName = claimantEntry?.lastName;
 
-    // Only prepopulate on GET (not POST with validation errors)
-    if (!req.body?.firstName && (existingFirstName || existingLastName)) {
-      formContent.fields = formContent.fields.map(field => {
-        if (field.name === 'firstName' && existingFirstName) {
-          return { ...field, value: existingFirstName };
-        }
-        if (field.name === 'lastName' && existingLastName) {
-          return { ...field, value: existingLastName };
-        }
-        return field;
-      });
+    const firstName =
+      (typeof party?.firstName === 'string' && party.firstName.trim() ? party.firstName : undefined) ||
+      (typeof claimantEntry?.firstName === 'string' && claimantEntry.firstName.trim()
+        ? claimantEntry.firstName
+        : undefined);
+    const lastName =
+      (typeof party?.lastName === 'string' && party.lastName.trim() ? party.lastName : undefined) ||
+      (typeof claimantEntry?.lastName === 'string' && claimantEntry.lastName.trim()
+        ? claimantEntry.lastName
+        : undefined);
+
+    if (!firstName && !lastName) {
+      return {};
     }
 
-    return formContent;
+    return {
+      ...(firstName ? { firstName } : {}),
+      ...(lastName ? { lastName } : {}),
+    };
   },
   fields: [
     {
