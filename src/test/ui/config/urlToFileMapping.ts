@@ -5,6 +5,7 @@ export default {
   home: 'home',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
+  'defendant-name-confirmation': 'defendantNameConfirmation',
   'date-of-birth': 'dateOfBirth',
   'confirmation-of-notice-date-when-not-provided': 'noticeDateUnknown',
   'confirmation-of-notice-given': 'noticeDetails',
