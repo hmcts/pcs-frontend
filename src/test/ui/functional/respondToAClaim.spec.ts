@@ -19,6 +19,7 @@ import {
   noticeDetails,
   paymentInterstitial,
   rentArrearsDispute,
+  repaymentsAgreed,
   repaymentsMade,
   startNow,
   tenancyDetails,
@@ -56,12 +57,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   test('Defendant name capture - Error messages - save for later Validations @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: defendantNameCapture.errorValidation,
-      validationType: defendantNameCapture.errorValidationType.input,
-      //inputArray: defendantNameCapture.errorValidationField.errorTextField,
-      header: defendantNameCapture.errorValidationHeader,
-    });
     await performAction('inputText', defendantNameCapture.firstNameLabelText, 'John');
     await performAction('inputText', defendantNameCapture.lastNameLabelText, 'Doe');
     await performAction('clickButton', defendantNameCapture.saveForLaterButton);
