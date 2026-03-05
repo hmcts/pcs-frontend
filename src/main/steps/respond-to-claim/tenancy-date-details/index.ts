@@ -89,9 +89,12 @@ export const step: StepDefinition = createFormStep({
     }
   },
   beforeRedirect: async req => {
-    const originalTenancyStartDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as
+    const englandTenancyStartDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as
       | string
       | undefined;
+    const walesLicenceStartDate = req.res?.locals?.validatedCase?.data?.licenceStartDate as string | undefined;
+    const existingStartDate = englandTenancyStartDate ?? walesLicenceStartDate;
+
     const confirmValue = req.body?.confirmTenancyDate as string | undefined;
 
     const defendantResponses: Record<string, unknown> = {};
@@ -99,7 +102,7 @@ export const step: StepDefinition = createFormStep({
 
     if (confirmValue === 'yes') {
       defendantResponses.tenancyStartDateCorrect = 'YES';
-      tenancyStartDate = originalTenancyStartDate;
+      tenancyStartDate = existingStartDate;
     } else if (confirmValue === 'no') {
       defendantResponses.tenancyStartDateCorrect = 'NO';
       const day = (req.body?.['confirmTenancyDate.tenancyStartDate-day'] as string | undefined) ?? '';
@@ -125,16 +128,13 @@ export const step: StepDefinition = createFormStep({
       ?.claimantOrganisations?.[0]?.value as string | undefined;
 
     const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
-
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession;
-
     const rawTenancyDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as string | undefined;
 
     // Format tenancy date with ordinal
     const tenancyStartDate = rawTenancyDate ? format(parseISO(rawTenancyDate), 'do LLLL yyyy') : undefined;
 
     const t = getTranslationFunction(req, 'tenancy-date-details', ['common']);
-
     const bulletPoint = t('bulletPoint', { returnObjects: true, tenancyStartDate });
     const subHeading = t('subHeading', { returnObjects: true, claimantName });
 

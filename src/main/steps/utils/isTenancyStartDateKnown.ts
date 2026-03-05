@@ -2,7 +2,9 @@ import type { Request } from 'express';
 
 export const isTenancyStartDateKnown = async (req: Request): Promise<boolean> => {
   const caseData = req.res?.locals.validatedCase?.data;
-  const tenancyStartDateKnown = caseData?.tenancy_TenancyLicenceDate;
+  const englandTenancyStartDate = caseData?.tenancy_TenancyLicenceDate;
+  const walesLicenceStartDate = req.res?.locals?.validatedCase?.data?.licenceStartDate;
+  const existingStartDate = englandTenancyStartDate ?? walesLicenceStartDate;
 
-  return tenancyStartDateKnown !== undefined && tenancyStartDateKnown !== null && tenancyStartDateKnown !== '';
+  return existingStartDate !== undefined && existingStartDate !== null && existingStartDate !== '';
 };
