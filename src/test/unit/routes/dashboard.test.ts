@@ -1,15 +1,65 @@
 import type { Application, Response } from 'express';
 import express from 'express';
 import type { Environment } from 'nunjucks';
+import request from 'supertest';
 
 import * as caseReferenceMiddleware from '../../../main/middleware/caseReference';
 import dashboardRoutes, { getDashboardUrl } from '../../../main/routes/dashboard';
 
-jest.mock('../../../main/middleware/caseReference');
+jest.mock('../../../main/middleware/caseReference', () => ({
+  caseReferenceParamMiddleware: jest.fn((req, res, next, caseReference) => {
+    // Simulate validatedCase being set by middleware so dashboard route can use it
+    res.locals.validatedCase = {
+      id: caseReference,
+      data: {
+        propertyAddress: {
+          AddressLine1: '10 Second Avenue',
+          AddressLine2: '',
+          AddressLine3: '',
+          PostTown: 'London',
+          County: '',
+          PostCode: 'W3 7RX',
+        },
+      },
+    };
+
+    return next();
+  }),
+}));
+
 jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
 }));
-describe('Dashboard Routes - Router Pattern Fix', () => {
+
+jest.mock('../../../main/services/pcsApi', () => {
+  const STATUS_MAP = {
+    AVAILABLE: { text: 'Available' },
+  };
+
+  const TASK_GROUP_MAP = {
+    GROUP_ONE: 'Group one title',
+  };
+
+  return {
+    STATUS_MAP,
+    TASK_GROUP_MAP,
+    getDashboardNotifications: jest.fn().mockResolvedValue([]),
+    getDashboardTaskGroups: jest.fn().mockResolvedValue([
+      {
+        groupId: 'GROUP_ONE',
+        tasks: [
+          {
+            templateId: 'task-1',
+            templateValues: {},
+            status: 'AVAILABLE',
+          },
+        ],
+      },
+    ]),
+  };
+});
+
+describe('Dashboard Routes', () => {
   let app: Application;
   let mockResponse: Partial<Response>;
 
@@ -31,7 +81,7 @@ describe('Dashboard Routes - Router Pattern Fix', () => {
     jest.clearAllMocks();
   });
 
-  describe('Fix #1: Dashboard Router Pattern', () => {
+  describe('Router pattern and wiring', () => {
     it('should create dashboard router with param middleware', () => {
       dashboardRoutes(app);
 
@@ -46,6 +96,39 @@ describe('Dashboard Routes - Router Pattern Fix', () => {
 
       // Verify validatedCase can be undefined
       expect(mockResponse.locals.validatedCase).toBeUndefined();
+    });
+
+    it('should render dashboard with property address and case reference', async () => {
+      dashboardRoutes(app);
+
+      const appWithResponse = app as unknown as { response: Response };
+      const renderSpy = jest.spyOn(appWithResponse.response, 'render');
+
+      await request(app).get('/dashboard/1772634251466249');
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'dashboard',
+        expect.objectContaining({
+          propertyAddress: '10 Second Avenue, London, W3 7RX',
+          dashboardCaseReference: '1772634251466249',
+        })
+      );
+    });
+
+    it('should redirect root /dashboard to case-specific dashboard when session case id is valid', async () => {
+      // Simulate a valid CCD case id in the session
+      app.use((req, _res, next) => {
+        // @ts-expect-error - adding test-only session shape
+        req.session = { ccdCase: { id: '1772634251466249' } };
+        next();
+      });
+
+      dashboardRoutes(app);
+
+      const response = await request(app).get('/dashboard');
+
+      expect(response.status).toBe(303);
+      expect(response.headers.location).toBe('/dashboard/1772634251466249');
     });
   });
 
