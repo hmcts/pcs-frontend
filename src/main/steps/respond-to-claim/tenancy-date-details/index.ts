@@ -2,7 +2,7 @@ import { format, parseISO } from 'date-fns';
 
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
@@ -38,7 +38,7 @@ export const step: StepDefinition = createFormStep({
             tenancyStartDate: {
               name: 'tenancyStartDate',
               type: 'date',
-              required: true,
+              required: false,
               noFutureDate: true,
               legendClasses: 'govuk-label--s govuk-!-font-weight-bold',
               translationKey: {
@@ -52,6 +52,42 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  beforeGet: async req => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const existingDateIsCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateCorrect as
+      | string
+      | undefined;
+    const existingTenancyStartDate = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDate as
+      | string
+      | undefined;
+
+    const existingDraftData = getFormData(req, 'tenancy-date-details');
+    if (existingDateIsCorrect && !existingDraftData?.confirmTenancyDate && !req.body?.confirmTenancyDate) {
+      const formValue =
+        existingDateIsCorrect === 'YES'
+          ? 'yes'
+          : existingDateIsCorrect === 'NO'
+            ? 'no'
+            : existingDateIsCorrect === 'NOT_SURE'
+              ? 'notSure'
+              : undefined;
+
+      if (formValue) {
+        const draftData: Record<string, unknown> = { confirmTenancyDate: formValue };
+
+        if (existingDateIsCorrect === 'NO' && existingTenancyStartDate) {
+          const parsed = parseISO(existingTenancyStartDate);
+          draftData.tenancyStartDate = {
+            day: format(parsed, 'd'),
+            month: format(parsed, 'M'),
+            year: format(parsed, 'yyyy'),
+          };
+        }
+
+        setFormData(req, 'tenancy-date-details', draftData);
+      }
+    }
+  },
   beforeRedirect: async req => {
     const originalTenancyStartDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as
       | string
@@ -72,7 +108,7 @@ export const step: StepDefinition = createFormStep({
       tenancyStartDate = formatDatePartsToISODate(day, month, year) ?? undefined;
     } else if (confirmValue === 'notSure') {
       defendantResponses.tenancyStartDateCorrect = 'NOT_SURE';
-      tenancyStartDate = originalTenancyStartDate;
+      tenancyStartDate = ' ';
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
@@ -90,7 +126,7 @@ export const step: StepDefinition = createFormStep({
 
     const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
 
-    const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops housing';
+    const claimantName = claimantNameFromValidatedCase || claimantNameFromSession;
 
     const rawTenancyDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as string | undefined;
 

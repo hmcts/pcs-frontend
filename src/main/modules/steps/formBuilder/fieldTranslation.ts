@@ -261,6 +261,8 @@ export function translateFields(
               const year = (dataSource?.[`${prefix}-year`] as string) || '';
               if (day || month || year) {
                 subFieldValues[subFieldName] = { day, month, year };
+              } else if (dataSource?.[subFieldName] !== undefined) {
+                subFieldValues[subFieldName] = dataSource[subFieldName];
               }
             }
           }

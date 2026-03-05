@@ -98,6 +98,7 @@ export interface FormBuilderConfig {
   journeyFolder: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
+  beforeGet?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
   stepDir: string;
   translationKeys?: TranslationKeys;
