@@ -35,7 +35,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     const pageDataFilePath = path.join(TriggerPageFunctionalTestsAction.PAGE_DATA_DIR, `${pageName}.page.data.ts`);
     const pageDataFileExists = fs.existsSync(pageDataFilePath);
 
-    if (enable_content_validation) {
+    if (enable_content_validation === 'true') {
       if (pageDataFileExists) {
         PageContentValidation.trackPageWithData(pageName);
         await this.runPageContentValidation(page, pageName);
@@ -48,10 +48,10 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     const pftFileExists = fs.existsSync(pftFilePath);
 
     if (!pftFileExists) {
-      if (enable_error_message_validation) {
+      if (enable_error_message_validation === 'true') {
         ErrorMessageValidation.trackMissingEMVFile(pageName);
       }
-      if (enable_navigation_tests) {
+      if (enable_navigation_tests === 'true') {
         PageNavigationValidation.trackMissingNavigationFile(pageName);
       }
       return;
@@ -61,11 +61,11 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       return;
     }
 
-    if (enable_error_message_validation) {
+    if (enable_error_message_validation === 'true') {
       await this.runErrorMessageValidation(page, pageName, pftFilePath);
     }
 
-    if (enable_navigation_tests) {
+    if (enable_navigation_tests === 'true') {
       await this.runNavigationTests(page, pageName, pftFilePath);
     }
   }

@@ -68,7 +68,9 @@ async function validatePageIfNavigated(action: string): Promise<void> {
       }
       if (
         startFunctionalTests &&
-        (enable_content_validation || enable_error_message_validation || enable_navigation_tests)
+        (enable_content_validation === 'true' ||
+          enable_error_message_validation === 'true' ||
+          enable_navigation_tests === 'true')
       ) {
         await performAction('triggerFunctionalTests');
       }
