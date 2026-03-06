@@ -138,14 +138,7 @@ export default function dashboardRoutes(app: Application): void {
 
   // Route: /dashboard/:caseReference (main dashboard page)
   dashboardRouter.get('/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
-    const validatedCase = res.locals.validatedCase as CcdCase | undefined;
-
-    if (!validatedCase) {
-      logger.error('Dashboard: validatedCase is undefined - middleware not executed');
-      return res.status(500).render('error', {
-        error: 'Case validation failed - validatedCase not set',
-      });
-    }
+    const validatedCase = res.locals.validatedCase as CcdCase;
 
     const caseReferenceNumber = Number(validatedCase.id);
     const propertyAddress = getPropertyAddressFromValidatedCase(validatedCase);

@@ -131,30 +131,6 @@ describe('Dashboard Routes', () => {
       expect((app.use as jest.Mock).mock.calls[0][1]).toBe(mockRouter);
     });
 
-    it('should handle validatedCase being undefined gracefully', async () => {
-      dashboardRoutes(app);
-
-      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[2] as (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        req: any,
-        res: Response
-      ) => Promise<void>;
-
-      const res = {
-        locals: {},
-        status: jest.fn().mockReturnThis(),
-        render: jest.fn(),
-      } as unknown as Response;
-
-      await handler({}, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.render).toHaveBeenCalledWith('error', {
-        error: 'Case validation failed - validatedCase not set',
-      });
-      expect(logger.error).toHaveBeenCalledWith('Dashboard: validatedCase is undefined - middleware not executed');
-    });
-
     it('should render dashboard view with mapped task groups', async () => {
       dashboardRoutes(app);
 
