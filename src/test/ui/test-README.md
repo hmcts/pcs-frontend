@@ -157,14 +157,14 @@ yarn test:functional
 How It Works -
 Automatic: Triggers after click actions that cause page navigation
 
-Data-Driven: Uses page data files in data/page-data-figma/
+Data-Driven: Uses page data files in data/page-data
 
 Smart Mapping: Automatically maps URLs to page data files, including numeric URLs using h1/h2 headers
 
 Comprehensive: Validates buttons, headers, links, paragraphs, and other UI elements
 
 Validation Summary -
-After each test, you'll see a detailed report:
+After each test, you'll see a detailed report in the respective test stdout:
 
 ```
 📊 PAGE CONTENT VALIDATION SUMMARY (Test #1):
@@ -173,3 +173,13 @@ Pages passed: 2
 Pages failed: 1
 Missing elements: Submit button, Continue link
 ```
+
+## 9. Functional test automation for pcs-frontend
+
+### Categories covered:
+
+- Page content validation
+- Error Message Validation
+- Page Navigation tests
+
+Please follow this confluence page for detailed instructions and guidelines- https://tools.hmcts.net/confluence/x/14FLd

@@ -51,6 +51,7 @@ jest.mock('@modules/logger', () => ({
 const mockDateNow = jest.spyOn(Date, 'now');
 
 // Import AFTER mocks are established - import the factory function, not the singleton
+import { HTTPError } from '../../../../main/HttpError';
 import { HttpService, createHttp } from '../../../../main/modules/http';
 
 describe('HttpService', () => {
@@ -279,6 +280,29 @@ describe('HttpService', () => {
       expect(mockRegenerator).toHaveBeenCalled();
 
       // Verify request was NOT retried since regeneration failed
+      expect(mockAxiosInstance.request).not.toHaveBeenCalled();
+    });
+
+    it('should reject with HTTPError(401) for user-token requests without S2S retry', async () => {
+      const requestConfig = {
+        url: '/test',
+        headers: { Authorization: 'Bearer user-oidc-token' },
+        __isRetryRequest: false,
+      };
+
+      const error = {
+        config: requestConfig,
+        response: { status: 401 },
+      };
+
+      const errorHandler = getResponseErrorHandler();
+
+      const rejectedError = await errorHandler(error).catch(e => e);
+
+      expect(rejectedError).toBeInstanceOf(HTTPError);
+      expect((rejectedError as HTTPError).status).toBe(401);
+
+      // S2S regenerator should NOT be called, request should NOT be retried
       expect(mockAxiosInstance.request).not.toHaveBeenCalled();
     });
 

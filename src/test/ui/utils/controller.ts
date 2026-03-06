@@ -5,6 +5,7 @@ import {
   enable_axe_audit,
   enable_content_validation,
   enable_error_message_validation,
+  enable_navigation_tests,
 } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
 
@@ -13,7 +14,7 @@ import { ActionRegistry, ValidationRegistry } from './registry';
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
-let startErrorMessageValidation = false;
+let startFunctionalTests = false;
 let startAxeAudit = false;
 
 export function initializeExecutor(page: Page): void {
@@ -34,8 +35,8 @@ async function detectPageNavigation(): Promise<boolean> {
   if (!startAxeAudit && executor.page.url().includes('start-now')) {
     startAxeAudit = true;
   }
-  if (!startErrorMessageValidation && executor.page.url().includes('free-legal-advice')) {
-    startErrorMessageValidation = true;
+  if (!startFunctionalTests && executor.page.url().includes('free-legal-advice')) {
+    startFunctionalTests = true;
   }
   const pageNavigated = currentUrl !== previousUrl;
 
@@ -51,9 +52,6 @@ async function validatePageIfNavigated(action: string): Promise<void> {
     const pageNavigated = await detectPageNavigation();
     const executor = getExecutor();
     if (pageNavigated) {
-      if (enable_content_validation) {
-        await performValidation('autoValidatePageContent');
-      }
       if (startAxeAudit && enable_axe_audit) {
         try {
           await new AxeUtils(executor.page).audit({
@@ -68,8 +66,13 @@ async function validatePageIfNavigated(action: string): Promise<void> {
           }
         }
       }
-      if (startErrorMessageValidation && enable_error_message_validation) {
-        await performAction('triggerErrorMessagesForValidation');
+      if (
+        startFunctionalTests &&
+        (enable_content_validation === 'true' ||
+          enable_error_message_validation === 'true' ||
+          enable_navigation_tests === 'true')
+      ) {
+        await performAction('triggerFunctionalTests');
       }
     }
   }
