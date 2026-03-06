@@ -27,7 +27,7 @@ export class TextValidation implements IValidation {
         data.elementType = '.govuk-details__text';
         break;
     }
-    const locator = page.locator(`${data.elementType}:has-text("${data.text}")`).first();
+    const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
     await expect(locator).toHaveText(String(data.text));
   }
 }

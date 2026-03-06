@@ -19,12 +19,12 @@ export class FormLabelValueValidation implements IValidation {
   private async findFieldValueLocator(page: Page, fieldName: string): Promise<Locator> {
     const locators = [
       page
-        .locator(`.case-viewer-label:has-text("${fieldName}")`)
+        .locator(`.case-viewer-label:text-is("${fieldName}")`)
         .locator('xpath=../following-sibling::td[1]')
         .locator('.text-16 span'),
 
       page
-        .locator(`th#complex-panel-simple-field-label > span.text-16:has-text("${fieldName}")`)
+        .locator(`th#complex-panel-simple-field-label > span.text-16:text-is("${fieldName}")`)
         .locator('xpath=../..')
         .locator('td span.text-16:not(:has(ccd-field-read-label))'),
     ];

@@ -4,6 +4,7 @@ import * as path from 'path';
 import { Page } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
+import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
@@ -39,85 +40,95 @@ export class PageContentValidation implements IValidation {
       page.locator(`
                     button:text-is("${value}"),
                     [value="${value}"],
-                    :has-text("${value}") + button,
-                    [role="link"]:text("${value}"),
-                    a:text("${value}"),
-                    :has-text("${value}") ~ button`),
+                    [role="link"]:text-is("${value}"),
+                    a:text-is("${value}"),
+                    button:has(:text-is("${value}"))`),
     Link: (page: Page, value: string) =>
       page.locator(`
-                    a:text("${value}"),
-                    a.govuk-link:text("${value}"),
-                    button.govuk-js-link:text("${value}"),
-                    [role="link"]:text("${value}"),
-                    [aria-label*="${value}"]:text("${value}")`),
+                    a:text-is("${value}"),
+                    a.govuk-link:text-is("${value}"),
+                    button.govuk-js-link:text-is("${value}"),
+                    [role="link"]:text-is("${value}"),
+                    [aria-label="${value}"]`),
     Summary: (page: Page, value: string) =>
       page.locator(`
-                    summary:has-text("${value}"),
-                    summary .govuk-details__summary-text:text("${value}")`),
+                    summary:text-is("${value}"),
+                    summary .govuk-details__summary-text:text-is("${value}")`),
     Header: (page: Page, value: string) =>
-      page.locator(`
-                    legend:has-text("${value}"),
-                    h1:text("${value}"),
-                    h2:text("${value}"),
-                    h3:text("${value}")`),
+      page.getByRole('heading', { name: new RegExp(`^${escapeForRegex(value)}$`) }).or(
+        page.locator(`
+                    legend:text-is("${value}"),
+                    h1:text-is("${value}"),
+                    h2:text-is("${value}"),
+                    h3:text-is("${value}")`)
+      ),
     Caption: (page: Page, value: string) =>
       page.locator(`
-                    caption:text("${value}"),
-                    .caption:text("${value}"),
-                    figcaption:text("${value}"),
-                    .figcaption:text("${value}"),
-                    span.govuk-caption-l:text("${value}"),
-                    [aria-label*="${value}"]:text("${value}")`),
+                    caption:text-is("${value}"),
+                    .caption:text-is("${value}"),
+                    figcaption:text-is("${value}"),
+                    .figcaption:text-is("${value}"),
+                    span.govuk-caption-l:text-is("${value}"),
+                    [aria-label="${value}"]`),
     Checkbox: (page: Page, value: string) =>
-      page.locator(`
-                    label:text("${value}") ~ input[type="checkbox"],
-                    label:text("${value}") + input[type="checkbox"],
-                    .checkbox:text("${value}") ~ input[type="checkbox"],
-                    label >> text=${value} >> xpath=..//input[@type="checkbox"]`),
+      page.getByRole('checkbox', { name: new RegExp(`^${escapeForRegex(value)}$`) }).or(
+        page.locator(`
+                    label:text-is("${value}") ~ input[type="checkbox"],
+                    label:text-is("${value}") + input[type="checkbox"],
+                    .checkbox:text-is("${value}") ~ input[type="checkbox"]`)
+      ),
     Question: (page: Page, value: string) =>
-      page.locator(`
-                    h1:has-text("${value}"),
-                    legend:has-text("${value}"),
-                    label:text("${value}") ~ input[type="radio"]`),
+      page.getByText(value, { exact: true }).or(
+        page.locator(`
+                    h1:text-is("${value}"),
+                    legend:text-is("${value}"),
+                    label:text-is("${value}") ~ input[type="radio"]`)
+      ),
     RadioOption: (page: Page, value: string) =>
-      page.locator(`
-                    label:text("${value}") ~ input[type="radio"],
-                    label:text("${value}") + input[type="radio"],
-                    .radio-option:text("${value}") ~ input[type="radio"],
-                    label >> text=${value} >> xpath=..//input[@type="radio"]`),
+      page.getByRole('radio', { name: new RegExp(`^${escapeForRegex(value)}$`) }).or(
+        page.locator(`
+                    label:text-is("${value}") ~ input[type="radio"],
+                    label:text-is("${value}") + input[type="radio"],
+                    .radio-option:text-is("${value}") ~ input[type="radio"]`)
+      ),
     SelectLabel: (page: Page, value: string) =>
       page.locator(`
-                    label:text("${value}") ~ select,
-                    .select:text("${value}") ~ select`),
+                    label:text-is("${value}") ~ select,
+                    .select:text-is("${value}") ~ select`),
     SelectOption: (page: Page, value: string) =>
       page.locator(`
-                    option:text("${value}"),
-                    select option:text("${value}")`),
+                    option:text-is("${value}"),
+                    select option:text-is("${value}")`),
     HintText: (page: Page, value: string) =>
       page.locator(`
-                    .govuk-hint:text("${value}"),
-                    div:text("${value}")`),
+                    .govuk-hint:text-is("${value}"),
+                    div:text-is("${value}")`),
     TextLabel: (page: Page, value: string) =>
       page.locator(`
-                    label:has-text("${value}"),
-                    .label:has-text("${value}")`),
+                    label:text-is("${value}"),
+                    .label:text-is("${value}")`),
     Paragraph: (page: Page, value: string) =>
-      page.locator(`span:text("${value}"),
-                    .paragraph:text("${value}"),
-                    p:text("${value}"),
-                    markdown:text("${value}"),
-                    .govuk-caption-l:text("${value}"),
-                    .body:text("${value}"),
-                    .text-content:text("${value}"),
-                    .govuk-body:text("${value}"),
-                    .govuk-list:text("${value}")`),
+      page
+        .getByText(value, { exact: true })
+        .or(page.getByText(exactTextWithOptionalWhitespaceRegex(value)))
+        .or(
+          page.locator(`span:text-is("${value}"),
+                    .paragraph:text-is("${value}"),
+                    p:text-is("${value}"),
+                    markdown:text-is("${value}"),
+                    .govuk-caption-l:text-is("${value}"),
+                    .body:text-is("${value}"),
+                    .text-content:text-is("${value}"),
+                    .govuk-body:text-is("${value}"),
+                    .govuk-list:text-is("${value}")`)
+        ),
     List: (page: Page, value: string) =>
       page.locator(`
-                    li:text("${value}"),
-                    ul li:text("${value}"),
-                    ol li:text("${value}")`),
-    Text: (page: Page, value: string) => page.locator(`:text("${value}")`),
-    Tab: (page: Page, value: string) => page.getByRole('tab', { name: value }),
+                    li:text-is("${value}"),
+                    ul li:text-is("${value}"),
+                    ol li:text-is("${value}")`),
+    Text: (page: Page, value: string) => page.locator(`:text-is("${value}")`),
+    Tab: (page: Page, value: string) => page.getByRole('tab', { name: new RegExp(`^${escapeForRegex(value)}$`) }),
   };
 
   async validate(page: Page, _validation: string, _fieldName?: string, _data?: never): Promise<void> {
@@ -262,7 +273,7 @@ export class PageContentValidation implements IValidation {
     }
     try {
       const locator = pattern(page, expectedValue);
-      return await locator.first().isVisible({ timeout: 5000 });
+      return await locator.filter({ visible: true }).first().isVisible({ timeout: 5000 });
     } catch {
       return false;
     }

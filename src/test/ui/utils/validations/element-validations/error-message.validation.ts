@@ -28,13 +28,13 @@ export class ErrorMessageValidation implements IValidation {
     if (typeof error === 'string') {
       scenario = 'Error message validation';
       expected = error;
-      errorMessage = page.locator(`a.validation-error:has-text("${error}")`);
+      errorMessage = page.locator(`a.validation-error:text-is("${error}")`);
     } else {
       scenario = 'Error message validation';
       expected = `${error.header}: ${error.message}`;
       errorMessage = page.locator(`
-        h2.govuk-error-summary__title:has-text("${error.header}") + p:has-text("${error.message}"),
-        h2.govuk-error-summary__title:has-text("${error.header}") ~ div>ul>li:has-text("${error.message}")
+        h2.govuk-error-summary__title:text-is("${error.header}") + p:text-is("${error.message}"),
+        h2.govuk-error-summary__title:text-is("${error.header}") ~ div>ul>li:text-is("${error.message}")
       `);
     }
 
