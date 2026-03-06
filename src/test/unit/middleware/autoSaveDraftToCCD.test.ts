@@ -237,12 +237,12 @@ describe('autoSaveDraftToCCD value mappers', () => {
 
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
-    updateCase: jest.fn(),
+    updateDraftRespondToClaim: jest.fn(),
   },
 }));
 
 describe('autoSaveToCCD main function', () => {
-  const mockUpdateCase = ccdCaseService.updateCase as jest.Mock;
+  const mockUpdateCase = ccdCaseService.updateDraftRespondToClaim as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -354,35 +354,29 @@ describe('autoSaveToCCD main function', () => {
     it('should save to CCD successfully with frontendField', async () => {
       mockUpdateCase.mockResolvedValueOnce({
         id: '1234567890123456',
-        data: { possessionClaimResponse: { defendantResponses: { receivedFreeLegalAdvice: 'YES' } } },
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { receivedFreeLegalAdvice: 'YES' },
+          },
+        },
       });
 
       const req = {
         session: {
-          formData: {
-            'free-legal-advice': { hadLegalAdvice: 'yes' },
-          },
+          formData: { 'free-legal-advice': { hadLegalAdvice: 'yes' } },
           user: { accessToken: 'mock-token' },
         },
       } as unknown as Request;
 
       const res = {
-        locals: {
-          validatedCase: { id: '1234567890123456' },
-        },
+        locals: { validatedCase: { id: '1234567890123456' } },
       } as unknown as Response;
 
       await autoSaveToCCD(req, res, 'free-legal-advice');
 
-      expect(mockUpdateCase).toHaveBeenCalledWith('mock-token', {
-        id: '1234567890123456',
-        data: {
-          submitDraftAnswers: 'No',
-          possessionClaimResponse: {
-            defendantResponses: {
-              receivedFreeLegalAdvice: 'YES',
-            },
-          },
+      expect(mockUpdateCase).toHaveBeenCalledWith('mock-token', '1234567890123456', {
+        possessionClaimResponse: {
+          defendantResponses: { receivedFreeLegalAdvice: 'YES' },
         },
       });
 
