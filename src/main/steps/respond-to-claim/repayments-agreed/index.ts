@@ -1,10 +1,6 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { getClaimantName } from '../../utils';
 import { flowConfig } from '../flow.config';
-
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',

@@ -32,3 +32,4 @@ nodejs:
     CCD_URL: 'http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     OIDC_ISSUER: 'https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o'
     PCQ_URL: 'https://pcq.{{ .Values.global.environment }}.platform.hmcts.net'
+    OTEL_SERVICE_NAME: 'pcs-frontend'
