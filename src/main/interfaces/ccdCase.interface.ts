@@ -3,7 +3,7 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'Yes' | 'No' | null;
+export type YesNoValue = 'YES' | 'NO' | null;
 
 export interface CcdUserCase {
   id: string;
@@ -58,11 +58,17 @@ export interface CcdDefendantParty {
   address?: CcdCaseAddress | Record<string, never>;
   addressKnown?: string;
   addressSameAsProperty?: string;
+  phoneNumberProvided?: YesNoValue;
+  phoneNumber?: string;
 }
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
   receivedFreeLegalAdvice?: string;
+  contactByPhone?: YesNoValue;
+  contactByEmail?: YesNoValue;
+  contactByPost?: YesNoValue;
+  contactByText?: YesNoValue;
 }
 
 /** Possession claim response block inside case_data. */

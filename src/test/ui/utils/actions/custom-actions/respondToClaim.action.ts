@@ -2,6 +2,8 @@ import { Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
 import {
+  contactByTelephone,
+  contactByTextMessage,
   correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
@@ -27,6 +29,8 @@ export class RespondToClaimAction implements IAction {
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
       ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
+      ['selectContactByTelephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
+      ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionData)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
@@ -105,6 +109,25 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  }
+
+  private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: contactByTelephone.areYouHappyToContactQuestion,
+      option: contactByPhoneData.radioOption,
+    });
+    if (contactByPhoneData.radioOption === contactByTelephone.yesRadioOption) {
+      await performAction('inputText', contactByTelephone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.phoneNumber);
+    }
+    await performAction('clickButton', contactByTelephone.saveAndContinueButton);
+  }
+
+  private async selectContactByTextMessage(contactData: actionData): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: contactByTextMessage.contactByTextMessageQuestion,
+      option: contactData,
+    });
+    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
   }
 
   private async disputeClaimInterstitial(isClaimantNameCorrect: actionData) {
