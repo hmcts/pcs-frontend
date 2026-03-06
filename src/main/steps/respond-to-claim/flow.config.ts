@@ -25,6 +25,8 @@ export const flowConfig: JourneyFlowConfig = {
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
+    'instalment-offer',
+    'instalments',
     'correspondence-address',
     'contact-preferences',
     'contact-preferences-telephone',
@@ -275,10 +277,22 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'repayments-agreed': {
       previousStep: 'repayments-made',
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const choseNo = req.session?.formData?.['repayments-agreed']?.confirmRepaymentsAgreed === 'no';
+            if (!choseNo) {
+              return false;
+            }
+            return isRentArrearsClaim(req);
+          },
+          nextStep: 'instalment-offer',
+        },
+      ],
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
-      previousStep: 'repayments',
+      previousStep: 'repayments-agreed',
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {
