@@ -50,14 +50,11 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
       await testedStep.beforeRedirect(req);
 
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-        req,
-        {
-          defendantResponses: {
-            tenancyTypeCorrect,
-          },
-        }
-      );
+      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
+        defendantResponses: {
+          tenancyTypeCorrect,
+        },
+      });
     });
   });
 
