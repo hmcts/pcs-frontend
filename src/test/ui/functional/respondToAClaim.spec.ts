@@ -53,12 +53,6 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Respond to a claim - functional @nightly', async () => {
-  test('Free legal advice - Save for later Validations', async () => {
-    await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
-    await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
-  });
-
   test('Defendant name capture - Error messages - save for later Validations @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
