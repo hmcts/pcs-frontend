@@ -33,6 +33,8 @@ export interface Address {
   Country?: string;
 }
 
+export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
+
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: {
@@ -48,6 +50,7 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
+    registeredLandlord?: YesNoNotSureValue;
   };
 }
 
