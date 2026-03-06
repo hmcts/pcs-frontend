@@ -16,7 +16,7 @@ import {
   noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
-  rentArrearsDispute,
+  rentArrears,
   repaymentsMade,
   startNow,
   tenancyDetails,
@@ -36,6 +36,12 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title.includes('@noDefendants')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  } else if (testInfo.title.includes('@introductoryTenancy')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadIntroductoryTenancy });
+  } else if (testInfo.title.includes('@flexibleTenancyDate')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadFlexibleTenancyDate });
   } else {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
@@ -351,8 +357,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
-    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
-    await performAction('clickButton', rentArrearsDispute.continueButton);
+    await performValidation('mainHeader', rentArrears.mainHeader);
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickButton', paymentInterstitial.continueButton);
