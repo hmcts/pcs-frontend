@@ -8,10 +8,52 @@ export const step: StepDefinition = createFormStep({
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: `${__dirname}/repaymentsAgreed.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    question: 'question',
   },
-  fields: [],
+  fields: [
+    {
+      name: 'confirmRepaymentsAgreed',
+      type: 'radio',
+      required: true,
+      translationKey: {
+        label: 'question',
+      },
+      options: [
+        {
+          value: 'yes',
+          translationKey: 'options.yes',
+          subFields: {
+            repaymentsAgreementInfo: {
+              name: 'repaymentsAgreementInfo',
+              type: 'character-count',
+              maxLength: 500,
+              required: true,
+              errorMessage: 'errors.repaymentsAgreementInfo',
+              labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
+              translationKey: {
+                label: 'textAreaLabel',
+                hint: 'textAreaHint',
+              },
+            },
+          },
+        },
+        { value: 'no', translationKey: 'options.no' },
+        { divider: 'options.or' },
+        { value: 'imNotSure', translationKey: 'options.imNotSure' },
+      ],
+    },
+  ],
+  extendGetContent: req => {
+    const caseData = req.session?.ccdCase?.data as
+      | { claimantName?: string; claimIssueDate?: string }
+      | undefined;
+
+    return {
+      claimantName: caseData?.claimantName || 'Treetops Housing',
+      claimIssueDate: caseData?.claimIssueDate || '20th May 2025',
+    };
+  },
 });
