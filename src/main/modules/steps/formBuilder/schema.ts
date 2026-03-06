@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import type {
+  CcdFieldMapping,
   FormBuilderConfig,
   FormFieldConfig,
   FormFieldOption,
@@ -124,6 +125,27 @@ const ExtendGetContentFunctionSchema = z
   })
   .optional();
 
+// Function type for getInitialFormData
+const GetInitialFormDataFunctionSchema = z
+  .custom<(req: unknown) => Record<string, unknown>>(val => typeof val === 'function', {
+    message: 'getInitialFormData must be a function',
+  })
+  .optional();
+
+const ValueMapperFunctionSchema = z.custom<(value: unknown, ctx?: unknown) => Record<string, unknown>>(
+  val => typeof val === 'function',
+  {
+    message: 'valueMapper must be a function',
+  }
+);
+
+const CcdFieldMappingSchema: z.ZodType<CcdFieldMapping> = z.object({
+  backendPath: z.string(),
+  frontendField: z.string().optional(),
+  frontendFields: z.array(z.string()).optional(),
+  valueMapper: ValueMapperFunctionSchema,
+});
+
 // FormBuilderConfig schema
 export const FormBuilderConfigSchema: z.ZodType<FormBuilderConfig> = z.object({
   stepName: z.string(),
@@ -131,6 +153,8 @@ export const FormBuilderConfigSchema: z.ZodType<FormBuilderConfig> = z.object({
   fields: z.array(FormFieldConfigSchema),
   beforeRedirect: BeforeRedirectFunctionSchema.optional(),
   extendGetContent: ExtendGetContentFunctionSchema.optional(),
+  getInitialFormData: GetInitialFormDataFunctionSchema.optional(),
+  ccdMapping: CcdFieldMappingSchema.optional(),
   stepDir: z.string(),
   translationKeys: TranslationKeysSchema.optional(),
   customTemplate: z.string().optional(),
