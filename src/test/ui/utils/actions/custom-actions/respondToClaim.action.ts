@@ -15,6 +15,7 @@ import {
   noticeDetails,
   paymentInterstitial,
   repaymentsMade,
+  tenancyStartDateKnown
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -31,6 +32,7 @@ export class RespondToClaimAction implements IAction {
       ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
       ['selectContactByTelephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
       ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionData)],
+      ['selectTenancyStartDateKnown', () => this.selectTenancyStartDateKnown(fieldName as actionRecord)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
@@ -158,6 +160,25 @@ export class RespondToClaimAction implements IAction {
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   }
+
+  private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
+    const getDetailsGivenByParagraph = tenancyStartDateKnown.getDetailsGivenByParagraph(claimantsName);
+    await performAction('clickRadioButton', {
+      question: tenancyStartDateKnown.isTheTenancyLicenceOrOccupationContractQuestion,
+      option: tenancyStartDateData.option,
+    });
+    if (tenancyStartDateData?.day && tenancyStartDateData?.month && tenancyStartDateData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', tenancyStartDateKnown.dayHiddenTextLabel, tenancyStartDateData.day],
+        ['inputText', tenancyStartDateKnown.monthHiddenTextLabel, tenancyStartDateData.month],
+        ['inputText', tenancyStartDateKnown.yearHiddenTextLabel, tenancyStartDateData.year]
+      );
+    }
+    await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
+    await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
+  }
+
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
