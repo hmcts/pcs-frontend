@@ -15,5 +15,9 @@ export const buildCcdCaseForPossessionClaimResponse = async (
       possessionClaimResponse,
     },
   };
-  return ccdCaseService.updateDraftRespondToClaim(req.session?.user?.accessToken, ccdCase.id, ccdCase.data);
+  return ccdCaseService.updateDraftRespondToClaim(
+    req.session?.user?.accessToken,
+    ccdCase.id,
+    ccdCase.data as Record<string, unknown>
+  );
 };
