@@ -22,6 +22,6 @@
       "missingOne": "cyYour tenancy start date must include a {{missingField}}",
       "missingTwo": "cyTenancy start date must include a  {{first}} and {{second}}"
     },
-    "confirmTenancyDate": "cySelect if these tenancy, licence or occupation contract details are correct"
+    "confirmTenancyDate": "cySelect if the tenancy, licence or occupation contract details are correct"
   }
 }

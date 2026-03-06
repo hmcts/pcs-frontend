@@ -22,6 +22,6 @@
       "missingOne": "Your tenancy start date must include a {{missingField}}",
       "missingTwo": "Tenancy start date must include a  {{first}} and {{second}}"
     },
-    "confirmTenancyDate": "Select if these tenancy, licence or occupation contract details are correct"
+    "confirmTenancyDate": "Select if the tenancy, licence or occupation contract details are correct"
   }
 }
