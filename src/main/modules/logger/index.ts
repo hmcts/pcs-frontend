@@ -61,19 +61,24 @@ const normaliseInfo = winston.format(info => {
 });
 
 function createTextFormat(name: string): winston.Logform.Format {
-  return winston.format.combine(
+  const formats: winston.Logform.Format[] = [
     winston.format.errors({ stack: true }),
+    winston.format.splat(),
     normaliseInfo(),
     winston.format.timestamp(),
+    ...(isColorizable ? [winston.format.colorize({ all: true })] : []),
     winston.format.printf(
       info => `${info.timestamp} - ${info.level}: [${name}] ${info.message}${formatMetadata(info.metadata)}`
-    )
-  );
+    ),
+  ];
+
+  return winston.format.combine(...formats);
 }
 
 function createJsonFormat(name: string): winston.Logform.Format {
   return winston.format.combine(
     winston.format.errors({ stack: true }),
+    winston.format.splat(),
     normaliseInfo(),
     winston.format.timestamp(),
     winston.format(info => {
@@ -87,16 +92,9 @@ function createJsonFormat(name: string): winston.Logform.Format {
 const isColorizable = process.stdout.isTTY === true && process.env.CI !== 'true';
 
 function transport(name: string) {
-  const formatParts = [
-    label({ label: name, message: true }),
-    timestamp(),
-    splat(),
-    ...(isColorizable ? [colorize({ all: true })] : []),
-    process.env.JSON_PRINT ? json() : myFormat,
-  ];
   return new winston.transports.Console({
     level: (process.env.LOG_LEVEL || 'INFO').toLowerCase(),
-    format: combine(...formatParts),
+    format: process.env.JSON_PRINT ? createJsonFormat(name) : createTextFormat(name),
   });
 }
 
