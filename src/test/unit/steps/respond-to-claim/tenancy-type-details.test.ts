@@ -56,8 +56,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
           defendantResponses: {
             tenancyTypeCorrect,
           },
-        },
-        false
+        }
       );
     });
   });

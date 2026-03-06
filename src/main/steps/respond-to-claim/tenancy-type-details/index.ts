@@ -84,7 +84,7 @@ export const step: StepDefinition = createFormStep({
       },
     };
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: async (req, formContent) => {
     const savedStepData = req.session?.formData?.[STEP_NAME] as Record<string, unknown> | undefined;

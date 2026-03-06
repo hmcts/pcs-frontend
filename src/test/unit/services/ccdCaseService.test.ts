@@ -255,26 +255,20 @@ describe('ccdCaseService', () => {
     });
 
     it('updates a case when case id is present', async () => {
-      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
       mockPost.mockResolvedValue({ data: { id: '123', data: { field: 'value' } } });
 
-      const result = await ccdCaseService.updateCase(accessToken, { id: '123', data: { field: 'value' } });
+      const result = await ccdCaseService.updateDraftRespondToClaim(accessToken, '123', { field: 'value' });
 
-      expect(mockGet).toHaveBeenCalledWith(
-        `${mockUrl}/cases/123/event-triggers/respondPossessionClaim`,
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: `Bearer ${accessToken}`,
-          }),
-        })
-      );
       expect(mockPost).toHaveBeenCalledWith(
-        `${mockUrl}/cases/123/events`,
-        expect.objectContaining({
-          data: { field: 'value' },
-          event: expect.objectContaining({ id: 'respondPossessionClaim' }),
-          event_token: 'event-token',
-        }),
+        `${mockUrl}/callbacks/mid-event?page=respondToPossessionDraftSavePage`,
+        {
+          event_id: 'respondPossessionClaim',
+          case_details: {
+            id: '123',
+            case_type_id: 'PCS',
+            data: { field: 'value' },
+          },
+        },
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: `Bearer ${accessToken}`,
