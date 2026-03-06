@@ -20,7 +20,8 @@ import {
   passThrough,
   yesNoEnum,
 } from '../../../main/middleware/autoSaveDraftToCCD';
-import { ccdCaseService } from '../../../main/services/ccdCaseService';
+
+import { ccdCaseService } from '@services/ccdCaseService';
 
 describe('autoSaveDraftToCCD value mappers', () => {
   beforeEach(() => {
@@ -234,7 +235,7 @@ describe('autoSaveDraftToCCD value mappers', () => {
   });
 });
 
-jest.mock('../../../main/services/ccdCaseService', () => ({
+jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
     updateDraftRespondToClaim: jest.fn(),
   },

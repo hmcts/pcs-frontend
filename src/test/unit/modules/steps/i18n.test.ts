@@ -13,7 +13,7 @@ jest.mock('@modules/logger', () => ({
   },
 }));
 
-import * as mainI18n from '../../../../main/modules/i18n';
+import * as mainI18n from '@modules/i18n';
 import {
   getStepNamespace,
   getStepTranslationPath,
@@ -21,9 +21,9 @@ import {
   getTranslationFunction,
   loadStepNamespace,
   validateTranslationKey,
-} from '../../../../main/modules/steps/i18n';
+} from '@modules/steps/i18n';
 
-jest.mock('../../../../main/modules/i18n', () => ({
+jest.mock('@modules/i18n', () => ({
   findLocalesDir: jest.fn(),
   getRequestLanguage: jest.fn(),
   getTranslationFunction: jest.fn(),

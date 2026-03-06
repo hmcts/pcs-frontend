@@ -1,9 +1,10 @@
 import type { Request, Response } from 'express';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, stepNavigation } from '../../../modules/steps';
-import { getDashboardUrl } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
+
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import { createGetController, stepNavigation } from '@modules/steps';
+import { getDashboardUrl } from '@routes/dashboard';
 
 const stepName = 'start-now';
 

@@ -13,8 +13,8 @@ import type { Request } from 'express';
  * - Unknown: { nameKnown: "NO" } (no firstName/lastName fields)
  */
 export const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
-  const caseData = req.res?.locals?.validatedCase?.data;
-  const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
-
-  return party?.nameKnown === 'YES';
+  const { defendantContactDetailsPartyNameKnown } = req.res?.locals?.validatedCase ?? {
+    defendantContactDetailsPartyNameKnown: '',
+  };
+  return defendantContactDetailsPartyNameKnown === 'YES';
 };

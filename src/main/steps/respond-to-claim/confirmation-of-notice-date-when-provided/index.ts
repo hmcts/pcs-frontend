@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -36,16 +36,14 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    // Read from CCD (fresh data from START callback via res.locals.validatedCase)
-    // Same pattern as free-legal-advice - no session dependency
-    const caseData = req.res?.locals.validatedCase?.data;
-    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
+    const validatedCase = req.res?.locals?.validatedCase;
+    const claimantName = validatedCase?.claimantName;
 
     // Check all possible notice date fields (different service methods use different fields)
     const noticeDateRaw =
-      caseData?.notice_NoticeHandedOverDateTime || // Hand delivered
-      caseData?.notice_NoticePostedDate || // Posted
-      caseData?.notice_NoticeOtherElectronicDateTime || // Electronic
+      validatedCase?.notice_NoticeHandedOverDateTime || // Hand delivered
+      validatedCase?.notice_NoticePostedDate || // Posted
+      validatedCase?.notice_NoticeOtherElectronicDateTime || // Electronic
       '';
 
     // Format the date for display (e.g., "1 January 2024")

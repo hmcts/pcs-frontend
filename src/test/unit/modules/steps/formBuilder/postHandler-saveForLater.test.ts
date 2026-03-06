@@ -1,12 +1,12 @@
 import type { NextFunction, Request, Response } from 'express';
 
-import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
-import { createPostHandler } from '../../../../../main/modules/steps/formBuilder/postHandler';
-import * as dashboardModule from '../../../../../main/routes/dashboard';
+import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
+import { createPostHandler } from '@modules/steps/formBuilder/postHandler';
+import * as dashboardModule from '@routes/dashboard';
 
-jest.mock('../../../../../main/routes/dashboard');
-jest.mock('../../../../../main/modules/i18n');
-jest.mock('../../../../../main/modules/steps/flow');
+jest.mock('@routes/dashboard');
+jest.mock('@modules/i18n');
+jest.mock('@modules/steps/flow');
 
 describe('PostHandler - Save for Later Fix', () => {
   let mockRequest: Partial<Request>;

@@ -1,6 +1,6 @@
 import winston from 'winston';
 
-import { Logger } from '../../../../main/modules/logger';
+import { Logger } from '@modules/logger';
 
 const ansiEscapePattern = new RegExp(String.raw`\u001b\[[0-9;]*m`, 'g');
 const stripAnsiCodes = (value: string): string => value.replace(ansiEscapePattern, '');

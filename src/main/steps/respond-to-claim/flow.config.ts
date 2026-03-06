@@ -1,6 +1,5 @@
 import { type Request } from 'express';
 
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
   getPreviousPageForArrears,
   isDefendantNameKnown,
@@ -9,6 +8,8 @@ import {
   isRentArrearsClaim,
   isWelshProperty,
 } from '../utils';
+
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 

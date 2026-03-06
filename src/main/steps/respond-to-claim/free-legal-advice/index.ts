@@ -1,6 +1,6 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -27,10 +27,9 @@ export const step: StepDefinition = createFormStep({
     paragraph4: 'paragraph4',
   },
   extendGetContent: async (req, formContent) => {
-    // Read from CCD (fresh data from START callback via res.locals.validatedCase)
-    // Same pattern as correspondence-address - no session dependency
-    const caseData = req.res?.locals.validatedCase?.data;
-    const existingAnswer = caseData?.possessionClaimResponse?.defendantResponses?.receivedFreeLegalAdvice;
+    const { defendantResponsesReceivedFreeLegalAdvice: existingAnswer } = req.res?.locals?.validatedCase ?? {
+      defendantResponsesReceivedFreeLegalAdvice: undefined,
+    };
 
     // Only prepopulate on GET (not on POST with validation errors)
     if (existingAnswer && !req.body?.hadLegalAdvice) {
