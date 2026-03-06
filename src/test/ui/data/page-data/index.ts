@@ -19,9 +19,4 @@ export * from './nonRentArrearsDispute.page.data';
 export * from './counterClaim.page.data';
 export * from './repaymentsMade.page.data';
 export * from './paymentInterstitial.page.data';
-<<<<<<< HDPI-3046-TestAutomation-ContactByPhone
-=======
-export * from './contactByPhone.page.data';
-export * from './contactByTextMessage.page.data';
 export * from './repaymentsAgreed.page.data';
->>>>>>> HDPI-3208-Automation-ContactbyText
