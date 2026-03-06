@@ -96,7 +96,6 @@ test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('tenancyStartDateKnown', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyStartDateKnown.yesRadioOption,
     });
