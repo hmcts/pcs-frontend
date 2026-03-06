@@ -27,6 +27,7 @@ jest.mock('@services/ccdCaseService', () => ({
   },
 }));
 
+import { CcdCaseModel } from '../../../main/interfaces/ccdCaseData.model';
 import { caseReferenceParamMiddleware } from '../../../main/middleware/caseReference';
 
 interface MockSession {
@@ -70,7 +71,8 @@ describe('caseReferenceParamMiddleware', () => {
       await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
       expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef);
-      expect(mockRes.locals?.validatedCase).toEqual(mockCase);
+      expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
+      expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
       expect(next).toHaveBeenCalledWith();
     });
 

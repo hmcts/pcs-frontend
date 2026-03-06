@@ -12,7 +12,7 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '@services/pcsApi';
-import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
+import { sanitiseCaseReference } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 interface MappedTask {
@@ -106,15 +106,8 @@ export default function dashboardRoutes(app: Application): void {
 
   // Route: /dashboard (redirect to case-specific dashboard)
   dashboardRouter.get('/', (req: Request, res: Response) => {
-    const caseReference = toCaseReference16(req.session?.ccdCase?.id);
-    const dashboardUrl = caseReference ? getDashboardUrl(caseReference) : null;
-
-    if (!dashboardUrl) {
-      // No valid case reference - redirect to home
-      return safeRedirect303(res, '/', '/', ['/']);
-    }
-
-    return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
+    // cannot redirect to dashboard as we don't have a case reference
+    return safeRedirect303(res, '/', '/', ['/']);
   });
 
   // Route: /dashboard/:caseReference (main dashboard page)

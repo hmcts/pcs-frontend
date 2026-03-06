@@ -8,8 +8,9 @@ export const buildCcdCaseForPossessionClaimResponse = async (
   req: Request,
   possessionClaimResponse: PossessionClaimResponse
 ): Promise<CcdCase> => {
+  const { id: caseId } = req.res?.locals?.validatedCase ?? { id: '' };
   const ccdCase: CcdCase = {
-    id: req.res?.locals.validatedCase?.id,
+    id: caseId,
     data: {
       possessionClaimResponse,
     },

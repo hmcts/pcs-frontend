@@ -114,9 +114,8 @@ export const step: StepDefinition = createFormStep({
     let possessionClaimResponse: PossessionClaimResponse;
     //prepopulate address is correct
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
-      // Read fresh CCD data from middleware (available on both GET and POST)
-      const caseData = req.res?.locals.validatedCase?.data;
-      const prepopulateAddress = caseData?.possessionClaimResponse?.defendantContactDetails?.party?.address;
+      const validatedCase = req.res?.locals?.validatedCase;
+      const prepopulateAddress = validatedCase?.defendantContactDetailsParty?.address;
 
       possessionClaimResponse = {
         defendantContactDetails: {
@@ -233,11 +232,9 @@ export const step: StepDefinition = createFormStep({
 });
 
 function getExistingAddress(req: Request): { formattedAddress: string } {
-  // Read from res.locals.validatedCase (already fetched by caseReference middleware via START callback)
-  const caseData = req.res?.locals.validatedCase?.data;
-  const defendantContactDetails = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
-  const addressKnown = defendantContactDetails?.addressKnown;
-  const address = defendantContactDetails?.address;
+  const party = req.res?.locals?.validatedCase?.defendantContactDetailsParty;
+  const addressKnown = party?.addressKnown;
+  const address = party?.address;
 
   // Check addressKnown field from CCD - if "YES" then address exists
   if (addressKnown === 'YES' && address) {

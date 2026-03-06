@@ -25,14 +25,12 @@ export const step: StepDefinition = {
           throw new Error('Translation function not available');
         }
 
-        // Get claimant name from CCD callback data (res.locals.validatedCase)
-        // Use only data from CCD - no hardcoded fallbacks
-        const claimantName = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
-          ?.value as string | undefined;
+        const { claimantName } = req.res?.locals?.validatedCase ?? { claimantName: 'Treetops Housing' };
+        const { id: caseId } = req.res?.locals?.validatedCase ?? { id: '' };
 
         return {
           backUrl: await stepNavigation.getBackUrl(req, stepName),
-          dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+          dashboardUrl: getDashboardUrl(caseId),
           // these keys override the translations from the step namespace but interpolate the claimantName
           cancel: t('buttons.cancel', { ns: 'common' }),
           heading: t('heading', { claimantName }),

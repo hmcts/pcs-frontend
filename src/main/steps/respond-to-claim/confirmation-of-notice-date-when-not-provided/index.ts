@@ -31,8 +31,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    //TODO: get claimantName from CCD case - currently hardcoded
-    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
+    const { claimantName } = req.res?.locals?.validatedCase ?? { claimantName: 'Treetops Housing' };
 
     const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-not-provided', ['common']);
 
