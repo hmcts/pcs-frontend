@@ -33,14 +33,22 @@ export interface Address {
   Country?: string;
 }
 
+export interface DefendantResponses {
+  disputeClaim?: 'YES' | 'NO';
+  disputeDetails?: string;
+  oweRentArrears?: 'YES' | 'NO' | 'NOT_SURE';
+  rentArrearsAmount?: string;
+}
+
 export interface PossessionClaimResponse {
-  defendantContactDetails: {
+  defendantContactDetails?: {
     party: {
       firstName?: string;
       lastName?: string;
       address?: Address;
     };
   };
+  defendantResponses?: DefendantResponses;
 }
 
 export interface StartCallbackData {

@@ -3,6 +3,7 @@ import { type Request } from 'express';
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
   getPreviousPageForArrears,
+  hasOnlyRentArrearsGrounds,
   isDefendantNameKnown,
   isNoticeDateProvided,
   isNoticeServed,
@@ -231,7 +232,16 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'confirmation-of-notice-given',
     },
     'rent-arrears-dispute': {
-      defaultNext: 'counter-claim',
+      routes: [
+        {
+          condition: async (req: Request) => hasOnlyRentArrearsGrounds(req),
+          nextStep: 'counter-claim',
+        },
+        {
+          condition: async (req: Request) => !hasOnlyRentArrearsGrounds(req),
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
       previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
     },
     'non-rent-arrears-dispute': {

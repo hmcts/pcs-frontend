@@ -144,8 +144,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performAction('clickRadioButton', {
+      question: nonRentArrearsDispute.disputeQuestion,
+      option: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
@@ -182,8 +185,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: noticeDetails.imNotSureRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performAction('clickRadioButton', {
+      question: nonRentArrearsDispute.disputeQuestion,
+      option: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
@@ -217,8 +223,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: noticeDetails.noRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performAction('clickRadioButton', {
+      question: nonRentArrearsDispute.disputeQuestion,
+      option: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
