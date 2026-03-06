@@ -17,7 +17,6 @@ import {
   noticeDetails,
   paymentInterstitial,
   rentArrears,
-  repaymentsAgreed,
   repaymentsMade,
   startNow,
   tenancyDetails,
@@ -358,8 +357,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
-    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
-    await performAction('clickButton', rentArrearsDispute.continueButton);
+    await performValidation('mainHeader', rentArrears.mainHeader);
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickButton', paymentInterstitial.continueButton);
