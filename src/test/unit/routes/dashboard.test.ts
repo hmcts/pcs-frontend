@@ -7,6 +7,17 @@ import * as caseReferenceMiddleware from '../../../main/middleware/caseReference
 import dashboardRoutes, { getDashboardUrl } from '@routes/dashboard';
 
 jest.mock('../../../main/middleware/caseReference');
+jest.mock('config', () => ({
+  get: jest.fn(() => 'mock-secret'),
+}));
+jest.mock('jose', () => ({
+  decodeJwt: jest.fn(() => ({ exp: 0, sub: 'user-1' })),
+  SignJWT: jest.fn().mockImplementation(() => ({
+    setProtectedHeader: jest.fn().mockReturnThis(),
+    setExpirationTime: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue('mock-signed-token'),
+  })),
+}));
 jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
 }));
