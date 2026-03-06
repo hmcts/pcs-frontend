@@ -3,7 +3,7 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'Yes' | 'No' | null;
+export type YesNoValue = 'YES' | 'NO' | null;
 export type TenancyTypeCorrectValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 
 export interface CcdUserCase {
@@ -36,14 +36,20 @@ export interface Address {
 
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
-    party: {
+    party?: {
       firstName?: string;
       lastName?: string;
       address?: Address;
+      phoneNumberProvided?: YesNoValue;
+      phoneNumber?: string;
     };
   };
   defendantResponses?: {
     tenancyTypeCorrect?: TenancyTypeCorrectValue;
+    contactByPhone?: YesNoValue;
+    contactByEmail?: YesNoValue;
+    contactByPost?: YesNoValue;
+    contactByText?: YesNoValue;
   };
 }
 
