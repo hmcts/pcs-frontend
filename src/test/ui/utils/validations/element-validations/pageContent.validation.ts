@@ -111,7 +111,8 @@ export class PageContentValidation implements IValidation {
       page
         .getByText(value, { exact: true })
         .or(page.getByText(exactTextWithOptionalWhitespaceRegex(value)))
-        .or(page.locator(`span:text-is("${value}"),
+        .or(
+          page.locator(`span:text-is("${value}"),
                     .paragraph:text-is("${value}"),
                     p:text-is("${value}"),
                     markdown:text-is("${value}"),
@@ -119,7 +120,8 @@ export class PageContentValidation implements IValidation {
                     .body:text-is("${value}"),
                     .text-content:text-is("${value}"),
                     .govuk-body:text-is("${value}"),
-                    .govuk-list:text-is("${value}")`)),
+                    .govuk-list:text-is("${value}")`)
+        ),
     List: (page: Page, value: string) =>
       page.locator(`
                     li:text-is("${value}"),

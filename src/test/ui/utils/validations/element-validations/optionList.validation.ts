@@ -5,7 +5,10 @@ import { IValidation, validationRecord } from '../../interfaces';
 export class OptionListValidation implements IValidation {
   async validate(page: Page, validation: string, fieldName: string, data: validationRecord): Promise<void> {
     const locator = page.locator(`input[type="${data.elementType}"][name="${fieldName}"]`);
-    await page.locator(`fieldset:has(legend:text-is("${fieldName}")) label:text-is("${String(data.options)}")`).first().click();
+    await page
+      .locator(`fieldset:has(legend:text-is("${fieldName}")) label:text-is("${String(data.options)}")`)
+      .first()
+      .click();
     const count = await locator.count();
     const actual: string[] = [];
 
