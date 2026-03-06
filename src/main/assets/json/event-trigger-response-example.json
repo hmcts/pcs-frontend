@@ -1,0 +1,240 @@
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJrc2hncG91YjdnaDQ1c24wbDVlcDM5bm1iciIsInN1YiI6IjJiZWFkZTM2LWIyMWEtM2JjMy05M2Q3LTc4MjUzN2IyNDBkZSIsImlhdCI6MTc3MTQ4MjAxNiwiY2FzZS1pZCI6IjM0IiwiZXZlbnQtaWQiOiJyZXNwb25kUG9zc2Vzc2lvbkNsYWltIiwiY2FzZS10eXBlLWlkIjoiUENTIiwianVyaXNkaWN0aW9uLWlkIjoiUENTIiwiY2FzZS1zdGF0ZSI6IlBFTkRJTkdfQ0FTRV9JU1NVRUQiLCJjYXNlLXZlcnNpb24iOiI3MGIzZGRlZDhkZGQ3Y2QxNDEzYjY3YzM1MTc3ZTAxZjMzMjQyYTBhZmY0ODVjZjk4ZmI2YzgwZjhjNDQ0ZDBhIiwiZW50aXR5LXZlcnNpb24iOjIsImNhc2UtcmV2aXNpb24iOjZ9.1vX2BAlsX6Ev9WRtV6ROQuxGXfHjMRAxDFPYFBCE87s",
+  "_links": {
+    "self": {
+      "href": "http://localhost:4452/cases/1771456429013468/event-triggers/respondPossessionClaim?ignore-warning=false"
+    }
+  },
+  "case_details": {
+    "id": 1771456429013468,
+    "jurisdiction": "PCS",
+    "state": "PENDING_CASE_ISSUED",
+    "version": 2,
+    "case_type_id": "PCS",
+    "created_date": "2026-02-18T23:13:49.147458",
+    "last_modified": "2026-02-19T06:13:37.273319",
+    "last_state_modified_date": "2026-02-18T23:17:30.847808",
+    "security_classification": "PUBLIC",
+    "case_data": {
+      "rentArrears_Total": "22222200",
+      "noticeServed": "Yes",
+      "propertyAddress": {
+        "AddressLine1": "1 Rse Way",
+        "AddressLine2": "",
+        "AddressLine3": "",
+        "PostTown": "London",
+        "County": "",
+        "PostCode": "SW11 1PD",
+        "Country": "United Kingdom"
+      },
+      "claimGroundSummaries": [
+        {
+          "value": {
+            "category": "SECURE_OR_FLEXIBLE_DISCRETIONARY",
+            "code": "RENT_ARREARS_OR_BREACH_OF_TENANCY",
+            "label": "Rent arrears or breach of the tenancy (ground 1)",
+            "reason": "asff",
+            "isRentArrears": "Yes"
+          },
+          "id": "120c603c-455d-4352-bb28-25446606ee81"
+        },
+        {
+          "value": {
+            "category": "SECURE_OR_FLEXIBLE_DISCRETIONARY",
+            "code": "DOMESTIC_VIOLENCE",
+            "label": "Domestic violence (ground 2A)",
+            "reason": "asdfasd",
+            "isRentArrears": "No"
+          },
+          "id": "286f59ab-2a1d-4dde-928d-ab3faa237f7d"
+        },
+        {
+          "value": {
+            "category": "SECURE_OR_FLEXIBLE_MANDATORY",
+            "code": "ANTI_SOCIAL",
+            "label": "Antisocial behaviour",
+            "reason": "dfasdas",
+            "isRentArrears": "No"
+          },
+          "id": "dab5302e-07ce-4bee-873a-311787ea7e1e"
+        },
+        {
+          "value": {
+            "category": "SECURE_OR_FLEXIBLE_MANDATORY_ALT",
+            "code": "OVERCROWDING",
+            "label": "Overcrowding (ground 9)",
+            "reason": "adfasd",
+            "isRentArrears": "No"
+          },
+          "id": "e0774c1a-fb4d-4960-8524-aad65ea89d4e"
+        },
+        {
+          "value": {
+            "category": "SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT",
+            "code": "UNDER_OCCUPYING_AFTER_SUCCESSION",
+            "label": "Under occupying after succession (ground 15A)",
+            "reason": "adfasd",
+            "isRentArrears": "No"
+          },
+          "id": "38cc2a25-0b95-4603-be08-bfdaf8515d8d"
+        }
+      ],
+      "userPcqIdSet": "No",
+      "tenancy_TenancyLicenceDate": "2023-01-01",
+      "legislativeCountry": "England",
+      "notice_NoticeHandedOverDateTime": "2022-01-01T01:01:01",
+      "tenancy_TypeOfTenancyLicence": "SECURE_TENANCY",
+      "possessionClaimResponse": {
+        "claimantOrganisations": [
+          {
+            "value": "DASFA",
+            "id": "a6afc1f3-1ce8-461d-9769-cb219575eaef"
+          }
+        ],
+        "defendantContactDetails": {
+          "party": {
+            "firstName": "Alec",
+            "lastName": "Alex",
+            "nameKnown": "YES",
+            "address": {
+              "AddressLine1": "1 Wiltshire Close",
+              "AddressLine2": "Woolston",
+              "PostTown": "Warrington",
+              "PostCode": "WA1 4DA"
+            },
+            "addressKnown": "NO"
+          }
+        },
+        "defendantResponses": {
+          "receivedFreeLegalAdvice": "PREFER_NOT_TO_SAY"
+        }
+      }
+    },
+    "data_classification": {
+      "rentArrears_Total": "PUBLIC",
+      "noticeServed": "PUBLIC",
+      "propertyAddress": {
+        "classification": "PUBLIC",
+        "value": {
+          "AddressLine1": "PUBLIC",
+          "AddressLine2": "PUBLIC",
+          "AddressLine3": "PUBLIC",
+          "PostTown": "PUBLIC",
+          "County": "PUBLIC",
+          "PostCode": "PUBLIC",
+          "Country": "PUBLIC"
+        }
+      },
+      "claimGroundSummaries": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "value": {
+              "category": "PUBLIC",
+              "code": "PUBLIC",
+              "label": "PUBLIC",
+              "reason": "PUBLIC",
+              "isRentArrears": "PUBLIC"
+            },
+            "id": "120c603c-455d-4352-bb28-25446606ee81"
+          },
+          {
+            "value": {
+              "category": "PUBLIC",
+              "code": "PUBLIC",
+              "label": "PUBLIC",
+              "reason": "PUBLIC",
+              "isRentArrears": "PUBLIC"
+            },
+            "id": "286f59ab-2a1d-4dde-928d-ab3faa237f7d"
+          },
+          {
+            "value": {
+              "category": "PUBLIC",
+              "code": "PUBLIC",
+              "label": "PUBLIC",
+              "reason": "PUBLIC",
+              "isRentArrears": "PUBLIC"
+            },
+            "id": "dab5302e-07ce-4bee-873a-311787ea7e1e"
+          },
+          {
+            "value": {
+              "category": "PUBLIC",
+              "code": "PUBLIC",
+              "label": "PUBLIC",
+              "reason": "PUBLIC",
+              "isRentArrears": "PUBLIC"
+            },
+            "id": "e0774c1a-fb4d-4960-8524-aad65ea89d4e"
+          },
+          {
+            "value": {
+              "category": "PUBLIC",
+              "code": "PUBLIC",
+              "label": "PUBLIC",
+              "reason": "PUBLIC",
+              "isRentArrears": "PUBLIC"
+            },
+            "id": "38cc2a25-0b95-4603-be08-bfdaf8515d8d"
+          }
+        ]
+      },
+      "userPcqIdSet": "PUBLIC",
+      "tenancy_TenancyLicenceDate": "PUBLIC",
+      "legislativeCountry": "PUBLIC",
+      "notice_NoticeHandedOverDateTime": "PUBLIC",
+      "tenancy_TypeOfTenancyLicence": "PUBLIC",
+      "possessionClaimResponse": {
+        "classification": "PUBLIC",
+        "value": {
+          "claimantOrganisations": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "a6afc1f3-1ce8-461d-9769-cb219575eaef",
+                "classification": "PUBLIC"
+              }
+            ]
+          },
+          "defendantContactDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "party": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "nameKnown": "PUBLIC",
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "AddressLine1": "PUBLIC",
+                      "AddressLine2": "PUBLIC",
+                      "PostTown": "PUBLIC",
+                      "PostCode": "PUBLIC"
+                    }
+                  },
+                  "addressKnown": "PUBLIC"
+                }
+              }
+            }
+          },
+          "defendantResponses": {
+            "classification": "PUBLIC",
+            "value": {
+              "receivedFreeLegalAdvice": "PUBLIC"
+            }
+          }
+        }
+      }
+    },
+    "supplementary_data": {},
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null
+  },
+  "event_id": "respondPossessionClaim"
+}

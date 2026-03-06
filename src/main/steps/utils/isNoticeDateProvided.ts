@@ -11,15 +11,18 @@ import type { Request } from 'express';
  * Returns true if any notice date is provided, false otherwise.
  */
 export const isNoticeDateProvided = async (req: Request): Promise<boolean> => {
-  // Read from CCD (fresh data from START callback via res.locals.validatedCase)
-  // Same pattern as free-legal-advice - no session dependency
-  const caseData = req.res?.locals?.validatedCase?.data;
+  const { notice_NoticeHandedOverDateTime, notice_NoticePostedDate, notice_NoticeOtherElectronicDateTime } = req.res
+    ?.locals?.validatedCase ?? {
+    notice_NoticeHandedOverDateTime: '',
+    notice_NoticePostedDate: '',
+    notice_NoticeOtherElectronicDateTime: '',
+  };
 
   // Check all possible notice date fields (different service methods use different fields)
   const noticeDate =
-    caseData?.notice_NoticeHandedOverDateTime || // Hand delivered
-    caseData?.notice_NoticePostedDate || // Posted
-    caseData?.notice_NoticeOtherElectronicDateTime; // Electronic
+    notice_NoticeHandedOverDateTime || // Hand delivered
+    notice_NoticePostedDate || // Posted
+    notice_NoticeOtherElectronicDateTime; // Electronic
 
   return !!noticeDate;
 };

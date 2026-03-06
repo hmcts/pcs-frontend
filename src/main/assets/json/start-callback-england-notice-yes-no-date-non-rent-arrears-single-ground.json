@@ -1,0 +1,138 @@
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhdnZrczk5cDEwc3MzcGh1ZW1mbjgwbWo1MCIsInN1YiI6ImIxNGE4NjlkLWU2YzAtM2JjMy1hYjk1LWJmMDZmOTUyN2NhNSIsImlhdCI6MTc3MTc3NzI4MywiY2FzZS1pZCI6IjgiLCJldmVudC1pZCI6InJlc3BvbmRQb3NzZXNzaW9uQ2xhaW0iLCJjYXNlLXR5cGUtaWQiOiJQQ1MiLCJqdXJpc2RpY3Rpb24taWQiOiJQQ1MiLCJjYXNlLXN0YXRlIjoiUEVORElOR19DQVNFX0lTU1VFRCIsImNhc2UtdmVyc2lvbiI6IjMyZjdjYTZhNzA3ZDk0YTA1YWJkYTJlODhjODY1ODMzNzg1ODMxNGIzYmFhOWYxNjJhMDFkZDE2NzY1NDE2YjciLCJlbnRpdHktdmVyc2lvbiI6MiwiY2FzZS1yZXZpc2lvbiI6Mn0.XOVL8Jvnm-sRwZOLA1aOhfqIr5QijS8FFse11Xsm1LQ",
+  "_links": {
+    "self": {
+      "href": "http://localhost:4452/cases/1771776952954667/event-triggers/respondPossessionClaim?ignore-warning=false"
+    }
+  },
+  "case_details": {
+    "id": 1771776952954667,
+    "jurisdiction": "PCS",
+    "state": "PENDING_CASE_ISSUED",
+    "version": 2,
+    "case_type_id": "PCS",
+    "created_date": "2026-02-22T16:15:53.04814",
+    "last_modified": "2026-02-22T16:18:24.542848",
+    "last_state_modified_date": "2026-02-22T16:18:24.542848",
+    "security_classification": "PUBLIC",
+    "case_data": {
+      "noticeServed": "Yes",
+      "propertyAddress": {
+        "AddressLine1": "1 Rse Way",
+        "AddressLine2": "",
+        "AddressLine3": "",
+        "PostTown": "London",
+        "County": "",
+        "PostCode": "SW11 1PD",
+        "Country": "United Kingdom"
+      },
+      "claimGroundSummaries": [
+        {
+          "value": {
+            "category": "SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT",
+            "code": "SPECIAL_NEEDS_ACCOMMODATION",
+            "label": "Special needs accommodation (ground 15)",
+            "reason": "fdfs",
+            "isRentArrears": "No"
+          },
+          "id": "d1557221-1bcf-4b28-86c0-24c1aa988fff"
+        }
+      ],
+      "userPcqIdSet": "No",
+      "legislativeCountry": "England",
+      "tenancy_TypeOfTenancyLicence": "SECURE_TENANCY",
+      "possessionClaimResponse": {
+        "claimantOrganisations": [
+          {
+            "value": "LODGERS & CO",
+            "id": "4fb5f6da-d7b9-4fb2-92d2-004551cb1334"
+          }
+        ],
+        "defendantContactDetails": {
+          "party": {
+            "nameKnown": "NO",
+            "emailAddress": "pcs-test-user-353145@test.com",
+            "address": {},
+            "addressKnown": "NO"
+          }
+        },
+        "defendantResponses": {}
+      }
+    },
+    "data_classification": {
+      "noticeServed": "PUBLIC",
+      "propertyAddress": {
+        "classification": "PUBLIC",
+        "value": {
+          "AddressLine1": "PUBLIC",
+          "AddressLine2": "PUBLIC",
+          "AddressLine3": "PUBLIC",
+          "PostTown": "PUBLIC",
+          "County": "PUBLIC",
+          "PostCode": "PUBLIC",
+          "Country": "PUBLIC"
+        }
+      },
+      "claimGroundSummaries": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "value": {
+              "category": "PUBLIC",
+              "code": "PUBLIC",
+              "label": "PUBLIC",
+              "reason": "PUBLIC",
+              "isRentArrears": "PUBLIC"
+            },
+            "id": "d1557221-1bcf-4b28-86c0-24c1aa988fff"
+          }
+        ]
+      },
+      "userPcqIdSet": "PUBLIC",
+      "legislativeCountry": "PUBLIC",
+      "tenancy_TypeOfTenancyLicence": "PUBLIC",
+      "possessionClaimResponse": {
+        "classification": "PUBLIC",
+        "value": {
+          "claimantOrganisations": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "4fb5f6da-d7b9-4fb2-92d2-004551cb1334",
+                "classification": "PUBLIC"
+              }
+            ]
+          },
+          "defendantContactDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "party": {
+                "classification": "PUBLIC",
+                "value": {
+                  "nameKnown": "PUBLIC",
+                  "emailAddress": "PUBLIC",
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {}
+                  },
+                  "addressKnown": "PUBLIC"
+                }
+              }
+            }
+          },
+          "defendantResponses": {
+            "classification": "PUBLIC",
+            "value": {}
+          }
+        }
+      }
+    },
+    "supplementary_data": {},
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null
+  },
+  "event_id": "respondPossessionClaim"
+}
