@@ -16,11 +16,11 @@
       "day": "Day",
       "month": "Month",
       "year": "Year",
-      "notRealDate": "The tenancy start date must be a real date",
-      "futureDate": "The tenancy start date must be in the past",
-      "invalidValue": "The tenancy start date must be a real date",
-      "missingOne": "The tenancy start date must include a {{missingField}}",
-      "missingTwo": "The tenancy start date must include a {{first}} and {{second}}"
+      "notRealDate": "Tenancy start date must be a real date",
+      "futureDate": "Tenancy start date must be in the past",
+      "invalidValue": "Tenancy start date must be a real date",
+      "missingOne": "Your tenancy start date must include a {{missingField}}",
+      "missingTwo": "Tenancy start date must include a  {{first}} and {{second}}"
     },
     "confirmTenancyDate": "Select if the tenancy, licence or occupation contract start date is correct"
   }

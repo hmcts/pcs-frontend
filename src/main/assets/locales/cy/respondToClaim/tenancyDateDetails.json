@@ -16,11 +16,11 @@
       "day": "cyDay",
       "month": "cyMonth",
       "year": "cyYear",
-      "notRealDate": "cyThe tenancy start date must be a real date",
-      "futureDate": "cyThe tenancy start date must be in the past",
-      "invalidValue": "cyThe tenancy start date must be a real date",
-      "missingOne": "cyThe tenancy start date must include a {{missingField}}",
-      "missingTwo": "cyThe tenancy start date must include a {{first}} and {{second}}"
+      "notRealDate": "cyTenancy start date must be a real date",
+      "futureDate": "cyTenancy start date must be in the past",
+      "invalidValue": "cyTenancy start date must be a real date",
+      "missingOne": "cyYour tenancy start date must include a {{missingField}}",
+      "missingTwo": "cyTenancy start date must include a  {{first}} and {{second}}"
     },
     "confirmTenancyDate": "cySelect if the tenancy, licence or occupation contract start date is correct"
   }
