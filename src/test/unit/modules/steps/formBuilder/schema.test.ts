@@ -30,13 +30,14 @@ describe('formBuilder schema', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should reject FormFieldOption without value', () => {
+    it('should validate FormFieldOption with divider (no value required)', () => {
       const option = {
-        text: 'Option 1',
+        divider: 'or',
       };
 
       const result = FormFieldOptionSchema.safeParse(option);
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
+      expect(result.success ? result.data : null).toEqual(option);
     });
   });
 
