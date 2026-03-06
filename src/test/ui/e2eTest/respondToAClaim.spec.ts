@@ -20,6 +20,7 @@ import {
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/element-validations';
 import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
+import { tenancyStartDateUnKnown } from '../data/page-data/tenancyOrContractLicenceStartUnKnown.page.data';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -72,6 +73,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyStartDateUnKnown.mainHeader);
+     await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: tenancyStartDateUnKnown.dayInputText,
+      tsMonth: tenancyStartDateUnKnown.monthInputText,
+      tsYear: tenancyStartDateUnKnown.yearInputText,
+    });
+    await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -95,6 +103,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyStartDateUnKnown.mainHeader);
+    await performAction('clickButton', tenancyStartDateUnKnown.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyStartDateUnKnown.mainHeader);
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
