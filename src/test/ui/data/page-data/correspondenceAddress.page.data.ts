@@ -1,7 +1,8 @@
-import { submitCaseApiData } from '../api-data';
-
+import { address } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 export const correspondenceAddress = {
-  correspondenceAddressKnownMainHeader: `Is your correspondence address ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.AddressLine1}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostTown}, ${submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress.PostCode}?`,
+  get correspondenceAddressKnownMainHeader(): string {
+    return `Is your correspondence address ${address}?`;
+  },
   correspondenceAddressUnKnownMainHeader: 'What’s your correspondence address?',
   correspondenceAddressUnKnownParagraph: 'Your correspondence address is your postal address.',
   respondToClaimParagraph: 'Respond to a property possession claim',
