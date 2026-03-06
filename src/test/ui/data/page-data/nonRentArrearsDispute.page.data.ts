@@ -19,7 +19,7 @@ export const nonRentArrearsDispute = {
   viewTheClaimLink: 'view the claim (opens in new tab)',
   mainHeaderGovServiceHiddenNewTab: 'Welcome to GOV.UK',
   thisIncludesParagraph: 'This includes:',
-  groundsForPossessionList: `${submitCaseApiData.submitCasePayload.claimantName}’s grounds for possession (their reasons for making the claim)`,
+  groundsForPossessionList: `${submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName}’s grounds for possession (their reasons for making the claim)`,
   anyDocumentsList: 'any documents they’ve uploaded to support their claim',
   anyOtherList: ' any other information they’ve given as part of their claim',
   doYouWantToDisputeQuestion: 'Do you want to dispute any other parts of the claim?',
