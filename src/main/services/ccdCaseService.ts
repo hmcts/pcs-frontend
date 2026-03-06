@@ -79,6 +79,20 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
   const status = axiosError.response?.status;
 
   logger.error(`Error in ${context}: ${axiosError.message}`);
+  logger.error(
+    `[ccdCaseService] ${context} request details: ${JSON.stringify(
+      {
+        method: axiosError.config?.method?.toUpperCase(),
+        url: axiosError.config?.url,
+        timeout: axiosError.config?.timeout,
+        status,
+        statusText: axiosError.response?.statusText,
+        responseHeaders: axiosError.response?.headers,
+      },
+      null,
+      2
+    )}`
+  );
   if (axiosError.response?.data) {
     logger.error(`Error response data: ${JSON.stringify(axiosError.response.data, null, 2)}`);
   }
@@ -273,6 +287,17 @@ export const ccdCaseService = {
       throw new HTTPError('Cannot Submit Response to Case, CCD Case Not found', 500);
     }
     const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
+    logger.info(
+      `[ccdCaseService] submitResponseToClaim starting: ${JSON.stringify(
+        {
+          caseId: ccdCase.id,
+          eventUrl,
+          payloadData: ccdCase.data,
+        },
+        null,
+        2
+      )}`
+    );
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 

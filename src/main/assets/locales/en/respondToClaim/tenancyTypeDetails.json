@@ -1,0 +1,19 @@
+{
+  "pageTitle": "Tenancy details",
+  "caption": "Respond to a property possession claim",
+  "heading": "Tenancy, occupation contract or licence agreement",
+  "insetText": "When they made their claim, Treetops Housing had to give details about the type of tenancy, occupation contract or licence agreement you signed to rent your property, and the date it began, if known.",
+  "detailsHeading": "Details given by ",
+  "tenancyType": "The property is let under an assured tenancy agreement",
+  "legend": "Is the tenancy, occupation contract or licence agreement type correct?",
+  "yes": "Yes",
+  "no": "No",
+  "notSure": "I’m not sure",
+  "correctTypeLabel": "Give the correct tenancy, occupation contract or licence type",
+  "errors": {
+    "tenancyTypeConfirm": "Select if these tenancy, licence or occupation contract details are correct",
+    "tenancyDetails.correctType": "Enter the correct tenancy, occupation contract or licence type",
+    "requiredText": "Enter the correct tenancy, licence or occupation contract details",
+    "defaultMaxLength": "Tenancy, occupation contract or licence type must be 60 characters or less"
+  }
+}
