@@ -50,29 +50,24 @@ export const oidcMiddleware: RequestHandler = async (
 
     // Decode JWT to check expiry
     let tokenExp: number | undefined;
-    let isExpired = false;
+    let shouldRefresh = false;
 
     try {
       const decoded = jose.decodeJwt(accessToken);
       tokenExp = decoded.exp;
 
       if (tokenExp) {
-        let accessTokenEarlyRefreshSeconds = 30;
-        try {
-          accessTokenEarlyRefreshSeconds = config.get<number>('oidc.accessTokenEarlyRefreshSeconds');
-        } catch {
-          // Use default value if config not found
-        }
+        const accessTokenEarlyRefreshSeconds = config.get<number>('oidc.accessTokenEarlyRefreshSeconds');
         const nowSeconds = Math.floor(Date.now() / 1000);
         const expiryThreshold = tokenExp - accessTokenEarlyRefreshSeconds;
-        isExpired = nowSeconds >= expiryThreshold;
+        shouldRefresh = nowSeconds >= expiryThreshold;
       } else {
         // If no exp claim, assume expired to be safe
-        isExpired = true;
+        shouldRefresh = true;
       }
     } catch (error) {
       // If decoding fails, assume expired
-      isExpired = true;
+      shouldRefresh = true;
       logger.warn('Failed to decode access token, treating as expired', {
         event: 'token_refresh_attempt',
         userId: user.uid,
@@ -83,7 +78,7 @@ export const oidcMiddleware: RequestHandler = async (
     }
 
     // If token is expired or near-expiry, attempt refresh
-    if (isExpired) {
+    if (shouldRefresh) {
       if (!refreshToken) {
         if (req.session) {
           delete req.session.user;
@@ -99,8 +94,15 @@ export const oidcMiddleware: RequestHandler = async (
         // Wait for existing refresh to complete
         try {
           await existingRefresh;
-        } catch {
+        } catch (error) {
           // If refresh failed, continue to handle it below
+          logger.error('Refresh failed, continuing to handle it below', {
+            event: 'token_refresh_failure',
+            userId: user.uid,
+            path: req.originalUrl,
+            reason: 'refresh_failed',
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
         // Re-check user after refresh (might have been cleared)
         if (!req.session?.user) {
