@@ -33,13 +33,18 @@ export interface Address {
   Country?: string;
 }
 
+export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
+
 export interface PossessionClaimResponse {
-  defendantContactDetails: {
+  defendantContactDetails?: {
     party: {
       firstName?: string;
       lastName?: string;
       address?: Address;
     };
+  };
+  defendantResponses?: {
+    registeredLandlord?: YesNoNotSureValue;
   };
 }
 
