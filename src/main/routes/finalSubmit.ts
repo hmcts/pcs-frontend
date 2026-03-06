@@ -1,9 +1,9 @@
 /**
- * ⚠️ TEMPORARY TESTING ROUTE - WILL BE DELETED LATER
+ * TEMPORARY TESTING ROUTE - WILL BE DELETED LATER
  * Simple page to test CCD final submit with minimal data payload
  *
- * Uses CCD's two-phase START → SUBMIT pattern:
- * 1. START: GET /event-triggers/respondPossessionClaim → event_token
+ * Uses CCD's two-phase START to SUBMIT pattern:
+ * 1. START: GET /event-triggers/respondPossessionClaim returns event_token
  * 2. SUBMIT: POST /events with minimal data { possessionClaimResponse: {} } and event_token
  *
  * Note: pcs-api SubmitEventHandler requires possessionClaimResponse to be non-null
