@@ -1,7 +1,11 @@
 import { IValidation } from '../interfaces';
 import {
-  BannerAlertValidation,
   ErrorMessageValidation,
+  PageContentValidation,
+  PageNavigationValidation,
+} from '../validations/custom-validations';
+import {
+  BannerAlertValidation,
   FormLabelValueValidation,
   InputErrorValidation,
   MainHeaderValidation,
@@ -10,7 +14,6 @@ import {
   TextValidation,
   VisibilityValidation,
 } from '../validations/element-validations';
-import { PageContentValidation } from '../validations/element-validations/pageContent.validation';
 
 export class ValidationRegistry {
   private static validations: Map<string, IValidation> = new Map([
@@ -26,6 +29,7 @@ export class ValidationRegistry {
     ['elementNotToBeVisible', new VisibilityValidation()],
     ['waitUntilElementDisappears', new VisibilityValidation()],
     ['autoValidatePageContent', new PageContentValidation()],
+    ['pageNavigation', new PageNavigationValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {
