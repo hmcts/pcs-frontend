@@ -306,7 +306,19 @@ export const ccdCaseService = {
     };
 
     try {
+      logger.info('Updating draft respond to claim', {
+        caseId,
+        hasPossessionClaimResponse: Boolean((data as { possessionClaimResponse?: unknown }).possessionClaimResponse),
+        hasDefendantResponses: Boolean(
+          (data as { possessionClaimResponse?: { defendantResponses?: unknown } }).possessionClaimResponse
+            ?.defendantResponses
+        ),
+      });
+
       const response = await http.post<CcdCase>(url, payload, getCaseHeaders(accessToken || ''));
+      logger.info('Draft respond to claim updated', {
+        caseId: response.data.id ?? caseId,
+      });
       return response.data;
     } catch (error) {
       throw convertAxiosErrorToHttpError(error, 'save draft response to claim');

@@ -1,8 +1,10 @@
 import type { Request } from 'express';
 
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { getClaimantName } from '../../utils';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -17,6 +19,22 @@ export const step: StepDefinition = createFormStep({
     introLinkHref: 'introLinkHref',
     includesHeading: 'includesHeading',
     caption: 'captionHeading',
+  },
+  beforeRedirect: async (req: Request) => {
+    const disputeClaimRaw = req.body?.disputeClaim as 'yes' | 'no' | undefined;
+    // Sub-field is submitted with dotted name: parentField.subField
+    const disputeDetailsRaw = req.body?.['disputeClaim.disputeDetails'] as string | undefined;
+
+    const disputeClaim = disputeClaimRaw === 'yes' ? 'YES' : disputeClaimRaw === 'no' ? 'NO' : undefined;
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        disputeClaim,
+        ...(disputeClaimRaw === 'yes' && disputeDetailsRaw ? { disputeDetails: disputeDetailsRaw } : {}),
+      },
+    };
+
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: (req: Request) => {
     const claimantName = getClaimantName(req);
