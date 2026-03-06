@@ -34,18 +34,18 @@ function getCaseHeaders(token: string) {
   };
 }
 
+function validateCaseId(caseId: string): boolean {
+  return /^\d{16}$/.test(caseId);
+}
+
 export default function finalSubmitRoutes(app: Application): void {
   // GET: Display final submit page
   app.get('/case/:caseId/final-submit', oidcMiddleware, (req: Request, res: Response) => {
     const caseId = req.params.caseId as string;
 
-    // Validate caseId format (16 digits only) to prevent SSRF
-    if (!/^\d{16}$/.test(caseId)) {
+    if (!validateCaseId(caseId)) {
       logger.warn(`Invalid caseId format: ${caseId}`);
-      return res.render('finalSubmit', {
-        caseId,
-        error: 'Invalid case reference',
-      });
+      return res.status(400).render('error', { error: 'Invalid case reference' });
     }
 
     const error = req.query.error as string | undefined;
@@ -61,10 +61,9 @@ export default function finalSubmitRoutes(app: Application): void {
     const caseId = req.params.caseId as string;
     const userAccessToken = req.session.user?.accessToken;
 
-    // Validate caseId format (16 digits only) to prevent SSRF
-    if (!/^\d{16}$/.test(caseId)) {
+    if (!validateCaseId(caseId)) {
       logger.warn(`Invalid caseId format: ${caseId}`);
-      return res.redirect(303, `/case/${caseId}/final-submit?error=failed`);
+      return res.status(400).render('error', { error: 'Invalid case reference' });
     }
 
     if (!userAccessToken) {
