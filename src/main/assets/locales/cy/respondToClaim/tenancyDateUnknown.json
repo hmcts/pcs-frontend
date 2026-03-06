@@ -1,0 +1,19 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyTenancy, occupation contract or licence start date",
+  "question": "cyWhen did your tenancy, occupation contract or licence start (optional)?",
+  "hint": "cyFor example, 27 9 2022",
+  "paragraph": "cy{{claimantName}} did not provide the start date of your tenancy, occupation contract or licence.",
+  "errors": {
+    "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
+      "required": "cyYour tenancy start date must include a day, month and year",
+      "notRealDate": "cyTenancy start date must be a real date",
+      "futureDate": "cyTenancy start date must be in the past",
+      "missingOne": "cyYour tenancy start date must include a {{missingField}}",
+      "missingTwo": "cyYour tenancy start date must include a {{first}} and {{second}}"
+    }
+  }
+}
