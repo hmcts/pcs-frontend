@@ -28,6 +28,7 @@ export const flowConfig: JourneyFlowConfig = {
     'correspondence-address',
     'dispute-claim-interstitial',
     'landlord-registered',
+    'landlord-licensed',
     'tenancy-details',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
@@ -104,6 +105,9 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'tenancy-details',
     },
     'landlord-registered': {
+      defaultNext: 'landlord-licensed',
+    },
+    'landlord-licensed': {
       defaultNext: 'tenancy-details',
     },
     'tenancy-details': {

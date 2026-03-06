@@ -17,6 +17,7 @@ import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
+import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
@@ -43,6 +44,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'contact-preferences': contactPreferences,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
+  'landlord-licensed': landlordLicensed,
   'tenancy-details': tenancyDetails,
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
   'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
