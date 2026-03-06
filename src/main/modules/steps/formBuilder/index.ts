@@ -51,11 +51,11 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
 
   const enhancedBeforeRedirect = ccdMapping
     ? async (req: Request) => {
-        // Run auto-save first (res is available via req.res)
+        // Auto-save runs first to ensure CCD has latest data before any custom logic
         if (req.res) {
           await autoSaveToCCD(req, req.res, { stepName, ccdMapping });
         }
-        // Then run custom callback if provided
+        // Then run your custom beforeRedirect if you provided one
         if (beforeRedirect) {
           await beforeRedirect(req);
         }
@@ -78,7 +78,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
-        // Get interpolation values from extendGetContent if available (for dynamic translation values)
+        // Get dynamic values for translation interpolation (e.g., defendant name in question text)
         const emptyFormContent = { fields: [] } as BuiltFormContent;
         const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
         const initialFormData = getInitialFormData ? await getInitialFormData(req) : undefined;

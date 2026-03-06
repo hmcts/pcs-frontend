@@ -16,7 +16,11 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   ccdMapping: {
     backendPath: 'possessionClaimResponse',
+    // Extract parent field and both subFields (using dot-notation for nested field names)
     frontendFields: ['nameConfirmation', 'nameConfirmation.firstName', 'nameConfirmation.lastName'],
+    // Custom mapper handles two scenarios:
+    // 1. User confirms name is correct (yes) - copy claimant-entered values from CCD
+    // 2. User corrects name (no) - save their manually entered values
     valueMapper: (valueOrFormData: FormFieldValue, ctx?: CcdMappingContext) => {
       if (typeof valueOrFormData === 'string' || Array.isArray(valueOrFormData)) {
         return {};
@@ -50,6 +54,8 @@ export const step: StepDefinition = createFormStep({
       }
 
       if (nameConfirmation === 'yes') {
+        // When user confirms name is correct, copy what the claimant originally entered
+        // Need to read from CCD context since this data isn't in the form submission
         const caseData = ctx?.caseData as Record<string, unknown> | undefined;
         const possessionClaimResponse = caseData?.possessionClaimResponse as Record<string, unknown> | undefined;
         const claimantEntry = possessionClaimResponse?.claimantEnteredDefendantDetails as
@@ -109,13 +115,13 @@ export const step: StepDefinition = createFormStep({
     return initial;
   },
   extendGetContent: (req: Request) => {
-    // Get defendant name from claimantEnteredDefendantDetails (what claimant entered)
+    // Provides dynamic values for the template (defendant name and organization name)
+    // These get interpolated into the question text and hint translations
     const caseData = req.res?.locals?.validatedCase?.data;
     const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
     const defendantName =
       claimantEntry?.firstName && claimantEntry?.lastName ? `${claimantEntry.firstName} ${claimantEntry.lastName}` : '';
 
-    // Get organisation name from CCD case data
     const organisationName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
 
     return {

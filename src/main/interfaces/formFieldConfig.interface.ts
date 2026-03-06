@@ -14,17 +14,12 @@ export type ComponentType =
 
 export interface FormFieldOption {
   value?: string;
-  // Backward compatible: text property still supported
   text?: string;
-  // Divider text for visual separation of options
   divider?: string;
-  // Translation key for option text (backward compatible)
   translationKey?: string;
-  // Dynamic label function (takes translations object, returns string)
   label?: string | ((translations: Record<string, string>) => string);
-  // Conditional HTML/text to display when this option is selected
   conditionalText?: string | ((translations: Record<string, string>) => string);
-  // Nested subFields that appear when this option is selected
+  // SubFields appear conditionally when this option is selected (e.g., text inputs under "No" radio button)
   subFields?: Record<string, FormFieldConfig>;
 }
 
@@ -36,7 +31,6 @@ export interface FormFieldConfig {
   pattern?: string;
   maxLength?: number;
   errorMessage?: string;
-  // Label can be a string or a function that takes translations and returns a string
   label?: string | ((translations: Record<string, string>) => string);
   labelClasses?: string;
   hint?: string;
@@ -47,28 +41,25 @@ export interface FormFieldConfig {
   options?: FormFieldOption[];
   classes?: string;
   attributes?: Record<string, unknown>;
-  // Legend classes for radio/checkbox/date fieldsets
   legendClasses?: string;
-  // Pre-processed component configuration for template rendering
+  // Pre-built component config for Nunjucks template rendering
   component?: Record<string, unknown>;
   componentType?: ComponentType;
-  // Field value (used for prepopulation from CCD)
+  // Field value used for prepopulation from CCD (via getInitialFormData)
   value?: unknown;
-  // Cross-field validation function
-  // Returns error message string if validation fails, undefined if valid
+  // Cross-field validation that returns error message string, or undefined if valid
   validate?: (
     value: unknown,
     formData: Record<string, unknown>,
     allData: Record<string, unknown>
   ) => string | undefined;
-  // Field-level validator function (simpler than validate, returns boolean or error message string)
-  // Only validates when field is visible/shown
+  // Simpler field-level validation that returns boolean or error message
   validator?: (
     value: unknown,
     formData?: Record<string, unknown>,
     allData?: Record<string, unknown>
   ) => boolean | string;
-  // For date fields: if true, disallows future and current dates
+  // For date fields: prevent future dates from being entered
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
 }
@@ -95,25 +86,30 @@ export type ExtendGetContent = (
   formContent: BuiltFormContent
 ) => MaybePromise<Partial<BuiltFormContent> & Record<string, unknown>>;
 
+// Prepopulation function that extracts field values from CCD case data for GET requests.
+// Use dot-notation for subFields (e.g., 'nameConfirmation.firstName') to match nested field names.
 export type GetInitialFormData = (req: Request) => MaybePromise<Record<string, unknown>>;
 
 export type FormFieldValue = string | string[] | Record<string, unknown>;
 
 export interface CcdMappingContext {
-  /**
-   * CCD case data snapshot available during POST (from START callback middleware).
-   * Keep this as plain data to avoid coupling mappers to Express `req/res`.
-   */
+  // CCD case data snapshot from START callback, available during draft save.
+  // Passed as plain data to keep mappers decoupled from Express req/res.
+  // Use this when your mapper needs to read other parts of the case (e.g., copying claimant-entered values).
   caseData?: Record<string, unknown>;
 }
 
+// Transforms frontend form values into CCD backend format.
+// Takes form field value(s) and optional context, returns object ready for CCD payload.
 export type ValueMapper = (valueOrFormData: FormFieldValue, ctx?: CcdMappingContext) => Record<string, unknown>;
 
+// Declarative mapping that tells formBuilder how to save form data to CCD draft.
+// Enables automatic draft persistence without manual beforeRedirect code.
 export interface CcdFieldMapping {
-  backendPath: string;
-  frontendField?: string;
-  frontendFields?: string[];
-  valueMapper: ValueMapper;
+  backendPath: string; // Where in CCD structure to save (dot-path like 'possessionClaimResponse.defendantResponses')
+  frontendField?: string; // Single field to extract from form data
+  frontendFields?: string[]; // Multiple fields to extract (e.g., parent + subFields)
+  valueMapper: ValueMapper; // Function that transforms frontend values to CCD format
 }
 
 export interface FormBuilderConfig {
@@ -122,15 +118,11 @@ export interface FormBuilderConfig {
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
-  /**
-   * Optional: provide initial field values on GET (e.g., from CCD).
-   * This is GET-only and must not overwrite POST body values during validation rerenders.
-   */
+  // Prepopulates form fields from CCD on GET requests (e.g., when user returns to edit their answer).
+  // Only runs on GET - POST uses submitted body to preserve user input during validation errors.
   getInitialFormData?: GetInitialFormData;
-  /**
-   * Optional: declarative CCD draft persistence mapping.
-   * When provided, formBuilder auto-injects auto-save on POST before any custom `beforeRedirect`.
-   */
+  // Declarative CCD draft persistence. When provided, formBuilder automatically saves form data
+  // to CCD on POST before running your custom beforeRedirect. No manual draft saving needed.
   ccdMapping?: CcdFieldMapping;
   stepDir: string;
   translationKeys?: TranslationKeys;

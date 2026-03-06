@@ -1,10 +1,10 @@
 /**
- * Auto-save form data to CCD draft for configured steps.
+ * Auto-saves form data to CCD draft after successful validation.
  *
- * Usage: formBuilder auto-injects this when a step defines `ccdMapping`.
- * You can also call it manually from a step's `beforeRedirect` if needed.
+ * Usage: formBuilder automatically injects this when your step defines `ccdMapping`.
+ * You rarely need to call this manually - just add ccdMapping to your step config.
  *
- * Example:
+ * Manual usage example (if you have custom logic):
  *   const step = createFormStep(
  *     { ... },
  *     templatePath,
@@ -29,22 +29,22 @@ import { Logger } from '@modules/logger';
 const logger = Logger.getLogger('autoSaveDraftToCCD');
 
 /**
- * Transforms yes/no/preferNotToSay enum values to CCD uppercase format.
+ * Maps radio button yes/no/preferNotToSay values to CCD's uppercase enum format.
+ * Converts 'yes' to 'YES', 'no' to 'NO', 'preferNotToSay' to 'PREFER_NOT_TO_SAY'
  *
- * IMPORTANT: Only use for controlled enum fields (radio buttons with predefined options).
- * DO NOT use for free-text fields or fields with arbitrary values.
+ * IMPORTANT: Only for radio buttons with controlled values, not free-text fields.
  *
  * @example
- * // Correct usage (radio button with controlled values)
+ * // Correct - radio button with predefined options
  * {
  *   frontendField: 'hadLegalAdvice',
  *   valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
  * }
  *
- * // Wrong usage (text field)
+ * // Wrong - text field with user input
  * {
  *   frontendField: 'userName',
- *   valueMapper: yesNoEnum('userName'), // Don't do this!
+ *   valueMapper: yesNoEnum('userName'), // Will fail validation!
  * }
  */
 export function yesNoEnum(backendFieldName: string): ValueMapper {
@@ -57,14 +57,12 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
       return { [backendFieldName]: '' };
     }
 
-    // Type-safe mapping: only allowed values as keys
     const enumMapping: Record<AllowedValue, string> = {
       yes: 'YES',
       no: 'NO',
       preferNotToSay: 'PREFER_NOT_TO_SAY',
     };
 
-    // Validate that value is one of the allowed enum values
     const isAllowedValue = (ALLOWED_VALUES as readonly string[]).includes(value);
 
     if (!isAllowedValue) {
@@ -73,16 +71,14 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
         `yesNoEnum: Invalid value "${value}" for field "${backendFieldName}". ` +
           `Allowed values: ${allowedStr}. This indicates a bug in form validation or incorrect mapper usage.`
       );
-      // Return empty string to prevent invalid data in CCD
+      // Fail safely by returning empty string instead of invalid data
       return { [backendFieldName]: '' };
     }
-
-    // Type assertion safe here because isAllowedValue check guarantees it
     return { [backendFieldName]: enumMapping[value as AllowedValue] };
   };
 }
 
-/** Combines date fields (day/month/year) into ISO date string using luxon */
+/** Combines separate day/month/year fields into ISO date string (e.g., '1990-02-15') using luxon for validation */
 export function dateToISO(backendFieldName: string): ValueMapper {
   return (formData: FormFieldValue) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
@@ -97,7 +93,6 @@ export function dateToISO(backendFieldName: string): ValueMapper {
       return {};
     }
 
-    // Use luxon for proper date validation and formatting
     const dateTime = DateTime.fromObject({
       year: Number(year),
       month: Number(month),
@@ -115,7 +110,7 @@ export function dateToISO(backendFieldName: string): ValueMapper {
   };
 }
 
-/** Pass through fields unchanged (1:1 mapping) */
+/** Passes form fields through to CCD unchanged - simple 1:1 mapping with no transformation */
 export function passThrough(fieldNames: readonly string[]): ValueMapper {
   return (formData: FormFieldValue) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
@@ -123,14 +118,13 @@ export function passThrough(fieldNames: readonly string[]): ValueMapper {
       return {};
     }
 
-    // Functional approach: map field names to entries, filter non-empty values
     return Object.fromEntries(
       fieldNames.map(name => [name, formData[name]] as const).filter(([, value]) => isNonEmpty(value))
     );
   };
 }
 
-/** Transforms array of checkbox values to uppercase enum array */
+/** Converts checkbox array values to uppercase enum format (e.g., ['option1', 'option2'] to ['OPTION_1', 'OPTION_2']) */
 export function multipleYesNo(backendFieldName: string): ValueMapper {
   return (value: FormFieldValue) => {
     if (!Array.isArray(value)) {
@@ -149,7 +143,7 @@ export function multipleYesNo(backendFieldName: string): ValueMapper {
   };
 }
 
-/** Converts dot-path to nested object (e.g., 'a.b.c' → { a: { b: { c: value } } }) */
+/** Converts dot-path notation to nested CCD structure (e.g., 'possessionClaimResponse.defendantResponses' becomes nested objects) */
 function pathToNested(path: string, value: Record<string, unknown>): Record<string, unknown> {
   const keys = path.split('.');
   const result: Record<string, unknown> = {};
@@ -255,10 +249,9 @@ async function saveToCCD(
 
     await ccdCaseService.updateDraftRespondToClaim(accessToken, validatedCase.id, ccdPayload);
 
-    // Don't update res.locals.validatedCase with CCD response
-    // CCD submit returns incomplete data (only fields in payload, not full merged case)
-    // Keep existing res.locals.validatedCase from start callback (has complete data)
-    // Next page will call start callback and get fresh merged data from CCD
+    // We don't update res.locals.validatedCase here because CCD only returns the fields we just saved,
+    // not the full merged case. The next page will fetch fresh complete data via its START callback.
+    // This is eventual consistency by design - current page keeps old data, next page gets merged data.
 
     logger.info(`[${stepName}] Draft saved successfully to CCD`);
   } catch (error) {
