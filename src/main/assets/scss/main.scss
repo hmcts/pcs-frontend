@@ -4,6 +4,20 @@
 @use 'service-navigation';
 @use 'timeout-modal';
 
+.dashboard-column-border {
+  border-top: 4px solid govuk-colour('blue');
+  padding-top: govuk-spacing(6);
+}
+
+.dashboard-notifications {
+  .govuk-notification-banner {
+    margin-bottom: govuk-spacing(4);
+  }
+  .govuk-notification-banner:last-child {
+    margin-bottom: 0;
+  }
+}
+
 .govuk-header__content {
   display: flex;
   align-items: center;

@@ -54,6 +54,15 @@ interface MappedTaskGroup {
 
 export const DASHBOARD_ROUTE = '/dashboard';
 
+const helpSupportLinks: { text: string; href: string }[] = [
+  { text: 'Help with fees', href: '#' },
+  { text: 'Find out about mediation', href: '#' },
+  { text: 'What to expect at the hearing', href: '#' },
+  { text: 'Represent myself at the hearing', href: '#' },
+  { text: 'Find legal advice', href: '#' },
+  { text: 'Find information', href: '#' },
+];
+
 export const getDashboardUrl = (caseReference?: string | number): string | null => {
   if (!caseReference) {
     return null;
@@ -155,6 +164,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
         propertyAddress,
         dashboardCaseReference,
+        helpSupportLinks,
       });
     } catch (e) {
       logger.error(`Failed to fetch dashboard data for case ${validatedCase.id}. Error was: ${String(e)}`);

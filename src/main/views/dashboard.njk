@@ -4,25 +4,54 @@
 
 {% block content %}
 
-  {% if propertyAddress %}
-    <h2 class="govuk-heading-l govuk-!-margin-bottom-4">
-      {{ propertyAddress }}
-    </h2>
-  {% endif %}
+  <div class="govuk-width-container">
+    <main class="govuk-main-wrapper">
+      {% if propertyAddress %}
+        <h2 class="govuk-heading-l govuk-!-margin-bottom-4">
+          {{ propertyAddress }}
+        </h2>
+      {% endif %}
 
-  {% if dashboardCaseReference %}
-    <p class="govuk-body govuk-!-margin-bottom-4">
-      Case number: {{ dashboardCaseReference }}
-    </p>
-  {% endif %}
+      {% if dashboardCaseReference %}
+        <p class="govuk-body">
+          Case number: {{ dashboardCaseReference }}
+        </p>
+      {% endif %}
 
-  {% for dashboardNotification in notifications %}
-    {{ notification(dashboardNotification.templateId, dashboardNotification.templateValues)
-    }}    
-  {% endfor %}
+      <div class="govuk-grid-row govuk-!-margin-top-8">
+        <div class="govuk-grid-column-two-thirds">
+          <div class="dashboard-column-border">
+            <div class="dashboard-notifications">
+              {% for dashboardNotification in notifications %}
+                {{ notification(dashboardNotification.templateId, dashboardNotification.templateValues)
+                }}
+              {% endfor %}
+            </div>
 
-  {% for dashboardTaskGroup in taskGroups %}
-      {{ taskGroup(dashboardTaskGroup) }}
-  {% endfor %}
+            {% for dashboardTaskGroup in taskGroups %}
+              {{ taskGroup(dashboardTaskGroup) }}
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="govuk-grid-column-one-third">
+          <div class="dashboard-column-border">
+            <aside class="app-related-items" role="complementary">
+              <h2 class="govuk-heading-m">Help and support</h2>
+              <nav role="navigation" aria-label="Help and support">
+                <ul class="govuk-list">
+                  {% for link in helpSupportLinks %}
+                    <li>
+                      <a class="govuk-link" href="{{ link.href }}">{{ link.text }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </nav>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 
 {% endblock %}

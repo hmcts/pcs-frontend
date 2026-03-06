@@ -169,10 +169,12 @@ describe('Dashboard Routes', () => {
         expect.objectContaining({
           propertyAddress: '10 Second Avenue, London, W3 7RX',
           dashboardCaseReference: '1234567890123456',
+          helpSupportLinks: expect.any(Array),
         })
       );
 
       const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        helpSupportLinks: { text: string; href: string }[];
         taskGroups: {
           title: string;
           tasks: {
@@ -183,6 +185,9 @@ describe('Dashboard Routes', () => {
           }[];
         }[];
       };
+
+      expect(renderArgs.helpSupportLinks).toHaveLength(6);
+      expect(renderArgs.helpSupportLinks[0]).toEqual({ text: 'Help with fees', href: '#' });
 
       const [firstGroup] = renderArgs.taskGroups;
       expect(firstGroup.title).toBe('Group one title');
