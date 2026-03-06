@@ -15,7 +15,7 @@ import {
   noticeDetails,
   paymentInterstitial,
   repaymentsMade,
-  tenancyStartDateKnown
+  tenancyStartDateKnown,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -178,7 +178,6 @@ export class RespondToClaimAction implements IAction {
     await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
     await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
   }
-
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {

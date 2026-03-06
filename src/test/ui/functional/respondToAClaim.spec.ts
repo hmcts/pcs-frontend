@@ -22,7 +22,7 @@ import {
   repaymentsMade,
   startNow,
   tenancyDetails,
-  tenancyStartDateKnown
+  tenancyStartDateKnown,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
