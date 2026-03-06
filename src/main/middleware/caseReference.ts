@@ -40,6 +40,23 @@ export async function caseReferenceParamMiddleware(
 
     next();
   } catch (error) {
+    // In non-production, allow step pages to load with a mock case when CCD rejects the ID (e.g. local dev with placeholder case ID)
+    const isDev = process.env.NODE_ENV !== 'production';
+    const isCcdValidationFailure =
+      error instanceof Error && (error.message.includes('400') || error.message.includes('Case ID is not valid'));
+
+    if (isDev && isCcdValidationFailure) {
+      logger.warn('CCD case validation failed in development – using mock case so step pages can load', {
+        caseReference: sanitisedCaseReference,
+        url: req.originalUrl,
+      });
+      res.locals.validatedCase = {
+        id: sanitisedCaseReference,
+        data: {},
+      };
+      return next();
+    }
+
     logger.error('Case access validation failed', {
       caseReference: sanitisedCaseReference,
       error: error instanceof Error ? error.message : 'Unknown error',

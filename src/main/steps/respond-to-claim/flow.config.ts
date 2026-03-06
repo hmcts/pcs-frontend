@@ -3,6 +3,7 @@ import { type Request } from 'express';
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
   getPreviousPageForArrears,
+  hasOnlyRentArrearsGrounds,
   isDefendantNameKnown,
   isNoticeDateProvided,
   isNoticeServed,
@@ -231,8 +232,29 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'confirmation-of-notice-given',
     },
     'rent-arrears-dispute': {
-      defaultNext: 'counter-claim',
-      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
+      routes: [
+        {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            _currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            return hasOnlyRentArrearsGrounds(req);
+          },
+          nextStep: 'counter-claim',
+        },
+        {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            _currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            return !hasOnlyRentArrearsGrounds(req);
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
+      previousStep: req => getPreviousPageForArrears(req),
     },
     'non-rent-arrears-dispute': {
       defaultNext: 'counter-claim',
@@ -310,6 +332,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
+      defaultNext: 'end-now',
+    },
+    'rent-arrears': {
       defaultNext: 'end-now',
     },
   },
