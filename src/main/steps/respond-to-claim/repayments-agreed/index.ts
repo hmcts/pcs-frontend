@@ -2,10 +2,9 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { createFormStep } from '../../../modules/steps';
 import { getClaimantName } from '../../utils';
 import { flowConfig } from '../flow.config';
-//import { getClaimIssueDate } from '../../utils';
 
-//import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-//import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',
@@ -31,7 +30,7 @@ export const step: StepDefinition = createFormStep({
           translationKey: 'options.yes',
           subFields: {
             repaymentsAgreedInfo: {
-              name: 'repaymentsAgreedInfo',
+              name: 'repaymentsAgreedDetails',
               type: 'character-count',
               maxLength: 500,
               required: true,
@@ -46,7 +45,7 @@ export const step: StepDefinition = createFormStep({
                 if (allowedCharsRegex.test(text)) {
                   return true;
                 }
-                return 'errors.repaymentsAgreed.repaymentsAgreedInfo.invalid';
+                return 'errors.repaymentsAgreed.repaymentsAgreedDetails.invalid';
               },
             },
           },
@@ -59,6 +58,32 @@ export const step: StepDefinition = createFormStep({
   ],
   extendGetContent: req => ({
     claimantName: getClaimantName(req),
-    //claimIssueDate: getClaimIssueDate(req),
+    claimIssueDate: "20th May 2025",
   }),
+beforeRedirect: async req => {
+    const repaymentsForm = req.session.formData?.['repayments-agreed'];
+    if (!repaymentsForm) {
+      return;
+    }
+   const existingRepaymentsDetails =
+        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.repaymentsAgreedDetails
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+      repaymentsAgreed: repaymentsForm.repaymentsAgreed === 'yes'
+        ? 'YES'
+        : repaymentsForm.repaymentsAgreed === 'no'
+          ? 'NO'
+          : 'NOT_SURE',
+        repaymentsAgreedDetails: repaymentsForm.repaymentsAgreed === 'yes'
+                                               ? repaymentsForm['repaymentsAgreedInfo.repaymentsAgreedDetails']
+                                               : existingRepaymentsDetails
+                                                 ? ''
+                                                 : undefined,
+      },
+    };
+
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+  },
 });
+

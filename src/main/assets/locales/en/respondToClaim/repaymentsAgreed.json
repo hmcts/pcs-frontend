@@ -12,7 +12,7 @@
   "textAreaHint": "You can enter up to 500 characters",
   "errors": {
     "repaymentsAgreed": "Select if you've come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}",
-    "repaymentsAgreed.repaymentsAgreedInfo": "Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
-    "repaymentsAgreed.repaymentsAgreedInfo.invalid": "Repayments agreed details must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "repaymentsAgreed.repaymentsAgreedDetails": "Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
+    "repaymentsAgreed.repaymentsAgreedDetails.invalid": "Repayments agreed details must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }
