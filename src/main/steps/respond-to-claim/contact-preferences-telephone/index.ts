@@ -54,7 +54,7 @@ export const step: StepDefinition = createFormStep({
 
                 const landlineRegex = /^0[12]\d{8,9}$/;
 
-                const businessRegex = /^0[389]\d{8}$/;
+                const businessRegex = /^0[389]\d{9}$/;
 
                 if (mobileRegex.test(normalized) || landlineRegex.test(normalized) || businessRegex.test(normalized)) {
                   return true;
@@ -98,6 +98,6 @@ export const step: StepDefinition = createFormStep({
       },
     };
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
 });

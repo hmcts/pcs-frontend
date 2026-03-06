@@ -1,7 +1,19 @@
 import type { Request } from 'express';
 
-import { getLaunchDarklyFlag } from '../../utils/getLaunchDarklyFlag';
-
+/**
+ * Checks if the claim includes rent arrears from CCD case data.
+ *
+ * Checks claimGroundSummaries array from CCD case data.
+ * Returns true if ANY claim ground has isRentArrears: "Yes" (case-insensitive), false otherwise.
+ */
 export const isRentArrearsClaim = async (req: Request): Promise<boolean> => {
-  return getLaunchDarklyFlag<boolean>(req, 'is-rent-arrears-claim', true);
+  const caseData = req.res?.locals?.validatedCase?.data;
+  const claimGroundSummaries = caseData?.claimGroundSummaries;
+
+  if (!Array.isArray(claimGroundSummaries)) {
+    return false;
+  }
+
+  // Check if any claim ground has isRentArrears: "Yes" (case-insensitive)
+  return claimGroundSummaries.some(ground => ground?.value?.isRentArrears?.toUpperCase() === 'YES');
 };
