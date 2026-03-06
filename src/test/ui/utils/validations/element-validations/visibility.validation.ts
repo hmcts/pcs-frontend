@@ -4,13 +4,13 @@ import { IValidation, validationData } from '../../interfaces';
 
 export class VisibilityValidation implements IValidation {
   async validate(page: Page, validation: string, fieldName: string, data: validationData): Promise<void> {
-    const element = page.locator(`label:has-text("${fieldName}"),
-                                         span:has-text("${fieldName}"),
-                                         div:has-text("${fieldName}") textarea:visible`);
+    const element = page.locator(`label:text-is("${fieldName}"),
+                                         span:text-is("${fieldName}"),
+                                         div:text-is("${fieldName}") textarea:visible`);
     const selectors = fieldName === '' ? (Array.isArray(data) ? (data as string[]) : [data as string]) : [fieldName];
     const elements = selectors.map(selector =>
-      page.locator(`label:has-text("${selector}"),
-                                         span:has-text("${selector}")`)
+      page.locator(`label:text-is("${selector}"),
+                                         span:text-is("${selector}")`)
     );
 
     const validationsMap = new Map<string, () => Promise<void>>([

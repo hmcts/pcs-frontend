@@ -18,9 +18,9 @@ export class InputErrorValidation implements IValidation {
   private async findFieldValueLocator(page: Page, fieldName: string, data: validationData): Promise<Locator> {
     const locator = page.locator(`
       :is(
-        .govuk-form-group:has(label:has-text("${fieldName}")),
-        fieldset:has(legend:has-text("${fieldName}"))
-      ) p.govuk-error-message:has-text("${data}")
+        .govuk-form-group:has(label:text-is("${fieldName}")),
+        fieldset:has(legend:text-is("${fieldName}"))
+      ) p.govuk-error-message:text-is("${data}")
     `);
     const count = await locator.count();
     if (count === 0) {
