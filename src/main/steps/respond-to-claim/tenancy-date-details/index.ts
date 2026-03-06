@@ -7,6 +7,10 @@ import { formatDatePartsToISODate } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+function getTenancyStartDate(caseData: Record<string, unknown> | undefined): string | undefined {
+  return (caseData?.tenancy_TenancyLicenceDate ?? caseData?.licenceStartDate) as string | undefined;
+}
+
 export const step: StepDefinition = createFormStep({
   stepName: 'tenancy-date-details',
   journeyFolder: 'respondToClaim',
@@ -89,12 +93,8 @@ export const step: StepDefinition = createFormStep({
     }
   },
   beforeRedirect: async req => {
-    const englandTenancyStartDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as
-      | string
-      | undefined;
-    const walesLicenceStartDate = req.res?.locals?.validatedCase?.data?.licenceStartDate as string | undefined;
-    const existingStartDate = englandTenancyStartDate ?? walesLicenceStartDate;
-
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const existingStartDate = getTenancyStartDate(caseData);
     const confirmValue = req.body?.confirmTenancyDate as string | undefined;
 
     const defendantResponses: Record<string, unknown> = {};
@@ -124,15 +124,16 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: req => {
-    const claimantNameFromValidatedCase = req.res?.locals?.validatedCase?.data?.possessionClaimResponse
-      ?.claimantOrganisations?.[0]?.value as string | undefined;
-
-    const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const claimantNameFromValidatedCase = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as
+      | string
+      | undefined;
+    const claimantNameFromSession = caseData?.claimantName as string | undefined;
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession;
-    const rawTenancyDate = req.res?.locals?.validatedCase?.data?.tenancy_TenancyLicenceDate as string | undefined;
+    const existingStartDate = getTenancyStartDate(caseData);
 
     // Format tenancy date with ordinal
-    const tenancyStartDate = rawTenancyDate ? format(parseISO(rawTenancyDate), 'do LLLL yyyy') : undefined;
+    const tenancyStartDate = existingStartDate ? format(parseISO(existingStartDate), 'do LLLL yyyy') : undefined;
 
     const t = getTranslationFunction(req, 'tenancy-date-details', ['common']);
     const bulletPoint = t('bulletPoint', { returnObjects: true, tenancyStartDate });
