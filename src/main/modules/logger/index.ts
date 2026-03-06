@@ -63,7 +63,6 @@ const normaliseInfo = winston.format(info => {
 function createTextFormat(name: string): winston.Logform.Format {
   const formats: winston.Logform.Format[] = [
     winston.format.errors({ stack: true }),
-    winston.format.splat(),
     normaliseInfo(),
     winston.format.timestamp(),
     ...(isColorizable ? [winston.format.colorize({ all: true })] : []),
@@ -78,7 +77,6 @@ function createTextFormat(name: string): winston.Logform.Format {
 function createJsonFormat(name: string): winston.Logform.Format {
   return winston.format.combine(
     winston.format.errors({ stack: true }),
-    winston.format.splat(),
     normaliseInfo(),
     winston.format.timestamp(),
     winston.format(info => {
