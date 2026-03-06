@@ -20,5 +20,5 @@ export async function getPreviousPageForArrears(req: Request): Promise<string> {
     return 'confirmation-of-notice-date-when-not-provided';
   }
 
-  return 'tenancy-details';
+  return 'tenancy-date-details';
 }
