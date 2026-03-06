@@ -1,0 +1,18 @@
+{
+  "pageTitle": "Contact by text message",
+  "subtitle": "We might need to send updates about your case by text message.",
+  "question": "Are you happy to be contacted by text message?",
+
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "phoneNumberLabel": "UK telephone number",
+  "buttons": {
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  },
+  "errors": {
+    "contactByTextMessage": "Select if you want to be contacted by text message."
+  }
+}

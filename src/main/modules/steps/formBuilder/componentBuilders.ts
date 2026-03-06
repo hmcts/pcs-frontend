@@ -19,7 +19,7 @@ function createFieldsetLegend(
   return {
     legend: {
       text: label,
-      isPageHeading: isFirstField,
+      isPageHeading: false,
       classes: legendClasses || (isFirstField ? 'govuk-fieldset__legend--l' : ''),
     },
   };

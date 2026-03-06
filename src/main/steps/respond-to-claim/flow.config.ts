@@ -26,6 +26,9 @@ export const flowConfig: JourneyFlowConfig = {
     'repayments-made',
     'repayments-agreed',
     'correspondence-address',
+    'contact-preferences-email-or-post',
+    'contact-preferences-telephone',
+    'contact-preferences-text-message',
     'dispute-claim-interstitial',
     'landlord-registered',
     'tenancy-details',
@@ -48,7 +51,6 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'end-now',
-    'contact-preferences',
   ],
   steps: {
     'start-now': {
@@ -82,10 +84,16 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'correspondence-address': {
       previousStep: 'defendant-date-of-birth',
-      defaultNext: 'contact-preferences',
+      defaultNext: 'contact-preferences-email-or-post',
     },
-    'contact-preferences': {
+    'contact-preferences-email-or-post': {
       previousStep: 'correspondence-address',
+      defaultNext: 'contact-preferences-telephone',
+    },
+    'contact-preferences-telephone': {
+      defaultNext: 'contact-preferences-text-message',
+    },
+    'contact-preferences-text-message': {
       defaultNext: 'dispute-claim-interstitial',
     },
     'dispute-claim-interstitial': {
