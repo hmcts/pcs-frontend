@@ -6,6 +6,8 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 
+import { HTTPError } from '../../HttpError';
+
 import { Logger } from '@modules/logger';
 
 type TokenRegenerator = () => Promise<void>;
@@ -57,21 +59,37 @@ export class HttpService {
         return response;
       },
       async error => {
-        const originalRequest = error.config as TracedRequestConfig;
-        if (error.response?.status === 401 && !originalRequest.__isRetryRequest) {
+        const originalRequest = error.config as TracedRequestConfig as InternalAxiosRequestConfig & {
+          __isRetryRequest?: boolean;
+        };
+        if (error.response?.status !== 401 || !originalRequest) {
           this.endSpanWithStatus(originalRequest, 401);
-          this.logger.warn('Received 401, attempting token regeneration and retry...');
-          try {
-            await this.regenerateToken();
-            originalRequest.__isRetryRequest = true;
-            return this.instance.request(originalRequest);
-          } catch (retryError) {
-            this.logger.error('Token regeneration on 401 failed:', retryError);
-            return Promise.reject(retryError);
-          }
+          return Promise.reject(error);
         }
-        this.endSpanWithError(originalRequest, error);
-        return Promise.reject(error);
+
+        // Requests with Authorization header use the user's OIDC token - 401 means user must re-login
+        const hasUserToken =
+          originalRequest.headers &&
+          (originalRequest.headers['Authorization'] ?? originalRequest.headers['authorization']);
+        if (hasUserToken) {
+          this.logger.warn('Received 401 on user-token request, redirecting to login');
+          return Promise.reject(new HTTPError('Unauthenticated - access token invalid or expired', 401));
+        }
+
+        // S2S-only requests - try regenerating service token and retry
+        if (originalRequest.__isRetryRequest) {
+          this.endSpanWithStatus(originalRequest, 401);
+          return Promise.reject(error);
+        }
+        this.logger.warn('Received 401 on S2S request, attempting token regeneration and retry...');
+        try {
+          await this.regenerateToken();
+          originalRequest.__isRetryRequest = true;
+          return this.instance.request(originalRequest);
+        } catch (retryError) {
+          this.logger.error('S2S token regeneration on 401 failed:', retryError);
+          return Promise.reject(retryError);
+        }
       }
     );
   }
