@@ -47,7 +47,7 @@ interface EventTokenResponse {
 }
 
 function getBaseUrl(): string {
-  return config.get('ccd.url');
+  return config.get<string>('ccd.url');
 }
 
 function getApiUrl(): string {
@@ -158,10 +158,15 @@ async function submitEvent(
 
 export const ccdCaseService = {
   async getCaseById(accessToken: string, caseId: string, eventId: string = 'respondPossessionClaim'): Promise<CcdCase> {
-    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
+    const ccdUrl = getBaseUrl();
+    const eventUrl = `${ccdUrl}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
       logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
+      logger.info(`[ccdCaseService] CCD URL: ${ccdUrl}`);
+      logger.info(`[ccdCaseService] Full URL: ${eventUrl}`);
+      logger.info(`[ccdCaseService] Access token: ${accessToken ? 'present' : 'MISSING'}`);
+
       const response = await http.get<{ case_details?: { case_data?: Record<string, unknown> } }>(
         eventUrl,
         getCaseHeaders(accessToken)
@@ -173,6 +178,7 @@ export const ccdCaseService = {
         data: response.data.case_details?.case_data || {},
       };
     } catch (error) {
+      logger.error('[ccdCaseService] getCaseById failed:', error);
       throw convertAxiosErrorToHttpError(error, 'getCaseById');
     }
   },
