@@ -4,6 +4,7 @@ import { type Redis } from 'ioredis';
 import { type Environment } from 'nunjucks';
 import { type CcdCase } from '../main/interfaces/ccdCase.interface';
 import { S2S } from '../main/modules/s2s';
+import { OIDCModule } from '../main/modules/oidc';
 import { type i18n, type TFunction } from 'i18next';
 
 export interface UserInfoResponseWithToken extends UserInfoResponse {
@@ -39,6 +40,7 @@ interface CustomSessionData extends SessionData {
   noticeServed?: boolean;
   rentarrears?: boolean;
   destroy(callback: (err?: Error) => void): void;
+  returnTo?: string;
 }
 
 declare module 'express-session' {
@@ -60,6 +62,7 @@ declare module 'express' {
       shutdown?: boolean;
       ENV?: string;
       s2s?: S2S;
+      oidc?: OIDCModule;
     };
   }
 }

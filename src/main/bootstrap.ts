@@ -6,7 +6,5 @@ const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
 
 new PropertiesVolume(developmentMode).enableFor();
-if (!developmentMode) {
-  initializeTelemetry();
-}
+initializeTelemetry();
 void import('./server');
