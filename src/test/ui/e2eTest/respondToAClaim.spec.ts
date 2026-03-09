@@ -20,8 +20,8 @@ import {
   startNow,
   tenancyDetails,
   tenancyStartDateKnown,
+  tenancyStartDateUnknown,
 } from '../data/page-data';
-import { tenancyStartDateUnknown } from '../data/page-data/tenancyStartDateUnknown.page.data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import {
   ErrorMessageValidation,

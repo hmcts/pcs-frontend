@@ -23,11 +23,11 @@ export const tenancyStartDateKnown = {
   errorValidationHeader: 'There is a problem',
   selectIfTheseTenancyDetailsAreCorrectErrorMessage:
     'Select if the tenancy, licence or occupation contract details are correct',
-  RealDateErrorMessage: 'Tenancy start date must be a real date',
-  DayMissingErrorMessage: 'Your tenancy start date must include a day',
-  MonthMissingErrorMessage: 'Your tenancy start date must include a month',
-  YearMissingErrorMessage: 'Your tenancy start date must include a year',
-  FutureDateErrorMessage: 'Tenancy start date must be in the past',
+  realDateErrorMessage: 'Tenancy start date must be a real date',
+  dayMissingErrorMessage: 'Your tenancy start date must include a day',
+  monthMissingErrorMessage: 'Your tenancy start date must include a month',
+  yearMissingErrorMessage: 'Your tenancy start date must include a year',
+  futureDateErrorMessage: 'Tenancy start date must be in the past',
 };
 
 export function convertDateFormatTenancyDate(dateString: string): string {

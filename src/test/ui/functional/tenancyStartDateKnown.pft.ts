@@ -15,7 +15,7 @@ export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
   });
   await performValidation('errorMessage', {
     header: tenancyStartDateKnown.errorValidationHeader,
-    message: tenancyStartDateKnown.RealDateErrorMessage,
+    message: tenancyStartDateKnown.realDateErrorMessage,
   });
   await performActions(
     'Enter Date',
@@ -25,7 +25,7 @@ export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
   await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyStartDateKnown.errorValidationHeader,
-    message: tenancyStartDateKnown.DayMissingErrorMessage,
+    message: tenancyStartDateKnown.dayMissingErrorMessage,
   });
   await performActions(
     'Enter Date',
@@ -35,7 +35,7 @@ export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
   await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyStartDateKnown.errorValidationHeader,
-    message: tenancyStartDateKnown.MonthMissingErrorMessage,
+    message: tenancyStartDateKnown.monthMissingErrorMessage,
   });
   await performActions(
     'Enter Date',
@@ -45,7 +45,7 @@ export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
   await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyStartDateKnown.errorValidationHeader,
-    message: tenancyStartDateKnown.YearMissingErrorMessage,
+    message: tenancyStartDateKnown.yearMissingErrorMessage,
   });
 }
 
