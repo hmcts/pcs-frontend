@@ -13,6 +13,9 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
   <span class="govuk-caption-xl">{{ caption or serviceName }}</span>
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% endif %}
   <form method="post" action="{{ url }}" novalidate>
     {% if insetText %}
       {{ govukInsetText({ text: insetText }) }}
