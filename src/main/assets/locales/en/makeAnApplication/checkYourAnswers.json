@@ -1,0 +1,16 @@
+{
+  "pageTitle": "Check your answers",
+  "caption": "Make an application",
+  "heading": "Check your answers (placeholder)",
+  "buttons": {
+    "submitApplication": "Submit application"
+  },
+  "answers": {
+    "chooseAnApplication": {
+      "SUSPEND": "Ask the court to suspend (delay) the eviction",
+      "ADJOURN": "Ask to adjourn (delay) the hearing",
+      "SET_ASIDE": "Ask the court to change (set aside) their decision to evict you",
+      "SOMETHING_ELSE": "Something else"
+    }
+  }
+}

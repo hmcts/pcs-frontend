@@ -1,0 +1,28 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
+{% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <span class="govuk-caption-xl">{{ caption }}</span>
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  {{ govukSummaryList(summaryData) }}
+
+  <form method="post" action="{{ url }}" novalidate>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: buttons.submitApplication,
+        attributes: { type: 'submit', name: 'action', value: 'submit' }
+      }) }}
+    </div>
+  </form>
+{% endblock %}
+

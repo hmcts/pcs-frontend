@@ -22,6 +22,8 @@ export interface FormFieldOption {
   translationKey?: string;
   // Dynamic label function (takes translations object, returns string)
   label?: string | ((translations: Record<string, string>) => string);
+  // Hint text for option
+  hint?: string | ((translations: Record<string, string>) => string);
   // Conditional HTML/text to display when this option is selected
   conditionalText?: string | ((translations: Record<string, string>) => string);
   // Nested subFields that appear when this option is selected
