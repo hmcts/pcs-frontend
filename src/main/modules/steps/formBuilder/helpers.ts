@@ -79,9 +79,10 @@ export function normalizeCheckboxFields(req: Request, fields: FormFieldConfig[])
 /**
  * Processes all field data (checkbox normalization + date field consolidation)
  * This should run AFTER validation because date field validation expects individual day/month/year keys
+ * Now also handles subFields within radio/checkbox options
  */
 export function processFieldData(req: Request, fields: FormFieldConfig[]): void {
-  for (const field of fields) {
+  const processField = (field: FormFieldConfig): void => {
     if (field.type === 'checkbox') {
       // Normalize checkbox values (in case they weren't normalized before validation)
       req.body[field.name] = normalizeCheckboxValue(req.body[field.name]);
@@ -95,6 +96,22 @@ export function processFieldData(req: Request, fields: FormFieldConfig[]): void 
       delete req.body[`${field.name}-month`];
       delete req.body[`${field.name}-year`];
     }
+
+    // Process subFields if this is a radio or checkbox with options
+    if ((field.type === 'radio' || field.type === 'checkbox') && field.options) {
+      for (const option of field.options) {
+        if (option.subFields) {
+          for (const subField of Object.values(option.subFields)) {
+            // Recursively process subFields (they might be dates or checkboxes too)
+            processField(subField);
+          }
+        }
+      }
+    }
+  };
+
+  for (const field of fields) {
+    processField(field);
   }
 }
 

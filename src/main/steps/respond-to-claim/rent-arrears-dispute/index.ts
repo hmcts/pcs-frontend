@@ -111,6 +111,7 @@ export const step: StepDefinition = createFormStep({
     } else if (response.oweRentArrears === 'NO') {
       formData.rentArrears = 'no';
       // Prepopulate the amount if it exists (convert pence to pounds)
+      // Use dotted notation for subField, matching defendant-name-confirmation pattern
       if (response.rentArrearsAmount) {
         const amountInPence = parseFloat(response.rentArrearsAmount as string);
         const amountInPounds = amountInPence / 100;
@@ -139,10 +140,14 @@ export const step: StepDefinition = createFormStep({
 
     if (amountField) {
       amountField.validator = (value: unknown): boolean | string => {
-        if (typeof value !== 'string') {return true;}
+        if (typeof value !== 'string') {
+          return true;
+        }
 
         const trimmed = value.trim();
-        if (!trimmed) {return true;} // Let required validation handle empty values
+        if (!trimmed) {
+          return true;
+        } // Let required validation handle empty values
 
         // Remove commas to handle user input like 1,234.56
         const normalized = trimmed.replace(/,/g, '');

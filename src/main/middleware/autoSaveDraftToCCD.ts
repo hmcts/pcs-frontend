@@ -207,7 +207,7 @@ async function saveToCCD(
   }
 
   try {
-    logger.debug(`[${stepName}] Auto-saving to CCD draft`);
+    logger.debug(`[${stepName}] Starting auto-save with form data:`, JSON.stringify(formData, null, 2));
 
     let relevantData: string | string[] | Record<string, unknown>;
     if (ccdMapping.frontendField) {
@@ -237,7 +237,7 @@ async function saveToCCD(
 
     // Skip save if transformed data is empty (nothing to update)
     if (Object.keys(transformedData).length === 0) {
-      logger.debug(`[${stepName}] Transformed data is empty, skipping CCD save`);
+      logger.warn(`[${stepName}] Transformed data is empty, skipping CCD save`);
       return;
     }
 
@@ -246,6 +246,7 @@ async function saveToCCD(
     const ccdPayload = {
       ...nestedData,
     };
+    logger.debug(`[${stepName}] Sending CCD payload:`, JSON.stringify(ccdPayload, null, 2));
 
     await ccdCaseService.updateDraftRespondToClaim(accessToken, validatedCase.id, ccdPayload);
 
