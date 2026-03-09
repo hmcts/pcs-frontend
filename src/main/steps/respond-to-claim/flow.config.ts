@@ -293,6 +293,17 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'instalment-offer': {
       previousStep: 'repayments-agreed',
+      routes: [
+        {
+          condition: async (req: Request) =>
+            req.session?.formData?.['instalment-offer']?.confirmInstalmentOffer === 'yes',
+          nextStep: 'instalments',
+        },
+      ],
+      defaultNext: 'your-household-and-circumstances',
+    },
+    instalments: {
+      previousStep: 'instalment-offer',
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
