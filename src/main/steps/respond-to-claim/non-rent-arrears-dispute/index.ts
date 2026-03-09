@@ -37,10 +37,7 @@ export const step: StepDefinition = createFormStep({
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: (req: Request) => {
-    console.log('non-rent-arrears-dispute CCD case data:', JSON.stringify(req.res?.locals.validatedCase?.data, null, 2));
-
     const claimantName = getClaimantName(req);
-
     const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
 
     // i18next automatically interpolates variables and applies formatters in translation strings
