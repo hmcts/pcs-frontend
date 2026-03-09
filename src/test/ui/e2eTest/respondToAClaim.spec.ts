@@ -21,8 +21,11 @@ import {
   tenancyDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import { ErrorMessageValidation } from '../utils/validations/element-validations';
-import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
+import {
+  ErrorMessageValidation,
+  PageContentValidation,
+  PageNavigationValidation,
+} from '../utils/validations/custom-validations';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -53,6 +56,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 test.afterEach(async () => {
   PageContentValidation.finaliseTest();
   ErrorMessageValidation.finaliseTest();
+  PageNavigationValidation.finaliseTest();
 });
 
 //@noDefendants(submitCasePayloadNoDefendants) represents all defendant details unknown pages and non-rent arrears

@@ -19,8 +19,11 @@ import {
   tenancyDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import { ErrorMessageValidation } from '../utils/validations/element-validations';
-import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
+import {
+  ErrorMessageValidation,
+  PageContentValidation,
+  PageNavigationValidation,
+} from '../utils/validations/custom-validations';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -40,6 +43,7 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async () => {
   PageContentValidation.finaliseTest();
   ErrorMessageValidation.finaliseTest();
+  PageNavigationValidation.finaliseTest();
 });
 
 //Following test is skipped due to accessibility issue(HDPI-4571) in the registered landlord page which is blocking the flow.

@@ -15,7 +15,7 @@ async function globalSetupConfig(): Promise<void> {
 }
 
 const clearEmvLocks = (): void => {
-  const lockDir = path.join(process.cwd(), 'test-results', 'emv-locks');
+  const lockDir = path.join(process.cwd(), 'test-results', 'pft-locks');
   fs.rmSync(lockDir, { recursive: true, force: true });
 };
 
