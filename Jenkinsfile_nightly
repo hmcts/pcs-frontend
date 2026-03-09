@@ -78,6 +78,7 @@ def handleEnvironmentSetting() {
 }
 
 def runE2ETests(yarnBuilder) {
+  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true',
   if (params.CHROME_TESTS) {
     runE2ETestsForBrowser(yarnBuilder, 'Chrome')
   }
