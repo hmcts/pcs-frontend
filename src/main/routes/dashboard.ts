@@ -13,7 +13,7 @@ import {
 } from '../services/pcsApi';
 
 import { Logger } from '@modules/logger';
-import { formatAddressParts } from '@utils/addressFormatter';
+import { arrayToString } from '@utils/arrayToString';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -34,7 +34,7 @@ function getPropertyAddressFromValidatedCase(validatedCase: CcdCase): string | n
     return null;
   }
 
-  const formatted = formatAddressParts([
+  const formatted = arrayToString([
     address.AddressLine1,
     address.AddressLine2,
     address.AddressLine3,
@@ -53,6 +53,15 @@ interface MappedTaskGroup {
 }
 
 export const DASHBOARD_ROUTE = '/dashboard';
+
+const HELP_SUPPORT_LINKS: { text: string; href: string }[] = [
+  { text: 'Help with fees', href: '#' },
+  { text: 'Find out about mediation', href: '#' },
+  { text: 'What to expect at the hearing', href: '#' },
+  { text: 'Represent myself at the hearing', href: '#' },
+  { text: 'Find legal advice', href: '#' },
+  { text: 'Find information', href: '#' },
+];
 
 export const getDashboardUrl = (caseReference?: string | number): string | null => {
   if (!caseReference) {
@@ -155,6 +164,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
         propertyAddress,
         dashboardCaseReference,
+        helpSupportLinks: HELP_SUPPORT_LINKS,
       });
     } catch (e) {
       logger.error(`Failed to fetch dashboard data for case ${validatedCase.id}. Error was: ${String(e)}`);
