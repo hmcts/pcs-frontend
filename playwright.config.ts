@@ -8,9 +8,17 @@ export const SHORT_TIMEOUT = 5000;
 export const actionRetries = 10;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
-export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'true';
-export const enable_error_message_validation =
-  env === 'preview' ? process.env.ENABLE_ERROR_MESSAGES_VALIDATION === 'true' : true;
+
+const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
+if (enable_all_page_functional_tests === 'true') {
+  process.env.ENABLE_CONTENT_VALIDATION = 'true';
+  process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true';
+  process.env.ENABLE_NAVIGATION_TESTS = 'true';
+}
+
+export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'false';
+export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
+export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
 export default defineConfig({
