@@ -50,7 +50,7 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
-    oweRentArrears?: YesNoNotSureValue;
+    rentArrearsAmountConfirmation?: YesNoNotSureValue;
     rentArrearsAmount?: string;
   };
 }
