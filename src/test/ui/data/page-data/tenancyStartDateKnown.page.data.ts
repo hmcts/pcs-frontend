@@ -1,17 +1,14 @@
 import { submitCaseApiData } from '../api-data';
 
-import { convertDateFormat } from './noticeDateKnown.page.data';
-
 export const tenancyStartDateKnown = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
-  getDetailsGivenByParagraph: (claimantName: string): string => {
-    return `Details given by : ${claimantName} `;
+  getDetailsGivenByHeader: (claimantName: string): string => {
+    return `Details given by ${claimantName}:`;
   },
-  yourTenancyOccupationContractOrLicenceDateParagraph: `Your tenancy, occupation contract or licence began on ${convertDateFormat(submitCaseApiData.submitCasePayload.tenancy_TenancyLicenceDate)}`,
+  yourTenancyOccupationContractOrLicenceDateList: `Your tenancy, occupation contract or licence began on ${convertDateFormatTenancyDate(submitCaseApiData.submitCasePayload.tenancy_TenancyLicenceDate)}`,
   isTheTenancyLicenceOrOccupationContractQuestion: 'Is the tenancy, licence or occupation contract start date correct?',
   backLink: 'Back',
-  exampleHintText: 'For example, 27 9 2022',
   yesRadioOption: 'Yes',
   noRadioOption: 'No',
   iAmNotSureRadioOption: 'I’m not sure',
@@ -25,10 +22,30 @@ export const tenancyStartDateKnown = {
   cymraegLink: 'Cymraeg',
   errorValidationHeader: 'There is a problem',
   selectIfTheseTenancyDetailsAreCorrectErrorMessage:
-    'Select if these tenancy, licence or occupation contract details are correct',
+    'Select if the tenancy, licence or occupation contract details are correct',
   RealDateErrorMessage: 'Tenancy start date must be a real date',
   DayMissingErrorMessage: 'Your tenancy start date must include a day',
   MonthMissingErrorMessage: 'Your tenancy start date must include a month',
   YearMissingErrorMessage: 'Your tenancy start date must include a year',
   FutureDateErrorMessage: 'Tenancy start date must be in the past',
 };
+
+export function convertDateFormatTenancyDate(dateString: string): string {
+  const cleanedDate = dateString.replace(/(\d+)(st|nd|rd|th)/, '$1');
+  const date = new Date(cleanedDate);
+
+  const day = date.getDate();
+  const month = date.toLocaleString('en-US', { month: 'long' });
+  const year = date.getFullYear();
+
+  const suffix =
+    day % 10 === 1 && day !== 11
+      ? 'st'
+      : day % 10 === 2 && day !== 12
+        ? 'nd'
+        : day % 10 === 3 && day !== 13
+          ? 'rd'
+          : 'th';
+
+  return `${day}${suffix} ${month} ${year}`;
+}

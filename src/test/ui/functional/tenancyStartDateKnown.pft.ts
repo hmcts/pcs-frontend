@@ -1,5 +1,5 @@
-import { tenancyStartDateKnown } from '../data/page-data';
-import { performAction, performValidation } from '../utils/controller';
+import { tenancyDetails, tenancyStartDateKnown } from '../data/page-data';
+import { performAction, performActions, performValidation } from '../utils/controller';
 
 export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
   await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
@@ -14,33 +14,43 @@ export async function tenancyStartDateKnownErrorValidation(): Promise<void> {
     year: '2025',
   });
   await performValidation('errorMessage', {
+    header: tenancyStartDateKnown.errorValidationHeader,
     message: tenancyStartDateKnown.RealDateErrorMessage,
   });
-  await performAction('selectTenancyStartDateKnown', {
-    option: tenancyStartDateKnown.noRadioOption,
-    day: '',
-    month: '12',
-    year: '2025',
-  });
+  await performActions(
+    'Enter Date',
+    ['inputText', tenancyStartDateKnown.dayHiddenTextLabel, ''],
+    ['inputText', tenancyStartDateKnown.monthHiddenTextLabel, '12']
+  );
+  await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
   await performValidation('errorMessage', {
+    header: tenancyStartDateKnown.errorValidationHeader,
     message: tenancyStartDateKnown.DayMissingErrorMessage,
   });
-  await performAction('selectTenancyStartDateKnown', {
-    option: tenancyStartDateKnown.noRadioOption,
-    day: '11',
-    month: '',
-    year: '2025',
-  });
+  await performActions(
+    'Enter Date',
+    ['inputText', tenancyStartDateKnown.dayHiddenTextLabel, '12'],
+    ['inputText', tenancyStartDateKnown.monthHiddenTextLabel, '']
+  );
+  await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
   await performValidation('errorMessage', {
+    header: tenancyStartDateKnown.errorValidationHeader,
     message: tenancyStartDateKnown.MonthMissingErrorMessage,
   });
-  await performAction('selectTenancyStartDateKnown', {
-    option: tenancyStartDateKnown.noRadioOption,
-    day: '11',
-    month: '12',
-    year: '',
-  });
+  await performActions(
+    'Enter Date',
+    ['inputText', tenancyStartDateKnown.monthHiddenTextLabel, '12'],
+    ['inputText', tenancyStartDateKnown.yearHiddenTextLabel, '']
+  );
+  await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
   await performValidation('errorMessage', {
+    header: tenancyStartDateKnown.errorValidationHeader,
     message: tenancyStartDateKnown.YearMissingErrorMessage,
   });
+}
+
+export async function tenancyStartDateKnownNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', tenancyStartDateKnown.backLink, tenancyDetails.mainHeader);
+  await performAction('clickRadioButton', tenancyStartDateKnown.yesRadioOption);
+  await performValidation('pageNavigation', tenancyStartDateKnown.saveForLaterButton, 'Dashboard');
 }

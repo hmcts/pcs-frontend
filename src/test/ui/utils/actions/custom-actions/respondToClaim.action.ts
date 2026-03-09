@@ -162,7 +162,8 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
-    const getDetailsGivenByParagraph = tenancyStartDateKnown.getDetailsGivenByParagraph(claimantsName);
+    const getDetailsGivenByHeader = tenancyStartDateKnown.getDetailsGivenByHeader(claimantsName);
+    await performValidation('text', { elementType: 'subHeader', text: getDetailsGivenByHeader });
     await performAction('clickRadioButton', {
       question: tenancyStartDateKnown.isTheTenancyLicenceOrOccupationContractQuestion,
       option: tenancyStartDateData.option,
@@ -175,7 +176,6 @@ export class RespondToClaimAction implements IAction {
         ['inputText', tenancyStartDateKnown.yearHiddenTextLabel, tenancyStartDateData.year]
       );
     }
-    await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
     await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
   }
 
