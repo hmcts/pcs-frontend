@@ -3,7 +3,7 @@ import { performAction, performValidation } from '../utils/controller';
 
 export async function defendantNameCaptureNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', defendantNameConfirmation.backLink, freeLegalAdvice.mainHeader);
-  await this.defendantNameCaptureInputValuesPrePopulated();
+  await defendantNameCaptureInputValuesPrePopulated();
 }
 
 export async function defendantNameCaptureInputValuesPrePopulated(): Promise<void> {
@@ -11,9 +11,13 @@ export async function defendantNameCaptureInputValuesPrePopulated(): Promise<voi
   await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantNameCapture.lastNameInputText);
   await performValidation('pageNavigation', freeLegalAdvice.saveForLaterButton, 'Dashboard');
   await performValidation(
-    'inputValue',
+    'inputTextValue',
     defendantNameCapture.firstNameLabelText,
     defendantNameCapture.firstNameInputText
   );
-  await performValidation('inputValue', defendantNameCapture.lastNameLabelText, defendantNameCapture.lastNameInputText);
+  await performValidation(
+    'inputTextValue',
+    defendantNameCapture.lastNameLabelText,
+    defendantNameCapture.lastNameInputText
+  );
 }
