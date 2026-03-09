@@ -44,6 +44,10 @@ export interface PossessionClaimResponse {
     };
   };
   defendantResponses?: {
+    contactByPhone?: YesNoValue;
+    contactByEmail?: YesNoValue;
+    contactByPost?: YesNoValue;
+    contactByText?: YesNoValue;
     tenancyStartDate?: string;
     contactByPhone?: YesNoValue;
     contactByEmail?: YesNoValue;
