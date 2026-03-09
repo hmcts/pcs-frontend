@@ -16,7 +16,7 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
     message: defendantNameConfirmation.enterYourLastNameErrorMessage,
   });
   // Test: First name empty and last name over max length
-  await performAction('inputText', defendantNameConfirmation.lastNameLabelText, overMaxLengthString);
+  await performAction('inputText', defendantNameConfirmation.lastNameHiddenLabelText, overMaxLengthString);
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
@@ -27,8 +27,8 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
     message: defendantNameConfirmation.enterLastNameMaxLengthErrorMessage,
   });
   // Test: Both first name and last name over max length
-  await performAction('inputText', defendantNameConfirmation.firstNameLabelText, overMaxLengthString);
-  await performAction('inputText', defendantNameConfirmation.lastNameLabelText, overMaxLengthString);
+  await performAction('inputText', defendantNameConfirmation.firstNameHiddenLabelText, overMaxLengthString);
+  await performAction('inputText', defendantNameConfirmation.lastNameHiddenLabelText, overMaxLengthString);
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
