@@ -56,7 +56,6 @@ export class ActionRegistry {
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['repaymentsMade', new RespondToClaimAction()],
     ['enterTenancyStartDetailsUnKnown', new RespondToClaimAction()],
-    //['triggerErrorMessagesForValidation', new TriggerErrorMessagesAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
   ]);
 

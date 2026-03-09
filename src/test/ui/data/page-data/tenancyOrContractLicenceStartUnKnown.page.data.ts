@@ -12,7 +12,6 @@ function getRandomDateOfBirth() {
 
 const randomDOB = getRandomDateOfBirth();
 
-
 export const tenancyStartDateUnKnown = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   forExampleParagraph: 'For example, 27 9 2022',
@@ -30,7 +29,8 @@ export const tenancyStartDateUnKnown = {
   tenancyStartDateMustIncludeYear: 'Your tenancy start date must include a year',
   tenancyStartDateMustBeRealDate: 'Tenancy start date must be a real date',
   tenancyStartDateMustBeInThePast: 'Tenancy start date must be in the past',
-  tenancyStartDateMustIncludeDayAndMonth:'Your tenancy start date must include a day and month',
-  tenancyStartDateMustIncludeDayAndYear:'Your tenancy start date must include a day and year',
-  tenancyStartDateMustIncludeMonthAndYear:'Your tenancy start date must include a month and year',
+  tenancyStartDateMustIncludeDayAndMonth: 'Your tenancy start date must include a day and month',
+  tenancyStartDateMustIncludeDayAndYear: 'Your tenancy start date must include a day and year',
+  tenancyStartDateMustIncludeMonthAndYear: 'Your tenancy start date must include a month and year',
+  backLink: 'Back',
 };
