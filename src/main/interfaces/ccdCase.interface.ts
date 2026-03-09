@@ -5,6 +5,8 @@ export enum CaseState {
 
 export type YesNoValue = 'YES' | 'NO' | null;
 
+export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
+
 export interface CcdUserCase {
   id: string;
   state: CaseState;
@@ -33,8 +35,6 @@ export interface Address {
   Country?: string;
 }
 
-export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
-
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: {
@@ -50,7 +50,7 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
-    registeredLandlord?: YesNoNotSureValue;
+    landlordRegistered?: YesNoNotSureValue;
   };
 }
 

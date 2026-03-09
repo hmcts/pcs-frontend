@@ -11,6 +11,6 @@
     "imNotSure": "I’m not sure"
   },
   "errors": {
-    "registeredLandlord": "Select if you agree with the landlord’s claim to be registered"
+    "landlordRegistered": "Select if you agree with the landlord’s claim to be registered"
   }
 }

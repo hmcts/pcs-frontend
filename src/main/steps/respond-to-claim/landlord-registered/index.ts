@@ -24,7 +24,7 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'registeredLandlord',
+      name: 'landlordRegistered',
       type: 'radio',
       required: true,
       translationKey: {
@@ -40,15 +40,15 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async (req: Request) => {
-    const registeredLandlord: YesNoNotSureValue | undefined = req.body?.registeredLandlord;
+    const landlordRegistered: YesNoNotSureValue | undefined = req.body?.landlordRegistered;
 
-    if (!registeredLandlord) {
+    if (!landlordRegistered) {
       return;
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        registeredLandlord,
+        landlordRegistered,
       },
     };
 

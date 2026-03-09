@@ -11,6 +11,6 @@
     "imNotSure": "cyI’m not sure"
   },
   "errors": {
-    "registeredLandlord": "cySelect if you agree with the landlord’s claim to be registered"
+    "landlordRegistered": "cySelect if you agree with the landlord’s claim to be registered"
   }
 }
