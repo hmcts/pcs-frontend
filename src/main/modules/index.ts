@@ -10,4 +10,4 @@ export { Logger } from './logger';
 export { Csrf } from './csrf';
 
 // this is used to register the modules with the app in a certain order
-export const modules = ['I18n', 'Nunjucks', 'Helmet', 'Session', 'S2S', 'OIDCModule', 'Csrf', 'LaunchDarkly'];
+export const modules = ['I18n', 'Nunjucks', 'Helmet', 'Session', 'S2S', 'OIDCModule', 'LaunchDarkly', 'Csrf'];
