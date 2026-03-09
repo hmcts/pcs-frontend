@@ -15,6 +15,14 @@ jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: mockOidcMiddleware,
 }));
 
+const mockCaseReferenceParamMiddleware = jest.fn((req, res, next) => {
+  res.locals.validatedCase = { id: req.params.caseReference };
+  next();
+});
+jest.mock('../../../main/middleware/caseReference', () => ({
+  caseReferenceParamMiddleware: mockCaseReferenceParamMiddleware,
+}));
+
 const mockHttpGet = jest.fn();
 const mockHttpPost = jest.fn();
 jest.mock('../../../main/modules/http', () => ({
@@ -30,37 +38,63 @@ import finalSubmitRoutes from '../../../main/routes/finalSubmit';
 
 describe('finalSubmit routes', () => {
   let app: Application;
-  let mockGet: jest.Mock;
-  let mockPost: jest.Mock;
+  let mockUse: jest.Mock;
+  let mockRouterGet: jest.Mock;
+  let mockRouterPost: jest.Mock;
+  let mockRouterParam: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockGet = jest.fn();
-    mockPost = jest.fn();
+    mockRouterGet = jest.fn();
+    mockRouterPost = jest.fn();
+    mockRouterParam = jest.fn();
+    mockUse = jest.fn();
+
+    const mockRouter = {
+      get: mockRouterGet,
+      post: mockRouterPost,
+      param: mockRouterParam,
+    };
+
+    jest.spyOn(require('express'), 'Router').mockReturnValue(mockRouter);
 
     app = {
-      get: mockGet,
-      post: mockPost,
+      use: mockUse,
     } as unknown as Application;
 
     finalSubmitRoutes(app);
   });
 
-  describe('GET /case/:caseId/final-submit', () => {
+  describe('Router setup', () => {
+    it('should register param middleware for caseReference', () => {
+      expect(mockRouterParam).toHaveBeenCalledWith('caseReference', mockCaseReferenceParamMiddleware);
+    });
+
+    it('should mount router under /case path', () => {
+      expect(mockUse).toHaveBeenCalledWith('/case', expect.anything());
+    });
+  });
+
+  describe('GET /:caseReference/final-submit', () => {
     it('should register GET route with oidc middleware', () => {
-      expect(mockGet).toHaveBeenCalledWith('/case/:caseId/final-submit', mockOidcMiddleware, expect.any(Function));
+      expect(mockRouterGet).toHaveBeenCalledWith(
+        '/:caseReference/final-submit',
+        mockOidcMiddleware,
+        expect.any(Function)
+      );
     });
 
     it('should render final-submit form without error', () => {
-      const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => void;
+      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => void;
 
       const req = {
-        params: { caseId: '1234567890123456' },
+        params: { caseReference: '1234567890123456' },
         query: {},
       } as unknown as Request;
 
       const res = {
+        locals: { validatedCase: { id: '1234567890123456' } },
         render: jest.fn(),
         status: jest.fn().mockReturnThis(),
       } as unknown as Response;
@@ -74,14 +108,15 @@ describe('finalSubmit routes', () => {
     });
 
     it('should render final-submit form with failed error', () => {
-      const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => void;
+      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => void;
 
       const req = {
-        params: { caseId: '1234567890123456' },
+        params: { caseReference: '1234567890123456' },
         query: { error: 'failed' },
       } as unknown as Request;
 
       const res = {
+        locals: { validatedCase: { id: '1234567890123456' } },
         render: jest.fn(),
         status: jest.fn().mockReturnThis(),
       } as unknown as Response;
@@ -94,87 +129,76 @@ describe('finalSubmit routes', () => {
       });
     });
 
-    it('should render error when caseId is not 16 digits', () => {
-      const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => void;
+    it('should render error when validatedCase is undefined', () => {
+      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => void;
 
       const req = {
-        params: { caseId: '123' },
+        params: { caseReference: '1234567890123456' },
         query: {},
       } as unknown as Request;
 
       const res = {
+        locals: {},
         render: jest.fn(),
         status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
       handler(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.render).toHaveBeenCalledWith('error', {
-        error: 'Invalid case reference',
+        error: 'Internal server error',
       });
-      expect(mockLogger.warn).toHaveBeenCalledWith('Invalid caseId format: 123');
-    });
-
-    it('should render error when caseId contains non-digits', () => {
-      const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => void;
-
-      const req = {
-        params: { caseId: '../admin/1234567' },
-        query: {},
-      } as unknown as Request;
-
-      const res = {
-        render: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-      } as unknown as Response;
-
-      handler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.render).toHaveBeenCalledWith('error', {
-        error: 'Invalid case reference',
-      });
-      expect(mockLogger.warn).toHaveBeenCalledWith('Invalid caseId format: ../admin/1234567');
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Final submit: validatedCase is undefined - middleware not executed'
+      );
     });
   });
 
-  describe('POST /case/:caseId/final-submit', () => {
+  describe('POST /:caseReference/final-submit', () => {
     it('should register POST route with oidc middleware', () => {
-      expect(mockPost).toHaveBeenCalledWith('/case/:caseId/final-submit', mockOidcMiddleware, expect.any(Function));
+      expect(mockRouterPost).toHaveBeenCalledWith(
+        '/:caseReference/final-submit',
+        mockOidcMiddleware,
+        expect.any(Function)
+      );
     });
 
-    it('should return 400 when caseId is invalid', async () => {
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+    it('should return 500 when validatedCase is undefined', async () => {
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       const req = {
-        params: { caseId: 'invalid' },
+        params: { caseReference: '1234567890123456' },
         session: {
           user: { accessToken: 'mock-token' },
         },
       } as unknown as Request;
 
       const res = {
+        locals: {},
         status: jest.fn().mockReturnThis(),
         render: jest.fn(),
       } as unknown as Response;
 
       await handler(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.render).toHaveBeenCalledWith('error', { error: 'Invalid case reference' });
-      expect(mockLogger.warn).toHaveBeenCalledWith('Invalid caseId format: invalid');
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.render).toHaveBeenCalledWith('error', { error: 'Internal server error' });
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Final submit POST: validatedCase is undefined - middleware not executed'
+      );
     });
 
     it('should return 401 when no access token in session', async () => {
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       const req = {
-        params: { caseId: '1234567890123456' },
+        params: { caseReference: '1234567890123456' },
         session: {},
       } as unknown as Request;
 
       const res = {
+        locals: { validatedCase: { id: '1234567890123456' } },
         status: jest.fn().mockReturnThis(),
         render: jest.fn(),
       } as unknown as Response;
@@ -187,7 +211,7 @@ describe('finalSubmit routes', () => {
     });
 
     it('should successfully submit to CCD and redirect to confirmation', async () => {
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       mockHttpGet.mockResolvedValue({
         data: { token: 'mock-event-token' },
@@ -196,13 +220,14 @@ describe('finalSubmit routes', () => {
       mockHttpPost.mockResolvedValue({});
 
       const req = {
-        params: { caseId: '1234567890123456' },
+        params: { caseReference: '1234567890123456' },
         session: {
           user: { accessToken: 'mock-token' },
         },
       } as unknown as Request;
 
       const res = {
+        locals: { validatedCase: { id: '1234567890123456' } },
         redirect: jest.fn(),
       } as unknown as Response;
 
@@ -244,18 +269,19 @@ describe('finalSubmit routes', () => {
     });
 
     it('should redirect with error when CCD submission fails', async () => {
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       mockHttpGet.mockRejectedValue(new Error('CCD connection failed'));
 
       const req = {
-        params: { caseId: '1234567890123456' },
+        params: { caseReference: '1234567890123456' },
         session: {
           user: { accessToken: 'mock-token' },
         },
       } as unknown as Request;
 
       const res = {
+        locals: { validatedCase: { id: '1234567890123456' } },
         redirect: jest.fn(),
       } as unknown as Response;
 
@@ -269,19 +295,24 @@ describe('finalSubmit routes', () => {
     });
   });
 
-  describe('GET /case/:caseId/confirmation', () => {
+  describe('GET /:caseReference/confirmation', () => {
     it('should register confirmation GET route with oidc middleware', () => {
-      expect(mockGet).toHaveBeenCalledWith('/case/:caseId/confirmation', mockOidcMiddleware, expect.any(Function));
+      expect(mockRouterGet).toHaveBeenCalledWith(
+        '/:caseReference/confirmation',
+        mockOidcMiddleware,
+        expect.any(Function)
+      );
     });
 
     it('should render confirmation page', () => {
-      const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response) => void;
+      const handler = mockRouterGet.mock.calls[1][2] as (req: Request, res: Response) => void;
 
       const req = {
-        params: { caseId: '1234567890123456' },
+        params: { caseReference: '1234567890123456' },
       } as unknown as Request;
 
       const res = {
+        locals: { validatedCase: { id: '1234567890123456' } },
         render: jest.fn(),
       } as unknown as Response;
 
@@ -290,6 +321,30 @@ describe('finalSubmit routes', () => {
       expect(res.render).toHaveBeenCalledWith('confirmation', {
         caseId: '1234567890123456',
       });
+    });
+
+    it('should render error when validatedCase is undefined', () => {
+      const handler = mockRouterGet.mock.calls[1][2] as (req: Request, res: Response) => void;
+
+      const req = {
+        params: { caseReference: '1234567890123456' },
+      } as unknown as Request;
+
+      const res = {
+        locals: {},
+        render: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      handler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.render).toHaveBeenCalledWith('error', {
+        error: 'Internal server error',
+      });
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Confirmation: validatedCase is undefined - middleware not executed'
+      );
     });
   });
 });

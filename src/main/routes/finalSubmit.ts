@@ -10,8 +10,10 @@
  * to pass validation, then it loads actual data from draft database.
  */
 import config from 'config';
-import type { Application, Request, Response } from 'express';
+import type { Application, Request, Response, Router } from 'express';
+import { Router as createRouter } from 'express';
 
+import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import { http } from '../modules/http';
 
@@ -34,20 +36,26 @@ function getCaseHeaders(token: string) {
   };
 }
 
-function validateCaseId(caseId: string): boolean {
-  return /^\d{16}$/.test(caseId);
-}
-
 export default function finalSubmitRoutes(app: Application): void {
-  // GET: Display final submit page
-  app.get('/case/:caseId/final-submit', oidcMiddleware, (req: Request, res: Response) => {
-    const caseId = req.params.caseId as string;
+  // Create dedicated router for final submit routes
+  const finalSubmitRouter: Router = createRouter({ mergeParams: true });
 
-    if (!validateCaseId(caseId)) {
-      logger.warn(`Invalid caseId format: ${caseId}`);
-      return res.status(400).render('error', { error: 'Invalid case reference' });
+  // Apply param middleware - validates format AND user access
+  // This ensures res.locals.validatedCase is set for routes with :caseReference
+  finalSubmitRouter.param('caseReference', caseReferenceParamMiddleware);
+
+  // GET: Display final submit page
+  finalSubmitRouter.get('/:caseReference/final-submit', oidcMiddleware, (req: Request, res: Response) => {
+    const validatedCase = res.locals.validatedCase;
+
+    if (!validatedCase) {
+      logger.error('Final submit: validatedCase is undefined - middleware not executed');
+      return res.status(500).render('error', {
+        error: 'Internal server error',
+      });
     }
 
+    const caseId = validatedCase.id;
     const error = req.query.error as string | undefined;
 
     return res.render('finalSubmit', {
@@ -57,14 +65,18 @@ export default function finalSubmitRoutes(app: Application): void {
   });
 
   // POST: Submit to CCD with minimal data
-  app.post('/case/:caseId/final-submit', oidcMiddleware, async (req: Request, res: Response) => {
-    const caseId = req.params.caseId as string;
-    const userAccessToken = req.session.user?.accessToken;
+  finalSubmitRouter.post('/:caseReference/final-submit', oidcMiddleware, async (req: Request, res: Response) => {
+    const validatedCase = res.locals.validatedCase;
 
-    if (!validateCaseId(caseId)) {
-      logger.warn(`Invalid caseId format: ${caseId}`);
-      return res.status(400).render('error', { error: 'Invalid case reference' });
+    if (!validatedCase) {
+      logger.error('Final submit POST: validatedCase is undefined - middleware not executed');
+      return res.status(500).render('error', {
+        error: 'Internal server error',
+      });
     }
+
+    const caseId = validatedCase.id;
+    const userAccessToken = req.session.user?.accessToken;
 
     if (!userAccessToken) {
       logger.error(`No user access token in session for case ${caseId}`);
@@ -115,8 +127,20 @@ export default function finalSubmitRoutes(app: Application): void {
   });
 
   // GET: Confirmation page
-  app.get('/case/:caseId/confirmation', oidcMiddleware, (req: Request, res: Response) => {
-    const caseId = req.params.caseId as string;
+  finalSubmitRouter.get('/:caseReference/confirmation', oidcMiddleware, (req: Request, res: Response) => {
+    const validatedCase = res.locals.validatedCase;
+
+    if (!validatedCase) {
+      logger.error('Confirmation: validatedCase is undefined - middleware not executed');
+      return res.status(500).render('error', {
+        error: 'Internal server error',
+      });
+    }
+
+    const caseId = validatedCase.id;
     return res.render('confirmation', { caseId });
   });
+
+  // Mount router under /case
+  app.use('/case', finalSubmitRouter);
 }
