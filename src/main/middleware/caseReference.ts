@@ -38,6 +38,11 @@ export async function caseReferenceParamMiddleware(
     // Store validated case
     res.locals.validatedCase = validatedCase;
 
+    logger.info('Case data loaded from database', {
+      caseId: validatedCase?.id,
+      caseData: JSON.stringify(validatedCase?.data, null, 2),
+    });
+
     next();
   } catch (error) {
     logger.error('Case access validation failed', {

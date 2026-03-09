@@ -55,6 +55,8 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
+    disputeClaim?: 'YES' | 'NO';
+    disputeDetails?: string;
   };
 }
 

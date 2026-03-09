@@ -55,12 +55,6 @@ export function buildComponentConfig(
   switch (field.type) {
     case 'text': {
       component.value = (fieldValue as string) || '';
-      if (field.enableErrorClearing) {
-        component.attributes = {
-          ...(component.attributes as Record<string, unknown>),
-          'data-enable-error-clearing': 'true',
-        };
-      }
       componentType = 'input';
       break;
     }
@@ -69,9 +63,7 @@ export function buildComponentConfig(
       component.value = (fieldValue as string) || '';
       component.rows = textareaAttributes.rows || 5;
       component.maxlength = field.maxLength || null;
-      component.attributes = field.enableErrorClearing
-        ? { ...textareaAttributes, 'data-enable-error-clearing': 'true' }
-        : textareaAttributes;
+      component.attributes = textareaAttributes;
       componentType = 'textarea';
       break;
     }
@@ -80,9 +72,7 @@ export function buildComponentConfig(
       component.value = (fieldValue as string) || '';
       component.rows = charCountAttributes.rows || 5;
       component.maxlength = field.maxLength;
-      component.attributes = field.enableErrorClearing
-        ? { ...charCountAttributes, 'data-enable-error-clearing': 'true' }
-        : charCountAttributes;
+      component.attributes = charCountAttributes;
       component.label = {
         text: label,
         isPageHeading: isFirstField,

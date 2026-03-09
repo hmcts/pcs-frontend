@@ -37,6 +37,8 @@ export const step: StepDefinition = createFormStep({
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: (req: Request) => {
+    console.log('non-rent-arrears-dispute CCD case data:', JSON.stringify(req.res?.locals.validatedCase?.data, null, 2));
+
     const claimantName = getClaimantName(req);
 
     const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
@@ -71,7 +73,6 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'disputeDetails.label',
               },
-              enableErrorClearing: true,
               attributes: {
                 rows: 5,
               },
