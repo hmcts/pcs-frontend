@@ -5,7 +5,7 @@ export const defendantNameConfirmation = {
     return `Is your name ${firstName} ${lastName}?`;
   },
   respondToClaimParagraph: 'Respond to a property possession claim',
-  thisIsTheNameParagraph: 'This is the name on the claim form.',
+  thisIsTheNameParagraph: 'This is the name provided by Possession Claims Solicitor Org',
   isYourNameCorrect: 'Is your Name',
   yesRadioOption: 'Yes',
   noRadioOption: 'No',
