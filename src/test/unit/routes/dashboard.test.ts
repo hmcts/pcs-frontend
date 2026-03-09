@@ -6,55 +6,18 @@ import { Logger } from '../../../main/modules/logger';
 import dashboardRoutes, { getDashboardUrl } from '../../../main/routes/dashboard';
 import { getDashboardNotifications, getDashboardTaskGroups } from '../../../main/services/pcsApi';
 
-jest.mock('../../../main/modules/logger', () => {
-  const errorFn = jest.fn();
-  const loggerInstance = { error: errorFn };
-  return {
-    Logger: {
-      getLogger: jest.fn(() => loggerInstance),
-    },
-  };
-});
-
-const mockRouterParam = jest.fn();
-const mockRouterGet = jest.fn();
-
-const mockRouter = {
-  param: mockRouterParam,
-  get: mockRouterGet,
-};
-
-jest.mock('express', () => {
-  const actual = jest.requireActual('express');
-
-  return {
-    __esModule: true,
-    ...actual,
-    Router: jest.fn(() => mockRouter),
-  };
-});
-
-jest.mock('../../../main/middleware/caseReference', () => ({
-  caseReferenceParamMiddleware: jest.fn((req, res, next, caseReference) => {
-    // Simulate validatedCase being set by middleware so dashboard route can use it
-    res.locals.validatedCase = {
-      id: caseReference,
-      data: {
-        propertyAddress: {
-          AddressLine1: '10 Second Avenue',
-          AddressLine2: '',
-          AddressLine3: '',
-          PostTown: 'London',
-          County: '',
-          PostCode: 'W3 7RX',
-        },
-      },
-    };
-
-    return next();
-  }),
+jest.mock('../../../main/middleware/caseReference');
+jest.mock('config', () => ({
+  get: jest.fn(() => 'mock-secret'),
 }));
-
+jest.mock('jose', () => ({
+  decodeJwt: jest.fn(() => ({ exp: 0, sub: 'user-1' })),
+  SignJWT: jest.fn().mockImplementation(() => ({
+    setProtectedHeader: jest.fn().mockReturnThis(),
+    setExpirationTime: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue('mock-signed-token'),
+  })),
+}));
 jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
 }));
