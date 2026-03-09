@@ -14,6 +14,7 @@ import {
   TextValidation,
   VisibilityValidation,
 } from '../validations/element-validations';
+import { InputTextValueValidation } from '../validations/element-validations/inputTextValue.validation';
 
 export class ValidationRegistry {
   private static validations: Map<string, IValidation> = new Map([
@@ -30,6 +31,7 @@ export class ValidationRegistry {
     ['waitUntilElementDisappears', new VisibilityValidation()],
     ['autoValidatePageContent', new PageContentValidation()],
     ['pageNavigation', new PageNavigationValidation()],
+    ['inputTextValue', new InputTextValueValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {
