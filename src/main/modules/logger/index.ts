@@ -78,16 +78,19 @@ const myFormat = printf((info: Record<string, unknown> & { [key: symbol]: unknow
   return `${logTimestamp} ${level}: ${message}${extraValues}${extraMetadata}`;
 });
 
+const isColorizable = process.stdout.isTTY === true && process.env.CI !== 'true';
+
 function transport(name: string) {
+  const formatParts = [
+    label({ label: name, message: true }),
+    timestamp(),
+    splat(),
+    ...(isColorizable ? [colorize({ all: true })] : []),
+    process.env.JSON_PRINT ? json() : myFormat,
+  ];
   return new winston.transports.Console({
     level: (process.env.LOG_LEVEL || 'INFO').toLowerCase(),
-    format: combine(
-      label({ label: name, message: true }),
-      timestamp(),
-      splat(),
-      colorize({ all: true }),
-      process.env.JSON_PRINT ? json() : myFormat
-    ),
+    format: combine(...formatParts),
   });
 }
 

@@ -5,7 +5,6 @@ import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',
   journeyFolder: 'respondToClaim',
