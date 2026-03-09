@@ -57,6 +57,7 @@
     "config": "^3.3.9",
     "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.7",
+    "csrf-sync": "^4.2.1",
     "express": "^5.2.1",
     "express-session": "^1.18.1",
     "glob": "^13.0.5",
