@@ -1,6 +1,10 @@
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
+import { getClaimantName } from '../../utils/getClaimantName';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',
@@ -25,7 +29,7 @@ export const step: StepDefinition = createFormStep({
           value: 'yes',
           translationKey: 'options.yes',
           subFields: {
-            repaymentsAgreedInfo: {
+            repaymentsAgreedDetails: {
               name: 'repaymentsAgreedDetails',
               type: 'character-count',
               maxLength: 500,
@@ -54,32 +58,26 @@ export const step: StepDefinition = createFormStep({
   ],
   extendGetContent: req => ({
     claimantName: getClaimantName(req),
-    claimIssueDate: "20th May 2025",
+    claimIssueDate: '20th May 2025',
   }),
-beforeRedirect: async req => {
+  beforeRedirect: async req => {
     const repaymentsForm = req.session.formData?.['repayments-agreed'];
     if (!repaymentsForm) {
       return;
     }
-   const existingRepaymentsDetails =
-        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.repaymentsAgreedDetails
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-      repaymentsAgreed: repaymentsForm.repaymentsAgreed === 'yes'
-        ? 'YES'
-        : repaymentsForm.repaymentsAgreed === 'no'
-          ? 'NO'
-          : 'NOT_SURE',
-        repaymentsAgreedDetails: repaymentsForm.repaymentsAgreed === 'yes'
-                                               ? repaymentsForm['repaymentsAgreedInfo.repaymentsAgreedDetails']
-                                               : existingRepaymentsDetails
-                                                 ? ''
-                                                 : undefined,
+        repaymentsAgreed:
+          repaymentsForm.repaymentsAgreed === 'yes'
+            ? 'YES'
+            : repaymentsForm.repaymentsAgreed === 'no'
+              ? 'NO'
+              : 'NOT_SURE',
+        repaymentsAgreedDetails: repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] || '',
       },
     };
 
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
 });
-
