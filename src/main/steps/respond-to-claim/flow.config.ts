@@ -291,8 +291,17 @@ export const flowConfig: JourneyFlowConfig = {
       ],
       defaultNext: 'your-household-and-circumstances',
     },
-    'your-household-and-circumstances': {
+    'instalment-offer': {
       previousStep: 'repayments-agreed',
+      defaultNext: 'your-household-and-circumstances',
+    },
+    'your-household-and-circumstances': {
+      previousStep: (_req: Request, formData: Record<string, unknown>) => {
+        if ('instalment-offer' in formData) {
+          return 'instalment-offer';
+        }
+        return 'repayments-agreed';
+      },
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {

@@ -19,6 +19,8 @@ import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
+import { step as instalmentOffer } from './instalment-offer';
+import { step as instalments } from './instalments';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
@@ -57,6 +59,8 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
+  'instalment-offer': instalmentOffer,
+  instalments,
   'your-household-and-circumstances': yourHouseholdAndCircumstances,
   'do-you-have-any-dependant-children': doYouHaveAnyDependantChildren,
   'do-you-have-any-other-dependants': doYouHaveAnyOtherDependants,
