@@ -97,6 +97,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentOption: repaymentsAgreed.noRadioOption,
+    });
   });
 
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @noDefendants @regression', async () => {
@@ -133,6 +144,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @noDefendants @regression', async () => {
@@ -324,6 +343,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentOption: repaymentsAgreed.yesRadioOption,
+      repaymentInfo: repaymentsAgreed.detailsTextInput,
+    });
   });
 
   test('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {

@@ -56,6 +56,7 @@ export class ActionRegistry {
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['repaymentsMade', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
+    ['repaymentsAgreed', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
