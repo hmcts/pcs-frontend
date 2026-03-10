@@ -308,6 +308,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'your-household-and-circumstances': {
       previousStep: (_req: Request, formData: Record<string, unknown>) => {
+        if ('instalments' in formData) {
+          return 'instalments';
+        }
         if ('instalment-offer' in formData) {
           return 'instalment-offer';
         }
