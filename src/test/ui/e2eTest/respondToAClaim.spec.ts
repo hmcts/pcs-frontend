@@ -19,7 +19,7 @@ import {
   repaymentsMade,
   startNow,
   tenancyDetails,
-  tenancyStartDateKnown,
+  tenancyDateDetails,
   tenancyStartDateUnknown,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -324,7 +324,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.yesRadioOption,
+      option: tenancyDateDetails.yesRadioOption,
     });
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
@@ -366,7 +366,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.yesRadioOption,
+      option: tenancyDateDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
@@ -403,7 +403,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.noRadioOption,
+      option: tenancyDateDetails.noRadioOption,
       day: '01',
       month: '12',
       year: '2025',
@@ -445,7 +445,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.iAmNotSureRadioOption,
+      option: tenancyDateDetails.iAmNotSureRadioOption,
     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
@@ -485,7 +485,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.noRadioOption,
+      option: tenancyDateDetails.noRadioOption,
       day: '01',
       month: '12',
       year: '2025',

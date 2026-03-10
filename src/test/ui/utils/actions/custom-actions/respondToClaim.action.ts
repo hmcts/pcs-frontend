@@ -15,7 +15,7 @@ import {
   noticeDetails,
   paymentInterstitial,
   repaymentsMade,
-  tenancyStartDateKnown,
+  tenancyDateDetails,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -162,21 +162,21 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
-    const getDetailsGivenByHeader = tenancyStartDateKnown.getDetailsGivenByHeader(claimantsName);
+    const getDetailsGivenByHeader = tenancyDateDetails.getDetailsGivenByHeader(claimantsName);
     await performValidation('text', { elementType: 'subHeader', text: getDetailsGivenByHeader });
     await performAction('clickRadioButton', {
-      question: tenancyStartDateKnown.isTheTenancyLicenceOrOccupationContractQuestion,
+      question: tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion,
       option: tenancyStartDateData.option,
     });
     if (tenancyStartDateData?.day && tenancyStartDateData?.month && tenancyStartDateData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', tenancyStartDateKnown.dayHiddenTextLabel, tenancyStartDateData.day],
-        ['inputText', tenancyStartDateKnown.monthHiddenTextLabel, tenancyStartDateData.month],
-        ['inputText', tenancyStartDateKnown.yearHiddenTextLabel, tenancyStartDateData.year]
+        ['inputText', tenancyDateDetails.dayHiddenTextLabel, tenancyStartDateData.day],
+        ['inputText', tenancyDateDetails.monthHiddenTextLabel, tenancyStartDateData.month],
+        ['inputText', tenancyDateDetails.yearHiddenTextLabel, tenancyStartDateData.year]
       );
     }
-    await performAction('clickButton', tenancyStartDateKnown.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {

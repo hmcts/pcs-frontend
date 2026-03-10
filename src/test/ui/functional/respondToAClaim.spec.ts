@@ -22,7 +22,7 @@ import {
   repaymentsMade,
   startNow,
   tenancyDetails,
-  tenancyStartDateKnown,
+  tenancyDateDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -284,7 +284,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.yesRadioOption,
+      option: tenancyDateDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
@@ -323,7 +323,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.yesRadioOption,
+      option: tenancyDateDetails.yesRadioOption,
     });
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
@@ -361,7 +361,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.yesRadioOption,
+      option: tenancyDateDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
@@ -403,7 +403,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.yesRadioOption,
+      option: tenancyDateDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
@@ -445,7 +445,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyStartDateKnown.yesRadioOption,
+      option: tenancyDateDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,

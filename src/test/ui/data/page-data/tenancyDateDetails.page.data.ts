@@ -1,6 +1,6 @@
 import { submitCaseApiData } from '../api-data';
 
-export const tenancyStartDateKnown = {
+export const tenancyDateDetails = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
   getDetailsGivenByHeader: (claimantName: string): string => {
