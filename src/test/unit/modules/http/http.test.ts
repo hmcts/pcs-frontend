@@ -52,6 +52,7 @@ const mockDateNow = jest.spyOn(Date, 'now');
 
 // Import AFTER mocks are established - import the factory function, not the singleton
 import { HTTPError } from '../../../../main/HttpError';
+
 import { HttpService, createHttp } from '@modules/http';
 
 describe('HttpService', () => {
