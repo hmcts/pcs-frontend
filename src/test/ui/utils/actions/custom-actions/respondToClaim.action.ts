@@ -79,7 +79,7 @@ export class RespondToClaimAction implements IAction {
     if (defendantData.option === defendantNameConfirmation.noRadioOption) {
       await this.inputDefendantDetails(defendantData);
     } else {
-      await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+      await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
     }
   }
 

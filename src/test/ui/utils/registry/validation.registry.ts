@@ -8,13 +8,13 @@ import {
   BannerAlertValidation,
   FormLabelValueValidation,
   InputErrorValidation,
+  InputTextValueValidation,
   MainHeaderValidation,
   OptionListValidation,
   RadioButtonValidation,
   TextValidation,
   VisibilityValidation,
 } from '../validations/element-validations';
-import { InputTextValueValidation } from '../validations/element-validations/inputTextValue.validation';
 
 export class ValidationRegistry {
   private static validations: Map<string, IValidation> = new Map([
