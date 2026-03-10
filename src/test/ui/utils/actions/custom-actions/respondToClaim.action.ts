@@ -15,6 +15,7 @@ import {
   noticeDetails,
   paymentInterstitial,
   repaymentsMade,
+  tenancyStartDateUnKnown,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -37,6 +38,7 @@ export class RespondToClaimAction implements IAction {
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -189,6 +191,18 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
+  }
+
+  private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {
+    if (tenancyStartData?.tsDay && tenancyStartData?.tsMonth && tenancyStartData?.tsYear) {
+      await performActions(
+        'Tenancy occupation contract or licence agreement',
+        ['inputText', tenancyStartDateUnKnown.dayTextLabel, tenancyStartData.tsDay],
+        ['inputText', tenancyStartDateUnKnown.monthTextLabel, tenancyStartData.tsMonth],
+        ['inputText', tenancyStartDateUnKnown.yearTextLabel, tenancyStartData.tsYear]
+      );
+    }
+    await performAction('clickButton', tenancyStartDateUnKnown.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

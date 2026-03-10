@@ -21,7 +21,9 @@ import {
   rentArrearsDispute,
   repaymentsMade,
   startNow,
+  tenancyDateDetails,
   tenancyDetails,
+  tenancyStartDateUnKnown,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -282,6 +284,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: tenancyStartDateUnKnown.dayInputText,
+      tsMonth: tenancyStartDateUnKnown.monthInputText,
+      tsYear: tenancyStartDateUnKnown.yearInputText,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -318,6 +326,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: tenancyStartDateUnKnown.dayInputText,
+      tsMonth: tenancyStartDateUnKnown.monthInputText,
+      tsYear: tenancyStartDateUnKnown.yearInputText,
+    });
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: noticeDetails.errorValidation,
@@ -353,6 +367,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: tenancyStartDateUnKnown.dayInputText,
+      tsMonth: tenancyStartDateUnKnown.monthInputText,
+      tsYear: tenancyStartDateUnKnown.yearInputText,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -392,6 +412,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: tenancyStartDateUnKnown.dayInputText,
+      tsMonth: tenancyStartDateUnKnown.monthInputText,
+      tsYear: tenancyStartDateUnKnown.yearInputText,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -431,6 +457,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: tenancyStartDateUnKnown.dayInputText,
+      tsMonth: tenancyStartDateUnKnown.monthInputText,
+      tsYear: tenancyStartDateUnKnown.yearInputText,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
