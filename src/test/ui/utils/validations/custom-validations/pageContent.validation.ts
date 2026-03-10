@@ -109,7 +109,6 @@ export class PageContentValidation implements IValidation {
                     .body:text("${value}"),
                     .text-content:text("${value}"),
                     .govuk-body:text("${value}"),
-                     div:text-is("${value}"),
                     .govuk-list:text("${value}")`),
     List: (page: Page, value: string) =>
       page.locator(`
