@@ -49,8 +49,8 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
-    repaymentsAgreed?: YesNoNotSureValue;
-    repaymentsAgreedDetails?: string;
+    repaymentAgreed?: YesNoNotSureValue;
+    repaymentAgreedDetails?: string;
   };
 }
 
