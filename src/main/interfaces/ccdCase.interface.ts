@@ -4,7 +4,7 @@ export enum CaseState {
 }
 
 export type YesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = 'YES' | 'NO' | 'NOT_SURE' | null;
+export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
 
 export interface CcdUserCase {
   id: string;
