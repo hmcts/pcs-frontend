@@ -2,8 +2,13 @@ import { defendantNameConfirmation } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(61);
-
 export async function defendantNameConfirmationErrorValidation(): Promise<void> {
+  // Test: Error message validation for mandatory radio button selection
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    messages: defendantNameConfirmation.nameErrorMessage,
+  });
   // Test: Both first name and last name text fields are empty
   await performAction('clickRadioButton', defendantNameConfirmation.noRadioOption);
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);

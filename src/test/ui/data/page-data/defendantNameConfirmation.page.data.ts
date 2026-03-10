@@ -3,11 +3,11 @@ export const defendantNameConfirmation = {
   get mainHeader(): string {
     return `Is your name ${firstName} ${lastName}?`;
   },
+  get nameErrorMessage(): string {
+    return `You must say if your name is ${firstName} ${lastName}`;
+  },
   respondToClaimParagraph: 'Respond to a property possession claim',
   thisIsTheNameHintText: 'This is the name provided by Possession Claims Solicitor Org',
-  //
-  //This is the name provided by Possession Claims Solicitor Org
-  //
   yesRadioOption: 'Yes',
   noRadioOption: 'No',
   saveAndContinueButton: 'Save and continue',

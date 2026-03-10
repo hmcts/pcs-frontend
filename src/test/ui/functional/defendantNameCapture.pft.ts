@@ -2,13 +2,12 @@ import { defendantNameCapture } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(61);
-
 export async function defendantNameCaptureErrorValidation(): Promise<void> {
   // Test: Both first name and last name text fields are empty
   await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
-    message: defendantNameCapture.thereIsAProblemErrorMessageHeader,
+    messages: [defendantNameCapture.enterYourFirstNameErrorMessage, defendantNameCapture.enterYourLastNameErrorMessage],
   });
   await performValidation('errorMessage', {
     header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
