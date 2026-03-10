@@ -20,8 +20,8 @@ export class InputTextValueValidation implements IValidation {
     const roleLocator = page.getByRole('textbox', { name: fieldParams, exact: true });
     return (await roleLocator.count()) > 0
       ? roleLocator
-      : page.locator(`:has-text("${fieldParams}") ~ input:visible:enabled,
-                      label:has-text("${fieldParams}") ~ textarea,
-                      label:has-text("${fieldParams}") + div input`);
+      : page.locator(`text-is("${fieldParams}") ~ input:visible:enabled,
+                      label:text-is("${fieldParams}") ~ textarea,
+                      label:text-is("${fieldParams}") + div input`);
   }
 }
