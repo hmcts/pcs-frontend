@@ -445,9 +445,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
-    });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
