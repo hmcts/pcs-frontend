@@ -45,7 +45,7 @@ export class ErrorMessageValidation implements IValidation {
         const errorStr = String(error);
         expected = errorStr;
 
-        // Try different error message selectors (exact text match)
+        // Try different error message selectors
         const errorMessage = page.locator(`
           .govuk-error-message:text-is("${errorStr}"),
           .govuk-list--error:text-is("${errorStr}"),
@@ -69,7 +69,7 @@ export class ErrorMessageValidation implements IValidation {
 
         expected = `${header}: ${message}`;
 
-        // Check for error summary header (exact text match)
+        // Check for error summary header
         const headerLocator = page.locator(`h2.govuk-error-summary__title:text-is("${header}")`);
         const headerCount = await headerLocator.count();
 
@@ -77,7 +77,7 @@ export class ErrorMessageValidation implements IValidation {
           actualText = `Header "${header}" not found`;
           passed = false;
         } else {
-          // Check for error message in the list (exact text match)
+          // Check for error message in the list
           const messageLocator = page.locator(`
             .govuk-error-summary__list a:text-is("${message}"),
             .govuk-error-summary__list li:text-is("${message}"),
