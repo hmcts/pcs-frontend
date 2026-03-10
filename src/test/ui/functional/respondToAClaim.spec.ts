@@ -21,6 +21,7 @@ import {
   rentArrearsDispute,
   repaymentsMade,
   startNow,
+  tenancyDateDetails,
   tenancyDetails,
   tenancyStartDateUnKnown,
 } from '../data/page-data';
@@ -190,7 +191,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Contact By Text Message - Back link and save for later Validations', async () => {
+  test('Contact By Text Message - Back link and save for later Validations', async () => { 
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -283,11 +284,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-    });
+     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -324,11 +326,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-    });
+     });
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: noticeDetails.errorValidation,
@@ -364,12 +367,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-    });
+     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -409,11 +412,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-    });
+     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -453,11 +457,12 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-    });
+     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
