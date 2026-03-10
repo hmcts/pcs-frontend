@@ -1,8 +1,7 @@
 export const noticeDetails = {
   mainHeader: `Notice details`,
   respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
-  noticeIsAFormalHintText:
-    `A notice is a formal document from your landlord or mortgage provider saying they plan to take legal action to repossess the property, which must follow certain legal requirements`,
+  noticeIsAFormalHintText: `A notice is a formal document from your landlord or mortgage provider saying they plan to take legal action to repossess the property, which must follow certain legal requirements`,
   backLink: `Back`,
   getDidClaimantGiveYouQuestion(claimantName: string): string {
     return `Did ${claimantName} give you notice of their intention to begin possession proceedings?`;
