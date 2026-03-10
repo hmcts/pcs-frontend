@@ -1,12 +1,13 @@
-//Main header data element will be corrected in a new task
-//import { firstName, lastName } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
-//function defendantNameHeader(): string {
-//return `Is your name ${firstName} ${lastName}?`;
-//}
+import { firstName, lastName } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 export const defendantNameConfirmation = {
-  //mainHeader: defendantNameHeader(),
+  get mainHeader(): string {
+    return `Is your name ${firstName} ${lastName}?`;
+  },
   respondToClaimParagraph: 'Respond to a property possession claim',
-  thisIsTheNameParagraph: 'This is the name provided by Possession Claims Solicitor Org',
+  thisIsTheNameHintText: 'This is the name provided by Possession Claims Solicitor Org',
+  //
+  //This is the name provided by Possession Claims Solicitor Org
+  //
   yesRadioOption: 'Yes',
   noRadioOption: 'No',
   saveAndContinueButton: 'Save and continue',
