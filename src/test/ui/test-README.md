@@ -1,5 +1,7 @@
 # Test Automation Framework Documentation
 
+g
+
 ## 1. Framework Overview
 
 A structured, maintainable test automation solution built on Playwright that:
