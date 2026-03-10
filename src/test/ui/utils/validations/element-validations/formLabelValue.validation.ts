@@ -1,5 +1,6 @@
 import { Locator, Page, expect } from '@playwright/test';
 
+import { escapeForRegex } from '../../common/string.utils';
 import { IValidation, validationRecord } from '../../interfaces';
 
 export class FormLabelValueValidation implements IValidation {
@@ -7,7 +8,7 @@ export class FormLabelValueValidation implements IValidation {
     const valueLocator = await this.findFieldValueLocator(page, fieldName);
 
     if (data?.value !== undefined) {
-      await expect(valueLocator).toHaveText(String(data.value));
+      await expect(valueLocator).toHaveText(new RegExp(`^${escapeForRegex(String(data.value))}$`));
     } else {
       const value = await valueLocator.textContent();
       if (!value?.trim()) {

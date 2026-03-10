@@ -1,12 +1,13 @@
 import { Locator, Page, expect } from '@playwright/test';
 
+import { escapeForRegex } from '../../common/string.utils';
 import { IValidation, validationData } from '../../interfaces';
 
 export class InputErrorValidation implements IValidation {
   async validate(page: Page, validation: string, fieldName: string, data: validationData): Promise<void> {
     const valueLocator = await this.findFieldValueLocator(page, fieldName, data);
     if (data !== undefined) {
-      await expect(valueLocator).toContainText(String(data));
+      await expect(valueLocator).toHaveText(new RegExp(`^${escapeForRegex(String(data))}$`));
     } else {
       const value = await valueLocator.textContent();
       if (!value?.trim()) {

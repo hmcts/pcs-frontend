@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 
+import { escapeForRegex } from '../../common/string.utils';
 import { IValidation, validationRecord } from '../../interfaces';
 
 export class TextValidation implements IValidation {
@@ -28,6 +29,6 @@ export class TextValidation implements IValidation {
         break;
     }
     const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
-    await expect(locator).toHaveText(String(data.text));
+    await expect(locator).toHaveText(new RegExp(`^${escapeForRegex(String(data.text))}$`));
   }
 }
