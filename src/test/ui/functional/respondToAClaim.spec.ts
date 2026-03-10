@@ -21,8 +21,8 @@ import {
   rentArrearsDispute,
   repaymentsMade,
   startNow,
-  tenancyDetails,
   tenancyDateDetails,
+  tenancyDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 

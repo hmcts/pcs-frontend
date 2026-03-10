@@ -1,4 +1,4 @@
-import { tenancyDetails, tenancyDateDetails } from '../data/page-data';
+import { tenancyDateDetails, tenancyDetails } from '../data/page-data';
 import { performAction, performActions, performValidation } from '../utils/controller';
 
 export async function tenancyDateDetailsErrorValidation(): Promise<void> {
