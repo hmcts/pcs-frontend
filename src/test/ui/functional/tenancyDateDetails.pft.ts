@@ -49,7 +49,7 @@ export async function tenancyDateDetailsErrorValidation(): Promise<void> {
   });
 }
 
-export async function tenancyStartDateKnownNavigationTests(): Promise<void> {
+export async function tenancyDateDetailsNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', tenancyDateDetails.backLink, tenancyDetails.mainHeader);
   await performAction('clickRadioButton', tenancyDateDetails.yesRadioOption);
   await performValidation('pageNavigation', tenancyDateDetails.saveForLaterButton, 'Dashboard');
