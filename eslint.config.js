@@ -1,5 +1,4 @@
 const { defineConfig, globalIgnores } = require('eslint/config');
-const path = require('path');
 
 const globals = require('globals');
 const tsParser = require('@typescript-eslint/parser');
@@ -10,7 +9,6 @@ const { fixupPluginRules, fixupConfigRules } = require('@eslint/compat');
 const js = require('@eslint/js');
 
 const { FlatCompat } = require('@eslint/eslintrc');
-const localTypeScriptResolver = path.resolve(__dirname, './eslint-import-resolver-local.js');
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -48,7 +46,7 @@ module.exports = defineConfig([
         '@typescript-eslint/parser': ['.ts', '.tsx'],
       },
       'import/resolver': {
-        [localTypeScriptResolver]: {
+        typescript: {
           alwaysTryTypes: true,
           project: './tsconfig.eslint.json',
         },
