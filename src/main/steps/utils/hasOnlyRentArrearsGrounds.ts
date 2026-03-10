@@ -1,9 +1,14 @@
 import type { Request } from 'express';
 
-export const hasOnlyRentArrearsGrounds = (req: Request): boolean => {
-  const caseData = req.res?.locals.validatedCase?.data;
-  const claimDueToRentArrears = caseData?.claimDueToRentArrears;
-  const hasOtherAdditionalGrounds = caseData?.hasOtherAdditionalGrounds;
+import type { CaseData } from '../../interfaces/ccdCase.interface';
 
-  return claimDueToRentArrears === 'Yes' && hasOtherAdditionalGrounds !== 'Yes';
+export const hasOnlyRentArrearsGrounds = (req: Request): boolean => {
+  const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
+  const claimGroundSummaries = caseData?.claimGroundSummaries;
+
+  if (!Array.isArray(claimGroundSummaries) || claimGroundSummaries.length === 0) {
+    return false;
+  }
+
+  return claimGroundSummaries.every(ground => ground?.value?.isRentArrears?.toUpperCase() === 'YES');
 };

@@ -55,21 +55,19 @@ export interface PossessionClaimResponse {
   };
 }
 
-export interface StartCallbackData {
-  case_details: {
-    case_data: {
-      possessionClaimResponse?: {
-        defendantContactDetails?: {
-          party?: {
-            address?: Address;
-          };
-        };
-      };
-    };
+export interface ClaimGroundSummary {
+  value?: {
+    isRentArrears?: string;
   };
 }
 
-export interface CcdCaseData {
-  claimDueToRentArrears?: 'Yes' | 'No';
-  hasOtherAdditionalGrounds?: 'Yes' | 'No';
+export interface CaseData {
+  claimGroundSummaries?: ClaimGroundSummary[];
+  possessionClaimResponse?: PossessionClaimResponse;
+}
+
+export interface StartCallbackData {
+  case_details: {
+    case_data: CaseData;
+  };
 }

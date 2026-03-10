@@ -251,23 +251,11 @@ export const flowConfig: JourneyFlowConfig = {
     'rent-arrears-dispute': {
       routes: [
         {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            _currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            return hasOnlyRentArrearsGrounds(req);
-          },
+          condition: async (req: Request): Promise<boolean> => hasOnlyRentArrearsGrounds(req),
           nextStep: 'counter-claim',
         },
         {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            _currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            return !hasOnlyRentArrearsGrounds(req);
-          },
+          condition: async (req: Request): Promise<boolean> => !hasOnlyRentArrearsGrounds(req),
           nextStep: 'non-rent-arrears-dispute',
         },
       ],

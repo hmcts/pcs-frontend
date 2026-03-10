@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import type { CaseData } from '../../interfaces/ccdCase.interface';
+
 /**
  * Checks if the claim includes rent arrears from CCD case data.
  *
@@ -7,7 +9,7 @@ import type { Request } from 'express';
  * Returns true if ANY claim ground has isRentArrears: "Yes" (case-insensitive), false otherwise.
  */
 export const isRentArrearsClaim = async (req: Request): Promise<boolean> => {
-  const caseData = req.res?.locals?.validatedCase?.data;
+  const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
   const claimGroundSummaries = caseData?.claimGroundSummaries;
 
   if (!Array.isArray(claimGroundSummaries)) {
