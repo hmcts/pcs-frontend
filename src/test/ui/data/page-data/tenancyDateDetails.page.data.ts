@@ -3,7 +3,7 @@ import { submitCaseApiData } from '../api-data';
 export const tenancyDateDetails = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
-  getDetailsGivenByHeader: (claimantName: string): string => {
+  getDetailsGivenByParagraph: (claimantName: string): string => {
     return `Details given by ${claimantName}:`;
   },
   yourTenancyOccupationContractOrLicenceDateList: `Your tenancy, occupation contract or licence began on ${convertDateFormatTenancyDate(submitCaseApiData.submitCasePayload.tenancy_TenancyLicenceDate)}`,
