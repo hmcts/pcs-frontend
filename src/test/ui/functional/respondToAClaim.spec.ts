@@ -191,7 +191,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', 'Dashboard');
   });
 
-  test('Contact By Text Message - Back link and save for later Validations', async () => { 
+  test('Contact By Text Message - Back link and save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -289,7 +289,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-     });
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -331,7 +331,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-     });
+    });
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: noticeDetails.errorValidation,
@@ -372,7 +372,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-     });
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -417,7 +417,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-     });
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -462,7 +462,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
       tsYear: tenancyStartDateUnKnown.yearInputText,
-     });
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
