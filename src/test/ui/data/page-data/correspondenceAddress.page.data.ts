@@ -1,4 +1,4 @@
-import { address } from '../../utils/actions/custom-actions';
+import { address } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 export const correspondenceAddress = {
   get correspondenceAddressKnownMainHeader(): string {
     return `Is your correspondence address ${address}?`;
