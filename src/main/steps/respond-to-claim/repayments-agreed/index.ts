@@ -11,6 +11,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    heading: 'question',
     question: 'question',
   },
   fields: [
@@ -18,6 +19,7 @@ export const step: StepDefinition = createFormStep({
       name: 'confirmRepaymentsAgreed',
       type: 'radio',
       required: true,
+      legendClasses: 'govuk-visually-hidden',
       translationKey: {
         label: 'question',
       },

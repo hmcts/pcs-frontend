@@ -9,9 +9,7 @@
   "question": "Would you like to offer to pay your arrears in instalments?",
   "options": {
     "yes": "Yes",
-    "no": "No",
-    "or": "or",
-    "imNotSure": "I'm not sure"
+    "no": "No"
   },
   "errors": {
     "confirmInstalmentOffer": "Select whether you would like to offer to pay your arrears in instalments"

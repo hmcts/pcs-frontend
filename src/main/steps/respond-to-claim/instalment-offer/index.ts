@@ -29,8 +29,6 @@ export const step: StepDefinition = createFormStep({
       options: [
         { value: 'yes', translationKey: 'options.yes' },
         { value: 'no', translationKey: 'options.no' },
-        { divider: 'options.or' },
-        { value: 'imNotSure', translationKey: 'options.imNotSure' },
       ],
     },
   ],

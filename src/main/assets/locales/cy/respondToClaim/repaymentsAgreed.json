@@ -1,5 +1,5 @@
 {
-  "pageTitle": "cyRepayments agreed",
+  "pageTitle": "cyHave you come to any agreement to repay the arrears?",
   "caption": "cyRespond to a property possession claim",
   "question": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
   "options": {

@@ -1,5 +1,5 @@
 {
-  "pageTitle": "Repayments agreed",
+  "pageTitle": "Have you come to any agreement to repay the arrears?",
   "caption": "Respond to a property possession claim",
   "question": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
   "options": {
