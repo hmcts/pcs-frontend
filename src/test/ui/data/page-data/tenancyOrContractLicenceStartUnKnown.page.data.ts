@@ -28,9 +28,5 @@ export const tenancyStartDateUnKnown = {
   tenancyStartDateMustIncludeMonth: 'Your tenancy start date must include a month',
   tenancyStartDateMustIncludeYear: 'Your tenancy start date must include a year',
   tenancyStartDateMustBeRealDate: 'Tenancy start date must be a real date',
-  tenancyStartDateMustBeInThePast: 'Tenancy start date must be in the past',
-  tenancyStartDateMustIncludeDayAndMonth: 'Your tenancy start date must include a day and month',
-  tenancyStartDateMustIncludeDayAndYear: 'Your tenancy start date must include a day and year',
-  tenancyStartDateMustIncludeMonthAndYear: 'Your tenancy start date must include a month and year',
   backLink: 'Back',
 };

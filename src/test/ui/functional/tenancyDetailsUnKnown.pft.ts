@@ -2,7 +2,7 @@ import { startNow, tenancyStartDateUnKnown } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function tenancyStartDateUnKnownErrorValidation(): Promise<void> {
-  //This error message will trigger if no date is provided
+  //This error message will trigger if no day is provided
   console.log('inside validation');
   await performAction('inputText', tenancyStartDateUnKnown.monthTextLabel, tenancyStartDateUnKnown.monthInputText);
   await performAction('inputText', tenancyStartDateUnKnown.yearTextLabel, tenancyStartDateUnKnown.yearInputText);
@@ -40,6 +40,20 @@ export async function tenancyStartDateUnKnownErrorValidation(): Promise<void> {
   await performValidation('errorMessage', {
     header: tenancyStartDateUnKnown.thereIsAProblemErrorMessageHeader,
     message: tenancyStartDateUnKnown.tenancyStartDateMustIncludeYear,
+  });
+
+  //This error message will trigger if invalid date is provided
+  await performAction('inputText', tenancyStartDateUnKnown.dayTextLabel, '30');
+  await performAction('inputText', tenancyStartDateUnKnown.monthTextLabel, '13');
+  await performAction('inputText', tenancyStartDateUnKnown.yearTextLabel, '2025');
+  await performAction('clickButton', tenancyStartDateUnKnown.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: tenancyStartDateUnKnown.thereIsAProblemErrorMessageHeader,
+    message: tenancyStartDateUnKnown.thereIsAProblemErrorMessageHeader,
+  });
+  await performValidation('errorMessage', {
+    header: tenancyStartDateUnKnown.thereIsAProblemErrorMessageHeader,
+    message: tenancyStartDateUnKnown.tenancyStartDateMustBeRealDate,
   });
 }
 

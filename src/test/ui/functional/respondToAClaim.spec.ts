@@ -365,7 +365,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: tenancyStartDateUnKnown.dayInputText,
       tsMonth: tenancyStartDateUnKnown.monthInputText,
