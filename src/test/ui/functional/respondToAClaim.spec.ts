@@ -56,8 +56,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   test('Defendant name capture - Error messages - save for later Validations @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
-    await performAction('inputText', defendantNameCapture.firstNameLabelText, 'John');
-    await performAction('inputText', defendantNameCapture.lastNameLabelText, 'Doe');
+    await performAction('inputText', defendantNameCapture.firstNameTextLabel, 'John');
+    await performAction('inputText', defendantNameCapture.lastNameTextLabel, 'Doe');
     await performAction('clickButton', defendantNameCapture.saveForLaterButton);
     await performValidation('mainHeader', 'Dashboard');
   });
@@ -65,8 +65,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
   test('Defendant Date of birth - Back link and Save for later Validations @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('clickLink', dateOfBirth.backLink);
     await performValidation('mainHeader', defendantNameCapture.mainHeader);
