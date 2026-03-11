@@ -11,6 +11,7 @@ import {
   validateForm,
 } from '../../../../main/modules/steps';
 import { getErrorMessage } from '../../../../main/modules/steps/formBuilder/errorUtils';
+import { createMockT } from '../../helpers/mockTranslation';
 
 describe('formHelpers', () => {
   describe('getFormData', () => {
@@ -1510,15 +1511,13 @@ describe('formHelpers', () => {
           },
         ];
 
-        const mockT = ((key: string) => {
-          if (key === 'errors.dateOfBirth.futureDate') {
-            return 'Your date of birth must be in the past';
-          }
-          if (key === 'errors.date.futureDate') {
-            return 'Date must be in the past';
-          }
-          return key;
-        }) as TFunction;
+        const mockT = createMockT({
+          'errors.dateOfBirth': {
+            futureDate: 'Your date of birth must be in the past',
+          },
+          'errors.dateOfBirth.futureDate': 'Your date of birth must be in the past',
+          'errors.date.futureDate': 'Date must be in the past',
+        });
 
         const stepSpecificErrors = getCustomErrorTranslations(mockT, fields);
         const translations = { ...stepSpecificErrors };
@@ -2084,15 +2083,14 @@ describe('formHelpers', () => {
     });
 
     it('should return step-specific date error translations', () => {
-      const mockT = ((key: string) => {
-        if (key === 'errors.dateOfBirth.required') {
-          return 'Enter your date of birth';
-        }
-        if (key === 'errors.dateOfBirth.missingOne') {
-          return 'Your date of birth must include a {{missingField}}';
-        }
-        return key;
-      }) as TFunction;
+      const mockT = createMockT({
+        'errors.dateOfBirth': {
+          required: 'Enter your date of birth',
+          missingOne: 'Your date of birth must include a {{missingField}}',
+        },
+        'errors.dateOfBirth.required': 'Enter your date of birth',
+        'errors.dateOfBirth.missingOne': 'Your date of birth must include a {{missingField}}',
+      });
 
       const fields = [
         {
@@ -2111,12 +2109,12 @@ describe('formHelpers', () => {
     });
 
     it('should return custom error translations', () => {
-      const mockT = ((key: string) => {
-        if (key === 'errors.dateOfBirth.custom') {
-          return 'Custom validation error';
-        }
-        return key;
-      }) as TFunction;
+      const mockT = createMockT({
+        'errors.dateOfBirth': {
+          custom: 'Custom validation error',
+        },
+        'errors.dateOfBirth.custom': 'Custom validation error',
+      });
 
       const fields = [
         {
@@ -2132,15 +2130,16 @@ describe('formHelpers', () => {
     });
 
     it('should handle multiple fields with custom errors', () => {
-      const mockT = ((key: string) => {
-        if (key === 'errors.dateOfBirth.required') {
-          return 'Enter your date of birth';
-        }
-        if (key === 'errors.startDate.required') {
-          return 'Enter a start date';
-        }
-        return key;
-      }) as TFunction;
+      const mockT = createMockT({
+        'errors.dateOfBirth': {
+          required: 'Enter your date of birth',
+        },
+        'errors.startDate': {
+          required: 'Enter a start date',
+        },
+        'errors.dateOfBirth.required': 'Enter your date of birth',
+        'errors.startDate.required': 'Enter a start date',
+      });
 
       const fields = [
         {
@@ -2162,12 +2161,12 @@ describe('formHelpers', () => {
     });
 
     it('should handle missingTwo translation key', () => {
-      const mockT = ((key: string) => {
-        if (key === 'errors.dateOfBirth.missingTwo') {
-          return 'Your date of birth must include two parts';
-        }
-        return key;
-      }) as TFunction;
+      const mockT = createMockT({
+        'errors.dateOfBirth': {
+          missingTwo: 'Your date of birth must include two parts',
+        },
+        'errors.dateOfBirth.missingTwo': 'Your date of birth must include two parts',
+      });
 
       const fields = [
         {
@@ -2184,12 +2183,12 @@ describe('formHelpers', () => {
     });
 
     it('should handle futureDate translation key for date fields', () => {
-      const mockT = ((key: string) => {
-        if (key === 'errors.dateOfBirth.futureDate') {
-          return 'Your date of birth must be in the past';
-        }
-        return key;
-      }) as TFunction;
+      const mockT = createMockT({
+        'errors.dateOfBirth': {
+          futureDate: 'Your date of birth must be in the past',
+        },
+        'errors.dateOfBirth.futureDate': 'Your date of birth must be in the past',
+      });
 
       const fields = [
         {
@@ -2206,12 +2205,12 @@ describe('formHelpers', () => {
     });
 
     it('should not add date key for non-date fields', () => {
-      const mockT = ((key: string) => {
-        if (key === 'errors.textField.required') {
-          return 'Text field is required';
-        }
-        return key;
-      }) as TFunction;
+      const mockT = createMockT({
+        'errors.textField': {
+          required: 'Text field is required',
+        },
+        'errors.textField.required': 'Text field is required',
+      });
 
       const fields = [
         {
@@ -2227,12 +2226,12 @@ describe('formHelpers', () => {
     });
 
     it('should handle nested keys that do not map to date keys', () => {
-      const mockT = ((key: string) => {
-        if (key === 'errors.dateOfBirth.unknownKey') {
-          return 'Unknown error';
-        }
-        return key;
-      }) as TFunction;
+      const mockT = createMockT({
+        'errors.dateOfBirth': {
+          unknownKey: 'Unknown error',
+        },
+        'errors.dateOfBirth.unknownKey': 'Unknown error',
+      });
 
       const fields = [
         {
@@ -2242,17 +2241,20 @@ describe('formHelpers', () => {
       ];
 
       const result = getCustomErrorTranslations(mockT, fields);
-      // unknownKey doesn't map to a date key, so it won't be in result
-      expect(result).toEqual({});
+      // unknownKey doesn't map to a date-specific key (like dateRequired), but it does get included
+      // as a field-specific error translation (dateOfBirth.unknownKey)
+      expect(result).toEqual({
+        'dateOfBirth.unknownKey': 'Unknown error',
+      });
     });
 
     it('should handle non-date field custom errors', () => {
-      const mockT = ((key: string) => {
-        if (key === 'errors.textField.required') {
-          return 'Text field is required';
-        }
-        return key;
-      }) as TFunction;
+      const mockT = createMockT({
+        'errors.textField': {
+          required: 'Text field is required',
+        },
+        'errors.textField.required': 'Text field is required',
+      });
 
       const fields = [
         {
