@@ -1,7 +1,7 @@
 import { csrfSync } from 'csrf-sync';
 import { Express, NextFunction, Request, Response } from 'express';
 
-import { Csrf } from '../../../../main/modules/csrf';
+import { Csrf } from '@modules/csrf';
 
 jest.mock('csrf-sync', () => {
   const csrfSynchronisedProtection = jest.fn();
