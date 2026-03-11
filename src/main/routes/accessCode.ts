@@ -4,6 +4,7 @@ import { oidcMiddleware } from '../middleware/oidc';
 import { validateAccessCode } from '../services/pcsApi/pcsApiService';
 
 import { Logger } from '@modules/logger';
+import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('accessCode');
 
@@ -38,7 +39,7 @@ export default function accessCodeRoutes(app: Application): void {
     // Validate caseId format (16 digits only) to prevent SSRF
     if (!/^\d{16}$/.test(caseId)) {
       logger.warn(`Invalid caseId format: ${caseId}`);
-      return res.redirect(303, `/case/${caseId}/access-code?error=invalid`);
+      return res.status(400).render('error', { error: 'Invalid case reference' });
     }
 
     if (!userAccessToken) {
@@ -48,7 +49,8 @@ export default function accessCodeRoutes(app: Application): void {
 
     if (!accessCode || typeof accessCode !== 'string' || accessCode.trim() === '') {
       logger.warn(`Missing access code for case ${caseId}`);
-      return res.redirect(303, `/case/${caseId}/access-code?error=invalid`);
+      // Use safeRedirect303 to prevent open redirect vulnerabilities
+      return safeRedirect303(res, `/case/${caseId}/access-code?error=invalid`, '/', ['/case']);
     }
 
     try {
@@ -60,15 +62,15 @@ export default function accessCodeRoutes(app: Application): void {
         // pcs-api granted CCD access during validation
         // caseReferenceParamMiddleware will validate access on redirect
 
-        // Redirect to start of respond-to-claim journey
-        return res.redirect(303, `/case/${caseId}/respond-to-claim/start-now`);
+        // Use safeRedirect303 to prevent open redirect vulnerabilities
+        return safeRedirect303(res, `/case/${caseId}/respond-to-claim/start-now`, '/', ['/case']);
       } else {
         logger.warn(`Invalid access code provided for case ${caseId}`);
-        return res.redirect(303, `/case/${caseId}/access-code?error=invalid`);
+        return safeRedirect303(res, `/case/${caseId}/access-code?error=invalid`, '/', ['/case']);
       }
     } catch (error) {
       logger.error(`Failed to validate access code for case ${caseId}:`, error);
-      return res.redirect(303, `/case/${caseId}/access-code?error=invalid`);
+      return safeRedirect303(res, `/case/${caseId}/access-code?error=invalid`, '/', ['/case']);
     }
   });
 }
