@@ -157,7 +157,6 @@ describe('respond-to-claim tenancy-type-details step', () => {
       expect(content.correctType).toBe('Body direct value');
     });
 
-
     it('uses claimant organisation name when claimantOrganisations[0].value exists', async () => {
       const content = await testedStep.extendGetContent(
         {
@@ -202,7 +201,6 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
       expect(content.organisationName).toBe('Unknown');
     });
-
 
     it('leaves insetText unchanged when it is not a string', async () => {
       const insetText = { text: 'unchanged' };
