@@ -4,7 +4,6 @@ import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { getClaimantName } from '../../utils';
 import { flowConfig } from '../flow.config';
 
 // Define fields separately so we can dynamically inject validator
@@ -124,9 +123,8 @@ export const step: StepDefinition = createFormStep({
     return formData;
   },
   extendGetContent: (req: Request) => {
-    const claimantName = getClaimantName(req);
-
     const caseData = req.res?.locals.validatedCase?.data;
+    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
     const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
     const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
     const rentArrearsAmount = currency(amountInPounds);
