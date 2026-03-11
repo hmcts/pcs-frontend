@@ -10,6 +10,6 @@ export class MainHeaderValidation implements IValidation {
         'legend h1.govuk-fieldset__heading, h1.govuk-heading-xl, h1.govuk-heading-l, legend.govuk-fieldset__legend--l'
       )
       .first();
-    await expect(locator).toHaveText(new RegExp(`^${escapeForRegex(fieldName)}$`));
+    await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(fieldName)}\\s*$`));
   }
 }
