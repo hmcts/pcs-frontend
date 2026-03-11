@@ -157,64 +157,6 @@ describe('respond-to-claim tenancy-type-details step', () => {
       expect(content.correctType).toBe('Body direct value');
     });
 
-    it('falls back to savedStepData["tenancyTypeConfirm.correctType"] when body values are missing', async () => {
-      const content = await testedStep.extendGetContent(
-        {
-          body: {},
-          session: {
-            formData: {
-              'tenancy-type-details': {
-                'tenancyTypeConfirm.correctType': 'Session subfield value',
-                correctType: 'Session direct value',
-              },
-            },
-          },
-          res: {
-            locals: {
-              validatedCase: {
-                data: {
-                  possessionClaimResponse: {
-                    claimantOrganisations: [{ value: 'Acme Housing' }],
-                  },
-                },
-              },
-            },
-          },
-        },
-        formContent
-      );
-
-      expect(content.correctType).toBe('Session subfield value');
-    });
-
-    it('falls back to savedStepData.correctType last', async () => {
-      const content = await testedStep.extendGetContent(
-        {
-          body: {},
-          session: {
-            formData: {
-              'tenancy-type-details': {
-                correctType: 'Session direct value',
-              },
-            },
-          },
-          res: {
-            locals: {
-              validatedCase: {
-                data: {
-                  possessionClaimResponse: {
-                    claimantOrganisations: [{ value: 'Acme Housing' }],
-                  },
-                },
-              },
-            },
-          },
-        },
-        formContent
-      );
-
-      expect(content.correctType).toBe('Session direct value');
-    });
 
     it('uses claimant organisation name when claimantOrganisations[0].value exists', async () => {
       const content = await testedStep.extendGetContent(
@@ -261,31 +203,6 @@ describe('respond-to-claim tenancy-type-details step', () => {
       expect(content.organisationName).toBe('Unknown');
     });
 
-    it('replaces Treetops Housing in insetText when insetText is a string', async () => {
-      const content = await testedStep.extendGetContent(
-        {
-          body: {},
-          session: { formData: { 'tenancy-type-details': {} } },
-          res: {
-            locals: {
-              validatedCase: {
-                data: {
-                  possessionClaimResponse: {
-                    claimantOrganisations: [{ value: 'Acme Housing' }],
-                  },
-                },
-              },
-            },
-          },
-        },
-        {
-          insetText: 'Treetops Housing gave these details.',
-          detailsHeading: 'Details given by ',
-        }
-      );
-
-      expect(content.insetText).toBe('Acme Housing gave these details.');
-    });
 
     it('leaves insetText unchanged when it is not a string', async () => {
       const insetText = { text: 'unchanged' };
@@ -313,32 +230,6 @@ describe('respond-to-claim tenancy-type-details step', () => {
       );
 
       expect(content.insetText).toBe(insetText);
-    });
-
-    it('replaces Treetops Housing in detailsHeading when detailsHeading contains it', async () => {
-      const content = await testedStep.extendGetContent(
-        {
-          body: {},
-          session: { formData: { 'tenancy-type-details': {} } },
-          res: {
-            locals: {
-              validatedCase: {
-                data: {
-                  possessionClaimResponse: {
-                    claimantOrganisations: [{ value: 'Acme Housing' }],
-                  },
-                },
-              },
-            },
-          },
-        },
-        {
-          insetText: 'No change',
-          detailsHeading: 'Details from Treetops Housing',
-        }
-      );
-
-      expect(content.detailsHeading).toBe('Details from Acme Housing');
     });
 
     it('appends orgName and colon when detailsHeading does not contain Treetops Housing', async () => {

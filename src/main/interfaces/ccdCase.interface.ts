@@ -46,6 +46,7 @@ export interface PossessionClaimResponse {
   };
   defendantResponses?: {
     tenancyTypeCorrect?: TenancyTypeCorrectValue;
+    tenancyType?: string;
     contactByPhone?: YesNoValue;
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;

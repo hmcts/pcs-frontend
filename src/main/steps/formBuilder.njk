@@ -8,6 +8,7 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block pageTitle %}
@@ -20,7 +21,7 @@
   {% endif %}
 
   {% if caption %}
-    <span class="govuk-caption-l">{{ caption }}</span>
+    <span class="{{ captionClasses or 'govuk-caption-l' }}">{{ caption }}</span>
   {% endif %}
 
   {% if heading %}
@@ -31,6 +32,20 @@
 
   {% if content %}
     <p class="govuk-body">{{ content | safe }}</p>
+  {% endif %}
+
+  {% if insetText %}
+    {{ govukInsetText({ text: insetText }) }}
+  {% endif %}
+
+  {% if detailsHeading %}
+    <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">{{ detailsHeading }}</p>
+  {% endif %}
+
+  {% if tenancyType %}
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ tenancyType }}</li>
+    </ul>
   {% endif %}
 
   <form method="post" action="{{ url }}">

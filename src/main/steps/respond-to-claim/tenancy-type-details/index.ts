@@ -49,6 +49,13 @@ const fieldsConfig: FormFieldConfig[] = [
 ];
 
 const STEP_NAME = 'tenancy-type-details';
+const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
+  ASSURED_TENANCY: 'an assured',
+  SECURE_TENANCY: 'a secure',
+  INTRODUCTORY_TENANCY: 'an introductory',
+  FLEXIBLE_TENANCY: 'a flexible',
+  DEMOTED_TENANCY: 'a demoted',
+};
 
 export const step: StepDefinition = createFormStep({
   stepName: STEP_NAME,
@@ -65,7 +72,6 @@ export const step: StepDefinition = createFormStep({
     detailsHeading: 'detailsHeading',
     tenancyType: 'tenancyType',
   },
-  customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
   beforeRedirect: async req => {
     const tenancyTypeConfirm = req.body?.tenancyTypeConfirm as string | undefined;
@@ -77,45 +83,68 @@ export const step: StepDefinition = createFormStep({
           : tenancyTypeConfirm === 'notSure'
             ? 'NOT_SURE'
             : null;
+    const correctedTenancyTypeText = (
+      (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
+      (req.body?.correctType as string | undefined)
+    )?.trim();
+    const existingCorrectedTenancyType =
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.tenancyType;
+    const tenancyType =
+      tenancyTypeConfirm === 'no'
+        ? correctedTenancyTypeText || undefined
+        : existingCorrectedTenancyType
+          ? ''
+          : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         tenancyTypeCorrect,
+        tenancyType,
       },
     };
 
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: async (req, formContent) => {
-    const savedStepData = req.session?.formData?.[STEP_NAME] as Record<string, unknown> | undefined;
+    const existingTenancyTypeCorrect = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+      ?.tenancyTypeCorrect as TenancyTypeCorrectValue | undefined;
+    const existingCorrectedTenancyType = req.res?.locals.validatedCase?.data?.possessionClaimResponse
+      ?.defendantResponses?.tenancyType as string | undefined;
     const tenancyTypeConfirm =
-      (req.body?.tenancyTypeConfirm as string | undefined) || (savedStepData?.tenancyTypeConfirm as string | undefined);
+      (req.body?.tenancyTypeConfirm as string | undefined) ||
+      (existingTenancyTypeCorrect === 'YES'
+        ? 'yes'
+        : existingTenancyTypeCorrect === 'NO'
+          ? 'no'
+          : existingTenancyTypeCorrect === 'NOT_SURE'
+            ? 'notSure'
+            : undefined);
     const correctType =
       (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
       (req.body?.correctType as string | undefined) ||
-      (savedStepData?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
-      (savedStepData?.correctType as string | undefined);
+      (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : undefined);
 
     const orgName =
       req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]?.value || 'Unknown';
-
-    const insetText =
-      typeof formContent.insetText === 'string'
-        ? formContent.insetText.replace(/Treetops Housing/g, orgName)
-        : formContent.insetText;
+    const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as
+      | string
+      | undefined;
+    const tenancyTypeAgreementType = tenancyTypeOfTenancyLicence
+      ? TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence] || 'an assured'
+      : 'an assured';
 
     const detailsHeading =
       typeof formContent.detailsHeading === 'string'
-        ? formContent.detailsHeading.includes('Treetops Housing')
-          ? formContent.detailsHeading.replace(/Treetops Housing/g, orgName)
-          : `${formContent.detailsHeading}${orgName}${':'}`
+        ? `${formContent.detailsHeading}${orgName}${':'}`
         : formContent.detailsHeading;
 
     return {
       ...formContent,
-      insetText,
+      captionClasses: 'govuk-caption-xl',
       detailsHeading,
       organisationName: orgName,
+      orgname: orgName,
+      tenancyTypeAgreementType,
       tenancyTypeConfirm,
       correctType,
     };
