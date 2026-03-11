@@ -264,7 +264,14 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'non-rent-arrears-dispute': {
       defaultNext: 'counter-claim',
-      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
+      previousStep: (req: Request, formData: Record<string, unknown>) => {
+        // Check if came from rent-arrears (mixed grounds)
+        if ('rent-arrears-dispute' in formData) {
+          return 'rent-arrears-dispute';
+        }
+        // Otherwise use same logic as rent-arrears
+        return getPreviousPageForArrears(req);
+      },
     },
     'counter-claim': {
       defaultNext: 'payment-interstitial',

@@ -1,30 +1,48 @@
-{% extends "stepsTemplate.njk" %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% extends "layouts/main.njk" %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
-{% block pageTitle %}{{ pageTitle }}{% endblock %}
+{% block pageTitle %}
+  {{ t('pageTitle') }}
+{% endblock %}
 
-{% block mainContent %}
-  {% if caption %}
-    <span class="govuk-caption-xl">{{ caption }}</span>
-  {% endif %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% include "includes/caption.njk" %}
 
-  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+      <form method="post" novalidate>
+        {{ csrfProtection(csrfToken) }}
 
-  <form method="post" action="{{ url }}" novalidate>
+        {% if fields %}
+          {% for field in fields %}
+            {% if field.componentType === 'radios' %}
+              {{ govukRadios(field.component) }}
+            {% elif field.componentType === 'character-count' %}
+              {{ govukCharacterCount(field.component) }}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
 
-    <div class="govuk-button-group">
-      {{ govukButton({ 
-        text: continue,
-        attributes: { type: 'submit', name: 'action', value: 'continue' }
-      }) }}
-      {{ govukButton({ 
-        text: saveForLater,
-        classes: 'govuk-button--secondary',
-        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
-      }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: t('buttons.saveAndContinue'),
+            type: 'submit',
+            name: 'saveAndContinue',
+            value: 'true'
+          }) }}
+
+          {{ govukButton({
+            text: t('buttons.saveForLater'),
+            type: 'submit',
+            name: 'saveForLater',
+            value: 'true',
+            classes: 'govuk-button--secondary'
+          }) }}
+        </div>
+      </form>
     </div>
-  </form>
-
+  </div>
 {% endblock %}
