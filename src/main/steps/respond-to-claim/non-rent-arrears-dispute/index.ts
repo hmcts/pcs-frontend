@@ -97,7 +97,6 @@ export const step: StepDefinition = createFormStep({
                 label: 'disputeDetails.label',
                 hint: 'disputeDetails.hint',
               },
-              rows: 10,
             },
           },
         },
