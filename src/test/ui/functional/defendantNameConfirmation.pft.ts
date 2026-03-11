@@ -1,4 +1,4 @@
-import { defendantNameConfirmation } from '../data/page-data';
+import { defendantNameCapture, defendantNameConfirmation } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(61);
@@ -14,30 +14,32 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-    message: [
-      defendantNameConfirmation.enterYourFirstNameErrorMessage,
-      defendantNameConfirmation.enterYourLastNameErrorMessage,
-    ],
+    message: defendantNameConfirmation.enterYourFirstNameErrorMessage,
   });
-  // Test: First name empty and last name over max length
-  await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, overMaxLengthString);
-  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-    message: [
-      defendantNameConfirmation.enterYourFirstNameErrorMessage,
-      defendantNameConfirmation.enterLastNameMaxLengthErrorMessage,
-    ],
+    message: defendantNameConfirmation.enterYourLastNameErrorMessage,
   });
-  // Test: Both first name and last name over max length
-  await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, overMaxLengthString);
-  await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, overMaxLengthString);
-  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  //Test: First name empty and last name over max length
+  await performAction('inputText', defendantNameCapture.lastNameTextLabel, overMaxLengthString);
+  await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-    message: [
-      defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
-      defendantNameConfirmation.enterLastNameMaxLengthErrorMessage,
-    ],
+    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
+    message: defendantNameCapture.enterYourFirstNameErrorMessage,
+  });
+  await performValidation('errorMessage', {
+    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
+    message: defendantNameCapture.enterLastNameMaxLengthErrorMessage,
+  });
+  //Test: Both first name and last name over max length
+  await performAction('inputText', defendantNameCapture.firstNameTextLabel, overMaxLengthString);
+  await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
+    message: defendantNameCapture.enterFirstNameMaxLengthErrorMessage,
+  });
+  await performValidation('errorMessage', {
+    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
+    message: defendantNameCapture.enterFirstNameMaxLengthErrorMessage,
   });
 }
