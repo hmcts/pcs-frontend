@@ -337,7 +337,7 @@ describe('accessCode routes', () => {
       );
     });
 
-    it('should redirect with error when caseId is not 16 digits', async () => {
+    it('should return error page when caseId is not 16 digits', async () => {
       const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       const req = {
@@ -349,17 +349,20 @@ describe('accessCode routes', () => {
       } as unknown as Request;
 
       const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn(),
         redirect: jest.fn(),
       } as unknown as Response;
 
       await handler(req, res);
 
-      expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/access-code?error=invalid');
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.render).toHaveBeenCalledWith('error', { error: 'Invalid case reference' });
       expect(mockLogger.warn).toHaveBeenCalledWith('Invalid caseId format: 123');
       expect(mockValidateAccessCode).not.toHaveBeenCalled();
     });
 
-    it('should redirect with error when caseId contains path traversal', async () => {
+    it('should return error page when caseId contains path traversal', async () => {
       const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       const req = {
@@ -371,12 +374,15 @@ describe('accessCode routes', () => {
       } as unknown as Request;
 
       const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn(),
         redirect: jest.fn(),
       } as unknown as Response;
 
       await handler(req, res);
 
-      expect(res.redirect).toHaveBeenCalledWith(303, '/case/../admin/1234567/access-code?error=invalid');
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.render).toHaveBeenCalledWith('error', { error: 'Invalid case reference' });
       expect(mockLogger.warn).toHaveBeenCalledWith('Invalid caseId format: ../admin/1234567');
       expect(mockValidateAccessCode).not.toHaveBeenCalled();
     });
