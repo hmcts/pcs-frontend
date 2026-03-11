@@ -1,5 +1,5 @@
 export const licensedLandlord = {
-  mainHeader: 'Licensed Landlord (placeholder)',
+  mainHeader: 'Licensed landlord (placeholder)',
   saveForLaterButton: 'Save for later',
   continueButton: 'Continue',
 };
