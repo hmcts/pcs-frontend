@@ -133,6 +133,7 @@ def runFullFunctionalTests(yarnBuilder) {
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       } finally {
+        sh(script: '[ -d allure-results ] && npx allure generate allure-results --clean -o allure-report || true', returnStatus: true)
         publishHTML([
           allowMissing: true,
           alwaysLinkToLastBuild: true,
@@ -143,7 +144,7 @@ def runFullFunctionalTests(yarnBuilder) {
         ])
         steps.archiveArtifacts(
           allowEmptyArchive: true,
-          artifacts: 'definitions/test/playwright-report/**'
+          artifacts: 'allure-results/**/*, definitions/test/playwright-report/**'
         )
         if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
           postAllureResultsToSlack('nightly')
