@@ -1,0 +1,38 @@
+{% extends "template.njk" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner" role="region" aria-labelledby="experimental-banner">
+        <div class="govuk-notification-banner__content">
+          <p class="govuk-notification-banner__heading" id="experimental-banner">
+            This is a development placeholder page for testing purposes only.
+          </p>
+        </div>
+      </div>
+
+      <h1 class="govuk-heading-xl">Submit Response</h1>
+
+      {% if error %}
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
+          <h2 class="govuk-error-summary__title" id="error-summary-title">
+            There is a problem
+          </h2>
+          <div class="govuk-error-summary__body">
+            <ul class="govuk-list govuk-error-summary__list">
+              <li>{{ error }}</li>
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+
+      <p class="govuk-body">Case ID: <strong>{{ caseId }}</strong></p>
+
+      <form method="POST" action="/case/{{ caseId }}/final-submit" novalidate>
+        <button type="submit" class="govuk-button" data-module="govuk-button">
+          Submit
+        </button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
