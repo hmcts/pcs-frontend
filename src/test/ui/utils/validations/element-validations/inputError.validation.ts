@@ -20,7 +20,7 @@ export class InputErrorValidation implements IValidation {
     const escapedData = String(data).replace(/"/g, '\\"');
     const selector = ':is(.govuk-form-group:has(label:text-is("' + fieldName + '")),fieldset:has(legend:text-is("' + fieldName + '")) ) p.govuk-error-message:has-text("' + escapedData + '")';
     const locator = page.locator(selector);
-    if (await locator.count() === 0) throw new Error('The error message "' + data + '" for field "' + fieldName + '" is not triggered');
+    if (await locator.count() === 0) {throw new Error('The error message "' + data + '" for field "' + fieldName + '" is not triggered');}
     return locator.first();
   }
 }
