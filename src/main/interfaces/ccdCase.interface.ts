@@ -4,6 +4,7 @@ export enum CaseState {
 }
 
 export type YesNoValue = 'YES' | 'NO' | null;
+export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export interface CcdUserCase {
   id: string;
@@ -46,9 +47,8 @@ export interface PossessionClaimResponse {
   };
   defendantResponses?: {
     contactByPhone?: YesNoValue;
-    contactByEmail?: YesNoValue;
-    contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
+    preferenceType?: ContactPreference;
   };
 }
 
