@@ -198,7 +198,7 @@ export class RespondToClaimAction implements IAction {
     await performValidation('text', { elementType: 'paragraph', text: getDidNotProvideParagraph });
     if (tenancyStartData?.tsDay && tenancyStartData?.tsMonth && tenancyStartData?.tsYear) {
       await performActions(
-        'Tenancy occupation contract or licence agreement',
+        'Enter Date',
         ['inputText', tenancyDateUnknown.dayTextLabel, tenancyStartData.tsDay],
         ['inputText', tenancyDateUnknown.monthTextLabel, tenancyStartData.tsMonth],
         ['inputText', tenancyDateUnknown.yearTextLabel, tenancyStartData.tsYear]
