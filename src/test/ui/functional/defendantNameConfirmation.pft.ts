@@ -14,14 +14,20 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-    message: [defendantNameConfirmation.enterYourFirstNameErrorMessage, defendantNameConfirmation.enterYourLastNameErrorMessage]
+    message: [
+      defendantNameConfirmation.enterYourFirstNameErrorMessage,
+      defendantNameConfirmation.enterYourLastNameErrorMessage,
+    ],
   });
   // Test: First name empty and last name over max length
   await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, overMaxLengthString);
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-    message: [defendantNameConfirmation.enterYourFirstNameErrorMessage, defendantNameConfirmation.enterLastNameMaxLengthErrorMessage]
+    message: [
+      defendantNameConfirmation.enterYourFirstNameErrorMessage,
+      defendantNameConfirmation.enterLastNameMaxLengthErrorMessage,
+    ],
   });
   // Test: Both first name and last name over max length
   await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, overMaxLengthString);
@@ -29,6 +35,9 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-    message: [defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,defendantNameConfirmation.enterLastNameMaxLengthErrorMessage]
+    message: [
+      defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
+      defendantNameConfirmation.enterLastNameMaxLengthErrorMessage,
+    ],
   });
 }

@@ -14,7 +14,10 @@ export async function defendantNameCaptureErrorValidation(): Promise<void> {
   await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
-    message: [defendantNameCapture.enterYourFirstNameErrorMessage, defendantNameCapture.enterLastNameMaxLengthErrorMessage]
+    message: [
+      defendantNameCapture.enterYourFirstNameErrorMessage,
+      defendantNameCapture.enterLastNameMaxLengthErrorMessage,
+    ],
   });
   // Test: Both first name and last name over max length
   await performAction('inputText', defendantNameCapture.firstNameTextLabel, overMaxLengthString);
@@ -22,6 +25,9 @@ export async function defendantNameCaptureErrorValidation(): Promise<void> {
   await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
-    message: [defendantNameCapture.enterFirstNameMaxLengthErrorMessage,defendantNameCapture.enterLastNameMaxLengthErrorMessage]
+    message: [
+      defendantNameCapture.enterFirstNameMaxLengthErrorMessage,
+      defendantNameCapture.enterLastNameMaxLengthErrorMessage,
+    ],
   });
 }
