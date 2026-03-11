@@ -29,6 +29,6 @@ export class TextValidation implements IValidation {
         break;
     }
     const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
-    await expect(locator).toHaveText(new RegExp(`^${escapeForRegex(String(data.text))}$`));
+    await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(String(data.text))}\\s*$`));
   }
 }

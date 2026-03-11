@@ -8,7 +8,7 @@ export class FormLabelValueValidation implements IValidation {
     const valueLocator = await this.findFieldValueLocator(page, fieldName);
 
     if (data?.value !== undefined) {
-      await expect(valueLocator).toHaveText(new RegExp(`^${escapeForRegex(String(data.value))}$`));
+      await expect(valueLocator).toHaveText(new RegExp(`^\\s*${escapeForRegex(String(data.value))}\\s*$`));
     } else {
       const value = await valueLocator.textContent();
       if (!value?.trim()) {

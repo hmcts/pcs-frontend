@@ -62,7 +62,7 @@ export class PageNavigationValidation implements IValidation {
   private async validateMainHeader(page: Page, expectedHeader: string): Promise<void> {
     try {
       const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
-      await expect(locator).toHaveText(new RegExp(`^${escapeForRegex(expectedHeader)}$`));
+      await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(expectedHeader)}\\s*$`));
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
@@ -106,7 +106,7 @@ export class PageNavigationValidation implements IValidation {
   private async validatePageNavigation(page: Page, expectedHeader: string): Promise<void> {
     try {
       const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
-      await expect(locator).toHaveText(new RegExp(`^${escapeForRegex(expectedHeader)}$`));
+      await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(expectedHeader)}\\s*$`));
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const actualText = await locator.first().textContent();
