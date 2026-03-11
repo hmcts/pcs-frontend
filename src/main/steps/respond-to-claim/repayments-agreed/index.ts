@@ -49,7 +49,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    const caseData = req.session?.ccdCase?.data as
+    const caseData = req.res?.locals?.validatedCase?.data as
       | { claimantName?: string; claimIssueDate?: string }
       | undefined;
 

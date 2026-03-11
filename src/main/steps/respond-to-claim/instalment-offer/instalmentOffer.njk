@@ -2,6 +2,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
@@ -26,6 +27,7 @@
   <p class="govuk-body govuk-!-margin-bottom-6">{{ paragraph4 }}</p>
 
   <form method="post" action="{{ url }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
         {{ govukRadios(field.component) }}
