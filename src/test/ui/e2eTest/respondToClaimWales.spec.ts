@@ -12,8 +12,6 @@ import {
   defendantNameCapture,
   freeLegalAdvice,
   licensedLandlord,
-  //nonRentArrearsDispute,
-  //noticeDetails,
   registeredLandlord,
   startNow,
   tenancyDetails,
@@ -77,13 +75,5 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', licensedLandlord.mainHeader);
     await performAction('clickButton', licensedLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    //---Below lines are commented, routing for wales journey is failing, as it's not been implemented for wales specific journey--
-    // await performAction('selectNoticeDetails', {
-    //   isClaimantNameCorrect: submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect,
-    //   option: noticeDetails.yesRadioOption,
-    // });
-    // await performAction('enterNoticeDateKnown');
-    // await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 });
