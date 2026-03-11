@@ -1,8 +1,9 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
+import type { PossessionClaimResponse } from '@interfaces/ccdCase.interface';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-telephone',
@@ -74,8 +75,10 @@ export const step: StepDefinition = createFormStep({
   ],
 
   beforeRedirect: async req => {
-    const telephoneForm = req.session.formData?.['contact-preferences-telephone'];
-    if (!telephoneForm) {
+    const telephoneForm = req.body as Record<string, unknown>;
+    const contactByTelephone = telephoneForm.contactByTelephone as string | undefined;
+
+    if (!contactByTelephone) {
       return;
     }
 
@@ -86,15 +89,15 @@ export const step: StepDefinition = createFormStep({
       defendantContactDetails: {
         party: {
           phoneNumber:
-            telephoneForm.contactByTelephone === 'yes'
-              ? telephoneForm['contactByTelephone.phoneNumber']
+            contactByTelephone === 'yes'
+              ? (telephoneForm['contactByTelephone.phoneNumber'] as string | undefined)
               : existingPhoneNumber
                 ? ''
                 : undefined,
         },
       },
       defendantResponses: {
-        contactByPhone: telephoneForm.contactByTelephone === 'yes' ? 'YES' : 'NO',
+        contactByPhone: contactByTelephone === 'yes' ? 'YES' : 'NO',
       },
     };
 

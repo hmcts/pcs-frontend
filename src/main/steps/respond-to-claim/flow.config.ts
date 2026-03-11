@@ -79,8 +79,10 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-date-of-birth': {
-      previousStep: (_req: Request, formData: Record<string, unknown>) =>
-        'defendant-name-confirmation' in formData ? 'defendant-name-confirmation' : 'defendant-name-capture',
+      previousStep: async (req: Request): Promise<string> => {
+        const defendantNameKnown = await isDefendantNameKnown(req);
+        return defendantNameKnown ? 'defendant-name-confirmation' : 'defendant-name-capture';
+      },
       defaultNext: 'correspondence-address',
     },
     'correspondence-address': {
@@ -93,13 +95,19 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-telephone': {
       routes: [
         {
-          condition: async (req: Request) =>
-            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'yes',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.contactByTelephone === 'yes',
           nextStep: 'contact-preferences-text-message',
         },
         {
-          condition: async (req: Request) =>
-            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'no',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.contactByTelephone === 'no',
           nextStep: 'dispute-claim-interstitial',
         },
       ],
@@ -145,27 +153,21 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: async (req: Request, formData: Record<string, unknown>) => {
-        // Check formData to see which path was actually taken
-        // This honors the actual journey path even if case data changes mid-journey
-        if ('landlord-registered' in formData) {
-          return 'landlord-registered';
-        }
-
-        // Fallback: check current case data for new journeys
+      previousStep: async (req: Request): Promise<string> => {
         const welshProperty = await isWelshProperty(req);
-        if (welshProperty) {
-          return 'landlord-registered';
-        }
-        return 'dispute-claim-interstitial';
+        return welshProperty ? 'landlord-registered' : 'dispute-claim-interstitial';
       },
     },
     'confirmation-of-notice-given': {
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
-            if (!confirmed) {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = currentStepData.confirmNoticeGiven as string | undefined;
+            if (confirmNoticeGiven !== 'yes') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -174,9 +176,13 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'confirmation-of-notice-date-when-provided',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
-            if (!confirmed) {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = currentStepData.confirmNoticeGiven as string | undefined;
+            if (confirmNoticeGiven !== 'yes') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -185,8 +191,12 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'confirmation-of-notice-date-when-not-provided',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = currentStepData.confirmNoticeGiven as string | undefined;
             if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
               return false;
             }
@@ -196,8 +206,12 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'rent-arrears-dispute',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = currentStepData.confirmNoticeGiven as string | undefined;
             if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
               return false;
             }

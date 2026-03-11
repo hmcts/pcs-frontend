@@ -158,6 +158,11 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
     frontendField: 'hadLegalAdvice',
     valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
   },
+  'confirmation-of-notice-given': {
+    backendPath: 'possessionClaimResponse.defendantResponses',
+    frontendField: 'confirmNoticeGiven',
+    valueMapper: passThrough(['confirmNoticeGiven']),
+  },
 };
 
 /** Converts dot-path to nested object (e.g., 'a.b.c' → { a: { b: { c: value } } }) */

@@ -4,6 +4,11 @@ export enum CaseState {
 }
 
 export type YesNoValue = 'YES' | 'NO' | null;
+export enum YesNoEnum {
+  YES = 'YES',
+  NO = 'NO',
+  PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
+}
 
 export interface CcdUserCase {
   id: string;
@@ -69,6 +74,8 @@ export interface CcdDefendantResponses {
   contactByEmail?: YesNoValue;
   contactByPost?: YesNoValue;
   contactByText?: YesNoValue;
+  /** User's confirmation of notice given: yes / no / imNotSure. Persisted for resume-after-logout routing. */
+  confirmNoticeGiven?: string;
 }
 
 /** Possession claim response block inside case_data. */

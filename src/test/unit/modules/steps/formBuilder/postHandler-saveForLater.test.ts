@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 
+import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
 import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
 import { createPostHandler } from '@modules/steps/formBuilder/postHandler';
 import * as dashboardModule from '@routes/dashboard';
@@ -45,7 +46,7 @@ describe('PostHandler - Save for Later Fix', () => {
       render: jest.fn(),
       status: jest.fn().mockReturnThis(),
       locals: {
-        validatedCase: { id: '1771325608502536' },
+        validatedCase: new CcdCaseModel({ id: '1771325608502536', data: {} }),
       },
     };
 

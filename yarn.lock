@@ -7534,6 +7534,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dotenv@npm:^17.3.1":
+  version: 17.3.1
+  resolution: "dotenv@npm:17.3.1"
+  checksum: 10/4dde6571dff22c2323a3e33ac25e1e7d51c4b6d60dc884f59e3efe85c8fd3cc8800d6b3925d05c46b19dca08cba821a0a24e22f75a1b9b768c859b98bb927b04
+  languageName: node
+  linkType: hard
+
 "drange@npm:^1.0.2":
   version: 1.1.1
   resolution: "drange@npm:1.1.1"
@@ -12444,6 +12451,7 @@ __metadata:
     copy-webpack-plugin: "npm:^13.0.0"
     css-loader: "npm:^7.0.0"
     debug: "npm:^4.3.4"
+    dotenv: "npm:^17.3.1"
     eslint: "npm:^9.0.0"
     eslint-config-prettier: "npm:^10.0.0"
     eslint-import-resolver-typescript: "npm:^4.4.4"
