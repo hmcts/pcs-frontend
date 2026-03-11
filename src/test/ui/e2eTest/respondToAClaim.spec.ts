@@ -19,8 +19,8 @@ import {
   repaymentsMade,
   startNow,
   tenancyDateDetails,
+  tenancyDateUnknown,
   tenancyDetails,
-  tenancyStartDateUnKnown,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import {
@@ -94,11 +94,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performValidation('mainHeader', tenancyStartDateUnKnown.mainHeader);
+    await performValidation('mainHeader', tenancyDateUnknown.mainHeader);
     await performAction('enterTenancyStartDetailsUnKnown', {
-      tsDay: tenancyStartDateUnKnown.dayInputText,
-      tsMonth: tenancyStartDateUnKnown.monthInputText,
-      tsYear: tenancyStartDateUnKnown.yearInputText,
+      tsDay: tenancyDateUnknown.dayInputText,
+      tsMonth: tenancyDateUnknown.monthInputText,
+      tsYear: tenancyDateUnknown.yearInputText,
     });
     await performValidation('mainHeader', noticeDetails.mainHeader);
     await performAction('selectNoticeDetails', {
@@ -137,8 +137,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performValidation('mainHeader', tenancyStartDateUnKnown.mainHeader);
-    await performAction('clickButton', tenancyStartDateUnKnown.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDateUnknown.mainHeader);
+    await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -171,11 +171,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performValidation('mainHeader', tenancyStartDateUnKnown.mainHeader);
+    await performValidation('mainHeader', tenancyDateUnknown.mainHeader);
     await performAction('enterTenancyStartDetailsUnKnown', {
-      tsDay: tenancyStartDateUnKnown.dayInputText,
-      tsMonth: tenancyStartDateUnKnown.monthInputText,
-      tsYear: tenancyStartDateUnKnown.yearInputText,
+      tsDay: tenancyDateUnknown.dayInputText,
+      tsMonth: tenancyDateUnknown.monthInputText,
+      tsYear: tenancyDateUnknown.yearInputText,
     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
@@ -220,8 +220,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performValidation('mainHeader', tenancyStartDateUnKnown.mainHeader);
-    await performAction('clickButton', tenancyStartDateUnKnown.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDateUnknown.mainHeader);
+    await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
@@ -260,11 +260,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performValidation('mainHeader', tenancyStartDateUnKnown.mainHeader);
+    await performValidation('mainHeader', tenancyDateUnknown.mainHeader);
     await performAction('enterTenancyStartDetailsUnKnown', {
-      tsDay: tenancyStartDateUnKnown.dayInputText,
-      tsMonth: tenancyStartDateUnKnown.monthInputText,
-      tsYear: tenancyStartDateUnKnown.yearInputText,
+      tsDay: tenancyDateUnknown.dayInputText,
+      tsMonth: tenancyDateUnknown.monthInputText,
+      tsYear: tenancyDateUnknown.yearInputText,
     });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.noRadioOption,
@@ -308,8 +308,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performValidation('mainHeader', tenancyStartDateUnKnown.mainHeader);
-    await performAction('clickButton', tenancyStartDateUnKnown.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyDateUnknown.mainHeader);
+    await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
   });

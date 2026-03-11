@@ -15,7 +15,7 @@ import {
   noticeDetails,
   paymentInterstitial,
   repaymentsMade,
-  tenancyStartDateUnKnown,
+  tenancyDateUnknown,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -194,15 +194,17 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {
+    const getDidNotProvideParagraph = tenancyDateUnknown.getDidNotProvideParagraph(claimantsName);
+    await performValidation('text', { elementType: 'paragraph', text: getDidNotProvideParagraph });
     if (tenancyStartData?.tsDay && tenancyStartData?.tsMonth && tenancyStartData?.tsYear) {
       await performActions(
         'Tenancy occupation contract or licence agreement',
-        ['inputText', tenancyStartDateUnKnown.dayTextLabel, tenancyStartData.tsDay],
-        ['inputText', tenancyStartDateUnKnown.monthTextLabel, tenancyStartData.tsMonth],
-        ['inputText', tenancyStartDateUnKnown.yearTextLabel, tenancyStartData.tsYear]
+        ['inputText', tenancyDateUnknown.dayTextLabel, tenancyStartData.tsDay],
+        ['inputText', tenancyDateUnknown.monthTextLabel, tenancyStartData.tsMonth],
+        ['inputText', tenancyDateUnknown.yearTextLabel, tenancyStartData.tsYear]
       );
     }
-    await performAction('clickButton', tenancyStartDateUnKnown.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
