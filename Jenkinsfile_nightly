@@ -100,48 +100,54 @@ def runE2ETests(yarnBuilder) {
 
 def runE2ETestsForBrowser(yarnBuilder, String browser) {
   stage("Full E2E Test - ${browser}") {
-    try {
-      yarnBuilder.yarn("test:E2e${browser}")
-    } catch (Error) {
-      unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-    } finally {
-      publishHTML([
-        allowMissing: true,
-        alwaysLinkToLastBuild: true,
-        keepAll: true,
-        reportDir: "allure-report",
-        reportFiles: 'index.html',
-        reportName: "Full ${browser} E2E Test Report"
-      ])
-      steps.archiveArtifacts(
-        allowEmptyArchive: true,
-        artifacts: 'definitions/test/playwright-report/**'
-      )
+    node {
+      checkout scm
+      try {
+        yarnBuilder.yarn("test:E2e${browser}")
+      } catch (Error) {
+        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+      } finally {
+        publishHTML([
+          allowMissing: true,
+          alwaysLinkToLastBuild: true,
+          keepAll: true,
+          reportDir: "allure-report",
+          reportFiles: 'index.html',
+          reportName: "Full ${browser} E2E Test Report"
+        ])
+        steps.archiveArtifacts(
+          allowEmptyArchive: true,
+          artifacts: 'definitions/test/playwright-report/**'
+        )
+      }
     }
   }
 }
 
 def runFullFunctionalTests(yarnBuilder) {
   stage('Full Functional Test') {
-    try {
-      yarnBuilder.yarn('test:fullfunctional')
-    } catch (Error) {
-      unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-    } finally {
-      publishHTML([
-        allowMissing: true,
-        alwaysLinkToLastBuild: true,
-        keepAll: true,
-        reportDir: 'allure-report',
-        reportFiles: 'index.html',
-        reportName: 'PCS Frontend Full Functional Test Report'
-      ])
-      steps.archiveArtifacts(
-        allowEmptyArchive: true,
-        artifacts: 'definitions/test/playwright-report/**'
-      )
-      if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-        postAllureResultsToSlack('nightly')
+    node {
+      checkout scm
+      try {
+        yarnBuilder.yarn('test:fullfunctional')
+      } catch (Error) {
+        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+      } finally {
+        publishHTML([
+          allowMissing: true,
+          alwaysLinkToLastBuild: true,
+          keepAll: true,
+          reportDir: 'allure-report',
+          reportFiles: 'index.html',
+          reportName: 'PCS Frontend Full Functional Test Report'
+        ])
+        steps.archiveArtifacts(
+          allowEmptyArchive: true,
+          artifacts: 'definitions/test/playwright-report/**'
+        )
+        if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
+          postAllureResultsToSlack('nightly')
+        }
       }
     }
   }
@@ -164,20 +170,23 @@ def postAllureResultsToSlack(String pipelineType = 'nightly') {
 
 def runAccessibilityTests(yarnBuilder) {
   stage("Full Accessibility Test") {
-    try {
-      yarnBuilder.yarn("test:accessibility")
-    } catch (Error) {
-      unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-    } finally {
-      publishHTML([
-        allowMissing         : true,
-        alwaysLinkToLastBuild: true,
-        keepAll              : true,
-        reportDir            : "allure-report",
-        reportFiles          : 'index.html',
-        reportName           : 'Accessibility Test Report'
-      ])
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+    node {
+      checkout scm
+      try {
+        yarnBuilder.yarn("test:accessibility")
+      } catch (Error) {
+        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+      } finally {
+        publishHTML([
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : "allure-report",
+          reportFiles          : 'index.html',
+          reportName           : 'Accessibility Test Report'
+        ])
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+      }
     }
   }
 }
