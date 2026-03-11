@@ -49,7 +49,7 @@ describe('Csrf', () => {
       expect(loggerInfo).toHaveBeenCalledWith('Enabling CSRF protection');
     });
 
-    it('should call csrfSync with getTokenFromRequest that reads _csrf from req.body', () => {
+    it('should call csrfSync with getTokenFromRequest that reads _csrf from req.body or x-csrf-token header', () => {
       csrf.enableFor(mockApp);
 
       expect(csrfSync).toHaveBeenCalledTimes(1);
@@ -60,7 +60,10 @@ describe('Csrf', () => {
       const mockReq = { body: { _csrf: 'token-from-body' } } as Request;
       expect(options.getTokenFromRequest(mockReq)).toBe('token-from-body');
 
-      const reqNoToken = { body: {} } as Request;
+      const headerTokenReq = { body: {}, headers: { 'x-csrf-token': 'token-from-header' } } as unknown as Request;
+      expect(options.getTokenFromRequest(headerTokenReq)).toBe('token-from-header');
+
+      const reqNoToken = { body: {}, headers: {} } as unknown as Request;
       expect(options.getTokenFromRequest(reqNoToken)).toBeUndefined();
     });
 
