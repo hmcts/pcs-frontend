@@ -1,42 +1,57 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 
+import type { PossessionClaimResponse, YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '../../../modules/steps';
-import { getDashboardUrl } from '../../../routes/dashboard';
-import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { flowConfig } from '../flow.config';
 
-const stepName = 'landlord-registered';
-const stepNavigation = createStepNavigation(flowConfig);
+import { createFormStep } from '@modules/steps';
 
-export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/landlord-registered`,
-  name: stepName,
-  view: 'respond-to-claim/landlord-registered/landlordRegistered.njk',
+const STEP_NAME = 'landlord-registered';
+
+export const step: StepDefinition = createFormStep({
+  stepName: STEP_NAME,
+  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  getController: () => {
-    return createGetController(
-      'respond-to-claim/landlord-registered/landlordRegistered.njk',
-      stepName,
-      async (req: Request) => {
-        return {
-          backUrl: await stepNavigation.getBackUrl(req, stepName),
-          dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-        };
+  flowConfig,
+  customTemplate: `${__dirname}/landlordRegistered.njk`,
+  translationKeys: {
+    caption: 'caption',
+    pageTitle: 'pageTitle',
+    question: 'question',
+    publicRegisterLinkText: 'publicRegisterLinkText',
+    introText: 'introText',
+  },
+  fields: [
+    {
+      name: 'landlordRegistered',
+      type: 'radio',
+      required: true,
+      translationKey: {
+        label: 'question',
       },
-      'respondToClaim'
-    );
-  },
-  postController: {
-    post: async (req: Request, res: Response) => {
-      // Get next step URL and redirect
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
-
-      if (!redirectPath) {
-        // No next step defined - show not found page
-        return res.status(404).render('not-found');
-      }
-
-      res.redirect(303, redirectPath);
+      legendClasses: 'govuk-fieldset__legend--m',
+      options: [
+        { value: 'YES', translationKey: 'options.yes' },
+        { value: 'NO', translationKey: 'options.no' },
+        { divider: 'options.or' },
+        { value: 'NOT_SURE', translationKey: 'options.imNotSure' },
+      ],
     },
+  ],
+  beforeRedirect: async (req: Request) => {
+    const landlordRegistered: YesNoNotSureValue | undefined = req.body?.landlordRegistered;
+
+    if (!landlordRegistered) {
+      return;
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        landlordRegistered,
+      },
+    };
+
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
-};
+});

@@ -31,6 +31,7 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-text-message',
     'dispute-claim-interstitial',
     'landlord-registered',
+    'landlord-licensed',
     'tenancy-details',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
@@ -121,6 +122,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
 
     'landlord-registered': {
+      defaultNext: 'landlord-licensed',
+    },
+    'landlord-licensed': {
       defaultNext: 'tenancy-details',
     },
     'tenancy-details': {
