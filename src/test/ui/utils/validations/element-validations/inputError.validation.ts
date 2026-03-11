@@ -20,12 +20,13 @@ export class InputErrorValidation implements IValidation {
 
   private async findFieldValueLocator(page: Page, fieldName: string, data: validationData): Promise<Locator> {
     const escapedData = String(data).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    const escapedField = fieldName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     const selector =
       ':is(.govuk-form-group:has(label:text-is("' +
-      fieldName +
-      '")),fieldset:has(legend:text-is("' +
-      fieldName +
-      '")) ) p.govuk-error-message:has-text("' +
+      escapedField +
+      '")),.govuk-form-group:has(fieldset:has(legend:text-is("' +
+      escapedField +
+      '")))) p.govuk-error-message:has-text("' +
       escapedData +
       '")';
     const locator = page.locator(selector);
