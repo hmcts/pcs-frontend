@@ -50,9 +50,27 @@ def component = "frontend"
 
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
+static Map<String, Object> secret(String secretName, String envVariable) {
+  [
+    $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    envVariable: envVariable
+  ]
+}
+
+def secrets = [
+  'pcs-${env}': [
+    secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
+    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')
+  ]
+]
+
 withNightlyPipeline(type, product, component) {
+  loadVaultSecrets(secrets)
   validateInputs()
   handleEnvironmentSetting()
+  setFunctionalTestEnvVars()
   enableSlackNotifications('#qa-pipeline-status')
   enableFortifyScan()
   afterSuccess('fortify-scan') {
@@ -83,6 +101,13 @@ def handleEnvironmentSetting() {
   env.TEST_URL = (params.ENVIRONMENT == 'preview')
     ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
     : "https://pcs.${params.ENVIRONMENT}.platform.hmcts.net/"
+}
+
+def setFunctionalTestEnvVars() {
+  env.NODE_CONFIG_ENV = 'test'
+  env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
+  env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  env.CASE_TYPE_ID = 'PCS'
 }
 
 def runE2ETests(yarnBuilder) {
