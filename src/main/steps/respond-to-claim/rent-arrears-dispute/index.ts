@@ -75,12 +75,12 @@ export const step: StepDefinition = createFormStep({
 
       const result: Record<string, unknown> = {};
 
-      // Map frontend radio value to backend enum
+      // Map frontend radio value to backend enum (updated field name)
       if (rentArrears === 'yes') {
-        result.oweRentArrears = 'YES';
+        result.rentArrearsAmountConfirmation = 'YES';
       } else if (rentArrears === 'no') {
-        result.oweRentArrears = 'NO';
-        // Convert pounds to pence (backend stores as pence string)
+        result.rentArrearsAmountConfirmation = 'NO';
+        // Convert pounds to pence (backend stores as pence string via MoneyGBP serializer)
         if (amountRaw) {
           const normalized = amountRaw.replace(/,/g, ''); // Remove comma separators
           const amountInPounds = parseFloat(normalized);
@@ -89,7 +89,7 @@ export const step: StepDefinition = createFormStep({
           }
         }
       } else if (rentArrears === 'notSure') {
-        result.oweRentArrears = 'NOT_SURE';
+        result.rentArrearsAmountConfirmation = 'NOT_SURE';
       }
 
       return result;
@@ -99,16 +99,16 @@ export const step: StepDefinition = createFormStep({
     const caseData = req.res?.locals?.validatedCase?.data;
     const response = caseData?.possessionClaimResponse?.defendantResponses;
 
-    if (!response?.oweRentArrears) {
+    if (!response?.rentArrearsAmountConfirmation) {
       return {};
     }
 
     const formData: Record<string, unknown> = {};
 
-    // Map backend enum to frontend radio value
-    if (response.oweRentArrears === 'YES') {
+    // Map backend enum to frontend radio value (updated field name)
+    if (response.rentArrearsAmountConfirmation === 'YES') {
       formData.rentArrears = 'yes';
-    } else if (response.oweRentArrears === 'NO') {
+    } else if (response.rentArrearsAmountConfirmation === 'NO') {
       formData.rentArrears = 'no';
       // Prepopulate the amount if it exists (convert pence to pounds)
       // Use dotted notation for subField, matching defendant-name-confirmation pattern
@@ -117,7 +117,7 @@ export const step: StepDefinition = createFormStep({
         const amountInPounds = amountInPence / 100;
         formData['rentArrears.rentArrearsAmountCorrection'] = amountInPounds.toFixed(2);
       }
-    } else if (response.oweRentArrears === 'NOT_SURE') {
+    } else if (response.rentArrearsAmountConfirmation === 'NOT_SURE') {
       formData.rentArrears = 'notSure';
     }
 
