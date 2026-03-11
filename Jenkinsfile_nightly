@@ -59,7 +59,7 @@ withNightlyPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true,
       artifacts: '**/Fortify Scan/**/*'
   }
-  afterAlways('FortifyScan') {
+  afterAlways('fortify-scan') {
     runE2ETests(yarnBuilder)
     if (params.FULL_FUNCTIONAL_TESTS) {
       runFullFunctionalTests(yarnBuilder)
