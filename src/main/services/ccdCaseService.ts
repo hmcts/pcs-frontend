@@ -167,16 +167,12 @@ export const ccdCaseService = {
     const eventUrl = `${ccdUrl}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
-      logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
-      logger.info(`[ccdCaseService] CCD URL: ${ccdUrl}`);
-      logger.info(`[ccdCaseService] Full URL: ${eventUrl}`);
-      logger.info(`[ccdCaseService] Access token: ${accessToken ? 'present' : 'MISSING'}`);
+      logger.debug(`[ccdCaseService] Validating case ${caseId} for event ${eventId}`);
 
       const response = await http.get<{ case_details?: { case_data?: Record<string, unknown> } }>(
         eventUrl,
         getCaseHeaders(accessToken)
       );
-      logger.info(`[ccdCaseService] Case access validated successfully for caseId: ${caseId}`);
 
       return {
         id: caseId,
