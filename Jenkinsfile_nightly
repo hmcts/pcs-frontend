@@ -34,6 +34,11 @@ properties([
       defaultValue: true,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
+    booleanParam(
+      name: 'FULL_FUNCTIONAL_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run full functional tests (all Playwright tests, Chromium) and send Slack notification.'
+    ),
   ])
 ])
 
@@ -56,6 +61,9 @@ withNightlyPipeline(type, product, component) {
   }
   afterAlways('FortifyScan') {
     runE2ETests(yarnBuilder)
+    if (params.FULL_FUNCTIONAL_TESTS) {
+      runFullFunctionalTests(yarnBuilder)
+    }
     if (params.ACCESSIBILITY_TESTS) {
       runAccessibilityTests(yarnBuilder)
     }
@@ -110,6 +118,47 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
         artifacts: 'definitions/test/playwright-report/**'
       )
     }
+  }
+}
+
+def runFullFunctionalTests(yarnBuilder) {
+  stage('Full Functional Test') {
+    try {
+      yarnBuilder.yarn('test:fullfunctional')
+    } catch (Error) {
+      unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+    } finally {
+      publishHTML([
+        allowMissing: true,
+        alwaysLinkToLastBuild: true,
+        keepAll: true,
+        reportDir: 'allure-report',
+        reportFiles: 'index.html',
+        reportName: 'PCS Frontend Full Functional Test Report'
+      ])
+      steps.archiveArtifacts(
+        allowEmptyArchive: true,
+        artifacts: 'definitions/test/playwright-report/**'
+      )
+      if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
+        postAllureResultsToSlack('nightly')
+      }
+    }
+  }
+}
+
+def postAllureResultsToSlack(String pipelineType = 'nightly') {
+  def msg = sh(
+    script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true",
+    returnStdout: true
+  ).trim()
+  if (!msg) {
+    msg = "Functional Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend  |  *Pipeline:* ${pipelineType}\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}PCS_20Frontend_20Full_20Functional_20Test_20Report/"
+  }
+  try {
+    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+  } catch (Exception e) {
+    echo "WARNING: Allure Slack notification failed: ${e.message}"
   }
 }
 
