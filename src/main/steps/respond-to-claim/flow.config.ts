@@ -103,7 +103,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'dispute-claim-interstitial',
         },
       ],
-      previousStep: 'contact-preferences',
+      previousStep: 'contact-preferences-email-or-post',
     },
     'contact-preferences-text-message': {
       defaultNext: 'dispute-claim-interstitial',
