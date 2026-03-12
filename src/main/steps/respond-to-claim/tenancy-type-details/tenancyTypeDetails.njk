@@ -1,6 +1,5 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}Contact Preferences - HM Courts & Tribunals Service – GOV.UK{% endblock %}
@@ -14,9 +13,9 @@
     <span class="govuk-caption-xl">{{ caption }}</span>
   {% endif %}
 
-  <h1 class="govuk-heading-l">Tenancy Details(placeholder)</h1>
+  <h1 class="govuk-heading-l">Tenancy type details(placeholder)</h1>
 
-  <p class="govuk-body">This is a placeholder page for tenancy details capture.</p>
+  <p class="govuk-body">This is a placeholder page for tenancy type details.</p>
 
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">
@@ -30,7 +29,6 @@
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
-    {{ csrfProtection(csrfToken) }}
   </form>
 
 {% endblock %}
