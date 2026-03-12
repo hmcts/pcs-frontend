@@ -1,4 +1,4 @@
-export const noticeDetails = {
+export const confirmationOfNoticeGiven = {
   mainHeader: 'Notice details',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
   noticeIsAFormalHintText:
@@ -14,16 +14,8 @@ export const noticeDetails = {
   saveForLaterButton: 'Save for later',
   signOutLink: 'Sign out',
   yesRadioOption: 'Yes',
-  errorValidation: 'YES',
-  errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
-  errorValidationHeader: 'There is a problem',
-  errorValidationField: {
-    errorRadioMsg: [
-      {
-        get errMessage(): string {
-          return `Select if Possession Claims Solicitor Org gave you notice of their intention to begin possession proceedings`;
-        },
-      },
-    ],
+  thereIsAProblemErrorMessageHeader: 'There is a problem',
+  selectIfNoticeOfIntentionGivenErrorMessage(claimantName: string): string {
+    return `Select if ${claimantName} gave you notice of their intention to begin possession proceedings`;
   },
 };

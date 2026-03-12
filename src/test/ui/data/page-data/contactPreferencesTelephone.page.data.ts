@@ -1,4 +1,4 @@
-export const contactByTelephone = {
+export const contactPreferencesTelephone = {
   mainHeader: 'Contact by telephone',
   respondToClaimParagraph: 'Respond to a property possession claim',
   backLink: 'Back',

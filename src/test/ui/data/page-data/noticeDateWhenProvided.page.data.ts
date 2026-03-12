@@ -1,6 +1,6 @@
 import { submitCaseApiData } from '../api-data';
 
-export const noticeDateKnown = {
+export const noticeDateWhenProvided = {
   mainHeader: 'Notice date',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
   backLink: 'Back',
@@ -17,12 +17,8 @@ export const noticeDateKnown = {
   saveAndContinueButton: 'Save and continue',
   saveForLaterButton: 'Save for later',
   signOutLink: 'Sign out',
-  errorValidation: 'YES',
-  errorValidationType: { input: 'textField', radio: 'radioOptions', checkbox: 'checkBox' },
-  errorValidationHeader: 'There is a problem',
-  errorValidationField: {
-    errorRadioMsg: [{ errMessage: 'The date you received notice must either be today’s date or in the past' }],
-  },
+  thereIsAProblemErrorMessageHeader: 'There is a problem',
+  theDateYouReceiveNoticeErrorMessage: 'The date you received notice must either be today’s date or in the past',
 };
 
 export function convertDateFormat(dateString: string): string {

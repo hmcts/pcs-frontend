@@ -5,15 +5,15 @@ import { submitCaseApiData } from '../data/api-data';
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
-  contactByTelephone,
-  contactByTextMessage,
+  confirmationOfNoticeGiven,
   contactPreference,
+  contactPreferencesTelephone,
+  contactPreferencesTextMessage,
   correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
   freeLegalAdvice,
   nonRentArrearsDispute,
-  noticeDetails,
   registeredLandlord,
   startNow,
   tenancyDetails,
@@ -67,10 +67,10 @@ test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectcontactByTelephone', {
-      radioOption: contactByTelephone.yesRadioOption,
-      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', registeredLandlord.mainHeader);
     await performAction('clickButton', registeredLandlord.continueButton);
@@ -78,7 +78,7 @@ test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       isClaimantNameCorrect: submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect,
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);

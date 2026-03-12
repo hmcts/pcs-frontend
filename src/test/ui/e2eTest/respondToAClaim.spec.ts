@@ -3,9 +3,10 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
-  contactByTelephone,
-  contactByTextMessage,
+  confirmationOfNoticeGiven,
   contactPreference,
+  contactPreferencesTelephone,
+  contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
   dateOfBirth,
@@ -13,7 +14,6 @@ import {
   defendantNameConfirmation,
   freeLegalAdvice,
   nonRentArrearsDispute,
-  noticeDetails,
   rentArrearsDispute,
   repaymentsAgreed,
   repaymentsMade,
@@ -84,10 +84,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.yesRadioOption,
-      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -97,7 +97,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyStartDateUnknown.mainHeader);
     await performAction('clickButton', tenancyStartDateUnknown.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
@@ -122,10 +122,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.yesRadioOption,
-      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -135,7 +135,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyStartDateUnknown.mainHeader);
     await performAction('clickButton', tenancyStartDateUnknown.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
@@ -156,10 +156,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.yesRadioOption,
-      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -169,7 +169,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyStartDateUnknown.mainHeader);
     await performAction('clickButton', tenancyStartDateUnknown.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
@@ -203,7 +203,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction(
       'disputeClaimInterstitial',
@@ -214,7 +214,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyStartDateUnknown.mainHeader);
     await performAction('clickButton', tenancyStartDateUnknown.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.imNotSureRadioOption,
+      option: confirmationOfNoticeGiven.imNotSureRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
@@ -243,7 +243,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction(
       'disputeClaimInterstitial',
@@ -254,7 +254,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyStartDateUnknown.mainHeader);
     await performAction('clickButton', tenancyStartDateUnknown.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.noRadioOption,
+      option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
@@ -287,7 +287,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction(
       'disputeClaimInterstitial',
@@ -320,7 +320,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -328,9 +328,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
     });
-    await performValidation('mainHeader', noticeDetails.mainHeader);
+    await performValidation('mainHeader', confirmationOfNoticeGiven.mainHeader);
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
@@ -362,7 +362,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -371,7 +371,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: tenancyDateDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown', {
       day: '25',
@@ -399,7 +399,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -411,7 +411,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       year: '2025',
     });
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.noRadioOption,
+      option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
@@ -441,7 +441,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -450,7 +450,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: tenancyDateDetails.iAmNotSureRadioOption,
     });
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.imNotSureRadioOption,
+      option: confirmationOfNoticeGiven.imNotSureRadioOption,
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
@@ -481,7 +481,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);

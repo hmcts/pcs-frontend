@@ -52,7 +52,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
     const pageNavigated = await detectPageNavigation();
     const executor = getExecutor();
     if (pageNavigated) {
-      if (startAxeAudit && enable_axe_audit) {
+      if (startAxeAudit && enable_axe_audit === 'true') {
         try {
           await new AxeUtils(executor.page).audit({
             exclude: axe_exclusions,
@@ -140,7 +140,7 @@ export async function performValidation(
 
 export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {
   getExecutor();
-  await test.step(`Performed action group: ${groupName}`, async () => {
+  await test.step(`${groupName}`, async () => {
     for (const action of actions) {
       const [actionName, fieldName, value] = action;
       await performAction(actionName, fieldName, value);
@@ -150,7 +150,7 @@ export async function performActions(groupName: string, ...actions: actionTuple[
 
 export async function performValidations(groupName: string, ...validations: validationTuple[]): Promise<void> {
   getExecutor();
-  await test.step(`Performed validation group: ${groupName}`, async () => {
+  await test.step(`${groupName}`, async () => {
     for (const validation of validations) {
       const [validationType, fieldName, data] = validation;
       await performValidation(validationType, fieldName, data);
