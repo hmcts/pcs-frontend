@@ -50,10 +50,10 @@ export interface PossessionClaimResponse {
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
   };
-  paymentAgreement?:{
+  paymentAgreement?: {
     repaymentAgreed?: YesNoNotSureValue;
     repaymentAgreedDetails?: string;
-    }
+  };
 }
 
 export interface StartCallbackData {
