@@ -1,4 +1,5 @@
-import { firstName, lastName } from '../../utils/actions/custom-actions';
+import { firstName, lastName } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+
 export const defendantNameConfirmation = {
   get mainHeader(): string {
     return `Is your name ${firstName} ${lastName}?`;
