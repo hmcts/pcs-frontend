@@ -55,7 +55,7 @@ export class ActionRegistry {
     ['disputeClaimInterstitial', new RespondToClaimAction()],
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['repaymentsMade', new RespondToClaimAction()],
-    ['selectRegisteredLandlord', new RespondToClaimAction()],
+    ['selectLandlordRegistered', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
   ]);
 

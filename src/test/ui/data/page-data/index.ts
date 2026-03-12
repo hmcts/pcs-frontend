@@ -6,7 +6,7 @@ export * from './defendantNameCapture.page.data';
 export * from './dateOfBirth.page.data';
 export * from './correspondenceAddress.page.data';
 export * from './tenancyDetails.page.data';
-export * from './registeredLandlord.page.data';
+export * from './landlordRegistered.page.data';
 export * from './defendantNameConfirmation.page.data';
 export * from './contactPreference.page.data';
 export * from './contactByTelephone.page.data';

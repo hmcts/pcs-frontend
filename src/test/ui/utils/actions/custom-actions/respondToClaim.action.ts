@@ -10,11 +10,11 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  landlordRegistered,
   noticeDateKnown,
   noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
-  registeredLandlord,
   repaymentsMade,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -38,7 +38,7 @@ export class RespondToClaimAction implements IAction {
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
-      ['selectRegisteredLandlord', () => this.selectRegisteredLandlord(fieldName as actionData)],
+      ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -145,12 +145,12 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
-  private async selectRegisteredLandlord(registeredData: actionData): Promise<void> {
+  private async selectLandlordRegistered(registeredData: actionData): Promise<void> {
     await performAction('clickRadioButton', {
-      question: registeredLandlord.isYourLandlordRegisteredQuestion,
+      question: landlordRegistered.isYourLandlordRegisteredQuestion,
       option: registeredData,
     });
-    await performAction('clickButton', registeredLandlord.saveAndContinueButton);
+    await performAction('clickButton', landlordRegistered.saveAndContinueButton);
   }
 
   private async readPaymentInterstitial(): Promise<void> {

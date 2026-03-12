@@ -1,4 +1,4 @@
-export const registeredLandlord = {
+export const landlordRegistered = {
   mainHeader: 'Registered landlord',
   respondToClaimParagraph: 'Respond to a property possession claim',
   backLink: 'Back',
