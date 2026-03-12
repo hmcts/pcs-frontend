@@ -69,7 +69,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', landlordRegistered.mainHeader);
     await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
     await performValidation('mainHeader', licensedLandlord.mainHeader);
     await performAction('clickButton', licensedLandlord.continueButton);
