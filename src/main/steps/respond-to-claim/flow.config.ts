@@ -246,7 +246,10 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: 'tenancy-date-details',
+      previousStep: async (req: Request) => {
+        const tenancyDateKnown = await isTenancyStartDateKnown(req);
+        return tenancyDateKnown ? 'tenancy-date-details' : 'tenancy-date-unknown';
+      },
     },
 
     'confirmation-of-notice-date-when-provided': {
