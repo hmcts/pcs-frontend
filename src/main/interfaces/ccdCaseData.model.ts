@@ -96,17 +96,14 @@ export class CcdCaseModel {
     return this.data.submitDraftAnswers;
   }
 
-  get claimantName(): string | undefined {
-    return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
+  get claimantName(): string {
+    return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
   }
 
   get defendantContactDetailsParty(): CcdDefendantParty {
     return this.data.possessionClaimResponse?.defendantContactDetails?.party ?? ({} as CcdDefendantParty);
   }
 
-  get organisationName(): string {
-    return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
-  }
   get defendantResponses(): CcdDefendantResponses | undefined {
     return this.data.possessionClaimResponse?.defendantResponses ?? undefined;
   }

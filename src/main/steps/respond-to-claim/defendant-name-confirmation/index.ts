@@ -18,10 +18,12 @@ export const step: StepDefinition = createFormStep({
     contactUs: 'contactUs',
   },
   extendGetContent: (req: Request) => {
-    const { defendantContactDetailsPartyName: defendantName, organisationName } = req.res?.locals?.validatedCase ?? {
+    const { defendantContactDetailsPartyName: defendantName, claimantName } = req.res?.locals?.validatedCase ?? {
       defendantContactDetailsPartyName: '',
-      organisationName: '',
+      claimantName: '',
     };
+
+    const organisationName = claimantName || 'Treetops Housing';
 
     return {
       defendantName,

@@ -44,10 +44,10 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    const { claimantName, claimIssueDate } = req.res?.locals?.validatedCase ?? {
-      claimantName: 'Treetops Housing',
-      claimIssueDate: '16th June 2025',
-    };
+    const validatedCase = req.res?.locals?.validatedCase;
+    const claimantName = validatedCase?.claimantName || 'Treetops Housing';
+    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
+
     return {
       claimantName,
       claimIssueDate,
