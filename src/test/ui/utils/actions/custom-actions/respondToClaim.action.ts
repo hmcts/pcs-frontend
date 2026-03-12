@@ -73,12 +73,16 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', dateOfBirth.saveAndContinueButton);
   }
 
-  private async confirmDefendantDetails(confirmDefendantName: actionRecord) {
+  private async confirmDefendantDetails(defendantData: actionRecord) {
     await performAction('clickRadioButton', {
-      question: confirmDefendantName.question,
-      option: confirmDefendantName.option,
+      question: defendantData.question,
+      option: defendantData.option,
     });
-    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    if (defendantData.option === defendantNameConfirmation.noRadioOption) {
+      await this.inputDefendantDetails(defendantData);
+    } else {
+      await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    }
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
