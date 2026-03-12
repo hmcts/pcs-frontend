@@ -1,5 +1,3 @@
-import { isMobilePhone } from 'validator';
-
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
@@ -9,10 +7,12 @@ import { flowConfig } from '../flow.config';
 export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-telephone',
   journeyFolder: 'respondToClaim',
+  showCancelButton: false,
   stepDir: __dirname,
   flowConfig,
 
   translationKeys: {
+    caption: 'caption',
     pageTitle: 'pageTitle',
     heading: 'heading',
     content: 'subtitle',
@@ -26,6 +26,7 @@ export const step: StepDefinition = createFormStep({
       translationKey: {
         label: 'labels.question',
       },
+      isPageHeading: false,
       options: [
         {
           value: 'yes',
@@ -36,6 +37,7 @@ export const step: StepDefinition = createFormStep({
               name: 'phoneNumber',
               type: 'text',
               required: true,
+              labelClasses: 'govuk-!-font-weight-bold',
               translationKey: {
                 label: 'labels.phoneNumberLabel',
               },
@@ -44,10 +46,21 @@ export const step: StepDefinition = createFormStep({
                 autocomplete: 'tel',
               },
               validator: (value: unknown) => {
-                if (!isMobilePhone(value as string, 'en-GB')) {
-                  return 'errors.contactByTelephone.phoneNumber.invalid';
+                const phone = (value as string)?.trim();
+
+                const normalized = phone.replace(/\s+/g, '');
+
+                const mobileRegex = /^07\d{9}$/;
+
+                const landlineRegex = /^0[12]\d{8,9}$/;
+
+                const businessRegex = /^0[389]\d{9}$/;
+
+                if (mobileRegex.test(normalized) || landlineRegex.test(normalized) || businessRegex.test(normalized)) {
+                  return true;
                 }
-                return true;
+
+                return 'errors.contactByTelephone.phoneNumber.invalid';
               },
             },
           },
@@ -65,11 +78,19 @@ export const step: StepDefinition = createFormStep({
     if (!telephoneForm) {
       return;
     }
+
+    const existingPhoneNumber =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.phoneNumber;
+
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {
         party: {
           phoneNumber:
-            telephoneForm.contactByTelephone === 'yes' ? telephoneForm['contactByTelephone.phoneNumber'] : undefined,
+            telephoneForm.contactByTelephone === 'yes'
+              ? telephoneForm['contactByTelephone.phoneNumber']
+              : existingPhoneNumber
+                ? ''
+                : undefined,
         },
       },
       defendantResponses: {

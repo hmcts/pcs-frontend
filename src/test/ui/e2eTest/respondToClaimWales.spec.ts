@@ -5,6 +5,8 @@ import { submitCaseApiData } from '../data/api-data';
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
+  contactByTelephone,
+  contactByTextMessage,
   contactPreference,
   correspondenceAddress,
   dateOfBirth,
@@ -17,8 +19,11 @@ import {
   tenancyDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import { ErrorMessageValidation } from '../utils/validations/element-validations';
-import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
+import {
+  ErrorMessageValidation,
+  PageContentValidation,
+  PageNavigationValidation,
+} from '../utils/validations/custom-validations';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -38,11 +43,12 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async () => {
   PageContentValidation.finaliseTest();
   ErrorMessageValidation.finaliseTest();
+  PageNavigationValidation.finaliseTest();
 });
 
 //Following test is skipped due to accessibility issue(HDPI-4571) in the registered landlord page which is blocking the flow.
 test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales @noDefendants', async () => {
+  test('Respond to a claim - Wales @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameInputText,
@@ -60,6 +66,11 @@ test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectcontactByTelephone', {
+      radioOption: contactByTelephone.yesRadioOption,
+      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', registeredLandlord.mainHeader);
     await performAction('clickButton', registeredLandlord.continueButton);

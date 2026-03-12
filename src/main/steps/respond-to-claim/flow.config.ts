@@ -91,7 +91,19 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'contact-preferences-telephone',
     },
     'contact-preferences-telephone': {
-      defaultNext: 'contact-preferences-text-message',
+      routes: [
+        {
+          condition: async (req: Request) =>
+            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'yes',
+          nextStep: 'contact-preferences-text-message',
+        },
+        {
+          condition: async (req: Request) =>
+            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'no',
+          nextStep: 'dispute-claim-interstitial',
+        },
+      ],
+      previousStep: 'contact-preferences',
     },
     'contact-preferences-text-message': {
       defaultNext: 'dispute-claim-interstitial',
@@ -99,18 +111,16 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial': {
       routes: [
         {
-          // Route to defendant name confirmation if defendant is known
           condition: async (req: Request) => isWelshProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          // Route to defendant name capture if defendant is unknown
-          condition: async (req: Request) => !isWelshProperty(req),
+          condition: async (req: Request) => !(await isWelshProperty(req)),
           nextStep: 'tenancy-details',
         },
       ],
-      defaultNext: 'tenancy-details',
     },
+
     'landlord-registered': {
       defaultNext: 'tenancy-details',
     },

@@ -117,7 +117,7 @@ const httpTelemetryConfig: HttpTelemetryConfig = {
 };
 
 export function initializeTelemetry(): void {
-  if (isTelemetryInitialized) {
+  if (isTelemetryInitialized || !config.get('appInsights.enabled')) {
     return;
   }
 
@@ -141,7 +141,7 @@ export function initializeTelemetry(): void {
 }
 
 export async function flushTelemetry(timeoutMs = 3000): Promise<void> {
-  if (!isTelemetryInitialized) {
+  if (!isTelemetryInitialized || !config.get('appInsights.enabled')) {
     return;
   }
 
