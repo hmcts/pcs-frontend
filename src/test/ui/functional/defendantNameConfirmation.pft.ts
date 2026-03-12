@@ -1,4 +1,5 @@
 import { defendantNameCapture, defendantNameConfirmation } from '../data/page-data';
+import { defendantNameCaptureInputValuesPrePopulated } from './defendantNameCapture.pft';
 import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(61);
@@ -42,4 +43,14 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
     header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
     message: defendantNameCapture.enterFirstNameMaxLengthErrorMessage,
   });
+
+
+
+export async function defendantNameConfirmationNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', defendantNameConfirmation.backLink, freeLegalAdvice.mainHeader);
+  await performAction('clickRadioButton', {
+    question: defendantNameConfirmation.mainHeader,
+    option: defendantNameConfirmation.noRadioOption,
+  });
+  await defendantNameCaptureInputValuesPrePopulated();
 }
