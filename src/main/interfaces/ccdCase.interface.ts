@@ -70,15 +70,15 @@ export interface CcdDefendantParty {
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
   receivedFreeLegalAdvice?: string;
+  confirmNoticeGiven?: string;
+  tenancyStartDateCorrect?: string;
+  tenancyStartDate?: string;
   contactByPhone?: YesNoValue;
   contactByEmail?: YesNoValue;
   contactByPost?: YesNoValue;
   contactByText?: YesNoValue;
-  /** User's confirmation of notice given: yes / no / imNotSure. Persisted for resume-after-logout routing. */
-  confirmNoticeGiven?: string;
 }
 
-/** Possession claim response block inside case_data. */
 export interface PossessionClaimResponse {
   claimantOrganisations?: CcdClaimantOrganisation[];
   defendantContactDetails?: {
@@ -106,7 +106,6 @@ export interface CcdCaseData {
   occupationLicenceTypeWales?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
-  /** Present when submitting response to claim (e.g. "Yes" / "No"). */
   submitDraftAnswers?: string;
 }
 
@@ -144,7 +143,6 @@ export interface CcdCaseDetails {
   delete_draft_response_status?: unknown;
 }
 
-/** Full CCD START event-trigger response (e.g. respondPossessionClaim). */
 export interface StartCallbackData {
   token: string;
   _links: CcdStartCallbackLinks;

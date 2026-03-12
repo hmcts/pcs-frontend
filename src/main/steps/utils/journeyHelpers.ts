@@ -2,14 +2,18 @@ import { Request } from 'express';
 
 import { isNoticeDateProvided } from './isNoticeDateProvided';
 import { isNoticeServed } from './isNoticeServed';
+import { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 
 export async function getPreviousPageForArrears(req: Request): Promise<string> {
   const noticeServed = await isNoticeServed(req);
   const noticeDateProvided = await isNoticeDateProvided(req);
-  const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+  const tenancyStartDateKnown = await isTenancyStartDateKnown(req);
+  const confirmNoticeGivenValue = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+  const confirmNoticeGiven =
+    typeof confirmNoticeGivenValue === 'string' ? confirmNoticeGivenValue.toLowerCase() : undefined;
 
   // User rejected or unsure about notice: back to the question page (CCD-backed, survives logout)
-  if ((confirmNoticeGiven === 'no' || confirmNoticeGiven === 'imNotSure') && noticeServed) {
+  if ((confirmNoticeGiven === 'no' || confirmNoticeGiven === 'imnotsure') && noticeServed) {
     return 'confirmation-of-notice-given';
   }
 
@@ -21,5 +25,9 @@ export async function getPreviousPageForArrears(req: Request): Promise<string> {
     return 'confirmation-of-notice-date-when-not-provided';
   }
 
-  return 'tenancy-details';
+  if (tenancyStartDateKnown) {
+    return 'tenancy-date-details';
+  }
+
+  return 'tenancy-date-unknown';
 }

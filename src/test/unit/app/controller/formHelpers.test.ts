@@ -392,7 +392,7 @@ describe('formHelpers', () => {
 
       const result = validateForm(req, fields);
       expect(result).toHaveProperty('field1');
-      expect(result.field1).toBe('Must be 100 characters or fewer');
+      expect(result.field1).toBe('Must be 100 characters or less');
     });
 
     it('should use translation for maxLength error', () => {

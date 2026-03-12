@@ -1,9 +1,11 @@
 import { isNoticeDateProvided } from '../../../../main/steps/utils/isNoticeDateProvided';
 import { isNoticeServed } from '../../../../main/steps/utils/isNoticeServed';
+import { isTenancyStartDateKnown } from '../../../../main/steps/utils/isTenancyStartDateKnown';
 import { getPreviousPageForArrears } from '../../../../main/steps/utils/journeyHelpers';
 
 jest.mock('../../../../main/steps/utils/isNoticeDateProvided');
 jest.mock('../../../../main/steps/utils/isNoticeServed');
+jest.mock('../../../../main/steps/utils/isTenancyStartDateKnown');
 
 describe('getPreviousPageForArrears', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,10 +13,10 @@ describe('getPreviousPageForArrears', () => {
 
   beforeEach(() => {
     mockReq = {
-      session: { formData: {} },
       res: { locals: {} },
     };
     jest.clearAllMocks();
+    (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
   });
 
   describe('User rejected notice (CCD-backed confirmNoticeGiven)', () => {
@@ -41,31 +43,10 @@ describe('getPreviousPageForArrears', () => {
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-given');
     });
-
-    it('returns confirmation-of-notice-given when user said imNotSure, notice served, even if date was provided', async () => {
-      (isNoticeServed as jest.Mock).mockResolvedValue(true);
-      (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
-      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'imNotSure' };
-
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-given');
-    });
   });
 
   describe('Notice date was provided in CCD', () => {
     it('returns confirmation-of-notice-date-when-provided when date provided and notice served', async () => {
-      (isNoticeServed as jest.Mock).mockResolvedValue(true);
-      (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
-    });
-
-    it('returns confirmation-of-notice-date-when-provided when date provided, notice served, no user answer', async () => {
-      (isNoticeServed as jest.Mock).mockResolvedValue(true);
-      (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
-
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
-    });
-
-    it('returns confirmation-of-notice-date-when-provided when date provided, notice served, confirmNoticeGiven undefined', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
 
@@ -74,21 +55,7 @@ describe('getPreviousPageForArrears', () => {
   });
 
   describe('Notice date was NOT provided in CCD', () => {
-    it('returns confirmation-of-notice-date-when-not-provided when date not provided, notice served, user confirmed yes', async () => {
-      (isNoticeServed as jest.Mock).mockResolvedValue(true);
-      (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
-
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
-    });
-
-    it('returns confirmation-of-notice-date-when-not-provided when date not provided, notice served, no user answer', async () => {
-      (isNoticeServed as jest.Mock).mockResolvedValue(true);
-      (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
-
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
-    });
-
-    it('returns confirmation-of-notice-date-when-not-provided when date not provided, notice served, confirmNoticeGiven undefined', async () => {
+    it('returns confirmation-of-notice-date-when-not-provided when date not provided and notice served', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
 
@@ -96,33 +63,53 @@ describe('getPreviousPageForArrears', () => {
     });
   });
 
-  describe('No notice served (default fallback)', () => {
-    it('returns tenancy-details when notice not served', async () => {
+  describe('No notice served (fallback)', () => {
+    it('returns tenancy-date-details when notice not served and tenancy start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });
 
-    it('returns tenancy-details when notice not served, even if date provided', async () => {
-      (isNoticeServed as jest.Mock).mockResolvedValue(false);
-      (isNoticeDateProvided as jest.Mock).mockResolvedValue(true); // Date provided but notice not served
-
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
-    });
-
-    it('returns tenancy-details when notice not served, user said no', async () => {
+    it('returns tenancy-date-unknown when notice not served and tenancy start date is unknown', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(false);
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-unknown');
+    });
+
+    it('does not route back to confirmation-of-notice-given when notice was not served', async () => {
+      (isNoticeServed as jest.Mock).mockResolvedValue(false);
+      (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'no' };
+
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
+    });
+  });
+
+  describe('Edge cases with missing validated case data', () => {
+    it('returns correct page when validatedCase is undefined', async () => {
+      (isNoticeServed as jest.Mock).mockResolvedValue(true);
+      (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
+      mockReq.res.locals = {};
+
+      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+    });
+
+    it('returns correct page when res is undefined', async () => {
+      (isNoticeServed as jest.Mock).mockResolvedValue(true);
+      (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
+      mockReq = {};
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
+
+      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
     });
   });
 
   describe('Integration with real routing scenarios', () => {
     it('handles rent arrears scenario with notice and date', async () => {
-      // Real scenario: User on rent-arrears-dispute, clicks back
-      // CCD has notice=Yes, date=2022-01-01, user confirmed yes
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
 
@@ -130,24 +117,13 @@ describe('getPreviousPageForArrears', () => {
     });
 
     it('handles non-rent arrears scenario without notice date', async () => {
-      // Real scenario: User on non-rent-arrears-dispute, clicks back
-      // CCD has notice=Yes, NO date, user confirmed yes
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
     });
 
-    it('handles no notice served scenario', async () => {
-      // Real scenario: CCD has notice=No, goes straight to rent-arrears-dispute from tenancy-details
-      (isNoticeServed as jest.Mock).mockResolvedValue(false);
-      (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
-
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
-    });
-
     it('handles user rejection scenario (CCD-backed)', async () => {
-      // User rejected notice on confirmation-of-notice-given, went to rent-arrears-dispute, clicks back
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'no' };

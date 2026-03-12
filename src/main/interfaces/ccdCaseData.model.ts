@@ -88,6 +88,25 @@ export class CcdCaseModel {
     return this.data.licenceStartDate;
   }
 
+  /**
+   * Combined tenancy/licence start date used in respondent flows.
+   *
+   * England: tenancy_TenancyLicenceDate
+   * Wales: licenceStartDate
+   */
+  get tenancyStartDate(): string | undefined {
+    return this.tenancy_TenancyLicenceDate ?? this.licenceStartDate;
+  }
+
+  /**
+   * Convenience boolean for routing decisions that depend on whether
+   * a tenancy/licence start date exists in CCD.
+   */
+  get hasTenancyStartDate(): boolean {
+    const start = this.tenancyStartDate;
+    return !!(start && start.trim());
+  }
+
   get possessionClaimResponse(): PossessionClaimResponse | undefined {
     return this.data.possessionClaimResponse;
   }
@@ -106,6 +125,14 @@ export class CcdCaseModel {
 
   get defendantResponses(): CcdDefendantResponses | undefined {
     return this.data.possessionClaimResponse?.defendantResponses ?? undefined;
+  }
+
+  get defendantResponsesTenancyStartDateCorrect(): string | undefined {
+    return this.defendantResponses?.tenancyStartDateCorrect ?? undefined;
+  }
+
+  get defendantResponsesTenancyStartDate(): string | undefined {
+    return this.defendantResponses?.tenancyStartDate ?? undefined;
   }
 
   get defendantResponsesReceivedFreeLegalAdvice(): string | undefined {
@@ -144,6 +171,10 @@ export class CcdCaseModel {
     return this.defendantResponses?.contactByPost ?? undefined;
   }
 
+  get defendantContactDetailsPartyPhoneNumber(): string | undefined {
+    return this.defendantContactDetailsParty.phoneNumber ?? undefined;
+  }
+
   get defendantContactDetailsPartyName(): string {
     return this.defendantContactDetailsParty.firstName && this.defendantContactDetailsParty.lastName
       ? `${this.defendantContactDetailsParty.firstName} ${this.defendantContactDetailsParty.lastName}`
@@ -161,5 +192,22 @@ export class CcdCaseModel {
       return undefined;
     }
     return String(raw).toLowerCase();
+  }
+
+  /**
+   * First provided notice date from CCD case data, regardless of channel.
+   *
+   * Order of precedence:
+   * - notice_NoticeHandedOverDateTime (hand delivered)
+   * - notice_NoticePostedDate (posted)
+   * - notice_NoticeOtherElectronicDateTime (electronic)
+   */
+  get noticeDate(): string | undefined {
+    return (
+      this.notice_NoticeHandedOverDateTime ||
+      this.notice_NoticePostedDate ||
+      this.notice_NoticeOtherElectronicDateTime ||
+      undefined
+    );
   }
 }

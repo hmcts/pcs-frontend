@@ -39,12 +39,7 @@ export const step: StepDefinition = createFormStep({
     const validatedCase = req.res?.locals?.validatedCase;
     const claimantName = validatedCase?.claimantName;
 
-    // Check all possible notice date fields (different service methods use different fields)
-    const noticeDateRaw =
-      validatedCase?.notice_NoticeHandedOverDateTime || // Hand delivered
-      validatedCase?.notice_NoticePostedDate || // Posted
-      validatedCase?.notice_NoticeOtherElectronicDateTime || // Electronic
-      '';
+    const noticeDateRaw = validatedCase?.noticeDate || '';
 
     // Format the date for display (e.g., "1 January 2024")
     const noticeDate = noticeDateRaw

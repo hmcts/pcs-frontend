@@ -7,17 +7,17 @@ import { createGetController, createStepNavigation } from '@modules/steps';
 import { getDashboardUrl } from '@routes/dashboard';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
-const stepName = 'tenancy-details';
+const stepName = 'tenancy-date-unknown';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/tenancy-details`,
+  url: `${RESPOND_TO_CLAIM_ROUTE}/tenancy-date-unknown`,
   name: stepName,
-  view: 'respond-to-claim/tenancy-details/tenancyDetails.njk',
+  view: 'respond-to-claim/tenancy-date-unknown/tenancyDateUnknown.njk',
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'respond-to-claim/tenancy-details/tenancyDetails.njk',
+      'respond-to-claim/tenancy-date-unknown/tenancyDateUnknown.njk',
       stepName,
       async (req: Request) => {
         const backUrl = await stepNavigation.getBackUrl(req, stepName);
