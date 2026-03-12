@@ -13,7 +13,7 @@ import {
 } from '../services/pcsApi';
 
 import { Logger } from '@modules/logger';
-import { formatAddressParts } from '@utils/addressFormatter';
+import { arrayToString } from '@utils/arrayToString';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -34,7 +34,7 @@ function getPropertyAddressFromValidatedCase(validatedCase: CcdCase): string | n
     return null;
   }
 
-  const formatted = formatAddressParts([
+  const formatted = arrayToString([
     address.AddressLine1,
     address.AddressLine2,
     address.AddressLine3,
@@ -151,7 +151,10 @@ export default function dashboardRoutes(app: Application): void {
 
     const caseReferenceNumber = Number(validatedCase.id);
     const propertyAddress = getPropertyAddressFromValidatedCase(validatedCase);
-    const dashboardCaseReference = toCaseReference16(validatedCase.id);
+    const rawDashboardCaseReference = toCaseReference16(validatedCase.id);
+    const dashboardCaseReference = rawDashboardCaseReference
+      ? rawDashboardCaseReference.replace(/(\d{4})(?=\d)/g, '$1 ')
+      : null;
 
     try {
       const [notifications, taskGroups] = await Promise.all([
