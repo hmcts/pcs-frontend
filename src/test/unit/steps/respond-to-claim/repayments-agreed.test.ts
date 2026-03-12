@@ -1,4 +1,3 @@
-import type { Request } from 'express';
 import type { Environment } from 'nunjucks';
 
 jest.mock('../../../../main/modules/steps/i18n', () => ({
@@ -70,7 +69,8 @@ import { step } from '../../../../main/steps/respond-to-claim/repayments-agreed'
 describe('respond-to-claim repayments-agreed step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
-  const createReq = (overrides: Record<string, unknown> = {}): Request =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const createReq = (overrides: Record<string, unknown> = {}): any =>
     ({
       body: {},
       originalUrl: '/case/1234567890123456/respond-to-claim/repayments-agreed',
@@ -87,7 +87,7 @@ describe('respond-to-claim repayments-agreed step', () => {
       i18n: { getResourceBundle: jest.fn(() => ({})) },
       res: { locals: { validatedCase: { id: '1234567890123456' } } },
       ...overrides,
-    }) as unknown as Request;
+    }) as any;
 
   beforeEach(() => {
     jest.clearAllMocks();
