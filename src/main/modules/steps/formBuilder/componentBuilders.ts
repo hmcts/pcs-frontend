@@ -14,12 +14,13 @@ import { buildSubFieldsHTML } from './subFieldsRenderer';
 function createFieldsetLegend(
   label: string,
   isFirstField: boolean,
-  legendClasses?: string
+  legendClasses?: string,
+  isPageHeading?: boolean
 ): { legend: { text: string; isPageHeading: boolean; classes: string } } {
   return {
     legend: {
       text: label,
-      isPageHeading: isFirstField,
+      isPageHeading: isPageHeading || false,
       classes: legendClasses || (isFirstField ? 'govuk-fieldset__legend--l' : ''),
     },
   };
@@ -54,12 +55,6 @@ export function buildComponentConfig(
   switch (field.type) {
     case 'text': {
       component.value = (fieldValue as string) || '';
-      if (field.enableErrorClearing) {
-        component.attributes = {
-          ...(component.attributes as Record<string, unknown>),
-          'data-enable-error-clearing': 'true',
-        };
-      }
       componentType = 'input';
       break;
     }
@@ -68,9 +63,7 @@ export function buildComponentConfig(
       component.value = (fieldValue as string) || '';
       component.rows = textareaAttributes.rows || 5;
       component.maxlength = field.maxLength || null;
-      component.attributes = field.enableErrorClearing
-        ? { ...textareaAttributes, 'data-enable-error-clearing': 'true' }
-        : textareaAttributes;
+      component.attributes = textareaAttributes;
       componentType = 'textarea';
       break;
     }
@@ -79,9 +72,7 @@ export function buildComponentConfig(
       component.value = (fieldValue as string) || '';
       component.rows = charCountAttributes.rows || 5;
       component.maxlength = field.maxLength;
-      component.attributes = field.enableErrorClearing
-        ? { ...charCountAttributes, 'data-enable-error-clearing': 'true' }
-        : charCountAttributes;
+      component.attributes = charCountAttributes;
       component.label = {
         text: label,
         isPageHeading: isFirstField,

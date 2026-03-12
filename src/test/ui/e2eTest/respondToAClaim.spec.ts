@@ -3,6 +3,8 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  contactByTelephone,
+  contactByTextMessage,
   contactPreference,
   correspondenceAddress,
   counterClaim,
@@ -19,8 +21,11 @@ import {
   tenancyDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import { ErrorMessageValidation } from '../utils/validations/element-validations';
-import { PageContentValidation } from '../utils/validations/element-validations/pageContent.validation';
+import {
+  ErrorMessageValidation,
+  PageContentValidation,
+  PageNavigationValidation,
+} from '../utils/validations/custom-validations';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -51,6 +56,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 test.afterEach(async () => {
   PageContentValidation.finaliseTest();
   ErrorMessageValidation.finaliseTest();
+  PageNavigationValidation.finaliseTest();
 });
 
 //@noDefendants(submitCasePayloadNoDefendants) represents all defendant details unknown pages and non-rent arrears
@@ -75,6 +81,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.yesRadioOption,
+      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -106,6 +117,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.yesRadioOption,
+      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -135,6 +151,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.yesRadioOption,
+      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -174,7 +195,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
+    await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
+    });
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -211,6 +236,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
+    });
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -252,6 +280,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
+    });
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -279,6 +310,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
+    });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
@@ -315,6 +349,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
+    });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
@@ -344,7 +381,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
+    await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
+    });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
@@ -378,6 +419,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
+    });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
@@ -412,6 +456,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', contactPreference.mainHeader);
     await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactByTelephone.noRadioOption,
+    });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);

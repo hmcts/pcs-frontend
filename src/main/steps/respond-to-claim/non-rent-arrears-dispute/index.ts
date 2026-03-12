@@ -38,7 +38,6 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: (req: Request) => {
     const claimantName = getClaimantName(req);
-
     const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
 
     // i18next automatically interpolates variables and applies formatters in translation strings
@@ -71,7 +70,6 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'disputeDetails.label',
               },
-              enableErrorClearing: true,
               attributes: {
                 rows: 5,
               },

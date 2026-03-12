@@ -36,11 +36,17 @@ withPipeline(type, product, component) {
   env.CASE_TYPE_ID = "PCS"
   onPR() {
     env.FUNCTIONAL_TEST_SCOPE = '@PR'
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_all_page_functional_tests").size() > 0) {
+      env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
+    }
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_content_validation").size() > 0) {
+      env.ENABLE_CONTENT_VALIDATION = 'true'
+    }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_error_messages_validation").size() > 0) {
       env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
     }
-    else {
-      env.ENABLE_ERROR_MESSAGES_VALIDATION = 'false'
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_navigation_tests").size() > 0) {
+      env.ENABLE_NAVIGATION_TESTS = 'true'
     }
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     def apiLabels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pcs-api-pr:")
@@ -64,6 +70,7 @@ withPipeline(type, product, component) {
   }
 
   onMaster() {
+    env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'false'
     env.FUNCTIONAL_TEST_SCOPE = '@regression'
     env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
     enablePactAs([

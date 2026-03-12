@@ -69,8 +69,7 @@ export interface FormFieldConfig {
   // For date fields: if true, disallows future and current dates
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
-  // Enable real-time error clearing when user starts typing valid content
-  enableErrorClearing?: boolean;
+  isPageHeading?: boolean;
 }
 
 export interface TranslationKeys {
