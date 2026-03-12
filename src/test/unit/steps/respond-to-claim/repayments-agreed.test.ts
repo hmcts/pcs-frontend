@@ -70,24 +70,23 @@ describe('respond-to-claim repayments-agreed step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const createReq = (overrides: Record<string, unknown> = {}): any =>
-    ({
-      body: {},
-      originalUrl: '/case/1234567890123456/respond-to-claim/repayments-agreed',
-      query: { lang: 'en' },
-      params: { caseReference: '1234567890123456' },
-      session: {
-        formData: {},
-        ccdCase: {
-          id: '1234567890123456',
-          data: { claimantName: 'Treetops Housing', claimIssueDate: '20th May 2025' },
-        },
+  const createReq = (overrides: Record<string, unknown> = {}): any => ({
+    body: {},
+    originalUrl: '/case/1234567890123456/respond-to-claim/repayments-agreed',
+    query: { lang: 'en' },
+    params: { caseReference: '1234567890123456' },
+    session: {
+      formData: {},
+      ccdCase: {
+        id: '1234567890123456',
+        data: { claimantName: 'Treetops Housing', claimIssueDate: '20th May 2025' },
       },
-      app: { locals: { nunjucksEnv } },
-      i18n: { getResourceBundle: jest.fn(() => ({})) },
-      res: { locals: { validatedCase: { id: '1234567890123456' } } },
-      ...overrides,
-    }) as any;
+    },
+    app: { locals: { nunjucksEnv } },
+    i18n: { getResourceBundle: jest.fn(() => ({})) },
+    res: { locals: { validatedCase: { id: '1234567890123456' } } },
+    ...overrides,
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();

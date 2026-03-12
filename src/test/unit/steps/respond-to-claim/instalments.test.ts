@@ -75,22 +75,21 @@ describe('respond-to-claim instalments step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const createReq = (overrides: Record<string, unknown> = {}): any =>
-    ({
-      body: {},
-      originalUrl: '/case/1234567890123456/respond-to-claim/instalments',
-      query: { lang: 'en' },
-      params: { caseReference: '1234567890123456' },
-      session: {
-        formData: {},
-        ccdCase: { id: '1234567890123456' },
-      },
-      app: { locals: { nunjucksEnv } },
-      i18n: { getResourceBundle: jest.fn(() => ({})) },
-      res: { locals: { validatedCase: { id: '1234567890123456' } } },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ...overrides,
-    }) as any;
+  const createReq = (overrides: Record<string, unknown> = {}): any => ({
+    body: {},
+    originalUrl: '/case/1234567890123456/respond-to-claim/instalments',
+    query: { lang: 'en' },
+    params: { caseReference: '1234567890123456' },
+    session: {
+      formData: {},
+      ccdCase: { id: '1234567890123456' },
+    },
+    app: { locals: { nunjucksEnv } },
+    i18n: { getResourceBundle: jest.fn(() => ({})) },
+    res: { locals: { validatedCase: { id: '1234567890123456' } } },
+
+    ...overrides,
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -170,4 +169,3 @@ describe('respond-to-claim instalments step', () => {
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 });
-
