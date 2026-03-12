@@ -41,6 +41,10 @@ export interface FormFieldConfig {
   options?: FormFieldOption[];
   classes?: string;
   attributes?: Record<string, unknown>;
+  // Optional prefix for input fields (e.g. currency symbol)
+  prefix?: {
+    text: string;
+  };
   legendClasses?: string;
   // Pre-built component config for Nunjucks template rendering
   component?: Record<string, unknown>;
