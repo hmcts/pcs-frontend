@@ -66,8 +66,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -102,8 +102,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -138,8 +138,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails');
     await performAction('selectCorrespondenceAddressUnKnown', {
@@ -179,8 +179,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -222,8 +222,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails');
     await performAction('selectCorrespondenceAddressUnKnown', {
@@ -259,8 +259,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('England - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
@@ -291,7 +291,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
-      option: defendantNameConfirmation.yesRadioOption,
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
