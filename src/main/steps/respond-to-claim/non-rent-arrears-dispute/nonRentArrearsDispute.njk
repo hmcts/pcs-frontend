@@ -1,48 +1,55 @@
-{% extends "layouts/main.njk" %}
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
-  {{ t('pageTitle') }}
+  {{ heading }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
 
-{% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {% include "includes/caption.njk" %}
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
 
-      <form method="post" novalidate>
-        {{ csrfProtection(csrfToken) }}
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
 
-        {% if fields %}
-          {% for field in fields %}
-            {% if field.componentType === 'radios' %}
-              {{ govukRadios(field.component) }}
-            {% elif field.componentType === 'character-count' %}
-              {{ govukCharacterCount(field.component) }}
-            {% endif %}
-          {% endfor %}
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  <p class="govuk-body">{{ introParagraph | safe }}</p>
+
+  <p class="govuk-body govuk-!-font-weight-bold">{{ includesHeading }}</p>
+
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+    <li>{{ includesBullet1 | safe }}</li>
+    <li>{{ includesBullet2 }}</li>
+    <li>{{ includesBullet3 }}</li>
+  </ul>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.component and field.componentType %}
+        {% if field.componentType == 'radios' %}
+          {{ govukRadios(field.component) }}
+        {% elif field.componentType == 'characterCount' %}
+          {{ govukCharacterCount(field.component) }}
         {% endif %}
+      {% endif %}
+    {% endfor %}
 
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: saveAndContinue,
-            type: 'submit',
-            name: 'saveAndContinue',
-            value: 'true'
-          }) }}
-
-          {{ govukButton({
-            text: saveForLater,
-            type: 'submit',
-            name: 'saveForLater',
-            value: 'true',
-            classes: 'govuk-button--secondary'
-          }) }}
-        </div>
-      </form>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: saveAndContinue,
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      {{ govukButton({
+        text: saveForLater,
+        classes: 'govuk-button--secondary',
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+      }) }}
     </div>
-  </div>
+  </form>
 {% endblock %}

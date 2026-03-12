@@ -4,7 +4,7 @@ import type { FormFieldValue } from '../../../interfaces/formFieldConfig.interfa
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'non-rent-arrears-dispute',
@@ -15,6 +15,12 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    heading: 'heading',
+    introParagraph: 'introParagraph',
+    includesHeading: 'includesHeading',
+    includesBullet1: 'includesBullet1',
+    includesBullet2: 'includesBullet2',
+    includesBullet3: 'includesBullet3',
   },
   ccdMapping: {
     backendPath: 'possessionClaimResponse.defendantResponses',
@@ -68,10 +74,21 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
+    const caseReference = req.params.caseReference;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
 
+    // Use getTranslationFunction to properly set up namespace
+    const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
+
+    // Interpolate claimantName into translation strings (like dispute-claim-interstitial)
     return {
       claimantName,
+      caseReference,
+      introParagraph: t('introParagraph', { caseReference }),
+      includesHeading: t('includesHeading'),
+      includesBullet1: t('includesBullet1', { claimantName }),
+      includesBullet2: t('includesBullet2'),
+      includesBullet3: t('includesBullet3'),
     };
   },
   fields: [
@@ -86,13 +103,14 @@ export const step: StepDefinition = createFormStep({
       options: [
         {
           value: 'yes',
-          translationKey: 'options.yes',
+          translationKey: 'disputeOtherPartsOptions.yes',
           subFields: {
             disputeDetails: {
               name: 'disputeDetails',
               type: 'character-count',
               required: true,
               maxLength: 6500,
+              errorMessage: 'errors.disputeDetails',
               translationKey: {
                 label: 'disputeDetails.label',
                 hint: 'disputeDetails.hint',
@@ -102,7 +120,7 @@ export const step: StepDefinition = createFormStep({
         },
         {
           value: 'no',
-          translationKey: 'options.no',
+          translationKey: 'disputeOtherPartsOptions.no',
         },
       ],
     },
