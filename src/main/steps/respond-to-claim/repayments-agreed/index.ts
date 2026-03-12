@@ -66,7 +66,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
+      paymentAgreement: {
         repaymentAgreed:
           repaymentsForm.repaymentsAgreed === 'yes'
             ? 'YES'

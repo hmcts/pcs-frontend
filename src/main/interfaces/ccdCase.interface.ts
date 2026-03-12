@@ -49,9 +49,11 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
+  };
+  paymentAgreement?:{
     repaymentAgreed?: YesNoNotSureValue;
     repaymentAgreedDetails?: string;
-  };
+    }
 }
 
 export interface StartCallbackData {
