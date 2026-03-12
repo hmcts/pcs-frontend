@@ -253,27 +253,30 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> => hasOnlyRentArrearsGrounds(req),
+          condition: (req: Request): Promise<boolean> => hasOnlyRentArrearsGrounds(req),
           nextStep: 'counter-claim',
         },
         {
-          condition: async (req: Request): Promise<boolean> => !hasOnlyRentArrearsGrounds(req),
+          condition: async (req: Request): Promise<boolean> => !(await hasOnlyRentArrearsGrounds(req)),
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
     },
     'non-rent-arrears-dispute': {
       defaultNext: 'counter-claim',
-      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
-    },
-    'counter-claim': {
-      defaultNext: 'payment-interstitial',
-      previousStep: async (req: Request, _formData: Record<string, unknown>) => {
+      previousStep: async (req: Request) => {
         const rentArrearsClaim = await isRentArrearsClaim(req);
         if (rentArrearsClaim) {
           return 'rent-arrears-dispute';
         }
-        return 'non-rent-arrears-dispute';
+        return getPreviousPageForArrears(req);
+      },
+    },
+    'counter-claim': {
+      defaultNext: 'payment-interstitial',
+      previousStep: async (req: Request) => {
+        const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
+        return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
     'payment-interstitial': {
