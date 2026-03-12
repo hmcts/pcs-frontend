@@ -1,6 +1,7 @@
-import { defendantNameCapture, defendantNameConfirmation } from '../data/page-data';
-import { defendantNameCaptureInputValuesPrePopulated } from './defendantNameCapture.pft';
+import { defendantNameConfirmation, freeLegalAdvice } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
+
+import { defendantNameCaptureInputValuesPrePopulated } from './defendantNameCapture.pft';
 
 const overMaxLengthString = 'A'.repeat(61);
 export async function defendantNameConfirmationErrorValidation(): Promise<void> {
@@ -22,30 +23,28 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
     message: defendantNameConfirmation.enterYourLastNameErrorMessage,
   });
   //Test: First name empty and last name over max length
-  await performAction('inputText', defendantNameCapture.lastNameTextLabel, overMaxLengthString);
-  await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, overMaxLengthString);
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
-    message: defendantNameCapture.enterYourFirstNameErrorMessage,
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterYourFirstNameErrorMessage,
   });
   await performValidation('errorMessage', {
-    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
-    message: defendantNameCapture.enterLastNameMaxLengthErrorMessage,
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterLastNameMaxLengthErrorMessage,
   });
   //Test: Both first name and last name over max length
-  await performAction('inputText', defendantNameCapture.firstNameTextLabel, overMaxLengthString);
-  await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, overMaxLengthString);
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
-    message: defendantNameCapture.enterFirstNameMaxLengthErrorMessage,
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
   });
   await performValidation('errorMessage', {
-    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
-    message: defendantNameCapture.enterFirstNameMaxLengthErrorMessage,
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
   });
-
-
-
+}
 export async function defendantNameConfirmationNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', defendantNameConfirmation.backLink, freeLegalAdvice.mainHeader);
   await performAction('clickRadioButton', {

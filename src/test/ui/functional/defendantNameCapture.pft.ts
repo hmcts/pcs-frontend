@@ -1,4 +1,4 @@
-import { defendantNameCapture } from '../data/page-data';
+import { defendantNameCapture, freeLegalAdvice } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(61);
@@ -31,24 +31,24 @@ export async function defendantNameCaptureErrorValidation(): Promise<void> {
     header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
     message: defendantNameCapture.enterFirstNameMaxLengthErrorMessage,
   });
-
+}
 export async function defendantNameCaptureNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', defendantNameConfirmation.backLink, freeLegalAdvice.mainHeader);
+  await performValidation('pageNavigation', defendantNameCapture.backLink, freeLegalAdvice.mainHeader);
   await defendantNameCaptureInputValuesPrePopulated();
 }
 
 export async function defendantNameCaptureInputValuesPrePopulated(): Promise<void> {
-  await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantNameCapture.firstNameInputText);
-  await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantNameCapture.lastNameInputText);
+  await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantNameCapture.firstNameTextInput);
+  await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantNameCapture.lastNameTextInput);
   await performValidation('pageNavigation', freeLegalAdvice.saveForLaterButton, 'Dashboard');
   await performValidation(
     'inputTextValue',
-    defendantNameCapture.firstNameLabelText,
-    defendantNameCapture.firstNameInputText
+    defendantNameCapture.firstNameTextLabel,
+    defendantNameCapture.firstNameTextInput
   );
   await performValidation(
     'inputTextValue',
-    defendantNameCapture.lastNameLabelText,
-    defendantNameCapture.lastNameInputText
+    defendantNameCapture.lastNameTextLabel,
+    defendantNameCapture.lastNameTextInput
   );
 }
