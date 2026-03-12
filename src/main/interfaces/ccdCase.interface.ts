@@ -51,7 +51,7 @@ export interface PossessionClaimResponse {
     contactByText?: YesNoValue;
   };
   paymentAgreement?: {
-    repaymentAgreed?: YesNoNotSureValue;
+    repaymentPlanAgreed?: YesNoNotSureValue;
     repaymentAgreedDetails?: string;
   };
 }
