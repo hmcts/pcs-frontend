@@ -2,6 +2,8 @@ import { Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
 import {
+  contactByTelephone,
+  contactByTextMessage,
   correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
@@ -13,6 +15,7 @@ import {
   noticeDetails,
   paymentInterstitial,
   repaymentsMade,
+  tenancyDateDetails,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -27,6 +30,9 @@ export class RespondToClaimAction implements IAction {
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
       ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
+      ['selectContactByTelephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
+      ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionData)],
+      ['selectTenancyStartDateKnown', () => this.selectTenancyStartDateKnown(fieldName as actionRecord)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
@@ -50,8 +56,8 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {
-    await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantData.fName);
-    await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantData.lName);
+    await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantData.fName);
+    await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantData.lName);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
@@ -67,12 +73,16 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', dateOfBirth.saveAndContinueButton);
   }
 
-  private async confirmDefendantDetails(confirmDefendantName: actionRecord) {
+  private async confirmDefendantDetails(defendantData: actionRecord) {
     await performAction('clickRadioButton', {
-      question: confirmDefendantName.question,
-      option: confirmDefendantName.option,
+      question: defendantData.question,
+      option: defendantData.option,
     });
-    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    if (defendantData.option === defendantNameConfirmation.noRadioOption) {
+      await this.inputDefendantDetails(defendantData);
+    } else {
+      await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    }
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
@@ -107,6 +117,25 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
+  private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: contactByTelephone.areYouHappyToContactQuestion,
+      option: contactByPhoneData.radioOption,
+    });
+    if (contactByPhoneData.radioOption === contactByTelephone.yesRadioOption) {
+      await performAction('inputText', contactByTelephone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.phoneNumber);
+    }
+    await performAction('clickButton', contactByTelephone.saveAndContinueButton);
+  }
+
+  private async selectContactByTextMessage(contactData: actionData): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: contactByTextMessage.contactByTextMessageQuestion,
+      option: contactData,
+    });
+    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
+  }
+
   private async disputeClaimInterstitial(isClaimantNameCorrect: actionData) {
     if (isClaimantNameCorrect === 'YES') {
       claimantsName = submitCaseApiData.submitCasePayload.claimantName;
@@ -134,6 +163,24 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  }
+
+  private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
+    const getDetailsGivenByParagraph = tenancyDateDetails.getDetailsGivenByParagraph(claimantsName);
+    await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
+    await performAction('clickRadioButton', {
+      question: tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion,
+      option: tenancyStartDateData.option,
+    });
+    if (tenancyStartDateData?.day && tenancyStartDateData?.month && tenancyStartDateData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', tenancyDateDetails.dayHiddenTextLabel, tenancyStartDateData.day],
+        ['inputText', tenancyDateDetails.monthHiddenTextLabel, tenancyStartDateData.month],
+        ['inputText', tenancyDateDetails.yearHiddenTextLabel, tenancyStartDateData.year]
+      );
+    }
+    await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {

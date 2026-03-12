@@ -20,4 +20,6 @@ export const contactPreference = {
   selectHowYouWantToReceiveUpdatesErrorMessage: `Select how you want to receive updates`,
   enterEmailAddressErrorMessage: 'Enter your email address',
   invalidEmailAddressErrorMessage: 'Enter an email address in the correct format, like name@example.com',
+  mainHeader: 'Contact Preferences',
+  saveAndContinueButton: 'Save and continue',
 };

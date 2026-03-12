@@ -22,6 +22,10 @@
   },
   "node-env": "NODE_ENV",
   "use-ssl": "USE_SSL",
+  "appInsights": {
+    "insightname": "OTEL_SERVICE_NAME",
+    "enabled": "OTEL_ENABLED"
+  },
   "session": {
     "prefix": "REDIS_SESSION_PREFIX",
     "redis": {
@@ -39,13 +43,15 @@
     "key": "S2S_KEY"
   },
   "ccd": {
-    "url": "CCD_URL"
+    "url": "CCD_URL",
+    "caseTypeId": "CASE_TYPE_ID"
   },
   "oidc": {
     "issuer": "OIDC_ISSUER",
     "clientId": "OIDC_CLIENT_ID",
     "redirectUri": "OIDC_REDIRECT_URI",
-    "scope": "OIDC_SCOPE"
+    "scope": "OIDC_SCOPE",
+    "accessTokenEarlyRefreshSeconds": "OIDC_ACCESS_TOKEN_EARLY_REFRESH_SECONDS"
   },
   "e2e": {
     "testUrl": "TEST_URL",

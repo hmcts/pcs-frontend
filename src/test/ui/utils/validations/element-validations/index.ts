@@ -1,5 +1,4 @@
 export * from '../../../utils/validations/element-validations/bannerAlert.validation';
-export * from '../../../utils/validations/element-validations/error-message.validation';
 export * from '../../../utils/validations/element-validations/formLabelValue.validation';
 export * from './inputError.validation';
 export * from '../../../utils/validations/element-validations/optionList.validation';
@@ -7,3 +6,4 @@ export * from '../../../utils/validations/element-validations/pageHeader.validat
 export * from '../../../utils/validations/element-validations/radioButton.validation';
 export * from '../../../utils/validations/element-validations/text.validation';
 export * from '../../../utils/validations/element-validations/visibility.validation';
+export * from '../../../utils/validations/element-validations/inputTextValue.validation';

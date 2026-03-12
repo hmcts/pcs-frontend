@@ -69,6 +69,7 @@ export interface FormFieldConfig {
   // For date fields: if true, disallows future and current dates
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
+  isPageHeading?: boolean;
 }
 
 export interface TranslationKeys {
@@ -98,6 +99,7 @@ export interface FormBuilderConfig {
   journeyFolder: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
+  beforeGet?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
   stepDir: string;
   translationKeys?: TranslationKeys;
