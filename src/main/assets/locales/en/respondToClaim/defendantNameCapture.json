@@ -7,6 +7,8 @@
   "contactUs": "Contact us for help",
   "errors": {
     "firstName": "Enter your first name",
-    "lastName": "Enter your last name"
+    "firstNameMaxLength": "First name must be 60 characters or less",
+    "lastName": "Enter your last name",
+    "lastNameMaxLength": "Last name must be 60 characters or less"
   }
 }
