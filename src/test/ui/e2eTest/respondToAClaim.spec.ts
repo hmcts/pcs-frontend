@@ -305,7 +305,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
-      option: defendantNameConfirmation.yesRadioOption,
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameCapture.firstNameInputText,
+      lName: defendantNameCapture.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: dateOfBirth.dayInputText,
