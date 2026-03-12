@@ -130,19 +130,12 @@ export const flowConfig: JourneyFlowConfig = {
     'tenancy-type-details': {
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> => isTenancyStartDateKnown(req),
+          condition: async (req: Request) => isTenancyStartDateKnown(req),
           nextStep: 'tenancy-date-details',
         },
         {
-          condition: async (req: Request): Promise<boolean> => !(await isTenancyStartDateKnown(req)),
+          condition: async (req: Request) => !isTenancyStartDateKnown(req),
           nextStep: 'tenancy-date-unknown',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
-            return !rentArrears;
-          },
-          nextStep: 'non-rent-arrears-dispute',
         },
       ],
       previousStep: async (req: Request, formData: Record<string, unknown>) => {
@@ -160,6 +153,10 @@ export const flowConfig: JourneyFlowConfig = {
         return 'dispute-claim-interstitial';
       },
     },
+    'tenancy-date-unknown': {
+      defaultNext: 'confirmation-of-notice-given',
+      previousStep: 'tenancy-type-details',
+    },
     'tenancy-date-details': {
       routes: [
         {
@@ -173,11 +170,14 @@ export const flowConfig: JourneyFlowConfig = {
           },
           nextStep: 'rent-arrears-dispute',
         },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
       ],
-      previousStep: 'tenancy-type-details',
-    },
-    'tenancy-date-unknown': {
-      defaultNext: 'confirmation-of-notice-given',
       previousStep: 'tenancy-type-details',
     },
     'confirmation-of-notice-given': {
@@ -228,8 +228,8 @@ export const flowConfig: JourneyFlowConfig = {
         },
       ],
       previousStep: async (req: Request) => {
-        const tenancyStartDateKnown = await isTenancyStartDateKnown(req);
-        return tenancyStartDateKnown ? 'tenancy-date-details' : 'tenancy-date-unknown';
+        const tenancyDateKnown = await isTenancyStartDateKnown(req);
+        return tenancyDateKnown ? 'tenancy-date-details' : 'tenancy-date-unknown';
       },
     },
 
