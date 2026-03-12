@@ -1,0 +1,61 @@
+import type { Request, Response } from 'express';
+
+import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { getDashboardUrl } from '../../../routes/dashboard';
+import { safeRedirect303 } from '../../../utils/safeRedirect';
+import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+
+import { createGetController, createStepNavigation } from '@modules/steps';
+
+const stepName = 'tenancy-date-unknown';
+const stepNavigation = createStepNavigation(flowConfig);
+
+export const step: StepDefinition = {
+  url: `${RESPOND_TO_CLAIM_ROUTE}/tenancy-date-unknown`,
+  name: stepName,
+  view: 'respond-to-claim/tenancy-date-unknown/tenancyDateUnknown.njk',
+  stepDir: __dirname,
+  getController: () => {
+    return createGetController(
+      'respond-to-claim/tenancy-date-unknown/tenancyDateUnknown.njk',
+      stepName,
+      async (req: Request) => {
+        const backUrl = await stepNavigation.getBackUrl(req, stepName);
+        const nextStepUrl = await stepNavigation.getNextStepUrl(req, stepName, {});
+        return {
+          backUrl,
+          nextStepUrl,
+          url: req.originalUrl,
+        };
+      },
+      'respondToClaim'
+    );
+  },
+  postController: {
+    post: async (req: Request, res: Response) => {
+      const action = req.body?.action;
+
+      // Handle saveForLater action
+      if (action === 'saveForLater') {
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
+
+        if (!dashboardUrl) {
+          // No valid case reference - redirect to home
+          return safeRedirect303(res, '/', '/', ['/']);
+        }
+
+        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
+      }
+
+      // Handle continue action - go to next step
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
+
+      if (!redirectPath) {
+        return res.status(404).render('not-found');
+      }
+
+      safeRedirect303(res, redirectPath, '/', ['/case/']);
+    },
+  },
+};
