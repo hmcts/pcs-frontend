@@ -4,6 +4,8 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../../HttpError';
 import { getTranslationFunction, populateCommonTranslations } from '../i18n';
 
+import { authFailure } from './authFailure';
+
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('error-handler');
@@ -28,9 +30,9 @@ function getErrorMessages(status: number, t: TFunction): { title: string; paragr
 }
 
 export function createNotFoundHandler(): (req: Request, res: Response, next: NextFunction) => void {
-  return (_req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     if (!res.headersSent && !(res as { writableEnded?: boolean }).writableEnded) {
-      const url = _req.originalUrl || 'Unknown URL';
+      const url = req.originalUrl || 'Unknown URL';
       // Skip logging for common browser/dev tools requests that generate harmless 404s
       const shouldSkipLogging = url.startsWith('/.well-known/') || url.startsWith('/favicon.ico');
 
@@ -82,6 +84,9 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
 }
 
 export function setupErrorHandlers(app: Express, env: string): void {
+  // Auth failure handler - catches 401 errors and redirects to login
+  // This must be before other error handlers to catch 401s before they're rendered as error pages
+  app.use(authFailure);
   app.use(createNotFoundHandler());
   app.use(createErrorHandler(env));
 }

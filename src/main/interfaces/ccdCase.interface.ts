@@ -3,7 +3,9 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'Yes' | 'No' | null;
+export type YesNoValue = 'YES' | 'NO' | null;
+
+export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
 
 export interface CcdUserCase {
   id: string;
@@ -39,29 +41,33 @@ export interface PossessionClaimResponse {
       firstName?: string;
       lastName?: string;
       address?: Address;
+      phoneNumberProvided?: YesNoValue;
+      phoneNumber?: string;
     };
   };
   defendantResponses?: {
-    oweRentArrears?: 'YES' | 'NO' | 'NOT_SURE';
+    contactByPhone?: YesNoValue;
+    contactByEmail?: YesNoValue;
+    contactByPost?: YesNoValue;
+    contactByText?: YesNoValue;
+    rentArrearsAmountConfirmation?: YesNoNotSureValue;
     rentArrearsAmount?: string;
   };
 }
 
-export interface StartCallbackData {
-  case_details: {
-    case_data: {
-      possessionClaimResponse?: {
-        defendantContactDetails?: {
-          party?: {
-            address?: Address;
-          };
-        };
-      };
-    };
+export interface ClaimGroundSummary {
+  value?: {
+    isRentArrears?: string;
   };
 }
 
-export interface CcdCaseData {
-  claimDueToRentArrears?: 'Yes' | 'No';
-  hasOtherAdditionalGrounds?: 'Yes' | 'No';
+export interface CaseData {
+  claimGroundSummaries?: ClaimGroundSummary[];
+  possessionClaimResponse?: PossessionClaimResponse;
+}
+
+export interface StartCallbackData {
+  case_details: {
+    case_data: CaseData;
+  };
 }

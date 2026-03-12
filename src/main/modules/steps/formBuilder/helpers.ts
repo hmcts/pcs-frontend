@@ -373,25 +373,28 @@ export function validateForm(
       if (field.validator && value !== undefined && value !== null && value !== '') {
         try {
           const validatorResult = field.validator(value, formData, validationAllData);
+
           if (validatorResult !== true) {
-            // Use translated error message if available, otherwise use validator result or default
-            // Don't use field.errorMessage directly as it's a translation key, not a translated message
-            const translatedMsg = translations?.[fieldName];
-            let errorMsg: string | undefined = translatedMsg;
+            let errorMsg: string;
 
-            if (!errorMsg && typeof validatorResult === 'string') {
-              errorMsg = translateErrorKey(validatorResult, translations, t);
-            }
-
-            if (!errorMsg) {
+            // Use translation function if available, else translations map, else fallback
+            if (typeof validatorResult === 'string') {
+              errorMsg = t ? t(validatorResult) : translations?.[validatorResult] || validatorResult;
+            } else {
               errorMsg = 'Invalid value';
             }
+
+            // Only set if there isn't already an error
             if (!errors[fieldName]) {
               errors[fieldName] = errorMsg;
+
               // Debug logging
-              if (!translatedMsg && parentFieldName) {
+              const translatedMsg = translations?.[fieldName];
+              if (!translatedMsg) {
                 logger.debug(
-                  `No translation found for subField ${fieldName}. Available keys: ${Object.keys(translations || {}).join(', ')}`
+                  `No translation found for validator of field "${fieldName}". Available keys: ${Object.keys(
+                    translations || {}
+                  ).join(', ')}`
                 );
               }
             }

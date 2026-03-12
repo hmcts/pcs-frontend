@@ -18,20 +18,20 @@ export const step: StepDefinition = createFormStep({
     caption: 'captionHeading',
   },
   beforeRedirect: async (req: Request) => {
-    const oweRentArrearsRaw = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
+    const rentArrearsAmountConfirmationRaw = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
     const rentArrearsAmountRaw = req.body?.['rentArrears.rentArrearsAmountCorrection'] as string | undefined;
 
-    const oweRentArrears =
-      oweRentArrearsRaw === 'yes'
+    const rentArrearsAmountConfirmation =
+      rentArrearsAmountConfirmationRaw === 'yes'
         ? 'YES'
-        : oweRentArrearsRaw === 'no'
+        : rentArrearsAmountConfirmationRaw === 'no'
           ? 'NO'
-          : oweRentArrearsRaw === 'notSure'
+          : rentArrearsAmountConfirmationRaw === 'notSure'
             ? 'NOT_SURE'
             : undefined;
 
     let rentArrearsAmount: string | undefined;
-    if (oweRentArrearsRaw === 'no' && rentArrearsAmountRaw) {
+    if (rentArrearsAmountConfirmationRaw === 'no' && rentArrearsAmountRaw) {
       const amountInPounds = parseFloat(rentArrearsAmountRaw.replace(/,/g, ''));
       if (!Number.isNaN(amountInPounds)) {
         rentArrearsAmount = String(Math.round(amountInPounds * 100));
@@ -40,12 +40,12 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        oweRentArrears,
+        rentArrearsAmountConfirmation,
         ...(rentArrearsAmount !== undefined && { rentArrearsAmount }),
       },
     };
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: (req: Request) => {
     const claimantName = getClaimantName(req);
