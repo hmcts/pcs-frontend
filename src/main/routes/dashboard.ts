@@ -151,7 +151,10 @@ export default function dashboardRoutes(app: Application): void {
 
     const caseReferenceNumber = Number(validatedCase.id);
     const propertyAddress = getPropertyAddressFromValidatedCase(validatedCase);
-    const dashboardCaseReference = toCaseReference16(validatedCase.id);
+    const rawDashboardCaseReference = toCaseReference16(validatedCase.id);
+    const dashboardCaseReference = rawDashboardCaseReference
+      ? rawDashboardCaseReference.replace(/(\d{4})(?=\d)/g, '$1 ')
+      : null;
 
     try {
       const [notifications, taskGroups] = await Promise.all([
