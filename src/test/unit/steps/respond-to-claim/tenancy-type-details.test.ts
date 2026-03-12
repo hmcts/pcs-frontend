@@ -43,8 +43,8 @@ describe('respond-to-claim tenancy-type-details step', () => {
       ['yes', 'YES'],
       ['no', 'NO'],
       ['notSure', 'NOT_SURE'],
-      ['maybe', null],
-      [undefined, null],
+      ['maybe', undefined],
+      [undefined, undefined],
     ])('maps tenancyTypeConfirm=%s to tenancyTypeCorrect=%s', async (tenancyTypeConfirm, tenancyTypeCorrect) => {
       const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
 

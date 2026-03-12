@@ -49,12 +49,26 @@ const fieldsConfig: FormFieldConfig[] = [
 ];
 
 const STEP_NAME = 'tenancy-type-details';
+
+const TENANCY_TYPE_CONFIRM_TO_CCD: Record<string, TenancyTypeCorrectValue> = {
+  yes: 'YES',
+  no: 'NO',
+  notSure: 'NOT_SURE',
+};
+
+const CCD_TO_TENANCY_TYPE_CONFIRM: Record<Exclude<TenancyTypeCorrectValue, null>, string> = {
+  YES: 'yes',
+  NO: 'no',
+  NOT_SURE: 'notSure',
+};
+
 const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   ASSURED_TENANCY: 'an assured',
   SECURE_TENANCY: 'a secure',
   INTRODUCTORY_TENANCY: 'an introductory',
   FLEXIBLE_TENANCY: 'a flexible',
   DEMOTED_TENANCY: 'a demoted',
+  OTHER: 'other',
 };
 
 export const step: StepDefinition = createFormStep({
@@ -72,17 +86,11 @@ export const step: StepDefinition = createFormStep({
     detailsHeading: 'detailsHeading',
     tenancyType: 'tenancyType',
   },
+  customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
   beforeRedirect: async req => {
     const tenancyTypeConfirm = req.body?.tenancyTypeConfirm as string | undefined;
-    const tenancyTypeCorrect: TenancyTypeCorrectValue =
-      tenancyTypeConfirm === 'yes'
-        ? 'YES'
-        : tenancyTypeConfirm === 'no'
-          ? 'NO'
-          : tenancyTypeConfirm === 'notSure'
-            ? 'NOT_SURE'
-            : null;
+    const tenancyTypeCorrect = tenancyTypeConfirm ? TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm] : undefined;
     const correctedTenancyTypeText = (
       (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
       (req.body?.correctType as string | undefined)
@@ -112,13 +120,7 @@ export const step: StepDefinition = createFormStep({
       ?.defendantResponses?.tenancyType as string | undefined;
     const tenancyTypeConfirm =
       (req.body?.tenancyTypeConfirm as string | undefined) ||
-      (existingTenancyTypeCorrect === 'YES'
-        ? 'yes'
-        : existingTenancyTypeCorrect === 'NO'
-          ? 'no'
-          : existingTenancyTypeCorrect === 'NOT_SURE'
-            ? 'notSure'
-            : undefined);
+      (existingTenancyTypeCorrect ? CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect] : undefined);
     const correctType =
       (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
       (req.body?.correctType as string | undefined) ||
@@ -129,6 +131,9 @@ export const step: StepDefinition = createFormStep({
     const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as
       | string
       | undefined;
+    const otherTenancyTypeDetails = req.res?.locals.validatedCase?.data?.tenancy_DetailsOfOtherTypeOfTenancyLicence as
+      | string
+      | undefined;
     const tenancyTypeAgreementType = tenancyTypeOfTenancyLicence
       ? TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence] || 'an assured'
       : 'an assured';
@@ -137,11 +142,17 @@ export const step: StepDefinition = createFormStep({
       typeof formContent.detailsHeading === 'string'
         ? `${formContent.detailsHeading}${orgName}${':'}`
         : formContent.detailsHeading;
+    const tenancyType =
+      tenancyTypeOfTenancyLicence === 'OTHER'
+        ? `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${
+            otherTenancyTypeDetails || ''
+          }`
+        : formContent.tenancyType;
 
     return {
       ...formContent,
-      captionClasses: 'govuk-caption-xl',
       detailsHeading,
+      tenancyType,
       organisationName: orgName,
       orgname: orgName,
       tenancyTypeAgreementType,
