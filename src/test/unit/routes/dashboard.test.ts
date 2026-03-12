@@ -181,7 +181,7 @@ describe('Dashboard Routes', () => {
         'dashboard',
         expect.objectContaining({
           propertyAddress: '10 Second Avenue, London, W3 7RX',
-          dashboardCaseReference: '1234567890123456',
+          dashboardCaseReference: '1234 5678 9012 3456',
         })
       );
 
