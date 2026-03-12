@@ -29,6 +29,9 @@ export class OIDCLocalModule {
     this.logger.warn('🔧 LOCAL DEV MODE: Using password grant flow with IDAM simulator');
     app.set('trust proxy', true);
 
+    // Register this module in app.locals so middleware can access it
+    app.locals.oidc = this;
+
     // Login form
     app.get('/login', (req: Request, res: Response) => {
       if (req.query.returnTo) {
@@ -110,7 +113,7 @@ export class OIDCLocalModule {
           }
 
           const tokens = await response.json();
-          const { access_token, id_token, refresh_token } = tokens;
+          const { access_token, id_token } = tokens;
 
           const userInfoEndpoint = `${this.oidcConfig.issuer}/userinfo`;
           const userInfoResponse = await fetch(userInfoEndpoint, {
@@ -124,10 +127,11 @@ export class OIDCLocalModule {
 
           const userInfo = await userInfoResponse.json();
 
+          // In local dev, store access_token as refreshToken so refreshUserTokens() can return it
           req.session.user = {
             accessToken: access_token,
             idToken: id_token,
-            refreshToken: refresh_token,
+            refreshToken: access_token, // Store access token here for refresh method
             ...userInfo,
           };
 
@@ -155,5 +159,28 @@ export class OIDCLocalModule {
         res.redirect(callbackUrl.origin);
       });
     });
+  }
+
+  /**
+   * Token refresh for local development
+   *
+   * In local dev, we store the access_token as the refreshToken during login.
+   * This method simply returns that access token back, effectively doing nothing
+   * but satisfying the middleware's expectation of a refresh operation.
+   *
+   * Since local tokens don't expire, this is a no-op that returns the same tokens.
+   */
+  public async refreshUserTokens(refreshToken: string): Promise<{
+    accessToken: string;
+    refreshToken?: string;
+    idToken?: string;
+    accessTokenExp?: number;
+  }> {
+    this.logger.debug('Token refresh in local dev - returning same access token');
+    // refreshToken IS the access token in local dev (see login code above)
+    return {
+      accessToken: refreshToken, // Return the access token that was passed in
+      refreshToken: refreshToken, // Keep the same "refresh" token
+    };
   }
 }
