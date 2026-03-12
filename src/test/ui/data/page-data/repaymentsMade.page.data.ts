@@ -1,5 +1,7 @@
 export const repaymentsMade = {
-  mainHeader: 'Have you paid any money to Treetops Housing since 16th June 2025?',
+  getmainHeader: (claimantName: string): string => {
+    return `Have you paid any money to ${claimantName} since`;
+  },
   respondToClaimParagraph: 'Respond to a property possession claim',
   yesRadioOption: 'Yes',
   noRadioOption: 'No',
