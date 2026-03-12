@@ -18,6 +18,7 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
+  tenancyDateDetails,
   tenancyDetails,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -92,6 +93,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -128,6 +134,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -160,6 +167,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -203,6 +215,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
@@ -241,6 +254,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.noRadioOption,
     });
@@ -283,6 +301,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('enterTenancyStartDetailsUnKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
   });
@@ -311,7 +330,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performValidation('mainHeader', noticeDetails.mainHeader);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -350,6 +369,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -384,6 +404,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performAction('selectNoticeDetails', {
       option: noticeDetails.noRadioOption,
     });
@@ -420,6 +441,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });
@@ -457,6 +479,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateDetails.continueButton);
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
