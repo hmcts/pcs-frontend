@@ -3,13 +3,8 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import * as jose from 'jose';
 
 import { Logger } from '@modules/logger';
-import type { OIDCConfig } from '@modules/oidc/config.interface';
 
 const logger = Logger.getLogger('oidcMiddleware');
-
-// Use the same environment detection pattern as modules/index.ts
-const oidcConfig: OIDCConfig = config.get<OIDCConfig>('oidc');
-const isLocalDevelopment = oidcConfig.issuer.includes('localhost');
 
 // In-memory map to prevent parallel refresh attempts for the same session
 const refreshInProgress = new Map<string, Promise<void>>();
@@ -121,12 +116,6 @@ export const oidcMiddleware: RequestHandler = async (
       // Start new refresh
       const refreshPromise = (async () => {
         try {
-          // Skip token refresh in local development (uses password grant flow, no refresh tokens)
-          if (isLocalDevelopment) {
-            logger.debug('Token refresh skipped in local development mode');
-            return;
-          }
-
           const oidcModule = req.app.locals.oidc;
           if (!oidcModule) {
             throw new Error('OIDC module not available in app.locals');
