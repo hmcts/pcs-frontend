@@ -6,6 +6,8 @@ import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-n
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
 import { step as contactPreferences } from './contact-preferences';
+import { step as contactPreferencesTelephone } from './contact-preferences-telephone';
+import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
 import { step as yourCircumstances } from './current-circumstances';
@@ -30,7 +32,9 @@ import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
-import { step as tenancyDetails } from './tenancy-details';
+import { step as tenancyDateDetails } from './tenancy-date-details';
+import { step as tenancyDateUnknown } from './tenancy-date-unknown';
+import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 
 export const stepRegistry: Record<string, StepDefinition> = {
@@ -41,9 +45,13 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
   'contact-preferences': contactPreferences,
+  'contact-preferences-telephone': contactPreferencesTelephone,
+  'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
-  'tenancy-details': tenancyDetails,
+  'tenancy-type-details': tenancyTypeDetails,
+  'tenancy-date-unknown': tenancyDateUnknown,
+  'tenancy-date-details': tenancyDateDetails,
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
   'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
   'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,

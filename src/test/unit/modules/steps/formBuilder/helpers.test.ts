@@ -420,6 +420,59 @@ describe('formBuilder helpers', () => {
     });
   });
 
+  describe('getCustomErrorTranslations - field-specific maxLength', () => {
+    const createMockT = (translations: Record<string, string> = {}) => {
+      return jest.fn((key: string) => translations[key] || key) as unknown as TFunction;
+    };
+
+    it('should map errors.<field>MaxLength to <field>.maxLength', () => {
+      const mockT = createMockT({
+        'errors.firstNameMaxLength': 'First name must be 60 characters or less',
+      });
+
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'firstName',
+          type: 'text',
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+      expect(result).toEqual({
+        'firstName.maxLength': 'First name must be 60 characters or less',
+      });
+    });
+
+    it('should map maxLength for nested subFields using nested field name', () => {
+      const mockT = createMockT({
+        'errors.firstNameMaxLength': 'First name must be 60 characters or less',
+      });
+
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'nameConfirmation',
+          type: 'radio',
+          options: [
+            {
+              value: 'no',
+              subFields: {
+                firstName: {
+                  name: 'firstName',
+                  type: 'text',
+                },
+              },
+            },
+          ],
+        },
+      ];
+
+      const result = getCustomErrorTranslations(mockT, fields);
+      expect(result).toEqual({
+        'nameConfirmation.firstName.maxLength': 'First name must be 60 characters or less',
+      });
+    });
+  });
+
   describe('getFormData', () => {
     it('should return form data from session', () => {
       const req = {
@@ -1048,6 +1101,60 @@ describe('formBuilder helpers', () => {
         const errors = validateForm(req, fields, translations);
         expect(errors.name).toBe('Must be 10 characters or fewer');
       });
+
+      it('should use field-specific maxLength translation when available', () => {
+        const req = createMockRequest({
+          name: 'This is a very long name',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'name',
+            type: 'text',
+            maxLength: 10,
+          },
+        ];
+
+        const translations = {
+          'name.maxLength': 'Name must be 10 characters or less',
+          defaultMaxLength: 'Must be {max} characters or fewer',
+        };
+
+        const errors = validateForm(req, fields, translations);
+        expect(errors.name).toBe('Name must be 10 characters or less');
+      });
+
+      it('should use nested field-specific maxLength translation for subFields when available', () => {
+        const req = createMockRequest({
+          contactMethod: 'email',
+          'contactMethod.emailAddress': '123456',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'contactMethod',
+            type: 'radio',
+            options: [
+              {
+                value: 'email',
+                subFields: {
+                  emailAddress: {
+                    name: 'emailAddress',
+                    type: 'text',
+                    maxLength: 5,
+                  },
+                },
+              },
+            ],
+          },
+        ];
+
+        const translations = {
+          'contactMethod.emailAddress.maxLength': 'Email address must be 5 characters or less',
+          defaultMaxLength: 'Must be {max} characters or fewer',
+        };
+
+        const errors = validateForm(req, fields, translations);
+        expect(errors['contactMethod.emailAddress']).toBe('Email address must be 5 characters or less');
+      });
     });
 
     describe('validator function', () => {
@@ -1107,21 +1214,25 @@ describe('formBuilder helpers', () => {
 
       it('should use translations for validator error messages', () => {
         const req = createMockRequest({
-          age: '15',
+          age: '15', // under 18
         });
+
         const fields: FormFieldConfig[] = [
           {
             name: 'age',
             type: 'text',
-            validator: () => false,
+            validator: value => (parseInt(value as string, 10) >= 18 ? true : 'errors.age'),
           },
         ];
 
-        const translations = {
+        const translations: Record<string, string> = {
           age: 'Age validation failed',
         };
 
-        const errors = validateForm(req, fields, translations);
+        const mockT = ((key: string) => translations[key.replace('errors.', '')] || key) as unknown as TFunction;
+
+        const errors = validateForm(req, fields, translations, undefined, mockT);
+
         expect(errors.age).toBe('Age validation failed');
       });
 
@@ -1363,6 +1474,86 @@ describe('formBuilder helpers', () => {
 
         const errors = validateForm(req, fields, translations);
         expect(errors['contactMethod.emailAddress']).toBe('Email address is required');
+      });
+    });
+
+    describe('nested date subField validation', () => {
+      const nestedDateFields: FormFieldConfig[] = [
+        {
+          name: 'confirmTenancyDate',
+          type: 'radio',
+          options: [
+            {
+              value: 'no',
+              subFields: {
+                tenancyStartDate: {
+                  name: 'tenancyStartDate',
+                  type: 'date',
+                  required: true,
+                  noFutureDate: true,
+                },
+              },
+            },
+          ],
+        },
+      ];
+
+      it('should return error for nested date subfield when parent option is selected and date is empty', () => {
+        const req = createMockRequest({
+          confirmTenancyDate: 'no',
+          'confirmTenancyDate.tenancyStartDate-day': '',
+          'confirmTenancyDate.tenancyStartDate-month': '',
+          'confirmTenancyDate.tenancyStartDate-year': '',
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeDefined();
+      });
+
+      it('should pass validation for nested date subfield when date is valid', () => {
+        const req = createMockRequest({
+          confirmTenancyDate: 'no',
+          'confirmTenancyDate.tenancyStartDate-day': '15',
+          'confirmTenancyDate.tenancyStartDate-month': '6',
+          'confirmTenancyDate.tenancyStartDate-year': '2020',
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeUndefined();
+      });
+
+      it('should not validate nested date subfield when parent option is not selected', () => {
+        const req = createMockRequest({
+          confirmTenancyDate: 'yes',
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeUndefined();
+      });
+
+      it('should return error for incomplete nested date (missing day)', () => {
+        const req = createMockRequest({
+          confirmTenancyDate: 'no',
+          'confirmTenancyDate.tenancyStartDate-day': '',
+          'confirmTenancyDate.tenancyStartDate-month': '6',
+          'confirmTenancyDate.tenancyStartDate-year': '2020',
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeDefined();
+      });
+
+      it('should return error for future nested date when noFutureDate is set', () => {
+        const futureYear = new Date().getFullYear() + 1;
+        const req = createMockRequest({
+          confirmTenancyDate: 'no',
+          'confirmTenancyDate.tenancyStartDate-day': '15',
+          'confirmTenancyDate.tenancyStartDate-month': '6',
+          'confirmTenancyDate.tenancyStartDate-year': futureYear.toString(),
+        });
+
+        const errors = validateForm(req, nestedDateFields);
+        expect(errors['confirmTenancyDate.tenancyStartDate']).toBeDefined();
       });
     });
 

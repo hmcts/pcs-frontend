@@ -34,6 +34,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     journeyFolder,
     fields,
     beforeRedirect,
+    beforeGet,
     extendGetContent,
     stepDir,
     translationKeys,
@@ -78,6 +79,10 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         if (!nunjucksEnv) {
           throw new Error('Nunjucks environment not initialized');
         }
+        if (beforeGet) {
+          await beforeGet(req);
+        }
+
         // Get interpolation values from extendGetContent if available (for dynamic translation values)
         const emptyFormContent = { fields: [] } as BuiltFormContent;
         const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};

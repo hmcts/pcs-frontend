@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development USE_SSL=true OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback yarn start:dev",
-    "start:dev": "node --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/bootstrap.ts",
+    "start:dev": "node --trace-deprecation --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/bootstrap.ts",
     "start": "NODE_ENV=production node -r module-alias/register dist/main/bootstrap.js",
     "createIdamUser": "./bin/dev/createIdamUser.sh",
     "start:watch": "nodemon --config nodemon.json",
@@ -57,6 +57,7 @@
     "config": "^3.3.9",
     "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.7",
+    "date-fns": "^4.1.0",
     "express": "^5.2.1",
     "express-session": "^1.18.1",
     "glob": "^13.0.5",
