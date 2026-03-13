@@ -20,7 +20,7 @@ module.exports = {
     '^jose$': '<rootDir>/src/test/unit/modules/s2s/__mocks__/jose.ts',
     '^uuid$': '<rootDir>/src/test/unit/__mocks__/uuid.ts',
   },
-  testPathIgnorePatterns: ['/__mocks__/', '/helpers/'],
+  testPathIgnorePatterns: ['/__mocks__/', '/src/test/unit/helpers/'],
   coverageProvider: 'v8',
   transformIgnorePatterns: ['node_modules/(?!(jose|@panva|oidc-token-hash)/)'],
 };
