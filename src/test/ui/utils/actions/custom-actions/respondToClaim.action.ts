@@ -15,6 +15,7 @@ import {
   noticeDetails,
   paymentInterstitial,
   repaymentsMade,
+  tenancyDateDetails,
   tenancyDateUnknown,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -32,6 +33,7 @@ export class RespondToClaimAction implements IAction {
       ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
       ['selectContactByTelephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
       ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionData)],
+      ['selectTenancyStartDateKnown', () => this.selectTenancyStartDateKnown(fieldName as actionRecord)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
@@ -56,8 +58,8 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {
-    await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantData.fName);
-    await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantData.lName);
+    await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantData.fName);
+    await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantData.lName);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
@@ -163,6 +165,24 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  }
+
+  private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
+    const getDetailsGivenByParagraph = tenancyDateDetails.getDetailsGivenByParagraph(claimantsName);
+    await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
+    await performAction('clickRadioButton', {
+      question: tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion,
+      option: tenancyStartDateData.option,
+    });
+    if (tenancyStartDateData?.day && tenancyStartDateData?.month && tenancyStartDateData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', tenancyDateDetails.dayHiddenTextLabel, tenancyStartDateData.day],
+        ['inputText', tenancyDateDetails.monthHiddenTextLabel, tenancyStartDateData.month],
+        ['inputText', tenancyDateDetails.yearHiddenTextLabel, tenancyStartDateData.year]
+      );
+    }
+    await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {

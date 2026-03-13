@@ -1,9 +1,11 @@
 import { isNoticeDateProvided } from '../../../../main/steps/utils/isNoticeDateProvided';
 import { isNoticeServed } from '../../../../main/steps/utils/isNoticeServed';
+import { isTenancyStartDateKnown } from '../../../../main/steps/utils/isTenancyStartDateKnown';
 import { getPreviousPageForArrears } from '../../../../main/steps/utils/journeyHelpers';
 
 jest.mock('../../../../main/steps/utils/isNoticeDateProvided');
 jest.mock('../../../../main/steps/utils/isNoticeServed');
+jest.mock('../../../../main/steps/utils/isTenancyStartDateKnown');
 
 describe('getPreviousPageForArrears', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -102,8 +104,16 @@ describe('getPreviousPageForArrears', () => {
     });
   });
 
-  describe('Priority 4: No notice served (default fallback)', () => {
-    it('returns tenancy-date-details when notice not served', async () => {
+  describe('Priority 4: No notice served (fallback)', () => {
+    it('returns tenancy-date-details when notice not served and tenancy start date is known', async () => {
+      (isNoticeServed as jest.Mock).mockResolvedValue(false);
+      (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
+
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
+    });
+
+    it('returns tenancy-date-details when notice not served and tenancy start date is unknown', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
 
@@ -162,8 +172,6 @@ describe('getPreviousPageForArrears', () => {
 
   describe('Integration with real routing scenarios', () => {
     it('handles rent arrears scenario with notice and date', async () => {
-      // Real scenario: User on rent-arrears-dispute, clicks back
-      // CCD has notice=Yes, date=2022-01-01, user confirmed yes
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
@@ -172,8 +180,6 @@ describe('getPreviousPageForArrears', () => {
     });
 
     it('handles non-rent arrears scenario without notice date', async () => {
-      // Real scenario: User on non-rent-arrears-dispute, clicks back
-      // CCD has notice=Yes, NO date, user confirmed yes
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
@@ -182,8 +188,6 @@ describe('getPreviousPageForArrears', () => {
     });
 
     it('handles user rejection scenario', async () => {
-      // Real scenario: User rejected notice on confirmation-of-notice-given
-      // Goes directly to rent-arrears-dispute, clicks back
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'no' } };

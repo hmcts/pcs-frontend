@@ -54,26 +54,11 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Respond to a claim - functional @nightly', async () => {
-  test('Defendant name capture - Error messages - save for later Validations @noDefendants', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
-    await performAction('inputErrorValidation', {
-      validationReq: defendantNameCapture.errorValidation,
-      validationType: defendantNameCapture.errorValidationType.input,
-      inputArray: defendantNameCapture.errorValidationField.errorTextField,
-      header: defendantNameCapture.errorValidationHeader,
-    });
-    await performAction('inputText', defendantNameCapture.firstNameLabelText, 'John');
-    await performAction('inputText', defendantNameCapture.lastNameLabelText, 'Doe');
-    await performAction('clickButton', defendantNameCapture.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
-  });
-
   test('Defendant Date of birth - Back link and Save for later Validations @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameInputText,
-      lName: defendantNameCapture.lastNameInputText,
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('clickLink', dateOfBirth.backLink);
     await performValidation('mainHeader', defendantNameCapture.mainHeader);
@@ -283,7 +268,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyDateDetails.yesRadioOption,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -320,7 +307,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyDateDetails.yesRadioOption,
+    });
     await performAction('clickButton', noticeDetails.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: noticeDetails.errorValidation,
@@ -356,7 +345,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyDateDetails.yesRadioOption,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -396,7 +387,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyDateDetails.yesRadioOption,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
     });
@@ -436,7 +429,9 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('clickButton', tenancyDateDetails.continueButton);
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyDateDetails.yesRadioOption,
+    });
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
     });

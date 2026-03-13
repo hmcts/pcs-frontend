@@ -33,8 +33,8 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial',
     'landlord-registered',
     'tenancy-type-details',
-    'tenancy-date-details',
     'tenancy-date-unknown',
+    'tenancy-date-details',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
     'confirmation-of-notice-date-when-not-provided',
@@ -130,12 +130,42 @@ export const flowConfig: JourneyFlowConfig = {
     'tenancy-type-details': {
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> => isTenancyStartDateKnown(req),
+          condition: async (req: Request) => isTenancyStartDateKnown(req),
           nextStep: 'tenancy-date-details',
         },
         {
           condition: async (req: Request): Promise<boolean> => !(await isTenancyStartDateKnown(req)),
           nextStep: 'tenancy-date-unknown',
+        },
+      ],
+      previousStep: async (req: Request, formData: Record<string, unknown>) => {
+        // Check formData to see which path was actually taken
+        // This honors the actual journey path even if case data changes mid-journey
+        if ('landlord-registered' in formData) {
+          return 'landlord-registered';
+        }
+
+        // Fallback: check current case data for new journeys
+
+        const welshProperty = await isWelshProperty(req);
+        if (welshProperty) {
+          return 'landlord-registered';
+        }
+        return 'dispute-claim-interstitial';
+      },
+    },
+    'tenancy-date-unknown': {
+      routes: [
+        {
+          condition: async (req: Request) => isNoticeServed(req),
+          nextStep: 'confirmation-of-notice-given',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
@@ -145,13 +175,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: async (req: Request) => {
-        const welshProperty = await isWelshProperty(req);
-        if (welshProperty) {
-          return 'landlord-registered';
-        }
-        return 'dispute-claim-interstitial';
-      },
+      previousStep: 'tenancy-type-details',
     },
     'tenancy-date-details': {
       routes: [
@@ -166,21 +190,14 @@ export const flowConfig: JourneyFlowConfig = {
           },
           nextStep: 'rent-arrears-dispute',
         },
-      ],
-      previousStep: 'tenancy-type-details',
-    },
-    'tenancy-date-unknown': {
-      routes: [
         {
-          condition: (req: Request) => isNoticeServed(req),
-          nextStep: 'confirmation-of-notice-given',
-        },
-        {
-          condition: (req: Request) => isRentArrearsClaim(req),
-          nextStep: 'rent-arrears-dispute',
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      defaultNext: 'non-rent-arrears-dispute',
       previousStep: 'tenancy-type-details',
     },
     'confirmation-of-notice-given': {
