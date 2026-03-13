@@ -1,15 +1,15 @@
-export const contactPreference = {
+export const contactPreferenceEmailOrPost = {
   mainHeader: 'Contact Preference',
   respondToClaimParagraph: 'Respond to a property possession claim',
   backLink: 'Back',
   importantDocumentSentByPostParagraph: 'Important documents like orders will always be sent by post.',
   youCanChooseToReceiveUpdatesParagraph:
     'You can choose to receive updates about your case by post or email. For example, when a hearing has been scheduled or a document is ready to view online.',
-  howDoYouWantReceiveUpdatesQuestion: 'How do you want to receive updates??',
-  byPostRadioOption: 'By email',
-  byEmailRadioOption: 'By post',
+  howDoYouWantTOReceiveUpdatesQuestion: 'How do you want to receive updates?',
+  byPostRadioOption: 'By post',
+  byEmailRadioOption: 'By email',
   enterEmailAddressHiddenTextLabel: 'Enter email address',
-  emailAddressTextInput: 'acitizen167@test.com',
+  emailAddressTextInput: 'acitizenpro167@test.com',
   emailAddressWithMoreThan250CharTextInput: '',
   emailAddressWithAlphaNumericCharTextInput: '',
   emailAddressWithSpecialCharTextInput: '',

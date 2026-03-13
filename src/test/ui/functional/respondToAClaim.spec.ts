@@ -5,7 +5,7 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   contactByTelephone,
   contactByTextMessage,
-  contactPreference,
+  contactPreferenceEmailOrPost,
   correspondenceAddress,
   counterClaim,
   dateOfBirth,
@@ -164,11 +164,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performAction('clickLink', contactByTelephone.backLink);
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performValidation('mainHeader', contactByTelephone.mainHeader);
     await performAction('clickRadioButton', contactByTelephone.noRadioOption);
     await performAction('clickButton', contactByTelephone.saveForLaterButton);
@@ -191,8 +191,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       postcode: correspondenceAddress.englandPostcodeTextInput,
       addressIndex: correspondenceAddress.addressIndex,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.yesRadioOption,
       phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
@@ -224,8 +224,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.yesRadioOption,
       phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
@@ -260,8 +260,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
@@ -299,8 +299,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
@@ -337,8 +337,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
@@ -379,8 +379,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
@@ -421,8 +421,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });

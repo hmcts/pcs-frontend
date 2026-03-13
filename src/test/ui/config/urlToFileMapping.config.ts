@@ -8,7 +8,6 @@ export default {
   'contact-preferences-telephone': 'contactByTelephone',
   'contact-preferences-text-message': 'contactByTextMessage',
   'dispute-claim-interstitial': 'disputeClaimInterstitial',
-  'defendant-name-confirmation': 'defendantNameConfirmation',
   'date-of-birth': 'dateOfBirth',
   'confirmation-of-notice-date-when-not-provided': 'noticeDateUnknown',
   'confirmation-of-notice-given': 'noticeDetails',
@@ -18,4 +17,5 @@ export default {
   'payment-interstitial': 'payment-interstitial',
   'repayments-made': 'repaymentsMade',
   'tenancy-date-details': 'tenancyDateDetails',
+  'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
 };

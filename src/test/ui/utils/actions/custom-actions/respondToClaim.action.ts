@@ -4,6 +4,7 @@ import { submitCaseApiData } from '../../../data/api-data';
 import {
   contactByTelephone,
   contactByTextMessage,
+  contactPreferenceEmailOrPost,
   correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
@@ -38,6 +39,7 @@ export class RespondToClaimAction implements IAction {
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
+      ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -115,6 +117,21 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  }
+
+  private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      option: contactPreferenceData.radioOption,
+    });
+    if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailRadioOption) {
+      await performAction(
+        'inputText',
+        contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+        contactPreferenceData.emailAddress
+      );
+    }
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   }
 
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {

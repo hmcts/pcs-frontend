@@ -8,7 +8,7 @@ export * from './correspondenceAddress.page.data';
 export * from './tenancyDetails.page.data';
 export * from './registeredLandlord.page.data';
 export * from './defendantNameConfirmation.page.data';
-export * from './contactPreference.page.data';
+export * from './contactPreferenceEmailOrPost.page.data';
 export * from './contactByTelephone.page.data';
 export * from './contactByTextMessage.page.data';
 export * from './noticeDetails.page.data';

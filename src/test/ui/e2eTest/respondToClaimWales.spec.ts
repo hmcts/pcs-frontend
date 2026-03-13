@@ -7,7 +7,7 @@ import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.dat
 import {
   contactByTelephone,
   contactByTextMessage,
-  contactPreference,
+  contactPreferenceEmailOrPost,
   correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
@@ -64,8 +64,8 @@ test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     await performAction('selectcontactByTelephone', {
       radioOption: contactByTelephone.yesRadioOption,
       phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
