@@ -4,3 +4,5 @@ export { isNoticeDateProvided } from './isNoticeDateProvided';
 export { isRentArrearsClaim } from './isRentArrearsClaim';
 export { isNoticeServed } from './isNoticeServed';
 export { getPreviousPageForArrears } from './journeyHelpers';
+export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
+export { formatDatePartsToISODate } from './dateUtils';

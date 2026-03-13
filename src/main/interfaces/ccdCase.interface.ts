@@ -46,6 +46,8 @@ export interface PossessionClaimResponse {
     };
   };
   defendantResponses?: {
+    tenancyStartDateCorrect?: string;
+    tenancyStartDate?: string;
     contactByPhone?: YesNoValue;
     contactByText?: YesNoValue;
     preferenceType?: ContactPreference;
