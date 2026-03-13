@@ -26,7 +26,7 @@ services:
       - pcs-frontend-network
 
   cache:
-    image: hmctspublic.azurecr.io/imported/bitnami/redis:8.2.0
+    image: hmctsprod.azurecr.io/imported/bitnami/redis:8.2.0
     ports:
       - '6379:6379'
     volumes:
