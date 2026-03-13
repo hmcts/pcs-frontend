@@ -141,6 +141,7 @@ def runAccessibilityTests(yarnBuilder) {
   stage("Full Accessibility Test") {
     node {
       checkout scm
+      sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
         yarnBuilder.yarn("test:accessibility")
       }
