@@ -12,6 +12,5 @@ export const landlordRegistered = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  selectIfYouAgreeWithLandlordsClaimRegisteredErrorMessage:
-    `Select if you agree with the landlord’s claim to be registered`,
+  selectIfYouAgreeWithLandlordsClaimRegisteredErrorMessage: `Select if you agree with the landlord’s claim to be registered`,
 };
