@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { dashboard } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -24,7 +25,8 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
-  test('Validate Address on the dashboard is same as defendant address @regression', async () => {
-    await performValidation('text', { elementType: 'paragraph', text: `Case number: ${process.env.CASE_FID}` });
+  test('Validate address on the dashboard is same as property address @regression', async () => {
+    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
   });
 });
