@@ -28,7 +28,6 @@
                 }}
               {% endfor %}
             </div>
-
             {% for dashboardTaskGroup in taskGroups %}
               {{ taskGroup(dashboardTaskGroup) }}
             {% endfor %}
@@ -38,7 +37,7 @@
           <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible section-border"/>
             <aside class="app-related-items" role="complementary">
               <h2 class="govuk-heading-m">{{ t('dashboard:helpAndSupportHeading') }}</h2>
-              <nav role="navigation" aria-label="{{ t('dashboard:helpAndSupportAriaLabel') }}">
+              <nav role="navigation" aria-label="{{ t('dashboard:helpAndSupportHeading') }}">
                 <ul class="govuk-list">
                   {% for link in helpSupportLinks %}
                     <li>
@@ -46,6 +45,9 @@
                     </li>
                   {% endfor %}
                 </ul>
+              </nav>
+              <nav role="navigation" aria-label="{{ t('dashboard:contactInformationAriaLabel') }}">
+                {% include "components/contact-us-details.njk" %}
               </nav>
             </aside>
         </div>

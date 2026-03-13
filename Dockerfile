@@ -1,6 +1,5 @@
 # ---- Base image ----
-ARG REGISTRY_NAME=hmctsprod
-FROM ${REGISTRY_NAME}.azurecr.io/base/node:20-alpine AS base
+FROM hmctsprod.azurecr.io/base/node:20-alpine AS base
 
 USER root
 RUN corepack enable
