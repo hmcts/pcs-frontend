@@ -18,7 +18,7 @@ nodejs:
     CASE_TYPE_ID: '${CASE_TYPE_ID}'
 redis:
   image:
-    registry: hmctsprod.azurecr.io
+    registry: hmctssbox.azurecr.io
     repository: imported/bitnami/redis
   enabled: true
 global:
