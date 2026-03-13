@@ -192,7 +192,7 @@ function buildMessage(
   const rag = ragStatus(summaryForRag);
   const reportUrl = buildUrl ? `${buildUrl}${reportSuffix}` : '';
   const platform = (process.env.E2E_PLATFORM ?? 'Linux').trim();
-  const browser = (process.env.E2E_BROWSER ?? 'Chromium').trim();
+  const browser = (process.env.E2E_BROWSER ?? 'Chrome').trim();
   const lines: string[] = [
     `*E2E Test Results* — Build #${buildNumber}  ${rag}`,
     `*Service:* ${serviceName}  |  *Pipeline:* ${pipelineType}`,
@@ -267,7 +267,7 @@ function getFallbackMessage(
   pipelineType: string
 ): string {
   const platform = (process.env.E2E_PLATFORM ?? 'Linux').trim();
-  const browser = (process.env.E2E_BROWSER ?? 'Chromium').trim();
+  const browser = (process.env.E2E_BROWSER ?? 'Chrome').trim();
   const isNightly = pipelineType === 'nightly';
   const lines = [
     `E2E Test Results — Build #${buildNumber}`,
