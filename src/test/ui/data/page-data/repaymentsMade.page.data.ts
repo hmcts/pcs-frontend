@@ -14,7 +14,6 @@ export const repaymentsMade = {
   selectIfYouPaidAnyMoneyErrorMessage: 'Select if you’ve paid any money to Treetops Housing since 16th June 2025',
   giveDetailsAboutHowMuchYouPaidErrorMessage: 'Give details about how much you paid and when',
   mustBeUnderCharacterLimitErrorMessage: 'Must be 500 characters or fewer',
-
   saveForLaterButton: 'Save for later',
   backLink: 'Back',
 };
