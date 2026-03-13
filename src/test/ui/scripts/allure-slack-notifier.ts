@@ -268,17 +268,26 @@ function getFallbackMessage(
 ): string {
   const platform = (process.env.E2E_PLATFORM ?? 'Linux').trim();
   const browser = (process.env.E2E_BROWSER ?? 'Chromium').trim();
-  const reportUrl = buildUrl ? `${buildUrl}${reportSuffix}` : '';
-  return [
+  const isNightly = pipelineType === 'nightly';
+  const lines = [
     `E2E Test Results — Build #${buildNumber}`,
     `*Service:* ${serviceName}  |  *Pipeline:* ${pipelineType}`,
     `*Platform:* ${platform}  |  *Browser:* ${browser}`,
     '',
-    'Allure report not available – check build logs.',
-    reportUrl ? `*Allure report:* ${reportUrl}` : buildUrl ? `*Build:* ${buildUrl}` : '',
-  ]
-    .filter(Boolean)
-    .join('\n');
+    'See full results in the Allure reports below.',
+  ];
+  if (buildUrl && isNightly) {
+    lines.push(
+      `*Chrome:* ${buildUrl}Full_20Chrome_20E2E_20Test_20Report/`,
+      `*Firefox:* ${buildUrl}Full_20Firefox_20E2E_20Test_20Report/`,
+      `*Safari:* ${buildUrl}Full_20Safari_20E2E_20Test_20Report/`,
+      `*Accessibility:* ${buildUrl}Accessibility_20Test_20Report/`
+    );
+  } else if (buildUrl) {
+    const reportUrl = `${buildUrl}${reportSuffix}`;
+    lines.push(`*Allure report:* ${reportUrl}`);
+  }
+  return lines.filter(Boolean).join('\n');
 }
 
 function getSlackMessage(): string {

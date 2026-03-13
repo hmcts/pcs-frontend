@@ -181,7 +181,7 @@ def postAllureResultsToSlack() {
     returnStdout: true
   ).trim()
   if (!msg) {
-    msg = "E2E Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend | *Pipeline:* nightly\n*Platform:* Linux | *Browser:* Chromium, Firefox, WebKit\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}Full_20Chrome_20E2E_20Test_20Report/"
+    msg = "E2E Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend | *Pipeline:* nightly\n*Platform:* Linux | *Browser:* Chromium, Firefox, WebKit\n\nSee full results in the Allure reports below.\n*Chrome:* ${env.BUILD_URL}Full_20Chrome_20E2E_20Test_20Report/\n*Firefox:* ${env.BUILD_URL}Full_20Firefox_20E2E_20Test_20Report/\n*Safari:* ${env.BUILD_URL}Full_20Safari_20E2E_20Test_20Report/\n*Accessibility:* ${env.BUILD_URL}Accessibility_20Test_20Report/"
   }
   try {
     slackSend(channel: '#qa-pipeline-status', message: msg)
