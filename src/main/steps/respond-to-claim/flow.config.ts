@@ -185,14 +185,14 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return rentArrears;
           },
           nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return !rentArrears;
           },
           nextStep: 'non-rent-arrears-dispute',
