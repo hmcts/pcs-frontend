@@ -47,7 +47,7 @@ test.afterEach(async () => {
 });
 
 //Following test is skipped due to accessibility issue(HDPI-4571) in the registered landlord page which is blocking the flow.
-test.describe('Respond to a claim - e2e Journey @nightly1', async () => {
+test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim - Wales @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
