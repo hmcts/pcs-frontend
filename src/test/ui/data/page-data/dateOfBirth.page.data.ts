@@ -13,16 +13,16 @@ function getRandomDateOfBirth() {
 const randomDOB = getRandomDateOfBirth();
 
 export const dateOfBirth = {
-  mainHeader: 'What’s your date of birth? (Optional)',
-  respondToClaimParagraph: 'Respond to a property possession claim',
-  forExampleParagraph: 'For example, 27 9 2022',
-  dayTextLabel: 'Day',
-  monthTextLabel: 'Month',
-  yearTextLabel: 'Year',
+  mainHeader: `What’s your date of birth? (Optional)`,
+  respondToClaimParagraph: `Respond to a property possession claim`,
+  forExampleParagraph: `For example, 27 9 2022`,
+  dayTextLabel: `Day`,
+  monthTextLabel: `Month`,
+  yearTextLabel: `Year`,
   dayInputText: randomDOB.day.toString(),
   monthInputText: randomDOB.month.toString(),
   yearInputText: randomDOB.year.toString(),
-  backLink: 'Back',
-  saveAndContinueButton: 'Save and continue',
-  saveForLaterButton: 'Save for later',
+  backLink: `Back`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
 };

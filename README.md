@@ -72,16 +72,32 @@ The applications's home page will be available at http://localhost:3209
 
 ### Running with Docker
 
+#### Authenticate to HMCTS ACR
+
+The Docker images used by this service (both the application base image and the Redis image) are now hosted in the
+`hmctsprod` Azure Container Registry and require authentication.
+
+Before running any Docker-based commands you must be logged in to `hmctsprod`:
+
+```bash
+az login            # if not already logged in
+az acr login --name hmctsprod
+```
+
+You only need to do this once per Azure CLI session.
+
 Create docker image:
 
 ```bash
-docker-compose build
+yarn docker:login:hmctsprod
+docker compose build
 ```
 
 Run the application by executing the following command:
 
 ```bash
-docker-compose up
+yarn docker:login:hmctsprod
+docker compose up
 ```
 
 This will start the frontend container exposing the application's port on `3209`, and a redis instance on port `6379`.
