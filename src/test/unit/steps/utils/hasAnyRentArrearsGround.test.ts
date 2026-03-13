@@ -1,8 +1,8 @@
 import { Request } from 'express';
 
-import { isRentArrearsClaim } from '../../../../main/steps/utils/isRentArrearsClaim';
+import { hasAnyRentArrearsGround } from '../../../../main/steps/utils/hasAnyRentArrearsGround';
 
-describe('isRentArrearsClaim', () => {
+describe('hasAnyRentArrearsGround', () => {
   describe('when claim includes rent arrears', () => {
     it('should return true when single ground has isRentArrears=Yes', async () => {
       const mockReq = {
@@ -25,7 +25,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -50,7 +50,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -75,7 +75,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -100,7 +100,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -140,7 +140,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -173,7 +173,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -201,7 +201,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -241,7 +241,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -266,7 +266,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -292,7 +292,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -318,7 +318,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -344,7 +344,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -362,7 +362,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -380,7 +380,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -398,7 +398,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -416,7 +416,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -434,7 +434,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -450,7 +450,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -462,7 +462,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -472,7 +472,7 @@ describe('isRentArrearsClaim', () => {
         res: {},
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -480,7 +480,7 @@ describe('isRentArrearsClaim', () => {
     it('should return false when res is undefined', async () => {
       const mockReq = {} as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -504,7 +504,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -522,7 +522,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -540,7 +540,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -568,7 +568,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -597,7 +597,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -630,7 +630,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -680,7 +680,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       // Should return true because ground-1 has isRentArrears: 'Yes'
       expect(result).toBe(true);
@@ -711,7 +711,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });
@@ -746,7 +746,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(true);
     });
@@ -786,7 +786,7 @@ describe('isRentArrearsClaim', () => {
         },
       } as unknown as Request;
 
-      const result = await isRentArrearsClaim(mockReq);
+      const result = await hasAnyRentArrearsGround(mockReq);
 
       expect(result).toBe(false);
     });

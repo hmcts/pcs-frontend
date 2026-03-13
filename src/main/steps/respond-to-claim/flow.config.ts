@@ -2,12 +2,12 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
-  getPreviousPageForArrears,
+  getPreviousNoticeStep,
+  hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
   isDefendantNameKnown,
   isNoticeDateProvided,
   isNoticeServed,
-  isRentArrearsClaim,
   isWelshProperty,
 } from '../utils';
 
@@ -132,14 +132,14 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return rentArrears;
           },
           nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return !rentArrears;
           },
           nextStep: 'non-rent-arrears-dispute',
@@ -190,7 +190,7 @@ export const flowConfig: JourneyFlowConfig = {
             if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
               return false;
             }
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return rentArrears;
           },
           nextStep: 'rent-arrears-dispute',
@@ -201,7 +201,7 @@ export const flowConfig: JourneyFlowConfig = {
             if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
               return false;
             }
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return !rentArrears;
           },
           nextStep: 'non-rent-arrears-dispute',
@@ -214,14 +214,14 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return rentArrears;
           },
           nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return !rentArrears;
           },
           nextStep: 'non-rent-arrears-dispute',
@@ -233,14 +233,14 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return rentArrears;
           },
           nextStep: 'rent-arrears-dispute',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await isRentArrearsClaim(req);
+            const rentArrears = await hasAnyRentArrearsGround(req);
             return !rentArrears;
           },
           nextStep: 'non-rent-arrears-dispute',
@@ -250,7 +250,7 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'rent-arrears-dispute': {
       defaultNext: 'counter-claim',
-      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
+      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousNoticeStep(req),
       routes: [
         {
           condition: (req: Request): Promise<boolean> => hasOnlyRentArrearsGrounds(req),
@@ -265,11 +265,11 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute': {
       defaultNext: 'counter-claim',
       previousStep: async (req: Request) => {
-        const rentArrearsClaim = await isRentArrearsClaim(req);
+        const rentArrearsClaim = await hasAnyRentArrearsGround(req);
         if (rentArrearsClaim) {
           return 'rent-arrears-dispute';
         }
-        return getPreviousPageForArrears(req);
+        return getPreviousNoticeStep(req);
       },
     },
     'counter-claim': {

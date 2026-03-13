@@ -3,7 +3,7 @@ import { Request } from 'express';
 import { isNoticeDateProvided } from './isNoticeDateProvided';
 import { isNoticeServed } from './isNoticeServed';
 
-export async function getPreviousPageForArrears(req: Request): Promise<string> {
+export async function getPreviousNoticeStep(req: Request): Promise<string> {
   const noticeServed = await isNoticeServed(req);
   const noticeDateProvided = await isNoticeDateProvided(req);
   const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;

@@ -1,11 +1,11 @@
 import { isNoticeDateProvided } from '../../../../main/steps/utils/isNoticeDateProvided';
 import { isNoticeServed } from '../../../../main/steps/utils/isNoticeServed';
-import { getPreviousPageForArrears } from '../../../../main/steps/utils/journeyHelpers';
+import { getPreviousNoticeStep } from '../../../../main/steps/utils/journeyHelpers';
 
 jest.mock('../../../../main/steps/utils/isNoticeDateProvided');
 jest.mock('../../../../main/steps/utils/isNoticeServed');
 
-describe('getPreviousPageForArrears', () => {
+describe('getPreviousNoticeStep', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockReq: any;
 
@@ -22,7 +22,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'no' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-given');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-given');
     });
 
     it('returns confirmation-of-notice-given when user said imNotSure and notice served', async () => {
@@ -30,7 +30,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'imNotSure' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-given');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-given');
     });
 
     it('returns confirmation-of-notice-given when user said no, notice served, even if date was provided', async () => {
@@ -38,7 +38,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true); // Date provided, but user rejected
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'no' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-given');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-given');
     });
 
     it('returns confirmation-of-notice-given when user said imNotSure, notice served, even if date was provided', async () => {
@@ -46,7 +46,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true); // Date provided, but user rejected
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'imNotSure' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-given');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-given');
     });
   });
 
@@ -56,7 +56,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-provided');
     });
 
     it('returns confirmation-of-notice-date-when-provided when date provided, notice served, no user answer', async () => {
@@ -64,7 +64,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.session.formData = {}; // No confirmation answer
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-provided');
     });
 
     it('returns confirmation-of-notice-date-when-provided when date provided, notice served, confirmNoticeGiven undefined', async () => {
@@ -72,7 +72,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.session.formData = { 'confirmation-of-notice-given': {} };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-provided');
     });
   });
 
@@ -82,7 +82,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
     });
 
     it('returns confirmation-of-notice-date-when-not-provided when date not provided, notice served, no user answer', async () => {
@@ -90,7 +90,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = {}; // No confirmation answer
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
     });
 
     it('returns confirmation-of-notice-date-when-not-provided when date not provided, notice served, confirmNoticeGiven undefined', async () => {
@@ -98,7 +98,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': {} };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
     });
   });
 
@@ -107,14 +107,14 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
     });
 
     it('returns tenancy-details when notice not served, even if date provided', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true); // Date provided but notice not served
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
     });
 
     it('returns tenancy-details when notice not served, user said no', async () => {
@@ -122,7 +122,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'no' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
     });
 
     it('returns tenancy-details when notice not served, user said yes', async () => {
@@ -130,7 +130,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
     });
   });
 
@@ -140,7 +140,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.session = {}; // No formData
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-provided');
     });
 
     it('returns correct page when session is undefined', async () => {
@@ -148,7 +148,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq = {}; // No session
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-provided');
     });
 
     it('returns tenancy-details when session is undefined and notice not served', async () => {
@@ -156,7 +156,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq = {}; // No session
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
     });
   });
 
@@ -168,7 +168,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-provided');
     });
 
     it('handles non-rent arrears scenario without notice date', async () => {
@@ -178,7 +178,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
     });
 
     it('handles user rejection scenario', async () => {
@@ -188,7 +188,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'no' } };
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-given');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-given');
     });
 
     it('handles no notice served scenario', async () => {
@@ -196,7 +196,7 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
     });
   });
 });
