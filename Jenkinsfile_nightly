@@ -159,9 +159,6 @@ def runAccessibilityTests(yarnBuilder) {
 }
 
 def sendAllureReportToSlack(String browser, String reportSuffix) {
-  env.E2E_SERVICE_NAME = 'pcs-frontend'
-  env.E2E_PIPELINE_TYPE = 'nightly'
-  env.E2E_PLATFORM = 'Linux'
   env.E2E_BROWSER = browser
   env.ALLURE_REPORT_PATH_SUFFIX = reportSuffix
   def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()

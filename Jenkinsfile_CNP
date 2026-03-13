@@ -102,10 +102,6 @@ def archiveFunctionalTestReports() {
 }
 
 def postAllureResultsToSlack(String pipelineType = 'master') {
-  env.E2E_SERVICE_NAME = 'pcs-frontend'
-  env.E2E_PIPELINE_TYPE = pipelineType
-  env.E2E_PLATFORM = 'Linux'
-  env.E2E_BROWSER = 'Chrome'
   env.ALLURE_REPORT_PATH_SUFFIX = 'PCS_20Frontend_20Functional_20Test_20Report/'
   def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
