@@ -122,24 +122,21 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
     node {
       checkout scm
       sh 'rm -rf allure-results allure-report'
-      try {
+      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
         yarnBuilder.yarn("test:E2e${browser}")
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      } finally {
-        publishHTML([
-          allowMissing: true,
-          alwaysLinkToLastBuild: true,
-          keepAll: true,
-          reportDir: "allure-report",
-          reportFiles: 'index.html',
-          reportName: "Full ${browser} E2E Test Report"
-        ])
-        steps.archiveArtifacts(
-          allowEmptyArchive: true,
-          artifacts: 'definitions/test/playwright-report/**'
-        )
       }
+      publishHTML([
+        allowMissing: true,
+        alwaysLinkToLastBuild: true,
+        keepAll: true,
+        reportDir: "allure-report",
+        reportFiles: 'index.html',
+        reportName: "Full ${browser} E2E Test Report"
+      ])
+      steps.archiveArtifacts(
+        allowEmptyArchive: true,
+        artifacts: 'definitions/test/playwright-report/**'
+      )
     }
   }
 }
@@ -148,21 +145,18 @@ def runAccessibilityTests(yarnBuilder) {
   stage("Full Accessibility Test") {
     node {
       checkout scm
-      try {
+      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
         yarnBuilder.yarn("test:accessibility")
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      } finally {
-        publishHTML([
-          allowMissing         : true,
-          alwaysLinkToLastBuild: true,
-          keepAll              : true,
-          reportDir            : "allure-report",
-          reportFiles          : 'index.html',
-          reportName           : 'Accessibility Test Report'
-        ])
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
       }
+      publishHTML([
+        allowMissing         : true,
+        alwaysLinkToLastBuild: true,
+        keepAll              : true,
+        reportDir            : "allure-report",
+        reportFiles          : 'index.html',
+        reportName           : 'Accessibility Test Report'
+      ])
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
     }
   }
 }
