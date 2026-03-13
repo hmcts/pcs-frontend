@@ -47,15 +47,15 @@ export class ErrorMessageValidation implements IValidation {
 
         // Try different error message selectors
         const errorMessage = page.locator(`
-          .govuk-error-message:has-text("${errorStr}"),
-          .govuk-list--error:has-text("${errorStr}"),
-          a.validation-error:has-text("${errorStr}")
+          .govuk-error-message:text-is("${errorStr}"),
+          .govuk-list--error:text-is("${errorStr}"),
+          a.validation-error:text-is("${errorStr}")
         `);
 
         const count = await errorMessage.count();
         if (count > 0) {
           actualText = await errorMessage.first().textContent();
-          passed = actualText?.includes(errorStr) || false;
+          passed = (actualText?.trim() ?? '') === errorStr;
         } else {
           actualText = 'No error message found';
           passed = false;
@@ -70,7 +70,7 @@ export class ErrorMessageValidation implements IValidation {
         expected = `${header}: ${message}`;
 
         // Check for error summary header
-        const headerLocator = page.locator(`h2.govuk-error-summary__title:has-text("${header}")`);
+        const headerLocator = page.locator(`h2.govuk-error-summary__title:text-is("${header}")`);
         const headerCount = await headerLocator.count();
 
         if (headerCount === 0) {
@@ -79,15 +79,15 @@ export class ErrorMessageValidation implements IValidation {
         } else {
           // Check for error message in the list
           const messageLocator = page.locator(`
-            .govuk-error-summary__list a:has-text("${message}"),
-            .govuk-error-summary__list li:has-text("${message}"),
-            ul.govuk-list--error li:has-text("${message}")
+            .govuk-error-summary__list a:text-is("${message}"),
+            .govuk-error-summary__list li:text-is("${message}"),
+            ul.govuk-list--error li:text-is("${message}")
           `);
 
           const messageCount = await messageLocator.count();
           if (messageCount > 0) {
             actualText = await messageLocator.first().textContent();
-            passed = actualText?.includes(message) || false;
+            passed = (actualText?.trim() ?? '') === message;
           } else {
             actualText = `Message "${message}" not found in error summary`;
             passed = false;
