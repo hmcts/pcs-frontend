@@ -50,7 +50,6 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
-    tenancyStartDate?: string;
   };
 }
 
