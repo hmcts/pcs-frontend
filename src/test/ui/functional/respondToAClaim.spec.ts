@@ -7,7 +7,7 @@ import {
   contactByTextMessage,
   contactPreference,
   correspondenceAddress,
-  counterClaim,
+  counterClaim, dashboard,
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -65,7 +65,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
     await performValidation('mainHeader', dateOfBirth.mainHeader);
     await performAction('clickButton', dateOfBirth.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
@@ -147,7 +147,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
     await performAction('clickButton', correspondenceAddress.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Contact By Telephone - back and save for later Validations', async () => {
@@ -172,7 +172,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactByTelephone.mainHeader);
     await performAction('clickRadioButton', contactByTelephone.noRadioOption);
     await performAction('clickButton', contactByTelephone.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Contact By Text Message - Back link and save for later Validations', async () => {
@@ -207,7 +207,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       option: contactByTextMessage.yesRadioOption,
     });
     await performAction('clickButton', contactByTextMessage.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Dispute claim interstitial - back and cancel link Validations', async () => {
@@ -243,7 +243,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', contactByTelephone.mainHeader);
     await performAction('clickButton', contactByTelephone.saveAndContinueButton);
     await performAction('clickButton', disputeClaimInterstitial.cancelLink);
-    await performValidation('mainHeader', 'Dashboard');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Payment interstitial - back and cancel link Validations', async () => {
@@ -282,7 +282,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('clickLink', paymentInterstitial.cancelLink);
-    await performValidation('mainHeader', 'Dashboard');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Notice Details - Error messages - Validations', async () => {
@@ -476,6 +476,6 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     });
     await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
     await performAction('clickButton', repaymentsMade.saveForLaterButton);
-    await performValidation('mainHeader', 'Dashboard');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });
