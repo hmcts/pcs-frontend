@@ -8,6 +8,7 @@ import type {
   FormFieldOption,
 } from '../../../interfaces/formFieldConfig.interface';
 
+import { CURRENCY_INPUT_ATTRIBUTES } from './currencyValidation';
 import { normalizeCheckboxValue } from './helpers';
 import { buildSubFieldsHTML } from './subFieldsRenderer';
 
@@ -47,7 +48,10 @@ export function buildComponentConfig(
     hint: hint ? { text: hint } : null,
     errorMessage: hasError && errorText ? { text: errorText } : null,
     classes: field.classes || (field.type === 'text' ? 'govuk-!-width-three-quarters' : undefined),
-    attributes: field.attributes || {},
+    attributes:
+      field.type === 'text' && field.currencyInput
+        ? { ...CURRENCY_INPUT_ATTRIBUTES, ...(field.attributes || {}) }
+        : field.attributes || {},
   };
 
   let componentType: ComponentType;

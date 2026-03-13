@@ -75,6 +75,7 @@ export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
     options: z.array(FormFieldOptionSchema).optional(),
     classes: z.string().optional(),
     attributes: z.record(z.string(), z.unknown()).optional(),
+    currencyInput: z.boolean().optional(),
     // Pre-processed component configuration for template rendering
     component: z.record(z.string(), z.unknown()).optional(),
     componentType: z.enum(['input', 'textarea', 'characterCount', 'radios', 'checkboxes', 'dateInput']).optional(),

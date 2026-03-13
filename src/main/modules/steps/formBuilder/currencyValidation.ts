@@ -1,24 +1,13 @@
-/**
- * Currency amount validation for form fields (e.g. £123.45 format).
- * Returns undefined if valid, or an error key string if invalid.
- *
- * This allows reusable validation logic while each page defines its own error messages.
- *
- * @param value - The value to validate
- * @param options - Validation options
- * @param options.max - Maximum allowed value (default: 1,000,000,000)
- * @param options.min - Minimum allowed value (default: 0)
- * @param options.errorPrefix - Prefix for error keys (e.g. 'errors.rentArrears')
- * @returns undefined if valid, or error key string like 'errors.rentArrears.rentArrearsFormat'
- *
- * @example
- * validate: value => validateCurrencyAmount(value, {
- *   max: 1000000000,
- *   min: 0,
- *   errorPrefix: 'errors.rentArrears'
- * })
- *
- */
+const CURRENCY_FORMAT_REGEX = /^(\d{1,10})(\.\d{1,2})?$/;
+
+const CURRENCY_INPUT_PATTERN = '[0-9]{1,10}(\\.[0-9]{1,2})?';
+
+// HTML input attributes for currency amount fields
+export const CURRENCY_INPUT_ATTRIBUTES: Record<string, string | boolean> = {
+  inputmode: 'numeric',
+  pattern: CURRENCY_INPUT_PATTERN,
+  spellcheck: false,
+};
 
 export function validateCurrencyAmount(
   value: unknown,
@@ -34,32 +23,28 @@ export function validateCurrencyAmount(
     return undefined;
   }
 
+  // Remove whitespace from the value
   const trimmed = value.trim();
   if (!trimmed) {
-    // Let the required + errorMessage handle empty values
     return undefined;
   }
-
   // Remove commas to handle user input like 1,234.56
   const normalized = trimmed.split(',').join('');
 
-  // First, try to parse as a number to check value ranges
-  // This allows us to give better error messages for large numbers
+  // Check if the value is a number and within the minimum and maximum allowed values
   const numericValue = Number(normalized);
   if (!Number.isNaN(numericValue)) {
     if (numericValue < min) {
-      return `${errorPrefix}.rentArrearsNegativeAmount`;
+      return `${errorPrefix}.negativeAmount`;
     }
-
+    // Check if the value is greater than the maximum allowed value
     if (numericValue > max) {
-      return `${errorPrefix}.rentArrearsLargeAmount`;
+      return `${errorPrefix}.largeAmount`;
     }
   }
-
-  // Then check strict format: 1–10 digits, a decimal point, exactly 2 decimal places
-  const formatRegex = /^(\d{1,10})\.(\d{2})$/;
-  if (!formatRegex.exec(normalized)) {
-    return `${errorPrefix}.rentArrearsFormat`;
+  // Then check strict format (same rule as CURRENCY_INPUT_ATTRIBUTES.pattern)
+  if (!CURRENCY_FORMAT_REGEX.exec(normalized)) {
+    return `${errorPrefix}.format`;
   }
 
   return undefined;

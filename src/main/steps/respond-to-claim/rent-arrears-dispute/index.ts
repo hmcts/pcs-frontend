@@ -102,10 +102,7 @@ export const step: StepDefinition = createFormStep({
               prefix: {
                 text: '£',
               },
-              attributes: {
-                inputmode: 'text',
-                spellcheck: false,
-              },
+              currencyInput: true,
               validate: value =>
                 validateCurrencyAmount(value, {
                   max: 1000000000,
