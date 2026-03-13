@@ -268,24 +268,15 @@ function getFallbackMessage(
 ): string {
   const platform = (process.env.E2E_PLATFORM ?? 'Linux').trim();
   const browser = (process.env.E2E_BROWSER ?? 'Chrome').trim();
-  const isNightly = pipelineType === 'nightly';
   const lines = [
     `E2E Test Results — Build #${buildNumber}`,
     `*Service:* ${serviceName}  |  *Pipeline:* ${pipelineType}`,
     `*Platform:* ${platform}  |  *Browser:* ${browser}`,
     '',
-    'See full results in the Allure reports below.',
+    'Allure report not available – check build logs.',
   ];
-  if (buildUrl && isNightly) {
-    lines.push(
-      `*Chrome:* ${buildUrl}Full_20Chrome_20E2E_20Test_20Report/`,
-      `*Firefox:* ${buildUrl}Full_20Firefox_20E2E_20Test_20Report/`,
-      `*Safari:* ${buildUrl}Full_20Safari_20E2E_20Test_20Report/`,
-      `*Accessibility:* ${buildUrl}Accessibility_20Test_20Report/`
-    );
-  } else if (buildUrl) {
-    const reportUrl = `${buildUrl}${reportSuffix}`;
-    lines.push(`*Allure report:* ${reportUrl}`);
+  if (buildUrl) {
+    lines.push(`*Allure report:* ${buildUrl}${reportSuffix}`);
   }
   return lines.filter(Boolean).join('\n');
 }

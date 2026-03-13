@@ -74,11 +74,6 @@ withNightlyPipeline(type, product, component) {
     if (params.ACCESSIBILITY_TESTS) {
       runAccessibilityTests(yarnBuilder)
     }
-    node {
-      checkout scm
-      sh 'yarn install --frozen-lockfile'
-      postAllureResultsToSlack()
-    }
   }
 }
 
@@ -137,6 +132,7 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
         allowEmptyArchive: true,
         artifacts: 'definitions/test/playwright-report/**'
       )
+      sendAllureReportToSlack(browser, "Full_20${browser}_20E2E_20Test_20Report/")
     }
   }
 }
@@ -157,19 +153,21 @@ def runAccessibilityTests(yarnBuilder) {
         reportName           : 'Accessibility Test Report'
       ])
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
+      sendAllureReportToSlack('Chrome', 'Accessibility_20Test_20Report/')
     }
   }
 }
 
-def postAllureResultsToSlack() {
+def sendAllureReportToSlack(String browser, String reportSuffix) {
   env.E2E_SERVICE_NAME = 'pcs-frontend'
   env.E2E_PIPELINE_TYPE = 'nightly'
   env.E2E_PLATFORM = 'Linux'
-  env.E2E_BROWSER = 'Chrome, Firefox, WebKit'
+  env.E2E_BROWSER = browser
+  env.ALLURE_REPORT_PATH_SUFFIX = reportSuffix
   def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
-    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    slackSend(channel: '#qa-pipeline-status', message: msg)
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }
