@@ -24,5 +24,5 @@ export const freeLegalAdvice = {
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
   youMustSayAboutFreeLegalAdviceErrorMessage: `You must say if you've had any free legal advice`,
-  thereIsAProblemErrorMessageHeader: 'There is a problem',
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
 };
