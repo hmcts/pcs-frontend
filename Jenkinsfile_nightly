@@ -124,7 +124,6 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
   stage("Full E2E Test - ${browser}") {
     node {
       checkout scm
-      sh 'uname -a'
       sh 'rm -rf allure-results allure-report'
       try {
         yarnBuilder.yarn("test:E2e${browser}")
