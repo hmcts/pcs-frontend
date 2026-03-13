@@ -21,7 +21,10 @@ type TenancyTypeDetailsStep = {
             data?: {
               possessionClaimResponse?: {
                 claimantOrganisations?: { value?: string }[];
+                defendantResponses?: { tenancyTypeCorrect?: string; tenancyType?: string };
               };
+              tenancy_TypeOfTenancyLicence?: string;
+              tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
             };
           };
         };
@@ -282,6 +285,148 @@ describe('respond-to-claim tenancy-type-details step', () => {
       );
 
       expect(content.detailsHeading).toBe(detailsHeading);
+    });
+
+    describe('tenancyTypeAgreementType', () => {
+      it.each([
+        ['ASSURED_TENANCY', 'an assured'],
+        ['SECURE_TENANCY', 'a secure'],
+        ['INTRODUCTORY_TENANCY', 'an introductory'],
+        ['FLEXIBLE_TENANCY', 'a flexible'],
+        ['DEMOTED_TENANCY', 'a demoted'],
+        ['OTHER', 'other'],
+      ])('maps tenancy_TypeOfTenancyLicence=%s to tenancyTypeAgreementType=%s', async (licenceType, expectedText) => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                    tenancy_TypeOfTenancyLicence: licenceType,
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'standard tenancy text' }
+        );
+
+        expect(content.tenancyTypeAgreementType).toBe(expectedText);
+      });
+
+      it('falls back to "an assured" when tenancy_TypeOfTenancyLicence is an unrecognised value', async () => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                    tenancy_TypeOfTenancyLicence: 'UNKNOWN_TYPE',
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'standard tenancy text' }
+        );
+
+        expect(content.tenancyTypeAgreementType).toBe('an assured');
+      });
+
+      it('falls back to "an assured" when tenancy_TypeOfTenancyLicence is absent', async () => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'standard tenancy text' }
+        );
+
+        expect(content.tenancyTypeAgreementType).toBe('an assured');
+      });
+    });
+
+    describe('tenancyType content for OTHER type', () => {
+      it('builds sentence from tenancy_DetailsOfOtherTypeOfTenancyLicence when type is OTHER', async () => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                    tenancy_TypeOfTenancyLicence: 'OTHER',
+                    tenancy_DetailsOfOtherTypeOfTenancyLicence: 'Rolling monthly agreement',
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'should be replaced' }
+        );
+
+        expect(content.tenancyType).toBe(
+          'The claimant provided the following information about your tenancy, occupation contract or licence agreement type: Rolling monthly agreement'
+        );
+      });
+
+      it('builds sentence with empty string when OTHER but no details provided', async () => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                    tenancy_TypeOfTenancyLicence: 'OTHER',
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'should be replaced' }
+        );
+
+        expect(content.tenancyType).toBe(
+          'The claimant provided the following information about your tenancy, occupation contract or licence agreement type: '
+        );
+      });
+
+      it('returns formContent.tenancyType unchanged when type is not OTHER', async () => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                    tenancy_TypeOfTenancyLicence: 'ASSURED_TENANCY',
+                    tenancy_DetailsOfOtherTypeOfTenancyLicence: 'should be ignored',
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'original tenancy text' }
+        );
+
+        expect(content.tenancyType).toBe('original tenancy text');
+      });
     });
   });
 });

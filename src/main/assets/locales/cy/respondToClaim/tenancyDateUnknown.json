@@ -1,4 +1,6 @@
 {
-  "pageTitle": "cyTenancy date unknown",
-  "caption": "cyRespond to a property possession claim"
+  "pageTitle": "cyTenancy start date",
+  "caption": "cyRespond to a property possession claim",
+  "heading": "cyTenancy start date",
+  "body": "cyThe claimant did not provide a tenancy start date in their claim."
 }

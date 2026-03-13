@@ -9,4 +9,10 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   fields: [],
   customTemplate: `${__dirname}/tenancyDateUnknown.njk`,
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    caption: 'caption',
+    heading: 'heading',
+    body: 'body',
+  },
 });
