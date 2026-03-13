@@ -66,6 +66,7 @@ withPipeline(type, product, component) {
     }
     afterAlways('fullFunctionalTest:preview') {
       archiveFunctionalTestReports()
+      postAllureResultsToSlack('master')
     }
   }
 
@@ -107,16 +108,11 @@ def postAllureResultsToSlack(String pipelineType = 'master') {
   env.E2E_PLATFORM = 'Linux'
   env.E2E_BROWSER = 'Chrome'
   env.ALLURE_REPORT_PATH_SUFFIX = 'PCS_20Frontend_20Functional_20Test_20Report/'
-  def msg = sh(
-    script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true",
-    returnStdout: true
-  ).trim()
-  if (!msg) {
-    msg = "E2E Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend | *Pipeline:* ${pipelineType}\n*Platform:* Linux | *Browser:* Chrome\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}PCS_20Frontend_20Functional_20Test_20Report/"
-  }
+  def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
+  if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
     slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
   } catch (Exception e) {
-    echo "WARNING: Allure Slack notification failed: ${e.message}"
+    echo "WARNING: Slack notification failed: ${e.message}"
   }
 }
