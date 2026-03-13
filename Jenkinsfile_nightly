@@ -154,12 +154,12 @@ def runAccessibilityTests(yarnBuilder) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       } finally {
         publishHTML([
-          allowMissing: true,
+          allowMissing         : true,
           alwaysLinkToLastBuild: true,
-          keepAll: true,
-          reportDir: "allure-report",
-          reportFiles: 'index.html',
-          reportName: 'Accessibility Test Report'
+          keepAll              : true,
+          reportDir            : "allure-report",
+          reportFiles          : 'index.html',
+          reportName           : 'Accessibility Test Report'
         ])
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
       }
@@ -167,7 +167,7 @@ def runAccessibilityTests(yarnBuilder) {
   }
 }
 
-// E2E stage notification to #hdp-qa-e2e-test-results
+// E2E stage notification to #qa-pipeline-status
 def postAllureResultsToSlack() {
   env.E2E_SERVICE_NAME = 'pcs-frontend'
   env.E2E_PIPELINE_TYPE = 'nightly'
