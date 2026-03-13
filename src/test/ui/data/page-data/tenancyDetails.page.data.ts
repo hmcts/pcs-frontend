@@ -1,5 +1,5 @@
 export const tenancyDetails = {
-  mainHeader: `Tenancy Details(placeholder)`,
+  mainHeader: `Tenancy type details(placeholder)`,
   saveForLaterButton: `Save for later`,
   saveAndContinueButton: `Save and continue`,
 };
