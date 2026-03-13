@@ -39,7 +39,7 @@ export const step: StepDefinition = createFormStep({
               },
               validator: (value: unknown) => {
                 const text = (value as string)?.trim();
-                const allowedCharsRegex = /^[A-Za-z\s\-']+$/;
+                const allowedCharsRegex = /^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u;
 
                 if (allowedCharsRegex.test(text)) {
                   return true;
