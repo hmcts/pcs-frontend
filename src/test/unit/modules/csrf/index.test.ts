@@ -114,6 +114,27 @@ describe('Csrf', () => {
       expect(next).toHaveBeenCalled();
     });
 
+    it('should log and call next with the error when req.csrfToken throws', () => {
+      csrf.enableFor(mockApp);
+      const localsMiddleware = mockUse.mock.calls[1][0] as (req: Request, res: Response, next: NextFunction) => void;
+
+      const error = new Error('csrf token failure');
+      const req = {
+        csrfToken: jest.fn(() => {
+          throw error;
+        }),
+      } as unknown as Request;
+      const res = { locals: {} } as unknown as Response;
+      const next = jest.fn();
+
+      localsMiddleware(req, res, next);
+
+      expect(csrf.logger.error).toHaveBeenCalledWith('Error getting CSRF token', {
+        error: 'csrf token failure',
+      });
+      expect(next).toHaveBeenCalledWith(error);
+    });
+
     it('should call next when req has no csrfToken property', () => {
       csrf.enableFor(mockApp);
       const localsMiddleware = mockUse.mock.calls[1][0] as (req: Request, res: Response, next: NextFunction) => void;
