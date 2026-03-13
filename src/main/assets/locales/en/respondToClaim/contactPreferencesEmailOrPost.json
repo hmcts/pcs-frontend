@@ -1,0 +1,24 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Contact preference",
+  "heading": "Contact preference",
+  "content": "<p class=\"govuk-body\">Important documents like orders will always be sent by post.</p><p class=\"govuk-body\"> You can choose to receive updates about your case by post or email. For example, when a hearing has been scheduled or a document is ready to view online.</p>",
+
+  "labels": {
+    "question": "How do you want to receive updates?",
+    "options": {
+      "byEmail": "By email",
+      "byPost": "By post"
+    },
+    "emailLabel": "Enter email address"
+  },
+  "buttons": {
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  },
+  "errors": {
+    "contactByEmailOrPost": "Select how you want to receive updates",
+    "contactByEmailOrPost.email": "Enter your email address",
+    "contactByEmailOrPost.email.invalid": "Enter an email address in the correct format, like name@example.com"
+  }
+}
