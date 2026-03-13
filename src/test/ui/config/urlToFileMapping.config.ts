@@ -17,4 +17,5 @@ export default {
   'payment-interstitial': 'payment-interstitial',
   'repayments-made': 'repaymentsMade',
   'landlord-registered': 'landlordRegistered',
+  'tenancy-date-details': 'tenancyDateDetails',
 };

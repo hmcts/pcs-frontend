@@ -57,6 +57,7 @@ export class ActionRegistry {
     ['repaymentsMade', new RespondToClaimAction()],
     ['selectLandlordRegistered', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
+    ['selectTenancyStartDateKnown', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
