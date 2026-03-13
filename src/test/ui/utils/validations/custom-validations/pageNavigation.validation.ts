@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
+import { escapeForRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
@@ -32,7 +33,7 @@ export class PageNavigationValidation implements IValidation {
   async validate(page: Page, validation: string, navigateButton: string, fieldName: string): Promise<void> {
     PageNavigationValidation.currentPageUrl = page.url();
     if (navigateButton) {
-      if (navigateButton.includes('Back')) {
+      if (navigateButton === 'Back') {
         await performAction('clickLink', navigateButton);
       } else {
         await performAction('clickButton', navigateButton);
@@ -61,7 +62,7 @@ export class PageNavigationValidation implements IValidation {
   private async validateMainHeader(page: Page, expectedHeader: string): Promise<void> {
     try {
       const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
-      await expect(locator).toHaveText(expectedHeader);
+      await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(expectedHeader)}\\s*$`));
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
@@ -105,7 +106,7 @@ export class PageNavigationValidation implements IValidation {
   private async validatePageNavigation(page: Page, expectedHeader: string): Promise<void> {
     try {
       const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
-      await expect(locator).toHaveText(expectedHeader);
+      await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(expectedHeader)}\\s*$`));
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const actualText = await locator.first().textContent();
@@ -189,7 +190,7 @@ export class PageNavigationValidation implements IValidation {
       const segments = pathname.split('/').filter(Boolean);
       const urlSegment = segments.at(-1) || 'home';
 
-      if (urlSegment.toLowerCase() === 'dashboard') {
+      if (urlSegment === 'dashboard') {
         return 'Dashboard';
       }
 
