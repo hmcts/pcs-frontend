@@ -79,6 +79,7 @@ withNightlyPipeline(type, product, component) {
     }
     node {
       checkout scm
+      sh 'yarn install --frozen-lockfile'
       postAllureResultsToSlack()
     }
   }
