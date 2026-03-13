@@ -1,23 +1,22 @@
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { safeRedirect303 } from '../../../utils/safeRedirect';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
-import { createGetController, createStepNavigation } from '@modules/steps';
-
-const stepName = 'tenancy-details';
+const stepName = 'tenancy-type-details';
 const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/tenancy-details`,
+  url: `${RESPOND_TO_CLAIM_ROUTE}/tenancy-type-details`,
   name: stepName,
-  view: 'respond-to-claim/tenancy-details/tenancyDetails.njk',
+  view: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'respond-to-claim/tenancy-details/tenancyDetails.njk',
+      'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
       stepName,
       async (req: Request) => {
         const backUrl = await stepNavigation.getBackUrl(req, stepName);

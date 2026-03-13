@@ -1,0 +1,19 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Tenancy, occupation contract or licence start date",
+  "question": "When did your tenancy, occupation contract or licence start (optional)?",
+  "hint": "For example, 27 9 2022",
+  "paragraph": "{{claimantName}} did not provide the start date of your tenancy, occupation contract or licence.",
+  "errors": {
+    "date": {
+      "day": "Day",
+      "month": "Month",
+      "year": "Year",
+      "required": "Your tenancy start date must include a day, month and year",
+      "notRealDate": "Tenancy start date must be a real date",
+      "futureDate": "Tenancy start date must be in the past",
+      "missingOne": "Your tenancy start date must include a {{missingField}}",
+      "missingTwo": "Your tenancy start date must include a {{first}} and {{second}}"
+    }
+  }
+}

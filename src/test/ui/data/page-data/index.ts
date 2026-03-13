@@ -20,3 +20,5 @@ export * from './counterClaim.page.data';
 export * from './repaymentsMade.page.data';
 export * from './paymentInterstitial.page.data';
 export * from './repaymentsAgreed.page.data';
+export * from './tenancyDateUnknown.page.data';
+export * from './tenancyDateDetails.page.data';

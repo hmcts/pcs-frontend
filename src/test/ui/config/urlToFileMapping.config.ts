@@ -4,6 +4,7 @@ export default {
   home: 'home',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
+  'defendant-name-confirmation': 'defendantNameConfirmation',
   'contact-preferences-telephone': 'contactByTelephone',
   'contact-preferences-text-message': 'contactByTextMessage',
   'dispute-claim-interstitial': 'disputeClaimInterstitial',
@@ -15,4 +16,6 @@ export default {
   'rent-arrears-dispute': 'rentArrearsDispute',
   'payment-interstitial': 'payment-interstitial',
   'repayments-made': 'repaymentsMade',
+  'tenancy-date-unknown': 'tenancyDateUnknown',
+  'tenancy-date-details': 'tenancyDateDetails',
 };

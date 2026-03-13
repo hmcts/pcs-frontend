@@ -1,6 +1,8 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+
 
 {% for subField in subFields %}
   {% if subField.component and subField.componentType %}
@@ -10,6 +12,8 @@
       {{ govukTextarea(subField.component) }}
     {% elif subField.componentType == 'characterCount' %}
       {{ govukCharacterCount(subField.component) }}
+    {% elif subField.componentType == 'dateInput' %}
+      {{ govukDateInput(subField.component) }}  
     {% elif subField.componentType == 'postcodeLookup' %}
       {% include "components/postcodeLookup.njk" %}
     {% else %}
