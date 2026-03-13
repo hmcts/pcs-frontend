@@ -62,7 +62,7 @@ def secrets = [
 
 withNightlyPipeline(type, product, component) {
   validateInputs()
-  enableSlackNotifications('#qa-pipeline-status')
+  enableSlackNotifications('#pcs-tech')
   loadVaultSecrets(secrets)
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
@@ -161,7 +161,7 @@ def runAccessibilityTests(yarnBuilder) {
   }
 }
 
-// E2E stage notification to #qa-pipeline-status
+// E2E stage notification to #hdp-qa-e2e-test-results
 def postAllureResultsToSlack() {
   env.E2E_SERVICE_NAME = 'pcs-frontend'
   env.E2E_PIPELINE_TYPE = 'nightly'
@@ -175,8 +175,8 @@ def postAllureResultsToSlack() {
     msg = "E2E Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend | *Pipeline:* nightly\n*Platform:* Linux | *Browser:* Chromium, Firefox, WebKit\n\nSee full results in the Allure reports below.\n*Chrome:* ${env.BUILD_URL}Full_20Chrome_20E2E_20Test_20Report/\n*Firefox:* ${env.BUILD_URL}Full_20Firefox_20E2E_20Test_20Report/\n*Safari:* ${env.BUILD_URL}Full_20Safari_20E2E_20Test_20Report/\n*Accessibility:* ${env.BUILD_URL}Accessibility_20Test_20Report/"
   }
   try {
-    slackSend(channel: '#qa-pipeline-status', message: msg)
-    echo "E2E Slack notification sent to #qa-pipeline-status"
+    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    echo "E2E Slack notification sent to #hdp-qa-e2e-test-results"
   } catch (Exception e) {
     echo "WARNING: Failed to send E2E Slack notification: ${e.message}. Check Jenkins Slack plugin and channel access."
   }
