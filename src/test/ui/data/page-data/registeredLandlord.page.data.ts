@@ -1,4 +1,4 @@
 export const registeredLandlord = {
-  mainHeader: 'Landlord registered',
-  continueButton: 'Continue',
+  mainHeader: `Landlord registered`,
+  continueButton: `Continue`,
 };
