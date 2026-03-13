@@ -1,0 +1,27 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Tenancy, occupation contract or licence start date",
+  "question": "Is the tenancy, licence or occupation contract start date correct?",
+  "subHeading": "Details given by {{claimantName}}:",
+  "bulletPoint": "Your tenancy, occupation contract or licence began on {{tenancyStartDate}}",
+  "dateLabel": "What is the correct start date (optional)?",
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "notSure": "I’m not sure"
+  },
+  "errors": {
+    "date": {
+      "day": "Day",
+      "month": "Month",
+      "year": "Year",
+      "notRealDate": "Tenancy start date must be a real date",
+      "futureDate": "Tenancy start date must be in the past",
+      "invalidValue": "Tenancy start date must be a real date",
+      "missingOne": "Your tenancy start date must include a {{missingField}}",
+      "missingTwo": "Tenancy start date must include a  {{first}} and {{second}}"
+    },
+    "confirmTenancyDate": "Select if the tenancy, licence or occupation contract details are correct"
+  }
+}
