@@ -5,3 +5,5 @@ export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
 export { isNoticeServed } from './isNoticeServed';
 export { getPreviousNoticeStep } from './journeyHelpers';
 export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
+export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
+export { formatDatePartsToISODate } from './dateUtils';

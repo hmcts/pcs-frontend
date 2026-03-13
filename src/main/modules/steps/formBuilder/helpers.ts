@@ -340,9 +340,11 @@ export function validateForm(
     }
 
     if (field.type === 'date') {
-      const dayKey = parentFieldName ? `${parentFieldName}-${field.name}-day` : `${field.name}-day`;
-      const monthKey = parentFieldName ? `${parentFieldName}-${field.name}-month` : `${field.name}-month`;
-      const yearKey = parentFieldName ? `${parentFieldName}-${field.name}-year` : `${field.name}-year`;
+      // Nested date fields use parent-prefixed keys, top-level date fields don’t.
+      const prefix = parentFieldName ? `${parentFieldName}.${field.name}` : field.name;
+      const dayKey = `${prefix}-day`;
+      const monthKey = `${prefix}-month`;
+      const yearKey = `${prefix}-year`;
 
       const day = req.body[dayKey]?.trim() || '';
       const month = req.body[monthKey]?.trim() || '';
