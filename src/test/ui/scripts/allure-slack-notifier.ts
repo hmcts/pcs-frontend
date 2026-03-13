@@ -3,7 +3,7 @@ import * as path from 'path';
 
 const SUMMARY_CANDIDATES = ['allure-report/widgets/summary.json', 'allure-report/data/widgets/summary.json'];
 
-const DEFAULT_REPORT_PATH = 'PCS_20Frontend_20Functional_20Test_20Report/';
+const DEFAULT_REPORT_PATH = 'Full_20Chrome_20E2E_20Test_20Report/';
 const DEFAULT_SERVICE_NAME = 'pcs-frontend';
 const SLOW_THRESHOLD_SEC = 5 * 60;
 const TOP_SLOW_N = 5;
@@ -191,9 +191,12 @@ function buildMessage(
   const summaryForRag = tests && tests.length > 0 ? { ...summary, ...latestResultSummary(tests) } : summary;
   const rag = ragStatus(summaryForRag);
   const reportUrl = buildUrl ? `${buildUrl}${reportSuffix}` : '';
+  const platform = (process.env.E2E_PLATFORM ?? 'Linux').trim();
+  const browser = (process.env.E2E_BROWSER ?? 'Chromium').trim();
   const lines: string[] = [
     `*E2E Test Results* — Build #${buildNumber}  ${rag}`,
     `*Service:* ${serviceName}  |  *Pipeline:* ${pipelineType}`,
+    `*Platform:* ${platform}  |  *Browser:* ${browser}`,
     '',
   ];
   if (reportUrl) {
@@ -263,10 +266,13 @@ function getFallbackMessage(
   serviceName: string,
   pipelineType: string
 ): string {
+  const platform = (process.env.E2E_PLATFORM ?? 'Linux').trim();
+  const browser = (process.env.E2E_BROWSER ?? 'Chromium').trim();
   const reportUrl = buildUrl ? `${buildUrl}${reportSuffix}` : '';
   return [
-    `Functional Test Results — Build #${buildNumber}`,
+    `E2E Test Results — Build #${buildNumber}`,
     `*Service:* ${serviceName}  |  *Pipeline:* ${pipelineType}`,
+    `*Platform:* ${platform}  |  *Browser:* ${browser}`,
     '',
     'Allure report not available – check build logs.',
     reportUrl ? `*Allure report:* ${reportUrl}` : buildUrl ? `*Build:* ${buildUrl}` : '',
