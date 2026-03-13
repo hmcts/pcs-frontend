@@ -67,7 +67,6 @@ withPipeline(type, product, component) {
     afterAlways('fullFunctionalTest:preview') {
       archiveFunctionalTestReports()
       postAllureResultsToSlack('pr')
-
     }
   }
 
