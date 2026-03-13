@@ -186,7 +186,7 @@ describe('Dashboard Routes', () => {
       );
 
       const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
-        helpSupportLinks: { text: string; href: string }[];
+        helpSupportLinks: { key: string; href: string }[];
         taskGroups: {
           title: string;
           tasks: {
@@ -199,7 +199,7 @@ describe('Dashboard Routes', () => {
       };
 
       expect(renderArgs.helpSupportLinks).toHaveLength(6);
-      expect(renderArgs.helpSupportLinks[0]).toEqual({ text: 'Help with fees', href: '#' });
+      expect(renderArgs.helpSupportLinks[0]).toEqual({ key: 'helpWithFees', href: '#' });
 
       const [firstGroup] = renderArgs.taskGroups;
       expect(firstGroup.title).toBe('Group one title');
