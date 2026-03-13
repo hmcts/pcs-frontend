@@ -47,6 +47,8 @@ export interface FormFieldConfig {
   options?: FormFieldOption[];
   classes?: string;
   attributes?: Record<string, unknown>;
+  /** When true, applies GOV.UK-recommended currency input attributes (inputmode, pattern, spellcheck) automatically */
+  currencyInput?: boolean;
   // Optional prefix for input fields (e.g. currency symbol)
   prefix?: {
     text: string;
