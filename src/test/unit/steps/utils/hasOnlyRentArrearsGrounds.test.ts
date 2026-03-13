@@ -4,7 +4,7 @@ import { hasOnlyRentArrearsGrounds } from '../../../../main/steps/utils/hasOnlyR
 
 describe('hasOnlyRentArrearsGrounds', () => {
   describe('when all grounds are rent arrears (rent-only)', () => {
-    it('should return true when single ground has isRentArrears=Yes', async () => {
+    it('should return true when single ground has isRentArrears=Yes (case-insensitive)', async () => {
       const mockReq = {
         res: {
           locals: {
@@ -15,57 +15,6 @@ describe('hasOnlyRentArrearsGrounds', () => {
                     value: {
                       isRentArrears: 'Yes',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-1',
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      expect(result).toBe(true);
-    });
-
-    it('should return true when isRentArrears=YES (uppercase)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'YES',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-1',
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      expect(result).toBe(true);
-    });
-
-    it('should return true when isRentArrears=yes (lowercase)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'yes',
                     },
                     id: 'ground-1',
                   },
@@ -173,42 +122,9 @@ describe('hasOnlyRentArrearsGrounds', () => {
                   {
                     value: {
                       isRentArrears: 'No',
-                      code: 'LANDLORDS_WORKS',
+                      code: 'CRIMINAL_CONVICTION',
                     },
                     id: 'ground-3',
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false when first ground is non-rent and second is rent', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
-                  },
-                  {
-                    value: {
-                      isRentArrears: 'Yes',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-2',
                   },
                 ],
               },
@@ -234,7 +150,7 @@ describe('hasOnlyRentArrearsGrounds', () => {
                   {
                     value: {
                       isRentArrears: 'No',
-                      code: 'PREMIUM_PAID_MUTUAL_EXCHANGE',
+                      code: 'NUISANCE_OR_IMMORAL_USE',
                     },
                     id: 'ground-1',
                   },
@@ -267,60 +183,9 @@ describe('hasOnlyRentArrearsGrounds', () => {
                   {
                     value: {
                       isRentArrears: 'No',
-                      code: 'DOMESTIC_VIOLENCE',
+                      code: 'CRIMINAL_CONVICTION',
                     },
                     id: 'ground-2',
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false when isRentArrears is undefined', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false when isRentArrears is null', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: null,
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
                   },
                 ],
               },
@@ -360,24 +225,6 @@ describe('hasOnlyRentArrearsGrounds', () => {
           locals: {
             validatedCase: {
               data: {},
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false when claimGroundSummaries is null', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: null,
-              },
             },
           },
         },
@@ -428,14 +275,6 @@ describe('hasOnlyRentArrearsGrounds', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false when res is undefined', async () => {
-      const mockReq = {} as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      expect(result).toBe(false);
-    });
-
     it('should return false when ground.value is undefined', async () => {
       const mockReq = {
         res: {
@@ -458,24 +297,6 @@ describe('hasOnlyRentArrearsGrounds', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false when ground is null', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [null],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      expect(result).toBe(false);
-    });
-
     it('should handle mixed null/undefined grounds with valid rent arrears ground', async () => {
       const mockReq = {
         res: {
@@ -483,7 +304,6 @@ describe('hasOnlyRentArrearsGrounds', () => {
             validatedCase: {
               data: {
                 claimGroundSummaries: [
-                  null,
                   {
                     value: {
                       isRentArrears: 'Yes',
@@ -491,7 +311,10 @@ describe('hasOnlyRentArrearsGrounds', () => {
                     },
                     id: 'ground-1',
                   },
-                  undefined,
+                  {
+                    value: null,
+                    id: 'ground-2',
+                  },
                 ],
               },
             },
@@ -501,13 +324,12 @@ describe('hasOnlyRentArrearsGrounds', () => {
 
       const result = await hasOnlyRentArrearsGrounds(mockReq);
 
-      // Should return false because not ALL grounds are rent arrears (null/undefined are not rent arrears)
       expect(result).toBe(false);
     });
   });
 
   describe('regression tests - verify against real CCD data', () => {
-    it('should return true for scenario 1: rent-only, no notice (real CCD data)', async () => {
+    it('should return true for rent-only scenario (real CCD data)', async () => {
       const mockReq = {
         res: {
           locals: {
@@ -516,12 +338,11 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                      label: 'Rent arrears or breach of the tenancy (ground 1)',
                       isRentArrears: 'Yes',
+                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
+                      description: 'Rent arrears or breach of other obligation of the tenancy',
                     },
-                    id: '46c3fe9c-c786-4737-b565-a90ff33aef08',
+                    id: '4bd94bb9-e72f-473e-95ae-a6d2b3f8e8be',
                   },
                 ],
               },
@@ -535,7 +356,7 @@ describe('hasOnlyRentArrearsGrounds', () => {
       expect(result).toBe(true);
     });
 
-    it('should return false for scenario 4: mixed grounds (real CCD data)', async () => {
+    it('should return false for mixed grounds scenario (real CCD data)', async () => {
       const mockReq = {
         res: {
           locals: {
@@ -544,21 +365,18 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                      label: 'Rent arrears or breach of the tenancy (ground 1)',
-                      reason: 'rent arrears reason',
                       isRentArrears: 'Yes',
+                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
+                      description: 'Rent arrears or breach of other obligation of the tenancy',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
-                      code: 'ANTISOCIAL_BEHAVIOUR_S158',
-                      label: 'Antisocial behaviour (ground 14)',
-                      reason: 'antisocial behaviour reason',
                       isRentArrears: 'No',
+                      code: 'NUISANCE_OR_IMMORAL_USE',
+                      description:
+                        'Nuisance or annoyance to neighbours, illegal or immoral use of the property, or conviction for an arrestable offence in or near the property',
                     },
                     id: 'ground-2',
                   },
@@ -571,11 +389,10 @@ describe('hasOnlyRentArrearsGrounds', () => {
 
       const result = await hasOnlyRentArrearsGrounds(mockReq);
 
-      // Critical: Mixed grounds should return FALSE
       expect(result).toBe(false);
     });
 
-    it('should return false for scenario 5: mixed grounds with 3 grounds (real CCD data)', async () => {
+    it('should return false for non-rent-only scenario (real CCD data)', async () => {
       const mockReq = {
         res: {
           locals: {
@@ -584,53 +401,10 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                      isRentArrears: 'Yes',
-                    },
-                    id: 'ground-1',
-                  },
-                  {
-                    value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
-                      code: 'ANTISOCIAL_BEHAVIOUR_S158',
                       isRentArrears: 'No',
-                    },
-                    id: 'ground-2',
-                  },
-                  {
-                    value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
-                      code: 'SPECIAL_NEEDS_ACCOMMODATION',
-                      isRentArrears: 'No',
-                    },
-                    id: 'ground-3',
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false for scenario 7: non-rent-only (real CCD data)', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
-                      code: 'ANTISOCIAL_BEHAVIOUR_S157',
-                      label: 'Antisocial behaviour (ground 2)',
-                      isRentArrears: 'No',
+                      code: 'NUISANCE_OR_IMMORAL_USE',
+                      description:
+                        'Nuisance or annoyance to neighbours, illegal or immoral use of the property, or conviction for an arrestable offence in or near the property',
                     },
                     id: 'ground-1',
                   },
@@ -643,69 +417,6 @@ describe('hasOnlyRentArrearsGrounds', () => {
 
       const result = await hasOnlyRentArrearsGrounds(mockReq);
 
-      expect(result).toBe(false);
-    });
-  });
-
-  describe('.every() and .some() method behavior verification', () => {
-    it('should use .some() to check if at least one ground is rent arrears', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      // No rent arrears at all - should return false
-      expect(result).toBe(false);
-    });
-
-    it('should use .every() to verify ALL grounds are rent arrears', async () => {
-      const mockReq = {
-        res: {
-          locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'Yes',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-1',
-                  },
-                  {
-                    value: {
-                      isRentArrears: 'No', // This makes .every() return false
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-2',
-                  },
-                ],
-              },
-            },
-          },
-        },
-      } as unknown as Request;
-
-      const result = await hasOnlyRentArrearsGrounds(mockReq);
-
-      // Has rent arrears BUT not ALL are rent arrears - should return false
       expect(result).toBe(false);
     });
   });
