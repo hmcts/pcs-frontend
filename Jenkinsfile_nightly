@@ -1,7 +1,7 @@
 #!groovy
 
 properties([
-// H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
+  // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
     choice(
@@ -34,11 +34,6 @@ properties([
       defaultValue: true,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
-    booleanParam(
-      name: 'FULL_FUNCTIONAL_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run full functional tests (all Playwright tests, Chromium) and send Slack notification.'
-    ),
   ])
 ])
 
@@ -50,12 +45,11 @@ def component = "frontend"
 
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
-static Map<String, Object> secret(String secretName, String envVariable) {
-  [
-    $class: 'AzureKeyVaultSecret',
-    secretType: 'Secret',
-    name: secretName,
-    envVariable: envVariable
+static Map secret(String secretName, String envVariable) {
+  [$class     : 'AzureKeyVaultSecret',
+   secretType : 'Secret',
+   name       : secretName,
+   envVariable: envVariable
   ]
 }
 
@@ -67,24 +61,23 @@ def secrets = [
 ]
 
 withNightlyPipeline(type, product, component) {
-  loadVaultSecrets(secrets)
   validateInputs()
+  enableSlackNotifications('#pcs-tech')
+  loadVaultSecrets(secrets)
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
-  enableSlackNotifications('#qa-pipeline-status')
   enableFortifyScan()
-  afterSuccess('fortify-scan') {
-    steps.archiveArtifacts allowEmptyArchive: true,
-      artifacts: '**/Fortify Scan/**/*'
+
+  afterAlways('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
   }
+
   afterAlways('fortify-scan') {
     runE2ETests(yarnBuilder)
-    if (params.FULL_FUNCTIONAL_TESTS) {
-      runFullFunctionalTests(yarnBuilder)
-    }
     if (params.ACCESSIBILITY_TESTS) {
       runAccessibilityTests(yarnBuilder)
     }
+    postAllureResultsToSlack()
   }
 }
 
@@ -149,51 +142,6 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
   }
 }
 
-def runFullFunctionalTests(yarnBuilder) {
-  stage('Full Functional Test') {
-    node {
-      checkout scm
-      try {
-        yarnBuilder.yarn('test:fullfunctional')
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      } finally {
-        sh(script: '[ -d allure-results ] && npx allure generate allure-results --clean -o allure-report || true', returnStatus: true)
-        publishHTML([
-          allowMissing: true,
-          alwaysLinkToLastBuild: true,
-          keepAll: true,
-          reportDir: 'allure-report',
-          reportFiles: 'index.html',
-          reportName: 'PCS Frontend Full Functional Test Report'
-        ])
-        steps.archiveArtifacts(
-          allowEmptyArchive: true,
-          artifacts: 'allure-results/**/*, definitions/test/playwright-report/**'
-        )
-        if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-          postAllureResultsToSlack('nightly')
-        }
-      }
-    }
-  }
-}
-
-def postAllureResultsToSlack(String pipelineType = 'nightly') {
-  def msg = sh(
-    script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true",
-    returnStdout: true
-  ).trim()
-  if (!msg) {
-    msg = "Functional Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend  |  *Pipeline:* ${pipelineType}\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}PCS_20Frontend_20Full_20Functional_20Test_20Report/"
-  }
-  try {
-    slackSend(channel: '#qa-pipeline-status', message: msg)
-  } catch (Exception e) {
-    echo "WARNING: Allure Slack notification failed: ${e.message}"
-  }
-}
-
 def runAccessibilityTests(yarnBuilder) {
   stage("Full Accessibility Test") {
     node {
@@ -204,15 +152,34 @@ def runAccessibilityTests(yarnBuilder) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
       } finally {
         publishHTML([
-          allowMissing         : true,
+          allowMissing: true,
           alwaysLinkToLastBuild: true,
-          keepAll              : true,
-          reportDir            : "allure-report",
-          reportFiles          : 'index.html',
-          reportName           : 'Accessibility Test Report'
+          keepAll: true,
+          reportDir: "allure-report",
+          reportFiles: 'index.html',
+          reportName: 'Accessibility Test Report'
         ])
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
       }
     }
+  }
+}
+
+// E2E stage notification to #hdp-qa-e2e-test-results
+def postAllureResultsToSlack() {
+  env.E2E_SERVICE_NAME = 'pcs-frontend'
+  env.E2E_PIPELINE_TYPE = 'nightly'
+  def msg = sh(
+    script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true",
+    returnStdout: true
+  ).trim()
+  if (!msg) {
+    msg = "E2E Test Results — Build #${env.BUILD_NUMBER}\n*Service:* pcs-frontend | *Pipeline:* nightly\n\nAllure report not available – check build logs.\n*Allure report:* ${env.BUILD_URL}Full_20Chrome_20E2E_20Test_20Report/"
+  }
+  try {
+    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    echo "E2E Slack notification sent to #hdp-qa-e2e-test-results"
+  } catch (Exception e) {
+    echo "WARNING: Failed to send E2E Slack notification: ${e.message}. Check Jenkins Slack plugin and channel access."
   }
 }
