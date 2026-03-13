@@ -1,5 +1,6 @@
 import { isNoticeDateProvided } from '../../../../main/steps/utils/isNoticeDateProvided';
 import { isNoticeServed } from '../../../../main/steps/utils/isNoticeServed';
+import { isTenancyStartDateKnown } from '../../../../main/steps/utils/isTenancyStartDateKnown';
 import { getPreviousNoticeStep } from '../../../../main/steps/utils/journeyHelpers';
 
 jest.mock('../../../../main/steps/utils/isNoticeDateProvided');
@@ -104,34 +105,38 @@ describe('getPreviousNoticeStep', () => {
   });
 
   describe('Priority 4: No notice served (fallback)', () => {
-    it('returns tenancy-details when notice not served and tenancy start date is unknown', async () => {
+    it('returns tenancy-date-unknown when notice not served and tenancy start date is unknown', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(false);
 
-      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-date-unknown');
     });
 
-    it('returns tenancy-details when notice not served, even if date provided', async () => {
+    it('returns tenancy-date-details when notice not served and tenancy start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true); // Date provided but notice not served
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
 
-      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-date-details');
     });
 
-    it('returns tenancy-details when notice not served, user said no', async () => {
+    it('returns tenancy-date-unknown when notice not served, user said no', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'no' } };
 
-      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-date-unknown');
     });
 
-    it('returns tenancy-details when notice not served, user said yes', async () => {
+    it('returns tenancy-date-unknown when notice not served, user said yes', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(false);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
 
-      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-date-unknown');
     });
   });
 
@@ -152,12 +157,13 @@ describe('getPreviousNoticeStep', () => {
       expect(await getPreviousNoticeStep(mockReq)).toBe('confirmation-of-notice-date-when-provided');
     });
 
-    it('returns tenancy-details when session is undefined and notice not served', async () => {
+    it('returns tenancy-date-unknown when session is undefined and notice not served', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(false);
       mockReq = {}; // No session
 
-      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-date-unknown');
     });
   });
 
@@ -189,8 +195,9 @@ describe('getPreviousNoticeStep', () => {
     it('handles no notice served scenario', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(false);
 
-      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-details');
+      expect(await getPreviousNoticeStep(mockReq)).toBe('tenancy-date-unknown');
     });
   });
 });
