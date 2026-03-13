@@ -8,7 +8,6 @@ export class Csrf {
   enableFor(app: Express): void {
     this.logger.info('Enabling CSRF protection');
     const { csrfSynchronisedProtection }: { csrfSynchronisedProtection: RequestHandler } = csrfSync({
-      ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
       /**
        * Extracts the CSRF token from the request body.
        *

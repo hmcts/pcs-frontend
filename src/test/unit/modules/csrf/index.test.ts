@@ -60,10 +60,16 @@ describe('Csrf', () => {
       const mockReq = { body: { _csrf: 'token-from-body' } } as Request;
       expect(options.getTokenFromRequest(mockReq)).toBe('token-from-body');
 
-      const headerTokenReq = { body: {}, headers: { 'x-csrf-token': 'token-from-header' } } as unknown as Request;
+      const headerTokenReq = {
+        body: {},
+        get: jest.fn((headerName: string) => (headerName === 'x-csrf-token' ? 'token-from-header' : undefined)),
+      } as unknown as Request;
       expect(options.getTokenFromRequest(headerTokenReq)).toBe('token-from-header');
 
-      const reqNoToken = { body: {}, headers: {} } as unknown as Request;
+      const reqNoToken = {
+        body: {},
+        get: jest.fn().mockReturnValue(undefined),
+      } as unknown as Request;
       expect(options.getTokenFromRequest(reqNoToken)).toBeUndefined();
     });
 
