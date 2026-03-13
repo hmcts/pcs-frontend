@@ -41,4 +41,22 @@ export const correspondenceAddress = {
   pleaseSelectAnAddressErrorMessage: `Please select an address`,
   enterAddressLine1ErrorMessage: `Enter address line 1, typically the building and street`,
   enterTownOrCityErrorMessage: `Enter town or city`,
+
+  //The below section will be deleted once correspondence address functional tests automatically handle page routing - will be implemented in a new story
+  errorValidation: `YES`,
+  errorValidationType: { input: `textField`, radio: `radioOptions` },
+  errorValidationHeader: `There is a problem`,
+  errorValidationField: {
+    errorRadioMsg: [{ errMessage: `Please confirm your address by selecting the options below` }],
+    errorTextField1: [{ type: `empty`, label: `Enter a UK postcode`, errMessage: `Enter a valid UK postcode` }],
+    errorTextField2: [
+      { type: `empty`, label: `Enter a UK postcode`, errMessage: `Postcode not found. Please check and try again.` },
+    ],
+    errorTextField3: [{ type: `empty`, label: `Select an address`, errMessage: `Please select an address` }],
+    errorTextField4: [
+      { type: `empty`, label: `Address line 1`, errMessage: `Enter address line 1, typically the building and street` },
+      { type: `empty`, label: `Town or city`, errMessage: `Enter town or city` },
+      { type: `empty`, label: `Postcode`, errMessage: `Enter a valid UK postcode` },
+    ],
+  },
 };
