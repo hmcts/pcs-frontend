@@ -54,7 +54,7 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chromium',
+        channel: 'chrome',
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
         trace: 'on-first-retry',
