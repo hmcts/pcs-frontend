@@ -1,6 +1,14 @@
 import { contactPreferencesTelephone, contactPreferencesTextMessage } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
+export async function contactPreferencesTextMessageErrorValidation(): Promise<void> {
+  await performAction('clickButton', contactPreferencesTextMessage.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: contactPreferencesTextMessage.thereIsAProblemErrorMessageHeader,
+    message: contactPreferencesTextMessage.selectIfYouWantErrorMessage,
+  });
+}
+
 export async function contactPreferencesTextMessageNavigationTests(): Promise<void> {
   await performValidation(
     'pageNavigation',
