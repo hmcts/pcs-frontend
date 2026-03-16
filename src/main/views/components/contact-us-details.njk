@@ -1,30 +1,44 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
-
+ 
 {% set contactInformation %}
-  <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Email - SDM comment START - arbitrary comment so I can raise a and get a PR number - END</h3>
+  <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+    {{ t('contactUsDetailsEmailHeading', 'Email') }}
+  </h3>
 
   <p class="govuk-body">
-    Use the
+    {{ t('contactUsDetailsEmailIntroPrefix', 'Use the') }}
     <a
       class="govuk-link"
       href="https://www.find-court-tribunal.service.gov.uk/"
       target="_blank"
       rel="noopener noreferrer">
-      find a court or tribunal service (opens in new tab)
+      {{ t(
+        'contactUsDetailsEmailLinkText',
+        'find a court or tribunal service (opens in new tab)'
+      ) }}
     </a>
-    to get your local court&rsquo;s email address.
+    {{ t(
+      'contactUsDetailsEmailIntroSuffix',
+      'to get your local court’s email address.'
+    ) }}
   </p>
 
   <p class="govuk-body">
-    If you do not know the name of your local court, select the
-    &lsquo;Money&rsquo; category and then the &lsquo;Housing&rsquo; category to find it.
+    {{ t(
+      'contactUsDetailsEmailHelp',
+      'If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.'
+    ) }}
   </p>
 
-  <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Telephone</h3>
+  <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+    {{ t('contactUsDetailsTelephoneHeading', 'Telephone') }}
+  </h3>
 
   <p class="govuk-body">
-    0300 123 7050<br>
-    Monday to Friday, 8.30am to 5pm.
+    {{ t(
+      'contactUsDetailsTelephoneNumber',
+      '0300 123 7050<br>Monday to Friday, 8.30am to 5pm.'
+    ) | safe }}
   </p>
 
   <p class="govuk-body">
@@ -33,7 +47,10 @@
       href="https://www.gov.uk/call-charges"
       target="_blank"
       rel="noopener noreferrer">
-      Find out about call charges (opens in new tab)
+      {{ t(
+        'contactUsDetailsCallChargesLinkText',
+        'Find out about call charges (opens in new tab)'
+      ) }}
     </a>
   </p>
 
