@@ -17,16 +17,6 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
   await performAction(
     'inputText',
     contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage
-  );
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
-  await performValidation('errorMessage', {
-    header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
-    message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
-  });
-  await performAction(
-    'inputText',
-    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
     contactPreferenceEmailOrPost.emailAddressWithMoreThan250CharTextInput
   );
   await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
@@ -37,7 +27,57 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
   await performAction(
     'inputText',
     contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.emailAddressWithSpecialCharTextInput
+    contactPreferenceEmailOrPost.emailAddressWithMultipleSpecialCharTextInput
+  );
+  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
+    message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+    contactPreferenceEmailOrPost.emailAddressWithSpaceTextInput
+  );
+  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
+    message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+    contactPreferenceEmailOrPost.emailAddressWithSpecialCharInDomainTextInput
+  );
+  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
+    message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+    contactPreferenceEmailOrPost.emailAddressWithSpecialCharInDomainTextInput
+  );
+  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
+    message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+    contactPreferenceEmailOrPost.plainAddressTextInput
+  );
+  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
+    message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+    contactPreferenceEmailOrPost.missingDomainExtensionTextInput
   );
   await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
@@ -50,7 +90,7 @@ export async function contactPreferenceEmailOrPostNavigationTests(): Promise<voi
   await performValidation(
     'pageNavigation',
     contactPreferenceEmailOrPost.backLink,
-    correspondenceAddress.correspondenceAddressKnownMainHeader
+    correspondenceAddress.correspondenceAddressUnKnownMainHeader
   );
   await performAction('clickRadioButton', contactPreferenceEmailOrPost.byPostRadioOption);
   await performValidation('pageNavigation', contactPreferenceEmailOrPost.saveForLaterButton, 'Dashboard');

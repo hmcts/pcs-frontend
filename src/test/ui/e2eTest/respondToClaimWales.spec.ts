@@ -61,8 +61,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.yesRadioOption,
       phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
