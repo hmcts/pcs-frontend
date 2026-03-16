@@ -66,7 +66,6 @@ withPipeline(type, product, component) {
     }
     afterAlways('fullFunctionalTest:preview') {
       archiveFunctionalTestReports()
-      sendAllureReportToSlack('master')
     }
   }
 
@@ -107,7 +106,7 @@ def sendAllureReportToSlack(String pipelineType = 'master') {
   def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
-    slackSend(channel: '#qa-pipeline-status', message: msg)
+    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }
