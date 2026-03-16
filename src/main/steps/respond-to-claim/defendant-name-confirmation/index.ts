@@ -40,19 +40,9 @@ export const step: StepDefinition = createFormStep({
     }
 
     if (nameConfirmation === 'yes') {
-      // User confirms name - copy from claimant-entered details
-      const caseData = req.res?.locals?.validatedCase?.data;
-      const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
-
-      const firstName = claimantEntry?.firstName;
-      const lastName = claimantEntry?.lastName;
-
-      if (typeof firstName === 'string' && firstName.trim()) {
-        party.firstName = firstName;
-      }
-      if (typeof lastName === 'string' && lastName.trim()) {
-        party.lastName = lastName;
-      }
+      // User confirms name - clear any previously corrected names by sending empty strings
+      party.firstName = '';
+      party.lastName = '';
     }
 
     // Build payload with dual paths
