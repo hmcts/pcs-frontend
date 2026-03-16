@@ -16,6 +16,8 @@ export default {
   'rent-arrears-dispute': 'rentArrearsDispute',
   'payment-interstitial': 'payment-interstitial',
   'repayments-made': 'repaymentsMade',
+  'landlord-registered': 'landlordRegistered',
+  'tenancy-date-unknown': 'tenancyDateUnknown',
   'tenancy-date-details': 'tenancyDateDetails',
   'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
 };

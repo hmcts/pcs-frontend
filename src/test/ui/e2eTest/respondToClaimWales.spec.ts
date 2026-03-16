@@ -1,7 +1,6 @@
 import { test } from '@playwright/test';
 import config from 'config';
 
-import { submitCaseApiData } from '../data/api-data';
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
@@ -12,9 +11,8 @@ import {
   dateOfBirth,
   defendantNameCapture,
   freeLegalAdvice,
-  nonRentArrearsDispute,
-  noticeDetails,
-  registeredLandlord,
+  landlordRegistered,
+  licensedLandlord,
   startNow,
   tenancyDetails,
 } from '../data/page-data';
@@ -46,8 +44,7 @@ test.afterEach(async () => {
   PageNavigationValidation.finaliseTest();
 });
 
-//Following test is skipped due to accessibility issue(HDPI-4571) in the registered landlord page which is blocking the flow.
-test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
+test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim - Wales @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -64,23 +61,17 @@ test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
-    await performAction('selectcontactByTelephone', {
+    await performValidation('mainHeader', contactPreference.mainHeader);
+    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.yesRadioOption,
       phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
     });
     await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', registeredLandlord.mainHeader);
-    await performAction('clickButton', registeredLandlord.continueButton);
+    await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
+    await performValidation('mainHeader', licensedLandlord.mainHeader);
+    await performAction('clickButton', licensedLandlord.continueButton);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('selectNoticeDetails', {
-      isClaimantNameCorrect: submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect,
-      option: noticeDetails.yesRadioOption,
-    });
-    await performAction('enterNoticeDateKnown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 });
