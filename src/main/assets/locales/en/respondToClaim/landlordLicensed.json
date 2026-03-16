@@ -1,0 +1,16 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Licensed landlord",
+  "paragraph": "You can check if your landlord is licensed by searching the <a href=\"https://rentsmart.gov.wales/en/check-register/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Public Register (opens in new tab)</a>.",
+  "question": "Is your landlord licensed?",
+
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "imNotSure": "I’m not sure"
+  },
+  "errors": {
+    "confirmLandlordLicensed": "Select if your landlord is licensed?"
+  }
+}

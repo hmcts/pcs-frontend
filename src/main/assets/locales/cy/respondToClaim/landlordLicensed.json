@@ -1,0 +1,16 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyLicensed landlord",
+  "paragraph": "cyYou can check if your landlord is licensed by searching the <a href=\"https://rentsmart.gov.wales/en/check-register/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Public Register (opens in new tab)</a>.",
+  "question": "cyIs your landlord licensed?",
+
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "imNotSure": "cyI’m not sure"
+  },
+  "errors": {
+    "confirmLandlordLicensed": "cySelect if your landlord is licensed?"
+  }
+}
