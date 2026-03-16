@@ -60,20 +60,16 @@ export const step: StepDefinition = createFormStep({
     claimIssueDate: '20th May 2025',
   }),
   beforeRedirect: async req => {
-    const repaymentsForm = req.session.formData?.['repayments-agreed'];
+    const repaymentsForm = req.body as Record<string, unknown>;
+    const repaymentsAgreed = repaymentsForm.repaymentsAgreed as string | undefined;
+
     if (!repaymentsForm) {
       return;
     }
-
     const possessionClaimResponse: PossessionClaimResponse = {
       paymentAgreement: {
-        repaymentPlanAgreed:
-          repaymentsForm.repaymentsAgreed === 'yes'
-            ? 'YES'
-            : repaymentsForm.repaymentsAgreed === 'no'
-              ? 'NO'
-              : 'NOT_SURE',
-        repaymentAgreedDetails: repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] || '',
+        repaymentPlanAgreed: repaymentsAgreed === 'yes' ? 'YES' : repaymentsAgreed === 'no' ? 'NO' : 'NOT_SURE',
+        repaymentAgreedDetails: repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined,
       },
     };
 

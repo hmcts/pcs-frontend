@@ -321,13 +321,21 @@ export const flowConfig: JourneyFlowConfig = {
     'repayments-agreed': {
       routes: [
         {
-          condition: async (req: Request) => req.session?.formData?.['repayments-agreed']?.repaymentsAgreed === 'no',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.repaymentsAgreed === 'no',
+
           nextStep: 'installment-payments',
         },
         {
-          condition: async (req: Request) =>
-            req.session?.formData?.['repayments-agreed']?.repaymentsAgreed === 'yes' ||
-            req.session?.formData?.['repayments-agreed']?.repaymentsAgreed === 'imNotSure',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> =>
+            currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
           nextStep: 'your-household-and-circumstances',
         },
       ],
