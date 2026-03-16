@@ -35,10 +35,8 @@
   </h3>
 
   <p class="govuk-body">
-    {{ t(
-      'contactUsDetailsTelephoneNumber',
-      '0300 123 7050<br>Monday to Friday, 8.30am to 5pm.'
-    ) }}
+    {{ t('contactUsDetailsTelephoneNumber', '0300 123 7050') }}<br>
+    {{ t('contactUsDetailsTelephoneHours', 'Monday to Friday, 8.30am to 5pm.') }}
   </p>
 
   <p class="govuk-body">
@@ -57,6 +55,6 @@
 {% endset %}
 
 {{ govukDetails({
-  summaryText: "Contact us for help",
+  summaryText: t('contactUsForHelp', 'Contact us for help'),
   html: contactInformation
 }) }}
