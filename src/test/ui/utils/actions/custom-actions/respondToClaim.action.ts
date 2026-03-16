@@ -16,7 +16,8 @@ import {
   paymentInterstitial,
   repaymentsMade,
   tenancyDateDetails,
-  tenancyDateUnknown, tenancyOccupationContractLicenseAgreement,
+  tenancyDateUnknown,
+  tenancyOccupationContractLicenseAgreement,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -257,7 +258,7 @@ export class RespondToClaimAction implements IAction {
       question: tenancyOccupationContractLicenseAgreement.isTenancyTypeCorrectQuestion,
       option: tenancyTypeDetails.tenancyOption,
     });
-    if (tenancyTypeDetails.tenancyOption === 'no' && tenancyTypeDetails.tenancyTypeInfo) {
+    if (tenancyTypeDetails.tenancyOption === 'No' && tenancyTypeDetails.tenancyTypeInfo) {
       await performAction(
         'inputText',
         tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeHiddenTextLabel,

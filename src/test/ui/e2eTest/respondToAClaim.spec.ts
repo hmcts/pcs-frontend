@@ -18,7 +18,8 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
-  tenancyDateDetails, tenancyOccupationContractLicenseAgreement,
+  tenancyDateDetails,
+  tenancyOccupationContractLicenseAgreement,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import {
@@ -36,9 +37,28 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else {
     process.env.NOTICE_SERVED = 'YES';
   }
+
+  if (testInfo.title.includes('Introductory')) {
+    process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+  } else if (testInfo.title.includes('Demoted')) {
+    process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
+  } else if (testInfo.title.includes('Assured')) {
+    process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
+  } else if (testInfo.title.includes('Secure')) {
+    process.env.TENANCY_TYPE = 'SECURE_TENANCY';
+  } else if (testInfo.title.includes('Flexible')) {
+    process.env.TENANCY_TYPE = 'FLEXIBLE_TENANCY';
+  }
+
   if (testInfo.title.includes('@noDefendants')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  } else if (testInfo.title.includes('@assured')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
+  } else if (testInfo.title.includes('@secureFlexible')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
   } else {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
@@ -106,7 +126,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 
-  test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @noDefendants @regression', async () => {
+  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -131,10 +151,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performAction(
       'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+      submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.noRadioOption,
+      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+    });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
@@ -143,7 +166,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 
-  test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @noDefendants @regression', async () => {
+  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -164,10 +187,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
     await performAction(
       'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.noRadioOption,
+      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+    });
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: '15',
       tsMonth: '11',
@@ -189,7 +215,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
-  test('Non-RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @noDefendants @regression', async () => {
+  test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -212,10 +238,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction(
       'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.imNotSureRadioOption,
+      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+    });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
@@ -229,48 +258,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.yesRadioOption,
       repaymentInfo: repaymentsMade.detailsTextInput,
-    });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
-  });
-
-  test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute @noDefendants @regression', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameTextInput,
-      lName: defendantNameCapture.lastNameTextInput,
-    });
-    await performAction('enterDateOfBirthDetails');
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-      postcode: correspondenceAddress.walesPostcodeTextInput,
-    });
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
-    });
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
-    );
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
-    await performAction('enterTenancyStartDetailsUnKnown', {
-      tsDay: '15',
-      tsMonth: '11',
-      tsYear: '2024',
-    });
-    await performAction('selectNoticeDetails', {
-      option: noticeDetails.noRadioOption,
-    });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
@@ -307,7 +294,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
   });
 
-  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -329,8 +316,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.noRadioOption,
+      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+    });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
     });
@@ -351,7 +341,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
-  test('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -371,8 +361,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.imNotSureRadioOption,
+    });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
     });
@@ -408,8 +400,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.yesRadioOption,
+    });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.noRadioOption,
       day: '01',
