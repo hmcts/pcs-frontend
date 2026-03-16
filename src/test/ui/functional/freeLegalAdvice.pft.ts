@@ -12,5 +12,5 @@ export async function freeLegalAdviceErrorValidation(): Promise<void> {
 export async function freeLegalAdviceNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', freeLegalAdvice.backLink, startNow.mainHeader);
   await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
-  await performValidation('pageNavigation', freeLegalAdvice.saveForLaterButton, 'Dashboard');
+  await performValidation('pageNavigation', freeLegalAdvice.saveForLaterButton, 'IncorrectDashboard');
 }
