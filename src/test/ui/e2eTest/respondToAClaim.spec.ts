@@ -81,6 +81,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
@@ -124,6 +125,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
@@ -159,6 +161,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
@@ -211,6 +214,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
     await performAction('selectContactByTelephone', {
@@ -252,6 +256,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
     await performAction('selectContactByTelephone', {
@@ -300,6 +305,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
     await performAction('selectContactByTelephone', {
@@ -333,6 +339,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
     await performAction('selectContactByTelephone', {
@@ -373,6 +380,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
@@ -414,6 +422,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
     await performAction('selectContactByTelephone', {
@@ -458,6 +467,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
     await performAction('selectContactByTelephone', {
@@ -499,6 +509,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
     await performAction('selectContactByTelephone', {

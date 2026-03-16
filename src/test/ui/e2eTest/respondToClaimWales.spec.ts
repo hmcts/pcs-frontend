@@ -62,6 +62,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });

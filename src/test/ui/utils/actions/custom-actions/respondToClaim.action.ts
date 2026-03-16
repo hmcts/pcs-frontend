@@ -123,9 +123,9 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
-  private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord): Promise<void> {
+  private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord) {
     await performAction('clickRadioButton', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      question: contactPreferenceData.question,
       option: contactPreferenceData.radioOption,
     });
     if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailRadioOption) {
@@ -134,8 +134,8 @@ export class RespondToClaimAction implements IAction {
         contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
         contactPreferenceData.emailAddress
       );
+      await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     }
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   }
 
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
