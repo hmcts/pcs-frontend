@@ -93,16 +93,10 @@ export type GetInitialFormData = (req: Request) => MaybePromise<Record<string, u
 
 export type FormFieldValue = string | string[] | Record<string, unknown>;
 
-export interface CcdMappingContext {
-  // CCD case data snapshot from START callback, available during draft save.
-  // Passed as plain data to keep mappers decoupled from Express req/res.
-  // Use this when your mapper needs to read other parts of the case (e.g., copying claimant-entered values).
-  caseData?: Record<string, unknown>;
-}
-
 // Transforms frontend form values into CCD backend format.
-// Takes form field value(s) and optional context, returns object ready for CCD payload.
-export type ValueMapper = (valueOrFormData: FormFieldValue, ctx?: CcdMappingContext) => Record<string, unknown>;
+// Takes form field value(s) and optional Request object, returns object ready for CCD payload.
+// Use req parameter when your mapper needs to read CCD case data (req.res.locals.validatedCase.data).
+export type ValueMapper = (valueOrFormData: FormFieldValue, req?: Request) => Record<string, unknown>;
 
 // Declarative mapping that tells formBuilder how to save form data to CCD draft.
 // Enables automatic draft persistence without manual beforeRedirect code.

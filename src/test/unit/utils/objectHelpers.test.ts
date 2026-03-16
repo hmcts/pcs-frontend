@@ -1,4 +1,4 @@
-import { filterNonEmptyValues, isNonEmpty } from '../../../main/utils/objectHelpers';
+import { filterNonEmptyValues, isNonEmpty, pathToNested } from '../../../main/utils/objectHelpers';
 
 describe('objectHelpers', () => {
   describe('isNonEmpty', () => {
@@ -417,6 +417,214 @@ describe('objectHelpers', () => {
         hadLegalAdvice: 'yes',
       });
       expect(Object.keys(filteredData)).toHaveLength(1);
+    });
+  });
+
+  describe('pathToNested', () => {
+    describe('should create nested objects from dot-notation paths', () => {
+      it('should create single-level nested object', () => {
+        const result = pathToNested('field', { value: 'test' });
+
+        expect(result).toEqual({
+          field: { value: 'test' },
+        });
+      });
+
+      it('should create two-level nested object', () => {
+        const result = pathToNested('parent.child', { value: 'test' });
+
+        expect(result).toEqual({
+          parent: {
+            child: { value: 'test' },
+          },
+        });
+      });
+
+      it('should create three-level nested object', () => {
+        const result = pathToNested('level1.level2.level3', { value: 'test' });
+
+        expect(result).toEqual({
+          level1: {
+            level2: {
+              level3: { value: 'test' },
+            },
+          },
+        });
+      });
+
+      it('should create deep nested object (5 levels)', () => {
+        const result = pathToNested('a.b.c.d.e', { deepValue: 'test' });
+
+        expect(result).toEqual({
+          a: {
+            b: {
+              c: {
+                d: {
+                  e: { deepValue: 'test' },
+                },
+              },
+            },
+          },
+        });
+      });
+    });
+
+    describe('should handle different value types within objects', () => {
+      it('should accept object with multiple fields', () => {
+        const value = { firstName: 'John', lastName: 'Doe' };
+        const result = pathToNested('user.details', value);
+
+        expect(result).toEqual({
+          user: {
+            details: {
+              firstName: 'John',
+              lastName: 'Doe',
+            },
+          },
+        });
+      });
+
+      it('should accept object with number field', () => {
+        const result = pathToNested('user', { age: 25 });
+
+        expect(result).toEqual({
+          user: {
+            age: 25,
+          },
+        });
+      });
+
+      it('should accept object with boolean field', () => {
+        const result = pathToNested('user', { isActive: true });
+
+        expect(result).toEqual({
+          user: {
+            isActive: true,
+          },
+        });
+      });
+
+      it('should accept object with null field', () => {
+        const result = pathToNested('user', { deletedAt: null });
+
+        expect(result).toEqual({
+          user: {
+            deletedAt: null,
+          },
+        });
+      });
+
+      it('should accept object with array field', () => {
+        const result = pathToNested('user', { roles: ['admin', 'user'] });
+
+        expect(result).toEqual({
+          user: {
+            roles: ['admin', 'user'],
+          },
+        });
+      });
+
+      it('should accept empty object', () => {
+        const result = pathToNested('user', {});
+
+        expect(result).toEqual({
+          user: {},
+        });
+      });
+    });
+
+    describe('real-world CCD use cases', () => {
+      it('should create possessionClaimResponse.defendantResponses structure', () => {
+        const result = pathToNested('possessionClaimResponse.defendantResponses', {
+          receivedFreeLegalAdvice: 'YES',
+        });
+
+        expect(result).toEqual({
+          possessionClaimResponse: {
+            defendantResponses: {
+              receivedFreeLegalAdvice: 'YES',
+            },
+          },
+        });
+      });
+
+      it('should create possessionClaimResponse.defendantContactDetails.party structure', () => {
+        const result = pathToNested('possessionClaimResponse.defendantContactDetails.party', {
+          firstName: 'John',
+          lastName: 'Doe',
+        });
+
+        expect(result).toEqual({
+          possessionClaimResponse: {
+            defendantContactDetails: {
+              party: {
+                firstName: 'John',
+                lastName: 'Doe',
+              },
+            },
+          },
+        });
+      });
+
+      it('should handle date field mapping', () => {
+        const result = pathToNested('possessionClaimResponse.defendantResponses', {
+          dateOfBirth: '1990-02-15',
+        });
+
+        expect(result).toEqual({
+          possessionClaimResponse: {
+            defendantResponses: {
+              dateOfBirth: '1990-02-15',
+            },
+          },
+        });
+      });
+
+      it('should handle multiple fields in nested object', () => {
+        const result = pathToNested('possessionClaimResponse.defendantResponses', {
+          receivedFreeLegalAdvice: 'YES',
+          defendantNameConfirmation: 'YES',
+          dateOfBirth: '1990-02-15',
+        });
+
+        expect(result).toEqual({
+          possessionClaimResponse: {
+            defendantResponses: {
+              receivedFreeLegalAdvice: 'YES',
+              defendantNameConfirmation: 'YES',
+              dateOfBirth: '1990-02-15',
+            },
+          },
+        });
+      });
+    });
+
+    describe('integration with filterNonEmptyValues', () => {
+      it('should work together for CCD save flow', () => {
+        // Step 1: Transform data
+        const transformedData = {
+          firstName: 'John',
+          lastName: 'Doe',
+          middleName: '',
+        };
+
+        // Step 2: Filter empty values
+        const filteredData = filterNonEmptyValues(transformedData);
+
+        // Step 3: Nest into CCD structure
+        const nestedData = pathToNested('possessionClaimResponse.defendantContactDetails.party', filteredData);
+
+        expect(nestedData).toEqual({
+          possessionClaimResponse: {
+            defendantContactDetails: {
+              party: {
+                firstName: 'John',
+                lastName: 'Doe',
+              },
+            },
+          },
+        });
+      });
     });
   });
 });

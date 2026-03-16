@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { dateToISO } from '../../../middleware/autoSaveDraftToCCD';
+import { dateToISO } from '../../../mappers/ccdMappers';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';

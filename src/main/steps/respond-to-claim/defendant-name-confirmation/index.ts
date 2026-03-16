@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 
-import type { CcdMappingContext, FormFieldValue } from '../../../interfaces/formFieldConfig.interface';
+import type { FormFieldValue } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { yesNoEnum } from '../../../middleware/autoSaveDraftToCCD';
+import { mapYesNoPreferNotToSay } from '../../../mappers/ccdMappers';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -21,7 +21,7 @@ export const step: StepDefinition = createFormStep({
     // Custom mapper handles two scenarios:
     // 1. User confirms name is correct (yes) - copy claimant-entered values from CCD
     // 2. User corrects name (no) - save their manually entered values
-    valueMapper: (valueOrFormData: FormFieldValue, ctx?: CcdMappingContext) => {
+    valueMapper: (valueOrFormData: FormFieldValue, req?: Request) => {
       if (typeof valueOrFormData === 'string' || Array.isArray(valueOrFormData)) {
         return {};
       }
@@ -33,7 +33,7 @@ export const step: StepDefinition = createFormStep({
         return {};
       }
 
-      const mappedAnswer = yesNoEnum('defendantNameConfirmation')(nameConfirmation);
+      const mappedAnswer = mapYesNoPreferNotToSay('defendantNameConfirmation')(nameConfirmation);
       const defendantNameConfirmation = mappedAnswer.defendantNameConfirmation;
 
       const defendantResponses: Record<string, unknown> = {};
@@ -55,8 +55,8 @@ export const step: StepDefinition = createFormStep({
 
       if (nameConfirmation === 'yes') {
         // When user confirms name is correct, copy what the claimant originally entered
-        // Need to read from CCD context since this data isn't in the form submission
-        const caseData = ctx?.caseData as Record<string, unknown> | undefined;
+        // Read from CCD via req.res.locals (same pattern as getInitialFormData)
+        const caseData = req?.res?.locals?.validatedCase?.data;
         const possessionClaimResponse = caseData?.possessionClaimResponse as Record<string, unknown> | undefined;
         const claimantEntry = possessionClaimResponse?.claimantEnteredDefendantDetails as
           | Record<string, unknown>

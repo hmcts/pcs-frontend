@@ -1,5 +1,5 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { passThrough } from '../../../middleware/autoSaveDraftToCCD';
+import { passThrough } from '../../../mappers/ccdMappers';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';

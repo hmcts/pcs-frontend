@@ -44,6 +44,9 @@ export interface PossessionClaimResponse {
     };
   };
   defendantResponses?: {
+    receivedFreeLegalAdvice?: 'YES' | 'NO' | 'PREFER_NOT_TO_SAY';
+    defendantNameConfirmation?: 'YES' | 'NO';
+    dateOfBirth?: string;
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
     contactByPhone?: YesNoValue;
@@ -51,6 +54,12 @@ export interface PossessionClaimResponse {
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
   };
+  claimantEnteredDefendantDetails?: {
+    nameKnown?: 'YES' | 'NO';
+    firstName?: string;
+    lastName?: string;
+  };
+  claimantOrganisations?: { value: string }[];
 }
 
 export interface StartCallbackData {
