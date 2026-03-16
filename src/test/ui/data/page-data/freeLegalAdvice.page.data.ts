@@ -4,7 +4,7 @@ export const freeLegalAdvice = {
   helpAvailableSubHeader: `Help available now online`,
   housingExpertsParagraph: `Housing experts are ready and waiting to help you, and it takes just minutes to find one in your area.`,
   visitTheLegalAdviserList: `Visit the `,
-  findALegalAdvisorLink: `find a legal adviser service (opens in new tab)`,
+  findALegalAdvisorLink: `ERRORfind a legal adviser service (opens in new tab)`,
   enterYourPostcodeList: `Enter your postcode and select the 'Housing Loss Prevention Advice Service' and ‘Housing’ options.`,
   chooseALocalExpertList: `Choose a local expert.`,
   callThemToDiscussList: `Call them to discuss your options.`,
@@ -23,6 +23,6 @@ export const freeLegalAdvice = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
-  youMustSayAboutFreeLegalAdviceErrorMessage: `You must say if you've had any free legal advice`,
+  youMustSayAboutFreeLegalAdviceErrorMessage: `ERRORYou must say if you've had any free legal advice`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
 };
