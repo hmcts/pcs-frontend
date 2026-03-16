@@ -25,7 +25,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Error page to indicate Page Not Found error @nightly', () => {
-  test('Content Validation on Page not found page @PR', async () => {
+  test('Content Validation on Page not found page', async () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
   });
 
