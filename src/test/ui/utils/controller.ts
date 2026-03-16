@@ -11,6 +11,11 @@ import { axe_exclusions } from '../config/axe-exclusions.config';
 
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
+import {
+  ErrorMessageValidation,
+  PageContentValidation,
+  PageNavigationValidation,
+} from './validations/custom-validations';
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
@@ -175,4 +180,31 @@ function readValuesFromInputObjects(obj: object): string {
     return `${key}: ${valueString}`;
   });
   return `${formattedPairs.join(', ')}`;
+}
+
+export function finaliseAllValidations(): void {
+  const errors: Error[] = [];
+
+  try {
+    PageContentValidation.finaliseTest();
+  } catch (error) {
+    errors.push(error as Error);
+  }
+
+  try {
+    ErrorMessageValidation.finaliseTest();
+  } catch (error) {
+    errors.push(error as Error);
+  }
+
+  try {
+    PageNavigationValidation.finaliseTest();
+  } catch (error) {
+    errors.push(error as Error);
+  }
+
+  if (errors.length > 0) {
+    const errorMessages = errors.map(e => e.message).join('\n\n');
+    throw new Error(`\n❌ VALIDATION FAILURES:\n\n${errorMessages}`);
+  }
 }

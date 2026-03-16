@@ -21,8 +21,7 @@ import {
   tenancyDateDetails,
   tenancyDetails,
 } from '../data/page-data';
-import { finaliseFunctionalTests } from '../scripts/finaliseFunctionalTests';
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -51,7 +50,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.afterEach(async () => {
-  finaliseFunctionalTests();
+  finaliseAllValidations();
 });
 
 //@noDefendants(submitCasePayloadNoDefendants) represents all defendant details unknown pages and non-rent arrears
