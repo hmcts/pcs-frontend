@@ -1,61 +1,64 @@
-import type { Request, Response } from 'express';
+import { formatDatePartsToISODate } from '../../utils';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { flowConfig } from '../flow.config';
 
-import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
-
+import type { PossessionClaimResponse } from '@interfaces/ccdCase.interface';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation } from '@modules/steps';
-import { getDashboardUrl } from '@routes/dashboard';
-import { safeRedirect303 } from '@utils/safeRedirect';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 
-const stepName = 'tenancy-date-unknown';
-const stepNavigation = createStepNavigation(flowConfig);
+const STEP_NAME = 'tenancy-date-unknown';
 
-export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/tenancy-date-unknown`,
-  name: stepName,
-  view: 'respond-to-claim/tenancy-date-unknown/tenancyDateUnknown.njk',
+export const step: StepDefinition = createFormStep({
+  stepName: STEP_NAME,
+  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  getController: () => {
-    return createGetController(
-      'respond-to-claim/tenancy-date-unknown/tenancyDateUnknown.njk',
-      stepName,
-      async (req: Request) => {
-        const backUrl = await stepNavigation.getBackUrl(req, stepName);
-        const nextStepUrl = await stepNavigation.getNextStepUrl(req, stepName, {});
-        return {
-          backUrl,
-          nextStepUrl,
-          url: req.originalUrl,
-        };
+  flowConfig,
+  customTemplate: `${__dirname}/tenancyDateUnknown.njk`,
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    caption: 'caption',
+    question: 'question',
+    hint: 'hint',
+    paragraph: 'paragraph',
+  },
+  fields: [
+    {
+      name: 'tenancyStartDate',
+      type: 'date',
+      required: false,
+      noFutureDate: true,
+      noCurrentDate: true,
+      legendClasses: 'govuk-fieldset__legend--m',
+      translationKey: {
+        label: 'question',
+        hint: 'hint',
       },
-      'respondToClaim'
-    );
-  },
-  postController: {
-    post: async (req: Request, res: Response) => {
-      const action = req.body?.action;
-
-      // Handle saveForLater action
-      if (action === 'saveForLater') {
-        const caseId = req.res?.locals.validatedCase?.id;
-        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
-
-        if (!dashboardUrl) {
-          // No valid case reference - redirect to home
-          return safeRedirect303(res, '/', '/', ['/']);
-        }
-
-        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
-      }
-
-      // Handle continue action - go to next step
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
-
-      if (!redirectPath) {
-        return res.status(404).render('not-found');
-      }
-
-      safeRedirect303(res, redirectPath, '/', ['/case/']);
     },
+  ],
+  beforeRedirect: async req => {
+    const dateObject = req.body?.tenancyStartDate;
+    const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
+    const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
+    const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
+    const tenancyStartDateIso = formatDatePartsToISODate(day, month, year);
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        ...(tenancyStartDateIso && { tenancyStartDate: tenancyStartDateIso }),
+      },
+    };
+
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
-};
+  extendGetContent: async req => {
+    const claimantName = req.res?.locals?.validatedCase?.claimantName || 'Treetops Housing';
+
+    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+    const paragraph = t('paragraph', { claimantName });
+
+    return {
+      claimantName,
+      paragraph,
+    };
+  },
+});
