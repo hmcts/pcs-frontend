@@ -1,0 +1,16 @@
+export const landlordRegistered = {
+  mainHeader: `Registered landlord`,
+  respondToClaimParagraph: `Respond to a property possession claim`,
+  backLink: `Back`,
+  youCheckIfYourLandlordIsRegisteredParagraph: `You can check if your landlord is registered by searching the`,
+  publicRegisterLink: `Public Register (opens in new tab)`,
+  isYourLandlordRegisteredQuestion: `Is your landlord registered?`,
+  yesRadioOption: `Yes`,
+  noRadioOption: `No`,
+  imNotSureRadioOption: `I’m not sure`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  cymraegLink: `Cymraeg`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfYouAgreeWithLandlordsClaimRegisteredErrorMessage: `Select if you agree with the landlord’s claim to be registered`,
+};
