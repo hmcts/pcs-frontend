@@ -1,4 +1,32 @@
 {
-  "caption": "Respond to a property possession claim",
-  "pageTitle": "Rent Arrears Dispute(Placeholder)"
+  "title": "Rent arrears",
+  "captionHeading": "Respond to a property possession claim",
+  "pageTitle": "Rent arrears",
+  "insetIntroText": "Rent arrears are money you owe in rent payments.",
+  "insetDetailsText": "When making their claim, {{claimantName}} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.",
+  "insetConditionalYesText": "The rent statement will have been included in the pack you received in the post letting you know a claim had been made against you, and is also available to view from 'View the claim' on your case dashboard.",
+  "amountOwedHeading": "Amount you owe in rent arrears given by {{claimantName}}:",
+  "rentArrearsQuestion": "Do you owe this amount in rent arrears?",
+  "rentArrearsOptions": {
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "notSure": "I'm not sure"
+  },
+  "rentArrearsAmountCorrection": {
+    "label": "What amount do you believe you owe?",
+    "hint": "Enter the amount in pounds and pence, for example 123.45"
+  },
+  "errors": {
+    "rentArrears": {
+      "required": "Select yes if you owe this amount in rent arrears"
+    },
+    "rentArrearsAmountCorrection": {
+      "required": "Enter the amount you believe you owe in rent arrears",
+      "negativeAmount": "The amount you believe you owe in rent arrears must be £0.00 or above",
+      "largeAmount": "Enter how much you believe you owe in rent arrears, in the correct format, up to £1,000,000,000.00",
+      "invalidFormat": "Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write £148.00)"
+    },
+    "rentArrears.rentArrearsAmountCorrection": "Enter the amount you believe you owe in rent arrears"
+  }
 }

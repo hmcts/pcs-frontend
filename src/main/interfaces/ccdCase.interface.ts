@@ -53,7 +53,14 @@ export interface PossessionClaimResponse {
     receivedFreeLegalAdvice?: string;
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
+    rentArrearsAmountConfirmation?: string;
+    rentArrearsAmount?: string;
   };
+  claimantEnteredDefendantDetails?: {
+    firstName?: string;
+    lastName?: string;
+  };
+  claimantOrganisations?: { value: string }[];
 }
 
 export interface StartCallbackData {

@@ -2,6 +2,8 @@ export { isDefendantNameKnown } from './isDefendantNameKnown';
 export { isWelshProperty } from './isWelshProperty';
 export { isNoticeDateProvided } from './isNoticeDateProvided';
 export { isRentArrearsClaim } from './isRentArrearsClaim';
+export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
+export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getPreviousPageForArrears } from './journeyHelpers';
