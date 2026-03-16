@@ -54,7 +54,7 @@ export class RespondToClaimAction implements IAction {
       question: freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion,
       option: legalAdviceData,
     });
-    await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
+    //await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {

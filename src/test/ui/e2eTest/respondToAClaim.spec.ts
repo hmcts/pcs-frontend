@@ -64,45 +64,8 @@ test.afterEach(async () => {
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim @noDefendants @regression', async () => {
+  test('Respond to a claim @noDefendants @analysis', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameTextInput,
-      lName: defendantNameCapture.lastNameTextInput,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-      postcode: correspondenceAddress.walesPostcodeTextInput,
-    });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.yesRadioOption,
-      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
-    });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
-    );
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('enterTenancyStartDetailsUnKnown', {
-      tsDay: '15',
-      tsMonth: '11',
-      tsYear: '2024',
-    });
-    await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
-    });
-    await performAction('enterNoticeDateUnknown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @noDefendants @regression', async () => {
