@@ -18,8 +18,7 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
-  tenancyDateDetails,
-  tenancyDetails,
+  tenancyDateDetails, tenancyOccupationContractLicenseAgreement,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import {
@@ -91,8 +90,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: '15',
       tsMonth: '11',
@@ -132,8 +131,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
       option: noticeDetails.yesRadioOption,
@@ -165,8 +164,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: '15',
       tsMonth: '11',
@@ -213,8 +212,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
       option: noticeDetails.imNotSureRadioOption,
@@ -252,8 +251,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: '15',
       tsMonth: '11',
@@ -299,8 +298,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
@@ -328,8 +327,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
     });
@@ -370,8 +369,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
     });
@@ -407,8 +406,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.noRadioOption,
       day: '01',
@@ -449,8 +448,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.iAmNotSureRadioOption,
     });
@@ -489,8 +488,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactByTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.noRadioOption,
       day: '01',

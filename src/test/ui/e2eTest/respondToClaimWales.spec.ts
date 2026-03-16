@@ -16,7 +16,7 @@ import {
   noticeDetails,
   registeredLandlord,
   startNow,
-  tenancyDetails,
+  tenancyOccupationContractLicenseAgreement,
 } from '../data/page-data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import {
@@ -74,8 +74,8 @@ test.describe.skip('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', registeredLandlord.mainHeader);
     await performAction('clickButton', registeredLandlord.continueButton);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
     await performAction('selectNoticeDetails', {
       isClaimantNameCorrect: submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect,
       option: noticeDetails.yesRadioOption,
