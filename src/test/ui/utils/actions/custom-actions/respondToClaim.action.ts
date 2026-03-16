@@ -14,6 +14,7 @@ import {
   noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
+  rentArrears,
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
@@ -40,6 +41,7 @@ export class RespondToClaimAction implements IAction {
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -215,6 +217,39 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
+  }
+
+  private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
+    // let rentArrears_Total: string | null = null;
+    // let claimantName: string | null = null;
+    // if (rentArrearsInfo.tenancy === 'flexible') {
+    //   rentArrears_Total = `${submitCaseApiData.submitCasePayloadFlexibleTenancyDate.rentArrears_Total}`;
+    //   claimantName = `${submitCaseApiData.submitCasePayloadFlexibleTenancyDate.claimantName}`;
+    // }
+    // if (rentArrearsInfo.tenancy === 'introductory') {
+    //   rentArrears_Total = `${submitCaseApiData.submitCasePayloadIntroductoryTenancy.rentArrears_Total}`;
+    //   claimantName = `${submitCaseApiData.submitCasePayloadIntroductoryTenancy.claimantName}`;
+    // }
+
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `Amount you owe in rent arrears given by ${submitCaseApiData.submitCasePayload.claimantName}:`,
+    });
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `Rent arrears are money you owe in rent payments.
+When making their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.
+The rent statement will have been included in the pack you received in the post letting you know a claim had been made against you, and is also available to view from ‘View the claim’ on your case overview.`,
+    });
+    //await performValidation('text', { elementType: 'heading', text: `${submitCaseApiData.submitCasePayload.rentArrears_Total}` });
+    await performAction('clickRadioButton', {
+      question: rentArrears.doYouOweThisQuestion,
+      option: rentArrearsInfo.option,
+    });
+    if (rentArrearsInfo.option === rentArrears.noRadioOption) {
+      await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
+    }
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
   }
 
   private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {
