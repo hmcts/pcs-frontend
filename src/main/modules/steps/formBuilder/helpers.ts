@@ -79,9 +79,10 @@ export function normalizeCheckboxFields(req: Request, fields: FormFieldConfig[])
 /**
  * Processes all field data (checkbox normalization + date field consolidation)
  * This should run AFTER validation because date field validation expects individual day/month/year keys
+ * Now also handles subFields within radio/checkbox options
  */
 export function processFieldData(req: Request, fields: FormFieldConfig[]): void {
-  for (const field of fields) {
+  const processField = (field: FormFieldConfig): void => {
     if (field.type === 'checkbox') {
       // Normalize checkbox values (in case they weren't normalized before validation)
       req.body[field.name] = normalizeCheckboxValue(req.body[field.name]);
@@ -95,6 +96,22 @@ export function processFieldData(req: Request, fields: FormFieldConfig[]): void 
       delete req.body[`${field.name}-month`];
       delete req.body[`${field.name}-year`];
     }
+
+    // Process subFields if this is a radio or checkbox with options
+    if ((field.type === 'radio' || field.type === 'checkbox') && field.options) {
+      for (const option of field.options) {
+        if (option.subFields) {
+          for (const subField of Object.values(option.subFields)) {
+            // Recursively process subFields (they might be dates or checkboxes too)
+            processField(subField);
+          }
+        }
+      }
+    }
+  };
+
+  for (const field of fields) {
+    processField(field);
   }
 }
 
@@ -173,7 +190,6 @@ export function getTranslationErrors(
 export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
   const stepSpecificErrors: Record<string, string> = {};
 
-  const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate'];
   const commonErrorKeys = ['defaultRequired', 'defaultInvalid', 'defaultMaxLength'];
 
   for (const key of commonErrorKeys) {
@@ -196,19 +212,26 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
   const visitField = (field: FormFieldConfig): void => {
     addMaxLengthTranslation(field.name);
 
-    // Keep existing nested error support for non-nested names (e.g., date fields)
+    // Auto-discover all error translations for this field from the step's translation file
+    // This eliminates the need for a hardcoded nestedKeys list
     if (!field.name.includes('.')) {
-      for (const nestedKey of nestedKeys) {
-        const nestedErrorKey = `errors.${field.name}.${nestedKey}`;
-        const nestedError = t(nestedErrorKey);
-        if (nestedError && nestedError !== nestedErrorKey) {
-          if (field.type === 'date') {
-            const dateKey = getDateTranslationKey(nestedKey);
-            if (dateKey) {
-              stepSpecificErrors[dateKey] = nestedError;
+      const errorNamespace = `errors.${field.name}`;
+      const allFieldErrors = t(errorNamespace, { returnObjects: true });
+
+      // If the translation exists and is an object (not a string), it contains error keys
+      if (allFieldErrors && typeof allFieldErrors === 'object' && !Array.isArray(allFieldErrors)) {
+        for (const [errorKey, errorMessage] of Object.entries(allFieldErrors)) {
+          if (typeof errorMessage === 'string') {
+            // Special handling for date fields - map to date-specific keys
+            if (field.type === 'date') {
+              const dateKey = getDateTranslationKey(errorKey);
+              if (dateKey) {
+                stepSpecificErrors[dateKey] = errorMessage;
+              }
             }
+            // Add the standard field.errorKey mapping
+            stepSpecificErrors[`${field.name}.${errorKey}`] = errorMessage;
           }
-          stepSpecificErrors[`${field.name}.${nestedKey}`] = nestedError;
         }
       }
     }

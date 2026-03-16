@@ -1,20 +1,26 @@
 /**
- * Auto-save form data to CCD draft for configured steps.
+ * Auto-saves form data to CCD draft after successful validation.
  *
- * Usage: Call autoSaveToCCD() in formBuilder's beforeRedirect callback.
- * Add steps to STEP_FIELD_MAPPING to enable auto-save.
+ * Usage: formBuilder automatically injects this when your step defines `ccdMapping`.
+ * You rarely need to call this manually - just add ccdMapping to your step config.
  *
- * Example:
+ * Manual usage example (if you have custom logic):
  *   const step = createFormStep(
  *     { ... },
  *     templatePath,
- *     async (req, res) => { await autoSaveToCCD(req, res, 'step-name'); }
+ *     async (req, res) => { await autoSaveToCCD(req, res, { stepName: 'step-name', ccdMapping }); }
  *   );
  */
 
 import type { Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
+import type {
+  CcdFieldMapping,
+  CcdMappingContext,
+  FormFieldValue,
+  ValueMapper,
+} from '../interfaces/formFieldConfig.interface';
 import { ccdCaseService } from '../services/ccdCaseService';
 import { isNonEmpty } from '../utils/objectHelpers';
 
@@ -22,33 +28,23 @@ import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('autoSaveDraftToCCD');
 
-type FormFieldValue = string | string[] | Record<string, unknown>;
-type ValueMapper = (valueOrFormData: FormFieldValue) => Record<string, unknown>;
-
-interface StepMapping {
-  backendPath: string;
-  frontendField?: string;
-  frontendFields?: string[];
-  valueMapper: ValueMapper;
-}
-
 /**
- * Transforms yes/no/preferNotToSay enum values to CCD uppercase format.
+ * Maps radio button yes/no/preferNotToSay values to CCD's uppercase enum format.
+ * Converts 'yes' to 'YES', 'no' to 'NO', 'preferNotToSay' to 'PREFER_NOT_TO_SAY'
  *
- * IMPORTANT: Only use for controlled enum fields (radio buttons with predefined options).
- * DO NOT use for free-text fields or fields with arbitrary values.
+ * IMPORTANT: Only for radio buttons with controlled values, not free-text fields.
  *
  * @example
- * // Correct usage (radio button with controlled values)
+ * // Correct - radio button with predefined options
  * {
  *   frontendField: 'hadLegalAdvice',
  *   valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
  * }
  *
- * // Wrong usage (text field)
+ * // Wrong - text field with user input
  * {
  *   frontendField: 'userName',
- *   valueMapper: yesNoEnum('userName'), // Don't do this!
+ *   valueMapper: yesNoEnum('userName'), // Will fail validation!
  * }
  */
 export function yesNoEnum(backendFieldName: string): ValueMapper {
@@ -61,14 +57,12 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
       return { [backendFieldName]: '' };
     }
 
-    // Type-safe mapping: only allowed values as keys
     const enumMapping: Record<AllowedValue, string> = {
       yes: 'YES',
       no: 'NO',
       preferNotToSay: 'PREFER_NOT_TO_SAY',
     };
 
-    // Validate that value is one of the allowed enum values
     const isAllowedValue = (ALLOWED_VALUES as readonly string[]).includes(value);
 
     if (!isAllowedValue) {
@@ -77,16 +71,14 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
         `yesNoEnum: Invalid value "${value}" for field "${backendFieldName}". ` +
           `Allowed values: ${allowedStr}. This indicates a bug in form validation or incorrect mapper usage.`
       );
-      // Return empty string to prevent invalid data in CCD
+      // Fail safely by returning empty string instead of invalid data
       return { [backendFieldName]: '' };
     }
-
-    // Type assertion safe here because isAllowedValue check guarantees it
     return { [backendFieldName]: enumMapping[value as AllowedValue] };
   };
 }
 
-/** Combines date fields (day/month/year) into ISO date string using luxon */
+/** Combines separate day/month/year fields into ISO date string (e.g., '1990-02-15') using luxon for validation */
 export function dateToISO(backendFieldName: string): ValueMapper {
   return (formData: FormFieldValue) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
@@ -101,7 +93,6 @@ export function dateToISO(backendFieldName: string): ValueMapper {
       return {};
     }
 
-    // Use luxon for proper date validation and formatting
     const dateTime = DateTime.fromObject({
       year: Number(year),
       month: Number(month),
@@ -119,7 +110,7 @@ export function dateToISO(backendFieldName: string): ValueMapper {
   };
 }
 
-/** Pass through fields unchanged (1:1 mapping) */
+/** Passes form fields through to CCD unchanged - simple 1:1 mapping with no transformation */
 export function passThrough(fieldNames: readonly string[]): ValueMapper {
   return (formData: FormFieldValue) => {
     if (typeof formData === 'string' || Array.isArray(formData)) {
@@ -127,14 +118,13 @@ export function passThrough(fieldNames: readonly string[]): ValueMapper {
       return {};
     }
 
-    // Functional approach: map field names to entries, filter non-empty values
     return Object.fromEntries(
       fieldNames.map(name => [name, formData[name]] as const).filter(([, value]) => isNonEmpty(value))
     );
   };
 }
 
-/** Transforms array of checkbox values to uppercase enum array */
+/** Converts checkbox array values to uppercase enum format (e.g., ['option1', 'option2'] to ['OPTION_1', 'OPTION_2']) */
 export function multipleYesNo(backendFieldName: string): ValueMapper {
   return (value: FormFieldValue) => {
     if (!Array.isArray(value)) {
@@ -153,15 +143,7 @@ export function multipleYesNo(backendFieldName: string): ValueMapper {
   };
 }
 
-export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
-  'free-legal-advice': {
-    backendPath: 'possessionClaimResponse.defendantResponses',
-    frontendField: 'hadLegalAdvice',
-    valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
-  },
-};
-
-/** Converts dot-path to nested object (e.g., 'a.b.c' → { a: { b: { c: value } } }) */
+/** Converts dot-path notation to nested CCD structure (e.g., 'possessionClaimResponse.defendantResponses' becomes nested objects) */
 function pathToNested(path: string, value: Record<string, unknown>): Record<string, unknown> {
   const keys = path.split('.');
   const result: Record<string, unknown> = {};
@@ -179,13 +161,16 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
 }
 
 /**
- * Auto-saves form data to CCD draft if step is configured in STEP_FIELD_MAPPING.
- * Use this in formBuilder's beforeRedirect callback instead of middleware.
+ * Auto-saves form data to CCD draft using the provided `ccdMapping`.
  */
-export async function autoSaveToCCD(req: Request, res: Response, stepName: string): Promise<void> {
-  const config = STEP_FIELD_MAPPING[stepName];
+export async function autoSaveToCCD(
+  req: Request,
+  res: Response,
+  config: { stepName: string; ccdMapping?: CcdFieldMapping }
+): Promise<void> {
+  const { stepName, ccdMapping } = config;
 
-  if (!config) {
+  if (!ccdMapping) {
     logger.debug(`[${stepName}] No CCD mapping configured, skipping auto-save`);
     return;
   }
@@ -193,10 +178,11 @@ export async function autoSaveToCCD(req: Request, res: Response, stepName: strin
   const formData = req.session.formData?.[stepName];
 
   if (!formData || Object.keys(formData).length === 0) {
+    logger.debug(`[${stepName}] No form data in session, skipping auto-save`);
     return;
   }
 
-  await saveToCCD(req, res, stepName, formData, config);
+  await saveToCCD(req, res, stepName, formData, ccdMapping);
 }
 
 async function saveToCCD(
@@ -204,10 +190,11 @@ async function saveToCCD(
   res: Response,
   stepName: string,
   formData: Record<string, unknown>,
-  config: StepMapping
+  ccdMapping: CcdFieldMapping
 ): Promise<void> {
   const validatedCase = res.locals.validatedCase;
   const accessToken = req.session.user?.accessToken;
+  const ctx: CcdMappingContext = { caseData: validatedCase?.data as Record<string, unknown> | undefined };
 
   if (!validatedCase?.id) {
     logger.warn(`[${stepName}] No validated case, skipping draft save`);
@@ -220,19 +207,19 @@ async function saveToCCD(
   }
 
   try {
-    logger.debug(`[${stepName}] Auto-saving to CCD draft`);
+    logger.debug(`[${stepName}] Starting auto-save with ${Object.keys(formData).length} fields`);
 
     let relevantData: string | string[] | Record<string, unknown>;
-    if (config.frontendField) {
-      const fieldValue = formData[config.frontendField];
+    if (ccdMapping.frontendField) {
+      const fieldValue = formData[ccdMapping.frontendField];
       if (fieldValue === undefined) {
-        logger.warn(`[${stepName}] Field '${config.frontendField}' not found in form data, skipping save`);
+        logger.warn(`[${stepName}] Field '${ccdMapping.frontendField}' not found in form data, skipping save`);
         return;
       }
       relevantData = fieldValue as string | string[];
-    } else if (config.frontendFields) {
+    } else if (ccdMapping.frontendFields) {
       const multiFieldData: Record<string, unknown> = {};
-      for (const fieldName of config.frontendFields) {
+      for (const fieldName of ccdMapping.frontendFields) {
         if (formData[fieldName] !== undefined) {
           multiFieldData[fieldName] = formData[fieldName];
         }
@@ -246,19 +233,26 @@ async function saveToCCD(
       relevantData = formData;
     }
 
-    const transformedData = config.valueMapper(relevantData);
-    const nestedData = pathToNested(config.backendPath, transformedData);
+    const transformedData = ccdMapping.valueMapper(relevantData, ctx);
+
+    // Skip save if transformed data is empty (nothing to update)
+    if (Object.keys(transformedData).length === 0) {
+      logger.debug(`[${stepName}] Transformed data is empty, skipping CCD save`);
+      return;
+    }
+
+    const nestedData = pathToNested(ccdMapping.backendPath, transformedData);
 
     const ccdPayload = {
       ...nestedData,
     };
+    logger.debug(`[${stepName}] Sending CCD payload for case ${validatedCase.id}`);
 
     await ccdCaseService.updateDraftRespondToClaim(accessToken, validatedCase.id, ccdPayload);
 
-    // Don't update res.locals.validatedCase with CCD response
-    // CCD submit returns incomplete data (only fields in payload, not full merged case)
-    // Keep existing res.locals.validatedCase from start callback (has complete data)
-    // Next page will call start callback and get fresh merged data from CCD
+    // We don't update res.locals.validatedCase here because CCD only returns the fields we just saved,
+    // not the full merged case. The next page will fetch fresh complete data via its START callback.
+    // This is eventual consistency by design - current page keeps old data, next page gets merged data.
 
     logger.info(`[${stepName}] Draft saved successfully to CCD`);
   } catch (error) {

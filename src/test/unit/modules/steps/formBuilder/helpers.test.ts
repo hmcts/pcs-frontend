@@ -11,6 +11,7 @@ import {
   setFormData,
   validateForm,
 } from '../../../../../main/modules/steps/formBuilder/helpers';
+import { createMockT } from '../../../helpers/mockTranslation';
 
 describe('formBuilder helpers', () => {
   describe('getTranslation', () => {
@@ -206,12 +207,12 @@ describe('formBuilder helpers', () => {
   });
 
   describe('getTranslationErrors', () => {
-    const createMockT = (translations: Record<string, string> = {}) => {
+    const createSimpleMockT = (translations: Record<string, string> = {}) => {
       return jest.fn((key: string) => translations[key] || key) as unknown as TFunction;
     };
 
     it('should return empty object when no fields provided', () => {
-      const mockT = createMockT();
+      const mockT = createSimpleMockT();
       const result = getTranslationErrors(mockT, []);
       expect(result).toEqual({});
     });
@@ -391,15 +392,14 @@ describe('formBuilder helpers', () => {
     });
 
     it('should include both common errors and field-specific errors', () => {
-      const mockT = jest.fn((key: string) => {
-        const translations: Record<string, string> = {
-          'errors.defaultRequired': 'This field is required',
-          'errors.defaultInvalid': 'Invalid format',
-          'errors.defaultMaxLength': 'Must be {max} characters or fewer',
-          'errors.dateOfBirth.required': 'Enter your date of birth',
-        };
-        return translations[key] || key;
-      }) as unknown as TFunction;
+      const mockT = createMockT({
+        'errors.defaultRequired': 'This field is required',
+        'errors.defaultInvalid': 'Invalid format',
+        'errors.defaultMaxLength': 'Must be {max} characters or fewer',
+        'errors.dateOfBirth': {
+          required: 'Enter your date of birth',
+        },
+      });
 
       const fields = [
         {
@@ -421,12 +421,12 @@ describe('formBuilder helpers', () => {
   });
 
   describe('getCustomErrorTranslations - field-specific maxLength', () => {
-    const createMockT = (translations: Record<string, string> = {}) => {
+    const createSimpleMockT2 = (translations: Record<string, string> = {}) => {
       return jest.fn((key: string) => translations[key] || key) as unknown as TFunction;
     };
 
     it('should map errors.<field>MaxLength to <field>.maxLength', () => {
-      const mockT = createMockT({
+      const mockT = createSimpleMockT2({
         'errors.firstNameMaxLength': 'First name must be 60 characters or less',
       });
 

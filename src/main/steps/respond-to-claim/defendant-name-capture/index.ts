@@ -1,4 +1,5 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { passThrough } from '../../../middleware/autoSaveDraftToCCD';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -9,6 +10,11 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   showCancelButton: false,
+  ccdMapping: {
+    backendPath: 'possessionClaimResponse.defendantContactDetails.party',
+    frontendFields: ['firstName', 'lastName'],
+    valueMapper: passThrough(['firstName', 'lastName']),
+  },
   translationKeys: {
     // Browser/tab title
     pageTitle: 'pageTitle',
@@ -16,6 +22,31 @@ export const step: StepDefinition = createFormStep({
     heading: 'heading',
     caption: 'caption',
     contactUs: 'contactUs',
+  },
+  getInitialFormData: req => {
+    const caseData = req.res?.locals.validatedCase?.data;
+    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
+    const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
+
+    const firstName =
+      (typeof party?.firstName === 'string' && party.firstName.trim() ? party.firstName : undefined) ||
+      (typeof claimantEntry?.firstName === 'string' && claimantEntry.firstName.trim()
+        ? claimantEntry.firstName
+        : undefined);
+    const lastName =
+      (typeof party?.lastName === 'string' && party.lastName.trim() ? party.lastName : undefined) ||
+      (typeof claimantEntry?.lastName === 'string' && claimantEntry.lastName.trim()
+        ? claimantEntry.lastName
+        : undefined);
+
+    if (!firstName && !lastName) {
+      return {};
+    }
+
+    return {
+      ...(firstName ? { firstName } : {}),
+      ...(lastName ? { lastName } : {}),
+    };
   },
   fields: [
     {
