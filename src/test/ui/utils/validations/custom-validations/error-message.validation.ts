@@ -55,7 +55,7 @@ export class ErrorMessageValidation implements IValidation {
         const count = await errorMessage.count();
         if (count > 0) {
           actualText = await errorMessage.first().textContent();
-          passed = actualText?.includes(errorStr) ?? false;
+          passed = actualText?.includes(errorStr) || false;
         } else {
           actualText = 'No error message found';
           passed = false;
@@ -69,6 +69,7 @@ export class ErrorMessageValidation implements IValidation {
 
         expected = `${header}: ${message}`;
 
+        // Check for error summary header
         const headerLocator = page.locator(`h2.govuk-error-summary__title:has-text("${header}")`);
         const headerCount = await headerLocator.count();
 
@@ -86,7 +87,7 @@ export class ErrorMessageValidation implements IValidation {
           const messageCount = await messageLocator.count();
           if (messageCount > 0) {
             actualText = await messageLocator.first().textContent();
-            passed = actualText?.includes(message) ?? false;
+            passed = actualText?.includes(message) || false;
           } else {
             actualText = `Message "${message}" not found in error summary`;
             passed = false;
