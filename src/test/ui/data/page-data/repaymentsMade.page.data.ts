@@ -1,6 +1,6 @@
 export const repaymentsMade = {
   getmainHeader: (claimantName: string): string => {
-    return `Have you paid any money to ${claimantName} since`;
+    return `Have you paid any money to ${claimantName} since 16th June 2025?`;
   },
   respondToClaimParagraph: 'Respond to a property possession claim',
   yesRadioOption: 'Yes',
@@ -12,11 +12,11 @@ export const repaymentsMade = {
     'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz1234567',
   tooManyCharacterHiddenHintText: 'You have 1 character too many',
   youHave500CharactersHiddenHintText: 'You have 500 characters remaining',
-  errorValidation: 'YES',
-  errorValidationType: { input: 'textField', radio: 'radioOptions' },
-  errorValidationHeader: 'There is a problem',
-  errorValidationField: {
-    errorRadioMsg: [{ errMessage: `Select if you’ve paid any money to Treetops Housing since 16th June 2025` }],
+  getErrorRadioMsg: (claimantName: string): string => {
+    return `Select if you've paid any money to ${claimantName} since 16th June 2025`;
+  },
+  getErrorValidationField: (claimantName: string) => ({
+    errorRadioMsg: [{ errMessage: repaymentsMade.getErrorRadioMsg(claimantName) }],
     errorTextField: [
       {
         type: `empty`,
@@ -31,7 +31,10 @@ export const repaymentsMade = {
         errMessage: `Must be 500 characters or fewer`,
       },
     ],
-  },
+  }),
+  errorValidation: 'YES',
+  errorValidationType: { input: 'textField', radio: 'radioOptions' },
+  errorValidationHeader: 'There is a problem',
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
 };
