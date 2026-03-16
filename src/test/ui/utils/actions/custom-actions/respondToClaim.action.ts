@@ -14,7 +14,6 @@ import {
   landlordRegistered,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
-  noticeDetails,
   paymentInterstitial,
   repaymentsMade,
   tenancyDateDetails,

@@ -4,7 +4,6 @@ import config from 'config';
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
-  confirmationOfNoticeGiven,
   contactPreference,
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
