@@ -1,5 +1,5 @@
-import type { PcqParameters } from '../../../../main/services/pcq/PcqParameters.interface';
-import { createToken } from '../../../../main/services/pcq/createToken';
+import type { PcqParameters } from '@services/pcq/PcqParameters.interface';
+import { createToken } from '@services/pcq/createToken';
 
 describe('createToken', () => {
   const sampleParams: PcqParameters = {

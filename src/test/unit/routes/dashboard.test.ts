@@ -1,9 +1,10 @@
-import type { Application, Response } from 'express';
 import express from 'express';
+import type { Application, Response } from 'express';
 import type { Environment } from 'nunjucks';
 
 import * as caseReferenceMiddleware from '../../../main/middleware/caseReference';
-import dashboardRoutes, { getDashboardUrl } from '../../../main/routes/dashboard';
+
+import dashboardRoutes, { getDashboardUrl } from '@routes/dashboard';
 
 jest.mock('../../../main/middleware/caseReference');
 jest.mock('config', () => ({

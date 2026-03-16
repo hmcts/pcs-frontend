@@ -4771,6 +4771,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/git-rev-sync@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "@types/git-rev-sync@npm:2.0.2"
+  checksum: 10/24d8e9573cffad57b6809b0e60917f01d70d1577d5cc027ef1fe557ae2968f827e38836750dd9acbe2339ec9d9d7faa05584b8a162665706085943ade2601a7b
+  languageName: node
+  linkType: hard
+
 "@types/glob@npm:^8.1.0":
   version: 8.1.0
   resolution: "@types/glob@npm:8.1.0"
@@ -7215,6 +7222,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"date-fns@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "date-fns@npm:4.1.0"
+  checksum: 10/d5f6e9de5bbc52310f786099e18609289ed5e30af60a71e0646784c8185ddd1d0eebcf7c96b7faaaefc4a8366f3a3a4244d099b6d0866ee2bec80d1361e64342
+  languageName: node
+  linkType: hard
+
 "dateformat@npm:3.0.2":
   version: 3.0.2
   resolution: "dateformat@npm:3.0.2"
@@ -7524,6 +7538,13 @@ __metadata:
   dependencies:
     type-fest: "npm:^4.18.2"
   checksum: 10/2c2352401818a527f4489df6f27ff74a447ee03f7dbb52c24f25c123be175e1034b6d59946af8fe3cdb8f41946f1a46213e26801c49b0987a4277a275ada1d90
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^17.3.1":
+  version: 17.3.1
+  resolution: "dotenv@npm:17.3.1"
+  checksum: 10/4dde6571dff22c2323a3e33ac25e1e7d51c4b6d60dc884f59e3efe85c8fd3cc8800d6b3925d05c46b19dca08cba821a0a24e22f75a1b9b768c859b98bb927b04
   languageName: node
   linkType: hard
 
@@ -12413,6 +12434,7 @@ __metadata:
     "@types/cookie-parser": "npm:^1.4.3"
     "@types/express": "npm:^5.0.1"
     "@types/express-session": "npm:^1.18.1"
+    "@types/git-rev-sync": "npm:^2.0.2"
     "@types/glob": "npm:^8.1.0"
     "@types/jest": "npm:^29.5.14"
     "@types/lodash": "npm:^4.14.197"
@@ -12435,7 +12457,9 @@ __metadata:
     cookie-parser: "npm:^1.4.7"
     copy-webpack-plugin: "npm:^13.0.0"
     css-loader: "npm:^7.0.0"
+    date-fns: "npm:^4.1.0"
     debug: "npm:^4.3.4"
+    dotenv: "npm:^17.3.1"
     eslint: "npm:^9.0.0"
     eslint-config-prettier: "npm:^10.0.0"
     eslint-import-resolver-typescript: "npm:^4.4.4"

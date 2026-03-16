@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -18,13 +18,12 @@ export const step: StepDefinition = createFormStep({
     contactUs: 'contactUs',
   },
   extendGetContent: (req: Request) => {
-    // Get defendant name from CCD case data
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
-    const defendantName = party?.firstName && party?.lastName ? `${party.firstName} ${party.lastName}` : '';
+    const { defendantContactDetailsPartyName: defendantName, claimantName } = req.res?.locals?.validatedCase ?? {
+      defendantContactDetailsPartyName: '',
+      claimantName: '',
+    };
 
-    // Get organisation name from CCD case data
-    const organisationName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    const organisationName = claimantName || 'Treetops Housing';
 
     return {
       defendantName,
@@ -53,6 +52,7 @@ export const step: StepDefinition = createFormStep({
               name: 'firstName',
               type: 'text',
               required: true,
+              maxLength: 60,
               errorMessage: 'errors.firstName',
               translationKey: {
                 label: 'firstNameLabel',
@@ -67,6 +67,7 @@ export const step: StepDefinition = createFormStep({
               name: 'lastName',
               type: 'text',
               required: true,
+              maxLength: 60,
               errorMessage: 'errors.lastName',
               translationKey: {
                 label: 'lastNameLabel',

@@ -13,7 +13,7 @@ import {
   refreshTokenGrant,
 } from 'openid-client';
 
-import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
+import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '@modules/oidc';
 
 jest.mock('config');
 jest.mock('jose');

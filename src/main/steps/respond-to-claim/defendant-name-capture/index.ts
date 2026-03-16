@@ -1,6 +1,6 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -22,6 +22,7 @@ export const step: StepDefinition = createFormStep({
       name: 'firstName',
       type: 'text',
       required: true,
+      maxLength: 60,
       translationKey: {
         label: 'firstNameLabel',
       },
@@ -35,6 +36,7 @@ export const step: StepDefinition = createFormStep({
       name: 'lastName',
       type: 'text',
       required: true,
+      maxLength: 60,
       translationKey: {
         label: 'lastNameLabel',
       },

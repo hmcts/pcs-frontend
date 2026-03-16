@@ -40,14 +40,16 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
-    const textForm = req.session.formData?.['contact-preferences-text-message'];
-    if (!textForm) {
+    const textForm = req.body as Record<string, unknown>;
+    const contactByTextMessage = textForm.contactByTextMessage as string | undefined;
+
+    if (!contactByTextMessage) {
       return;
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        contactByText: textForm.contactByTextMessage === 'yes' ? 'YES' : 'NO',
+        contactByText: contactByTextMessage === 'yes' ? 'YES' : 'NO',
       },
     };
 

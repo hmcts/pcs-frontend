@@ -10,11 +10,14 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  landlordRegistered,
   noticeDateKnown,
   noticeDateUnknown,
   noticeDetails,
   paymentInterstitial,
   repaymentsMade,
+  tenancyDateDetails,
+  tenancyDateUnknown,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -31,12 +34,15 @@ export class RespondToClaimAction implements IAction {
       ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
       ['selectContactByTelephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
       ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionData)],
+      ['selectTenancyStartDateKnown', () => this.selectTenancyStartDateKnown(fieldName as actionRecord)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
+      ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -54,8 +60,8 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {
-    await performAction('inputText', defendantNameCapture.firstNameLabelText, defendantData.fName);
-    await performAction('inputText', defendantNameCapture.lastNameLabelText, defendantData.lName);
+    await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantData.fName);
+    await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantData.lName);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
@@ -147,6 +153,14 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
+  private async selectLandlordRegistered(registeredData: actionData): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: landlordRegistered.isYourLandlordRegisteredQuestion,
+      option: registeredData,
+    });
+    await performAction('clickButton', landlordRegistered.saveAndContinueButton);
+  }
+
   private async readPaymentInterstitial(): Promise<void> {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
@@ -161,6 +175,24 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  }
+
+  private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
+    const getDetailsGivenByParagraph = tenancyDateDetails.getDetailsGivenByParagraph(claimantsName);
+    await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
+    await performAction('clickRadioButton', {
+      question: tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion,
+      option: tenancyStartDateData.option,
+    });
+    if (tenancyStartDateData?.day && tenancyStartDateData?.month && tenancyStartDateData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', tenancyDateDetails.dayHiddenTextLabel, tenancyStartDateData.day],
+        ['inputText', tenancyDateDetails.monthHiddenTextLabel, tenancyStartDateData.month],
+        ['inputText', tenancyDateDetails.yearHiddenTextLabel, tenancyStartDateData.year]
+      );
+    }
+    await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
@@ -193,6 +225,20 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
+  }
+
+  private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {
+    const getDidNotProvideParagraph = tenancyDateUnknown.getDidNotProvideParagraph(claimantsName);
+    await performValidation('text', { elementType: 'paragraph', text: getDidNotProvideParagraph });
+    if (tenancyStartData?.tsDay && tenancyStartData?.tsMonth && tenancyStartData?.tsYear) {
+      await performActions(
+        'Enter Date',
+        ['inputText', tenancyDateUnknown.dayTextLabel, tenancyStartData.tsDay],
+        ['inputText', tenancyDateUnknown.monthTextLabel, tenancyStartData.tsMonth],
+        ['inputText', tenancyDateUnknown.yearTextLabel, tenancyStartData.tsYear]
+      );
+    }
+    await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

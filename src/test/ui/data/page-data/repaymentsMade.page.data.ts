@@ -16,22 +16,22 @@ export const repaymentsMade = {
   errorValidationType: { input: 'textField', radio: 'radioOptions' },
   errorValidationHeader: 'There is a problem',
   errorValidationField: {
-    errorRadioMsg: [{ errMessage: 'Select if you’ve paid any money to Treetops Housing since 16th June 2025' }],
+    errorRadioMsg: [{ errMessage: `Select if you’ve paid any money to Treetops Housing since 16th June 2025` }],
     errorTextField: [
       {
-        type: 'empty',
-        label: 'Give details about how much you paid and when',
-        errMessage: 'Give details about how much you paid and when',
+        type: `empty`,
+        label: `Give details about how much you paid and when`,
+        errMessage: `Give details about how much you paid and when`,
       },
     ],
     errorCharLimit: [
       {
-        type: 'empty',
-        label: 'Give details about how much you paid and when',
-        errMessage: 'Must be 500 characters or fewer',
+        type: `empty`,
+        label: `Give details about how much you paid and when`,
+        errMessage: `Must be 500 characters or fewer`,
       },
     ],
   },
-  saveForLaterButton: 'Save for later',
-  backLink: 'Back',
+  saveForLaterButton: `Save for later`,
+  backLink: `Back`,
 };

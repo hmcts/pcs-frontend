@@ -1,11 +1,11 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig, FormFieldOption } from '../../../interfaces/formFieldConfig.interface';
-
 import { buildComponentConfig } from './componentBuilders';
 import { buildConditionalContent, getNestedFieldName } from './conditionalFields';
 import { getTranslation, normalizeCheckboxValue } from './helpers';
+
+import type { FormFieldConfig, FormFieldOption } from '@interfaces/formFieldConfig.interface';
 
 export function buildFieldValues(
   fields: FormFieldConfig[],
@@ -248,11 +248,22 @@ export function translateFields(
           const subFieldValues: Record<string, unknown> = {};
           const parentFieldName = fieldPrefix ? `${fieldPrefix}.${field.name}` : field.name;
 
-          for (const [subFieldName] of Object.entries(option.subFields)) {
+          for (const [subFieldName, subField] of Object.entries(option.subFields)) {
             const nestedFieldName = `${parentFieldName}.${subFieldName}`;
             // Check for nested field name in originalData
             if (dataSource?.[nestedFieldName] !== undefined) {
               subFieldValues[subFieldName] = dataSource[nestedFieldName];
+            } else if (subField.type === 'date') {
+              // Reconstruct the { day, month, year } object so the date input re-populates on error re-render.
+              const prefix = `${parentFieldName}.${subFieldName}`;
+              const day = (dataSource?.[`${prefix}-day`] as string) || '';
+              const month = (dataSource?.[`${prefix}-month`] as string) || '';
+              const year = (dataSource?.[`${prefix}-year`] as string) || '';
+              if (day || month || year) {
+                subFieldValues[subFieldName] = { day, month, year };
+              } else if (dataSource?.[subFieldName] !== undefined) {
+                subFieldValues[subFieldName] = dataSource[subFieldName];
+              }
             }
           }
 

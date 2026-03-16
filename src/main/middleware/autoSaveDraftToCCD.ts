@@ -15,10 +15,9 @@
 import type { Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
-import { ccdCaseService } from '../services/ccdCaseService';
-import { isNonEmpty } from '../utils/objectHelpers';
-
 import { Logger } from '@modules/logger';
+import { ccdCaseService } from '@services/ccdCaseService';
+import { isNonEmpty } from '@utils/objectHelpers';
 
 const logger = Logger.getLogger('autoSaveDraftToCCD');
 
@@ -158,6 +157,11 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
     backendPath: 'possessionClaimResponse.defendantResponses',
     frontendField: 'hadLegalAdvice',
     valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
+  },
+  'confirmation-of-notice-given': {
+    backendPath: 'possessionClaimResponse.defendantResponses',
+    frontendField: 'confirmNoticeGiven',
+    valueMapper: passThrough(['confirmNoticeGiven']),
   },
 };
 
