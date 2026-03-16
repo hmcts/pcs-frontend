@@ -17,7 +17,7 @@ import {
   paymentInterstitial,
   repaymentsMade,
   tenancyDateDetails,
-  tenancyDateUnknown,
+  tenancyDateUnknown, tenancyOccupationContractLicenseAgreement,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -43,6 +43,7 @@ export class RespondToClaimAction implements IAction {
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
+      ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -245,6 +246,41 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
   }
 
+  private async tenancyOrContractTypeDetails(tenancyTypeDetails: actionRecord) {
+    const tenancyType = formatText(tenancyTypeDetails.tenancyType);
+    const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
+
+    if (
+      tenancyType === 'assured tenancy' ||
+      tenancyType === 'introductory tenancy' ||
+      tenancyType === 'secure tenancy' ||
+      tenancyType === 'flexible tenancy' ||
+      tenancyType === 'demoted tenancy'
+    ) {
+      await performValidation('text', {
+        elementType: 'listItem',
+        text: `The property is let under ${article} ${tenancyType} agreement`,
+      });
+    } else if (tenancyType === 'other') {
+      // await performValidation('text', {
+      //   elementType: 'paragraph',
+      //   text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancyDate.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+      // });
+    }
+    await performAction('clickRadioButton', {
+      question: tenancyOccupationContractLicenseAgreement.isTenancyTypeCorrectQuestion,
+      option: tenancyTypeDetails.tenancyOption,
+    });
+    if (tenancyTypeDetails.tenancyOption === 'no' && tenancyTypeDetails.tenancyTypeInfo) {
+      await performAction(
+        'inputText',
+        tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeHiddenTextLabel,
+        tenancyTypeDetails.tenancyTypeInfo
+      );
+    }
+    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+  }
+
   // Below changes are temporary will be changed as part of HDPI-3596
   private async inputErrorValidation(validationArr: actionRecord) {
     if (!validationArr || validationArr.validationReq !== 'YES') {
@@ -282,4 +318,8 @@ export class RespondToClaimAction implements IAction {
       }
     }
   }
+}
+
+export function formatText(value: string | number | boolean | string[] | object): string {
+  return typeof value === 'string' ? value.toLowerCase().replace(/_/g, ' ').trim() : String(value);
 }

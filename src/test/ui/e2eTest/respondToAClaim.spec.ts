@@ -83,8 +83,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadNoDefendants.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyOccupationContractLicenseAgreement.yesRadioOption,
+    });
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: '15',
       tsMonth: '11',
