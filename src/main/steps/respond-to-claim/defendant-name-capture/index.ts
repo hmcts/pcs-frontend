@@ -1,5 +1,6 @@
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { passThrough } from '../../../middleware/autoSaveDraftToCCD';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -10,10 +11,31 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   showCancelButton: false,
-  ccdMapping: {
-    backendPath: 'possessionClaimResponse.defendantContactDetails.party',
-    frontendFields: ['firstName', 'lastName'],
-    valueMapper: passThrough(['firstName', 'lastName']),
+  beforeRedirect: async req => {
+    const firstName = req.body?.firstName as string | undefined;
+    const lastName = req.body?.lastName as string | undefined;
+
+    const party: Record<string, string> = {};
+
+    if (firstName && firstName.trim()) {
+      party.firstName = firstName;
+    }
+
+    if (lastName && lastName.trim()) {
+      party.lastName = lastName;
+    }
+
+    if (Object.keys(party).length === 0) {
+      return;
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantContactDetails: {
+        party,
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   translationKeys: {
     // Browser/tab title

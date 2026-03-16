@@ -50,6 +50,9 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
+    receivedFreeLegalAdvice?: string;
+    defendantNameConfirmation?: string;
+    dateOfBirth?: string;
   };
 }
 
