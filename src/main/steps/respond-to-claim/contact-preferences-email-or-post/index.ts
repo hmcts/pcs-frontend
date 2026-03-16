@@ -39,6 +39,7 @@ export const step: StepDefinition = createFormStep({
               type: 'text',
               required: true,
               labelClasses: 'govuk-!-font-weight-bold',
+              classes: 'govuk-input govuk-input--width-10',
               translationKey: {
                 label: 'labels.emailLabel',
               },
