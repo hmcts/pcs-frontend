@@ -322,7 +322,7 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           condition: async (req: Request) => req.session?.formData?.['repayments-agreed']?.repaymentsAgreed === 'no',
-          nextStep: 'installment-payments', //create this page?
+          nextStep: 'installment-payments',
         },
         {
           condition: async (req: Request) =>
