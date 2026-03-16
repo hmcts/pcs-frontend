@@ -5,7 +5,7 @@ export * from './freeLegalAdvice.page.data';
 export * from './defendantNameCapture.page.data';
 export * from './dateOfBirth.page.data';
 export * from './correspondenceAddress.page.data';
-export * from './tenancyDetails.page.data';
+export * from './tenancyOccupationContractLicenseAgreement.page.data';
 export * from './landlordRegistered.page.data';
 export * from './defendantNameConfirmation.page.data';
 export * from './contactPreference.page.data';
