@@ -36,6 +36,9 @@ const fieldsConfig: FormFieldConfig[] = [
               hint: 'rentArrearsAmountCorrection.hint',
             },
             classes: 'govuk-input--width-10',
+            prefix: {
+              text: '£',
+            },
             attributes: {
               inputmode: 'decimal',
               spellcheck: false,
