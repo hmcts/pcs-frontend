@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 import type {
-  CcdFieldMapping,
   FormBuilderConfig,
   FormFieldConfig,
   FormFieldOption,
@@ -132,20 +131,6 @@ const GetInitialFormDataFunctionSchema = z
   })
   .optional();
 
-const ValueMapperFunctionSchema = z.custom<(value: unknown, ctx?: unknown) => Record<string, unknown>>(
-  val => typeof val === 'function',
-  {
-    message: 'valueMapper must be a function',
-  }
-);
-
-const CcdFieldMappingSchema: z.ZodType<CcdFieldMapping> = z.object({
-  backendPath: z.string(),
-  frontendField: z.string().optional(),
-  frontendFields: z.array(z.string()).optional(),
-  valueMapper: ValueMapperFunctionSchema,
-});
-
 // FormBuilderConfig schema
 export const FormBuilderConfigSchema: z.ZodType<FormBuilderConfig> = z.object({
   stepName: z.string(),
@@ -154,7 +139,6 @@ export const FormBuilderConfigSchema: z.ZodType<FormBuilderConfig> = z.object({
   beforeRedirect: BeforeRedirectFunctionSchema,
   extendGetContent: ExtendGetContentFunctionSchema,
   getInitialFormData: GetInitialFormDataFunctionSchema,
-  ccdMapping: CcdFieldMappingSchema.optional(),
   stepDir: z.string(),
   translationKeys: TranslationKeysSchema.optional(),
   customTemplate: z.string().optional(),

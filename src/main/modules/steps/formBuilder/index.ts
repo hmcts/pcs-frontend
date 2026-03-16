@@ -1,11 +1,9 @@
 import path from 'path';
 
-import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { BuiltFormContent, FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { autoSaveToCCD } from '../../../middleware/autoSaveDraftToCCD';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
 import { createStepNavigation, stepNavigation } from '../flow';
@@ -42,26 +40,12 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     flowConfig,
     showCancelButton,
     customTemplate,
-    ccdMapping,
   } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
-
-  const enhancedBeforeRedirect = ccdMapping
-    ? async (req: Request) => {
-        // Auto-save runs first to ensure CCD has latest data before any custom logic
-        if (req.res) {
-          await autoSaveToCCD(req, req.res, { stepName, ccdMapping });
-        }
-        // Then run your custom beforeRedirect if you provided one
-        if (beforeRedirect) {
-          await beforeRedirect(req);
-        }
-      }
-    : beforeRedirect;
 
   return {
     url: path.join(basePath, stepName),
@@ -117,7 +101,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       stepName,
       viewPath,
       journeyFolder,
-      enhancedBeforeRedirect,
+      beforeRedirect,
       translationKeys,
       flowConfig,
       showCancelButton,
