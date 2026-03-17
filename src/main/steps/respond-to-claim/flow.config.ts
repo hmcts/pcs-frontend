@@ -2,7 +2,7 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
-  getPreviousNoticeStep,
+  getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
   isDefendantNameKnown,
@@ -300,7 +300,7 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'rent-arrears-dispute': {
       defaultNext: 'counter-claim',
-      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousNoticeStep(req),
+      previousStep: (req: Request) => getStepBeforeDisputePages(req),
       routes: [
         {
           condition: (req: Request): Promise<boolean> => hasOnlyRentArrearsGrounds(req),
@@ -319,7 +319,7 @@ export const flowConfig: JourneyFlowConfig = {
         if (rentArrearsClaim) {
           return 'rent-arrears-dispute';
         }
-        return getPreviousNoticeStep(req);
+        return getStepBeforeDisputePages(req);
       },
     },
     'counter-claim': {
