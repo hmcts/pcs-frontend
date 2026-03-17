@@ -32,6 +32,7 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-text-message',
     'dispute-claim-interstitial',
     'landlord-registered',
+    'landlord-licensed',
     'tenancy-type-details',
     'tenancy-date-unknown',
     'tenancy-date-details',
@@ -123,8 +124,10 @@ export const flowConfig: JourneyFlowConfig = {
       ],
       defaultNext: 'tenancy-type-details',
     },
-
     'landlord-registered': {
+      defaultNext: 'landlord-licensed',
+    },
+    'landlord-licensed': {
       defaultNext: 'tenancy-type-details',
     },
     'tenancy-type-details': {
@@ -141,15 +144,15 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: async (req: Request, formData: Record<string, unknown>) => {
         // Check formData to see which path was actually taken
         // This honors the actual journey path even if case data changes mid-journey
-        if ('landlord-registered' in formData) {
-          return 'landlord-registered';
+        if ('landlord-licensed' in formData) {
+          return 'landlord-licensed';
         }
 
         // Fallback: check current case data for new journeys
 
         const welshProperty = await isWelshProperty(req);
         if (welshProperty) {
-          return 'landlord-registered';
+          return 'landlord-licensed';
         }
         return 'dispute-claim-interstitial';
       },

@@ -1,6 +1,7 @@
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+
 import { createFormStep } from '@modules/steps';
 import { buildCcdCaseForPossessionClaimResponse } from 'steps/utils/populateResponseToClaimPayloadmap';
 
@@ -31,7 +32,7 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
- beforeRedirect: async req => {
+  beforeRedirect: async req => {
     const confirmValue = req.body?.confirmLandlordLicensed as string | undefined;
 
     const defendantResponses: Record<string, unknown> = {};
@@ -46,7 +47,7 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        ...defendantResponses
+        ...defendantResponses,
       },
     };
 
