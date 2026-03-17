@@ -444,7 +444,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('inputErrorValidation', {
       validationReq: repaymentsMade.errorValidation,
       validationType: repaymentsMade.errorValidationType.radio,
-      inputArray: repaymentsMade.getErrorValidationField(claimantsName).errorRadioMsg,
+      inputArray: repaymentsMade.errorValidationField.getErrorRadioMsg(claimantsName),
       question: repaymentsMade.getmainHeader(claimantsName),
       header: repaymentsMade.errorValidationHeader,
     });
@@ -453,7 +453,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('inputErrorValidation', {
       validationReq: repaymentsMade.errorValidation,
       validationType: repaymentsMade.errorValidationType.input,
-      inputArray: repaymentsMade.getErrorValidationField(claimantsName).errorRadioMsg,
+      inputArray: repaymentsMade.errorValidationField.errorTextField,
       header: repaymentsMade.errorValidationHeader,
     });
     await performAction('clickLink', repaymentsMade.backLink);
@@ -471,7 +471,7 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('inputErrorValidation', {
       validationReq: repaymentsMade.errorValidation,
       validationType: repaymentsMade.errorValidationType.input,
-      inputArray: repaymentsMade.getErrorValidationField(claimantsName).errorCharLimit,
+      inputArray: repaymentsMade.errorValidationField.errorCharLimit,
       header: repaymentsMade.errorValidationHeader,
     });
     await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
