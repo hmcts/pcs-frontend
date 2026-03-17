@@ -2069,6 +2069,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hmcts/ccd-event-runtime@file:../../sdk/ccd-event-runtime::locator=pcs-frontend%40workspace%3A.":
+  version: 0.0.1
+  resolution: "@hmcts/ccd-event-runtime@file:../../sdk/ccd-event-runtime#../../sdk/ccd-event-runtime::hash=806de2&locator=pcs-frontend%40workspace%3A."
+  checksum: 10/010de30256160eb66b291177a7e36536955d8cc936594102235eb241abaa40b3af9a3891c4a3344b647be56cfb5e39abaa8c45e2caeeda7b0568bc52679f8e71
+  languageName: node
+  linkType: hard
+
 "@hmcts/info-provider@npm:^1.1.0":
   version: 1.3.0
   resolution: "@hmcts/info-provider@npm:1.3.0"
@@ -12623,6 +12630,7 @@ __metadata:
     "@eslint/eslintrc": "npm:^3.3.1"
     "@eslint/js": "npm:^9.29.0"
     "@eslint/plugin-kit": "npm:^0.5.0"
+    "@hmcts/ccd-event-runtime": "file:../../sdk/ccd-event-runtime"
     "@hmcts/info-provider": "npm:^1.1.0"
     "@hmcts/nodejs-healthcheck": "npm:^1.8.0"
     "@hmcts/nodejs-logging": "npm:^4.0.4"

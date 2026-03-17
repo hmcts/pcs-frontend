@@ -13,7 +13,9 @@ export class OIDCModule {
   private readonly logger = Logger.getLogger('oidc');
 
   constructor() {
-    this.setupClient();
+    void this.setupClient().catch(error => {
+      this.logger.error('Initial OIDC client setup failed, middleware will retry on demand:', error);
+    });
   }
 
   private async setupClient(): Promise<void> {

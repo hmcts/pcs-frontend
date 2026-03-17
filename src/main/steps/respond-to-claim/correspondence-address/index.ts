@@ -1,11 +1,12 @@
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import type { Address, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { SubmitDefendantResponseData } from '../../../generated/ccd/PCS';
+import type { Address } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { submitDefendantResponseDraft } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 const STEP_NAME = 'postcode-finder';
@@ -112,15 +113,16 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
   },
   beforeRedirect: async req => {
-    let possessionClaimResponse: PossessionClaimResponse;
-    //prepopulate address is correct
+    let responseData: SubmitDefendantResponseData;
+
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
-      possessionClaimResponse = {
-        defendantContactDetails: {
-          party: {
-            address: prepopulateAddress,
-          },
-        },
+      if (!prepopulateAddress) {
+        throw new Error('Expected a prepopulated correspondence address');
+      }
+
+      responseData = {
+        correspondenceAddress: toGeneratedAddress(prepopulateAddress),
+        submitDraftAnswers: 'No',
       };
     } else {
       const addressLine1 = req.body?.['correspondenceAddressConfirm.addressLine1'] ?? '';
@@ -129,23 +131,19 @@ export const step: StepDefinition = createFormStep({
       const county = req.body?.['correspondenceAddressConfirm.county'];
       const postcode = req.body?.['correspondenceAddressConfirm.postcode'] ?? '';
 
-      //only the details the defendant provides
-      possessionClaimResponse = {
-        defendantContactDetails: {
-          party: {
-            address: {
-              AddressLine1: addressLine1,
-              ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
-              PostTown: townOrCity,
-              ...(county !== undefined && county !== '' && { County: county }),
-              PostCode: postcode,
-            },
-          },
-        },
+      responseData = {
+        correspondenceAddress: toGeneratedAddress({
+          AddressLine1: addressLine1,
+          ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
+          PostTown: townOrCity,
+          ...(county !== undefined && county !== '' && { County: county }),
+          PostCode: postcode,
+        }),
+        submitDraftAnswers: 'No',
       };
     }
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse, false);
+    await submitDefendantResponseDraft(req, responseData);
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'correspondence-address', ['common']);
@@ -233,9 +231,8 @@ export const step: StepDefinition = createFormStep({
 });
 
 async function getExistingAddress(accessToken: string, caseReference: string): Promise<string> {
-  // Pull data from API
-  const response = await ccdCaseService.getExistingCaseData(accessToken, caseReference);
-  prepopulateAddress = response.case_details.case_data.possessionClaimResponse?.defendantContactDetails?.party?.address;
+  const responseData = await ccdCaseService.getResponseToClaimData(accessToken, caseReference);
+  prepopulateAddress = responseData.correspondenceAddress;
 
   if (prepopulateAddress) {
     const formattedAddress =
@@ -256,4 +253,16 @@ async function getExistingAddress(accessToken: string, caseReference: string): P
   } else {
     return '?'; //no address
   }
+}
+
+function toGeneratedAddress(address: Address): SubmitDefendantResponseData['correspondenceAddress'] {
+  return {
+    AddressLine1: address.AddressLine1,
+    AddressLine2: address.AddressLine2 ?? '',
+    AddressLine3: address.AddressLine3 ?? '',
+    PostTown: address.PostTown,
+    County: address.County ?? '',
+    PostCode: address.PostCode,
+    Country: address.Country ?? '',
+  };
 }

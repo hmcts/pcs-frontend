@@ -32,27 +32,3 @@ export interface Address {
   PostCode: string;
   Country?: string;
 }
-
-export interface PossessionClaimResponse {
-  defendantContactDetails: {
-    party: {
-      firstName?: string;
-      lastName?: string;
-      address?: Address;
-    };
-  };
-}
-
-export interface StartCallbackData {
-  case_details: {
-    case_data: {
-      possessionClaimResponse?: {
-        defendantContactDetails?: {
-          party?: {
-            address?: Address;
-          };
-        };
-      };
-    };
-  };
-}

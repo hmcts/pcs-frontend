@@ -2,12 +2,11 @@
 // This module is for developer reference and is not wired into runtime routes.
 // eslint-disable-next-line import/no-named-as-default
 import Axios, { AxiosInstance } from 'axios';
+import { createCcdClient, type CcdClientConfig, type CcdTransport } from '@hmcts/ccd-event-runtime';
 
 import {
-  CcdClientConfig,
-  CcdTransport,
   CreateClaimData,
-  GeneratedCcdClient,
+  caseBindings,
 } from '../generated/ccd/PCS';
 
 function createTransport(api: AxiosInstance): CcdTransport {
@@ -22,7 +21,7 @@ function createClient(
   caseTypeId: string,
   bearerToken: string,
   serviceToken: string
-): GeneratedCcdClient {
+) {
   const api = Axios.create({
     baseURL: baseUrl,
     headers: {
@@ -41,7 +40,7 @@ function createClient(
     transport: createTransport(api),
   };
 
-  return new GeneratedCcdClient(clientConfig);
+  return createCcdClient(clientConfig, caseBindings);
 }
 
 export async function createPossessionClaimExample(
@@ -53,7 +52,7 @@ export async function createPossessionClaimExample(
   const client = createClient(baseUrl, caseTypeId, bearerToken, serviceToken);
 
   // 1) Start event to get token + current event data.
-  const flow = await client.events.createPossessionClaim.start();
+  const flow = await client.event('createPossessionClaim').start();
 
   // If the event defines an about-to-start callback,  any pre-populated values are returned.
   const startData: CreateClaimData = flow.data;
@@ -62,12 +61,12 @@ export async function createPossessionClaimExample(
   startData.feeAmount = '£12345';
   startData.propertyAddress = {
     AddressLine1: '2 Second Avenue',
-      AddressLine2: '',
-      AddressLine3: '',
-      PostTown: 'London',
-      County: '',
-      PostCode: 'W3 7RX',
-      Country: 'United Kingdom',
+    AddressLine2: '',
+    AddressLine3: '',
+    PostTown: 'London',
+    County: '',
+    PostCode: 'W3 7RX',
+    Country: 'United Kingdom',
   };
 
   await flow.submit(startData);

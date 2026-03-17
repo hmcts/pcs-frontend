@@ -1,34 +1,65 @@
 import { Page } from '@playwright/test';
 // eslint-disable-next-line import/no-named-as-default
-import Axios from 'axios';
+import Axios, { AxiosInstance } from 'axios';
+import { createCcdClient, type CcdClientConfig, type CcdTransport } from '@hmcts/ccd-event-runtime';
 
 import {
-  createCaseApiData,
   createCaseEventTokenApiData,
   submitCaseApiData,
   submitCaseEventTokenApiData,
 } from '../../../data/api-data';
 import { IAction, actionData, actionRecord } from '../../interfaces';
+import { caseBindings, type CreateClaimData } from '../../../../../main/generated/ccd/PCS';
 
 export const caseInfo: { id: string; fid: string; state: string } = { id: '', fid: '', state: '' };
 
-export class CreateCaseAPIAction implements IAction {
-  private mapToPrefixedEventData(data: actionData): actionData {
-    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
-      return data;
-    }
+interface CreatedCaseResponse {
+  id?: string;
+  state?: string;
+}
 
-    const prefix = createCaseApiData.createCaseDataPrefix;
-    if (!prefix) {
-      return data;
-    }
+function createTransport(api: AxiosInstance): CcdTransport {
+  return {
+    get: async (url, headers) => (await api.get(url, { headers })).data,
+    post: async (url, data, headers) => (await api.post(url, data, { headers })).data,
+  };
+}
 
-    const typedData = data as Record<string, unknown>;
-    return Object.fromEntries(
-      Object.entries(typedData).map(([key, value]) => [prefix + key.charAt(0).toUpperCase() + key.slice(1), value])
-    );
+function createCaseClient() {
+  const requestConfig = createCaseEventTokenApiData.createCaseApiInstance();
+  const api = Axios.create(requestConfig);
+  const baseUrl = requestConfig.baseURL;
+  if (!baseUrl) {
+    throw new Error('Missing DATA_STORE_URL_BASE for createCaseAPI');
   }
 
+  const clientConfig: CcdClientConfig = {
+    baseUrl,
+    getAuthHeaders: () => (requestConfig.headers ?? {}) as Record<string, string>,
+    transport: createTransport(api),
+  };
+
+  return createCcdClient(clientConfig, caseBindings);
+}
+
+function extractCreateCasePayload(caseData: actionData): Partial<CreateClaimData> {
+  const payload = typeof caseData === 'object' && caseData !== null && 'data' in caseData ? caseData.data : caseData;
+  return (payload ?? {}) as Partial<CreateClaimData>;
+}
+
+function setCaseInfo(createResponse: CreatedCaseResponse): void {
+  const caseId = String(createResponse.id ?? '');
+  if (!caseId) {
+    throw new Error('Create case response did not include a case id');
+  }
+
+  process.env.CASE_NUMBER = caseId;
+  caseInfo.id = caseId;
+  caseInfo.fid = caseId.replace(/(.{4})(?=.)/g, '$1-');
+  caseInfo.state = createResponse.state ?? '';
+}
+
+export class CreateCaseAPIAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['createCaseAPI', () => this.createCaseAPI(fieldName)],
@@ -42,20 +73,13 @@ export class CreateCaseAPIAction implements IAction {
   }
 
   private async createCaseAPI(caseData: actionData): Promise<void> {
-    const createCaseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
-    const CREATE_EVENT_TOKEN = (await createCaseApi.get(createCaseEventTokenApiData.createCaseEventTokenApiEndPoint))
-      .data.token;
-    const createCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
-    const createCaseEventData = this.mapToPrefixedEventData(createCasePayloadData);
-    const createResponse = await createCaseApi.post(createCaseApiData.createCaseApiEndPoint, {
-      data: createCaseEventData,
-      event: { id: createCaseApiData.createCaseEventName },
-      event_token: CREATE_EVENT_TOKEN,
-    });
-    process.env.CASE_NUMBER = createResponse.data.id;
-    caseInfo.id = createResponse.data.id;
-    caseInfo.fid = createResponse.data.id.replace(/(.{4})(?=.)/g, '$1-');
-    caseInfo.state = createResponse.data.state;
+    const client = createCaseClient();
+    const flow = await client.event('createPossessionClaim').start();
+    const createResponse = (await flow.submit({
+      ...flow.data,
+      ...extractCreateCasePayload(caseData),
+    } as CreateClaimData)) as CreatedCaseResponse;
+    setCaseInfo(createResponse);
   }
 
   private async submitCaseAPI(caseData: actionData): Promise<void> {
