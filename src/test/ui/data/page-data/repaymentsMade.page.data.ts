@@ -1,5 +1,7 @@
 export const repaymentsMade = {
-  mainHeader: `Have you paid any money to Treetops Housing since 16th June 2025?`,
+  getmainHeader: (claimantName: string): string => {
+    return `Have you paid any money to ${claimantName} since 16th June 2025?`;
+  },
   respondToClaimParagraph: `Respond to a property possession claim`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
@@ -13,7 +15,9 @@ export const repaymentsMade = {
   errorValidationType: { input: `textField`, radio: `radioOptions` },
   errorValidationHeader: `There is a problem`,
   errorValidationField: {
-    errorRadioMsg: [{ errMessage: `Select if you’ve paid any money to Treetops Housing since 16th June 2025` }],
+    getErrorRadioMsg: (claimantName: string) => [
+      { errMessage: `Select if you’ve paid any money to ${claimantName} since 16th June 2025` },
+    ],
     errorTextField: [
       {
         type: `empty`,

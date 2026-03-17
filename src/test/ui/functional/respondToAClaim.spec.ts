@@ -444,8 +444,8 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('inputErrorValidation', {
       validationReq: repaymentsMade.errorValidation,
       validationType: repaymentsMade.errorValidationType.radio,
-      inputArray: repaymentsMade.errorValidationField.errorRadioMsg,
-      question: repaymentsMade.mainHeader,
+      inputArray: repaymentsMade.errorValidationField.getErrorRadioMsg(claimantsName),
+      question: repaymentsMade.getmainHeader(claimantsName),
       header: repaymentsMade.errorValidationHeader,
     });
     await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
