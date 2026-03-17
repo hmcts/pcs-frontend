@@ -1,0 +1,24 @@
+{
+  "pageTitle": "cyChoose an application",
+  "caption": "cyMake an application",
+  "heading": "cyChoose an application",
+  "question": "cyWhat do you want to apply for?",
+  "hintText": "cySome optional hint text here (placeholder)",
+  "options": {
+    "suspend": {
+      "label": "cyAsk the court to suspend (delay) the eviction"
+    },
+    "adjourn": {
+      "label": "cyAsk to adjourn (delay) the hearing"
+    },
+    "setAside": {
+      "label": "cyAsk the court to change (set aside) their decision to evict you"
+    },
+    "somethingElse": {
+      "label": "cySomething else"
+    }
+  },
+  "errors": {
+    "typeOfApplication": "cyYou must select an type of application to apply for"
+  }
+}

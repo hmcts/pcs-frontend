@@ -69,3 +69,14 @@ export interface StartCallbackData {
     };
   };
 }
+
+export enum GenAppType {
+  SUSPEND,
+  ADJOURN,
+  SET_ASIDE,
+  SOMETHING_ELSE,
+}
+
+export interface CitizenGenAppRequest {
+  type: GenAppType;
+}
