@@ -67,9 +67,11 @@ export const step: StepDefinition = createFormStep({
       return;
     }
     const possessionClaimResponse: PossessionClaimResponse = {
-      paymentAgreement: {
-        repaymentPlanAgreed: repaymentsAgreed === 'yes' ? 'YES' : repaymentsAgreed === 'no' ? 'NO' : 'NOT_SURE',
-        repaymentAgreedDetails: repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined,
+      defendantResponses: {
+        paymentAgreement: {
+          repaymentPlanAgreed: repaymentsAgreed === 'yes' ? 'YES' : repaymentsAgreed === 'no' ? 'NO' : 'NOT_SURE',
+          repaymentAgreedDetails: repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined,
+        },
       },
     };
 

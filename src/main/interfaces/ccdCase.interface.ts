@@ -55,10 +55,11 @@ export interface PossessionClaimResponse {
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
-  };
-  paymentAgreement?: {
-    repaymentPlanAgreed?: YesNoNotSureValue;
-    repaymentAgreedDetails?: string;
+
+    paymentAgreement?: {
+      repaymentPlanAgreed?: YesNoNotSureValue;
+      repaymentAgreedDetails?: string;
+    };
   };
 }
 
