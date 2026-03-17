@@ -11,10 +11,12 @@ describe('isDefendantNameKnown', () => {
             validatedCase: {
               data: {
                 possessionClaimResponse: {
-                  claimantEnteredDefendantDetails: {
-                    nameKnown: 'YES',
-                    firstName: 'John',
-                    lastName: 'Doe',
+                  defendantContactDetails: {
+                    party: {
+                      nameKnown: 'YES',
+                      firstName: 'John',
+                      lastName: 'Doe',
+                    },
                   },
                 },
               },
@@ -37,8 +39,10 @@ describe('isDefendantNameKnown', () => {
             validatedCase: {
               data: {
                 possessionClaimResponse: {
-                  claimantEnteredDefendantDetails: {
-                    nameKnown: 'NO',
+                  defendantContactDetails: {
+                    party: {
+                      nameKnown: 'NO',
+                    },
                   },
                 },
               },
@@ -59,9 +63,11 @@ describe('isDefendantNameKnown', () => {
             validatedCase: {
               data: {
                 possessionClaimResponse: {
-                  claimantEnteredDefendantDetails: {
-                    nameKnown: 'YES',
-                    firstName: 'John',
+                  defendantContactDetails: {
+                    party: {
+                      nameKnown: 'YES',
+                      firstName: 'John',
+                    },
                   },
                 },
               },
@@ -82,9 +88,11 @@ describe('isDefendantNameKnown', () => {
             validatedCase: {
               data: {
                 possessionClaimResponse: {
-                  claimantEnteredDefendantDetails: {
-                    nameKnown: 'YES',
-                    lastName: 'Doe',
+                  defendantContactDetails: {
+                    party: {
+                      nameKnown: 'YES',
+                      lastName: 'Doe',
+                    },
                   },
                 },
               },
@@ -135,10 +143,12 @@ describe('isDefendantNameKnown', () => {
             validatedCase: {
               data: {
                 possessionClaimResponse: {
-                  claimantEnteredDefendantDetails: {
-                    nameKnown: 'YES',
-                    firstName: '',
-                    lastName: '',
+                  defendantContactDetails: {
+                    party: {
+                      nameKnown: 'YES',
+                      firstName: '',
+                      lastName: '',
+                    },
                   },
                 },
               },
