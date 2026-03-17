@@ -164,8 +164,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
     await performAction('clickLink', contactByTelephone.backLink);
     await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
     await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
@@ -191,8 +194,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
       postcode: correspondenceAddress.englandPostcodeTextInput,
       addressIndex: correspondenceAddress.addressIndex,
     });
-    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.yesRadioOption,
       phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
@@ -224,8 +230,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.yesRadioOption,
       phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
@@ -260,8 +268,11 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
@@ -299,8 +310,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
@@ -337,8 +350,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
@@ -379,8 +394,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
@@ -421,8 +438,10 @@ test.describe('Respond to a claim - functional @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreferenceEmailOrPost.mainHeader);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
       radioOption: contactByTelephone.noRadioOption,
     });
