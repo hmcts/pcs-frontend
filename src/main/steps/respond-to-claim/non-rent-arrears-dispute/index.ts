@@ -2,9 +2,11 @@ import type { Request } from 'express';
 
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'non-rent-arrears-dispute',
@@ -24,24 +26,18 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const result: Record<string, unknown> = {};
+    const result: Record<string, unknown> = {
+      disputeClaim: toYesNoEnum(disputeOtherParts),
+    };
 
-    // Map frontend radio value to backend enum
-    if (disputeOtherParts === 'yes') {
-      result.disputeClaim = 'YES';
-      if (disputeDetailsRaw && typeof disputeDetailsRaw === 'string') {
-        const trimmed = disputeDetailsRaw.trim();
-        if (trimmed) {
-          result.disputeDetails = trimmed;
-        }
+    // Add dispute details if user selected 'yes' and provided details
+    if (disputeOtherParts === 'yes' && disputeDetailsRaw) {
+      const trimmed = disputeDetailsRaw.trim();
+      if (trimmed) {
+        result.disputeDetails = trimmed;
       }
     } else if (disputeOtherParts === 'no') {
-      result.disputeClaim = 'NO';
       result.disputeDetails = '';
-    }
-
-    if (Object.keys(result).length === 0) {
-      return;
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
@@ -58,25 +54,26 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
 
-    const formData: Record<string, unknown> = {};
-
-    // Map backend enum to frontend radio value
-    if (response.disputeClaim === 'YES') {
-      formData.disputeOtherParts = 'yes';
-      // Prepopulate the details if they exist, otherwise explicitly set to empty string
-      // Use dotted notation for subField, matching defendant-name-confirmation pattern
-      if (response.disputeDetails && response.disputeDetails.trim() !== '') {
-        formData['disputeOtherParts.disputeDetails'] = response.disputeDetails as string;
-      } else {
-        formData['disputeOtherParts.disputeDetails'] = '';
-      }
-    } else if (response.disputeClaim === 'NO') {
-      formData.disputeOtherParts = 'no';
-      // Explicitly clear the textarea field when NO is selected
-      formData['disputeOtherParts.disputeDetails'] = '';
+    // Map backend enum to frontend radio value using utility
+    const formValue = fromYesNoEnum(response.disputeClaim as string);
+    if (!formValue) {
+      return {};
     }
 
-    return formData;
+    const initialValues: Record<string, unknown> = {
+      disputeOtherParts: formValue,
+    };
+
+    // Prepopulate dispute details if user previously selected 'yes'
+    // Use dotted notation for subField, matching defendant-name-confirmation pattern
+    if (formValue === 'yes' && response.disputeDetails) {
+      const trimmed = (response.disputeDetails as string).trim();
+      initialValues['disputeOtherParts.disputeDetails'] = trimmed || '';
+    } else {
+      initialValues['disputeOtherParts.disputeDetails'] = '';
+    }
+
+    return initialValues;
   },
   extendGetContent: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
