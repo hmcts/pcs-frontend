@@ -1,5 +1,5 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}Contact Preferences - HM Courts & Tribunals Service – GOV.UK{% endblock %}
@@ -18,17 +18,7 @@
   <p class="govuk-body">This is a placeholder page for tenancy type details.</p>
 
   <form method="post" action="{{ url }}" novalidate>
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: t('buttons.saveAndContinue', { ns: 'common' }),
-        attributes: { name: 'action', value: 'continue' }
-      }) }}
-      {{ govukButton({
-        text: t('buttons.saveForLater', { ns: 'common' }),
-        classes: "govuk-button--secondary",
-        attributes: { name: 'action', value: 'saveForLater' }
-      }) }}
-    </div>
+    {{ stepButtons(saveAndContinue, saveForLater) }}
   </form>
 
 {% endblock %}

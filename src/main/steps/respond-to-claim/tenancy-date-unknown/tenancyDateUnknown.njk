@@ -1,6 +1,6 @@
 {% extends "stepsTemplate.njk" %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
@@ -29,17 +29,7 @@
       {% endif %}
     {% endfor %}
 
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: saveAndContinue,
-        attributes: { name: 'action', value: 'continue' }
-      }) }}
-      {{ govukButton({
-        text: saveForLater,
-        classes: 'govuk-button--secondary',
-        attributes: { name: 'action', value: 'saveForLater' }
-      }) }}
-    </div>
+    {{ stepButtons(saveAndContinue, saveForLater) }}
   </form>
 
 {% endblock %}
