@@ -69,7 +69,6 @@ export interface FormFieldConfig {
   // For date fields: if true, disallows future and current dates
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
-  isPageHeading?: boolean;
 }
 
 export interface TranslationKeys {
@@ -94,6 +93,10 @@ export type ExtendGetContent = (
   formContent: BuiltFormContent
 ) => MaybePromise<Partial<BuiltFormContent> & Record<string, unknown>>;
 
+// Prepopulation function that extracts field values from CCD case data for GET requests.
+// Use dot-notation for subFields (e.g., 'nameConfirmation.firstName') to match nested field names.
+export type GetInitialFormData = (req: Request) => MaybePromise<Record<string, unknown>>;
+
 export interface FormBuilderConfig {
   stepName: string;
   journeyFolder: string;
@@ -101,6 +104,9 @@ export interface FormBuilderConfig {
   beforeRedirect?: (req: Request) => Promise<void> | void;
   beforeGet?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
+  // Prepopulates form fields from CCD on GET requests (e.g., when user returns to edit their answer).
+  // Only runs on GET - POST uses submitted body to preserve user input during validation errors.
+  getInitialFormData?: GetInitialFormData;
   stepDir: string;
   translationKeys?: TranslationKeys;
   customTemplate?: string;

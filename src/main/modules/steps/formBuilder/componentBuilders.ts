@@ -14,13 +14,12 @@ import { buildSubFieldsHTML } from './subFieldsRenderer';
 function createFieldsetLegend(
   label: string,
   isFirstField: boolean,
-  legendClasses?: string,
-  isPageHeading?: boolean
+  legendClasses?: string
 ): { legend: { text: string; isPageHeading: boolean; classes: string } } {
   return {
     legend: {
       text: label,
-      isPageHeading: isPageHeading || false,
+      isPageHeading: isFirstField,
       classes: legendClasses || (isFirstField ? 'govuk-fieldset__legend--l' : ''),
     },
   };

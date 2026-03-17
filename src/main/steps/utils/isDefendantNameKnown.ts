@@ -3,18 +3,21 @@ import type { Request } from 'express';
 /**
  * Checks if defendant name is known from CCD case data.
  *
- * Uses real CCD callback data path:
- * possessionClaimResponse.defendantContactDetails.party.nameKnown
+ * Uses claimantEnteredDefendantDetails.nameKnown for routing decision:
+ * - What the CLAIMANT entered when creating the claim
+ * - Determines if we can show a name to the defendant for confirmation
  *
- * A defendant name is considered "known" when nameKnown flag is explicitly "YES"
+ * Architecture:
+ * - claimantEnteredDefendantDetails = INPUT (what claimant knows)
+ * - defendantContactDetails.party = OUTPUT (what defendant confirms/corrects)
  *
  * Real data examples:
  * - Known: { nameKnown: "YES", firstName: "ARUN", lastName: "KUMAR" }
- * - Unknown: { nameKnown: "NO" } (no firstName/lastName fields)
+ * - Unknown: { nameKnown: "NO" }
  */
 export const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
   const caseData = req.res?.locals?.validatedCase?.data;
-  const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
+  const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
 
-  return party?.nameKnown === 'YES';
+  return claimantEntry?.nameKnown === 'YES';
 };

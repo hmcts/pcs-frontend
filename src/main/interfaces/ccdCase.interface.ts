@@ -52,8 +52,15 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
+    rentArrearsAmountConfirmation?: string;
+    rentArrearsAmount?: string;
     landlordRegistered?: YesNoNotSureValue;
   };
+  claimantEnteredDefendantDetails?: {
+    firstName?: string;
+    lastName?: string;
+  };
+  claimantOrganisations?: { value: string }[];
 }
 
 export interface StartCallbackData {

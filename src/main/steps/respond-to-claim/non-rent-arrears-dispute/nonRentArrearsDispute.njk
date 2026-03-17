@@ -1,30 +1,55 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 
-{% block pageTitle %}{{ pageTitle }}{% endblock %}
+{% block pageTitle %}
+  {{ heading }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
 
 {% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
   {% if caption %}
     <span class="govuk-caption-xl">{{ caption }}</span>
   {% endif %}
 
-  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  <p class="govuk-body">{{ introParagraph | safe }}</p>
+
+  <p class="govuk-body">{{ includesHeading }}</p>
+
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+    <li>{{ includesBullet1 | safe }}</li>
+    <li>{{ includesBullet2 }}</li>
+    <li>{{ includesBullet3 }}</li>
+  </ul>
 
   <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.component and field.componentType %}
+        {% if field.componentType == 'radios' %}
+          {{ govukRadios(field.component) }}
+        {% elif field.componentType == 'characterCount' %}
+          {{ govukCharacterCount(field.component) }}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
 
     <div class="govuk-button-group">
-      {{ govukButton({ 
-        text: continue,
+      {{ govukButton({
+        text: saveAndContinue,
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
-      {{ govukButton({ 
+      {{ govukButton({
         text: saveForLater,
         classes: 'govuk-button--secondary',
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
   </form>
-
 {% endblock %}

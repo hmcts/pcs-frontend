@@ -4,7 +4,7 @@ import { isNoticeDateProvided } from './isNoticeDateProvided';
 import { isNoticeServed } from './isNoticeServed';
 import { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 
-export async function getPreviousPageForArrears(req: Request): Promise<string> {
+export async function getPreviousNoticeStep(req: Request): Promise<string> {
   const noticeServed = await isNoticeServed(req);
   const noticeDateProvided = await isNoticeDateProvided(req);
   const tenancyStartDateKnown = await isTenancyStartDateKnown(req);
