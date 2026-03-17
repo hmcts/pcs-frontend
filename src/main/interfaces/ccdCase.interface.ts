@@ -51,6 +51,7 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
+    landlordRegistered?: YesNoNotSureValue;
   };
   paymentAgreement?: {
     repaymentPlanAgreed?: YesNoNotSureValue;
