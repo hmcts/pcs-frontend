@@ -32,6 +32,7 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-text-message',
     'dispute-claim-interstitial',
     'landlord-registered',
+    'landlord-licensed',
     'tenancy-type-details',
     'tenancy-date-details',
     'tenancy-date-unknown',
@@ -125,6 +126,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
 
     'landlord-registered': {
+      defaultNext: 'landlord-licensed',
+    },
+    'landlord-licensed': {
       defaultNext: 'tenancy-type-details',
     },
     'tenancy-type-details': {
