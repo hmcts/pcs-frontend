@@ -46,6 +46,9 @@ export interface FormFieldConfig {
   };
   options?: FormFieldOption[];
   classes?: string;
+  prefix?: {
+    text: string;
+  };
   attributes?: Record<string, unknown>;
   // Legend classes for radio/checkbox/date fieldsets
   legendClasses?: string;

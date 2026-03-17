@@ -14,12 +14,13 @@ import { buildSubFieldsHTML } from './subFieldsRenderer';
 function createFieldsetLegend(
   label: string,
   isFirstField: boolean,
-  legendClasses?: string
+  legendClasses?: string,
+  isPageHeading?: boolean
 ): { legend: { text: string; isPageHeading: boolean; classes: string } } {
   return {
     legend: {
       text: label,
-      isPageHeading: isFirstField,
+      isPageHeading: isPageHeading || false,
       classes: legendClasses || (isFirstField ? 'govuk-fieldset__legend--l' : ''),
     },
   };
@@ -54,6 +55,9 @@ export function buildComponentConfig(
   switch (field.type) {
     case 'text': {
       component.value = (fieldValue as string) || '';
+      if (field.prefix) {
+        component.prefix = field.prefix;
+      }
       componentType = 'input';
       break;
     }
