@@ -1,3 +1,5 @@
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
@@ -9,6 +11,29 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/freeLegalAdvice.njk`,
+  beforeRedirect: async req => {
+    const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
+
+    if (!hadLegalAdvice) {
+      return;
+    }
+
+    const enumMapping: Record<string, string> = {
+      yes: 'YES',
+      no: 'NO',
+      preferNotToSay: 'PREFER_NOT_TO_SAY',
+    };
+
+    const ccdValue = enumMapping[hadLegalAdvice];
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        receivedFreeLegalAdvice: ccdValue,
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
@@ -26,36 +51,22 @@ export const step: StepDefinition = createFormStep({
     paragraph3: 'paragraph3',
     paragraph4: 'paragraph4',
   },
-  extendGetContent: async (req, formContent) => {
+  getInitialFormData: req => {
     const { defendantResponsesReceivedFreeLegalAdvice: existingAnswer } = req.res?.locals?.validatedCase ?? {
       defendantResponsesReceivedFreeLegalAdvice: undefined,
     };
 
-    // Only prepopulate on GET (not on POST with validation errors)
-    if (existingAnswer && !req.body?.hadLegalAdvice) {
-      // Map CCD enum to frontend value
-      const formValue =
-        existingAnswer === 'YES'
-          ? 'yes'
-          : existingAnswer === 'NO'
-            ? 'no'
-            : existingAnswer === 'PREFER_NOT_TO_SAY'
-              ? 'preferNotToSay'
-              : undefined;
+    // Map CCD enum to frontend value
+    const formValue =
+      existingAnswer === 'YES'
+        ? 'yes'
+        : existingAnswer === 'NO'
+          ? 'no'
+          : existingAnswer === 'PREFER_NOT_TO_SAY'
+            ? 'preferNotToSay'
+            : undefined;
 
-      if (formValue) {
-        // Prepopulate radio button from CCD data
-        const radioField = formContent.fields.find(f => f.componentType === 'radios');
-        if (radioField?.component?.items && Array.isArray(radioField.component.items)) {
-          radioField.component.items = radioField.component.items.map((item: Record<string, unknown>) => ({
-            ...item,
-            checked: item.value === formValue,
-          }));
-        }
-      }
-    }
-
-    return formContent;
+    return formValue ? { hadLegalAdvice: formValue } : {};
   },
   fields: [
     {

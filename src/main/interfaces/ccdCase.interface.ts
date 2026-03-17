@@ -55,6 +55,13 @@ export interface CcdClaimantOrganisation {
   id: string;
 }
 
+/** Claimant-entered defendant details captured when the claim was created. */
+export interface CcdClaimantEnteredDefendantDetails {
+  nameKnown?: YesNoValue;
+  firstName?: string;
+  lastName?: string;
+}
+
 /** Defendant party contact details (name/address known flags and values). */
 export interface CcdDefendantParty {
   firstName?: string;
@@ -74,6 +81,8 @@ export interface CcdDefendantResponses {
   confirmNoticeGiven?: string;
   tenancyStartDateCorrect?: string;
   tenancyStartDate?: string;
+  defendantNameConfirmation?: string;
+  dateOfBirth?: string;
   contactByPhone?: YesNoValue;
   contactByEmail?: YesNoValue;
   contactByPost?: YesNoValue;
@@ -86,6 +95,7 @@ export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: CcdDefendantParty;
   };
+  claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
 }
 
