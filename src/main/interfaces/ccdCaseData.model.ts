@@ -3,6 +3,7 @@ import {
   CcdCaseAddress,
   CcdCaseData,
   CcdClaimGroundSummaryItem,
+  CcdClaimantEnteredDefendantDetails,
   CcdDefendantParty,
   CcdDefendantResponses,
   PossessionClaimResponse,
@@ -119,6 +120,21 @@ export class CcdCaseModel {
     return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
   }
 
+  get claimantEnteredDefendantDetails(): CcdClaimantEnteredDefendantDetails {
+    return (
+      this.data.possessionClaimResponse?.claimantEnteredDefendantDetails ?? ({} as CcdClaimantEnteredDefendantDetails)
+    );
+  }
+
+  get claimantEnteredDefendantDetailsNameKnown(): string {
+    return this.claimantEnteredDefendantDetails.nameKnown ?? '';
+  }
+
+  get claimantEnteredDefendantDetailsName(): string {
+    const { firstName, lastName } = this.claimantEnteredDefendantDetails;
+    return firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || '';
+  }
+
   get defendantContactDetailsParty(): CcdDefendantParty {
     return this.data.possessionClaimResponse?.defendantContactDetails?.party ?? ({} as CcdDefendantParty);
   }
@@ -137,6 +153,14 @@ export class CcdCaseModel {
 
   get defendantResponsesReceivedFreeLegalAdvice(): string | undefined {
     return this.defendantResponses?.receivedFreeLegalAdvice ?? undefined;
+  }
+
+  get defendantResponsesDefendantNameConfirmation(): string | undefined {
+    return this.defendantResponses?.defendantNameConfirmation ?? undefined;
+  }
+
+  get defendantResponsesDateOfBirth(): string | undefined {
+    return this.defendantResponses?.dateOfBirth ?? undefined;
   }
 
   get defendantResponsesContactByPhone(): string | undefined {
@@ -176,9 +200,8 @@ export class CcdCaseModel {
   }
 
   get defendantContactDetailsPartyName(): string {
-    return this.defendantContactDetailsParty.firstName && this.defendantContactDetailsParty.lastName
-      ? `${this.defendantContactDetailsParty.firstName} ${this.defendantContactDetailsParty.lastName}`
-      : '';
+    const { firstName, lastName } = this.defendantContactDetailsParty;
+    return firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || '';
   }
 
   get defendantContactDetailsPartyNameKnown(): string {

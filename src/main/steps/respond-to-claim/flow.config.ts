@@ -83,8 +83,10 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-date-of-birth': {
-      previousStep: formData =>
-        'defendant-name-confirmation' in formData ? 'defendant-name-confirmation' : 'defendant-name-capture',
+      previousStep: async (req: Request) => {
+        const nameKnown = await isDefendantNameKnown(req);
+        return nameKnown ? 'defendant-name-confirmation' : 'defendant-name-capture';
+      },
       defaultNext: 'correspondence-address',
     },
     'correspondence-address': {
