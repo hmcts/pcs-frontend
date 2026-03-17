@@ -124,13 +124,21 @@ const ExtendGetContentFunctionSchema = z
   })
   .optional();
 
+// Function type for getInitialFormData
+const GetInitialFormDataFunctionSchema = z
+  .custom<(req: unknown) => Record<string, unknown>>(val => typeof val === 'function', {
+    message: 'getInitialFormData must be a function',
+  })
+  .optional();
+
 // FormBuilderConfig schema
 export const FormBuilderConfigSchema: z.ZodType<FormBuilderConfig> = z.object({
   stepName: z.string(),
   journeyFolder: z.string(),
   fields: z.array(FormFieldConfigSchema),
-  beforeRedirect: BeforeRedirectFunctionSchema.optional(),
-  extendGetContent: ExtendGetContentFunctionSchema.optional(),
+  beforeRedirect: BeforeRedirectFunctionSchema,
+  extendGetContent: ExtendGetContentFunctionSchema,
+  getInitialFormData: GetInitialFormDataFunctionSchema,
   stepDir: z.string(),
   translationKeys: TranslationKeysSchema.optional(),
   customTemplate: z.string().optional(),
