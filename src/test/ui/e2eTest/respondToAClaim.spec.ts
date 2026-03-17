@@ -380,10 +380,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: dateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
     await performAction('selectContactByTelephone', {
