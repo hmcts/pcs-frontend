@@ -54,6 +54,9 @@ export interface PossessionClaimResponse {
     contactByText?: YesNoValue;
     rentArrearsAmountConfirmation?: string;
     rentArrearsAmount?: string;
+    receivedFreeLegalAdvice?: string;
+    defendantNameConfirmation?: string;
+    dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
   };
   claimantEnteredDefendantDetails?: {
