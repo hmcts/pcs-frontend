@@ -1,9 +1,11 @@
+
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import { buildCcdCaseForPossessionClaimResponse } from 'steps/utils/populateResponseToClaimPayloadmap';
+
 
 export const step: StepDefinition = createFormStep({
   stepName: 'landlord-licensed',
