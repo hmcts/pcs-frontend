@@ -14,17 +14,12 @@ export type ComponentType =
 
 export interface FormFieldOption {
   value?: string;
-  // Backward compatible: text property still supported
   text?: string;
-  // Divider text for visual separation of options
   divider?: string;
-  // Translation key for option text (backward compatible)
   translationKey?: string;
-  // Dynamic label function (takes translations object, returns string)
   label?: string | ((translations: Record<string, string>) => string);
-  // Conditional HTML/text to display when this option is selected
   conditionalText?: string | ((translations: Record<string, string>) => string);
-  // Nested subFields that appear when this option is selected
+  // SubFields appear conditionally when this option is selected (e.g., text inputs under "No" radio button)
   subFields?: Record<string, FormFieldConfig>;
 }
 
@@ -36,7 +31,6 @@ export interface FormFieldConfig {
   pattern?: string;
   maxLength?: number;
   errorMessage?: string;
-  // Label can be a string or a function that takes translations and returns a string
   label?: string | ((translations: Record<string, string>) => string);
   labelClasses?: string;
   hint?: string;
@@ -54,26 +48,25 @@ export interface FormFieldConfig {
     text: string;
   };
   attributes?: Record<string, unknown>;
-  // Legend classes for radio/checkbox/date fieldsets
   legendClasses?: string;
-  // Pre-processed component configuration for template rendering
+  // Pre-built component config for Nunjucks template rendering
   component?: Record<string, unknown>;
   componentType?: ComponentType;
-  // Cross-field validation function
-  // Returns error message string if validation fails, undefined if valid
+  // Field value used for prepopulation from CCD (via getInitialFormData)
+  value?: unknown;
+  // Cross-field validation that returns error message string, or undefined if valid
   validate?: (
     value: unknown,
     formData: Record<string, unknown>,
     allData: Record<string, unknown>
   ) => string | undefined;
-  // Field-level validator function (simpler than validate, returns boolean or error message string)
-  // Only validates when field is visible/shown
+  // Simpler field-level validation that returns boolean or error message
   validator?: (
     value: unknown,
     formData?: Record<string, unknown>,
     allData?: Record<string, unknown>
   ) => boolean | string;
-  // For date fields: if true, disallows future and current dates
+  // For date fields: prevent future dates from being entered
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
   isPageHeading?: boolean;
@@ -86,10 +79,10 @@ export interface TranslationKeys {
 }
 
 export type BuiltFormContent = {
-  fields: {
+  fields: (FormFieldConfig & {
     componentType?: string;
     component?: Record<string, unknown>;
-  }[];
+  })[];
   errorSummary?: unknown;
   errors?: Record<string, string>;
   [key: string]: unknown;
@@ -101,8 +94,8 @@ export type ExtendGetContent = (
   formContent: BuiltFormContent
 ) => MaybePromise<Partial<BuiltFormContent> & Record<string, unknown>>;
 
-// Restores form data from CCD when user revisits the page.
-// Use dot-notation for nested fields: 'parentField.childField'
+// Prepopulation function that extracts field values from CCD case data for GET requests.
+// Use dot-notation for subFields (e.g., 'nameConfirmation.firstName') to match nested field names.
 export type GetInitialFormData = (req: Request) => MaybePromise<Record<string, unknown>>;
 
 export interface FormBuilderConfig {
@@ -112,7 +105,8 @@ export interface FormBuilderConfig {
   beforeRedirect?: (req: Request) => Promise<void> | void;
   beforeGet?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
-  // Restores previously saved answers from CCD (runs on GET only).
+  // Prepopulates form fields from CCD on GET requests (e.g., when user returns to edit their answer).
+  // Only runs on GET - POST uses submitted body to preserve user input during validation errors.
   getInitialFormData?: GetInitialFormData;
   stepDir: string;
   translationKeys?: TranslationKeys;
