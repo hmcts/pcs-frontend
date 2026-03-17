@@ -11,6 +11,7 @@ export async function noticeDateWhenNotProvidedErrorValidation(): Promise<void> 
     header: noticeDateWhenNotProvided.thereIsAProblemErrorMessageHeader,
     message: noticeDateWhenNotProvided.theDateYouReceiveNoticeErrorMessage,
   });
+  await performAction('inputText', noticeDateWhenNotProvided.yearTextLabel, '2000');
 }
 
 export async function noticeDateWhenNotProvidedNavigationTests(): Promise<void> {
