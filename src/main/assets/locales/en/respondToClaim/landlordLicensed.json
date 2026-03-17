@@ -11,6 +11,6 @@
     "imNotSure": "I’m not sure"
   },
   "errors": {
-    "confirmLandlordLicensed": "Select if your landlord is licensed?"
+    "confirmLandlordLicensed": "Select if you agree with the landlord’s claim to be licensed"
   }
 }
