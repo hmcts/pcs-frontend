@@ -69,6 +69,7 @@ export interface FormFieldConfig {
   // For date fields: prevent future dates from being entered
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
+  isPageHeading?: boolean;
 }
 
 export interface TranslationKeys {
