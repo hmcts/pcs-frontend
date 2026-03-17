@@ -16,12 +16,7 @@ import {
   startNow,
   tenancyDetails,
 } from '../data/page-data';
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import {
-  ErrorMessageValidation,
-  PageContentValidation,
-  PageNavigationValidation,
-} from '../utils/validations/custom-validations';
+import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -39,9 +34,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async () => {
-  PageContentValidation.finaliseTest();
-  ErrorMessageValidation.finaliseTest();
-  PageNavigationValidation.finaliseTest();
+  finaliseAllValidations();
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {

@@ -2,12 +2,7 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import {
-  ErrorMessageValidation,
-  PageContentValidation,
-  PageNavigationValidation,
-} from '../utils/validations/custom-validations';
+import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -19,13 +14,11 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async () => {
-  PageContentValidation.finaliseTest();
-  ErrorMessageValidation.finaliseTest();
-  PageNavigationValidation.finaliseTest();
+  finaliseAllValidations();
 });
 
 test.describe('Error page to indicate Page Not Found error @nightly', () => {
-  test('Content Validation on Page not found page', async () => {
+  test('Content Validation on Page not found page @PR', async () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
   });
 
