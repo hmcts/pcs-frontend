@@ -33,7 +33,6 @@ describe('error-handler', () => {
       'errorPages.500.paragraph': 'Please try again in a few minutes.',
       serviceName: 'Possession claims',
       phase: 'ALPHA',
-      feedback: 'Feedback text',
       languageToggle: 'Language toggle',
       back: 'Back',
     };
@@ -337,7 +336,6 @@ describe('error-handler', () => {
 
       expect(res.locals.serviceName).toBe('Possession claims');
       expect(res.locals.phase).toBe('ALPHA');
-      expect(res.locals.feedback).toBe('Feedback text');
       expect(res.locals.languageToggle).toBe('Language toggle');
       expect(res.locals.back).toBe('Back');
     });
