@@ -46,6 +46,10 @@ export interface FormFieldConfig {
   };
   options?: FormFieldOption[];
   classes?: string;
+  // Prefix text displayed before the input field (e.g., '£' for currency).
+  // Used to show units or symbols that help users understand the format.
+  // Follows GOV.UK Design System: https://design-system.service.gov.uk/components/text-input/#prefixes-and-suffixes
+  // The prefix is visually displayed but not included in the field's value.
   prefix?: {
     text: string;
   };
@@ -96,8 +100,8 @@ export type ExtendGetContent = (
   formContent: BuiltFormContent
 ) => MaybePromise<Partial<BuiltFormContent> & Record<string, unknown>>;
 
-// Prepopulation function that extracts field values from CCD case data for GET requests.
-// Use dot-notation for subFields (e.g., 'nameConfirmation.firstName') to match nested field names.
+// Restores form data from CCD when user revisits the page.
+// Use dot-notation for nested fields: 'parentField.childField'
 export type GetInitialFormData = (req: Request) => MaybePromise<Record<string, unknown>>;
 
 export interface FormBuilderConfig {
@@ -107,8 +111,7 @@ export interface FormBuilderConfig {
   beforeRedirect?: (req: Request) => Promise<void> | void;
   beforeGet?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
-  // Prepopulates form fields from CCD on GET requests (e.g., when user returns to edit their answer).
-  // Only runs on GET - POST uses submitted body to preserve user input during validation errors.
+  // Restores previously saved answers from CCD (runs on GET only).
   getInitialFormData?: GetInitialFormData;
   stepDir: string;
   translationKeys?: TranslationKeys;
