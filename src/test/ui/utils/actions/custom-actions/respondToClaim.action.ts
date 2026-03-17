@@ -134,10 +134,9 @@ export class RespondToClaimAction implements IAction {
         contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
         contactPreferenceData.emailAddress
       );
-      }
-      await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
     }
-
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  }
 
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
