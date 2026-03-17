@@ -151,7 +151,7 @@ export const createPostController = (
         }
       }
 
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

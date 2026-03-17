@@ -214,7 +214,21 @@ export class CcdCaseModel {
     if (raw === undefined || raw === null) {
       return undefined;
     }
-    return String(raw).toLowerCase();
+    const normalized = String(raw).trim().toUpperCase();
+
+    if (normalized === 'YES') {
+      return 'yes';
+    }
+
+    if (normalized === 'NO') {
+      return 'no';
+    }
+
+    if (normalized === 'NOT_SURE' || normalized === 'IM_NOT_SURE' || normalized === 'IMNOTSURE') {
+      return 'imNotSure';
+    }
+
+    return String(raw).trim();
   }
 
   /**

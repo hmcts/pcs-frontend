@@ -336,7 +336,7 @@ describe('createPostController', () => {
     await controller.post(req, res, next);
 
     expect(mockSetFormData).toHaveBeenCalledWith(req, stepName, { field1: 'value1' });
-    expect(stepNavigation.getNextStepUrl).toHaveBeenCalledWith(req, stepName, { field1: 'value1' });
+    expect(stepNavigation.getNextStepUrl).toHaveBeenCalledWith(req, stepName);
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 
