@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
@@ -12,17 +14,92 @@ export const step: StepDefinition = createFormStep({
   basePath: '/respond-to-claim',
   flowConfig,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
+  beforeRedirect: async req => {
+    const nameConfirmation = req.body?.nameConfirmation as string | undefined;
+
+    if (!nameConfirmation || (nameConfirmation !== 'yes' && nameConfirmation !== 'no')) {
+      return;
+    }
+
+    // Map to CCD enum (same logic as yesNoEnum)
+    const defendantNameConfirmation = nameConfirmation === 'yes' ? 'YES' : 'NO';
+
+    const party: Record<string, string> = {};
+
+    if (nameConfirmation === 'no') {
+      // User corrects name - read from subFields with dot-notation
+      const firstName = req.body?.['nameConfirmation.firstName'] as string | undefined;
+      const lastName = req.body?.['nameConfirmation.lastName'] as string | undefined;
+
+      if (firstName && firstName.trim()) {
+        party.firstName = firstName;
+      }
+      if (lastName && lastName.trim()) {
+        party.lastName = lastName;
+      }
+    }
+
+    if (nameConfirmation === 'yes') {
+      // User confirms name - clear any previously corrected names by sending empty strings
+      party.firstName = '';
+      party.lastName = '';
+    }
+
+    // Build payload with dual paths
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        defendantNameConfirmation,
+      },
+      ...(Object.keys(party).length > 0 && {
+        defendantContactDetails: {
+          party,
+        },
+      }),
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
     contactUs: 'contactUs',
   },
+  getInitialFormData: (req: Request) => {
+    const { defendantResponsesDefendantNameConfirmation: existingAnswer, defendantContactDetailsParty: party } = req.res
+      ?.locals?.validatedCase ?? {
+      defendantResponsesDefendantNameConfirmation: undefined,
+      defendantContactDetailsParty: undefined,
+    };
+
+    const formValue = existingAnswer === 'YES' ? 'yes' : existingAnswer === 'NO' ? 'no' : undefined;
+
+    if (!formValue) {
+      return {};
+    }
+
+    if (formValue === 'yes') {
+      return { nameConfirmation: 'yes' };
+    }
+
+    const initial: Record<string, unknown> = { nameConfirmation: 'no' };
+    if (party?.firstName) {
+      initial['nameConfirmation.firstName'] = party.firstName;
+    }
+    if (party?.lastName) {
+      initial['nameConfirmation.lastName'] = party.lastName;
+    }
+
+    return initial;
+  },
   extendGetContent: (req: Request) => {
-    const { defendantContactDetailsPartyName: defendantName, claimantName } = req.res?.locals?.validatedCase ?? {
+    const { claimantEnteredDefendantDetailsName, defendantContactDetailsPartyName, claimantName } = req.res?.locals
+      ?.validatedCase ?? {
+      claimantEnteredDefendantDetailsName: '',
       defendantContactDetailsPartyName: '',
       claimantName: '',
     };
 
+    const defendantName = claimantEnteredDefendantDetailsName || defendantContactDetailsPartyName;
     const organisationName = claimantName || 'Treetops Housing';
 
     return {
