@@ -1,7 +1,7 @@
 {
   "serviceName": "Respond to a property possession claim",
   "phase": "ALPHA",
-  "feedback": "cyThis is a new service – your <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">feedback</a> will help us to improve it.",
+  "feedback": "This is a new service – your <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">feedback (opens in new tab)</a> will help us to improve it.",
   "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link language\">Cymraeg</a>",
   "logout": "Sign out",
   "navigationLabel": "Service navigation",

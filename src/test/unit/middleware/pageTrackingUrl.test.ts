@@ -32,7 +32,7 @@ describe('pageTrackingUrlMiddleware', () => {
 
     pageTrackingUrlMiddleware(req as Request, res as Response, next);
 
-    expect(res.locals?.pageTrackingUrl).toBe('/respond-to-claim/start-now');
+    expect(res.locals?.pageTrackingUrl).toBe('respond-to-claim/start-now');
     expect(next).toHaveBeenCalledTimes(1);
   });
 

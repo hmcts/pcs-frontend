@@ -8,7 +8,7 @@ const getPageTrackingUrl = (path: string): string => {
   }
 
   if (segments[0] === 'case' && segments.length > 2) {
-    return `/${segments.slice(2).join('/')}`;
+    return `${segments.slice(2).join('/')}`;
   }
 
   return path;
