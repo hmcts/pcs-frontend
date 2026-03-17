@@ -8,7 +8,7 @@
     "or": "or",
     "imNotSure": "I’m not sure"
   },
-  "textAreaLabel": "Give details about how much you paid and when",
+  "textAreaLabel": "Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
   "textAreaHint": "You can enter up to 500 characters",
   "errors": {
     "repaymentsAgreed": "Select if you've come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}",

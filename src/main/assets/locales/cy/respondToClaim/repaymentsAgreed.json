@@ -1,18 +1,18 @@
 {
-  "pageTitle": "Repayments agreed",
-  "caption": "Respond to a property possession claim",
-  "question": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+  "pageTitle": "cyRepayments agreed",
+  "caption": "cyRespond to a property possession claim",
+  "question": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
   "options": {
-    "yes": "Yes",
-    "no": "No",
-    "or": "or",
-    "imNotSure": "I’m not sure"
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "imNotSure": "cyI’m not sure"
   },
-  "textAreaLabel": "Give details about how much you paid and when",
-  "textAreaHint": "You can enter up to 500 characters",
+  "textAreaLabel": "cyGive details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
+  "textAreaHint": "cyYou can enter up to 500 characters",
   "errors": {
-    "repaymentsAgreed": "Select if you've come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}",
-    "repaymentsAgreed.repaymentsAgreedDetails": "Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
-    "repaymentsAgreed.repaymentsAgreedDetails.invalid": "Repayments agreed details must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "repaymentsAgreed": "cySelect if you've come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}",
+    "repaymentsAgreed.repaymentsAgreedDetails": "cyGive details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
+    "repaymentsAgreed.repaymentsAgreedDetails.invalid": "cyRepayments agreed details must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }
