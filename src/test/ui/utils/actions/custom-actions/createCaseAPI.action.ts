@@ -36,9 +36,7 @@ export class CreateCaseAPIAction implements IAction {
       event_token: CREATE_EVENT_TOKEN,
     });
     process.env.CASE_NUMBER = createResponse.data.id;
-    caseInfo.id = createResponse.data.id;
-    caseInfo.fid = createResponse.data.id.replace(/(.{4})(?=.)/g, '$1-');
-    caseInfo.state = createResponse.data.state;
+    process.env.CASE_FID = createResponse.data.id.replace(/(.{4})(?=.)/g, '$1 ');
   }
 
   private async submitCaseAPI(caseData: actionData): Promise<void> {
@@ -47,14 +45,11 @@ export class CreateCaseAPIAction implements IAction {
       .data.token;
     const submitCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
     try {
-      const submitResponse = await submitCaseApi.post(submitCaseApiData.submitCaseApiEndPoint(), {
+      await submitCaseApi.post(submitCaseApiData.submitCaseApiEndPoint(), {
         data: submitCasePayloadData,
         event: { id: submitCaseApiData.submitCaseEventName },
         event_token: SUBMIT_EVENT_TOKEN,
       });
-      caseInfo.id = submitResponse.data.id;
-      caseInfo.fid = submitResponse.data.id.replace(/(.{4})(?=.)/g, '$1-');
-      caseInfo.state = submitResponse.data.state;
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
         const status = error.response?.status;
