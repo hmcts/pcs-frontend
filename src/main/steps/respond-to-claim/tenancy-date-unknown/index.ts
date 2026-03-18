@@ -1,9 +1,10 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { formatDatePartsToISODate } from '../../utils/dateUtils';
+import { formatDatePartsToISODate } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
+import type { PossessionClaimResponse } from '@interfaces/ccdCase.interface';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 
 const STEP_NAME = 'tenancy-date-unknown';
 
@@ -50,10 +51,7 @@ export const step: StepDefinition = createFormStep({
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: async req => {
-    const claimantNameFromValidatedCase = req.res?.locals?.validatedCase?.data?.possessionClaimResponse
-      ?.claimantOrganisations?.[0]?.value as string | undefined;
-    const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
-    const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops Housing';
+    const claimantName = req.res?.locals?.validatedCase?.claimantName || 'Treetops Housing';
 
     const t = getTranslationFunction(req, STEP_NAME, ['common']);
     const paragraph = t('paragraph', { claimantName });

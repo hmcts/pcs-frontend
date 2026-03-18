@@ -7,8 +7,7 @@ import type { Request } from 'express';
  * Returns true if ANY claim ground has isRentArrears: "Yes" (case-insensitive), false otherwise.
  */
 export const isRentArrearsClaim = async (req: Request): Promise<boolean> => {
-  const caseData = req.res?.locals?.validatedCase?.data;
-  const claimGroundSummaries = caseData?.claimGroundSummaries;
+  const claimGroundSummaries = req.res?.locals?.validatedCase?.claimGroundSummaries;
 
   if (!Array.isArray(claimGroundSummaries)) {
     return false;

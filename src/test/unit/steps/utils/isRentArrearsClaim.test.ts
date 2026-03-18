@@ -2,25 +2,31 @@ import { Request } from 'express';
 
 import { isRentArrearsClaim } from '../../../../main/steps/utils/isRentArrearsClaim';
 
+import type { CcdCaseData } from '@interfaces/ccdCase.interface';
+import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
+
+/** Build a CcdCaseModel from partial test data (avoids strict CcdCaseData typing in tests). */
+function mockValidatedCase(data: Record<string, unknown> = {}) {
+  return new CcdCaseModel({ id: '', data: data as CcdCaseData });
+}
+
 describe('isRentArrearsClaim', () => {
   describe('when claim includes rent arrears', () => {
     it('should return true when single ground has isRentArrears=Yes', async () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'Yes',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'Yes',
+                    code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -34,18 +40,16 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'YES',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'YES',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -59,18 +63,16 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'yes',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'yes',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -84,18 +86,16 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'YeS',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'YeS',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -109,33 +109,31 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'ANTISOCIAL_BEHAVIOUR',
                   },
-                  {
-                    value: {
-                      isRentArrears: 'Yes',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-2',
+                  id: 'ground-1',
+                },
+                {
+                  value: {
+                    isRentArrears: 'Yes',
+                    code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                   },
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'SPECIAL_NEEDS_ACCOMMODATION',
-                    },
-                    id: 'ground-3',
+                  id: 'ground-2',
+                },
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'SPECIAL_NEEDS_ACCOMMODATION',
                   },
-                ],
-              },
-            },
+                  id: 'ground-3',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -149,26 +147,24 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'Yes',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'Yes',
+                    code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                   },
-                  {
-                    value: {
-                      isRentArrears: 'Yes',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-2',
+                  id: 'ground-1',
+                },
+                {
+                  value: {
+                    isRentArrears: 'Yes',
+                    code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                   },
-                ],
-              },
-            },
+                  id: 'ground-2',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -184,19 +180,17 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'ANTISOCIAL_BEHAVIOUR',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -210,33 +204,31 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'ANTISOCIAL_BEHAVIOUR',
                   },
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'SPECIAL_NEEDS_ACCOMMODATION',
-                    },
-                    id: 'ground-2',
+                  id: 'ground-1',
+                },
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'SPECIAL_NEEDS_ACCOMMODATION',
                   },
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'CRIMINAL_BEHAVIOUR',
-                    },
-                    id: 'ground-3',
+                  id: 'ground-2',
+                },
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'CRIMINAL_BEHAVIOUR',
                   },
-                ],
-              },
-            },
+                  id: 'ground-3',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -250,18 +242,16 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    code: 'ANTISOCIAL_BEHAVIOUR',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -275,19 +265,17 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: null,
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: null,
+                    code: 'ANTISOCIAL_BEHAVIOUR',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -301,19 +289,17 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: '',
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: '',
+                    code: 'ANTISOCIAL_BEHAVIOUR',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -327,19 +313,17 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'Maybe',
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'Maybe',
+                    code: 'ANTISOCIAL_BEHAVIOUR',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -355,9 +339,7 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {},
-            },
+            validatedCase: mockValidatedCase({}),
           },
         },
       } as unknown as Request;
@@ -371,11 +353,9 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: null,
-              },
-            },
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: null,
+            }),
           },
         },
       } as unknown as Request;
@@ -389,11 +369,9 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [],
-              },
-            },
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [],
+            }),
           },
         },
       } as unknown as Request;
@@ -407,11 +385,9 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: 'not-an-array',
-              },
-            },
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: 'not-an-array',
+            }),
           },
         },
       } as unknown as Request;
@@ -425,11 +401,9 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: { value: { isRentArrears: 'Yes' } },
-              },
-            },
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: { value: { isRentArrears: 'Yes' } },
+            }),
           },
         },
       } as unknown as Request;
@@ -445,7 +419,7 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {},
+            validatedCase: mockValidatedCase({}),
           },
         },
       } as unknown as Request;
@@ -491,15 +465,13 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    id: 'ground-1',
-                  },
-                ],
-              },
-            },
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -513,11 +485,9 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [null],
-              },
-            },
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [null],
+            }),
           },
         },
       } as unknown as Request;
@@ -531,11 +501,9 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [undefined],
-              },
-            },
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [undefined],
+            }),
           },
         },
       } as unknown as Request;
@@ -549,21 +517,19 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  null,
-                  undefined,
-                  {
-                    value: {
-                      isRentArrears: 'Yes',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                null,
+                undefined,
+                {
+                  value: {
+                    isRentArrears: 'Yes',
+                    code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -580,19 +546,17 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'Yes',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: '46c3fe9c-c786-4737-b565-a90ff33aef08',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'Yes',
+                    code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                   },
-                ],
-              },
-            },
+                  id: '46c3fe9c-c786-4737-b565-a90ff33aef08',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -607,25 +571,22 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              id: 1771777994911210,
-              data: {
-                rentArrears_Total: '122200',
-                noticeServed: 'Yes',
-                legislativeCountry: 'England',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                      label: 'Rent arrears or breach of the tenancy (ground 1)',
-                      isRentArrears: 'Yes',
-                    },
-                    id: '46c3fe9c-c786-4737-b565-a90ff33aef08',
+            validatedCase: mockValidatedCase({
+              rentArrears_Total: '122200',
+              noticeServed: 'Yes',
+              legislativeCountry: 'England',
+              claimGroundSummaries: [
+                {
+                  value: {
+                    category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
+                    code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
+                    label: 'Rent arrears or breach of the tenancy (ground 1)',
+                    isRentArrears: 'Yes',
                   },
-                ],
-              },
-            },
+                  id: '46c3fe9c-c786-4737-b565-a90ff33aef08',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -640,42 +601,40 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                      label: 'Rent arrears or breach of the tenancy (ground 1)',
-                      reason: 'rent arrears reason',
-                      isRentArrears: 'Yes',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
+                    code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
+                    label: 'Rent arrears or breach of the tenancy (ground 1)',
+                    reason: 'rent arrears reason',
+                    isRentArrears: 'Yes',
                   },
-                  {
-                    value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
-                      code: 'ANTISOCIAL_BEHAVIOUR_S158',
-                      label: 'Antisocial behaviour (ground 14)',
-                      reason: 'antisocial behaviour reason',
-                      isRentArrears: 'No',
-                    },
-                    id: 'ground-2',
+                  id: 'ground-1',
+                },
+                {
+                  value: {
+                    category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
+                    code: 'ANTISOCIAL_BEHAVIOUR_S158',
+                    label: 'Antisocial behaviour (ground 14)',
+                    reason: 'antisocial behaviour reason',
+                    isRentArrears: 'No',
                   },
-                  {
-                    value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
-                      code: 'SPECIAL_NEEDS_ACCOMMODATION',
-                      label: 'Special needs accommodation (ground 15)',
-                      reason: 'special needs reason',
-                      isRentArrears: 'No',
-                    },
-                    id: 'ground-3',
+                  id: 'ground-2',
+                },
+                {
+                  value: {
+                    category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
+                    code: 'SPECIAL_NEEDS_ACCOMMODATION',
+                    label: 'Special needs accommodation (ground 15)',
+                    reason: 'special needs reason',
+                    isRentArrears: 'No',
                   },
-                ],
-              },
-            },
+                  id: 'ground-3',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -691,22 +650,20 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
-                      code: 'ANTISOCIAL_BEHAVIOUR_S157',
-                      label: 'Antisocial behaviour (ground 2)',
-                      isRentArrears: 'No',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              legislativeCountry: 'Wales',
+              claimGroundSummaries: [
+                {
+                  value: {
+                    category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
+                    code: 'ANTISOCIAL_BEHAVIOUR_S157',
+                    label: 'Antisocial behaviour (ground 2)',
+                    isRentArrears: 'No',
                   },
-                ],
-              },
-            },
+                  id: 'ground-1',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -722,26 +679,24 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'Yes', // First match - .some() should stop here
-                      code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'Yes', // First match - .some() should stop here
+                    code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                   },
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-2',
+                  id: 'ground-1',
+                },
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'ANTISOCIAL_BEHAVIOUR',
                   },
-                ],
-              },
-            },
+                  id: 'ground-2',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
@@ -755,33 +710,31 @@ describe('isRentArrearsClaim', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                claimGroundSummaries: [
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'ANTISOCIAL_BEHAVIOUR',
-                    },
-                    id: 'ground-1',
+            validatedCase: mockValidatedCase({
+              claimGroundSummaries: [
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'ANTISOCIAL_BEHAVIOUR',
                   },
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'SPECIAL_NEEDS_ACCOMMODATION',
-                    },
-                    id: 'ground-2',
+                  id: 'ground-1',
+                },
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'SPECIAL_NEEDS_ACCOMMODATION',
                   },
-                  {
-                    value: {
-                      isRentArrears: 'No',
-                      code: 'CRIMINAL_BEHAVIOUR',
-                    },
-                    id: 'ground-3',
+                  id: 'ground-2',
+                },
+                {
+                  value: {
+                    isRentArrears: 'No',
+                    code: 'CRIMINAL_BEHAVIOUR',
                   },
-                ],
-              },
-            },
+                  id: 'ground-3',
+                },
+              ],
+            }),
           },
         },
       } as unknown as Request;
