@@ -1,4 +1,4 @@
-import { contactPreference, contactPreferencesTelephone, dashboard } from '../data/page-data';
+import { contactPreferenceEmailOrPost, contactPreferencesTelephone, dashboard } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferencesTelephoneErrorValidation(): Promise<void> {
@@ -46,7 +46,7 @@ export async function contactPreferencesTelephoneErrorValidation(): Promise<void
 }
 
 export async function contactPreferencesTelephoneNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', contactPreferencesTelephone.backLink, contactPreference.mainHeader);
+  await performValidation('pageNavigation', contactPreferencesTelephone.backLink, contactPreferenceEmailOrPost.mainHeader);
   await performAction('clickRadioButton', contactPreferencesTelephone.noRadioOption);
   await performValidation('pageNavigation', contactPreferencesTelephone.saveForLaterButton, dashboard.mainHeader);
 }

@@ -1,4 +1,4 @@
-import { contactPreferenceEmailOrPost, correspondenceAddress } from '../data/page-data';
+import { contactPreferenceEmailOrPost, correspondenceAddress, dashboard } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferenceEmailOrPostErrorValidation(): Promise<void> {
@@ -87,11 +87,20 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
 }
 
 export async function contactPreferenceEmailOrPostNavigationTests(): Promise<void> {
-  await performValidation(
-    'pageNavigation',
-    contactPreferenceEmailOrPost.backLink,
-    correspondenceAddress.correspondenceAddressUnKnownMainHeader
-  );
+  if(process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN'){
+    await performValidation(
+      'pageNavigation',
+      contactPreferenceEmailOrPost.backLink,
+      correspondenceAddress.correspondenceAddressUnKnownMainHeader
+    );
+  }
+  else if(process.env.CORRESPONDENCE_ADDRESS === 'KNOWN'){
+    await performValidation(
+      'pageNavigation',
+      contactPreferenceEmailOrPost.backLink,
+      correspondenceAddress.correspondenceAddressKnownMainHeader
+    );
+  }
   await performAction('clickRadioButton', contactPreferenceEmailOrPost.byPostRadioOption);
-  await performValidation('pageNavigation', contactPreferenceEmailOrPost.saveForLaterButton, 'Dashboard');
+  await performValidation('pageNavigation', contactPreferenceEmailOrPost.saveForLaterButton, dashboard.mainHeader);
 }
