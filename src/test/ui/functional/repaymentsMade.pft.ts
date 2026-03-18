@@ -1,4 +1,4 @@
-import { paymentInterstitial, repaymentsMade } from '../data/page-data';
+import { dashboard, paymentInterstitial, repaymentsMade } from '../data/page-data';
 import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -29,5 +29,5 @@ export async function repaymentsMadeNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', repaymentsMade.backLink, paymentInterstitial.mainHeader);
   await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
   await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
-  await performValidation('pageNavigation', repaymentsMade.saveForLaterButton, 'Dashboard');
+  await performValidation('pageNavigation', repaymentsMade.saveForLaterButton, dashboard.mainHeader);
 }
