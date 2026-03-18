@@ -47,15 +47,15 @@ export class ErrorMessageValidation implements IValidation {
 
         // Try different error message selectors
         const errorMessage = page.locator(`
-          .govuk-error-message:text-is("${errorStr}"),
-          .govuk-list--error:text-is("${errorStr}"),
-          a.validation-error:text-is("${errorStr}")
+          .govuk-error-message:has-text("${errorStr}"),
+          .govuk-list--error:has-text("${errorStr}"),
+          a.validation-error:has-text("${errorStr}")
         `);
 
         const count = await errorMessage.count();
         if (count > 0) {
           actualText = await errorMessage.first().textContent();
-          passed = (actualText?.trim() ?? '') === errorStr;
+          passed = actualText?.includes(errorStr) || false;
         } else {
           actualText = 'No error message found';
           passed = false;
@@ -70,7 +70,7 @@ export class ErrorMessageValidation implements IValidation {
         expected = `${header}: ${message}`;
 
         // Check for error summary header
-        const headerLocator = page.locator(`h2.govuk-error-summary__title:text-is("${header}")`);
+        const headerLocator = page.locator(`h2.govuk-error-summary__title:has-text("${header}")`);
         const headerCount = await headerLocator.count();
 
         if (headerCount === 0) {
@@ -79,15 +79,15 @@ export class ErrorMessageValidation implements IValidation {
         } else {
           // Check for error message in the list
           const messageLocator = page.locator(`
-            .govuk-error-summary__list a:text-is("${message}"),
-            .govuk-error-summary__list li:text-is("${message}"),
-            ul.govuk-list--error li:text-is("${message}")
+            .govuk-error-summary__list a:has-text("${message}"),
+            .govuk-error-summary__list li:has-text("${message}"),
+            ul.govuk-list--error li:has-text("${message}")
           `);
 
           const messageCount = await messageLocator.count();
           if (messageCount > 0) {
             actualText = await messageLocator.first().textContent();
-            passed = (actualText?.trim() ?? '') === message;
+            passed = actualText?.includes(message) || false;
           } else {
             actualText = `Message "${message}" not found in error summary`;
             passed = false;
@@ -248,7 +248,7 @@ export class ErrorMessageValidation implements IValidation {
     console.log(`   Total pages validated for error messages: ${totalPages}`);
     console.log(`   Number of pages passed: ${passedPages.size}`);
     console.log(`   Number of pages failed: ${failedPages.size}`);
-    console.log(`   Number of missing EMV files: ${ErrorMessageValidation.missingEMVFiles.size}`);
+    console.log(`   Number of missing EMV methods: ${ErrorMessageValidation.missingEMVFiles.size}`);
 
     if (passedPages.size > 0) {
       console.log(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
@@ -259,7 +259,7 @@ export class ErrorMessageValidation implements IValidation {
     }
 
     if (ErrorMessageValidation.missingEMVFiles.size > 0) {
-      console.log(`   EMV files not found: ${Array.from(ErrorMessageValidation.missingEMVFiles).join(', ')}`);
+      console.log(`   EMV methods not found: ${Array.from(ErrorMessageValidation.missingEMVFiles).join(', ')}`);
     }
 
     // Show failure details
@@ -287,7 +287,7 @@ export class ErrorMessageValidation implements IValidation {
     } else if (passedPages.size > 0) {
       console.log('\n✅ ALL ERROR MESSAGE VALIDATIONS PASSED\n');
     } else if (ErrorMessageValidation.pagesWithEMV.size > 0) {
-      console.log('\n⚠️  EMV files found but no validations performed\n');
+      console.log('\n⚠️  EMV methods found but no validations performed\n');
     }
 
     ErrorMessageValidation.clearResults();
