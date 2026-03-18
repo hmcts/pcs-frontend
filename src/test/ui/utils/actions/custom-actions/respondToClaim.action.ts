@@ -18,7 +18,7 @@ import {
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
-  tenancyOccupationContractLicenseAgreement,
+  tenancyTypeDetails,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -247,8 +247,8 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
   }
 
-  private async tenancyOrContractTypeDetails(tenancyTypeDetails: actionRecord) {
-    const tenancyType = formatText(tenancyTypeDetails.tenancyType);
+  private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
+    const tenancyType = formatText(tenancyTypeDetailsInfo.tenancyType);
     const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
 
     if (
@@ -269,17 +269,17 @@ export class RespondToClaimAction implements IAction {
       });
     }
     await performAction('clickRadioButton', {
-      question: tenancyOccupationContractLicenseAgreement.isTenancyTypeCorrectQuestion,
-      option: tenancyTypeDetails.tenancyOption,
+      question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
+      option: tenancyTypeDetailsInfo.tenancyOption,
     });
-    if (tenancyTypeDetails.tenancyOption === 'No' && tenancyTypeDetails.tenancyTypeInfo) {
+    if (tenancyTypeDetailsInfo.tenancyOption === 'No' && tenancyTypeDetailsInfo.tenancyTypeInfo) {
       await performAction(
         'inputText',
-        tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeHiddenTextLabel,
-        tenancyTypeDetails.tenancyTypeInfo
+        tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+        tenancyTypeDetailsInfo.tenancyTypeInfo
       );
     }
-    await performAction('clickButton', tenancyOccupationContractLicenseAgreement.saveAndContinueButton);
+    await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

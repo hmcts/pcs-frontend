@@ -381,27 +381,27 @@ export const submitCaseApiData = {
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
-          label: 'Registered provider of social housing'
+          label: 'Registered provider of social housing',
         },
         list_items: [
           {
             code: 'PRIVATE_LANDLORD',
-            label: 'Private landlord'
+            label: 'Private landlord',
           },
           {
             code: 'PROVIDER_OF_SOCIAL_HOUSING',
-            label: 'Registered provider of social housing'
+            label: 'Registered provider of social housing',
           },
           {
             code: 'MORTGAGE_LENDER',
-            label: 'Mortgage lender'
+            label: 'Mortgage lender',
           },
           {
             code: 'OTHER',
-            label: 'Other'
-          }
+            label: 'Other',
+          },
         ],
-        valueCode: 'PROVIDER_OF_SOCIAL_HOUSING'
+        valueCode: 'PROVIDER_OF_SOCIAL_HOUSING',
       },
       claimAgainstTrespassers: 'NO',
       orgNameFound: 'Yes',
@@ -415,7 +415,7 @@ export const submitCaseApiData = {
         AddressLine2: 'Seventh Floor 102 Petty France',
         PostTown: 'London',
         PostCode: 'SW1H 9AJ',
-        Country: 'United Kingdom'
+        Country: 'United Kingdom',
       },
       formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
       isCorrectClaimantContactAddress: 'YES',
@@ -431,9 +431,7 @@ export const submitCaseApiData = {
       tenancy_TenancyLicenceDocuments: [],
       showIntroductoryDemotedOtherGroundReasonPage: 'Yes',
       introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
-      introGrounds_IntroductoryDemotedOrOtherGrounds: [
-        'ANTI_SOCIAL'
-      ],
+      introGrounds_IntroductoryDemotedOrOtherGrounds: ['ANTI_SOCIAL'],
       antiSocialBehaviourGround: 'Antisocial behaviour',
       preActionProtocolCompleted: 'NO',
       mediationAttempted: 'NO',
@@ -448,7 +446,7 @@ export const submitCaseApiData = {
       alternativesToPossession: [],
       claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
-        hasReasons: 'NO'
+        hasReasons: 'NO',
       },
       hasUnderlesseeOrMortgagee: 'NO',
       wantToUploadDocuments: 'NO',
@@ -459,10 +457,8 @@ export const submitCaseApiData = {
         completedBy: 'CLAIMANT',
         fullNameClaimant: 'fg',
         positionClaimant: 'fg',
-        agreementClaimant: [
-          'BELIEVE_TRUE'
-        ]
-      }
+        agreementClaimant: ['BELIEVE_TRUE'],
+      },
     };
   },
   get submitCasePayloadRentNonRent() {
@@ -471,27 +467,27 @@ export const submitCaseApiData = {
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
-          label: 'Registered provider of social housing'
+          label: 'Registered provider of social housing',
         },
         list_items: [
           {
             code: 'PRIVATE_LANDLORD',
-            label: 'Private landlord'
+            label: 'Private landlord',
           },
           {
             code: 'PROVIDER_OF_SOCIAL_HOUSING',
-            label: 'Registered provider of social housing'
+            label: 'Registered provider of social housing',
           },
           {
             code: 'MORTGAGE_LENDER',
-            label: 'Mortgage lender'
+            label: 'Mortgage lender',
           },
           {
             code: 'OTHER',
-            label: 'Other'
-          }
+            label: 'Other',
+          },
         ],
-        valueCode: 'PROVIDER_OF_SOCIAL_HOUSING'
+        valueCode: 'PROVIDER_OF_SOCIAL_HOUSING',
       },
       claimAgainstTrespassers: 'NO',
       orgNameFound: 'Yes',
@@ -505,7 +501,7 @@ export const submitCaseApiData = {
         AddressLine2: 'Seventh Floor 102 Petty France',
         PostTown: 'London',
         PostCode: 'SW1H 9AJ',
-        Country: 'United Kingdom'
+        Country: 'United Kingdom',
       },
       formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
       isCorrectClaimantContactAddress: 'YES',
@@ -564,10 +560,7 @@ export const submitCaseApiData = {
       tenancy_TenancyLicenceDocuments: [],
       showIntroductoryDemotedOtherGroundReasonPage: 'Yes',
       introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
-      introGrounds_IntroductoryDemotedOrOtherGrounds: [
-        'ANTI_SOCIAL',
-        'RENT_ARREARS'
-      ],
+      introGrounds_IntroductoryDemotedOrOtherGrounds: ['ANTI_SOCIAL', 'RENT_ARREARS'],
       antiSocialBehaviourGround: 'Antisocial',
       showRentArrearsPage: 'Yes',
       rentArrears_Total: '200000',
@@ -582,8 +575,8 @@ export const submitCaseApiData = {
             document_url: `http://dm-store-aat.service.core-compute-aat.internal/documents/${uuidv4()}`,
             document_binary_url: `http://dm-store-aat.service.core-compute-aat.internal/documents/${uuidv4()}/binary`,
             document_filename: `Rent Arrears ${Date.now()}.docx`,
-          }
-        }
+          },
+        },
       ],
       suspensionOfRTB_ShowHousingActsPage: 'No',
       demotionOfTenancy_ShowHousingActsPage: 'No',
@@ -591,7 +584,7 @@ export const submitCaseApiData = {
       alternativesToPossession: [],
       claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
-        hasReasons: 'NO'
+        hasReasons: 'NO',
       },
       hasUnderlesseeOrMortgagee: 'NO',
       wantToUploadDocuments: 'NO',
@@ -602,10 +595,8 @@ export const submitCaseApiData = {
         completedBy: 'CLAIMANT',
         fullNameClaimant: 'fg',
         positionClaimant: 'fg',
-        agreementClaimant: [
-          'BELIEVE_TRUE'
-        ]
-      }
+        agreementClaimant: ['BELIEVE_TRUE'],
+      },
     };
   },
   submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,

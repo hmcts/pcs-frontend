@@ -14,7 +14,7 @@ import {
   landlordRegistered,
   licensedLandlord,
   startNow,
-  tenancyOccupationContractLicenseAgreement,
+  tenancyTypeDetails,
 } from '../data/page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -65,6 +65,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
     await performValidation('mainHeader', licensedLandlord.mainHeader);
     await performAction('clickButton', licensedLandlord.continueButton);
-    await performValidation('mainHeader', tenancyOccupationContractLicenseAgreement.mainHeader);
+    await performValidation('mainHeader', tenancyTypeDetails.mainHeader);
   });
 });

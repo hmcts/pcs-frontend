@@ -19,7 +19,7 @@ import {
   repaymentsMade,
   startNow,
   tenancyDateDetails,
-  tenancyOccupationContractLicenseAgreement,
+  tenancyTypeDetails,
 } from '../data/page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -59,11 +59,10 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else if (testInfo.title.includes('@other')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
-  }
-  else if (testInfo.title.includes('@rentAndNonRent')) {
+  } else if (testInfo.title.includes('@rentAndNonRent')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
-  }else {
+  } else {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
@@ -114,7 +113,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadNoDefendants.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyOccupationContractLicenseAgreement.yesRadioOption,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: '15',
@@ -157,8 +156,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyOccupationContractLicenseAgreement.noRadioOption,
-      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
@@ -193,8 +192,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyOccupationContractLicenseAgreement.noRadioOption,
-      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: '15',
@@ -244,8 +243,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyOccupationContractLicenseAgreement.imNotSureRadioOption,
-      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
@@ -291,8 +290,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     );
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyOccupationContractLicenseAgreement.imNotSureRadioOption,
-      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
@@ -320,14 +319,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayload.isClaimantNameCorrect
-    );
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyOccupationContractLicenseAgreement.noRadioOption,
-      tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
@@ -368,13 +364,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayload.isClaimantNameCorrect
-    );
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyOccupationContractLicenseAgreement.imNotSureRadioOption,
+      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
     });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
@@ -413,7 +406,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyOccupationContractLicenseAgreement.yesRadioOption,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.noRadioOption,
@@ -455,13 +448,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayload.isClaimantNameCorrect
-    );
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyOccupationContractLicenseAgreement.imNotSureRadioOption,
+      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
     });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.noRadioOption,

@@ -1,6 +1,6 @@
 import { submitCaseApiData } from '../api-data';
 
-export const tenancyOccupationContractLicenseAgreement = {
+export const tenancyTypeDetails = {
   mainHeader: `Tenancy, occupation contract or licence agreement`,
   respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   whenTheyMadeClaimHintText: `When they made their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to give details about the type of tenancy, occupation contract or licence agreement you signed to rent your property, and the date it began, if known.`,
@@ -14,4 +14,8 @@ export const tenancyOccupationContractLicenseAgreement = {
   yesRadioOption: `Yes`,
   saveForLaterButton: `Save for later`,
   saveAndContinueButton: `Save and continue`,
+  backLink: `Back`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfTenancyDetailsErrorMessage: `Select if these tenancy, licence or occupation contract details are correct`,
+  enterCorrectTenancyDetailsErrorMessage: `Enter the correct tenancy, licence or occupation contract details`,
 };
