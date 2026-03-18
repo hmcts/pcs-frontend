@@ -88,7 +88,7 @@ export const submitCaseApiData = {
       tenancy_TenancyLicenceDocuments: [],
       showIntroductoryDemotedOtherGroundReasonPage: 'Yes',
       introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
-      introGrounds_IntroductoryDemotedOrOtherGrounds: [process.env.GROUNDS],
+      introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS'],
       preActionProtocolCompleted: 'NO',
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
@@ -369,7 +369,7 @@ export const submitCaseApiData = {
       },
     };
   },
-  get submitCasePayloadOtherTenancyOld() {
+  get submitCasePayloadOtherTenancy() {
     return {
       legislativeCountry: 'England',
       claimantType: {
@@ -484,7 +484,7 @@ export const submitCaseApiData = {
       },
     };
   },
-  get submitCasePayloadOtherTenancy() {
+  get submitCasePayloadOtherTenancyNew() {
     return {
       legislativeCountry: 'England',
       claimantType: {
@@ -551,7 +551,7 @@ export const submitCaseApiData = {
       preActionProtocolCompleted: 'NO',
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
-      noticeServed: 'Yes',
+      noticeServed: process.env.NOTICE_SERVED,
       notice_NoticeServiceMethod: 'FIRST_CLASS_POST',
       notice_NoticePostedDate: null,
       notice_NoticeDocuments: [],
