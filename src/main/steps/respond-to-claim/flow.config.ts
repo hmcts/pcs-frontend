@@ -152,13 +152,13 @@ export const flowConfig: JourneyFlowConfig = {
         // Check formData to see which path was actually taken
         // This honors the actual journey path even if case data changes mid-journey
         if ('landlord-registered' in formData) {
-          return 'landlord-registered';
+          return 'written-terms';
         }
 
         // Fallback: check current case data for new journeys
         const welshProperty = await isWelshProperty(req);
         if (welshProperty) {
-          return 'landlord-registered';
+          return 'written-terms';
         }
         return 'dispute-claim-interstitial';
       },
