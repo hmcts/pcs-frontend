@@ -1,4 +1,4 @@
-# pcs-frontend - SDM arbitrary note to raise a PR number
+# pcs-frontend
 
 ## Getting Started
 
