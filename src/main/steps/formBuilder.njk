@@ -6,7 +6,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
@@ -85,18 +85,7 @@
       {% endfor %}
     {% endif %}
 
-
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: saveAndContinue,
-        attributes: { name: 'action', value: 'continue' }
-      }) }}
-      {{ govukButton({
-        text: saveForLater,
-        classes: 'govuk-button--secondary',
-        attributes: { name: 'action', value: 'saveForLater' }
-      }) }}
-    </div>
+    {{ stepButtons(saveAndContinue, saveForLater) }}
     {% if showCancelButton is not defined or showCancelButton %}
         <p class="govuk-body">
           <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
