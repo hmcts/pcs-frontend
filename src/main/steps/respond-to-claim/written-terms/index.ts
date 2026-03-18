@@ -37,6 +37,11 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  getInitialFormData: async req => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const writtenTerms = caseData?.possessionClaimResponse?.defendantResponses?.writtenTerms as string | undefined;
+    return { writtenTerms };
+  },
   beforeRedirect: async (req: Request) => {
     const writtenTerms: YesNoNotSureValue | undefined = req.body?.writtenTerms;
 
