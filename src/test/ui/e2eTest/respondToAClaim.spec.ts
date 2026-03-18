@@ -263,7 +263,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
-  test('England - Assured - Rent and NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @rentAndNonRent @regression', async () => {
+  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -286,10 +286,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction(
       'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadOtherTenancy.isClaimantNameCorrect
+      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
     );
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
