@@ -264,7 +264,7 @@ export class RespondToClaimAction implements IAction {
       });
     } else if (tenancyType === 'other') {
       await performValidation('text', {
-        elementType: 'paragraph',
+        elementType: 'listItem',
         text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
       });
     }

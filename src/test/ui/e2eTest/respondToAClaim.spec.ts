@@ -59,7 +59,11 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else if (testInfo.title.includes('@other')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
-  } else {
+  }
+  else if (testInfo.title.includes('@rentAndNonRent')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
+  }else {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
@@ -260,7 +264,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
-  test('England - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @noDefendants @regression', async () => {
+  test('England - Assured - Rent and NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @rentAndNonRent @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -283,10 +287,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction(
       'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+      submitCaseApiData.submitCasePayloadOtherTenancy.isClaimantNameCorrect
     );
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadNoDefendants.tenancy_TypeOfTenancyLicence,
+      tenancyType: submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyOccupationContractLicenseAgreement.imNotSureRadioOption,
       tenancyTypeInfo: tenancyOccupationContractLicenseAgreement.giveCorrectTenancyTypeTextInput,
     });
@@ -387,7 +391,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', rentArrearsDispute.continueButton);
   });
 
-  test('RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - No - RentArrearsDispute @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - No - RentArrearsDispute  @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -432,7 +436,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
-  test('England - RentArrears Non rent arrears - NoticeServed - No NoticeDateProvided - No - RentArrearsDispute @other @regression', async () => {
+  test('England - Demoted - RentArrears - NoticeServed - No NoticeDateProvided - No - RentArrearsDispute @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -453,10 +457,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction(
       'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadOtherTenancy.isClaimantNameCorrect
+      submitCaseApiData.submitCasePayload.isClaimantNameCorrect
     );
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyOccupationContractLicenseAgreement.imNotSureRadioOption,
     });
     await performAction('selectTenancyStartDateKnown', {
@@ -467,8 +471,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
