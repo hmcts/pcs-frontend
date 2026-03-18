@@ -18,7 +18,8 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
-  tenancyDateDetails, tenancyOccupationContractLicenseAgreement,
+  tenancyDateDetails,
+  tenancyOccupationContractLicenseAgreement,
 } from '../data/page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
