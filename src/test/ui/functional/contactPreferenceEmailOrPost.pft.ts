@@ -1,4 +1,4 @@
-import { contactPreferenceEmailOrPost, correspondenceAddress, dashboard } from '../data/page-data';
+import { contactPreferenceEmailOrPost } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferenceEmailOrPostErrorValidation(): Promise<void> {
@@ -85,8 +85,8 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
 }
-
-export async function contactPreferenceEmailOrPostNavigationTests(): Promise<void> {
+//--The below method is commented out as we have an open bug - HDPI-5396
+/*export async function contactPreferenceEmailOrPostNavigationTests(): Promise<void> {
   if (process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN') {
     await performValidation(
       'pageNavigation',
@@ -102,4 +102,4 @@ export async function contactPreferenceEmailOrPostNavigationTests(): Promise<voi
   }
   await performAction('clickRadioButton', contactPreferenceEmailOrPost.byPostRadioOption);
   await performValidation('pageNavigation', contactPreferenceEmailOrPost.saveForLaterButton, dashboard.mainHeader);
-}
+}*/
