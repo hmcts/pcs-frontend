@@ -56,8 +56,13 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
+jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
+  buildCcdCaseForPossessionClaimResponse: jest.fn(),
+}));
+
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
+import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 describe('respond-to-claim defendant-name-capture step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -149,14 +154,26 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
   it('POST saves data and redirects when validation passes', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
+    (buildCcdCaseForPossessionClaimResponse as jest.Mock).mockResolvedValue(undefined);
 
-    const req = createReq({ body: { action: 'continue', firstName: 'Jane', lastName: 'Doe' } });
+    const req = createReq({
+      body: { action: 'continue', firstName: 'Jane', lastName: 'Doe' },
+      res: { locals: { validatedCase: { id: '123' } } },
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
+    const res = { redirect: jest.fn(), locals: { validatedCase: { id: '123' } } } as any;
     const next = jest.fn();
 
     await step.postController!.post(req, res, next);
 
+    expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
+      defendantContactDetails: {
+        party: {
+          firstName: 'Jane',
+          lastName: 'Doe',
+        },
+      },
+    });
     expect(req.session.formData?.['defendant-name-capture']).toEqual({ firstName: 'Jane', lastName: 'Doe' });
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });

@@ -196,6 +196,7 @@ describe('getPreviousPageForArrears', () => {
     });
 
     it('handles no notice served scenario', async () => {
+      // Real scenario: CCD has notice=No, goes straight to rent-arrears-dispute from tenancy-date-details
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
 
