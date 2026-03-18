@@ -1,7 +1,7 @@
 import type { PossessionClaimResponse, TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getFormData, setFormData } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -88,6 +88,25 @@ export const step: StepDefinition = createFormStep({
   },
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
+  beforeGet: async req => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const existingTenancyTypeCorrect = caseData?.possessionClaimResponse?.defendantResponses
+      ?.tenancyTypeCorrect as TenancyTypeCorrectValue | undefined;
+    const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses
+      ?.tenancyType as string | undefined;
+
+    const existingDraftData = getFormData(req, STEP_NAME);
+    if (existingTenancyTypeCorrect && !existingDraftData?.tenancyTypeConfirm && !req.body?.tenancyTypeConfirm) {
+      const formValue = CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect];
+      if (formValue) {
+        const draftData: Record<string, unknown> = { tenancyTypeConfirm: formValue };
+        if (existingTenancyTypeCorrect === 'NO' && existingCorrectedTenancyType) {
+          draftData.correctType = existingCorrectedTenancyType;
+        }
+        setFormData(req, STEP_NAME, draftData);
+      }
+    }
+  },
   beforeRedirect: async req => {
     const tenancyTypeConfirm = req.body?.tenancyTypeConfirm as string | undefined;
     const tenancyTypeCorrect = tenancyTypeConfirm ? TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm] : undefined;

@@ -159,6 +159,26 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'tenancy-date-unknown': {
+      routes:[
+        {
+          condition: async (req: Request) => isNoticeServed(req),
+          nextStep: 'confirmation-of-notice-given',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
       defaultNext: 'confirmation-of-notice-given',
       previousStep: 'tenancy-type-details',
     },

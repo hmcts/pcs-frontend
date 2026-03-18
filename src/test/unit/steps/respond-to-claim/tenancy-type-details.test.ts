@@ -1,5 +1,10 @@
+const mockSetFormData = jest.fn();
+const mockGetFormData = jest.fn();
+
 jest.mock('../../../../main/modules/steps', () => ({
   createFormStep: jest.fn(config => config),
+  getFormData: (...args: unknown[]) => mockGetFormData(...args),
+  setFormData: (...args: unknown[]) => mockSetFormData(...args),
 }));
 
 jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
@@ -10,6 +15,21 @@ import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-detai
 import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 type TenancyTypeDetailsStep = {
+  beforeGet: (req: {
+    body?: Record<string, unknown>;
+    session?: { formData?: Record<string, Record<string, unknown>> };
+    res?: {
+      locals?: {
+        validatedCase?: {
+          data?: {
+            possessionClaimResponse?: {
+              defendantResponses?: { tenancyTypeCorrect?: string; tenancyType?: string };
+            };
+          };
+        };
+      };
+    };
+  }) => Promise<void>;
   beforeRedirect: (req: { body?: Record<string, unknown> }) => Promise<void>;
   extendGetContent: (
     req: {
@@ -39,6 +59,66 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('beforeGet', () => {
+    const makeReq = (tenancyTypeCorrect?: string, tenancyType?: string) => ({
+      body: {},
+      session: { formData: {} as Record<string, Record<string, unknown>> },
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { tenancyTypeCorrect, tenancyType },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    beforeEach(() => {
+      mockGetFormData.mockReturnValue(undefined);
+    });
+
+    it.each([
+      ['YES', 'yes'],
+      ['NO', 'no'],
+      ['NOT_SURE', 'notSure'],
+    ])('seeds session with tenancyTypeConfirm=%s when CCD has %s and session is empty', async (ccdValue, formValue) => {
+      const req = makeReq(ccdValue);
+      await testedStep.beforeGet(req);
+      expect(mockSetFormData).toHaveBeenCalledWith(req, 'tenancy-type-details', { tenancyTypeConfirm: formValue });
+    });
+
+    it('also seeds correctType when CCD value is NO and tenancyType is set', async () => {
+      const req = makeReq('NO', 'Assured shorthold');
+      await testedStep.beforeGet(req);
+      expect(mockSetFormData).toHaveBeenCalledWith(req, 'tenancy-type-details', {
+        tenancyTypeConfirm: 'no',
+        correctType: 'Assured shorthold',
+      });
+    });
+
+    it('does not seed session when CCD has no tenancyTypeCorrect', async () => {
+      const req = makeReq(undefined);
+      await testedStep.beforeGet(req);
+      expect(mockSetFormData).not.toHaveBeenCalled();
+    });
+
+    it('does not overwrite existing session draft data', async () => {
+      mockGetFormData.mockReturnValue({ tenancyTypeConfirm: 'yes' });
+      const req = makeReq('NO');
+      await testedStep.beforeGet(req);
+      expect(mockSetFormData).not.toHaveBeenCalled();
+    });
+
+    it('does not overwrite when req.body already has tenancyTypeConfirm (POST with errors)', async () => {
+      const req = { ...makeReq('NO'), body: { tenancyTypeConfirm: 'yes' } };
+      await testedStep.beforeGet(req);
+      expect(mockSetFormData).not.toHaveBeenCalled();
+    });
   });
 
   describe('beforeRedirect', () => {
