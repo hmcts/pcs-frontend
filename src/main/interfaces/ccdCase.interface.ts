@@ -53,6 +53,9 @@ export interface PossessionClaimResponse {
     contactByPhone?: YesNoValue;
     contactByText?: YesNoValue;
     preferenceType?: ContactPreference;
+    receivedFreeLegalAdvice?: string;
+    defendantNameConfirmation?: string;
+    dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
   };
 }
