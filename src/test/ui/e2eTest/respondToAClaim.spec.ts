@@ -34,8 +34,10 @@ test.beforeEach(async ({ page }, testInfo) => {
 
   if (testInfo.title.includes('Introductory')) {
     process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+    process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   } else if (testInfo.title.includes('Demoted')) {
     process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
+    process.env.GROUNDS = 'RENT_ARREARS';
   } else if (testInfo.title.includes('Assured')) {
     process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
   } else if (testInfo.title.includes('Secure')) {
