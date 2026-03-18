@@ -159,7 +159,7 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'tenancy-date-unknown': {
-      routes:[
+      routes: [
         {
           condition: async (req: Request) => isNoticeServed(req),
           nextStep: 'confirmation-of-notice-given',

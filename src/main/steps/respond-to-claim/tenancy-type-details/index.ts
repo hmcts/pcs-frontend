@@ -90,10 +90,12 @@ export const step: StepDefinition = createFormStep({
   fields: fieldsConfig,
   beforeGet: async req => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const existingTenancyTypeCorrect = caseData?.possessionClaimResponse?.defendantResponses
-      ?.tenancyTypeCorrect as TenancyTypeCorrectValue | undefined;
-    const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses
-      ?.tenancyType as string | undefined;
+    const existingTenancyTypeCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeCorrect as
+      | TenancyTypeCorrectValue
+      | undefined;
+    const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses?.tenancyType as
+      | string
+      | undefined;
 
     const existingDraftData = getFormData(req, STEP_NAME);
     if (existingTenancyTypeCorrect && !existingDraftData?.tenancyTypeConfirm && !req.body?.tenancyTypeConfirm) {
