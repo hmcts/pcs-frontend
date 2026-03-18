@@ -86,6 +86,38 @@ export function yesNoEnum(backendFieldName: string): ValueMapper {
   };
 }
 
+/** Transforms yes/no/imNotSure values to CCD YES_NO_NOT_SURE enum format */
+export function yesNoNotSureEnum(backendFieldName: string): ValueMapper {
+  const ALLOWED_VALUES = ['yes', 'no', 'imNotSure'] as const;
+  type AllowedValue = (typeof ALLOWED_VALUES)[number]; // 'yes' | 'no' | 'imNotSure'
+
+  return (value: FormFieldValue) => {
+    if (typeof value !== 'string') {
+      logger.warn('yesNoNotSureEnum expects a string, received:', typeof value);
+      return { [backendFieldName]: '' };
+    }
+
+    const enumMapping: Record<AllowedValue, string> = {
+      yes: 'YES',
+      no: 'NO',
+      imNotSure: 'NOT_SURE',
+    };
+
+    const isAllowedValue = (ALLOWED_VALUES as readonly string[]).includes(value);
+
+    if (!isAllowedValue) {
+      const allowedStr = ALLOWED_VALUES.join(', ');
+      logger.error(
+        `yesNoNotSureEnum: Invalid value "${value}" for field "${backendFieldName}". ` +
+          `Allowed values: ${allowedStr}. This indicates a bug in form validation or incorrect mapper usage.`
+      );
+      return { [backendFieldName]: '' };
+    }
+
+    return { [backendFieldName]: enumMapping[value as AllowedValue] };
+  };
+}
+
 /** Combines date fields (day/month/year) into ISO date string using luxon */
 export function dateToISO(backendFieldName: string): ValueMapper {
   return (formData: FormFieldValue) => {
@@ -153,11 +185,110 @@ export function multipleYesNo(backendFieldName: string): ValueMapper {
   };
 }
 
+function repaymentsMadeMapper(formData: FormFieldValue): Record<string, unknown> {
+  if (typeof formData === 'string' || Array.isArray(formData)) {
+    logger.warn('repaymentsMadeMapper expects an object, received:', typeof formData);
+    return {};
+  }
+
+  const { confirmRepaymentsMade, repaymentsInfo } = formData as {
+    confirmRepaymentsMade?: unknown;
+    repaymentsInfo?: unknown;
+  };
+
+  const result: Record<string, unknown> = {};
+
+  if (typeof confirmRepaymentsMade === 'string') {
+    const mapped = yesNoEnum('anyPaymentsMade')(confirmRepaymentsMade);
+    Object.assign(result, mapped);
+  }
+
+  if (typeof repaymentsInfo === 'string' && repaymentsInfo.trim()) {
+    result.paymentDetails = repaymentsInfo.trim();
+  }
+
+  return result;
+}
+
+function repaymentsAgreedMapper(formData: FormFieldValue): Record<string, unknown> {
+  if (typeof formData === 'string' || Array.isArray(formData)) {
+    logger.warn('repaymentsAgreedMapper expects an object, received:', typeof formData);
+    return {};
+  }
+
+  const { confirmRepaymentsAgreed, repaymentsAgreementInfo } = formData as {
+    confirmRepaymentsAgreed?: unknown;
+    repaymentsAgreementInfo?: unknown;
+  };
+
+  const result: Record<string, unknown> = {};
+
+  if (typeof confirmRepaymentsAgreed === 'string') {
+    const mapped = yesNoNotSureEnum('repaymentPlanAgreed')(confirmRepaymentsAgreed);
+    Object.assign(result, mapped);
+  }
+
+  if (typeof repaymentsAgreementInfo === 'string' && repaymentsAgreementInfo.trim()) {
+    result.repaymentAgreedDetails = repaymentsAgreementInfo.trim();
+  }
+
+  return result;
+}
+
+function instalmentsMapper(formData: FormFieldValue): Record<string, unknown> {
+  if (typeof formData === 'string' || Array.isArray(formData)) {
+    logger.warn('instalmentsMapper expects an object, received:', typeof formData);
+    return {};
+  }
+
+  const { instalmentAmount, instalmentFrequency } = formData as {
+    instalmentAmount?: unknown;
+    instalmentFrequency?: unknown;
+  };
+
+  const result: Record<string, unknown> = {};
+
+  if (typeof instalmentAmount === 'string' && instalmentAmount.trim()) {
+    const amountNumber = Number(instalmentAmount.trim());
+    if (Number.isFinite(amountNumber)) {
+      result.additionalRentContribution = amountNumber;
+    } else {
+      logger.warn('instalmentsMapper received non-numeric instalmentAmount');
+    }
+  }
+
+  if (typeof instalmentFrequency === 'string' && instalmentFrequency.trim()) {
+    result.additionalContributionFrequency = instalmentFrequency.trim();
+  }
+
+  return result;
+}
+
 export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
   'free-legal-advice': {
     backendPath: 'possessionClaimResponse.defendantResponses',
     frontendField: 'hadLegalAdvice',
     valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
+  },
+  'repayments-made': {
+    backendPath: 'possessionClaimResponse.paymentAgreement',
+    frontendFields: ['confirmRepaymentsMade', 'repaymentsInfo'],
+    valueMapper: repaymentsMadeMapper,
+  },
+  'repayments-agreed': {
+    backendPath: 'possessionClaimResponse.paymentAgreement',
+    frontendFields: ['confirmRepaymentsAgreed', 'repaymentsAgreementInfo'],
+    valueMapper: repaymentsAgreedMapper,
+  },
+  'instalment-offer': {
+    backendPath: 'possessionClaimResponse.paymentAgreement',
+    frontendField: 'confirmInstalmentOffer',
+    valueMapper: yesNoEnum('repayArrearsInstalments'),
+  },
+  instalments: {
+    backendPath: 'possessionClaimResponse.paymentAgreement',
+    frontendFields: ['instalmentAmount', 'instalmentFrequency'],
+    valueMapper: instalmentsMapper,
   },
 };
 
