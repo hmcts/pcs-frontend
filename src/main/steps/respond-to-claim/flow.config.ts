@@ -181,7 +181,6 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      defaultNext: 'confirmation-of-notice-given',
       previousStep: 'tenancy-type-details',
     },
     'tenancy-date-details': {
