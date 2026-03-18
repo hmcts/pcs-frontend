@@ -1,5 +1,5 @@
 import { submitCaseApiData } from '../data/api-data';
-import { confirmationOfNoticeGiven, tenancyDateUnknown } from '../data/page-data';
+import { confirmationOfNoticeGiven, dashboard, tenancyDateUnknown } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 const claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
@@ -15,5 +15,5 @@ export async function confirmationOfNoticeGivenErrorValidation(): Promise<void> 
 export async function confirmationOfNoticeGivenNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', confirmationOfNoticeGiven.backLink, tenancyDateUnknown.mainHeader);
   await performAction('clickRadioButton', confirmationOfNoticeGiven.yesRadioOption);
-  await performValidation('pageNavigation', confirmationOfNoticeGiven.saveForLaterButton, 'Dashboard');
+  await performValidation('pageNavigation', confirmationOfNoticeGiven.saveForLaterButton, dashboard.mainHeader);
 }
