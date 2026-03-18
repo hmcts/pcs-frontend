@@ -21,6 +21,7 @@ import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
 import { step as instalmentOffer } from './instalment-offer';
 import { step as instalments } from './instalments';
+import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
@@ -51,6 +52,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
+  'landlord-licensed': landlordLicensed,
   'tenancy-type-details': tenancyTypeDetails,
   'tenancy-date-unknown': tenancyDateUnknown,
   'tenancy-date-details': tenancyDateDetails,
