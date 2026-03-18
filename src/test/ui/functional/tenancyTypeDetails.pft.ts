@@ -2,7 +2,7 @@ import { dashboard, disputeClaimInterstitial, tenancyTypeDetails } from '../data
 import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
-export async function tenancyTypeDetailsNotProvidedErrorValidation(): Promise<void> {
+export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
   await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
