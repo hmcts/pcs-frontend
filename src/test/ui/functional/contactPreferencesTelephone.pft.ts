@@ -46,7 +46,11 @@ export async function contactPreferencesTelephoneErrorValidation(): Promise<void
 }
 
 export async function contactPreferencesTelephoneNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', contactPreferencesTelephone.backLink, contactPreferenceEmailOrPost.mainHeader);
+  await performValidation(
+    'pageNavigation',
+    contactPreferencesTelephone.backLink,
+    contactPreferenceEmailOrPost.mainHeader
+  );
   await performAction('clickRadioButton', contactPreferencesTelephone.noRadioOption);
   await performValidation('pageNavigation', contactPreferencesTelephone.saveForLaterButton, dashboard.mainHeader);
 }

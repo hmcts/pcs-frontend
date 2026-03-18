@@ -87,14 +87,13 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
 }
 
 export async function contactPreferenceEmailOrPostNavigationTests(): Promise<void> {
-  if(process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN'){
+  if (process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN') {
     await performValidation(
       'pageNavigation',
       contactPreferenceEmailOrPost.backLink,
       correspondenceAddress.correspondenceAddressUnKnownMainHeader
     );
-  }
-  else if(process.env.CORRESPONDENCE_ADDRESS === 'KNOWN'){
+  } else if (process.env.CORRESPONDENCE_ADDRESS === 'KNOWN') {
     await performValidation(
       'pageNavigation',
       contactPreferenceEmailOrPost.backLink,
