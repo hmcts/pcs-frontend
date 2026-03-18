@@ -109,12 +109,17 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
       if (typeof navigationFunction === 'function') {
         PageNavigationValidation.trackPageWithNavigation(pageName);
+
+        PageNavigationValidation.setSourcePage(pageName);
         await navigationFunction(page);
+        PageNavigationValidation.clearSourcePage();
+
         PageNavigationValidation.trackPagePassed(pageName);
       } else {
         PageNavigationValidation.trackMissingNavigationMethod(pageName);
       }
     } catch (error) {
+      PageNavigationValidation.clearSourcePage();
       PageNavigationValidation.trackNavigationFailure(pageName, error);
     }
   }
