@@ -1,6 +1,5 @@
 import { type Request } from 'express';
 
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
   getPreviousPageForArrears,
   isDefendantNameKnown,
@@ -10,6 +9,8 @@ import {
   isTenancyStartDateKnown,
   isWelshProperty,
 } from '../utils';
+
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -98,13 +99,13 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-telephone': {
       routes: [
         {
-          condition: async (req: Request) =>
-            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'yes',
+          condition: async (req: Request): Promise<boolean> =>
+            !!req.res?.locals?.validatedCase?.isDefendantContactByPhone,
           nextStep: 'contact-preferences-text-message',
         },
         {
-          condition: async (req: Request) =>
-            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'no',
+          condition: async (req: Request): Promise<boolean> =>
+            !req.res?.locals?.validatedCase?.isDefendantContactByPhone,
           nextStep: 'dispute-claim-interstitial',
         },
       ],
@@ -144,15 +145,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'tenancy-date-unknown',
         },
       ],
-      previousStep: async (req: Request, formData: Record<string, unknown>) => {
-        // Check formData to see which path was actually taken
-        // This honors the actual journey path even if case data changes mid-journey
-        if ('landlord-registered' in formData) {
-          return 'landlord-registered';
-        }
-
-        // Fallback: check current case data for new journeys
-
+      previousStep: async (req: Request) => {
         const welshProperty = await isWelshProperty(req);
         if (welshProperty) {
           return 'landlord-registered';
@@ -210,8 +203,8 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
-            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
-            if (!confirmed) {
+            const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+            if (confirmNoticeGiven !== 'yes') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -221,8 +214,8 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
-            if (!confirmed) {
+            const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+            if (confirmNoticeGiven !== 'yes') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -232,7 +225,7 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+            const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
             if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
               return false;
             }
@@ -243,7 +236,7 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+            const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
             if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
               return false;
             }

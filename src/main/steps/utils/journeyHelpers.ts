@@ -8,9 +8,10 @@ export async function getPreviousPageForArrears(req: Request): Promise<string> {
   const noticeServed = await isNoticeServed(req);
   const noticeDateProvided = await isNoticeDateProvided(req);
   const tenancyStartDateKnown = await isTenancyStartDateKnown(req);
-  const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
+  const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
 
-  if ((confirmed === 'no' || confirmed === 'imNotSure') && noticeServed) {
+  // User rejected or unsure about notice: back to the question page (CCD-backed, survives logout)
+  if ((confirmNoticeGiven === 'no' || confirmNoticeGiven === 'imNotSure') && noticeServed) {
     return 'confirmation-of-notice-given';
   }
 

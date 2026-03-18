@@ -26,18 +26,18 @@ const t = ((key: string) => {
   return translations[key] || key;
 }) as unknown as (key: string, options?: unknown) => string;
 
-jest.mock('../../../../main/modules/steps/i18n', () => ({
+jest.mock('@modules/steps/i18n', () => ({
   loadStepNamespace: jest.fn(),
   getStepTranslations: jest.fn(() => ({})),
   getTranslationFunction: jest.fn(() => t),
 }));
 
-jest.mock('../../../../main/modules/i18n', () => ({
+jest.mock('@modules/i18n', () => ({
   getRequestLanguage: jest.fn(() => 'en'),
   getCommonTranslations: jest.fn(() => ({})),
 }));
 
-jest.mock('../../../../main/modules/steps/flow', () => ({
+jest.mock('@modules/steps/flow', () => ({
   stepNavigation: {
     getBackUrl: jest.fn(async () => null),
     getNextStepUrl: jest.fn(async () => '/next-step'),
@@ -48,7 +48,7 @@ jest.mock('../../../../main/modules/steps/flow', () => ({
   })),
 }));
 
-jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
+jest.mock('@modules/steps/formBuilder/helpers', () => {
   const actual = jest.requireActual('../../../../main/modules/steps/formBuilder/helpers');
   return {
     ...actual,
@@ -59,10 +59,10 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
 jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
   buildCcdCaseForPossessionClaimResponse: jest.fn(),
 }));
-
-import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
 import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
+
+import { validateForm } from '@modules/steps/formBuilder/helpers';
 
 describe('respond-to-claim defendant-name-capture step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;

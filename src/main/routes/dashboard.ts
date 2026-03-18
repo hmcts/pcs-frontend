@@ -1,18 +1,18 @@
-import type { Application, Request, Response } from 'express';
 import { Router } from 'express';
+import type { Application, Request, Response } from 'express';
 
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
+
+import { Logger } from '@modules/logger';
 import {
   type DashboardTaskGroup,
   STATUS_MAP,
   TASK_GROUP_MAP,
   getDashboardNotifications,
   getDashboardTaskGroups,
-} from '../services/pcsApi';
-
-import { Logger } from '@modules/logger';
-import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
+} from '@services/pcsApi';
+import { sanitiseCaseReference } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 interface MappedTask {
@@ -98,25 +98,20 @@ export default function dashboardRoutes(app: Application): void {
   // Create dedicated router for dashboard routes
   const dashboardRouter = Router({ mergeParams: true });
 
+  dashboardRouter.use(oidcMiddleware);
+
   // Apply param middleware - dashboard owns this dependency
   // This ensures res.locals.validatedCase is set for routes with :caseReference
   dashboardRouter.param('caseReference', caseReferenceParamMiddleware);
 
   // Route: /dashboard (redirect to case-specific dashboard)
-  dashboardRouter.get('/', oidcMiddleware, (req: Request, res: Response) => {
-    const caseReference = toCaseReference16(req.session?.ccdCase?.id);
-    const dashboardUrl = caseReference ? getDashboardUrl(caseReference) : null;
-
-    if (!dashboardUrl) {
-      // No valid case reference - redirect to home
-      return safeRedirect303(res, '/', '/', ['/']);
-    }
-
-    return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
+  dashboardRouter.get('/', (req: Request, res: Response) => {
+    // cannot redirect to dashboard as we don't have a case reference
+    return safeRedirect303(res, '/', '/', ['/']);
   });
 
   // Route: /dashboard/:caseReference (main dashboard page)
-  dashboardRouter.get('/:caseReference', oidcMiddleware, async (req: Request, res: Response) => {
+  dashboardRouter.get('/:caseReference', async (req: Request, res: Response) => {
     const validatedCase = res.locals.validatedCase;
 
     if (!validatedCase) {

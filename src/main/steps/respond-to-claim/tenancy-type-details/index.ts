@@ -20,7 +20,7 @@ export const step: StepDefinition = {
       stepName,
       async (req: Request) => {
         const backUrl = await stepNavigation.getBackUrl(req, stepName);
-        const nextStepUrl = await stepNavigation.getNextStepUrl(req, stepName, {});
+        const nextStepUrl = await stepNavigation.getNextStepUrl(req, stepName);
         return {
           backUrl,
           nextStepUrl,
@@ -48,7 +48,7 @@ export const step: StepDefinition = {
       }
 
       // Handle continue action - go to next step
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
 
       if (!redirectPath) {
         return res.status(404).render('not-found');

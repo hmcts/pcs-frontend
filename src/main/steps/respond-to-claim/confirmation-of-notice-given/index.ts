@@ -1,6 +1,8 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import type { PossessionClaimResponse } from '@interfaces/ccdCase.interface';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -14,6 +16,37 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     question: 'question',
     hintText: 'hintText',
+  },
+  beforeRedirect: async req => {
+    const confirmNoticeGiven = req.body?.confirmNoticeGiven as string | undefined;
+
+    if (!confirmNoticeGiven) {
+      return;
+    }
+
+    const enumMapping: Record<string, string> = {
+      yes: 'YES',
+      no: 'NO',
+      imNotSure: 'NOT_SURE',
+    };
+
+    const ccdValue = enumMapping[confirmNoticeGiven];
+    if (!ccdValue) {
+      return;
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        confirmNoticeGiven: ccdValue,
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  getInitialFormData: req => {
+    const existingAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven as string | undefined;
+
+    return existingAnswer ? { confirmNoticeGiven: existingAnswer } : {};
   },
   fields: [
     {
@@ -31,11 +64,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    // Read from CCD (fresh data from START callback via res.locals.validatedCase)
-    // Same pattern as free-legal-advice - no session dependency
-    const caseData = req.res?.locals.validatedCase?.data;
-    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
-
+    const { claimantName } = req.res?.locals?.validatedCase ?? { claimantName: 'Treetops Housing' };
     return {
       claimantName,
     };
