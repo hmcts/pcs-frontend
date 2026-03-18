@@ -4,7 +4,7 @@ import { performAction, performValidation } from '../utils/controller';
 export async function freeLegalAdviceErrorValidation(): Promise<void> {
   await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: freeLegalAdvice.thereIsAProbelmErrorMessageHeader,
+    header: freeLegalAdvice.thereIsAProblemErrorMessageHeader,
     message: freeLegalAdvice.youMustSayAboutFreeLegalAdviceErrorMessage,
   });
 }
