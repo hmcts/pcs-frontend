@@ -34,6 +34,15 @@ export const correspondenceAddress = {
   walesTownOrCityTextInput: `Caerdydd`,
   walesCountyTextInput: `Cardiff`,
   walesPostcodeTextInput: `CF11 6QX`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  pleaseConfirmYourAddressErrorMessage: `Please confirm your address by selecting the options below`,
+  enterValidPostcodeErrorMessage: `Enter a valid UK postcode`,
+  postCodeNotFoundErrorMessage: `Postcode not found. Please check and try again.`,
+  pleaseSelectAnAddressErrorMessage: `Please select an address`,
+  enterAddressLine1ErrorMessage: `Enter address line 1, typically the building and street`,
+  enterTownOrCityErrorMessage: `Enter town or city`,
+
+  //The below section will be deleted once correspondence address functional tests automatically handle page routing - will be implemented in a new story
   errorValidation: `YES`,
   errorValidationType: { input: `textField`, radio: `radioOptions` },
   errorValidationHeader: `There is a problem`,
