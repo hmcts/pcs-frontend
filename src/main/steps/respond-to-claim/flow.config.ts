@@ -129,12 +129,15 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'landlord-registered': {
       defaultNext: 'landlord-licensed',
+      previousStep: 'dispute-claim-interstitial',
     },
     'landlord-licensed': {
       defaultNext: 'written-terms',
+      previousStep: 'landlord-registered',
     },
     'written-terms': {
       defaultNext: 'tenancy-type-details',
+      previousStep: 'landlord-licensed',
     },
     'tenancy-type-details': {
       routes: [
