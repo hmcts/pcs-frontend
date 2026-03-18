@@ -26,8 +26,8 @@ export const flowConfig: JourneyFlowConfig = {
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
-    'instalment-offer',
-    'instalments',
+    'instalment-payments',
+    'how-much-afford-to-pay',
     'correspondence-address',
     'contact-preferences',
     'contact-preferences-telephone',
@@ -329,33 +329,33 @@ export const flowConfig: JourneyFlowConfig = {
             }
             return isRentArrearsClaim(req);
           },
-          nextStep: 'instalment-offer',
+          nextStep: 'instalment-payments',
         },
       ],
       defaultNext: 'your-household-and-circumstances',
     },
-    'instalment-offer': {
+    'instalment-payments': {
       previousStep: 'repayments-agreed',
       routes: [
         {
           condition: async (req: Request) =>
             req.session?.formData?.['instalment-offer']?.confirmInstalmentOffer === 'yes',
-          nextStep: 'instalments',
+          nextStep: 'how-much-afford-to-pay',
         },
       ],
       defaultNext: 'your-household-and-circumstances',
     },
-    instalments: {
-      previousStep: 'instalment-offer',
+    'how-much-afford-to-pay': {
+      previousStep: 'instalment-payments',
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
       previousStep: (_req: Request, formData: Record<string, unknown>) => {
-        if ('instalments' in formData) {
-          return 'instalments';
+        if ('how-much-afford-to-pay' in formData) {
+          return 'how-much-afford-to-pay';
         }
-        if ('instalment-offer' in formData) {
-          return 'instalment-offer';
+        if ('instalment-offer' in formData || 'instalment-payments' in formData) {
+          return 'instalment-payments';
         }
         return 'repayments-agreed';
       },

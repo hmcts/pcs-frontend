@@ -280,12 +280,12 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
     frontendFields: ['confirmRepaymentsAgreed', 'repaymentsAgreementInfo'],
     valueMapper: repaymentsAgreedMapper,
   },
-  'instalment-offer': {
+  'instalment-payments': {
     backendPath: 'possessionClaimResponse.paymentAgreement',
     frontendField: 'confirmInstalmentOffer',
     valueMapper: yesNoEnum('repayArrearsInstalments'),
   },
-  instalments: {
+  'how-much-afford-to-pay': {
     backendPath: 'possessionClaimResponse.paymentAgreement',
     frontendFields: ['instalmentAmount', 'instalmentFrequency'],
     valueMapper: instalmentsMapper,

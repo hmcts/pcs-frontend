@@ -77,7 +77,7 @@ describe('respond-to-claim instalments step', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (overrides: Record<string, unknown> = {}): any => ({
     body: {},
-    originalUrl: '/case/1234567890123456/respond-to-claim/instalments',
+    originalUrl: '/case/1234567890123456/respond-to-claim/how-much-afford-to-pay',
     query: { lang: 'en' },
     params: { caseReference: '1234567890123456' },
     session: {
@@ -96,8 +96,8 @@ describe('respond-to-claim instalments step', () => {
   });
 
   it('exposes correct step url and view', () => {
-    expect(step.name).toBe('instalments');
-    expect(step.url).toBe('/case/:caseReference/respond-to-claim/instalments');
+    expect(step.name).toBe('how-much-afford-to-pay');
+    expect(step.url).toBe('/case/:caseReference/respond-to-claim/how-much-afford-to-pay');
     expect(step.view).toContain('formBuilder.njk');
   });
 
