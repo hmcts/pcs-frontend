@@ -253,7 +253,7 @@ export const submitCaseApiData = {
       preActionProtocolCompleted: 'NO',
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
-      noticeServed: 'Yes',
+      noticeServed: process.env.NOTICE_SERVED,
       showRentSectionPage: 'No',
       noRentArrears_ShowGroundReasonPage: 'Yes',
       noRentArrears_MandatoryGrounds: [],
@@ -367,6 +367,238 @@ export const submitCaseApiData = {
         positionClaimant: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
+    };
+  },
+  get submitCasePayloadOtherTenancyOld() {
+    return {
+      legislativeCountry: 'England',
+      claimantType: {
+        value: {
+          code: 'PROVIDER_OF_SOCIAL_HOUSING',
+          label: 'Registered provider of social housing',
+        },
+        list_items: [
+          {
+            code: 'PRIVATE_LANDLORD',
+            label: 'Private landlord',
+          },
+          {
+            code: 'PROVIDER_OF_SOCIAL_HOUSING',
+            label: 'Registered provider of social housing',
+          },
+          {
+            code: 'MORTGAGE_LENDER',
+            label: 'Mortgage lender',
+          },
+          {
+            code: 'OTHER',
+            label: 'Other',
+          },
+        ],
+        valueCode: 'PROVIDER_OF_SOCIAL_HOUSING',
+      },
+      claimAgainstTrespassers: 'NO',
+      orgNameFound: 'Yes',
+      claimantName: 'Possession Claims Solicitor Org',
+      isClaimantNameCorrect: 'YES',
+      claimantContactEmail: 'pcs-solicitor-automation@test.com',
+      isCorrectClaimantContactEmail: 'YES',
+      orgAddressFound: 'Yes',
+      organisationAddress: {
+        AddressLine1: 'Ministry Of Justice',
+        AddressLine2: 'Seventh Floor 102 Petty France',
+        PostTown: 'London',
+        PostCode: 'SW1H 9AJ',
+        Country: 'United Kingdom',
+      },
+      formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
+      isCorrectClaimantContactAddress: 'YES',
+      claimantProvidePhoneNumber: 'NO',
+      defendant1: {
+        nameKnown: 'YES',
+        firstName: 'Jeremiah',
+        lastName: 'Test',
+        addressKnown: 'YES',
+        addressSameAsPossession: 'YES',
+      },
+      addAnotherDefendant: 'NO',
+      tenancy_TypeOfTenancyLicence: 'OTHER',
+      tenancy_DetailsOfOtherTypeOfTenancyLicence: 'Other tenancy type - short term',
+      tenancy_TenancyLicenceDate: '2020-05-20',
+      tenancy_TenancyLicenceDocuments: [],
+      showIntroductoryDemotedOtherGroundReasonPage: 'Yes',
+      introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
+      introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS', 'BREACH_OF_THE_TENANCY'],
+      breachOfTheTenancyGround: 'Breach of tenancy',
+      preActionProtocolCompleted: 'NO',
+      mediationAttempted: 'NO',
+      settlementAttempted: 'NO',
+      noticeServed: process.env.NOTICE_SERVED,
+      notice_NoticeServiceMethod: 'FIRST_CLASS_POST',
+      notice_NoticePostedDate: null,
+      notice_NoticeDocuments: [],
+      rentDetails_CurrentRent: '100000',
+      rentDetails_Frequency: 'MONTHLY',
+      rentDetails_CalculatedDailyCharge: '3285',
+      rentSectionPaymentFrequency: 'MONTHLY',
+      rentDetails_FormattedCalculatedDailyCharge: '£32.85',
+      rentDetails_PerDayCorrect: 'YES',
+      showRentArrearsPage: 'Yes',
+      rentArrears_StatementDocuments: [
+        {
+          id: 'bbf04b98-b054-455f-9685-bd80edb4524c',
+          value: {
+            document_url:
+              'http://dm-store-aat.service.core-compute-aat.internal/documents/bdfc114f-7448-487b-95c7-609023a808a5',
+            document_binary_url:
+              'http://dm-store-aat.service.core-compute-aat.internal/documents/bdfc114f-7448-487b-95c7-609023a808a5/binary',
+            document_filename: 'Rent Arrears.docx',
+            document_hash: '87e8c2740eac8015100c2915dccf1f10254c20f2c72435ca17b0ee6c1ba03cd0',
+          },
+        },
+      ],
+      rentArrears_Total: '250000',
+      rentArrears_ThirdPartyPayments: 'NO',
+      arrearsJudgmentWanted: 'NO',
+      claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
+      claimantCircumstancesSelect: 'NO',
+      hasDefendantCircumstancesInfo: 'NO',
+      suspensionOfRTB_ShowHousingActsPage: 'No',
+      demotionOfTenancy_ShowHousingActsPage: 'No',
+      suspensionToBuyDemotionOfTenancyPages: 'No',
+      alternativesToPossession: [],
+      claimingCostsWanted: 'NO',
+      additionalReasonsForPossession: {
+        hasReasons: 'NO',
+      },
+      hasUnderlesseeOrMortgagee: 'NO',
+      wantToUploadDocuments: 'NO',
+      applicationWithClaim: 'NO',
+      languageUsed: 'ENGLISH_AND_WELSH',
+      completionNextStep: 'SUBMIT_AND_PAY_NOW',
+      statementOfTruth: {
+        completedBy: 'CLAIMANT',
+        fullNameClaimant: 'fg',
+        positionClaimant: 'fg',
+        agreementClaimant: ['BELIEVE_TRUE'],
+      },
+    };
+  },
+  get submitCasePayloadOtherTenancy() {
+    return {
+      legislativeCountry: 'England',
+      claimantType: {
+        value: {
+          code: 'PROVIDER_OF_SOCIAL_HOUSING',
+          label: 'Registered provider of social housing'
+        },
+        list_items: [
+          {
+            code: 'PRIVATE_LANDLORD',
+            label: 'Private landlord'
+          },
+          {
+            code: 'PROVIDER_OF_SOCIAL_HOUSING',
+            label: 'Registered provider of social housing'
+          },
+          {
+            code: 'MORTGAGE_LENDER',
+            label: 'Mortgage lender'
+          },
+          {
+            code: 'OTHER',
+            label: 'Other'
+          }
+        ],
+        valueCode: 'PROVIDER_OF_SOCIAL_HOUSING'
+      },
+      claimAgainstTrespassers: 'NO',
+      orgNameFound: 'Yes',
+      claimantName: 'Possession Claims Solicitor Org',
+      isClaimantNameCorrect: 'YES',
+      claimantContactEmail: 'pcs-solicitor-automation@test.com',
+      isCorrectClaimantContactEmail: 'YES',
+      orgAddressFound: 'Yes',
+      organisationAddress: {
+        AddressLine1: 'Ministry Of Justice',
+        AddressLine2: 'Seventh Floor 102 Petty France',
+        PostTown: 'London',
+        PostCode: 'SW1H 9AJ',
+        Country: 'United Kingdom'
+      },
+      formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
+      isCorrectClaimantContactAddress: 'YES',
+      claimantProvidePhoneNumber: 'NO',
+      defendant1: {
+        nameKnown: 'YES',
+        firstName: 'Jeremiah',
+        lastName: 'Test',
+        addressKnown: 'YES',
+        addressSameAsPossession: 'YES'
+      },
+      addAnotherDefendant: 'NO',
+      tenancy_TypeOfTenancyLicence: 'OTHER',
+      tenancy_DetailsOfOtherTypeOfTenancyLicence: 'Other tenancy type - short term',
+      tenancy_TenancyLicenceDate: '2020-05-20',
+      tenancy_TenancyLicenceDocuments: [],
+      showIntroductoryDemotedOtherGroundReasonPage: 'Yes',
+      introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
+      introGrounds_IntroductoryDemotedOrOtherGrounds: [
+        'RENT_ARREARS',
+        'BREACH_OF_THE_TENANCY'
+      ],
+      breachOfTheTenancyGround: 'Breach of tenancy',
+      preActionProtocolCompleted: 'NO',
+      mediationAttempted: 'NO',
+      settlementAttempted: 'NO',
+      noticeServed: 'Yes',
+      notice_NoticeServiceMethod: 'FIRST_CLASS_POST',
+      notice_NoticePostedDate: null,
+      notice_NoticeDocuments: [],
+      rentDetails_CurrentRent: '100000',
+      rentDetails_Frequency: 'MONTHLY',
+      rentDetails_CalculatedDailyCharge: '3285',
+      rentSectionPaymentFrequency: 'MONTHLY',
+      rentDetails_FormattedCalculatedDailyCharge: '£32.85',
+      rentDetails_PerDayCorrect: 'YES',
+      showRentArrearsPage: 'Yes',
+      rentArrears_StatementDocuments: [
+        {
+          id: 'bbf04b98-b054-455f-9685-bd80edb4524c',
+          value: {
+            document_url: 'http://dm-store-aat.service.core-compute-aat.internal/documents/bdfc114f-7448-487b-95c7-609023a808a5',
+            document_binary_url: 'http://dm-store-aat.service.core-compute-aat.internal/documents/bdfc114f-7448-487b-95c7-609023a808a5/binary',
+            document_filename: 'Rent Arrears.docx',
+            document_hash: '87e8c2740eac8015100c2915dccf1f10254c20f2c72435ca17b0ee6c1ba03cd0'
+          }
+        }
+      ],
+      rentArrears_Total: '250000',
+      rentArrears_ThirdPartyPayments: 'NO',
+      arrearsJudgmentWanted: 'NO',
+      claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
+      claimantCircumstancesSelect: 'NO',
+      hasDefendantCircumstancesInfo: 'NO',
+      suspensionOfRTB_ShowHousingActsPage: 'No',
+      demotionOfTenancy_ShowHousingActsPage: 'No',
+      suspensionToBuyDemotionOfTenancyPages: 'No',
+      alternativesToPossession: [],
+      claimingCostsWanted: 'NO',
+      additionalReasonsForPossession: {
+        hasReasons: 'NO'
+      },
+      hasUnderlesseeOrMortgagee: 'NO',
+      wantToUploadDocuments: 'NO',
+      languageUsed: 'ENGLISH_AND_WELSH',
+      completionNextStep: 'SUBMIT_AND_PAY_NOW',
+      statementOfTruth: {
+        completedBy: 'CLAIMANT',
+        fullNameClaimant: 'fg',
+        positionClaimant: 'fg',
+        agreementClaimant: [
+          'BELIEVE_TRUE'
+        ]
+      }
     };
   },
   submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,

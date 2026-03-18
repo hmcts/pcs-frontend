@@ -263,10 +263,10 @@ export class RespondToClaimAction implements IAction {
         text: `The property is let under ${article} ${tenancyType} agreement`,
       });
     } else if (tenancyType === 'other') {
-      // await performValidation('text', {
-      //   elementType: 'paragraph',
-      //   text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancyDate.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
-      // });
+      await performValidation('text', {
+        elementType: 'paragraph',
+        text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+      });
     }
     await performAction('clickRadioButton', {
       question: tenancyOccupationContractLicenseAgreement.isTenancyTypeCorrectQuestion,
