@@ -55,10 +55,10 @@ export default defineConfig({
   ],
   projects: [
     {
-      name: 'chromium',
+      name: 'chrome',
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chromium',
+        channel: 'chrome',
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
         trace: 'on-first-retry',

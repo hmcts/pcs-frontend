@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
 
+import type { CcdCase, CcdCaseAddress } from '../interfaces/ccdCase.interface';
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 
@@ -12,7 +13,8 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '@services/pcsApi';
-import { sanitiseCaseReference } from '@utils/caseReference';
+import { arrayToString } from '@utils/arrayToString';
+import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 interface MappedTask {
@@ -25,6 +27,25 @@ interface MappedTask {
   };
 }
 
+function getPropertyAddressFromValidatedCase(validatedCase: CcdCase): string | null {
+  const address = (validatedCase.data as { propertyAddress?: CcdCaseAddress | undefined })?.propertyAddress;
+
+  if (!address) {
+    return null;
+  }
+
+  const formatted = arrayToString([
+    address.AddressLine1,
+    address.AddressLine2,
+    address.AddressLine3,
+    address.PostTown,
+    address.County,
+    address.PostCode,
+  ]);
+
+  return formatted || null;
+}
+
 interface MappedTaskGroup {
   groupId: DashboardTaskGroup['groupId'];
   title: string;
@@ -32,6 +53,15 @@ interface MappedTaskGroup {
 }
 
 export const DASHBOARD_ROUTE = '/dashboard';
+
+const HELP_SUPPORT_LINKS: { text: string; href: string }[] = [
+  { text: 'Help with fees', href: '#' },
+  { text: 'Find out about mediation', href: '#' },
+  { text: 'What to expect at the hearing', href: '#' },
+  { text: 'Represent myself at the hearing', href: '#' },
+  { text: 'Find legal advice', href: '#' },
+  { text: 'Find information', href: '#' },
+];
 
 export const getDashboardUrl = (caseReference?: string | number): string | null => {
   if (!caseReference) {
@@ -122,6 +152,11 @@ export default function dashboardRoutes(app: Application): void {
     }
 
     const caseReferenceNumber = Number(validatedCase.id);
+    const propertyAddress = getPropertyAddressFromValidatedCase(validatedCase);
+    const rawDashboardCaseReference = toCaseReference16(validatedCase.id);
+    const dashboardCaseReference = rawDashboardCaseReference
+      ? rawDashboardCaseReference.replace(/(\d{4})(?=\d)/g, '$1 ')
+      : null;
 
     try {
       const [notifications, taskGroups] = await Promise.all([
@@ -132,6 +167,9 @@ export default function dashboardRoutes(app: Application): void {
       return res.render('dashboard', {
         notifications,
         taskGroups,
+        propertyAddress,
+        dashboardCaseReference,
+        helpSupportLinks: HELP_SUPPORT_LINKS,
       });
     } catch (e) {
       logger.error(`Failed to fetch dashboard data for case ${validatedCase.id}. Error was: ${String(e)}`);
