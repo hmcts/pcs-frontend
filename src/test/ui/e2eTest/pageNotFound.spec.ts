@@ -36,7 +36,7 @@ test.describe('Error page to indicate Page Not Found error @nightly', () => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-    await performValidation('mainHeader', 'Sorry, we’re having technical problems');
+    await performValidation('mainHeader', 'Sorry, we’re having technical problemss');
     await performValidation('text', { text: 'Please try again in a few minutes.', elementType: 'paragraph' });
   });
 });
