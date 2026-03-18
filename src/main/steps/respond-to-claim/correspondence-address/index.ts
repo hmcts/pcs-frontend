@@ -7,15 +7,12 @@ import { flowConfig } from '../flow.config';
 import type { PossessionClaimResponse } from '@interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
-import { createFormStep, getFormData, getTranslationFunction, setFormData } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import { arrayToString } from '@utils/arrayToString';
 
-const STEP_NAME = 'postcode-finder';
-
-// Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
-// Session is set in extendGetContent; validation reads it via allData on POST.
-const correspondenceAddressRequired = (_formData: Record<string, unknown>, allData: Record<string, unknown>): boolean =>
-  allData.__isAddressKnown === true;
+// When no existing address is known, the template submits a hidden "no" value,
+// so the radio can be required unconditionally without using session-backed state.
+const correspondenceAddressRequired = (): boolean => true;
 
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
@@ -113,10 +110,10 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     let possessionClaimResponse: PossessionClaimResponse;
-    //prepopulate address is correct
+
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
       const validatedCase = req.res?.locals?.validatedCase;
-      const prepopulateAddress = validatedCase?.defendantContactDetailsParty?.address;
+      const prepopulateAddress = validatedCase?.defendantContactDetailsPartyAddress;
 
       possessionClaimResponse = {
         defendantContactDetails: {
@@ -154,9 +151,7 @@ export const step: StepDefinition = createFormStep({
     const t = getTranslationFunction(req, 'correspondence-address', ['common']);
 
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
-
     const isAddressKnown = formattedAddressStr !== '?';
-    setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as
       | { component: { label: { text: string }; fieldset: { legend: { text: string } } } }
@@ -233,12 +228,13 @@ export const step: StepDefinition = createFormStep({
 });
 
 function getExistingAddress(req: Request): { formattedAddress: string } {
-  const party = req.res?.locals?.validatedCase?.defendantContactDetailsParty;
-  const addressKnown = party?.addressKnown;
-  const address = party?.address;
+  const { hasDefendantContactDetailsPartyAddress, defendantContactDetailsPartyAddress: address } = req.res?.locals
+    ?.validatedCase ?? {
+    hasDefendantContactDetailsPartyAddress: false,
+    defendantContactDetailsPartyAddress: undefined,
+  };
 
-  // Check addressKnown field from CCD - if "YES" then address exists
-  if (addressKnown === 'YES' && address) {
+  if (hasDefendantContactDetailsPartyAddress && address) {
     const formattedAddress =
       arrayToString([
         address.AddressLine1,

@@ -139,6 +139,23 @@ export class CcdCaseModel {
     return this.data.possessionClaimResponse?.defendantContactDetails?.party ?? ({} as CcdDefendantParty);
   }
 
+  get defendantContactDetailsPartyAddress(): CcdCaseAddress | undefined {
+    const { address } = this.defendantContactDetailsParty;
+    if (!address || Array.isArray(address) || !('AddressLine1' in address)) {
+      return undefined;
+    }
+
+    return address as CcdCaseAddress;
+  }
+
+  get defendantContactDetailsPartyAddressKnown(): string {
+    return this.defendantContactDetailsParty.addressKnown ?? '';
+  }
+
+  get hasDefendantContactDetailsPartyAddress(): boolean {
+    return this.defendantContactDetailsPartyAddressKnown === 'YES' && !!this.defendantContactDetailsPartyAddress;
+  }
+
   get defendantResponses(): CcdDefendantResponses | undefined {
     return this.data.possessionClaimResponse?.defendantResponses ?? undefined;
   }
