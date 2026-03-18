@@ -40,7 +40,7 @@ export async function defendantNameCaptureNavigationTests(): Promise<void> {
 export async function defendantNameCaptureInputValuesPrePopulated(): Promise<void> {
   await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantNameCapture.firstNameTextInput);
   await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantNameCapture.lastNameTextInput);
-  await performValidation('pageNavigation', freeLegalAdvice.saveForLaterButton, 'Dashboard');
+  await performValidation('pageNavigation', defendantNameCapture.saveForLaterButton, 'Dashboard');
   await performValidation(
     'inputTextValue',
     defendantNameCapture.firstNameTextLabel,

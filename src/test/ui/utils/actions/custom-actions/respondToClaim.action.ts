@@ -2,20 +2,22 @@ import { Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
 import {
-  contactByTelephone,
-  contactByTextMessage,
+  confirmationOfNoticeGiven,
+  contactPreferencesTelephone,
+  contactPreferencesTextMessage,
   correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
-  noticeDateKnown,
-  noticeDateUnknown,
-  noticeDetails,
+  landlordRegistered,
+  noticeDateWhenNotProvided,
+  noticeDateWhenProvided,
   paymentInterstitial,
   repaymentsMade,
   tenancyDateDetails,
+  tenancyDateUnknown,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -39,6 +41,8 @@ export class RespondToClaimAction implements IAction {
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
+      ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -119,21 +123,25 @@ export class RespondToClaimAction implements IAction {
 
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: contactByTelephone.areYouHappyToContactQuestion,
+      question: contactPreferencesTelephone.areYouHappyToContactQuestion,
       option: contactByPhoneData.radioOption,
     });
-    if (contactByPhoneData.radioOption === contactByTelephone.yesRadioOption) {
-      await performAction('inputText', contactByTelephone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.phoneNumber);
+    if (contactByPhoneData.radioOption === contactPreferencesTelephone.yesRadioOption) {
+      await performAction(
+        'inputText',
+        contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
+        contactByPhoneData.phoneNumber
+      );
     }
-    await performAction('clickButton', contactByTelephone.saveAndContinueButton);
+    await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
   }
 
   private async selectContactByTextMessage(contactData: actionData): Promise<void> {
     await performAction('clickRadioButton', {
-      question: contactByTextMessage.contactByTextMessageQuestion,
+      question: contactPreferencesTextMessage.contactByTextMessageQuestion,
       option: contactData,
     });
-    await performAction('clickButton', contactByTextMessage.saveAndContinueButton);
+    await performAction('clickButton', contactPreferencesTextMessage.saveAndContinueButton);
   }
 
   private async disputeClaimInterstitial(isClaimantNameCorrect: actionData) {
@@ -147,6 +155,14 @@ export class RespondToClaimAction implements IAction {
     await performValidation('text', { elementType: 'heading', text: mainHeader });
     await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
+  }
+
+  private async selectLandlordRegistered(registeredData: actionData): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: landlordRegistered.isYourLandlordRegisteredQuestion,
+      option: registeredData,
+    });
+    await performAction('clickButton', landlordRegistered.saveAndContinueButton);
   }
 
   private async readPaymentInterstitial(): Promise<void> {
@@ -185,34 +201,48 @@ export class RespondToClaimAction implements IAction {
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: noticeDetails.getDidClaimantGiveYouQuestion(claimantsName),
+      question: confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(claimantsName),
       option: noticeGivenData.option,
     });
-    await performAction('clickButton', noticeDetails.saveAndContinueButton);
+    await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+        ['inputText', noticeDateWhenProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', noticeDateKnown.saveAndContinueButton);
+    await performAction('clickButton', noticeDateWhenProvided.saveAndContinueButton);
   }
 
   private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', noticeDateKnown.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateKnown.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateKnown.yearTextLabel, noticeData.year]
+        ['inputText', noticeDateWhenProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', noticeDateUnknown.saveAndContinueButton);
+    await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
+  }
+
+  private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {
+    const getDidNotProvideParagraph = tenancyDateUnknown.getDidNotProvideParagraph(claimantsName);
+    await performValidation('text', { elementType: 'paragraph', text: getDidNotProvideParagraph });
+    if (tenancyStartData?.tsDay && tenancyStartData?.tsMonth && tenancyStartData?.tsYear) {
+      await performActions(
+        'Enter Date',
+        ['inputText', tenancyDateUnknown.dayTextLabel, tenancyStartData.tsDay],
+        ['inputText', tenancyDateUnknown.monthTextLabel, tenancyStartData.tsMonth],
+        ['inputText', tenancyDateUnknown.yearTextLabel, tenancyStartData.tsYear]
+      );
+    }
+    await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

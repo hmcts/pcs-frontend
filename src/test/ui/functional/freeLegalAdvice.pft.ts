@@ -1,10 +1,10 @@
-import { defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import { freeLegalAdvice, startNow } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function freeLegalAdviceErrorValidation(): Promise<void> {
-  await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: freeLegalAdvice.thereIsAProbelmErrorMessageHeader,
+    header: freeLegalAdvice.thereIsAProblemErrorMessageHeader,
     message: freeLegalAdvice.youMustSayAboutFreeLegalAdviceErrorMessage,
   });
 }
