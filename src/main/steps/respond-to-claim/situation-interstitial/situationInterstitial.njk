@@ -28,7 +28,7 @@
   </ul>
   <p class="govuk-body">{{ paragraph3 }}</p>
 
-  <form method="post" action="{{ url }}">
+  <form method="post" action="{{ url }}" novalidate>
     {{ csrfProtection(csrfToken) }}
     <div class="govuk-button-group">
       {{ govukButton({

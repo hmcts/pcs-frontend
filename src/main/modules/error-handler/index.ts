@@ -53,7 +53,10 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
       return next(err);
     }
 
-    const httpError = err instanceof HTTPError ? err : new HTTPError(err.message || 'Internal server error', 500);
+    const httpError =
+      err instanceof HTTPError
+        ? err
+        : new HTTPError(err.message || 'Internal server error', (err as HTTPError).status || 500);
     const status = httpError.status || 500;
 
     // Skip logging for common browser/dev tools requests that generate harmless 404s
