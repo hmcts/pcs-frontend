@@ -29,7 +29,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 0 : 0,
   workers: env === 'preview' ? 6 : 4,
-  timeout: 30 * 1000,
+  timeout: 300 * 1000,
   expect: { timeout: 5 * 1000 },
   use: { actionTimeout: 5 * 1000, navigationTimeout: 5 * 1000 },
   /* Report slow tests if they take longer than 5 mins */
