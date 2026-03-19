@@ -35,7 +35,7 @@ describe('CreateCaseAPIAction', () => {
         token: 'event-token',
         case_details: {
           case_data: {
-            claimCreateFeeAmount: '£999999.99',
+            cpcfeeAmount: '£999999.99',
           },
         },
       },
@@ -58,9 +58,9 @@ describe('CreateCaseAPIAction', () => {
       'http://ccd.example.com/case-types/PCS/cases',
       expect.objectContaining({
         data: expect.objectContaining({
-          claimCreateFeeAmount: '£404',
-          claimCreateLegislativeCountry: 'England',
-          claimCreatePropertyAddress: createCaseApiData.createCasePayload.propertyAddress,
+          cpcfeeAmount: '£404',
+          cpclegislativeCountry: 'England',
+          cpcpropertyAddress: createCaseApiData.createCasePayload.propertyAddress,
         }),
         event: { id: 'createPossessionClaim' },
         event_token: 'event-token',

@@ -44,7 +44,7 @@ describe('ccdCaseService', () => {
       const result = await ccdCaseService.getCaseById(accessToken, caseId);
 
       expect(mockGet).toHaveBeenCalledWith(
-        `${mockUrl}/cases/${caseId}/event-triggers/submitDefendantResponse?ignore-warning=false`,
+        `${mockUrl}/cases/${caseId}/event-triggers/respondPossessionClaim?ignore-warning=false`,
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: `Bearer ${accessToken}`,
@@ -206,68 +206,13 @@ describe('ccdCaseService', () => {
   });
 
   describe('createCase', () => {
-    it('uses generated bindings to submit createPossessionClaim data', async () => {
-      const propertyAddress = {
-        AddressLine1: '123 Baker Street',
-        AddressLine2: '',
-        AddressLine3: '',
-        PostTown: 'London',
-        County: 'Greater London',
-        PostCode: 'NW1 6XE',
-        Country: 'United Kingdom',
-      };
+    it('calls submitEvent with correct args', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockResolvedValue({ data: { id: '999', data: { applicantForename: 'bar' } } });
 
-      mockGet.mockResolvedValue({
-        data: {
-          token: 'event-token',
-          case_details: {
-            case_data: {
-              claimCreateFeeAmount: '£999999.99',
-            },
-          },
-        },
-      });
-      mockPost.mockResolvedValue({ data: { id: '999' } });
+      const result = await ccdCaseService.createCase(accessToken, { applicantForename: 'bar' });
 
-      const result = await ccdCaseService.createCase(accessToken, {
-        legislativeCountry: 'England',
-        propertyAddress,
-      });
-
-      expect(mockGet).toHaveBeenCalledWith(
-        `${mockUrl}/case-types/PCS/event-triggers/createPossessionClaim`,
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: `Bearer ${accessToken}`,
-          }),
-        })
-      );
-      expect(mockPost).toHaveBeenCalledWith(
-        `${mockUrl}/case-types/PCS/cases`,
-        {
-          data: {
-            claimCreateFeeAmount: '£999999.99',
-            claimCreateLegislativeCountry: 'England',
-            claimCreatePropertyAddress: propertyAddress,
-          },
-          event: { id: 'createPossessionClaim' },
-          event_token: 'event-token',
-          ignore_warning: false,
-        },
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: `Bearer ${accessToken}`,
-          }),
-        })
-      );
-      expect(result).toEqual({
-        id: '999',
-        data: {
-          feeAmount: '£999999.99',
-          legislativeCountry: 'England',
-          propertyAddress,
-        },
-      });
+      expect(result).toEqual({ id: '999', data: { applicantForename: 'bar' } });
     });
   });
 
@@ -291,118 +236,17 @@ describe('ccdCaseService', () => {
 
   describe('submitResponseToClaim', () => {
     it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.submitResponseToClaim(accessToken, '', {})).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.submitResponseToClaim(accessToken, '', {})).rejects.toThrow(
+      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(
         'Cannot Submit Response to Case, CCD Case Not found'
       );
     });
-
-    it('uses generated bindings to submit response-to-claim data', async () => {
-      const correspondenceAddress = {
-        AddressLine1: '10 Example Street',
-        AddressLine2: '',
-        AddressLine3: '',
-        PostTown: 'London',
-        County: '',
-        PostCode: 'SW1 1AA',
-        Country: '',
-      };
-
-      mockGet.mockResolvedValue({
-        data: {
-          token: 'event-token',
-          case_details: {
-            case_data: {
-              respDefSubmitDraftAnswers: 'Yes',
-            },
-          },
-        },
-      });
-      mockPost.mockResolvedValue({ data: { id: '1234567890123456' } });
-
-      const result = await ccdCaseService.submitResponseToClaim(accessToken, '1234567890123456', {
-        correspondenceAddress,
-        submitDraftAnswers: 'No',
-      });
-
-      expect(mockGet).toHaveBeenCalledWith(
-        `${mockUrl}/cases/1234567890123456/event-triggers/submitDefendantResponse?ignore-warning=false`,
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: `Bearer ${accessToken}`,
-          }),
-        })
-      );
-      expect(mockPost).toHaveBeenCalledWith(
-        `${mockUrl}/cases/1234567890123456/events`,
-        {
-          data: {
-            respDefCorrespondenceAddress: correspondenceAddress,
-            respDefSubmitDraftAnswers: 'No',
-          },
-          event: { id: 'submitDefendantResponse' },
-          event_token: 'event-token',
-          ignore_warning: false,
-        },
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: `Bearer ${accessToken}`,
-          }),
-        })
-      );
-      expect(result).toEqual({
-        id: '1234567890123456',
-        data: {
-          correspondenceAddress,
-          submitDraftAnswers: 'No',
-        },
-      });
-    });
   });
 
-  describe('getResponseToClaimData', () => {
-    it('uses generated bindings to load submitDefendantResponse data', async () => {
-      const correspondenceAddress = {
-        AddressLine1: '10 Example Street',
-        AddressLine2: '',
-        AddressLine3: '',
-        PostTown: 'London',
-        County: '',
-        PostCode: 'SW1 1AA',
-        Country: '',
-      };
-
-      mockGet.mockResolvedValue({
-        data: {
-          token: 'event-token',
-          case_details: {
-            case_data: {
-              respDefCorrespondenceAddress: correspondenceAddress,
-              respDefSubmitDraftAnswers: 'No',
-            },
-          },
-        },
-      });
-
-      const result = await ccdCaseService.getResponseToClaimData(accessToken, '1234567890123456');
-
-      expect(mockGet).toHaveBeenCalledWith(
-        `${mockUrl}/cases/1234567890123456/event-triggers/submitDefendantResponse?ignore-warning=false`,
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: `Bearer ${accessToken}`,
-          }),
-        })
-      );
-      expect(result).toEqual({
-        correspondenceAddress,
-        submitDraftAnswers: 'No',
-      });
-    });
-
+  describe('getExistingCaseData', () => {
     it('throws if case data errors', async () => {
       mockGet.mockRejectedValue({ response: { status: 400 } });
-      await expect(ccdCaseService.getResponseToClaimData(accessToken, '')).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getExistingCaseData(accessToken, '')).rejects.toThrow(HTTPError);
     });
   });
 });

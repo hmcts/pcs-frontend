@@ -8,16 +8,16 @@ export interface EventDtoMap {
   "submitDefendantResponse": SubmitDefendantResponseData;
 }
 
-export const caseBindings = defineCaseBindings<EventDtoMap>({
+export const caseBindings = defineCaseBindings<EventDtoMap>()({
   caseTypeId: "PCS",
   events: {
   "createPossessionClaim": {
-    fieldNamespace: "claim.create",
+    fieldPrefix: "cpc",
     pages: ["crossBorderPostcodeSelection", "enterPropertyAddress", "postcodeNotAssignedToCourt", "propertyNotEligible", "startTheService"],
   },
   "submitDefendantResponse": {
-    fieldNamespace: "resp.def",
+    fieldPrefix: "sdr",
     pages: [],
   },
   },
-} satisfies CcdCaseBindings<EventDtoMap>);
+} as const satisfies CcdCaseBindings<EventDtoMap>);

@@ -1,12 +1,10 @@
 import { Logger } from '@hmcts/nodejs-logging';
-import { createCcdClient, type CcdClientConfig, type CcdSubmitResult, type CcdTransport } from '@hmcts/ccd-event-runtime';
 import { AxiosError } from 'axios';
 import config from 'config';
 
-import { caseBindings, type CreateClaimData, type SubmitDefendantResponseData } from '../generated/ccd/PCS';
 import { HTTPError } from '../HttpError';
 import { CaseState } from '../interfaces/ccdCase.interface';
-import type { CcdCase, CcdUserCases } from '../interfaces/ccdCase.interface';
+import type { CcdCase, CcdUserCases, StartCallbackData } from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
 
 const logger = Logger.getLogger('ccdCaseService');
@@ -31,46 +29,6 @@ function getCaseHeaders(token: string) {
       Accept: '*/*',
       'Content-Type': 'application/json',
     },
-  };
-}
-
-function getGeneratedClientHeaders(token: string): Record<string, string> {
-  return {
-    Authorization: `Bearer ${token}`,
-    experimental: 'true',
-    Accept: '*/*',
-    'Content-Type': 'application/json',
-  };
-}
-
-function createTransport(): CcdTransport {
-  return {
-    get: async (url, headers) => (await http.get(url, { headers })).data,
-    post: async (url, data, headers) => (await http.post(url, data, { headers })).data,
-  };
-}
-
-function createGeneratedClient(userToken: string) {
-  const clientConfig: CcdClientConfig = {
-    baseUrl: getBaseUrl(),
-    caseTypeId: getCaseTypeId(),
-    getAuthHeaders: () => getGeneratedClientHeaders(userToken),
-    transport: createTransport(),
-  };
-
-  return createCcdClient(clientConfig, caseBindings);
-}
-
-function toRecord(value: unknown): Record<string, unknown> {
-  return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {};
-}
-
-function normaliseSubmitResult(result: CcdSubmitResult, fallbackData: Record<string, unknown>): CcdCase {
-  const resultData = toRecord(result.data);
-
-  return {
-    id: String(result.id ?? ''),
-    data: Object.keys(resultData).length > 0 ? resultData : fallbackData,
   };
 }
 
@@ -131,11 +89,7 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseById(
-    accessToken: string,
-    caseId: string,
-    eventId: string = 'submitDefendantResponse'
-  ): Promise<CcdCase> {
+  async getCaseById(accessToken: string, caseId: string, eventId: string = 'respondPossessionClaim'): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
@@ -198,20 +152,11 @@ export const ccdCaseService = {
     }
   },
 
-  async createCase(accessToken: string | undefined, data: Partial<CreateClaimData>): Promise<CcdCase> {
-    try {
-      const client = createGeneratedClient(accessToken || '');
-      const flow = await client.event('createPossessionClaim').start();
-      const submitData: CreateClaimData = {
-        ...flow.data,
-        ...(data as Partial<CreateClaimData>),
-      };
-      const result = await flow.submit(submitData);
-
-      return normaliseSubmitResult(result, submitData as unknown as Record<string, unknown>);
-    } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'createCase');
-    }
+  async createCase(accessToken: string | undefined, data: Record<string, unknown>): Promise<CcdCase> {
+    const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
+    const eventToken = await getEventToken(accessToken || '', eventUrl);
+    const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/cases`;
+    return submitEvent(accessToken || '', url, 'citizenCreateApplication', eventToken, data);
   },
 
   async updateCase(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
@@ -235,44 +180,25 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
   },
 
-  async submitResponseToClaim(
-    accessToken: string | undefined,
-    ccdCaseId: string,
-    data: Partial<SubmitDefendantResponseData>
-  ): Promise<CcdCase> {
-    if (!ccdCaseId) {
+  async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+    if (!ccdCase.id) {
       throw new HTTPError('Cannot Submit Response to Case, CCD Case Not found', 500);
     }
+    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
+    const eventToken = await getEventToken(accessToken || '', eventUrl);
+    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
-    try {
-      const client = createGeneratedClient(accessToken || '');
-      const flow = await client.event('submitDefendantResponse').start(ccdCaseId);
-      const submitData: SubmitDefendantResponseData = {
-        ...flow.data,
-        ...data,
-      };
-      const result = await flow.submit(submitData);
-
-      return normaliseSubmitResult(result, submitData as unknown as Record<string, unknown>);
-    } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'submitResponseToClaim');
-    }
+    return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
   },
 
-  async getResponseToClaimData(
-    accessToken: string | undefined,
-    ccdCaseId: string
-  ): Promise<SubmitDefendantResponseData> {
-    if (!ccdCaseId) {
-      throw new HTTPError('Cannot Load Response to Claim Data, CCD Case Not found', 500);
-    }
-
+  async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {
+    const eventUrl = `${getBaseUrl()}/cases/${ccdCaseId}/event-triggers/respondPossessionClaim?ignore-warning=false`;
+    logger.info('getExistingCaseData event URL', { eventUrl });
     try {
-      const client = createGeneratedClient(accessToken || '');
-      const flow = await client.event('submitDefendantResponse').start(ccdCaseId);
-      return flow.data;
+      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
+      return response.data;
     } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'getResponseToClaimData');
+      throw convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
     }
   },
 };
