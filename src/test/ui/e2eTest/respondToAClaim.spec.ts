@@ -27,6 +27,7 @@ const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayload.claimantName;
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.NOTICE_SERVED = 'NO';
   } else {
@@ -48,6 +49,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   if (testInfo.title.includes('@noDefendants')) {
+    process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else if (testInfo.title.includes('@assured')) {
