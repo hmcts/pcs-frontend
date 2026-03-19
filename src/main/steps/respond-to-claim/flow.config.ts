@@ -71,7 +71,7 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           // Route to defendant name capture if defendant is unknown
-          condition: async (req: Request) => !isDefendantNameKnown(req),
+          condition: async (req: Request) => !(await isDefendantNameKnown(req)),
           nextStep: 'defendant-name-capture',
         },
       ],
@@ -122,7 +122,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !isWelshProperty(req),
+          condition: async (req: Request) => !(await isWelshProperty(req)),
           nextStep: 'tenancy-type-details',
         },
       ],
@@ -329,8 +329,12 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'repayments-made',
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const choseNo = req.session?.formData?.['repayments-agreed']?.confirmRepaymentsAgreed === 'no';
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const choseNo = currentStepData?.confirmRepaymentsAgreed === 'no';
             if (!choseNo) {
               return false;
             }
@@ -345,8 +349,11 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'repayments-agreed',
       routes: [
         {
-          condition: async (req: Request) =>
-            req.session?.formData?.['installment-payments']?.confirmInstallmentOffer === 'yes',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData?.confirmInstallmentOffer === 'yes',
           nextStep: 'how-much-afford-to-pay',
         },
       ],

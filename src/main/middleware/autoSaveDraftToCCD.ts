@@ -303,16 +303,18 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
   const keys = path.split('.');
   const result: Record<string, unknown> = {};
 
-  const nested = keys.reduce((acc, key, index) => {
+  let current: Record<string, unknown> = result;
+  keys.forEach((key, index) => {
     if (index === keys.length - 1) {
-      acc[key] = value;
-    } else {
-      acc[key] = {};
+      current[key] = value;
+      return;
     }
-    return acc[key] as Record<string, unknown>;
-  }, result);
 
-  return nested;
+    current[key] = {};
+    current = current[key] as Record<string, unknown>;
+  });
+
+  return result;
 }
 
 /**
