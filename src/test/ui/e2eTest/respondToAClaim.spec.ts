@@ -156,7 +156,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @noDefendants @regression', async () => {
@@ -341,7 +341,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -437,7 +437,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - No - RentArrearsDispute @regression', async () => {
@@ -568,6 +568,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 });
