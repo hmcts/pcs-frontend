@@ -1,6 +1,7 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
@@ -30,6 +31,7 @@
     {% endfor %}
 
     {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
   </form>
 
 {% endblock %}

@@ -1,6 +1,8 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
+
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
@@ -9,5 +11,6 @@
   <p class="govuk-body">This is a placeholder for Licensed landlord step.</p>
   <form method="post" action="{{ url }}">
     {{ stepButtons(continue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}

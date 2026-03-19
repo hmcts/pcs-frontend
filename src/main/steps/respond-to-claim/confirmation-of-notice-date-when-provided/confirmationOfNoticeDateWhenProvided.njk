@@ -3,6 +3,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
@@ -35,6 +36,7 @@
     {% endfor %}
 
     {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
   </form>
 
 {% endblock %}

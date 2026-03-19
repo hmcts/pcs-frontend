@@ -1,5 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}Contact Preferences - HM Courts & Tribunals Service – GOV.UK{% endblock %}
@@ -19,6 +20,7 @@
 
   <form method="post" action="{{ url }}" novalidate>
     {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
   </form>
 
 {% endblock %}

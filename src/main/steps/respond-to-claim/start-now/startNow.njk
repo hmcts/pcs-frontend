@@ -1,6 +1,7 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
@@ -85,6 +86,7 @@
         isStartButton: true
       }) }}
     </div>
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
 

@@ -1,6 +1,7 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block mainContent %}
   {% if errorSummary %}
@@ -10,5 +11,6 @@
   <p class="govuk-body">This is a placeholder for the counterclaim step.</p>
   <form method="post" action="{{ url }}">
     {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}

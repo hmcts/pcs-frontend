@@ -2,6 +2,7 @@
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}{{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
@@ -38,7 +39,7 @@
     {% endfor %}
 
     {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
   </form>
-
 {% endblock %}
 

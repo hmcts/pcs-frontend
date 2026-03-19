@@ -6,6 +6,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}
@@ -190,6 +191,7 @@
     </div>
     {% endif %}
     {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
   </form>
 
 
