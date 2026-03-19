@@ -7,7 +7,6 @@ module.exports = {
     '^.+\\.ts?$': 'ts-jest',
   },
   moduleNameMapper: {
-    '^@hmcts/ccd-event-runtime$': '<rootDir>/../../sdk/ccd-event-runtime/src/index.ts',
     '^openid-client$': '<rootDir>/src/test/unit/modules/oidc/__mocks__/openid-client.ts',
     '^steps$': '<rootDir>/src/main/steps',
     '^app/(.*)$': '<rootDir>/src/main/app/$1',
@@ -16,5 +15,5 @@ module.exports = {
   },
   testPathIgnorePatterns: ['/__mocks__/'],
   coverageProvider: 'v8',
-  transformIgnorePatterns: ['node_modules/(?!(jose|@panva|oidc-token-hash|@hmcts/ccd-event-runtime)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(jose|@panva|oidc-token-hash)/)'],
 };

@@ -148,15 +148,7 @@ describe('OIDCModule', () => {
     it('should successfully setup the OIDC client', async () => {
       await oidcModule['setupClient']();
 
-      expect(discovery).toHaveBeenCalledWith(
-        expect.any(URL),
-        'test-client-id',
-        'test-secret',
-        undefined,
-        expect.objectContaining({
-          execute: expect.any(Array),
-        })
-      );
+      expect(discovery).toHaveBeenCalledWith(expect.any(URL), 'test-client-id', 'test-secret');
     });
 
     it('should throw OIDCAuthenticationError when setup fails', async () => {

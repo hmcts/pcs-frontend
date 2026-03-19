@@ -13,9 +13,7 @@ export class OIDCModule {
   private readonly logger = Logger.getLogger('oidc');
 
   constructor() {
-    void this.setupClient().catch(error => {
-      this.logger.error('Initial OIDC client setup failed, middleware will retry on demand:', error);
-    });
+    this.setupClient();
   }
 
   private async setupClient(): Promise<void> {
@@ -29,11 +27,9 @@ export class OIDCModule {
       // Create client with the actual issuer
       const clientId = this.oidcConfig.clientId;
       const clientSecret = config.get<string>('secrets.pcs.pcs-frontend-idam-secret');
-      const discoveryOptions =
-        issuer.protocol === 'http:' ? { execute: [client.allowInsecureRequests] } : undefined;
 
       // Create the client configuration with the server discovery
-      this.clientConfig = await client.discovery(issuer, clientId, clientSecret, undefined, discoveryOptions);
+      this.clientConfig = await client.discovery(issuer, clientId, clientSecret);
     } catch (error) {
       this.logger.error('Failed to setup OIDC client:', error);
       throw new OIDCAuthenticationError('Failed to initialize OIDC client');

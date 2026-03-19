@@ -6,13 +6,11 @@
   },
   "include": [
     "src/main/generated/**/*",
-    "src/main/examples/**/*",
     "src/test/ui/data/api-data/createCase.api.data.ts",
     "src/test/ui/data/api-data/index.ts",
     "src/test/ui/utils/actions/custom-actions/createCaseAPI.action.ts",
     "src/test/ui/utils/actions/custom-actions/index.ts",
-    "src/test/unit/generated/**/*.ts",
-    "src/test/unit/ui/**/*.ts"
+    "src/test/unit/generated/**/*.ts"
   ],
   "exclude": []
 }

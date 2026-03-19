@@ -1,14 +1,20 @@
 import { Request } from 'express';
 
-import type { SubmitDefendantResponseData } from '../../generated/ccd/PCS';
+import { CcdCase, PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
 import { ccdCaseService } from '../../services/ccdCaseService';
 
-export const submitDefendantResponseDraft = async (
+// Wrap the possession claim response in a ccd case object and submit via ccdCaseService
+export const buildCcdCaseForPossessionClaimResponse = async (
   req: Request,
-  responseData: SubmitDefendantResponseData
-) =>
-  ccdCaseService.submitResponseToClaim(
-    req.session?.user?.accessToken,
-    req.res?.locals.validatedCase?.id || '',
-    responseData
-  );
+  possessionClaimResponse: PossessionClaimResponse,
+  submitDraftAnswers: boolean
+): Promise<CcdCase> => {
+  const ccdCase: CcdCase = {
+    id: req.res?.locals.validatedCase?.id,
+    data: {
+      possessionClaimResponse,
+      submitDraftAnswers: submitDraftAnswers ? 'Yes' : 'No',
+    },
+  };
+  return ccdCaseService.submitResponseToClaim(req.session?.user?.accessToken, ccdCase);
+};

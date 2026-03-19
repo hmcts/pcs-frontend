@@ -9,7 +9,8 @@ import {
   submitCaseEventTokenApiData,
 } from '../../../data/api-data';
 import { IAction, actionData, actionRecord } from '../../interfaces';
-import { caseBindings, type CreateClaimData } from '../../../../../main/generated/ccd/PCS';
+import { caseBindings } from '../../../../../main/generated/ccd/PCS/event-contracts';
+import type { CreateClaimData } from '../../../../../main/generated/ccd/PCS/dto-types';
 
 export const caseInfo: { id: string; fid: string; state: string } = { id: '', fid: '', state: '' };
 
