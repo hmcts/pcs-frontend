@@ -22,5 +22,5 @@ export * from './paymentInterstitial.page.data';
 export * from './repaymentsAgreed.page.data';
 export * from './tenancyDateUnknown.page.data';
 export * from './tenancyDateDetails.page.data';
-export * from './tenancyStartDateUnknown.page.data';
+export * from './dashboard.page.data';
 export * from './licensedLandlord.page.data';
