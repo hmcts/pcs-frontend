@@ -1,5 +1,13 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*", "playwright.config.ts"],
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*",
+    "playwright.config.ts",
+    "playwright.sauce.config.ts"
+  ],
   "exclude": []
 }

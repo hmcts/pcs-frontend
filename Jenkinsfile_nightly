@@ -1,7 +1,6 @@
 #!groovy
 
 properties([
-  // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
     choice(
@@ -34,6 +33,11 @@ properties([
       defaultValue: true,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
+    booleanParam(
+      name: 'RUN_SAUCE_CROSSBROWSER',
+      defaultValue: false,
+      description: 'Run Sauce Labs Playwright (saucectl). Requires Key Vault secrets (see docs/sauce-jenkins.md) and Sauce Connect on the agent.'
+    ),
   ])
 ])
 
@@ -53,16 +57,23 @@ static Map secret(String secretName, String envVariable) {
   ]
 }
 
-def secrets = [
-  'pcs-${env}': [
-    secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')
-  ]
+def keyVaultEntries = [
+  secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
+  secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')
 ]
+if (params.RUN_SAUCE_CROSSBROWSER) {
+  keyVaultEntries += [
+    secret('sauce-username', 'SAUCE_USERNAME'),
+    secret('sauce-access-key', 'SAUCE_ACCESS_KEY'),
+    secret('sauce-tunnel-name', 'SAUCE_TUNNEL_NAME'),
+    secret('sauce-tunnel-owner', 'SAUCE_TUNNEL_OWNER')
+  ]
+}
+def secrets = ['pcs-${env}': keyVaultEntries]
 
 withNightlyPipeline(type, product, component) {
   validateInputs()
-  enableSlackNotifications('#pcs-tech')
+  enableSlackNotifications('#qa-pipeline-status')
   loadVaultSecrets(secrets)
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
@@ -70,6 +81,9 @@ withNightlyPipeline(type, product, component) {
 
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    if (params.RUN_SAUCE_CROSSBROWSER) {
+      runSauceCrossbrowserTests(yarnBuilder)
+    }
     runE2ETests(yarnBuilder)
     if (params.ACCESSIBILITY_TESTS) {
       runAccessibilityTests(yarnBuilder)
@@ -95,6 +109,25 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+}
+
+def runSauceCrossbrowserTests(yarnBuilder) {
+  stage('Sauce cross-browser') {
+    node {
+      checkout scm
+      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+        withEnv(['BROWSER_GROUP=chrome']) {
+          yarnBuilder.yarn('test-crossbrowser-e2e')
+        }
+      }
+      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+        withEnv(['BROWSER_GROUP=firefox']) {
+          yarnBuilder.yarn('test-crossbrowser-e2e')
+        }
+      }
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/test-results/**,**/playwright-report/**,.sauce/**'
+    }
+  }
 }
 
 def runE2ETests(yarnBuilder) {
@@ -163,7 +196,7 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
   def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
-    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    slackSend(channel: '#qa-pipeline-status', message: msg)
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }

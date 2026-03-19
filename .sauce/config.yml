@@ -1,0 +1,82 @@
+apiVersion: v1alpha
+kind: playwright
+
+sauce:
+  region: eu-central-1
+  concurrency: 1
+  retries: 0
+  metadata:
+    tags:
+      - pcs-frontend
+      - crossbrowser
+
+playwright:
+  version: "1.58.1"
+  configFile: playwright.sauce.config.ts
+nodeVersion: "v20"
+rootDir: ./
+
+npm:
+  registries:
+    - url: https://registry.npmjs.org
+  usePackageLock: false
+
+env:
+  CI: "true"
+  TEST_URL: "https://pcs.aat.platform.hmcts.net/"
+  NPM_CONFIG_PRODUCTION: "false"
+  IDAM_WEB_URL: "https://idam-api.aat.platform.hmcts.net"
+  IDAM_TESTING_SUPPORT_URL: "https://idam-testing-support-api.aat.platform.hmcts.net"
+
+suites:
+  - name: PCS crossbrowser chrome windows
+    platformName: "Windows 10"
+    screenResolution: "1440x900"
+    preExec:
+      - npm install --include=dev
+      - node ./scripts/sauce-remove-playwright.js
+    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+    passThreshold: 1
+    params:
+      browserName: "chromium"
+      project: "chromium"
+      grep: "@crossbrowser"
+
+  - name: PCS crossbrowser chrome mac
+    platformName: "macOS 13"
+    screenResolution: "1440x900"
+    preExec:
+      - npm install --include=dev
+      - node ./scripts/sauce-remove-playwright.js
+    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+    passThreshold: 1
+    params:
+      browserName: "chromium"
+      project: "chromium"
+      grep: "@crossbrowser"
+
+  - name: PCS crossbrowser firefox windows
+    platformName: "Windows 10"
+    screenResolution: "1440x900"
+    preExec:
+      - npm install --include=dev
+      - node ./scripts/sauce-remove-playwright.js
+    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+    passThreshold: 1
+    params:
+      browserName: "firefox"
+      project: "firefox"
+      grep: "@crossbrowser"
+
+  - name: PCS crossbrowser firefox mac
+    platformName: "macOS 13"
+    screenResolution: "1440x900"
+    preExec:
+      - npm install --include=dev
+      - node ./scripts/sauce-remove-playwright.js
+    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+    passThreshold: 1
+    params:
+      browserName: "firefox"
+      project: "firefox"
+      grep: "@crossbrowser"

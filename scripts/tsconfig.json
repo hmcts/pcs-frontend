@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.scripts.json",
+  "compilerOptions": {
+    "rootDir": ".."
+  },
+  "include": [
+    "./**/*.ts",
+    "../src/test/ui/crossbrowser/**/*.ts",
+    "../playwright.sauce.config.ts"
+  ]
+}
