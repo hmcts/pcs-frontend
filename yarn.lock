@@ -2071,8 +2071,8 @@ __metadata:
 
 "@hmcts/ccd-event-runtime@file:../../sdk/ccd-event-runtime::locator=pcs-frontend%40workspace%3A.":
   version: 0.0.1
-  resolution: "@hmcts/ccd-event-runtime@file:../../sdk/ccd-event-runtime#../../sdk/ccd-event-runtime::hash=806de2&locator=pcs-frontend%40workspace%3A."
-  checksum: 10/010de30256160eb66b291177a7e36536955d8cc936594102235eb241abaa40b3af9a3891c4a3344b647be56cfb5e39abaa8c45e2caeeda7b0568bc52679f8e71
+  resolution: "@hmcts/ccd-event-runtime@file:../../sdk/ccd-event-runtime#../../sdk/ccd-event-runtime::hash=013df5&locator=pcs-frontend%40workspace%3A."
+  checksum: 10/44964facd692fb168438cde932d8b4ac1e67ae8f65e206266e705875503f8494359572ec7d90221e71fd8f49d7b3a2d53687526935493a7160313581452fc207
   languageName: node
   linkType: hard
 

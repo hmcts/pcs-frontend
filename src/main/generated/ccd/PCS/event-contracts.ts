@@ -13,12 +13,10 @@ export const caseBindings = defineCaseBindings<EventDtoMap>({
   events: {
   "createPossessionClaim": {
     fieldNamespace: "claim.create",
-    fields: ["crossBorderCountriesList", "crossBorderCountry1", "crossBorderCountry2", "feeAmount", "legislativeCountry", "postcodeNotAssignedView", "propertyAddress", "showCrossBorderPage", "showPostcodeNotAssignedToCourt", "showPropertyNotEligiblePage"],
     pages: ["crossBorderPostcodeSelection", "enterPropertyAddress", "postcodeNotAssignedToCourt", "propertyNotEligible", "startTheService"],
   },
   "submitDefendantResponse": {
     fieldNamespace: "resp.def",
-    fields: ["correspondenceAddress", "submitDraftAnswers"],
     pages: [],
   },
   },
