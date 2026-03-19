@@ -14,13 +14,14 @@ function generateRandomString(length: number): string {
 
 export const nonRentArrearsDispute = {
   mainHeader: `Disputing other parts of the claim`,
-  partOfClaimParagraph: `You should view the claim (opens in new tab) to see if there’s any other parts of the claim that are incorrect or you disagree with.`,
+  partOfClaimParagraph: `You should`,
+  toSeeIfParagraph: `to see if there’s any other parts of the claim that are incorrect or you disagree with.`,
   viewTheClaimLink: `view the claim (opens in new tab)`,
   mainHeaderGovServiceHiddenNewTab: `Welcome to GOV.UK`,
   thisIncludesParagraph: `This includes:`,
   groundsForPossessionList: `${submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName}’s grounds for possession (their reasons for making the claim)`,
   anyDocumentsList: `any documents they’ve uploaded to support their claim`,
-  anyOtherList: ` any other information they’ve given as part of their claim`,
+  anyOtherList: `any other information they’ve given as part of their claim`,
   doYouWantToDisputeQuestion: `Do you want to dispute any other parts of the claim?`,
   explainPartOfClaimHiddenTextLabel: `Explain which parts of the claim you do not agree with`,
   explainClaimTextInput: `Example - Do not agree with claim 1,2 and 3`,
