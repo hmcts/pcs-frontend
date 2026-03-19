@@ -3,11 +3,13 @@ import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
+  //mandatory radio button selection
   await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
     message: tenancyTypeDetails.selectIfTenancyDetailsErrorMessage,
   });
+  //mandatory text field for 'No' radio button selection
   await performAction('clickRadioButton', tenancyTypeDetails.noRadioOption);
   await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
