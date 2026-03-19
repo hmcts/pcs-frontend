@@ -26,19 +26,65 @@ function createFieldsetLegend(
   };
 }
 
-export function buildComponentConfig(
-  field: FormFieldConfig,
-  label: string,
-  hint: string | undefined,
-  fieldValue: unknown,
-  translatedOptions: { value?: string; text?: string; divider?: string }[] | undefined,
-  hasError: boolean,
-  errorText: string | undefined,
-  index: number,
-  hasTitle: boolean,
-  t: TFunction,
-  nunjucksEnv: Environment
-): ComponentConfig {
+function applyCharacterCountMessages({
+  field,
+  component,
+  t,
+}: {
+  field: FormFieldConfig;
+  component: Record<string, unknown>;
+  t: TFunction;
+}): void {
+  if (!field.maxLength) {
+    return;
+  }
+
+  if (field.characterCountMessageKey) {
+    const staticCountText = t(field.characterCountMessageKey);
+    if (staticCountText && staticCountText !== field.characterCountMessageKey) {
+      component.textareaDescriptionText = staticCountText;
+      component.charactersUnderLimitText = { one: staticCountText, other: staticCountText };
+      component.charactersAtLimitText = staticCountText;
+      component.charactersOverLimitText = { one: staticCountText, other: staticCountText };
+    }
+    return;
+  }
+
+  const characterCount = t('characterCount', { returnObjects: true }) as Record<string, unknown> | string;
+  if (characterCount && typeof characterCount === 'object') {
+    Object.assign(component, {
+      charactersUnderLimitText: characterCount.charactersUnderLimitText,
+      charactersAtLimitText: characterCount.charactersAtLimitText,
+      charactersOverLimitText: characterCount.charactersOverLimitText,
+    });
+  }
+}
+
+export function buildComponentConfig({
+  field,
+  label,
+  hint,
+  fieldValue,
+  translatedOptions,
+  hasError,
+  errorText,
+  index,
+  hasTitle,
+  t,
+  nunjucksEnv,
+}: {
+  field: FormFieldConfig;
+  label: string;
+  hint: string | undefined;
+  fieldValue: unknown;
+  translatedOptions: { value?: string; text?: string; divider?: string }[] | undefined;
+  hasError: boolean;
+  errorText: string | undefined;
+  index: number;
+  hasTitle: boolean;
+  t: TFunction;
+  nunjucksEnv: Environment;
+}): ComponentConfig {
   const isFirstField = index === 0 && !hasTitle;
   const component: Record<string, unknown> = {
     id: field.name,
@@ -79,19 +125,11 @@ export function buildComponentConfig(
         classes: field.labelClasses,
       };
 
-      // Add translated character count messages
-      // i18next handles pluralization via the 'one' and 'other' keys in the translation object
-      // The GOV.UK component will use these keys to select the correct plural form
-      if (field.maxLength) {
-        const characterCount = t('characterCount', { returnObjects: true }) as Record<string, unknown> | string;
-        if (characterCount && typeof characterCount === 'object') {
-          Object.assign(component, {
-            charactersUnderLimitText: characterCount.charactersUnderLimitText,
-            charactersAtLimitText: characterCount.charactersAtLimitText,
-            charactersOverLimitText: characterCount.charactersOverLimitText,
-          });
-        }
-      }
+      applyCharacterCountMessages({
+        field,
+        component,
+        t,
+      });
 
       componentType = 'characterCount';
       break;

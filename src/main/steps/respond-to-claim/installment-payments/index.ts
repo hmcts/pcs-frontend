@@ -1,7 +1,7 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'installment-payments',
@@ -34,9 +34,16 @@ export const step: StepDefinition = createFormStep({
   ],
   extendGetContent: req => {
     const caseData = req.res?.locals?.validatedCase?.data as { claimantName?: string } | undefined;
+    const claimantName = caseData?.claimantName || 'Treetops Housing';
+
+    // The locale `paragraph1` includes i18next interpolation placeholders (e.g. {{claimantName}}).
+    // The generic formBuilder translationKeys translation does not pass interpolation, so we
+    // compute the final string here to avoid showing literal `{{...}}` in the template.
+    const t = getTranslationFunction(req, 'installment-payments', ['common']);
 
     return {
-      claimantName: caseData?.claimantName || 'Treetops Housing',
+      claimantName,
+      paragraph1: t('paragraph1', { claimantName }),
     };
   },
 });

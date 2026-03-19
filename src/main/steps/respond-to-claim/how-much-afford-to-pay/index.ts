@@ -22,6 +22,7 @@ export const step: StepDefinition = createFormStep({
         label: 'amountQuestion',
         hint: 'amountHint',
       },
+      labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
       errorMessage: 'errors.installmentAmount',
       validator: value => {
         const amountString = String(value).trim();
@@ -49,10 +50,9 @@ export const step: StepDefinition = createFormStep({
       required: true,
       translationKey: {
         label: 'frequencyQuestion',
-        hint: 'frequencyHint',
       },
       errorMessage: 'errors.installmentFrequency',
-      legendClasses: 'govuk-fieldset__legend--m',
+      legendClasses: 'govuk-fieldset__legend--m govuk-!-font-size-19',
       options: [
         { value: 'weekly', translationKey: 'frequencyOptions.weekly' },
         { value: 'every2Weeks', translationKey: 'frequencyOptions.every2Weeks' },
@@ -67,7 +67,7 @@ export const step: StepDefinition = createFormStep({
     );
 
     if (amountField?.component) {
-      const component = amountField.component as Record<string, unknown>;
+      const component = amountField.component;
       const existingAttributes = (component.attributes as Record<string, unknown> | undefined) || {};
 
       component.prefix = { text: '£' };

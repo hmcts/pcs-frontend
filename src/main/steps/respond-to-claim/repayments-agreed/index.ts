@@ -1,7 +1,6 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
-
-import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',
@@ -11,8 +10,6 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
-    heading: 'question',
-    question: 'question',
   },
   fields: [
     {
@@ -34,10 +31,10 @@ export const step: StepDefinition = createFormStep({
               maxLength: 500,
               required: true,
               errorMessage: 'errors.repaymentsAgreementInfo',
-              labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
+              characterCountMessageKey: 'textAreaHint',
+              labelClasses: 'govuk-label--s govuk-!-font-weight-regular',
               translationKey: {
                 label: 'textAreaLabel',
-                hint: 'textAreaHint',
               },
             },
           },
@@ -53,9 +50,15 @@ export const step: StepDefinition = createFormStep({
       | { claimantName?: string; claimIssueDate?: string }
       | undefined;
 
+    const claimantName = caseData?.claimantName || 'Treetops Housing';
+    const claimIssueDate = caseData?.claimIssueDate || '20th May 2025';
+
+    const t = getTranslationFunction(req, 'repayments-agreed', ['common']);
+
     return {
-      claimantName: caseData?.claimantName || 'Treetops Housing',
-      claimIssueDate: caseData?.claimIssueDate || '20th May 2025',
+      claimantName,
+      claimIssueDate,
+      heading: t('question', { claimantName, claimIssueDate }),
     };
   },
 });
