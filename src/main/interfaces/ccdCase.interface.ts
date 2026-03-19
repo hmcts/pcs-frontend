@@ -5,6 +5,7 @@ export enum CaseState {
 
 export type YesNoValue = 'YES' | 'NO' | null;
 export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
+export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
 
@@ -44,6 +45,7 @@ export interface PossessionClaimResponse {
       address?: Address;
       phoneNumberProvided?: YesNoValue;
       phoneNumber?: string;
+      emailAddress?: string;
     };
   };
   defendantResponses?: {
@@ -52,9 +54,8 @@ export interface PossessionClaimResponse {
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
     contactByPhone?: YesNoValue;
-    contactByEmail?: YesNoValue;
-    contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
+    preferenceType?: ContactPreference;
     receivedFreeLegalAdvice?: string;
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
