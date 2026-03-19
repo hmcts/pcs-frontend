@@ -19,7 +19,6 @@ import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
-import { step as installmentPayments } from './installment-payments';
 import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
@@ -31,6 +30,7 @@ import { step as whatOtherRegularExpensesDoYouHave } from './regular-expenses';
 import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
+import { step as installmentPayments } from './installment-payments';
 import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
@@ -64,6 +64,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
+  'installment-payments': installmentPayments,
   'your-household-and-circumstances': yourHouseholdAndCircumstances,
   'do-you-have-any-dependant-children': doYouHaveAnyDependantChildren,
   'do-you-have-any-other-dependants': doYouHaveAnyOtherDependants,
@@ -78,5 +79,4 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,
   'what-other-regular-expenses-do-you-have': whatOtherRegularExpensesDoYouHave,
-  'installment-payments': installmentPayments,
 };

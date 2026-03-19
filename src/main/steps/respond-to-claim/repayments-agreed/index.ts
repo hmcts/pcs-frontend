@@ -19,11 +19,22 @@ export const step: StepDefinition = createFormStep({
     if (!repaymentsForm) {
       return;
     }
+    const existingRepaymentDetails =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
+        ?.repaymentAgreedDetails;
+
+    const repaymentAgreedDetails =
+      repaymentsAgreed === 'yes'
+        ? (repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined)
+        : existingRepaymentDetails
+          ? ''
+          : undefined;
+
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         paymentAgreement: {
           repaymentPlanAgreed: repaymentsAgreed === 'yes' ? 'YES' : repaymentsAgreed === 'no' ? 'NO' : 'NOT_SURE',
-          repaymentAgreedDetails: repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined,
+          repaymentAgreedDetails,
         },
       },
     };
