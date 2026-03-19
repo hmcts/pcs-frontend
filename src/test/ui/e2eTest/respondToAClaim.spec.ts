@@ -132,7 +132,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
   });
 
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @noDefendants @regression', async () => {
@@ -169,8 +171,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -212,8 +215,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.imNotSureRadioOption,
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.yesRadioOption,
+      disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -221,48 +226,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.yesRadioOption,
       repaymentInfo: repaymentsMade.detailsTextInput,
-    });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
-  });
-
-  test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute @noDefendants @regression', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameTextInput,
-      lName: defendantNameCapture.lastNameTextInput,
-    });
-    await performAction('enterDateOfBirthDetails');
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-      postcode: correspondenceAddress.walesPostcodeTextInput,
-    });
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.noRadioOption,
-    });
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
-    );
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('enterTenancyStartDetailsUnKnown', {
-      tsDay: '15',
-      tsMonth: '11',
-      tsYear: '2024',
-    });
-    await performAction('selectNoticeDetails', {
-      option: confirmationOfNoticeGiven.noRadioOption,
-    });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
@@ -295,8 +258,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', tenancyDetails.mainHeader);
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
   });
 
   test('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -410,45 +374,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.noRadioOption,
-    });
-    await performValidation('mainHeader', rentArrearsDispute.mainHeader);
-    await performAction('clickButton', rentArrearsDispute.continueButton);
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
-  });
-
-  test('RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - RentArrearsDispute @regression', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.mainHeader,
-      option: defendantNameConfirmation.yesRadioOption,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
-    });
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.noRadioOption,
-    });
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
-    await performAction('selectTenancyStartDateKnown', {
-      option: tenancyDateDetails.iAmNotSureRadioOption,
-    });
-    await performAction('selectNoticeDetails', {
-      option: confirmationOfNoticeGiven.imNotSureRadioOption,
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
