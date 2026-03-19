@@ -20,6 +20,7 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
 } from '../../../data/page-data';
+import { formatText } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
@@ -319,8 +320,4 @@ export class RespondToClaimAction implements IAction {
       }
     }
   }
-}
-
-export function formatText(value: string | number | boolean | string[] | object): string {
-  return typeof value === 'string' ? value.toLowerCase().replace(/_/g, ' ').trim() : String(value);
 }
