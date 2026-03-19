@@ -35,7 +35,7 @@ properties([
     ),
     booleanParam(
       name: 'RUN_SAUCE_CROSSBROWSER',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Run Sauce Labs Playwright (saucectl). Requires Key Vault secrets (see docs/sauce-jenkins.md) and Sauce Connect on the agent.'
     ),
   ])

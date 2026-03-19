@@ -4,17 +4,7 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { pageNotFound } from '../data/page-data/pageNotFound.page.data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-function resolveE2eBaseUrl(): string {
-  const fromEnv = process.env.TEST_URL?.trim();
-  if (fromEnv) {
-    return fromEnv.endsWith('/') ? fromEnv : `${fromEnv}/`;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  const nodeConfig = require('config') as { get: (key: string) => string };
-  return nodeConfig.get('e2e.testUrl');
-}
-
-const home_url = resolveE2eBaseUrl();
+const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
