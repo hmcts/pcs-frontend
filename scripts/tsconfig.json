@@ -3,9 +3,5 @@
   "compilerOptions": {
     "rootDir": ".."
   },
-  "include": [
-    "./**/*.ts",
-    "../src/test/ui/crossbrowser/**/*.ts",
-    "../playwright.sauce.config.ts"
-  ]
+  "include": ["./**/*.ts", "../playwright.sauce.config.ts"]
 }

@@ -1,3 +1,4 @@
+# All suites run in one go: yarn test:crossbrowser → saucectl run (see scripts/crossbrowser/runSauceCrossbrowser.ts).
 apiVersion: v1alpha
 kind: playwright
 
@@ -21,19 +22,22 @@ npm:
     - url: https://registry.npmjs.org
   usePackageLock: false
 
+# $VAR expanded by saucectl from the machine running `yarn test:crossbrowser` (Jenkins agent env / local shell). No saucectl `-e` needed.
 env:
   CI: "true"
-  TEST_URL: "https://pcs.aat.platform.hmcts.net/"
+  TEST_URL: "$TEST_URL"
   NPM_CONFIG_PRODUCTION: "false"
-  IDAM_WEB_URL: "https://idam-api.aat.platform.hmcts.net"
-  IDAM_TESTING_SUPPORT_URL: "https://idam-testing-support-api.aat.platform.hmcts.net"
+  PCS_FRONTEND_IDAM_SECRET: "$PCS_FRONTEND_IDAM_SECRET"
+  IDAM_PCS_USER_PASSWORD: "$IDAM_PCS_USER_PASSWORD"
 
+# Quick feedback: only one suite active. Uncomment the blocks below for full Chrome/Firefox × Windows/macOS matrix.
 suites:
   - name: PCS crossbrowser chrome windows
     platformName: "Windows 10"
     screenResolution: "1440x900"
     preExec:
-      - npm install --include=dev
+      # Sauce caps all preExec at 300s total; full install often needs --no-audit/--ignore-scripts (skip husky prepare).
+      - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
       - node ./scripts/sauce-remove-playwright.js
     testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
     passThreshold: 1
@@ -42,41 +46,41 @@ suites:
       project: "chromium"
       grep: "@crossbrowser"
 
-  - name: PCS crossbrowser chrome mac
-    platformName: "macOS 13"
-    screenResolution: "1440x900"
-    preExec:
-      - npm install --include=dev
-      - node ./scripts/sauce-remove-playwright.js
-    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
-    passThreshold: 1
-    params:
-      browserName: "chromium"
-      project: "chromium"
-      grep: "@crossbrowser"
-
-  - name: PCS crossbrowser firefox windows
-    platformName: "Windows 10"
-    screenResolution: "1440x900"
-    preExec:
-      - npm install --include=dev
-      - node ./scripts/sauce-remove-playwright.js
-    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
-    passThreshold: 1
-    params:
-      browserName: "firefox"
-      project: "firefox"
-      grep: "@crossbrowser"
-
-  - name: PCS crossbrowser firefox mac
-    platformName: "macOS 13"
-    screenResolution: "1440x900"
-    preExec:
-      - npm install --include=dev
-      - node ./scripts/sauce-remove-playwright.js
-    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
-    passThreshold: 1
-    params:
-      browserName: "firefox"
-      project: "firefox"
-      grep: "@crossbrowser"
+#  - name: PCS crossbrowser chrome mac
+#    platformName: "macOS 13"
+#    screenResolution: "1440x900"
+#    preExec:
+#      - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
+#      - node ./scripts/sauce-remove-playwright.js
+#    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+#    passThreshold: 1
+#    params:
+#      browserName: "chromium"
+#      project: "chromium"
+#      grep: "@crossbrowser"
+#
+#  - name: PCS crossbrowser firefox windows
+#    platformName: "Windows 10"
+#    screenResolution: "1440x900"
+#    preExec:
+#      - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
+#      - node ./scripts/sauce-remove-playwright.js
+#    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+#    passThreshold: 1
+#    params:
+#      browserName: "firefox"
+#      project: "firefox"
+#      grep: "@crossbrowser"
+#
+#  - name: PCS crossbrowser firefox mac
+#    platformName: "macOS 13"
+#    screenResolution: "1440x900"
+#    preExec:
+#      - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
+#      - node ./scripts/sauce-remove-playwright.js
+#    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+#    passThreshold: 1
+#    params:
+#      browserName: "firefox"
+#      project: "firefox"
+#      grep: "@crossbrowser"

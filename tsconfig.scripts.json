@@ -10,10 +10,6 @@
     "skipLibCheck": true,
     "noUnusedLocals": true
   },
-  "include": [
-    "scripts/**/*.ts",
-    "playwright.sauce.config.ts",
-    "src/test/ui/crossbrowser/**/*.ts"
-  ],
+  "include": ["scripts/**/*.ts", "playwright.sauce.config.ts"],
   "exclude": []
 }
