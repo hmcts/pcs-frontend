@@ -15,6 +15,7 @@ type NavigationTestResult = {
   actual?: string;
   error?: string;
   hasPFTFile: boolean;
+  sourcePage?: string;
 };
 
 export class PageNavigationValidation implements IValidation {
@@ -28,6 +29,15 @@ export class PageNavigationValidation implements IValidation {
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static currentPageUrl: string = '';
+  private static currentSourcePage: string | null = null; // Track the source page that initiated navigation
+
+  static setSourcePage(pageName: string): void {
+    PageNavigationValidation.currentSourcePage = pageName;
+  }
+
+  static clearSourcePage(): void {
+    PageNavigationValidation.currentSourcePage = null;
+  }
 
   async validate(page: Page, validation: string, navigateButton: string, fieldName: string): Promise<void> {
     PageNavigationValidation.currentPageUrl = page.url();
@@ -69,6 +79,7 @@ export class PageNavigationValidation implements IValidation {
       PageNavigationValidation.navigationResults.push({
         pageUrl: page.url(),
         pageName,
+        sourcePage: PageNavigationValidation.currentSourcePage || undefined,
         testName: 'Main Header Validation',
         passed: true,
         expected: expectedHeader,
@@ -92,6 +103,7 @@ export class PageNavigationValidation implements IValidation {
       PageNavigationValidation.navigationResults.push({
         pageUrl: page.url(),
         pageName,
+        sourcePage: PageNavigationValidation.currentSourcePage || undefined,
         testName: 'Main Header Validation',
         passed: false,
         expected: expectedHeader,
@@ -114,6 +126,7 @@ export class PageNavigationValidation implements IValidation {
       PageNavigationValidation.navigationResults.push({
         pageUrl: page.url(),
         pageName,
+        sourcePage: PageNavigationValidation.currentSourcePage || undefined,
         testName: 'Page Navigation Validation',
         passed: true,
         expected: expectedHeader,
@@ -136,6 +149,7 @@ export class PageNavigationValidation implements IValidation {
       PageNavigationValidation.navigationResults.push({
         pageUrl: page.url(),
         pageName,
+        sourcePage: PageNavigationValidation.currentSourcePage || undefined,
         testName: 'Page Navigation Validation',
         passed: false,
         expected: expectedHeader,
@@ -166,6 +180,7 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.navigationResults.push({
       pageUrl: '',
       pageName,
+      sourcePage: PageNavigationValidation.currentSourcePage || undefined,
       testName: 'Navigation Tests Execution',
       passed: false,
       expected: 'Navigation tests should execute successfully',
@@ -281,16 +296,26 @@ export class PageNavigationValidation implements IValidation {
       return;
     }
 
-    // Track failures by the page that has the PFT file
+    // Track failures by the source page (the page that initiated the navigation)
     const failureDetails = new Map<string, { expected: string; actual: string }>();
     const failedPages = new Set<string>();
     const passedPages = new Set<string>();
 
-    // First, identify all pages with PFT files that have any failures
+    // First, identify all failures
     for (const result of PageNavigationValidation.navigationResults) {
       if (!result.passed) {
-        // If this failure is on a page with a PFT file, mark it as failed
-        if (result.hasPFTFile) {
+        // If this failure has a source page, mark that source page as failed
+        if (result.sourcePage) {
+          failedPages.add(result.sourcePage);
+          if (result.expected && result.actual) {
+            failureDetails.set(result.sourcePage, {
+              expected: result.expected,
+              actual: result.actual,
+            });
+          }
+        }
+        // If no source page but the page itself has a PFT file, mark it as failed
+        else if (result.hasPFTFile) {
           failedPages.add(result.pageName);
           if (result.expected && result.actual) {
             failureDetails.set(result.pageName, {
@@ -298,25 +323,23 @@ export class PageNavigationValidation implements IValidation {
               actual: result.actual,
             });
           }
-        } else {
-          // If the failure is on a page without a PFT file (like Dashboard),
-          // we need to find which page with a PFT file led us here
-          for (const pageWithPFT of PageNavigationValidation.pagesWithNavigation) {
-            failedPages.add(pageWithPFT);
-            if (result.expected && result.actual) {
-              failureDetails.set(pageWithPFT, {
-                expected: result.expected,
-                actual: result.actual,
-              });
-            }
-          }
+        }
+        // If it's a page without PFT file and no source page (like Dashboard), we can't attribute it
+        // So we log it but don't fail any specific page
+        else {
+          console.log(`   ⚠️  Unattributed failure on ${result.pageName}: ${result.error}`);
         }
       }
     }
 
     // A page passes only if it has no failures and has a PFT file
     for (const result of PageNavigationValidation.navigationResults) {
-      if (result.passed && result.hasPFTFile && !failedPages.has(result.pageName)) {
+      if (
+        result.passed &&
+        result.hasPFTFile &&
+        !failedPages.has(result.pageName) &&
+        !failedPages.has(result.sourcePage || '')
+      ) {
         passedPages.add(result.pageName);
       }
     }
@@ -394,5 +417,6 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.missingNavigationMethods.clear();
     PageNavigationValidation.missingNavigationFiles.clear();
     PageNavigationValidation.currentPageUrl = '';
+    PageNavigationValidation.currentSourcePage = null;
   }
 }

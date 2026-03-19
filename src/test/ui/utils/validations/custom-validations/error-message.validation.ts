@@ -248,7 +248,7 @@ export class ErrorMessageValidation implements IValidation {
     console.log(`   Total pages validated for error messages: ${totalPages}`);
     console.log(`   Number of pages passed: ${passedPages.size}`);
     console.log(`   Number of pages failed: ${failedPages.size}`);
-    console.log(`   Number of missing EMV files: ${ErrorMessageValidation.missingEMVFiles.size}`);
+    console.log(`   Number of missing EMV methods: ${ErrorMessageValidation.missingEMVFiles.size}`);
 
     if (passedPages.size > 0) {
       console.log(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
@@ -259,7 +259,7 @@ export class ErrorMessageValidation implements IValidation {
     }
 
     if (ErrorMessageValidation.missingEMVFiles.size > 0) {
-      console.log(`   EMV files not found: ${Array.from(ErrorMessageValidation.missingEMVFiles).join(', ')}`);
+      console.log(`   EMV methods not found: ${Array.from(ErrorMessageValidation.missingEMVFiles).join(', ')}`);
     }
 
     // Show failure details
@@ -287,7 +287,7 @@ export class ErrorMessageValidation implements IValidation {
     } else if (passedPages.size > 0) {
       console.log('\n✅ ALL ERROR MESSAGE VALIDATIONS PASSED\n');
     } else if (ErrorMessageValidation.pagesWithEMV.size > 0) {
-      console.log('\n⚠️  EMV files found but no validations performed\n');
+      console.log('\n⚠️  EMV methods found but no validations performed\n');
     }
 
     ErrorMessageValidation.clearResults();

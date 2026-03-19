@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 
+import { escapeForRegex } from '../../common/string.utils';
 import { IValidation, validationRecord } from '../../interfaces';
 
 export class TextValidation implements IValidation {
@@ -7,6 +8,9 @@ export class TextValidation implements IValidation {
     switch (data.elementType) {
       case 'link':
         data.elementType = 'a';
+        break;
+      case 'subHeader':
+        data.elementType = 'h2';
         break;
       case 'paragraphLink':
         data.elementType = 'p > a';
@@ -27,7 +31,7 @@ export class TextValidation implements IValidation {
         data.elementType = '.govuk-details__text';
         break;
     }
-    const locator = page.locator(`${data.elementType}:has-text("${data.text}")`).first();
-    await expect(locator).toHaveText(String(data.text));
+    const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
+    await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(String(data.text))}\\s*$`));
   }
 }

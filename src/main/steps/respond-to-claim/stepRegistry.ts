@@ -19,6 +19,7 @@ import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
+import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
@@ -32,7 +33,9 @@ import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
-import { step as tenancyDetails } from './tenancy-details';
+import { step as tenancyDateDetails } from './tenancy-date-details';
+import { step as tenancyDateUnknown } from './tenancy-date-unknown';
+import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 
 export const stepRegistry: Record<string, StepDefinition> = {
@@ -47,7 +50,10 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
-  'tenancy-details': tenancyDetails,
+  'landlord-licensed': landlordLicensed,
+  'tenancy-type-details': tenancyTypeDetails,
+  'tenancy-date-unknown': tenancyDateUnknown,
+  'tenancy-date-details': tenancyDateDetails,
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
   'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
   'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,

@@ -7,6 +7,7 @@ import {
   isNoticeDateProvided,
   isNoticeServed,
   isRentArrearsClaim,
+  isTenancyStartDateKnown,
   isWelshProperty,
 } from '../utils';
 
@@ -31,7 +32,10 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-text-message',
     'dispute-claim-interstitial',
     'landlord-registered',
-    'tenancy-details',
+    'landlord-licensed',
+    'tenancy-type-details',
+    'tenancy-date-unknown',
+    'tenancy-date-details',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
     'confirmation-of-notice-date-when-not-provided',
@@ -78,8 +82,10 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-date-of-birth': {
-      previousStep: (_req: Request, formData: Record<string, unknown>) =>
-        'defendant-name-confirmation' in formData ? 'defendant-name-confirmation' : 'defendant-name-capture',
+      previousStep: async (req: Request) => {
+        const nameKnown = await isDefendantNameKnown(req);
+        return nameKnown ? 'defendant-name-confirmation' : 'defendant-name-capture';
+      },
       defaultNext: 'correspondence-address',
     },
     'correspondence-address': {
@@ -114,16 +120,47 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !(await isWelshProperty(req)),
-          nextStep: 'tenancy-details',
+          condition: async (req: Request) => !isWelshProperty(req),
+          nextStep: 'tenancy-type-details',
         },
       ],
+      defaultNext: 'tenancy-type-details',
     },
 
     'landlord-registered': {
-      defaultNext: 'tenancy-details',
+      defaultNext: 'landlord-licensed',
     },
-    'tenancy-details': {
+    'landlord-licensed': {
+      defaultNext: 'tenancy-type-details',
+    },
+    'tenancy-type-details': {
+      routes: [
+        {
+          condition: async (req: Request) => isTenancyStartDateKnown(req),
+          nextStep: 'tenancy-date-details',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => !(await isTenancyStartDateKnown(req)),
+          nextStep: 'tenancy-date-unknown',
+        },
+      ],
+      previousStep: async (req: Request, formData: Record<string, unknown>) => {
+        // Check formData to see which path was actually taken
+        // This honors the actual journey path even if case data changes mid-journey
+        if ('landlord-registered' in formData) {
+          return 'landlord-registered';
+        }
+
+        // Fallback: check current case data for new journeys
+
+        const welshProperty = await isWelshProperty(req);
+        if (welshProperty) {
+          return 'landlord-registered';
+        }
+        return 'dispute-claim-interstitial';
+      },
+    },
+    'tenancy-date-unknown': {
       routes: [
         {
           condition: async (req: Request) => isNoticeServed(req),
@@ -144,20 +181,30 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: async (req: Request, formData: Record<string, unknown>) => {
-        // Check formData to see which path was actually taken
-        // This honors the actual journey path even if case data changes mid-journey
-        if ('landlord-registered' in formData) {
-          return 'landlord-registered';
-        }
-
-        // Fallback: check current case data for new journeys
-        const welshProperty = await isWelshProperty(req);
-        if (welshProperty) {
-          return 'landlord-registered';
-        }
-        return 'dispute-claim-interstitial';
-      },
+      previousStep: 'tenancy-type-details',
+    },
+    'tenancy-date-details': {
+      routes: [
+        {
+          condition: async (req: Request) => isNoticeServed(req),
+          nextStep: 'confirmation-of-notice-given',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return rentArrears;
+          },
+          nextStep: 'rent-arrears-dispute',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const rentArrears = await isRentArrearsClaim(req);
+            return !rentArrears;
+          },
+          nextStep: 'non-rent-arrears-dispute',
+        },
+      ],
+      previousStep: 'tenancy-type-details',
     },
     'confirmation-of-notice-given': {
       routes: [
@@ -206,7 +253,10 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'non-rent-arrears-dispute',
         },
       ],
-      previousStep: 'tenancy-details',
+      previousStep: async (req: Request) => {
+        const tenancyStartDateKnown = await isTenancyStartDateKnown(req);
+        return tenancyStartDateKnown ? 'tenancy-date-details' : 'tenancy-date-unknown';
+      },
     },
 
     'confirmation-of-notice-date-when-provided': {
@@ -249,15 +299,15 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'rent-arrears-dispute': {
       defaultNext: 'counter-claim',
-      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
+      previousStep: req => getPreviousPageForArrears(req),
     },
     'non-rent-arrears-dispute': {
       defaultNext: 'counter-claim',
-      previousStep: (req: Request, _formData: Record<string, unknown>) => getPreviousPageForArrears(req),
+      previousStep: req => getPreviousPageForArrears(req),
     },
     'counter-claim': {
       defaultNext: 'payment-interstitial',
-      previousStep: async (req: Request, _formData: Record<string, unknown>) => {
+      previousStep: async (req: Request) => {
         const rentArrearsClaim = await isRentArrearsClaim(req);
         if (rentArrearsClaim) {
           return 'rent-arrears-dispute';
