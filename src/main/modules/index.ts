@@ -9,6 +9,7 @@ export { I18n } from './i18n';
 export { Logger } from './logger';
 export * from './opentelemetry';
 export * from './properties-volume';
+export { Csrf } from './csrf';
 
 // this is used to register the modules with the app in a certain order
-export const modules = ['Session', 'I18n', 'Nunjucks', 'Helmet', 'S2S', 'OIDCModule', 'LaunchDarkly'];
+export const modules = ['Session', 'I18n', 'Nunjucks', 'Helmet', 'S2S', 'OIDCModule', 'LaunchDarkly', 'Csrf'];

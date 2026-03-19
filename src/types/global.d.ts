@@ -61,6 +61,7 @@ declare module 'express' {
       t?: TFunction;
       lang?: string;
     } & Record<string, unknown>;
+    csrfToken?: () => string;
   }
 
   interface Application {
