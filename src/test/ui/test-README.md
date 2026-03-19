@@ -183,3 +183,18 @@ Missing elements: Submit button, Continue link
 - Page Navigation tests
 
 Please follow this confluence page for detailed instructions and guidelines- https://tools.hmcts.net/confluence/x/14FLd
+
+## 10. CI Pipeline Stages
+
+### PR & Master (Jenkinsfile_CNP)
+
+- **PR:** Runs functional tests (`@PR` scope) on Chrome. Optional full functional test if `enable_full_functional_tests` label is added.
+- **Master:** Runs functional tests (`@regression` scope) on Chrome. Sends Slack notification to `#hdp-qa-e2e-test-results` on failure.
+
+### Nightly (Jenkinsfile_nightly)
+
+- **Schedule:** Mon–Fri at ~07:00.
+- **E2E tests:** Runs per-browser stages (Chrome, Firefox, Safari) with separate Allure reports for each.
+- **Accessibility:** Runs `@accessibility` tests on Chrome.
+- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` with links to all 4 reports (Chrome, Firefox, Safari, Accessibility).
+- **Stage behaviour:** If a browser fails, the stage shows red but the pipeline continues to the next browser. All stages always run.
