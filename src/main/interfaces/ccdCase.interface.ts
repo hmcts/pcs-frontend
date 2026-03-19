@@ -52,7 +52,7 @@ export interface PossessionClaimResponse {
     contactByEmail?: YesNoValue;
     contactByPost?: YesNoValue;
     contactByText?: YesNoValue;
-    receivedFreeLegalAdvice?: string;
+    freeLegalAdvice?: string;
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
