@@ -44,13 +44,13 @@ const t = ((key: string) => {
     'frequencyOptions.every2Weeks': 'Every 2 weeks',
     'frequencyOptions.every4Weeks': 'Every 4 weeks',
     'frequencyOptions.monthly': 'Monthly',
-    'errors.instalmentAmount': 'Enter how much you could afford to pay in addition to the current rent',
-    'errors.instalmentAmountFormat': 'Enter an amount in the correct format, for example 148.00 or 148.50',
-    'errors.instalmentAmountMax':
+    'errors.installmentAmount': 'Enter how much you could afford to pay in addition to the current rent',
+    'errors.installmentAmountFormat': 'Enter an amount in the correct format, for example 148.00 or 148.50',
+    'errors.installmentAmountMax':
       'The amount you could afford to pay in addition to the current rent must be less than £1 billion',
-    'errors.instalmentAmountMin':
+    'errors.installmentAmountMin':
       'The amount you could afford to pay in addition to the current rent must be £0.00 or above',
-    'errors.instalmentFrequency': 'Select how frequently you could afford to pay this amount',
+    'errors.installmentFrequency': 'Select how frequently you could afford to pay this amount',
     // Common keys
     'buttons.saveAndContinue': 'Save and continue',
     'buttons.continue': 'Continue',
@@ -69,9 +69,9 @@ const t = ((key: string) => {
 }) as unknown as (key: string, options?: unknown) => string;
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { step } from '../../../../main/steps/respond-to-claim/instalments';
+import { step } from '../../../../main/steps/respond-to-claim/how-much-afford-to-pay';
 
-describe('respond-to-claim instalments step', () => {
+describe('respond-to-claim installments step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -101,7 +101,7 @@ describe('respond-to-claim instalments step', () => {
     expect(step.view).toContain('formBuilder.njk');
   });
 
-  it('GET renders instalments content and adds currency prefix', async () => {
+  it('GET renders installments content and adds currency prefix', async () => {
     const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { render: jest.fn() } as any;
@@ -118,7 +118,7 @@ describe('respond-to-claim instalments step', () => {
     );
 
     const viewModel = res.render.mock.calls[0][1] as { fields: Record<string, unknown>[] };
-    const amountField = viewModel.fields.find(f => f.name === 'instalmentAmount') as
+    const amountField = viewModel.fields.find(f => f.name === 'installmentAmount') as
       | { component?: { prefix?: { text?: string } } }
       | undefined;
     expect(amountField?.component?.prefix?.text).toBe('£');
@@ -126,8 +126,8 @@ describe('respond-to-claim instalments step', () => {
 
   it('POST returns validation errors for invalid amount and missing frequency', async () => {
     (validateForm as jest.Mock).mockReturnValue({
-      instalmentAmount: 'Enter an amount in the correct format, for example 148.00 or 148.50',
-      instalmentFrequency: 'Select how frequently you could afford to pay this amount',
+      installmentAmount: 'Enter an amount in the correct format, for example 148.00 or 148.50',
+      installmentFrequency: 'Select how frequently you could afford to pay this amount',
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -138,8 +138,8 @@ describe('respond-to-claim instalments step', () => {
       createReq({
         body: {
           action: 'continue',
-          instalmentAmount: 'ten',
-          instalmentFrequency: '',
+          installmentAmount: 'ten',
+          installmentFrequency: '',
         },
       }),
       res,
@@ -156,8 +156,8 @@ describe('respond-to-claim instalments step', () => {
     const req = createReq({
       body: {
         action: 'continue',
-        instalmentAmount: '123.45',
-        instalmentFrequency: 'monthly',
+        installmentAmount: '123.45',
+        installmentFrequency: 'monthly',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

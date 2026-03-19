@@ -4,7 +4,7 @@ import { flowConfig } from '../flow.config';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'instalment-payments',
+  stepName: 'installment-payments',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
@@ -21,7 +21,7 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'confirmInstalmentOffer',
+      name: 'confirmInstallmentOffer',
       type: 'radio',
       required: true,
       legendClasses: 'govuk-fieldset__legend--m',

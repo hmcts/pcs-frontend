@@ -13,10 +13,10 @@
     "monthly": "Monthly"
   },
   "errors": {
-    "instalmentAmount": "Enter how much you could afford to pay in addition to the current rent",
-    "instalmentAmountFormat": "Enter an amount in the correct format, for example 148.00 or 148.50",
-    "instalmentAmountMax": "The amount you could afford to pay in addition to the current rent must be less than £1 billion",
-    "instalmentAmountMin": "The amount you could afford to pay in addition to the current rent must be £0.00 or above",
-    "instalmentFrequency": "Select how frequently you could afford to pay this amount"
+    "installmentAmount": "Enter how much you could afford to pay in addition to the current rent",
+    "installmentAmountFormat": "Enter an amount in the correct format, for example 148.00 or 148.50",
+    "installmentAmountMax": "The amount you could afford to pay in addition to the current rent must be less than £1 billion",
+    "installmentAmountMin": "The amount you could afford to pay in addition to the current rent must be £0.00 or above",
+    "installmentFrequency": "Select how frequently you could afford to pay this amount"
   }
 }

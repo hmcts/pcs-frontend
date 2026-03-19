@@ -12,6 +12,6 @@
     "no": "cyNo"
   },
   "errors": {
-    "confirmInstalmentOffer": "cySelect whether you would like to offer to pay your arrears in instalments"
+    "confirmInstallmentOffer": "cySelect whether you would like to offer to pay your arrears in instalments"
   }
 }

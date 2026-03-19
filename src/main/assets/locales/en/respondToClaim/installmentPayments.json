@@ -12,6 +12,6 @@
     "no": "No"
   },
   "errors": {
-    "confirmInstalmentOffer": "Select whether you would like to offer to pay your arrears in instalments"
+    "confirmInstallmentOffer": "Select whether you would like to offer to pay your arrears in instalments"
   }
 }

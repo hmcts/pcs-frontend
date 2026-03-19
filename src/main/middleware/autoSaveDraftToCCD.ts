@@ -241,24 +241,24 @@ function instalmentsMapper(formData: FormFieldValue): Record<string, unknown> {
     return {};
   }
 
-  const { instalmentAmount, instalmentFrequency } = formData as {
-    instalmentAmount?: unknown;
-    instalmentFrequency?: unknown;
+  const { installmentAmount, installmentFrequency } = formData as {
+    installmentAmount?: unknown;
+    installmentFrequency?: unknown;
   };
 
   const result: Record<string, unknown> = {};
 
-  if (typeof instalmentAmount === 'string' && instalmentAmount.trim()) {
-    const amountNumber = Number(instalmentAmount.trim());
+  if (typeof installmentAmount === 'string' && installmentAmount.trim()) {
+    const amountNumber = Number(installmentAmount.trim());
     if (Number.isFinite(amountNumber)) {
       result.additionalRentContribution = amountNumber;
     } else {
-      logger.warn('instalmentsMapper received non-numeric instalmentAmount');
+      logger.warn('instalmentsMapper received non-numeric installmentAmount');
     }
   }
 
-  if (typeof instalmentFrequency === 'string' && instalmentFrequency.trim()) {
-    result.additionalContributionFrequency = instalmentFrequency.trim();
+  if (typeof installmentFrequency === 'string' && installmentFrequency.trim()) {
+    result.additionalContributionFrequency = installmentFrequency.trim();
   }
 
   return result;
@@ -280,14 +280,14 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
     frontendFields: ['confirmRepaymentsAgreed', 'repaymentsAgreementInfo'],
     valueMapper: repaymentsAgreedMapper,
   },
-  'instalment-payments': {
+  'installment-payments': {
     backendPath: 'possessionClaimResponse.paymentAgreement',
-    frontendField: 'confirmInstalmentOffer',
+    frontendField: 'confirmInstallmentOffer',
     valueMapper: yesNoEnum('repayArrearsInstalments'),
   },
   'how-much-afford-to-pay': {
     backendPath: 'possessionClaimResponse.paymentAgreement',
-    frontendFields: ['instalmentAmount', 'instalmentFrequency'],
+    frontendFields: ['installmentAmount', 'installmentFrequency'],
     valueMapper: instalmentsMapper,
   },
 };

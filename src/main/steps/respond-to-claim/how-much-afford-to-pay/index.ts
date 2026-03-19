@@ -15,43 +15,43 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'instalmentAmount',
+      name: 'installmentAmount',
       type: 'text',
       required: true,
       translationKey: {
         label: 'amountQuestion',
         hint: 'amountHint',
       },
-      errorMessage: 'errors.instalmentAmount',
+      errorMessage: 'errors.installmentAmount',
       validator: value => {
         const amountString = String(value).trim();
         if (!/^-?\d+(\.\d{1,2})?$/.test(amountString)) {
-          return 'errors.instalmentAmountFormat';
+          return 'errors.installmentAmountFormat';
         }
 
         const amount = Number(amountString);
         if (Number.isNaN(amount)) {
-          return 'errors.instalmentAmountFormat';
+          return 'errors.installmentAmountFormat';
         }
         if (amount < 0) {
-          return 'errors.instalmentAmountMin';
+          return 'errors.installmentAmountMin';
         }
         if (amount >= 1000000000) {
-          return 'errors.instalmentAmountMax';
+          return 'errors.installmentAmountMax';
         }
 
         return true;
       },
     },
     {
-      name: 'instalmentFrequency',
+      name: 'installmentFrequency',
       type: 'radio',
       required: true,
       translationKey: {
         label: 'frequencyQuestion',
         hint: 'frequencyHint',
       },
-      errorMessage: 'errors.instalmentFrequency',
+      errorMessage: 'errors.installmentFrequency',
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
         { value: 'weekly', translationKey: 'frequencyOptions.weekly' },
@@ -63,7 +63,7 @@ export const step: StepDefinition = createFormStep({
   ],
   extendGetContent: (_req, formContent) => {
     const amountField = formContent.fields.find(
-      field => field.componentType === 'input' && (field.component as { name?: string })?.name === 'instalmentAmount'
+      field => field.componentType === 'input' && (field.component as { name?: string })?.name === 'installmentAmount'
     );
 
     if (amountField?.component) {
