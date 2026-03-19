@@ -1,6 +1,7 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}Repayments agreed - HM Courts & Tribunals Service – GOV.UK{% endblock %}
@@ -23,5 +24,6 @@
         attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
   </div>
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}

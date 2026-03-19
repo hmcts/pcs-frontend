@@ -53,6 +53,7 @@ declare module 'express' {
     i18n?: i18n;
     t?: TFunction;
     language: string;
+    csrfToken?: () => string;
   }
 
   interface Application {

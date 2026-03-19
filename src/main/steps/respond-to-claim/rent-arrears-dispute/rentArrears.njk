@@ -1,5 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block mainContent %}
   <span class="govuk-caption-xl">Responding to the claim</span>
@@ -17,5 +18,6 @@
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
