@@ -1,5 +1,6 @@
 import {
   CreateCaseAPIAction,
+  CreateCaseTypedAPIAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   LoginAction,
   NavigateToUrlAction,
@@ -36,6 +37,7 @@ export class ActionRegistry {
     ['createUser', new LoginAction()],
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
+    ['createCaseTypedAPI', new CreateCaseTypedAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
