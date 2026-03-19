@@ -32,12 +32,7 @@ properties([
       name: 'ACCESSIBILITY_TESTS',
       defaultValue: true,
       description: 'Tick the checkbox to run Accessibility tests.'
-    ),
-    booleanParam(
-      name: 'RUN_SAUCE_CROSSBROWSER',
-      defaultValue: true,
-      description: 'Run Sauce Labs Playwright (saucectl). Requires Key Vault secrets (see docs/sauce-jenkins.md) and Sauce Connect on the agent.'
-    ),
+    )
   ])
 ])
 
@@ -57,19 +52,12 @@ static Map secret(String secretName, String envVariable) {
   ]
 }
 
-def keyVaultEntries = [
-  secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-  secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')
-]
-if (params.RUN_SAUCE_CROSSBROWSER) {
-  keyVaultEntries += [
-    secret('sauce-username', 'SAUCE_USERNAME'),
-    secret('sauce-access-key', 'SAUCE_ACCESS_KEY'),
-    secret('sauce-tunnel-name', 'SAUCE_TUNNEL_NAME'),
-    secret('sauce-tunnel-owner', 'SAUCE_TUNNEL_OWNER')
+def secrets = [
+  'pcs-${env}': [
+    secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
+    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')
   ]
-}
-def secrets = ['pcs-${env}': keyVaultEntries]
+]
 
 withNightlyPipeline(type, product, component) {
   validateInputs()
@@ -78,12 +66,14 @@ withNightlyPipeline(type, product, component) {
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
   enableFortifyScan()
+  enableCrossBrowserTest(120)
+
+  afterAlways('crossBrowserTest') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/test-results/**,**/playwright-report/**,.sauce/**'
+  }
 
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    if (params.RUN_SAUCE_CROSSBROWSER) {
-      runSauceCrossbrowserTests(yarnBuilder)
-    }
     runE2ETests(yarnBuilder)
     if (params.ACCESSIBILITY_TESTS) {
       runAccessibilityTests(yarnBuilder)
@@ -109,25 +99,6 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
-}
-
-def runSauceCrossbrowserTests(yarnBuilder) {
-  stage('Sauce cross-browser') {
-    node {
-      checkout scm
-      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        withEnv(['BROWSER_GROUP=chrome']) {
-          yarnBuilder.yarn('test-crossbrowser-e2e')
-        }
-      }
-      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        withEnv(['BROWSER_GROUP=firefox']) {
-          yarnBuilder.yarn('test-crossbrowser-e2e')
-        }
-      }
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/test-results/**,**/playwright-report/**,.sauce/**'
-    }
-  }
 }
 
 def runE2ETests(yarnBuilder) {
