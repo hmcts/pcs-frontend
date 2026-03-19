@@ -1,4 +1,4 @@
-import { contactPreferencesTextMessage, disputeClaimInterstitial } from '../data/page-data';
+import { contactPreferencesTextMessage, dashboard, disputeClaimInterstitial } from '../data/page-data';
 import { performValidation } from '../utils/controller';
 
 export async function disputeClaimInterstitialNavigationTests(): Promise<void> {
@@ -7,5 +7,5 @@ export async function disputeClaimInterstitialNavigationTests(): Promise<void> {
     disputeClaimInterstitial.backLink,
     contactPreferencesTextMessage.mainHeader
   );
-  await performValidation('pageNavigation', disputeClaimInterstitial.cancelLink, 'Dashboard');
+  await performValidation('pageNavigation', disputeClaimInterstitial.cancelLink, dashboard.mainHeader);
 }

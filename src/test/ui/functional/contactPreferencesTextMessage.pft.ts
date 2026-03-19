@@ -1,4 +1,4 @@
-import { contactPreferencesTelephone, contactPreferencesTextMessage } from '../data/page-data';
+import { contactPreferencesTelephone, contactPreferencesTextMessage, dashboard } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferencesTextMessageErrorValidation(): Promise<void> {
@@ -19,5 +19,5 @@ export async function contactPreferencesTextMessageNavigationTests(): Promise<vo
     question: contactPreferencesTextMessage.contactByTextMessageQuestion,
     option: contactPreferencesTextMessage.yesRadioOption,
   });
-  await performValidation('pageNavigation', contactPreferencesTextMessage.saveForLaterButton, 'Dashboard');
+  await performValidation('pageNavigation', contactPreferencesTextMessage.saveForLaterButton, dashboard.mainHeader);
 }
