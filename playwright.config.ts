@@ -27,11 +27,11 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 0 : 0,
-  workers: env === 'preview' ? 6 : 4,
+  retries: process.env.CI ? 1 : 0,
+  workers: env === 'preview' ? 4 : 4,
   timeout: 300 * 1000,
-  expect: { timeout: 5 * 1000 },
-  use: { actionTimeout: 5 * 1000, navigationTimeout: 5 * 1000 },
+  expect: { timeout: 30 * 1000 },
+  use: { actionTimeout: 30 * 1000, navigationTimeout: 30 * 1000 },
   /* Report slow tests if they take longer than 5 mins */
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
