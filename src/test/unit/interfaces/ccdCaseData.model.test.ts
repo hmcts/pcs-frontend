@@ -82,6 +82,28 @@ describe('CcdCaseModel', () => {
   });
 
   describe('claimant and defendant names', () => {
+    it('uses overridden claimant name when claimant correction is NO', () => {
+      const model = buildModel({
+        data: {
+          claimantName: 'Possession Claims Solicitor Org',
+          isClaimantNameCorrect: 'NO',
+          overriddenClaimantName: 'John Doe',
+        },
+      });
+
+      expect(model.claimantName).toBe('John Doe');
+    });
+
+    it('falls back to top-level claimant name when present', () => {
+      const model = buildModel({
+        data: {
+          claimantName: 'Possession Claims Solicitor Org',
+        },
+      });
+
+      expect(model.claimantName).toBe('Possession Claims Solicitor Org');
+    });
+
     it('builds the claimant-entered defendant name from first and last name', () => {
       const model = buildModel({
         data: {
@@ -122,6 +144,46 @@ describe('CcdCaseModel', () => {
 
       expect(model.claimantEnteredDefendantDetailsName).toBe('Alex');
       expect(model.defendantContactDetailsPartyName).toBe('Resident');
+    });
+
+    it('falls back to legacy defendant fields when claimantEnteredDefendantDetails is absent', () => {
+      const model = buildModel({
+        data: {
+          defendant1: {
+            nameKnown: 'YES',
+            firstName: 'Test',
+            lastName: 'John',
+          },
+          additionalDefendants: [
+            {
+              value: {
+                nameKnown: 'YES',
+                firstName: 'Peter',
+                lastName: 'Parker',
+              },
+              id: null,
+            },
+          ],
+        },
+      });
+
+      expect(model.claimantEnteredDefendantDetailsNameKnown).toBe('YES');
+      expect(model.claimantEnteredDefendantDetailsName).toBe('Peter Parker');
+    });
+
+    it('prefers top-level defendantName when available', () => {
+      const model = buildModel({
+        data: {
+          defendantName: 'Jen Parker',
+          defendant1: {
+            nameKnown: 'YES',
+            firstName: 'Test',
+            lastName: 'John',
+          },
+        },
+      });
+
+      expect(model.claimantEnteredDefendantDetailsName).toBe('Jen Parker');
     });
   });
 

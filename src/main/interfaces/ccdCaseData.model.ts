@@ -6,6 +6,7 @@ import {
   CcdClaimantEnteredDefendantDetails,
   CcdDefendantParty,
   CcdDefendantResponses,
+  CcdLegacyDefendant,
   PossessionClaimResponse,
   YesNoEnum,
 } from '@interfaces/ccdCase.interface';
@@ -117,13 +118,38 @@ export class CcdCaseModel {
   }
 
   get claimantName(): string {
+    if (this.data.isClaimantNameCorrect === YesNoEnum.NO && this.data.overriddenClaimantName?.trim()) {
+      return this.data.overriddenClaimantName.trim();
+    }
+
+    if (this.data.claimantName?.trim()) {
+      return this.data.claimantName.trim();
+    }
+
     return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
   }
 
+  get legacyDefendant(): CcdLegacyDefendant | undefined {
+    const additionalDefendant = this.data.additionalDefendants?.[0]?.value;
+    return additionalDefendant ?? this.data.defendant1;
+  }
+
   get claimantEnteredDefendantDetails(): CcdClaimantEnteredDefendantDetails {
-    return (
-      this.data.possessionClaimResponse?.claimantEnteredDefendantDetails ?? ({} as CcdClaimantEnteredDefendantDetails)
-    );
+    const claimantEntered = this.data.possessionClaimResponse?.claimantEnteredDefendantDetails;
+    if (claimantEntered) {
+      return claimantEntered;
+    }
+
+    const fallback = this.legacyDefendant;
+    if (fallback) {
+      return {
+        nameKnown: fallback.nameKnown,
+        firstName: fallback.firstName,
+        lastName: fallback.lastName,
+      };
+    }
+
+    return {} as CcdClaimantEnteredDefendantDetails;
   }
 
   get claimantEnteredDefendantDetailsNameKnown(): string {
@@ -131,6 +157,10 @@ export class CcdCaseModel {
   }
 
   get claimantEnteredDefendantDetailsName(): string {
+    if (this.defendantName?.trim()) {
+      return this.defendantName.trim();
+    }
+
     const { firstName, lastName } = this.claimantEnteredDefendantDetails;
     return firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || '';
   }

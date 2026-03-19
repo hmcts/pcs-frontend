@@ -1,3 +1,4 @@
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
@@ -45,7 +46,7 @@ export const step: StepDefinition = createFormStep({
   ],
   extendGetContent: req => {
     const validatedCase = req.res?.locals?.validatedCase;
-    const claimantName = validatedCase?.claimantName || 'Treetops Housing';
+    const claimantName = getClaimantName(req);
     const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
 
     return {

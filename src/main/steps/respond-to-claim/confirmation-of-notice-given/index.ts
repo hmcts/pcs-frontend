@@ -1,3 +1,4 @@
+import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -64,7 +65,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    const { claimantName } = req.res?.locals?.validatedCase ?? { claimantName: 'Treetops Housing' };
+    const claimantName = getClaimantName(req);
     return {
       claimantName,
     };

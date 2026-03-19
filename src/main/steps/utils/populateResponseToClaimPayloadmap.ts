@@ -4,6 +4,29 @@ import type { CcdCase, PossessionClaimResponse } from '@interfaces/ccdCase.inter
 import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 
+type PlainRecord = Record<string, unknown>;
+
+function isPlainRecord(value: unknown): value is PlainRecord {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function mergeRecords(base: PlainRecord, update: PlainRecord): PlainRecord {
+  const merged: PlainRecord = { ...base };
+
+  for (const [key, updateValue] of Object.entries(update)) {
+    const baseValue = merged[key];
+
+    if (isPlainRecord(baseValue) && isPlainRecord(updateValue)) {
+      merged[key] = mergeRecords(baseValue, updateValue);
+      continue;
+    }
+
+    merged[key] = updateValue;
+  }
+
+  return merged;
+}
+
 // Wrap the possession claim response in a ccd case object and submit via ccdCaseService
 export const buildCcdCaseForPossessionClaimResponse = async (
   req: Request,
@@ -24,9 +47,13 @@ export const buildCcdCaseForPossessionClaimResponse = async (
   );
 
   if (req.res?.locals) {
+    const existingData = (existingValidatedCase?.data ?? {}) as PlainRecord;
+    const updatedData = (updatedCase.data ?? {}) as PlainRecord;
+    const mergedData = mergeRecords(existingData, updatedData);
+
     req.res.locals.validatedCase = new CcdCaseModel({
       id: updatedCase.id || caseId,
-      data: updatedCase.data || existingValidatedCase?.data || {},
+      data: mergedData,
     });
   }
 

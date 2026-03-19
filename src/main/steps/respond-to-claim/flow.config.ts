@@ -226,7 +226,9 @@ export const flowConfig: JourneyFlowConfig = {
         {
           condition: async (req: Request): Promise<boolean> => {
             const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
-            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+            // Treat any non-yes value as "not yes" to avoid falling through
+            // to notice-date pages when CCD returns an unexpected string.
+            if (confirmNoticeGiven === 'yes') {
               return false;
             }
             const rentArrears = await isRentArrearsClaim(req);
@@ -237,7 +239,9 @@ export const flowConfig: JourneyFlowConfig = {
         {
           condition: async (req: Request): Promise<boolean> => {
             const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
-            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+            // Treat any non-yes value as "not yes" to avoid falling through
+            // to notice-date pages when CCD returns an unexpected string.
+            if (confirmNoticeGiven === 'yes') {
               return false;
             }
             const rentArrears = await isRentArrearsClaim(req);
