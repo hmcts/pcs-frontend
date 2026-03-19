@@ -1,7 +1,8 @@
+import type { Request } from 'express';
+
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -11,10 +12,65 @@ export const step: StepDefinition = createFormStep({
   showCancelButton: false,
   stepDir: __dirname,
   flowConfig,
+  beforeRedirect: async req => {
+    const repaymentsForm = req.body as Record<string, unknown>;
+    const repaymentsAgreed = repaymentsForm.repaymentsAgreed as string | undefined;
+
+    if (!repaymentsForm) {
+      return;
+    }
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        paymentAgreement: {
+          repaymentPlanAgreed: repaymentsAgreed === 'yes' ? 'YES' : repaymentsAgreed === 'no' ? 'NO' : 'NOT_SURE',
+          repaymentAgreedDetails: repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined,
+        },
+      },
+    };
+
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+  },
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
     question: 'question',
+  },
+  getInitialFormData: (req: Request) => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const paymentAgreement = caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+    const repaymentPlanAgreed = paymentAgreement?.repaymentPlanAgreed;
+    const repaymentAgreedDetails = paymentAgreement?.repaymentAgreedDetails;
+
+    const formValue =
+      repaymentPlanAgreed === 'YES'
+        ? 'yes'
+        : repaymentPlanAgreed === 'NO'
+          ? 'no'
+          : repaymentPlanAgreed === 'NOT_SURE'
+            ? 'imNotSure'
+            : undefined;
+
+    if (formValue === undefined) {
+      return {};
+    }
+
+    const initial: Record<string, unknown> = { repaymentsAgreed: formValue };
+
+    if (formValue === 'yes' && repaymentAgreedDetails) {
+      initial['repaymentsAgreed.repaymentsAgreedDetails'] = repaymentAgreedDetails;
+    }
+
+    return initial;
+  },
+  extendGetContent: (req: Request) => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    const claimIssueDate = '20th May 2025';
+
+    return {
+      claimantName,
+      claimIssueDate,
+    };
   },
   fields: [
     {
@@ -55,26 +111,4 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  extendGetContent: req => ({
-    claimantName: getClaimantName(req),
-    claimIssueDate: '20th May 2025',
-  }),
-  beforeRedirect: async req => {
-    const repaymentsForm = req.body as Record<string, unknown>;
-    const repaymentsAgreed = repaymentsForm.repaymentsAgreed as string | undefined;
-
-    if (!repaymentsForm) {
-      return;
-    }
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        paymentAgreement: {
-          repaymentPlanAgreed: repaymentsAgreed === 'yes' ? 'YES' : repaymentsAgreed === 'no' ? 'NO' : 'NOT_SURE',
-          repaymentAgreedDetails: repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined,
-        },
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
-  },
 });
