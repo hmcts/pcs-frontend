@@ -14,11 +14,6 @@ export interface CreateClaimData {
     postcodeNotAssignedView: string;
 }
 
-export interface SubmitDefendantResponseData {
-    correspondenceAddress: AddressUK;
-    submitDraftAnswers: YesOrNo;
-}
-
 export interface AddressUK extends Address {
 }
 
