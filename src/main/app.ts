@@ -22,16 +22,15 @@ app.locals.ENV = env;
 setupDev(app, developmentMode);
 
 app.use(cookieParser());
+app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const moduleInstance = new (modules as any)[moduleName](developmentMode);
   await moduleInstance.enableFor(app);
 });
-
-app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {

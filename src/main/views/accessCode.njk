@@ -1,4 +1,5 @@
 {% extends "template.njk" %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -51,6 +52,7 @@
           >
         </div>
 
+        {{ csrfProtection(csrfToken) }}
         <button type="submit" class="govuk-button" data-module="govuk-button">
           Continue
         </button>

@@ -1,6 +1,7 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block mainContent %}
   {% if errorSummary %}
@@ -21,5 +22,6 @@
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
