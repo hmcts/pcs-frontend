@@ -1,9 +1,10 @@
 import { Page } from '@playwright/test';
 // eslint-disable-next-line import/no-named-as-default
-import Axios, { AxiosInstance } from 'axios';
-import { createCcdClient, type CcdClientConfig, type CcdTransport } from '@hmcts/ccd-event-runtime';
+import Axios from 'axios';
+import { createCcdClient } from '@hmcts/ccd-event-runtime';
 
 import {
+  createCaseApiData,
   createCaseEventTokenApiData,
   submitCaseApiData,
   submitCaseEventTokenApiData,
@@ -13,52 +14,6 @@ import { caseBindings } from '../../../../../main/generated/ccd/PCS/event-contra
 import type { CreateClaimData } from '../../../../../main/generated/ccd/PCS/dto-types';
 
 export const caseInfo: { id: string; fid: string; state: string } = { id: '', fid: '', state: '' };
-
-interface CreatedCaseResponse {
-  id?: string;
-  state?: string;
-}
-
-function createTransport(api: AxiosInstance): CcdTransport {
-  return {
-    get: async (url, headers) => (await api.get(url, { headers })).data,
-    post: async (url, data, headers) => (await api.post(url, data, { headers })).data,
-  };
-}
-
-function createCaseClient() {
-  const requestConfig = createCaseEventTokenApiData.createCaseApiInstance();
-  const api = Axios.create(requestConfig);
-  const baseUrl = requestConfig.baseURL;
-  if (!baseUrl) {
-    throw new Error('Missing DATA_STORE_URL_BASE for createCaseAPI');
-  }
-
-  const clientConfig: CcdClientConfig = {
-    baseUrl,
-    getAuthHeaders: () => (requestConfig.headers ?? {}) as Record<string, string>,
-    transport: createTransport(api),
-  };
-
-  return createCcdClient(clientConfig, caseBindings);
-}
-
-function extractCreateCasePayload(caseData: actionData): Partial<CreateClaimData> {
-  const payload = typeof caseData === 'object' && caseData !== null && 'data' in caseData ? caseData.data : caseData;
-  return (payload ?? {}) as Partial<CreateClaimData>;
-}
-
-function setCaseInfo(createResponse: CreatedCaseResponse): void {
-  const caseId = String(createResponse.id ?? '');
-  if (!caseId) {
-    throw new Error('Create case response did not include a case id');
-  }
-
-  process.env.CASE_NUMBER = caseId;
-  caseInfo.id = caseId;
-  caseInfo.fid = caseId.replace(/(.{4})(?=.)/g, '$1-');
-  caseInfo.state = createResponse.state ?? '';
-}
 
 export class CreateCaseAPIAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -74,13 +29,41 @@ export class CreateCaseAPIAction implements IAction {
   }
 
   private async createCaseAPI(caseData: actionData): Promise<void> {
-    const client = createCaseClient();
+    const requestConfig = createCaseEventTokenApiData.createCaseApiInstance();
+    const baseUrl = requestConfig.baseURL;
+    if (!baseUrl) {
+      throw new Error('Missing DATA_STORE_URL_BASE for createCaseAPI');
+    }
+
+    const createCaseApi = Axios.create(requestConfig);
+    const client = createCcdClient(
+      {
+        baseUrl,
+        getAuthHeaders: () => (requestConfig.headers ?? {}) as Record<string, string>,
+        transport: {
+          get: async (url, headers) => (await createCaseApi.get(url, { headers })).data,
+          post: async (url, data, headers) => (await createCaseApi.post(url, data, { headers })).data,
+        },
+      },
+      caseBindings
+    );
     const flow = await client.event('createPossessionClaim').start();
-    const createResponse = (await flow.submit({
+    const createCasePayloadData = (
+      typeof caseData === 'object' && caseData !== null && 'data' in caseData ? caseData.data : caseData
+    ) as Partial<CreateClaimData>;
+    const createResponse = await flow.submit({
       ...flow.data,
-      ...extractCreateCasePayload(caseData),
-    } as CreateClaimData)) as CreatedCaseResponse;
-    setCaseInfo(createResponse);
+      ...createCasePayloadData,
+    } as CreateClaimData);
+    const caseId = String(createResponse.id ?? '');
+    if (!caseId) {
+      throw new Error(`Create case response did not include a case id for ${createCaseApiData.createCaseEventName}`);
+    }
+
+    process.env.CASE_NUMBER = caseId;
+    caseInfo.id = caseId;
+    caseInfo.fid = caseId.replace(/(.{4})(?=.)/g, '$1-');
+    caseInfo.state = String(createResponse.state ?? '');
   }
 
   private async submitCaseAPI(caseData: actionData): Promise<void> {
