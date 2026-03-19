@@ -128,8 +128,12 @@ export function dateToISO(backendFieldName: string): ValueMapper {
 
     const { day, month, year } = formData;
 
+    const dayLog = typeof day === 'string' || typeof day === 'number' ? String(day) : 'unknown';
+    const monthLog = typeof month === 'string' || typeof month === 'number' ? String(month) : 'unknown';
+    const yearLog = typeof year === 'string' || typeof year === 'number' ? String(year) : 'unknown';
+
     if (!day || !month || !year) {
-      logger.warn(`Missing date components: day=${String(day)}, month=${String(month)}, year=${String(year)}`);
+      logger.warn(`Missing date components: day=${dayLog}, month=${monthLog}, year=${yearLog}`);
       return {};
     }
 
@@ -141,9 +145,7 @@ export function dateToISO(backendFieldName: string): ValueMapper {
     });
 
     if (!dateTime.isValid) {
-      logger.warn(
-        `Invalid date: ${dateTime.invalidReason} (day=${String(day)}, month=${String(month)}, year=${String(year)})`
-      );
+      logger.warn(`Invalid date: ${dateTime.invalidReason} (day=${dayLog}, month=${monthLog}, year=${yearLog})`);
       return {};
     }
 
@@ -174,12 +176,16 @@ export function multipleYesNo(backendFieldName: string): ValueMapper {
       return { [backendFieldName]: [] };
     }
 
-    const transformedValues = value.map(v =>
-      v
-        .replace(/([A-Z])/g, '_$1')
+    const transformedValues = value.map(v => {
+      const vWithReplaceAll = v as unknown as {
+        replaceAll: (searchValue: RegExp, replaceValue: string) => string;
+      };
+
+      return vWithReplaceAll
+        .replaceAll(/([A-Z])/g, '_$1')
         .toUpperCase()
-        .replace(/^_/, '')
-    );
+        .replace(/^_/, '');
+    });
 
     return { [backendFieldName]: transformedValues };
   };
@@ -297,7 +303,7 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
   const keys = path.split('.');
   const result: Record<string, unknown> = {};
 
-  void keys.reduce((acc, key, index) => {
+  const nested = keys.reduce((acc, key, index) => {
     if (index === keys.length - 1) {
       acc[key] = value;
     } else {
@@ -306,7 +312,7 @@ function pathToNested(path: string, value: Record<string, unknown>): Record<stri
     return acc[key] as Record<string, unknown>;
   }, result);
 
-  return result;
+  return nested;
 }
 
 /**
