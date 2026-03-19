@@ -20,7 +20,7 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
 } from '../../../data/page-data';
-import { formatText } from '../../common/string.utils';
+import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
@@ -249,7 +249,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
-    const tenancyType = formatText(tenancyTypeDetailsInfo.tenancyType);
+    const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
     const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
 
     if (
