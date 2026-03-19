@@ -19,4 +19,5 @@ export default {
   'landlord-registered': 'landlordRegistered',
   'tenancy-date-unknown': 'tenancyDateUnknown',
   'tenancy-date-details': 'tenancyDateDetails',
+  'repayments-agreed': 'repaymentsAgreed',
 };

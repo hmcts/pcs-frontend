@@ -1,11 +1,12 @@
 import { repaymentsAgreed, repaymentsMade } from '../data/page-data';
+import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
-export async function contactByTelephoneErrorValidation(): Promise<void> {
-  await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+export async function repaymentsAgreedErrorValidation(): Promise<void> {
+  await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsAgreed.thereIsAProblemErrorMessageHeader,
-    message: repaymentsAgreed.selectAgreementErrorMessage,
+    message: repaymentsAgreed.getSelectAgreementErrorMessage(claimantsName),
   });
   await performAction('clickRadioButton', repaymentsAgreed.yesRadioOption);
   await performValidation('elementToBeVisible', repaymentsAgreed.youCanEnterUpToHiddenHintText);
@@ -17,7 +18,7 @@ export async function contactByTelephoneErrorValidation(): Promise<void> {
   await performValidation('elementToBeVisible', repaymentsAgreed.tooManyCharacterHiddenHintText);
 }
 
-export async function freeLegalAdviceNavigationTests(): Promise<void> {
+export async function repaymentsAgreedNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', repaymentsAgreed.backLink, repaymentsMade.mainHeader);
   await performAction('clickRadioButton', repaymentsAgreed.yesRadioOption);
   await performValidation('pageNavigation', repaymentsAgreed.saveForLaterButton, 'Dashboard');

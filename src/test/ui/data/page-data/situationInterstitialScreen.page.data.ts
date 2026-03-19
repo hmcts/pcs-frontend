@@ -1,4 +1,4 @@
 export const situationInterstitialScreen = {
-  mainHeader: 'Non-Rent Arrears Dispute(Placeholder)',
+  mainHeader: 'Your Household And Circumstances (placeholder)',
   continueButton: 'Continue',
 };
