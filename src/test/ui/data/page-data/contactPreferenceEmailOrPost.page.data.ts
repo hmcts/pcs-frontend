@@ -9,7 +9,7 @@ export const contactPreferenceEmailOrPost = {
   byEmailRadioOption: `By email`,
   enterEmailAddressHiddenTextLabel: `Enter email address`,
   emailAddressTextInput: `acitizenpro167@test.com`,
-  emailAddressWithMoreThan250CharTextInput: `aaaaaaaaaaaaaaaaaaauser1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp`,
+  emailAddressWithMoreThan254CharTextInput: `aaaaaaaaaaaaaaaaaaauser1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp`,
   emailAddressWithMultipleSpecialCharTextInput: `us%$er@exam@ple.co&m`,
   emailAddressWithSpaceTextInput: `user name@example.com`,
   emailAddressWithSpecialCharInDomainTextInput: `user@exam!p&e.com`,
