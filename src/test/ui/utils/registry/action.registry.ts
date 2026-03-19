@@ -59,6 +59,7 @@ export class ActionRegistry {
     ['enterTenancyStartDetailsUnKnown', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
     ['selectTenancyStartDateKnown', new RespondToClaimAction()],
+    ['selectLicensedLandlord', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
