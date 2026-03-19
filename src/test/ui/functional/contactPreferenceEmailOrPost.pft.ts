@@ -17,7 +17,7 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
   await performAction(
     'inputText',
     contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.emailAddressWithMoreThan250CharTextInput
+    contactPreferenceEmailOrPost.emailAddressWithMoreThan254CharTextInput
   );
   await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
