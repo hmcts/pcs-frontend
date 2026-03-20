@@ -1,0 +1,7 @@
+{
+  "extends": "../tsconfig.scripts.json",
+  "compilerOptions": {
+    "rootDir": ".."
+  },
+  "include": ["./**/*.ts", "../playwright.sauce.config.ts"]
+}

@@ -1,4 +1,3 @@
-import { AxeUtils } from '@hmcts/playwright-common';
 import { Page, test } from '@playwright/test';
 
 import {
@@ -59,6 +58,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
     if (pageNavigated) {
       if (startAxeAudit && enable_axe_audit === 'true') {
         try {
+          const { AxeUtils } = await import('@hmcts/playwright-common');
           await new AxeUtils(executor.page).audit({
             exclude: axe_exclusions,
           });

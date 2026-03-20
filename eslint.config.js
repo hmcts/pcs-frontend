@@ -19,6 +19,7 @@ const compat = new FlatCompat({
 module.exports = defineConfig([
   {
     files: ['**/*.ts', '**/*.tsx'],
+    ignores: ['scripts/**'],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -137,6 +138,29 @@ module.exports = defineConfig([
           ignoreMemberSort: false,
         },
       ],
+    },
+  },
+  {
+    files: ['scripts/**/*.ts', 'playwright.sauce.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      ecmaVersion: 2018,
+      sourceType: 'module',
+      parserOptions: {
+        project: './tsconfig.scripts.json',
+        tsconfigRootDir: __dirname,
+      },
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: './tsconfig.scripts.json',
+        },
+      },
+    },
+    rules: {
+      'no-console': 'off',
     },
   },
   {

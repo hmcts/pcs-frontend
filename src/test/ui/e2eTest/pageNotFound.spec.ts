@@ -1,10 +1,10 @@
 import { test } from '@playwright/test';
-import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { pageNotFound } from '../data/page-data/pageNotFound.page.data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
@@ -18,8 +18,13 @@ test.afterEach(async () => {
 });
 
 test.describe('Error page to indicate Page Not Found error @nightly', () => {
-  test('Content Validation on Page not found page @PR', async () => {
+  test('Content Validation on Page not found page @PR @crossbrowser', async () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
+    await performValidation('mainHeader', pageNotFound.mainHeader);
+    await performValidation('text', {
+      text: pageNotFound.thisCouldBeBecauseParagraph,
+      elementType: 'paragraph',
+    });
   });
 
   // This test was written as part of the story HDPI-3883. A new story will update the error message screen with a “Contact Us” link.
@@ -30,8 +35,6 @@ test.describe('Error page to indicate Page Not Found error @nightly', () => {
     await performValidation('text', { text: 'Please try again in a few minutes.', elementType: 'paragraph' });
   });
 
-  // This test was written as part of the story HDPI-3883. A new story will update the error message screen with a “Contact Us” link.
-  // Keeping this here for reference only — please do not enable it.
   test.skip('Valid unmapped caseId validation', async () => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });

@@ -1,0 +1,32 @@
+# Dependencies – Sauce runs npm install from package-lock.json
+node_modules/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/install-state.gz
+.pnp.*
+
+# Build and output
+dist/
+public/
+coverage/
+.nyc_output/
+*.css
+
+# Git and IDE
+.git/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Test reports
+allure-report/
+allure-results/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Secrets
+.env
+.env.*
