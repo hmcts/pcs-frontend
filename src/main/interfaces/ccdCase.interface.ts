@@ -53,11 +53,18 @@ export interface PossessionClaimResponse {
     contactByPhone?: YesNoValue;
     contactByText?: YesNoValue;
     preferenceType?: ContactPreference;
+    rentArrearsAmountConfirmation?: string;
+    rentArrearsAmount?: string;
     freeLegalAdvice?: string;
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
   };
+  claimantEnteredDefendantDetails?: {
+    firstName?: string;
+    lastName?: string;
+  };
+  claimantOrganisations?: { value: string }[];
 }
 
 export interface StartCallbackData {
