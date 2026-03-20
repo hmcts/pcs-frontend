@@ -1,11 +1,12 @@
-import { dashboard, paymentInterstitial, repaymentsMade } from '../data/page-data';
+import { paymentInterstitial, repaymentsMade } from '../data/page-data';
+import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function repaymentsMadeErrorValidation(): Promise<void> {
   await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsMade.thereIsAProblemErrorMessageHeader,
-    message: repaymentsMade.selectIfYouPaidAnyMoneyErrorMessage,
+    message: repaymentsMade.getSelectIfYouPaidAnyMoneyErrorMessage(claimantsName),
   });
 
   await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
@@ -28,5 +29,5 @@ export async function repaymentsMadeNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', repaymentsMade.backLink, paymentInterstitial.mainHeader);
   await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
   await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
-  await performValidation('pageNavigation', repaymentsMade.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', repaymentsMade.saveForLaterButton, 'Dashboard');
 }

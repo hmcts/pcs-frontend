@@ -188,7 +188,7 @@ export class RespondToClaimAction implements IAction {
 
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: repaymentsMade.mainHeader,
+      question: repaymentsMade.getmainHeader(claimantsName),
       option: repaymentsData.repaymentOption,
     });
 
