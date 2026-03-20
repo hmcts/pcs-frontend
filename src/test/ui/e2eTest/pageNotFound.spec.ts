@@ -9,7 +9,7 @@ const home_url = process.env.TEST_URL;
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   await performAction('navigateToUrl', home_url);
-  await performAction('createUser', 'citizen', ['citizen']);
+  //await performAction('createUser', 'citizen', ['citizen']);
   await performAction('login');
 });
 
