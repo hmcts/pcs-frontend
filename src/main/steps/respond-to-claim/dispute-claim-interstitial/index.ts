@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 
+import { getClaimantName } from '../../utils/getClaimantName';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
@@ -25,7 +26,7 @@ export const step: StepDefinition = {
           throw new Error('Translation function not available');
         }
 
-        const { claimantName } = req.res?.locals?.validatedCase ?? { claimantName: 'Treetops Housing' };
+        const claimantName = getClaimantName(req);
         const { id: caseId } = req.res?.locals?.validatedCase ?? { id: '' };
 
         return {

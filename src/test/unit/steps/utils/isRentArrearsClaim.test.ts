@@ -744,4 +744,38 @@ describe('isRentArrearsClaim', () => {
       expect(result).toBe(false);
     });
   });
+
+  describe('legacy fallback fields', () => {
+    it('returns true for legacy introductory rent arrears grounds when claimGroundSummaries is missing', async () => {
+      const mockReq = {
+        res: {
+          locals: {
+            validatedCase: mockValidatedCase({
+              introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS'],
+            }),
+          },
+        },
+      } as unknown as Request;
+
+      const result = await isRentArrearsClaim(mockReq);
+
+      expect(result).toBe(true);
+    });
+
+    it('returns true for legacy Welsh discretionary arrears grounds when claimGroundSummaries is missing', async () => {
+      const mockReq = {
+        res: {
+          locals: {
+            validatedCase: mockValidatedCase({
+              secureGroundsWales_DiscretionaryGrounds: ['RENT_ARREARS_S157'],
+            }),
+          },
+        },
+      } as unknown as Request;
+
+      const result = await isRentArrearsClaim(mockReq);
+
+      expect(result).toBe(true);
+    });
+  });
 });

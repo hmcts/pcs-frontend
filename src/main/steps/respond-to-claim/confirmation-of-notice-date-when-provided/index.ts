@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
@@ -37,7 +38,7 @@ export const step: StepDefinition = createFormStep({
   ],
   extendGetContent: req => {
     const validatedCase = req.res?.locals?.validatedCase;
-    const claimantName = validatedCase?.claimantName;
+    const claimantName = getClaimantName(req);
 
     const noticeDateRaw = validatedCase?.noticeDate || '';
 

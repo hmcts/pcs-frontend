@@ -4,6 +4,7 @@ export enum CaseState {
 }
 
 export type YesNoValue = 'YES' | 'NO' | null;
+export type ContactPreference = 'EMAIL' | 'POST' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
 export enum YesNoEnum {
   YES = 'YES',
@@ -75,6 +76,17 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
+export interface CcdLegacyDefendant {
+  nameKnown?: YesNoValue;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface CcdLegacyDefendantCollectionItem {
+  value?: CcdLegacyDefendant;
+  id?: string | null;
+}
+
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
   receivedFreeLegalAdvice?: string;
@@ -87,6 +99,7 @@ export interface CcdDefendantResponses {
   contactByEmail?: YesNoValue;
   contactByPost?: YesNoValue;
   contactByText?: YesNoValue;
+  preferenceType?: ContactPreference;
   landlordRegistered?: YesNoNotSureValue;
 }
 
@@ -102,9 +115,16 @@ export interface PossessionClaimResponse {
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
   claimIssueDate?: string;
+  claimantName?: string;
+  isClaimantNameCorrect?: YesNoValue;
+  overriddenClaimantName?: string;
   defendantName?: string;
   defendantAddress?: string;
+  defendant1?: CcdLegacyDefendant;
+  additionalDefendants?: CcdLegacyDefendantCollectionItem[];
   rentArrears_Total?: string;
+  introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
+  secureGroundsWales_DiscretionaryGrounds?: string[];
   noticeServed?: string;
   propertyAddress?: CcdCaseAddress;
   claimGroundSummaries?: CcdClaimGroundSummaryItem[];

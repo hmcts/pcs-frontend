@@ -46,6 +46,19 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
+  it('routes unexpected confirmNoticeGiven values to arrears branches (not notice-date pages)', async () => {
+    const unexpectedValueReq = createReq({
+      defendantResponsesConfirmNoticeGiven: 'NOT SURE',
+      noticeDate: '2026-01-15',
+      noticeServed: 'YES',
+      claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+    });
+
+    await expect(getNextStep(unexpectedValueReq, 'confirmation-of-notice-given', flowConfig, {})).resolves.toBe(
+      'non-rent-arrears-dispute'
+    );
+  });
+
   it('derives tenancy type back navigation from validated case data only', async () => {
     const welshReq = createReq({ legislativeCountry: 'Wales' });
     const englishReq = createReq({ legislativeCountry: 'England' });

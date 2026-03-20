@@ -28,7 +28,7 @@ export const flowConfig: JourneyFlowConfig = {
     'repayments-made',
     'repayments-agreed',
     'correspondence-address',
-    'contact-preferences',
+    'contact-preferences-email-or-post',
     'contact-preferences-telephone',
     'contact-preferences-text-message',
     'dispute-claim-interstitial',
@@ -91,9 +91,10 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'correspondence-address': {
       previousStep: 'defendant-date-of-birth',
-      defaultNext: 'contact-preferences',
+      defaultNext: 'contact-preferences-email-or-post',
     },
-    'contact-preferences': {
+    'contact-preferences-email-or-post': {
+      previousStep: 'correspondence-address',
       defaultNext: 'contact-preferences-telephone',
     },
     'contact-preferences-telephone': {
@@ -109,7 +110,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'dispute-claim-interstitial',
         },
       ],
-      previousStep: 'contact-preferences',
+      previousStep: 'contact-preferences-email-or-post',
     },
     'contact-preferences-text-message': {
       defaultNext: 'dispute-claim-interstitial',
@@ -226,7 +227,9 @@ export const flowConfig: JourneyFlowConfig = {
         {
           condition: async (req: Request): Promise<boolean> => {
             const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
-            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+            // Treat any non-yes value as "not yes" to avoid falling through
+            // to notice-date pages when CCD returns an unexpected string.
+            if (confirmNoticeGiven === 'yes') {
               return false;
             }
             const rentArrears = await isRentArrearsClaim(req);
@@ -237,7 +240,9 @@ export const flowConfig: JourneyFlowConfig = {
         {
           condition: async (req: Request): Promise<boolean> => {
             const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
-            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+            // Treat any non-yes value as "not yes" to avoid falling through
+            // to notice-date pages when CCD returns an unexpected string.
+            if (confirmNoticeGiven === 'yes') {
               return false;
             }
             const rentArrears = await isRentArrearsClaim(req);

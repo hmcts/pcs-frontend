@@ -1,4 +1,5 @@
 import { formatDatePartsToISODate } from '../../utils';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -51,7 +52,7 @@ export const step: StepDefinition = createFormStep({
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: async req => {
-    const claimantName = req.res?.locals?.validatedCase?.claimantName || 'Treetops Housing';
+    const claimantName = getClaimantName(req);
 
     const t = getTranslationFunction(req, STEP_NAME, ['common']);
     const paragraph = t('paragraph', { claimantName });
