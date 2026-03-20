@@ -111,7 +111,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       }
       const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
       fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'wx' });
-      console.log(`   🔒 Lock file created for ${pageName}`);
     } catch {
       // Ignore lock file creation errors (e.g., file already exists)
     }
@@ -122,10 +121,9 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
       if (fs.existsSync(lockPath)) {
         fs.unlinkSync(lockPath);
-        console.log(`   🔓 Lock file deleted for ${pageName} (test failure)`);
       }
     } catch (_error) {
-      console.error(`   Error deleting lock file for ${pageName}:`, _error);
+      console.error(_error);
     }
   }
 

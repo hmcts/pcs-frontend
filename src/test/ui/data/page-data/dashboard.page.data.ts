@@ -1,6 +1,6 @@
-import { createCaseApiData } from '../api-data';
+import { address } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 
 export const dashboard = {
-  mainHeader: `${createCaseApiData.createCasePayload.propertyAddress.AddressLine1}, ${createCaseApiData.createCasePayload.propertyAddress.PostTown}, ${createCaseApiData.createCasePayload.propertyAddress.PostCode}`,
+  mainHeader: `${address}`,
   caseNumberParagraph: (): string => `Case number: ${process.env.CASE_FID}`,
 };
