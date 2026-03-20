@@ -1,4 +1,4 @@
-import { repaymentsAgreed, repaymentsMade } from '../data/page-data';
+import { dashboard, repaymentsAgreed, repaymentsMade } from '../data/page-data';
 import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -19,7 +19,7 @@ export async function repaymentsAgreedErrorValidation(): Promise<void> {
 }
 
 export async function repaymentsAgreedNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', repaymentsAgreed.backLink, repaymentsMade.mainHeader);
   await performAction('clickRadioButton', repaymentsAgreed.noRadioOption);
-  await performValidation('pageNavigation', repaymentsAgreed.saveForLaterButton, 'Dashboard');
+  await performValidation('pageNavigation', repaymentsAgreed.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', repaymentsAgreed.backLink, repaymentsMade.mainHeader);
 }
