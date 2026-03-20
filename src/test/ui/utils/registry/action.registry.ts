@@ -1,12 +1,12 @@
 import {
   CreateCaseAPIAction,
-  CreateCaseTypedAPIAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   LoginAction,
   NavigateToUrlAction,
   RespondToClaimAction,
   TriggerErrorMessagesAction,
 } from '../actions/custom-actions';
+import { CreateCaseTypedAPIAction } from '../actions/custom-actions/createCaseTypedAPI.action';
 import {
   CheckAction,
   ClickButtonAction,

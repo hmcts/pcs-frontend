@@ -21,7 +21,6 @@
     "test:unit": "jest",
     "test:coverage": "jest --coverage",
     "test:routes": "jest -c jest.routes.config.ts",
-    "typecheck:generated-consumers": "tsc --noEmit -p tsconfig.generated-consumers.json",
     "test:a11y": "echo 'Accessibility tests implemented later in the pipeline'",
     "test:accessibility": "yarn playwright install && yarn playwright test --project chromium --grep @accessibility; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:smoke": "NODE_TLS_REJECT_UNAUTHORIZED=0 jest -c jest.smoke.config.ts",
