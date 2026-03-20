@@ -16,6 +16,7 @@ import {
   startNow,
   tenancyDetails,
 } from '../data/page-data';
+import { writtenTerms } from '../data/page-data/writtenTerms.page.data';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import {
   ErrorMessageValidation,
@@ -72,6 +73,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
     await performValidation('mainHeader', licensedLandlord.mainHeader);
     await performAction('clickButton', licensedLandlord.continueButton);
+    await performAction('selectWrittenTerms', {
+      question: writtenTerms.hasYourLandlordSentYourWrittenTermsQuestion,
+      radioOption: writtenTerms.iamNotSureRadioOption,
+    });
     await performValidation('mainHeader', tenancyDetails.mainHeader);
   });
 });

@@ -19,6 +19,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
 } from '../../../data/page-data';
+import { writtenTerms } from '../../../data/page-data/writtenTerms.page.data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
@@ -42,6 +43,7 @@ export class RespondToClaimAction implements IAction {
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
+      ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -159,6 +161,14 @@ export class RespondToClaimAction implements IAction {
       option: registeredData,
     });
     await performAction('clickButton', landlordRegistered.saveAndContinueButton);
+  }
+
+  private async selectWrittenTerms(writtenTermsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: writtenTermsData.question,
+      option: writtenTermsData.radioOption,
+    });
+    await performAction('clickButton', writtenTerms.saveAndContinueButton);
   }
 
   private async readPaymentInterstitial(): Promise<void> {
