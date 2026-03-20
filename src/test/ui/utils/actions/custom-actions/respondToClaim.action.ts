@@ -21,6 +21,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
 } from '../../../data/page-data';
+import { formatCurrency } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
@@ -284,9 +285,10 @@ export class RespondToClaimAction implements IAction {
       elementType: 'paragraph',
       text: `When making their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
+    const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {
       elementType: 'paragraph',
-      text: `£${submitCaseApiData.submitCasePayload.rentArrears_Total}`,
+      text: `${rentArrearsAmount}`,
     });
     await performAction('clickRadioButton', {
       question: rentArrears.doYouOweThisQuestion,

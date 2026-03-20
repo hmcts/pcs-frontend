@@ -5,3 +5,7 @@ export function escapeForRegex(text: string): string {
 export function exactTextWithOptionalWhitespaceRegex(text: string): RegExp {
   return new RegExp(`^\\s*${escapeForRegex(text)}\\s*$`);
 }
+
+export function formatCurrency(value: number | string): string {
+  return `£${(Number(value) / 100).toFixed(2)}`;
+}

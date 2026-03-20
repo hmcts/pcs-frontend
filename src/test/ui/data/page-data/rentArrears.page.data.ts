@@ -17,8 +17,9 @@ export const rentArrears = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorValidationHeader: `There is a problem`,
   enterHowMuchYouBelieveErrorMessage: `Enter the amount you believe you owe in rent arrears`,
+  selectIfYouOweErrorMessage: `Select if you owe this amount in rent arrears`,
   theAmountYouBelieveErrorMessage: `The amount you believe you owe in rent arrears must be £0.00 or above`,
   lessThanBillionErrorMessage: `The amount you believe you owe in rent arrears must be less than £1 billion`,
   doYouOweThisAmountErrorMessage: `Do you owe this amount in rent arrears?`,
-  enterAmountInCorrectFormat: `Enter an amount in the correct format, for example 148.00 or 148.50`,
+  enterAmountInCorrectFormat: `Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write £148.00)`,
 };
