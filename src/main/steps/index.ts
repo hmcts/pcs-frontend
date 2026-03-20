@@ -1,8 +1,8 @@
-import type { JourneyFlowConfig } from '../interfaces/stepFlow.interface';
-import type { StepDefinition } from '../interfaces/stepFormData.interface';
-
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
+
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 
 export interface JourneyConfig {
   name: string;

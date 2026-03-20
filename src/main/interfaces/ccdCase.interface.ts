@@ -5,8 +5,12 @@ export enum CaseState {
 
 export type YesNoValue = 'YES' | 'NO' | null;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
-
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
+export enum YesNoEnum {
+  YES = 'YES',
+  NO = 'NO',
+  PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
+}
 
 export interface CcdUserCase {
   id: string;
@@ -21,12 +25,8 @@ export interface CcdUserCases {
   cases: CcdUserCase[];
 }
 
-export interface CcdCase {
-  id: string;
-  data: Record<string, unknown>;
-}
-
-export interface Address {
+/** Address shape used in CCD case data (property, defendant, etc.). */
+export interface CcdCaseAddress {
   AddressLine1: string;
   AddressLine2?: string;
   AddressLine3?: string;
@@ -36,40 +36,148 @@ export interface Address {
   Country?: string;
 }
 
+/** Single claim ground summary entry in claimGroundSummaries array. */
+export interface CcdClaimGroundSummaryValue {
+  category: string;
+  code: string;
+  label: string;
+  reason?: string;
+  isRentArrears: string;
+}
+
+export interface CcdClaimGroundSummaryItem {
+  value: CcdClaimGroundSummaryValue;
+  id: string;
+}
+
+/** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
+export interface CcdClaimantOrganisation {
+  value: string;
+  id: string;
+}
+
+/** Claimant-entered defendant details captured when the claim was created. */
+export interface CcdClaimantEnteredDefendantDetails {
+  nameKnown?: YesNoValue;
+  firstName?: string;
+  lastName?: string;
+}
+
+/** Defendant party contact details (name/address known flags and values). */
+export interface CcdDefendantParty {
+  firstName?: string;
+  lastName?: string;
+  nameKnown?: string;
+  emailAddress?: string;
+  address?: CcdCaseAddress | Record<string, never>;
+  addressKnown?: string;
+  addressSameAsProperty?: string;
+  phoneNumberProvided?: YesNoValue;
+  phoneNumber?: string;
+}
+
+export interface CcdLegacyDefendant {
+  nameKnown?: YesNoValue;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface CcdLegacyDefendantCollectionItem {
+  value?: CcdLegacyDefendant;
+  id?: string | null;
+}
+
+/** Defendant responses (e.g. receivedFreeLegalAdvice). */
+export interface CcdDefendantResponses {
+  freeLegalAdvice?: string;
+  confirmNoticeGiven?: string;
+  tenancyStartDateCorrect?: string;
+  tenancyStartDate?: string;
+  defendantNameConfirmation?: string;
+  dateOfBirth?: string;
+  contactByPhone?: YesNoValue;
+  contactByEmail?: YesNoValue;
+  contactByPost?: YesNoValue;
+  contactByText?: YesNoValue;
+  preferenceType?: ContactPreference;
+  landlordRegistered?: YesNoNotSureValue;
+}
+
 export interface PossessionClaimResponse {
+  claimantOrganisations?: CcdClaimantOrganisation[];
   defendantContactDetails?: {
-    party?: {
-      firstName?: string;
-      lastName?: string;
-      address?: Address;
-      phoneNumberProvided?: YesNoValue;
-      phoneNumber?: string;
-      emailAddress?: string;
-    };
+    party?: CcdDefendantParty;
   };
-  defendantResponses?: {
-    tenancyStartDateCorrect?: string;
-    tenancyStartDate?: string;
-    contactByPhone?: YesNoValue;
-    contactByText?: YesNoValue;
-    preferenceType?: ContactPreference;
-    freeLegalAdvice?: string;
-    defendantNameConfirmation?: string;
-    dateOfBirth?: string;
-    landlordRegistered?: YesNoNotSureValue;
+  claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
+  defendantResponses?: CcdDefendantResponses;
+}
+
+/** Case data payload from CCD (START callback case_data or CcdCase.data). */
+export interface CcdCaseData {
+  claimIssueDate?: string;
+  claimantName?: string;
+  isClaimantNameCorrect?: YesNoValue;
+  overriddenClaimantName?: string;
+  defendantName?: string;
+  defendantAddress?: string;
+  defendant1?: CcdLegacyDefendant;
+  additionalDefendants?: CcdLegacyDefendantCollectionItem[];
+  rentArrears_Total?: string;
+  introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
+  secureGroundsWales_DiscretionaryGrounds?: string[];
+  noticeServed?: string;
+  propertyAddress?: CcdCaseAddress;
+  claimGroundSummaries?: CcdClaimGroundSummaryItem[];
+  userPcqIdSet?: string;
+  tenancy_TenancyLicenceDate?: string;
+  legislativeCountry?: string;
+  notice_NoticeHandedOverDateTime?: string;
+  notice_NoticePostedDate?: string;
+  notice_NoticeOtherElectronicDateTime?: string;
+  tenancy_TypeOfTenancyLicence?: string;
+  occupationLicenceTypeWales?: string;
+  licenceStartDate?: string;
+  possessionClaimResponse?: PossessionClaimResponse;
+  submitDraftAnswers?: string;
+}
+
+/** Case representation used by services: id + case_data. */
+export interface CcdCase {
+  id: string;
+  data: CcdCaseData;
+}
+
+/** Links object in CCD START callback response. */
+export interface CcdStartCallbackLinks {
+  self: {
+    href: string;
   };
 }
 
+/** case_details envelope from CCD START callback (metadata + case_data). */
+export interface CcdCaseDetails {
+  id: number;
+  jurisdiction: string;
+  state: string;
+  version: number;
+  case_type_id: string;
+  created_date: string;
+  last_modified: string;
+  last_state_modified_date: string;
+  security_classification: string;
+  case_data: CcdCaseData;
+  data_classification?: Record<string, unknown>;
+  supplementary_data?: Record<string, unknown>;
+  after_submit_callback_response?: unknown;
+  callback_response_status_code?: unknown;
+  callback_response_status?: unknown;
+  delete_draft_response_status_code?: unknown;
+  delete_draft_response_status?: unknown;
+}
+
 export interface StartCallbackData {
-  case_details: {
-    case_data: {
-      possessionClaimResponse?: {
-        defendantContactDetails?: {
-          party?: {
-            address?: Address;
-          };
-        };
-      };
-    };
-  };
+  token: string;
+  _links: CcdStartCallbackLinks;
+  case_details: CcdCaseDetails;
+  event_id: string;
 }

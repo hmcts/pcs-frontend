@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type i18next from 'i18next';
 
-import { pluralPossessive } from '../../../../../main/modules/i18n/formatters/pluralPossessive';
+import { pluralPossessive } from '@modules/i18n/formatters/pluralPossessive';
 
 describe('pluralPossessive formatter', () => {
   let mockAdd: jest.Mock;

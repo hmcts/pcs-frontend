@@ -1,6 +1,7 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -31,8 +32,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    //TODO: get claimantName from CCD case - currently hardcoded
-    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
+    const claimantName = getClaimantName(req);
 
     const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-not-provided', ['common']);
 

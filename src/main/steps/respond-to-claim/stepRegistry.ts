@@ -1,5 +1,3 @@
-import type { StepDefinition } from '../../interfaces/stepFormData.interface';
-
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
@@ -37,6 +35,8 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
+
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
