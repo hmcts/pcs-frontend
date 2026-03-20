@@ -32,11 +32,16 @@
 
 ## S2S
 
-**`runSauceCrossbrowser.ts`** calls **`ServiceAuthUtils().retrieveToken()`** on the **same machine that runs `saucectl`** (Jenkins agent or your laptop with VPN) — same code path as **Full E2E** global setup. It sets **`SERVICE_AUTH_TOKEN`** / **`S2S_URL`** in the process env; **`.sauce/config.yml`** forwards them to the Sauce VM with **`"$SERVICE_AUTH_TOKEN"`** / **`"$S2S_URL"`**.
+**`runSauceCrossbrowser.ts`** on the **runner host** (same as **Full E2E**):
 
-On the VM, **global setup** sees **`SERVICE_AUTH_TOKEN`** already set and does **not** call internal **`*.internal`** URLs again.
+1. **`ServiceAuthUtils().retrieveToken()`** → **`SERVICE_AUTH_TOKEN`** / **`S2S_URL`**
+2. **`IdamUtils().generateIdamToken()`** → **`BEARER_TOKEN`**
 
-If **`SERVICE_AUTH_TOKEN`** is already exported (e.g. debugging), the runner skips fetching again.
+Sauce **VMs** often cannot reach HMCTS APIs from **Node** (internal S2S + sometimes Idam DNS). **`.sauce/config.yml`** forwards **`"$SERVICE_AUTH_TOKEN"`**, **`"$S2S_URL"`**, **`"$BEARER_TOKEN"`** to the VM.
+
+**Global setup** skips S2S / Idam HTTP calls when those env vars are already set.
+
+Runner needs **`PCS_FRONTEND_IDAM_SECRET`**, **`IDAM_PCS_USER_PASSWORD`** (and same network/VPN as Full E2E where required).
 
 ## Pre-exec timeout (300s)
 

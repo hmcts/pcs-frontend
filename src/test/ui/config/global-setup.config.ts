@@ -29,9 +29,12 @@ const getS2SToken = async (): Promise<void> => {
 };
 
 const getAccessToken = async (): Promise<void> => {
-  const { IdamUtils } = await import('@hmcts/playwright-common');
   process.env.IDAM_WEB_URL = accessTokenApiData.idamUrl;
   process.env.IDAM_TESTING_SUPPORT_URL = accessTokenApiData.idamTestingSupportUrl;
+  if (process.env.BEARER_TOKEN?.trim()) {
+    return;
+  }
+  const { IdamUtils } = await import('@hmcts/playwright-common');
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
     username: user.claimantSolicitor.email,
     password: user.claimantSolicitor.password,

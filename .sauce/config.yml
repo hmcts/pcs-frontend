@@ -29,9 +29,10 @@ env:
   NPM_CONFIG_PRODUCTION: 'false'
   PCS_FRONTEND_IDAM_SECRET: '$PCS_FRONTEND_IDAM_SECRET'
   IDAM_PCS_USER_PASSWORD: '$IDAM_PCS_USER_PASSWORD'
-  # S2S lease runs on the machine that executes saucectl (Jenkins / your laptop); token is forwarded here — VMs cannot reach *.internal.
+  # S2S + Idam tokens are obtained on the machine that runs saucectl (runner host); forwarded here — Sauce VMs often cannot reach HMCTS APIs from Node.
   SERVICE_AUTH_TOKEN: '$SERVICE_AUTH_TOKEN'
   S2S_URL: '$S2S_URL'
+  BEARER_TOKEN: '$BEARER_TOKEN'
 
 # Quick feedback: only one suite active. Uncomment the blocks below for full Chrome/Firefox × Windows/macOS matrix.
 suites:

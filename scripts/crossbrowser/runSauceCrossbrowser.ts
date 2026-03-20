@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import * as path from 'path';
 
 import { s2STokenApiData } from '../../src/test/ui/data/api-data';
+import { user } from '../../src/test/ui/data/user-data';
 
 const root = path.join(__dirname, '../..');
 
@@ -18,6 +19,26 @@ async function ensureS2STokenOnRunnerHost(): Promise<void> {
   process.env.S2S_URL = s2STokenApiData.s2sUrl;
   process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
     microservice: s2STokenApiData.microservice,
+  });
+}
+
+/**
+ * Same Idam password grant as global-setup / Full E2E, on the runner host.
+ * Sauce VMs often fail DNS/outbound to idam-api from Node — forward BEARER_TOKEN via .sauce/config.yml.
+ */
+async function ensureBearerTokenOnRunnerHost(): Promise<void> {
+  if (process.env.BEARER_TOKEN?.trim()) {
+    console.log('BEARER_TOKEN already set; not fetching Idam again.');
+    return;
+  }
+  const { IdamUtils } = await import('@hmcts/playwright-common');
+  process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
+    username: user.claimantSolicitor.email,
+    password: user.claimantSolicitor.password,
+    grantType: 'password',
+    clientId: 'pcs-frontend',
+    clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,
+    scope: 'profile openid roles',
   });
 }
 
@@ -46,8 +67,12 @@ async function main(): Promise<number> {
 
   try {
     await ensureS2STokenOnRunnerHost();
+    await ensureBearerTokenOnRunnerHost();
   } catch (e) {
-    console.error('S2S token fetch failed on this machine (need VPN / same network as Full E2E Chrome).', e);
+    console.error(
+      'S2S or Idam token fetch failed on this machine (need PCS_FRONTEND_IDAM_SECRET + IDAM_PCS_USER_PASSWORD + VPN / same network as Full E2E Chrome).',
+      e
+    );
     return 1;
   }
 
