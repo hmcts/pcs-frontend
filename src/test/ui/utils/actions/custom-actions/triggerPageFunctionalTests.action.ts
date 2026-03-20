@@ -34,7 +34,9 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
     const pageName = await this.getFileNameForPage(page);
-    if (!pageName) {return;}
+    if (!pageName) {
+      return;
+    }
 
     // Prevent duplicate runs within the same test run (in‑memory)
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
