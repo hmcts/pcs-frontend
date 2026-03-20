@@ -34,7 +34,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
   if (testInfo.title.includes('@noDefendants')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
-    process.env.DEFENDENT_CORRESPONDENCE_ADDRESS = `${createCaseApiData.createCasePayload.propertyAddress.AddressLine1}, ${createCaseApiData.createCasePayload.propertyAddress.PostTown}, ${createCaseApiData.createCasePayload.propertyAddress.PostCode}`;
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else {
