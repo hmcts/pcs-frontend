@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import * as path from 'path';
 
-import { s2STokenApiData } from '../../src/test/ui/data/api-data';
+import { accessTokenApiData, s2STokenApiData } from '../../src/test/ui/data/api-data';
 import { user } from '../../src/test/ui/data/user-data';
 
 const root = path.join(__dirname, '../..');
@@ -31,6 +31,9 @@ async function ensureBearerTokenOnRunnerHost(): Promise<void> {
     console.log('BEARER_TOKEN already set; not fetching Idam again.');
     return;
   }
+  // IdamUtils requires these (same order as global-setup getAccessToken).
+  process.env.IDAM_WEB_URL = accessTokenApiData.idamUrl;
+  process.env.IDAM_TESTING_SUPPORT_URL = accessTokenApiData.idamTestingSupportUrl;
   const { IdamUtils } = await import('@hmcts/playwright-common');
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
     username: user.claimantSolicitor.email,
