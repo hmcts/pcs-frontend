@@ -16,6 +16,7 @@ import {
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   paymentInterstitial,
+  repaymentsAgreed,
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
@@ -40,9 +41,10 @@ export class RespondToClaimAction implements IAction {
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
-      ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
+      ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord, 'repaymentsMade')],
       ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['repaymentsAgreed', () => this.repaymentsMade(fieldName as actionRecord, 'repaymentsAgreed')],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
     ]);
@@ -186,14 +188,23 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
 
-  private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
+  private async repaymentsMade(repaymentsData: actionRecord, actionType: string): Promise<void> {
+    let question: string;
+    let inputLabel: string;
+    if (actionType === 'repaymentsAgreed') {
+      question = repaymentsAgreed.getMainHeader(claimantsName);
+      inputLabel = repaymentsAgreed.giveDetailsHiddenHintText;
+    } else {
+      question = repaymentsMade.mainHeader;
+      inputLabel = repaymentsMade.giveDetailsHiddenTextLabel;
+    }
     await performAction('clickRadioButton', {
-      question: repaymentsMade.mainHeader,
+      question,
       option: repaymentsData.repaymentOption,
     });
 
     if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
-      await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
+      await performAction('inputText', inputLabel, repaymentsData.repaymentInfo);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   }

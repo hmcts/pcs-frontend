@@ -19,5 +19,6 @@ export default {
   'landlord-registered': 'landlordRegistered',
   'tenancy-date-unknown': 'tenancyDateUnknown',
   'tenancy-date-details': 'tenancyDateDetails',
+  'repayments-agreed': 'repaymentsAgreed',
   'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
 };

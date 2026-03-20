@@ -58,6 +58,7 @@ export class ActionRegistry {
     ['selectLandlordRegistered', new RespondToClaimAction()],
     ['enterTenancyStartDetailsUnKnown', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
+    ['repaymentsAgreed', new RespondToClaimAction()],
     ['selectTenancyStartDateKnown', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
   ]);

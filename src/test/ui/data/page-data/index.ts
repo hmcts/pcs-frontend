@@ -24,3 +24,5 @@ export * from './tenancyDateUnknown.page.data';
 export * from './tenancyDateDetails.page.data';
 export * from './dashboard.page.data';
 export * from './licensedLandlord.page.data';
+export * from './installmentPayments.data';
+export * from './situationInterstitialScreen.page.data';
