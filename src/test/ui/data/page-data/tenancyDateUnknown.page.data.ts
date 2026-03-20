@@ -1,7 +1,7 @@
 export const tenancyDateUnknown = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   respondToAPropertyPossessionParagraph: 'Respond to a property possession claim',
-  whenDidYourTenancyQuestion: 'When did your tenancy, occupation contract or licence start (optional)?',
+  whenDidYourTenancyQuestion: 'ERRWhen did your tenancy, occupation contract or licence start (optional)?',
   getDidNotProvideParagraph: (claimantName: string): string => {
     return `${claimantName} did not provide the start date of your tenancy, occupation contract or licence.`;
   },
@@ -14,7 +14,7 @@ export const tenancyDateUnknown = {
   thereIsAProblemErrorMessageHeader: 'There is a problem',
   dayMissingErrorMessage: 'Your tenancy start date must include a day',
   monthMissingErrorMessage: 'Your tenancy start date must include a month',
-  yearMissingErrorMessage: 'Your tenancy start date must include a year',
+  yearMissingErrorMessage: 'ERRYour tenancy start date must include a year',
   realDateErrorMessage: 'Tenancy start date must be a real date',
-  backLink: 'Back',
+  backLink: 'ERRBack',
 };

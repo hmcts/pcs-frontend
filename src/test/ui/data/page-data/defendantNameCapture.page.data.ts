@@ -10,7 +10,7 @@ export const defendantNameCapture = {
   firstNameTextInput: `John`,
   lastNameTextInput: `Doe`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  enterYourFirstNameErrorMessage: `Enter your first name`,
+  enterYourFirstNameErrorMessage: `ERREnter your first name`,
   enterYourLastNameErrorMessage: `Enter your last name`,
   enterFirstNameMaxLengthErrorMessage: `First name must be 60 characters or less`,
   enterLastNameMaxLengthErrorMessage: `Last name must be 60 characters or less`,
