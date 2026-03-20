@@ -23,6 +23,6 @@ export const freeLegalAdvice = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
-  youMustSayAboutFreeLegalAdviceErrorMessage: `ERRYou must say if you've had any free legal advice`,
+  youMustSayAboutFreeLegalAdviceErrorMessage: `You must say if you've had any free legal advice`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
 };
