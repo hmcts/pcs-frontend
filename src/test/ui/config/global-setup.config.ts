@@ -8,7 +8,10 @@ async function globalSetupConfig(): Promise<void> {
   if (!process.env.CI) {
     clearEmvLocks();
   }
-  await getS2SToken();
+  // If SERVICE_AUTH_TOKEN is already set (e.g. saucectl expanded it from the runner host), do not call internal S2S again.
+  if (!process.env.SERVICE_AUTH_TOKEN?.trim()) {
+    await getS2SToken();
+  }
   await getAccessToken();
 }
 

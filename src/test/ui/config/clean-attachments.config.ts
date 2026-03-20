@@ -47,6 +47,6 @@ for (const file of files) {
       fs.writeFileSync(filePath, JSON.stringify(cleanedData, null, 2));
     }
   } catch (error) {
-    console.log(error.message()); // Ignore errors
+    console.log(error instanceof Error ? error.message : String(error));
   }
 }

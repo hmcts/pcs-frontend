@@ -10,6 +10,6 @@
     "skipLibCheck": true,
     "noUnusedLocals": true
   },
-  "include": ["scripts/**/*.ts", "playwright.sauce.config.ts"],
+  "include": ["scripts/**/*.ts", "playwright.sauce.config.ts", "src/test/ui/data/api-data/s2SToken.api.data.ts"],
   "exclude": []
 }

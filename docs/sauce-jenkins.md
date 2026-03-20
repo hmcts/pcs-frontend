@@ -32,7 +32,11 @@
 
 ## S2S
 
-**`S2S_SECRET`** is not passed through **`.sauce/config.yml`**. **`global-setup.config.ts`** uses **`s2SToken.api.data.ts`** and **`ServiceAuthUtils().retrieveToken()`** to set **`SERVICE_AUTH_TOKEN`** (same as local Playwright).
+**`runSauceCrossbrowser.ts`** calls **`ServiceAuthUtils().retrieveToken()`** on the **same machine that runs `saucectl`** (Jenkins agent or your laptop with VPN) — same code path as **Full E2E** global setup. It sets **`SERVICE_AUTH_TOKEN`** / **`S2S_URL`** in the process env; **`.sauce/config.yml`** forwards them to the Sauce VM with **`"$SERVICE_AUTH_TOKEN"`** / **`"$S2S_URL"`**.
+
+On the VM, **global setup** sees **`SERVICE_AUTH_TOKEN`** already set and does **not** call internal **`*.internal`** URLs again.
+
+If **`SERVICE_AUTH_TOKEN`** is already exported (e.g. debugging), the runner skips fetching again.
 
 ## Pre-exec timeout (300s)
 
