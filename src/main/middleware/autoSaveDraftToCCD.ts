@@ -1,0 +1,406 @@
+/**
+ * Auto-save form data to CCD draft for configured steps.
+ *
+ * Usage: Call autoSaveToCCD() in formBuilder's beforeRedirect callback.
+ * Add steps to STEP_FIELD_MAPPING to enable auto-save.
+ *
+ * Example:
+ *   const step = createFormStep(
+ *     { ... },
+ *     templatePath,
+ *     async (req, res) => { await autoSaveToCCD(req, res, 'step-name'); }
+ *   );
+ */
+
+import type { Request, Response } from 'express';
+import { DateTime } from 'luxon';
+
+import { ccdCaseService } from '../services/ccdCaseService';
+import { isNonEmpty } from '../utils/objectHelpers';
+
+import { Logger } from '@modules/logger';
+
+const logger = Logger.getLogger('autoSaveDraftToCCD');
+
+type FormFieldValue = string | string[] | Record<string, unknown>;
+type ValueMapper = (valueOrFormData: FormFieldValue) => Record<string, unknown>;
+
+interface StepMapping {
+  backendPath: string;
+  frontendField?: string;
+  frontendFields?: string[];
+  valueMapper: ValueMapper;
+}
+
+/**
+ * Transforms yes/no/preferNotToSay enum values to CCD uppercase format.
+ *
+ * IMPORTANT: Only use for controlled enum fields (radio buttons with predefined options).
+ * DO NOT use for free-text fields or fields with arbitrary values.
+ *
+ * @example
+ * // Correct usage (radio button with controlled values)
+ * {
+ *   frontendField: 'hadLegalAdvice',
+ *   valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
+ * }
+ *
+ * // Wrong usage (text field)
+ * {
+ *   frontendField: 'userName',
+ *   valueMapper: yesNoEnum('userName'), // Don't do this!
+ * }
+ */
+export function yesNoEnum(backendFieldName: string): ValueMapper {
+  const ALLOWED_VALUES = ['yes', 'no', 'preferNotToSay'] as const;
+  type AllowedValue = (typeof ALLOWED_VALUES)[number]; // 'yes' | 'no' | 'preferNotToSay'
+
+  return (value: FormFieldValue) => {
+    if (typeof value !== 'string') {
+      logger.warn('yesNoEnum expects a string, received:', typeof value);
+      return { [backendFieldName]: '' };
+    }
+
+    // Type-safe mapping: only allowed values as keys
+    const enumMapping: Record<AllowedValue, string> = {
+      yes: 'YES',
+      no: 'NO',
+      preferNotToSay: 'PREFER_NOT_TO_SAY',
+    };
+
+    // Validate that value is one of the allowed enum values
+    const isAllowedValue = (ALLOWED_VALUES as readonly string[]).includes(value);
+
+    if (!isAllowedValue) {
+      const allowedStr = ALLOWED_VALUES.join(', ');
+      logger.error(
+        `yesNoEnum: Invalid value "${value}" for field "${backendFieldName}". ` +
+          `Allowed values: ${allowedStr}. This indicates a bug in form validation or incorrect mapper usage.`
+      );
+      // Return empty string to prevent invalid data in CCD
+      return { [backendFieldName]: '' };
+    }
+
+    // Type assertion safe here because isAllowedValue check guarantees it
+    return { [backendFieldName]: enumMapping[value as AllowedValue] };
+  };
+}
+
+/** Transforms yes/no/imNotSure values to CCD YES_NO_NOT_SURE enum format */
+export function yesNoNotSureEnum(backendFieldName: string): ValueMapper {
+  const ALLOWED_VALUES = ['yes', 'no', 'imNotSure'] as const;
+  type AllowedValue = (typeof ALLOWED_VALUES)[number]; // 'yes' | 'no' | 'imNotSure'
+
+  return (value: FormFieldValue) => {
+    if (typeof value !== 'string') {
+      logger.warn('yesNoNotSureEnum expects a string, received:', typeof value);
+      return { [backendFieldName]: '' };
+    }
+
+    const enumMapping: Record<AllowedValue, string> = {
+      yes: 'YES',
+      no: 'NO',
+      imNotSure: 'NOT_SURE',
+    };
+
+    const isAllowedValue = (ALLOWED_VALUES as readonly string[]).includes(value);
+
+    if (!isAllowedValue) {
+      const allowedStr = ALLOWED_VALUES.join(', ');
+      logger.error(
+        `yesNoNotSureEnum: Invalid value "${value}" for field "${backendFieldName}". ` +
+          `Allowed values: ${allowedStr}. This indicates a bug in form validation or incorrect mapper usage.`
+      );
+      return { [backendFieldName]: '' };
+    }
+
+    return { [backendFieldName]: enumMapping[value as AllowedValue] };
+  };
+}
+
+/** Combines date fields (day/month/year) into ISO date string using luxon */
+export function dateToISO(backendFieldName: string): ValueMapper {
+  return (formData: FormFieldValue) => {
+    if (typeof formData === 'string' || Array.isArray(formData)) {
+      logger.warn('dateToISO expects an object, received:', typeof formData);
+      return {};
+    }
+
+    const { day, month, year } = formData;
+
+    const dayLog = typeof day === 'string' || typeof day === 'number' ? String(day) : 'unknown';
+    const monthLog = typeof month === 'string' || typeof month === 'number' ? String(month) : 'unknown';
+    const yearLog = typeof year === 'string' || typeof year === 'number' ? String(year) : 'unknown';
+
+    if (!day || !month || !year) {
+      logger.warn(`Missing date components: day=${dayLog}, month=${monthLog}, year=${yearLog}`);
+      return {};
+    }
+
+    // Use luxon for proper date validation and formatting
+    const dateTime = DateTime.fromObject({
+      year: Number(year),
+      month: Number(month),
+      day: Number(day),
+    });
+
+    if (!dateTime.isValid) {
+      logger.warn(`Invalid date: ${dateTime.invalidReason} (day=${dayLog}, month=${monthLog}, year=${yearLog})`);
+      return {};
+    }
+
+    return { [backendFieldName]: dateTime.toISODate() };
+  };
+}
+
+/** Pass through fields unchanged (1:1 mapping) */
+export function passThrough(fieldNames: readonly string[]): ValueMapper {
+  return (formData: FormFieldValue) => {
+    if (typeof formData === 'string' || Array.isArray(formData)) {
+      logger.warn('passThrough expects an object, received:', typeof formData);
+      return {};
+    }
+
+    // Functional approach: map field names to entries, filter non-empty values
+    return Object.fromEntries(
+      fieldNames.map(name => [name, formData[name]] as const).filter(([, value]) => isNonEmpty(value))
+    );
+  };
+}
+
+/** Transforms array of checkbox values to uppercase enum array */
+export function multipleYesNo(backendFieldName: string): ValueMapper {
+  return (value: FormFieldValue) => {
+    if (!Array.isArray(value)) {
+      logger.warn('multipleYesNo expects an array, received:', typeof value);
+      return { [backendFieldName]: [] };
+    }
+
+    const transformedValues = value.map(v => {
+      const vWithReplaceAll = v as unknown as {
+        replaceAll: (searchValue: RegExp, replaceValue: string) => string;
+      };
+
+      return vWithReplaceAll
+        .replaceAll(/([A-Z])/g, '_$1')
+        .toUpperCase()
+        .replace(/^_/, '');
+    });
+
+    return { [backendFieldName]: transformedValues };
+  };
+}
+
+function repaymentsMadeMapper(formData: FormFieldValue): Record<string, unknown> {
+  if (typeof formData === 'string' || Array.isArray(formData)) {
+    logger.warn('repaymentsMadeMapper expects an object, received:', typeof formData);
+    return {};
+  }
+
+  const { confirmRepaymentsMade, repaymentsInfo } = formData as {
+    confirmRepaymentsMade?: unknown;
+    repaymentsInfo?: unknown;
+  };
+
+  const result: Record<string, unknown> = {};
+
+  if (typeof confirmRepaymentsMade === 'string') {
+    const mapped = yesNoEnum('anyPaymentsMade')(confirmRepaymentsMade);
+    Object.assign(result, mapped);
+  }
+
+  if (typeof repaymentsInfo === 'string' && repaymentsInfo.trim()) {
+    result.paymentDetails = repaymentsInfo.trim();
+  }
+
+  return result;
+}
+
+function repaymentsAgreedMapper(formData: FormFieldValue): Record<string, unknown> {
+  if (typeof formData === 'string' || Array.isArray(formData)) {
+    logger.warn('repaymentsAgreedMapper expects an object, received:', typeof formData);
+    return {};
+  }
+
+  const { confirmRepaymentsAgreed, repaymentsAgreementInfo } = formData as {
+    confirmRepaymentsAgreed?: unknown;
+    repaymentsAgreementInfo?: unknown;
+  };
+
+  const result: Record<string, unknown> = {};
+
+  if (typeof confirmRepaymentsAgreed === 'string') {
+    const mapped = yesNoNotSureEnum('repaymentPlanAgreed')(confirmRepaymentsAgreed);
+    Object.assign(result, mapped);
+  }
+
+  if (typeof repaymentsAgreementInfo === 'string' && repaymentsAgreementInfo.trim()) {
+    result.repaymentAgreedDetails = repaymentsAgreementInfo.trim();
+  }
+
+  return result;
+}
+
+function instalmentsMapper(formData: FormFieldValue): Record<string, unknown> {
+  if (typeof formData === 'string' || Array.isArray(formData)) {
+    logger.warn('instalmentsMapper expects an object, received:', typeof formData);
+    return {};
+  }
+
+  const { installmentAmount, installmentFrequency } = formData as {
+    installmentAmount?: unknown;
+    installmentFrequency?: unknown;
+  };
+
+  const result: Record<string, unknown> = {};
+
+  if (typeof installmentAmount === 'string' && installmentAmount.trim()) {
+    const amountNumber = Number(installmentAmount.trim());
+    if (Number.isFinite(amountNumber)) {
+      result.additionalRentContribution = amountNumber;
+    } else {
+      logger.warn('instalmentsMapper received non-numeric installmentAmount');
+    }
+  }
+
+  if (typeof installmentFrequency === 'string' && installmentFrequency.trim()) {
+    result.additionalContributionFrequency = installmentFrequency.trim();
+  }
+
+  return result;
+}
+
+export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
+  'free-legal-advice': {
+    backendPath: 'possessionClaimResponse.defendantResponses',
+    frontendField: 'hadLegalAdvice',
+    valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
+  },
+  'repayments-made': {
+    backendPath: 'possessionClaimResponse.paymentAgreement',
+    frontendFields: ['confirmRepaymentsMade', 'repaymentsInfo'],
+    valueMapper: repaymentsMadeMapper,
+  },
+  'repayments-agreed': {
+    backendPath: 'possessionClaimResponse.paymentAgreement',
+    frontendFields: ['confirmRepaymentsAgreed', 'repaymentsAgreementInfo'],
+    valueMapper: repaymentsAgreedMapper,
+  },
+  'installment-payments': {
+    backendPath: 'possessionClaimResponse.paymentAgreement',
+    frontendField: 'confirmInstallmentOffer',
+    valueMapper: yesNoEnum('repayArrearsInstalments'),
+  },
+  'how-much-afford-to-pay': {
+    backendPath: 'possessionClaimResponse.paymentAgreement',
+    frontendFields: ['installmentAmount', 'installmentFrequency'],
+    valueMapper: instalmentsMapper,
+  },
+};
+
+/** Converts dot-path to nested object (e.g., 'a.b.c' → { a: { b: { c: value } } }) */
+function pathToNested(path: string, value: Record<string, unknown>): Record<string, unknown> {
+  const keys = path.split('.');
+  const result: Record<string, unknown> = {};
+
+  let current: Record<string, unknown> = result;
+  keys.forEach((key, index) => {
+    if (index === keys.length - 1) {
+      current[key] = value;
+      return;
+    }
+
+    current[key] = {};
+    current = current[key] as Record<string, unknown>;
+  });
+
+  return result;
+}
+
+/**
+ * Auto-saves form data to CCD draft if step is configured in STEP_FIELD_MAPPING.
+ * Use this in formBuilder's beforeRedirect callback instead of middleware.
+ */
+export async function autoSaveToCCD(req: Request, res: Response, stepName: string): Promise<void> {
+  const config = STEP_FIELD_MAPPING[stepName];
+
+  if (!config) {
+    logger.debug(`[${stepName}] No CCD mapping configured, skipping auto-save`);
+    return;
+  }
+
+  const formData = req.session.formData?.[stepName];
+
+  if (!formData || Object.keys(formData).length === 0) {
+    return;
+  }
+
+  await saveToCCD(req, res, stepName, formData, config);
+}
+
+async function saveToCCD(
+  req: Request,
+  res: Response,
+  stepName: string,
+  formData: Record<string, unknown>,
+  config: StepMapping
+): Promise<void> {
+  const validatedCase = res.locals.validatedCase;
+  const accessToken = req.session.user?.accessToken;
+
+  if (!validatedCase?.id) {
+    logger.warn(`[${stepName}] No validated case, skipping draft save`);
+    return;
+  }
+
+  if (!accessToken) {
+    logger.error(`[${stepName}] No access token in session`);
+    throw new Error('No access token available for CCD update');
+  }
+
+  try {
+    logger.debug(`[${stepName}] Auto-saving to CCD draft`);
+
+    let relevantData: string | string[] | Record<string, unknown>;
+    if (config.frontendField) {
+      const fieldValue = formData[config.frontendField];
+      if (fieldValue === undefined) {
+        logger.warn(`[${stepName}] Field '${config.frontendField}' not found in form data, skipping save`);
+        return;
+      }
+      relevantData = fieldValue as string | string[];
+    } else if (config.frontendFields) {
+      const multiFieldData: Record<string, unknown> = {};
+      for (const fieldName of config.frontendFields) {
+        if (formData[fieldName] !== undefined) {
+          multiFieldData[fieldName] = formData[fieldName];
+        }
+      }
+      if (Object.keys(multiFieldData).length === 0) {
+        logger.warn(`[${stepName}] No matching fields found in form data, skipping save`);
+        return;
+      }
+      relevantData = multiFieldData;
+    } else {
+      relevantData = formData;
+    }
+
+    const transformedData = config.valueMapper(relevantData);
+    const nestedData = pathToNested(config.backendPath, transformedData);
+
+    const ccdPayload = {
+      ...nestedData,
+    };
+
+    await ccdCaseService.updateDraftRespondToClaim(accessToken, validatedCase.id, ccdPayload);
+
+    // Don't update res.locals.validatedCase with CCD response
+    // CCD submit returns incomplete data (only fields in payload, not full merged case)
+    // Keep existing res.locals.validatedCase from start callback (has complete data)
+    // Next page will call start callback and get fresh merged data from CCD
+
+    logger.info(`[${stepName}] Draft saved successfully to CCD`);
+  } catch (error) {
+    logger.error(`[${stepName}] Failed to save draft to CCD:`, error);
+  }
+}

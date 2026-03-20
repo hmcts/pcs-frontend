@@ -1,4 +1,17 @@
 {
-  "pageTitle": "Repayments agreed",
-  "caption": "Respond to a property possession claim"
+  "pageTitle": "Have you come to any agreement to repay the arrears?",
+  "caption": "Respond to a property possession claim",
+  "question": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "imNotSure": "I'm not sure"
+  },
+  "textAreaLabel": "Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
+  "textAreaHint": "You can enter up to 500 characters",
+  "errors": {
+    "confirmRepaymentsAgreed": "Select whether you have come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}",
+    "repaymentsAgreementInfo": "Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made"
+  }
 }

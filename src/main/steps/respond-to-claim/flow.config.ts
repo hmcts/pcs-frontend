@@ -26,6 +26,8 @@ export const flowConfig: JourneyFlowConfig = {
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
+    'installment-payments',
+    'how-much-afford-to-pay',
     'correspondence-address',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
@@ -69,7 +71,7 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           // Route to defendant name capture if defendant is unknown
-          condition: async (req: Request) => !isDefendantNameKnown(req),
+          condition: async (req: Request) => !(await isDefendantNameKnown(req)),
           nextStep: 'defendant-name-capture',
         },
       ],
@@ -121,7 +123,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !isWelshProperty(req),
+          condition: async (req: Request) => !(await isWelshProperty(req)),
           nextStep: 'tenancy-type-details',
         },
       ],
@@ -326,10 +328,72 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'repayments-agreed': {
       previousStep: 'repayments-made',
+      routes: [
+        {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const choseNo = currentStepData?.confirmRepaymentsAgreed === 'no';
+            if (!choseNo) {
+              return false;
+            }
+            return isRentArrearsClaim(req);
+          },
+          nextStep: 'installment-payments',
+        },
+      ],
+      defaultNext: 'your-household-and-circumstances',
+    },
+    'installment-payments': {
+      previousStep: 'repayments-agreed',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData?.confirmInstallmentOffer === 'yes',
+          nextStep: 'how-much-afford-to-pay',
+        },
+      ],
+      defaultNext: 'your-household-and-circumstances',
+    },
+    'how-much-afford-to-pay': {
+      previousStep: 'installment-payments',
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
-      previousStep: 'repayments',
+      previousStep: async (req: Request, formData: Record<string, unknown>) => {
+        const repaymentsAgreed = formData['repayments-agreed'] as Record<string, unknown> | undefined;
+        const confirmRepaymentsAgreed = repaymentsAgreed?.confirmRepaymentsAgreed;
+
+        // If user did not choose "No" on repayments-agreed, route always comes directly from that step.
+        // This also protects against stale installment data in session from earlier journey attempts.
+        if (confirmRepaymentsAgreed !== 'no') {
+          return 'repayments-agreed';
+        }
+
+        // "No" only routes through installment steps for rent arrears cases.
+        const rentArrearsClaim = await isRentArrearsClaim(req);
+        if (!rentArrearsClaim) {
+          return 'repayments-agreed';
+        }
+
+        const installmentPayments = formData['installment-payments'] as Record<string, unknown> | undefined;
+        const confirmInstallmentOffer = installmentPayments?.confirmInstallmentOffer;
+
+        if (confirmInstallmentOffer === 'yes') {
+          return 'how-much-afford-to-pay';
+        }
+        if (confirmInstallmentOffer === 'no') {
+          return 'installment-payments';
+        }
+
+        // Defensive fallback for partially-complete sessions.
+        return 'repayments-agreed';
+      },
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {
