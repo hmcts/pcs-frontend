@@ -22,7 +22,7 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            receivedFreeLegalAdvice: 'YES',
+            freeLegalAdvice: 'YES',
           },
         },
       },
@@ -47,12 +47,12 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
 
     await buildCcdCaseForPossessionClaimResponse(req, {
       defendantResponses: {
-        receivedFreeLegalAdvice: 'YES',
+        freeLegalAdvice: 'YES',
       },
     });
 
     expect(req.res?.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
-    expect(req.res?.locals?.validatedCase?.defendantResponsesReceivedFreeLegalAdvice).toBe('YES');
+    expect(req.res?.locals?.validatedCase?.defendantResponsesFreeLegalAdvice).toBe('YES');
   });
 
   it('preserves the existing case id when draft save response omits it', async () => {
@@ -60,7 +60,7 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            receivedFreeLegalAdvice: 'NO',
+            freeLegalAdvice: 'NO',
           },
         },
       },
@@ -84,13 +84,13 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
 
     await buildCcdCaseForPossessionClaimResponse(req, {
       defendantResponses: {
-        receivedFreeLegalAdvice: 'NO',
+        freeLegalAdvice: 'NO',
       },
     });
 
     expect(req.res?.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
     expect(req.res?.locals?.validatedCase?.id).toBe('1773071952538472');
-    expect(req.res?.locals?.validatedCase?.defendantResponsesReceivedFreeLegalAdvice).toBe('NO');
+    expect(req.res?.locals?.validatedCase?.defendantResponsesFreeLegalAdvice).toBe('NO');
   });
 
   it('merges partial draft save response with existing validated case data', async () => {
@@ -99,7 +99,7 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            receivedFreeLegalAdvice: 'NO',
+            freeLegalAdvice: 'NO',
           },
         },
       },
@@ -131,7 +131,7 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
 
     await buildCcdCaseForPossessionClaimResponse(req, {
       defendantResponses: {
-        receivedFreeLegalAdvice: 'NO',
+        freeLegalAdvice: 'NO',
       },
     });
 
@@ -139,6 +139,6 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
     expect(req.res?.locals?.validatedCase?.claimIssueDate).toBe('2025-06-16');
     expect(req.res?.locals?.validatedCase?.claimantName).toBe('Possession Claims Solicitor Org');
     expect(req.res?.locals?.validatedCase?.defendantResponsesDefendantNameConfirmation).toBe('YES');
-    expect(req.res?.locals?.validatedCase?.defendantResponsesReceivedFreeLegalAdvice).toBe('NO');
+    expect(req.res?.locals?.validatedCase?.defendantResponsesFreeLegalAdvice).toBe('NO');
   });
 });
