@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import {
   confirmationOfNoticeGiven,
+  contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
   correspondenceAddress,
@@ -42,6 +43,7 @@ export class RespondToClaimAction implements IAction {
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
+      ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
@@ -122,6 +124,21 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  }
+
+  private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: contactPreferenceData.question,
+      option: contactPreferenceData.radioOption,
+    });
+    if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailRadioOption) {
+      await performAction(
+        'inputText',
+        contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+        contactPreferenceData.emailAddress
+      );
+    }
+    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   }
 
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {

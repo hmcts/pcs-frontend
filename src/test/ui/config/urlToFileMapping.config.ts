@@ -20,4 +20,5 @@ export default {
   'tenancy-date-unknown': 'tenancyDateUnknown',
   'tenancy-date-details': 'tenancyDateDetails',
   'tenancy-type-details': 'tenancyTypeDetails',
+  'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
 };

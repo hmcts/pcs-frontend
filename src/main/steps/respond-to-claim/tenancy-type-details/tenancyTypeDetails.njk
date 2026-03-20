@@ -4,6 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
@@ -39,5 +40,6 @@
     <p class="govuk-body">
       <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
     </p>
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
