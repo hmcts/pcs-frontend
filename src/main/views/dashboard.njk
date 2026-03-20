@@ -2,6 +2,8 @@
 {%- from "components/notification/macro.njk" import notification -%}
 {%- from "components/taskGroup/macro.njk" import taskGroup -%}
 
+{% set backUrl = '/' %}
+
 {% block content %}
 
   {% if propertyAddress %}
@@ -16,13 +18,51 @@
     </p>
   {% endif %}
 
-  {% for dashboardNotification in notifications %}
-    {{ notification(dashboardNotification.templateId, dashboardNotification.templateValues)
-    }}    
-  {% endfor %}
+    
+      {% if propertyAddress %}
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-4">
+          {{ propertyAddress }}
+        </h2>
+      {% endif %}
 
-  {% for dashboardTaskGroup in taskGroups %}
-      {{ taskGroup(dashboardTaskGroup) }}
-  {% endfor %}
+      {% if dashboardCaseReference %}
+        <p class="govuk-body">
+          {{ t('dashboard:caseReferenceLabel') }} {{ dashboardCaseReference }}
+        </p>
+      {% endif %}
+
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible section-border"/>
+            <div class="dashboard-notifications">
+              {% for dashboardNotification in notifications %}
+                {{ notification(dashboardNotification.templateId, dashboardNotification.templateValues)
+                }}
+              {% endfor %}
+            </div>
+            {% for dashboardTaskGroup in taskGroups %}
+              {{ taskGroup(dashboardTaskGroup) }}
+            {% endfor %}
+        </div>
+
+        <div class="govuk-grid-column-one-third">
+          <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible section-border"/>
+            <aside class="app-related-items" role="complementary">
+              <h2 class="govuk-heading-m">{{ t('dashboard:helpAndSupportHeading') }}</h2>
+              <nav role="navigation" aria-label="{{ t('dashboard:helpAndSupportHeading') }}">
+                <ul class="govuk-list">
+                  {% for link in helpSupportLinks %}
+                    <li>
+                      <a class="govuk-link" href="{{ link.href }}">{{ t('dashboard:' ~ link.key) }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </nav>
+              <nav role="navigation" aria-label="{{ t('dashboard:contactInformationAriaLabel') }}">
+                {% include "components/contact-us-details.njk" %}
+              </nav>
+            </aside>
+        </div>
+      </div>
 
 {% endblock %}
