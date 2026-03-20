@@ -27,10 +27,14 @@ export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
  * fromYesNoEnum(null)  // returns undefined
  */
 export function fromYesNoEnum(value: YesNoValue | string | undefined): 'yes' | 'no' | undefined {
-  if (value === 'YES') {
+  if (!value) {
+    return undefined;
+  }
+  const upperValue = value.toUpperCase();
+  if (upperValue === 'YES') {
     return 'yes';
   }
-  if (value === 'NO') {
+  if (upperValue === 'NO') {
     return 'no';
   }
   return undefined;
