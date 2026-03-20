@@ -7,6 +7,24 @@ import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+// Validation constants
+const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
+const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 decimal places
+
+// Backend enum mappings
+const BACKEND_CONFIRMATION = {
+  YES: 'YES',
+  NO: 'NO',
+  NOT_SURE: 'NOT_SURE',
+} as const;
+
+// Frontend form values
+const FORM_VALUES = {
+  YES: 'yes',
+  NO: 'no',
+  NOT_SURE: 'notSure',
+} as const;
+
 export const step: StepDefinition = createFormStep({
   stepName: 'rent-arrears-dispute',
   journeyFolder: 'respondToClaim',
@@ -28,10 +46,10 @@ export const step: StepDefinition = createFormStep({
     const result: Record<string, unknown> = {};
 
     // Map frontend radio value to backend enum
-    if (rentArrears === 'yes') {
-      result.rentArrearsAmountConfirmation = 'YES';
-    } else if (rentArrears === 'no') {
-      result.rentArrearsAmountConfirmation = 'NO';
+    if (rentArrears === FORM_VALUES.YES) {
+      result.rentArrearsAmountConfirmation = BACKEND_CONFIRMATION.YES;
+    } else if (rentArrears === FORM_VALUES.NO) {
+      result.rentArrearsAmountConfirmation = BACKEND_CONFIRMATION.NO;
       // Convert pounds to pence (backend stores as pence string via MoneyGBP serializer)
       if (amountRaw) {
         const normalized = amountRaw.replace(/,/g, ''); // Remove comma separators
@@ -40,8 +58,8 @@ export const step: StepDefinition = createFormStep({
           result.rentArrearsAmount = String(Math.round(amountInPounds * 100));
         }
       }
-    } else if (rentArrears === 'notSure') {
-      result.rentArrearsAmountConfirmation = 'NOT_SURE';
+    } else if (rentArrears === FORM_VALUES.NOT_SURE) {
+      result.rentArrearsAmountConfirmation = BACKEND_CONFIRMATION.NOT_SURE;
     }
 
     if (Object.keys(result).length === 0) {
@@ -65,10 +83,10 @@ export const step: StepDefinition = createFormStep({
     const formData: Record<string, unknown> = {};
 
     // Map backend enum to frontend radio value
-    if (response.rentArrearsAmountConfirmation === 'YES') {
-      formData.rentArrears = 'yes';
-    } else if (response.rentArrearsAmountConfirmation === 'NO') {
-      formData.rentArrears = 'no';
+    if (response.rentArrearsAmountConfirmation === BACKEND_CONFIRMATION.YES) {
+      formData.rentArrears = FORM_VALUES.YES;
+    } else if (response.rentArrearsAmountConfirmation === BACKEND_CONFIRMATION.NO) {
+      formData.rentArrears = FORM_VALUES.NO;
       // Prepopulate the amount if it exists (convert pence to pounds)
       // Use dotted notation for subField, matching defendant-name-confirmation pattern
       if (response.rentArrearsAmount) {
@@ -76,8 +94,8 @@ export const step: StepDefinition = createFormStep({
         const amountInPounds = amountInPence / 100;
         formData['rentArrears.rentArrearsAmountCorrection'] = amountInPounds.toFixed(2);
       }
-    } else if (response.rentArrearsAmountConfirmation === 'NOT_SURE') {
-      formData.rentArrears = 'notSure';
+    } else if (response.rentArrearsAmountConfirmation === BACKEND_CONFIRMATION.NOT_SURE) {
+      formData.rentArrears = FORM_VALUES.NOT_SURE;
     }
 
     return formData;
@@ -156,13 +174,12 @@ export const step: StepDefinition = createFormStep({
                   if (numericValue < 0) {
                     return 'errors.rentArrearsAmountCorrection.negativeAmount';
                   }
-                  if (numericValue > 1000000000) {
+                  if (numericValue > MAX_RENT_ARREARS_AMOUNT) {
                     return 'errors.rentArrearsAmountCorrection.largeAmount';
                   }
                 }
 
-                const formatRegex = /^\d{1,10}\.\d{2}$/;
-                if (!formatRegex.test(normalized)) {
+                if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
                   return 'errors.rentArrearsAmountCorrection.invalidFormat';
                 }
 
