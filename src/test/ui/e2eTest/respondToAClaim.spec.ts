@@ -3,9 +3,10 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
-  contactByTelephone,
-  contactByTextMessage,
-  contactPreference,
+  confirmationOfNoticeGiven,
+  contactPreferenceEmailOrPost,
+  contactPreferencesTelephone,
+  contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
   dateOfBirth,
@@ -13,7 +14,6 @@ import {
   defendantNameConfirmation,
   freeLegalAdvice,
   nonRentArrearsDispute,
-  noticeDetails,
   rentArrearsDispute,
   repaymentsAgreed,
   repaymentsMade,
@@ -21,12 +21,7 @@ import {
   tenancyDateDetails,
   tenancyDetails,
 } from '../data/page-data';
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import {
-  ErrorMessageValidation,
-  PageContentValidation,
-  PageNavigationValidation,
-} from '../utils/validations/custom-validations';
+import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -38,9 +33,11 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
   if (testInfo.title.includes('@noDefendants')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else {
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
@@ -55,16 +52,14 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.afterEach(async () => {
-  PageContentValidation.finaliseTest();
-  ErrorMessageValidation.finaliseTest();
-  PageNavigationValidation.finaliseTest();
+  finaliseAllValidations();
 });
 
 //@noDefendants(submitCasePayloadNoDefendants) represents all defendant details unknown pages and non-rent arrears
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim @noDefendants @regression', async () => {
+  test('Respond to a claim @noDefendants @regression @accessibility', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -80,13 +75,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.yesRadioOption,
-      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.yesRadioOption);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -99,7 +97,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tsYear: '2024',
     });
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
@@ -121,13 +119,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.yesRadioOption,
-      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -136,7 +137,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
@@ -154,13 +155,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.yesRadioOption,
-      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -173,7 +177,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tsYear: '2024',
     });
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
@@ -204,10 +208,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction(
       'disputeClaimInterstitial',
@@ -217,7 +223,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', tenancyDetails.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.imNotSureRadioOption,
+      option: confirmationOfNoticeGiven.imNotSureRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
@@ -244,9 +250,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction(
       'disputeClaimInterstitial',
@@ -260,7 +269,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tsYear: '2024',
     });
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.noRadioOption,
+      option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
@@ -290,10 +299,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction(
       'disputeClaimInterstitial',
@@ -322,10 +333,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -333,9 +346,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
     });
-    await performValidation('mainHeader', noticeDetails.mainHeader);
+    await performValidation('mainHeader', confirmationOfNoticeGiven.mainHeader);
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
@@ -364,10 +377,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -376,7 +391,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: tenancyDateDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown', {
       day: '25',
@@ -401,10 +416,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -416,7 +433,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       year: '2025',
     });
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.noRadioOption,
+      option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
@@ -444,9 +461,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);
@@ -455,7 +475,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: tenancyDateDetails.iAmNotSureRadioOption,
     });
     await performAction('selectNoticeDetails', {
-      option: noticeDetails.imNotSureRadioOption,
+      option: confirmationOfNoticeGiven.imNotSureRadioOption,
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
@@ -483,10 +503,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
     await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performValidation('mainHeader', tenancyDetails.mainHeader);

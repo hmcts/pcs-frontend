@@ -60,6 +60,7 @@ export class ActionRegistry {
     ['enterTenancyStartDetailsUnKnown', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
     ['selectTenancyStartDateKnown', new RespondToClaimAction()],
+    ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

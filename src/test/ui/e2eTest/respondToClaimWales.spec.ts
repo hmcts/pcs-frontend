@@ -4,9 +4,9 @@ import config from 'config';
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
-  contactByTelephone,
-  contactByTextMessage,
-  contactPreference,
+  contactPreferenceEmailOrPost,
+  contactPreferencesTelephone,
+  contactPreferencesTextMessage,
   correspondenceAddress,
   dateOfBirth,
   defendantNameCapture,
@@ -17,12 +17,7 @@ import {
   tenancyDetails,
 } from '../data/page-data';
 import { writtenTerms } from '../data/page-data/writtenTerms.page.data';
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
-import {
-  ErrorMessageValidation,
-  PageContentValidation,
-  PageNavigationValidation,
-} from '../utils/validations/custom-validations';
+import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -40,9 +35,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async () => {
-  PageContentValidation.finaliseTest();
-  ErrorMessageValidation.finaliseTest();
-  PageNavigationValidation.finaliseTest();
+  finaliseAllValidations();
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
@@ -62,13 +55,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performValidation('mainHeader', contactPreference.mainHeader);
-    await performAction('clickButton', contactPreference.saveAndContinueButton);
-    await performAction('selectContactByTelephone', {
-      radioOption: contactByTelephone.yesRadioOption,
-      phoneNumber: contactByTelephone.ukPhoneNumberTextInput,
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
-    await performAction('selectContactByTextMessage', contactByTextMessage.noRadioOption);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
     await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
     await performValidation('mainHeader', licensedLandlord.mainHeader);
