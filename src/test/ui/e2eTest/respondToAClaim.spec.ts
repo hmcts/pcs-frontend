@@ -34,29 +34,34 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
 
-  switch (true) {
-    case testInfo.title.includes('Introductory'):
+  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
+    testInfo.title.includes(type)
+  );
+
+  switch (tenancyKey) {
+    case 'Introductory':
       process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
       process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
       break;
 
-    case testInfo.title.includes('Demoted'):
+    case 'Demoted':
       process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
       process.env.GROUNDS = 'RENT_ARREARS';
       break;
 
-    case testInfo.title.includes('Assured'):
+    case 'Assured':
       process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
       break;
 
-    case testInfo.title.includes('Secure'):
+    case 'Secure':
       process.env.TENANCY_TYPE = 'SECURE_TENANCY';
       break;
 
-    case testInfo.title.includes('Flexible'):
+    case 'Flexible':
       process.env.TENANCY_TYPE = 'FLEXIBLE_TENANCY';
       break;
   }
+
   if (testInfo.title.includes('@noDefendants')) {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
