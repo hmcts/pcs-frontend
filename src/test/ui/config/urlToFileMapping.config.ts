@@ -19,5 +19,6 @@ export default {
   'landlord-registered': 'landlordRegistered',
   'tenancy-date-unknown': 'tenancyDateUnknown',
   'tenancy-date-details': 'tenancyDateDetails',
-  'licensed-landlord': 'licensedLandlord',
+  'landlord-licensed': 'landlordLicensed',
+  'written-terms': 'writtenTerms',
 };

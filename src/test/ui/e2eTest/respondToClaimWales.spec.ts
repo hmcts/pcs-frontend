@@ -11,11 +11,12 @@ import {
   dateOfBirth,
   defendantNameCapture,
   freeLegalAdvice,
+  landlordLicensed,
   landlordRegistered,
-  licensedLandlord,
   startNow,
-  tenancyDetails,
+  //tenancyDetails,
 } from '../data/page-data';
+import { writtenTerms } from '../data/page-data/writtenTerms.page.data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -63,10 +64,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
     await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
     await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
-    await performAction('selectLicensedLandlord', {
-      question: licensedLandlord.isYourLandlordLicensedQuestion,
-      radioOption: licensedLandlord.iamNotSureRadioOption,
+    await performAction('selectLandlordLicensed', {
+      question: landlordLicensed.isYourLandlordLicensedQuestion,
+      radioOption: landlordLicensed.iamNotSureRadioOption,
     });
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performValidation('mainHeader', writtenTerms.mainHeader);
+    // await performValidation('mainHeader', tenancyDetails.mainHeader);
   });
 });

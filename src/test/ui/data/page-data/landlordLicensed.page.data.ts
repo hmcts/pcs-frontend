@@ -1,4 +1,4 @@
-export const licensedLandlord = {
+export const landlordLicensed = {
   mainHeader: `Licensed landlord`,
   respondToClaimParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
@@ -7,7 +7,7 @@ export const licensedLandlord = {
   publicRegisterLink: `Public Register (opens in new tab)`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  iamNotSureRadioOption: `I'm not sure`,
+  iamNotSureRadioOption: `I’m not sure`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
