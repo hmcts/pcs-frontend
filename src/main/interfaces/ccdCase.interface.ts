@@ -4,6 +4,7 @@ export enum CaseState {
 }
 
 export type YesNoValue = 'YES' | 'NO' | null;
+export type ContactPreference = 'EMAIL' | 'POST' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
 export enum YesNoEnum {
   YES = 'YES',
@@ -98,6 +99,7 @@ export interface CcdDefendantResponses {
   contactByEmail?: YesNoValue;
   contactByPost?: YesNoValue;
   contactByText?: YesNoValue;
+  preferenceType?: ContactPreference;
   landlordRegistered?: YesNoNotSureValue;
 }
 
