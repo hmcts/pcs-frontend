@@ -12,9 +12,9 @@ sauce:
       - crossbrowser
 
 playwright:
-  version: "1.58.1"
+  version: '1.58.1'
   configFile: playwright.sauce.config.ts
-nodeVersion: "v20"
+nodeVersion: 'v20'
 rootDir: ./
 
 npm:
@@ -24,17 +24,17 @@ npm:
 
 # $VAR expanded by saucectl from the machine running `yarn test:crossbrowser` (Jenkins agent env / local shell). No saucectl `-e` needed.
 env:
-  CI: "true"
-  TEST_URL: "$TEST_URL"
-  NPM_CONFIG_PRODUCTION: "false"
-  PCS_FRONTEND_IDAM_SECRET: "$PCS_FRONTEND_IDAM_SECRET"
-  IDAM_PCS_USER_PASSWORD: "$IDAM_PCS_USER_PASSWORD"
+  CI: 'true'
+  TEST_URL: '$TEST_URL'
+  NPM_CONFIG_PRODUCTION: 'false'
+  PCS_FRONTEND_IDAM_SECRET: '$PCS_FRONTEND_IDAM_SECRET'
+  IDAM_PCS_USER_PASSWORD: '$IDAM_PCS_USER_PASSWORD'
 
 # Quick feedback: only one suite active. Uncomment the blocks below for full Chrome/Firefox × Windows/macOS matrix.
 suites:
   - name: PCS crossbrowser chrome windows
-    platformName: "Windows 10"
-    screenResolution: "1440x900"
+    platformName: 'Windows 10'
+    screenResolution: '1440x900'
     preExec:
       # Sauce caps all preExec at 300s total; full install often needs --no-audit/--ignore-scripts (skip husky prepare).
       - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
@@ -42,9 +42,9 @@ suites:
     testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
     passThreshold: 1
     params:
-      browserName: "chromium"
-      project: "chromium"
-      grep: "@crossbrowser"
+      browserName: 'chromium'
+      project: 'chromium'
+      grep: '@crossbrowser'
 
 #  - name: PCS crossbrowser chrome mac
 #    platformName: "macOS 13"
