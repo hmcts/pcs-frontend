@@ -1,7 +1,7 @@
 import { fail } from 'node:assert';
 
-import axios, { AxiosResponse } from 'axios';
 import { describe, expect, test } from '@jest/globals';
+import axios, { AxiosResponse } from 'axios';
 
 const testUrl = process.env.TEST_URL || 'http://localhost:3209';
 
