@@ -1,4 +1,4 @@
 export const rentArrearsDispute = {
-  mainHeader: `Rent Arrears Dispute(Placeholder)`,
+  mainHeader: `Rent arrears`,
   continueButton: `Continue`,
 };

@@ -12,6 +12,7 @@ import {
   disputeClaimInterstitial,
   freeLegalAdvice,
   landlordRegistered,
+  nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   paymentInterstitial,
@@ -43,6 +44,7 @@ export class RespondToClaimAction implements IAction {
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
+      ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -243,6 +245,22 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  }
+
+  private async disputingOtherPartsOfTheClaim(doYouWantToDisputeOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
+      option: doYouWantToDisputeOption.disputeOption,
+    });
+
+    if (doYouWantToDisputeOption.disputeOption === nonRentArrearsDispute.yesRadioOption) {
+      await performAction(
+        'inputText',
+        nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
+        doYouWantToDisputeOption.disputeInfo
+      );
+    }
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
