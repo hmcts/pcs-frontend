@@ -55,7 +55,8 @@ export const submitCaseApiDataWales = {
 
     defendant1: {
       nameKnown: 'NO',
-      addressKnown: 'NO',
+      addressKnown: 'YES',
+      addressSameAsPossession: 'YES',
     },
 
     addAnotherDefendant: 'NO',
