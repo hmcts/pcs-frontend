@@ -1,4 +1,25 @@
 {
-  "caption": "Respond to a property possession claim",
-  "pageTitle": "Non-Rent Arrears Dispute(Placeholder)"
+  "pageTitle": "Disputing the claim - HM Courts & Tribunals Service - GOV.UK",
+  "caption": "Respond to a possession claim",
+  "heading": "Disputing other parts of the claim",
+  "introParagraph": "You should <a href=\"/case/{{caseReference}}/view-claim\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">view the claim (opens in new tab)</a> to see if there’s any other parts of the claim that are incorrect or you disagree with.",
+  "includesHeading": "This includes:",
+  "includesBullet1": "{{claimantName}}'s grounds for possession (their reasons for making the claim)",
+  "includesBullet2": "any documents they’ve uploaded to support their claim",
+  "includesBullet3": "any other information they’ve given as part of their claim",
+  "disputeOtherPartsQuestion": "Do you want to dispute any other parts of the claim?",
+  "disputeOtherPartsOptions": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "disputeDetails": {
+    "label": "Explain which parts of the claim you do not agree with"
+  },
+  "errors": {
+    "disputeOtherParts": "Select if you want to dispute any other parts of the claim",
+    "disputeDetails": {
+      "required": "Enter which parts of the claim you do not agree with"
+    },
+    "disputeDetailsMaxLength": "Your explanation must be 6500 characters or fewer"
+  }
 }

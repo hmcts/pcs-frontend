@@ -1,16 +1,15 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
-
-import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'rent-arrears-dispute',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: `${__dirname}/rentArrearsDispute.njk`,
+  customTemplate: `${__dirname}/rentArrears.njk`,
   translationKeys: {
-    pageTitle: 'pageTitle',
+    heading: 'heading',
     caption: 'caption',
   },
   fields: [],

@@ -1,20 +1,12 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
-{% block pageTitle %}{{ pageTitle }}{% endblock %}
-
 {% block mainContent %}
-  {% if caption %}
-    <span class="govuk-caption-xl">{{ caption }}</span>
-  {% endif %}
-
-  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+  <span class="govuk-caption-xl">Responding to the claim</span>
+  <h1 class="govuk-heading-l">Rent arrears</h1>
 
   <form method="post" action="{{ url }}" novalidate>
-
     <div class="govuk-button-group">
       {{ govukButton({
         text: t('buttons.continue', { ns: 'common' }),
@@ -28,5 +20,4 @@
     </div>
     {{ csrfProtection(csrfToken) }}
   </form>
-
 {% endblock %}
