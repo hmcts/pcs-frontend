@@ -198,8 +198,8 @@ export class CcdCaseModel {
     return this.defendantResponses?.tenancyStartDate ?? undefined;
   }
 
-  get defendantResponsesReceivedFreeLegalAdvice(): string | undefined {
-    return this.defendantResponses?.receivedFreeLegalAdvice ?? undefined;
+  get defendantResponsesFreeLegalAdvice(): string | undefined {
+    return this.defendantResponses?.freeLegalAdvice ?? undefined;
   }
 
   get defendantResponsesDefendantNameConfirmation(): string | undefined {

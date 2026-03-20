@@ -89,7 +89,7 @@ export interface CcdLegacyDefendantCollectionItem {
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
-  receivedFreeLegalAdvice?: string;
+  freeLegalAdvice?: string;
   confirmNoticeGiven?: string;
   tenancyStartDateCorrect?: string;
   tenancyStartDate?: string;
