@@ -99,6 +99,7 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  env.IDAM_PCS_USER_EMAIL = 'pcs-citizen1-user@test.com'
 }
 
 def runE2ETests(yarnBuilder) {
