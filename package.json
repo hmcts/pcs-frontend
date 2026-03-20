@@ -168,7 +168,7 @@
     "@types/node": "22.19.3",
     "glob": "^13.0.1",
     "js-yaml": "^4.1.1",
-    "@azure/msal-browser": "4.27.0",
+    "@azure/msal-browser": "4.30.0",
     "superagent": "10.2.3",
     "brace-expansion": "2.0.2",
     "diff": "^8.0.3",
