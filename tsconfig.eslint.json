@@ -4,10 +4,6 @@
     "rootDir": ".",
     "noEmit": true
   },
-  "include": [
-    "src/**/*",
-    "playwright.config.ts",
-    "playwright.sauce.config.ts"
-  ],
+  "include": ["src/**/*", "playwright.config.ts", "playwright.sauce.config.ts"],
   "exclude": []
 }
