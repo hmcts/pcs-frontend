@@ -34,20 +34,29 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
 
-  if (testInfo.title.includes('Introductory')) {
-    process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
-    process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
-  } else if (testInfo.title.includes('Demoted')) {
-    process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
-    process.env.GROUNDS = 'RENT_ARREARS';
-  } else if (testInfo.title.includes('Assured')) {
-    process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
-  } else if (testInfo.title.includes('Secure')) {
-    process.env.TENANCY_TYPE = 'SECURE_TENANCY';
-  } else if (testInfo.title.includes('Flexible')) {
-    process.env.TENANCY_TYPE = 'FLEXIBLE_TENANCY';
-  }
+  switch (true) {
+    case testInfo.title.includes('Introductory'):
+      process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+      process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
+      break;
 
+    case testInfo.title.includes('Demoted'):
+      process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
+      process.env.GROUNDS = 'RENT_ARREARS';
+      break;
+
+    case testInfo.title.includes('Assured'):
+      process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
+      break;
+
+    case testInfo.title.includes('Secure'):
+      process.env.TENANCY_TYPE = 'SECURE_TENANCY';
+      break;
+
+    case testInfo.title.includes('Flexible'):
+      process.env.TENANCY_TYPE = 'FLEXIBLE_TENANCY';
+      break;
+  }
   if (testInfo.title.includes('@noDefendants')) {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
