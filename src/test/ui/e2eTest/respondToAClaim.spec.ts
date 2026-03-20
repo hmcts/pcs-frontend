@@ -36,7 +36,8 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
-  } if (testInfo.title.includes('@rentNonRent')) {
+  }
+  if (testInfo.title.includes('@rentNonRent')) {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
