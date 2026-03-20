@@ -24,6 +24,7 @@ test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
+  process.env.DEFENDENT_CORRESPONDENCE_ADDRESS = `${submitCaseApiDataWales.submitCasePayload.propertyAddress.AddressLine1}, ${submitCaseApiDataWales.submitCasePayload.propertyAddress.PostTown}, ${submitCaseApiDataWales.submitCasePayload.propertyAddress.PostCode}`;
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('validateAccessCodeAPI');
