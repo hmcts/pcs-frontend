@@ -37,7 +37,7 @@
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",
     "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $(git rev-parse --short HEAD) --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:openAllureReport": "yarn allure open allure-report",
-    "test:crossbrowser": "yarn playwright install && yarn exec ts-node --transpile-only scripts/crossbrowser/runSauceCrossbrowser.ts",
+    "test:crossbrowser": "yarn exec ts-node --transpile-only scripts/crossbrowser/runSauceCrossbrowser.ts",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"
   },

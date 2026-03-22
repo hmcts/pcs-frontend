@@ -1,9 +1,9 @@
 /**
  * Sauce preExec: remove project Playwright packages so only the Sauce runner's copy is used.
- * Run with: node scripts/sauce-remove-playwright.js (no ts-node on Sauce VM).
+ * Run after `npm install` via: npx ts-node --transpile-only ./scripts/sauce-remove-playwright.ts
  */
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 const root = path.join(__dirname, '..');
 const targets = [

@@ -143,6 +143,44 @@ await performValidationGroup(
 yarn test:functional
 ```
 
+### Cross-browser tests (Sauce Labs) — run locally
+
+Nightly Jenkins uses **`enableCrossBrowserTest`** + Sauce Connect; on your machine you start the tunnel yourself, then run the same **`yarn test:crossbrowser`** entrypoint from the **repository root** (not under `src/test/ui`).
+
+1. **Install dependencies** (once), from repo root:
+   ```bash
+   yarn install
+   ```
+2. **Sauce credentials** — export your Sauce Labs username and access key:
+   ```bash
+   export SAUCE_USERNAME='<your-sauce-username>'
+   export SAUCE_ACCESS_KEY='<your-sauce-access-key>'
+   ```
+3. **Sauce Connect** — start a tunnel and choose a tunnel name (example: `my-local-tunnel`). Use the [Sauce Connect](https://docs.saucelabs.com/secure-connections/sauce-connect-5/) CLI you use in your team (`sc` v5 or legacy `sc`):
+   ```bash
+   # Example — match flags to your Sauce Connect version / docs
+   sc run --tunnel-name my-local-tunnel
+   ```
+   Leave this process running.
+4. **Tunnel env for `saucectl`** — must match the tunnel you started (Jenkins defaults **do not** apply locally unless `BUILD_TAG` / `JENKINS_URL` are set):
+   ```bash
+   export SAUCE_TUNNEL_NAME='my-local-tunnel'
+   export SAUCE_TUNNEL_OWNER="$SAUCE_USERNAME"
+   ```
+5. **App / Idam** — set the same variables you use for functional UI tests, at minimum:
+   - **`TEST_URL`** — environment under test (e.g. AAT manage-case URL).
+   - **`PCS_FRONTEND_IDAM_SECRET`**, **`IDAM_PCS_USER_PASSWORD`** (and **`IDAM_PCS_USER_EMAIL`** if your specs use a fixed user instead of `createUser`).
+   - Other keys your **`global-setup.config.ts`** / specs expect (e.g. **`DATA_STORE_URL_BASE`**, **`CHANGE_ID`**) — same as local **`yarn test:functional`**.
+6. **Run cross-browser** from **repo root**:
+   ```bash
+   yarn test:crossbrowser
+   ```
+   This runs **`scripts/crossbrowser/runSauceCrossbrowser.ts`** → **`saucectl run`** using **`.sauce/config.yml`** (suites use **`grep: @crossbrowser`** and the specs listed in **`testMatch`**).
+
+**More detail (Jenkins vs local, vault, timeouts):** see **`docs/sauce-jenkins.md`**.
+
+**Troubleshooting:** if `saucectl` cannot reach Sauce (e.g. proxy errors), check corporate **`HTTP_PROXY` / `HTTPS_PROXY`** and **`NO_PROXY`** for `*.saucelabs.com`. If tests cannot reach HMCTS internal URLs from the Sauce VM, ensure Sauce Connect is running and the tunnel name/owner match step 4.
+
 ## 8. Troubleshooting
 
 | Issue                  | Solution                                    |
