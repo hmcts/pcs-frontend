@@ -18,7 +18,7 @@
   "errors": {
     "disputeOtherParts": "Select if you want to dispute any other parts of the claim",
     "disputeDetails": {
-      "required": "Enter which parts of the claim you do not agree with"
+      "required": "Explain which parts of the claim you do not agree with"
     },
     "disputeDetailsMaxLength": "Your explanation must be 6500 characters or fewer"
   }
