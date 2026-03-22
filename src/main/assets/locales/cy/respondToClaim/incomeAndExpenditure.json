@@ -1,0 +1,14 @@
+{
+  "caption": "cyResponding to the possession claim",
+  "pageTitle": "cyIncome and expenses",
+  "infoParagraph1": "cyProviding details about your finances could help the judge when they're deciding whether to grant the landlord a possession order, or if they can delay the date you have to leave your home.",
+  "infoParagraph2": "cyOn the day of the hearing, there may be a duty adviser at the court who can give you advice and represent you for free. They can also use this information to see if there's any additional benefits or support you might be entitled to.",
+  "question": "cyDo you want to provide details of your income and expenses?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
+  "errors": {
+    "provideFinanceDetails": "cySelect if you want to provide details of your income and expenses"
+  }
+}

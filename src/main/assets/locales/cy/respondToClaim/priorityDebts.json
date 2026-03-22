@@ -1,0 +1,31 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyPriority debts",
+  "paragraph1": "cyPriority debts are debts which could lead to serious consequences if you do not pay them.",
+  "paragraph2": "cyExcluding rent or mortgage arrears, priority debts are:",
+  "bulletList": [
+    "cycouncil tax arrears",
+    "cygas or electricity arrears",
+    "cyphone or internet arrears",
+    "cyTV licence arrears",
+    "cycourt fines",
+    "cyoverpaid tax credits",
+    "cypayments for goods bought on hire purchase or conditional sale",
+    "cyunpaid income tax, National Insurance or VAT",
+    "cyunpaid child maintenance"
+  ],
+  "guidanceLink": {
+    "text": "cyRead guidance from Citizens Advice on what counts as a priority debt (opens in new tab)",
+    "url": "https://www.citizensadvice.org.uk/debt-and-money/priority-debts/"
+  },
+  "question": "cyDo you have any priority debts?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
+  "errors": {
+    "hasPriorityDebts": {
+      "required": "cySelect if you have any priority debts"
+    }
+  }
+}

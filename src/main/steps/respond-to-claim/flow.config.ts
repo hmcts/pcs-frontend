@@ -49,11 +49,11 @@ export const flowConfig: JourneyFlowConfig = {
     'your-circumstances',
     'exceptional-hardship',
     'income-and-expenditure',
-    'what-regular-income-do-you-receive',
-    'have-you-applied-for-universal-credit',
+    'regular-income',
+    'universal-credit',
     'priority-debts',
     'priority-debt-details',
-    'what-other-regular-expenses-do-you-have',
+    'regular-expenses',
     'end-now',
   ],
   steps: {
@@ -358,25 +358,45 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'income-and-expenditure': {
       previousStep: 'exceptional-hardship',
-      defaultNext: 'what-regular-income-do-you-receive',
+      routes: [
+        {
+          condition: async (req, formData) => formData.provideFinanceDetails === 'yes',
+          nextStep: 'regular-income',
+        },
+        {
+          condition: async (req, formData) => formData.provideFinanceDetails === 'no',
+          nextStep: 'end-now',
+        },
+      ],
+      defaultNext: 'regular-income',
     },
-    'what-regular-income-do-you-receive': {
+    'regular-income': {
       previousStep: 'income-and-expenditure',
-      defaultNext: 'have-you-applied-for-universal-credit',
+      defaultNext: 'universal-credit',
     },
-    'have-you-applied-for-universal-credit': {
-      previousStep: 'what-regular-income-do-you-receive',
+    'universal-credit': {
+      previousStep: 'regular-income',
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
-      previousStep: 'have-you-applied-for-universal-credit',
+      previousStep: 'universal-credit',
+      routes: [
+        {
+          condition: async (req, formData) => formData.hasPriorityDebts === 'yes',
+          nextStep: 'priority-debt-details',
+        },
+        {
+          condition: async (req, formData) => formData.hasPriorityDebts === 'no',
+          nextStep: 'regular-expenses',
+        },
+      ],
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {
       previousStep: 'priority-debts',
-      defaultNext: 'what-other-regular-expenses-do-you-have',
+      defaultNext: 'regular-expenses',
     },
-    'what-other-regular-expenses-do-you-have': {
+    'regular-expenses': {
       previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
     },

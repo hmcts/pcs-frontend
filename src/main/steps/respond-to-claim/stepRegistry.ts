@@ -26,8 +26,8 @@ import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
-import { step as whatOtherRegularExpensesDoYouHave } from './regular-expenses';
-import { step as whatRegularIncomeDoYouReceive } from './regular-income';
+import { step as regularExpenses } from './regular-expenses';
+import { step as regularIncome } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
@@ -36,7 +36,7 @@ import { step as startNow } from './start-now';
 import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
-import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
+import { step as universalCredit } from './universal-credit';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -72,9 +72,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'your-circumstances': yourCircumstances,
   'exceptional-hardship': exceptionalHardship,
   'income-and-expenditure': incomeAndExpenditure,
-  'what-regular-income-do-you-receive': whatRegularIncomeDoYouReceive,
-  'have-you-applied-for-universal-credit': haveYouAppliedForUniversalCredit,
+  'regular-income': regularIncome,
+  'universal-credit': universalCredit,
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,
-  'what-other-regular-expenses-do-you-have': whatOtherRegularExpensesDoYouHave,
+  'regular-expenses': regularExpenses,
 };

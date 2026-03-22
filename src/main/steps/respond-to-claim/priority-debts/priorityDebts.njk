@@ -1,25 +1,25 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "macros/csrf.njk" import csrfProtection %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "macros/formButtons.njk" import formButtons %}
+
 {% block mainContent %}
-  {% if errorSummary %}
-    {{ govukErrorSummary(errorSummary) }}
-  {% endif %}
-  <h1 class="govuk-heading-l">Priority debts (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for Priority Debts step.</p>
-  <form method="post" action="{{ url }}">
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: continue,
-        attributes: { type: 'submit', name: 'action', value: 'continue' }
-      }) }}
-      {{ govukButton({
-        text: saveForLater,
-        classes: 'govuk-button--secondary',
-        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
-      }) }}
-    </div>
-    {{ csrfProtection(csrfToken) }}
-  </form>
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+
+  <p class="govuk-body">{{ paragraph1 }}</p>
+
+  <p class="govuk-body">{{ paragraph2 }}</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    {% for item in bulletList %}
+      <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+
+  <p class="govuk-body">
+    <a href="{{ guidanceLinkUrl }}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ guidanceLinkText }}</a>.
+  </p>
+
+  {{ formHtml | safe }}
+
+  {{ formButtons(buttons) }}
 {% endblock %}
