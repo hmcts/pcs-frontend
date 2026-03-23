@@ -9,9 +9,11 @@ export async function freeLegalAdviceErrorValidation(): Promise<void> {
   });*/
 }
 
-export async function freeLegalAdviceNavigationTests(): Promise<void>
-{
-  await performValidation('pageNavigation', freeLegalAdvice.feedbackLink, { element: freeLegalAdvice.feedbackParagraph, pageSlug: freeLegalAdvice.pageSlug });
+export async function freeLegalAdviceNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', freeLegalAdvice.feedbackLink, {
+    element: freeLegalAdvice.feedbackParagraph,
+    pageSlug: freeLegalAdvice.pageSlug,
+  });
   await performValidation('pageNavigation', freeLegalAdvice.backLink, startNow.mainHeader);
   await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
   await performValidation('pageNavigation', freeLegalAdvice.saveForLaterButton, dashboard.mainHeader);
