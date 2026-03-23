@@ -102,8 +102,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
+    //This is a placeholder page
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
