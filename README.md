@@ -177,6 +177,31 @@ Running accessibility tests:
 yarn test:accessibility
 ```
 
+#### Sauce Labs (cross-browser)
+
+These tests run on Sauce via [saucectl](https://docs.saucelabs.com/dev/cli/saucectl/) using `.sauce/config.yml`. Install dependencies first so `saucectl` is available:
+
+```bash
+yarn install
+```
+
+Set Sauce credentials (from [Sauce Labs user settings](https://app.saucelabs.com/user-settings)) and tunnel metadata so the script can attach to your Sauce Connect tunnel:
+
+```bash
+export SAUCE_USERNAME="your-sauce-username"
+export SAUCE_ACCESS_KEY="your-access-key"
+export SAUCE_TUNNEL_NAME="your-tunnel-id"    # same as `sc -i` / Sauce Connect
+export SAUCE_TUNNEL_OWNER="your-sauce-username"
+```
+
+Start **Sauce Connect** (`sc`) with a tunnel name that matches `SAUCE_TUNNEL_NAME`, then from the repo root:
+
+```bash
+yarn test:crossbrowser
+```
+
+For local Playwright-only runs against `@crossbrowser` (no Sauce), use `yarn test:crossbrowserlocal`. More detail: `docs/sauce-jenkins.md` and `src/test/ui/test-README.md`.
+
 ### Security
 
 #### CSRF prevention

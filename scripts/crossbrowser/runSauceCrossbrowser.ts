@@ -1,7 +1,14 @@
 import { spawnSync } from 'node:child_process';
+import * as fs from 'fs';
 import * as path from 'path';
 
 const root = path.join(__dirname, '../..');
+
+function saucectlInstalled(): boolean {
+  const bin = path.join(root, 'node_modules', '.bin', 'saucectl');
+  const winCmd = path.join(root, 'node_modules', '.bin', 'saucectl.cmd');
+  return fs.existsSync(bin) || fs.existsSync(winCmd);
+}
 
 function resolveTunnel(): { name: string; owner: string } | number {
   const jenkins = Boolean(process.env.BUILD_TAG || process.env.JENKINS_URL);
@@ -26,15 +33,30 @@ function main(): number {
     return tunnel;
   }
 
-  const args = ['exec', '--', 'saucectl', 'run'];
-  args.push('--tunnel-name', tunnel.name);
-  args.push('--tunnel-owner', tunnel.owner);
-  args.push('--tunnel-timeout', process.env.SAUCE_TUNNEL_TIMEOUT ?? '3m');
+  if (!saucectlInstalled()) {
+    console.error(
+      'saucectl is not installed. From the repo root run: yarn install\n' +
+        '(saucectl is a devDependency; it must be present under node_modules/.bin.)'
+    );
+    return 1;
+  }
 
-  const result = spawnSync('yarn', args, {
+  const args = [
+    'saucectl',
+    'run',
+    '--tunnel-name',
+    tunnel.name,
+    '--tunnel-owner',
+    tunnel.owner,
+    '--tunnel-timeout',
+    process.env.SAUCE_TUNNEL_TIMEOUT ?? '3m',
+  ];
+
+  const result = spawnSync('npx', args, {
     cwd: root,
     stdio: 'inherit',
     env: process.env,
+    shell: process.platform === 'win32',
   });
   return result.status ?? 1;
 }

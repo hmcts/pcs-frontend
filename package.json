@@ -29,7 +29,7 @@
     "test:functional": "yarn playwright install && yarn playwright test --project chrome --grep \"${FUNCTIONAL_TEST_SCOPE:-@regression}\"; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:fullfunctional": "yarn playwright install && yarn playwright test --project chrome; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:changed": "yarn playwright install && ts-node ./src/test/functional/helpers/runChangedTestHelper.ts; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
-    "test:E2eChrome": "yarn playwright install && yarn playwright test --project chrome --grep @crossbrowser; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:E2eChrome": "yarn playwright install && yarn playwright test --project chrome --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:E2eFirefox": "yarn playwright install && yarn playwright test --project firefox --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:E2eSafari": "yarn playwright install && yarn playwright test --project webkit --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:pact": "jest -c jest.pact.config.ts --runInBand",
@@ -38,6 +38,7 @@
     "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $(git rev-parse --short HEAD) --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:openAllureReport": "yarn allure open allure-report",
     "test:crossbrowser": "yarn exec ts-node --transpile-only scripts/crossbrowser/runSauceCrossbrowser.ts",
+    "test:crossbrowserlocal": "yarn playwright install && yarn playwright test --project chrome --grep @crossbrowser; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"
   },
