@@ -4,6 +4,7 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
@@ -37,5 +38,6 @@
         attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
       }) }}
     </div>
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
