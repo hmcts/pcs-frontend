@@ -43,10 +43,14 @@ export async function rentArrearsErrorValidation(): Promise<void> {
 }
 
 export async function rentArrearsNavigationTests(): Promise<void> {
+  // if NoticeDateProvided = no then go to NoticeDateUnknown
+  // if NoticeDateProvided = yes then go to NoticeDateKnown
+  // if NoticeServed = No then go to
   //   await performValidation(
   //     'pageNavigation',
   //     rentArrears.backLink,
-  //     disputeClaimInterstitial.getMainHeader(claimantsName)
+  //     not.getMainHeader(claimantsName)
   //   );
+
   await performValidation('pageNavigation', rentArrears.saveForLaterButton, dashboard.mainHeader);
 }
