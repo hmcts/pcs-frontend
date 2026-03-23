@@ -4,8 +4,14 @@ export enum CaseState {
 }
 
 export type YesNoValue = 'YES' | 'NO' | null;
+export type YesNoCapitalised = 'Yes' | 'No';
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
+
+export interface HouseholdCircumstances {
+  dependantChildren?: YesNoCapitalised;
+  dependantChildrenDetails?: string;
+}
 
 export interface CcdUserCase {
   id: string;
@@ -56,6 +62,7 @@ export interface PossessionClaimResponse {
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
+    householdCircumstances?: HouseholdCircumstances;
   };
 }
 
