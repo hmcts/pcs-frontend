@@ -1,8 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import * as path from 'path';
 
-import { loadSauceEnvFiles } from './loadSauceEnv';
-
 const root = path.join(__dirname, '../..');
 
 const DEFAULT_GRID = 'https://ondemand.eu-central-1.saucelabs.com:443/wd/hub';
@@ -41,14 +39,13 @@ function buildCapabilitiesJson(): string {
 }
 
 function main(): number {
-  loadSauceEnvFiles(root);
   try {
     process.env.SELENIUM_REMOTE_URL = (process.env.SELENIUM_REMOTE_URL ?? DEFAULT_GRID).trim();
     process.env.SELENIUM_REMOTE_CAPABILITIES = buildCapabilitiesJson();
   } catch (e) {
     console.error(e instanceof Error ? e.message : e);
     console.error(
-      'Set SAUCE_USERNAME and SAUCE_ACCESS_KEY, or add them to .env.sauce.local in the repo root. For tunnelled URLs, set SAUCE_TUNNEL_NAME and SAUCE_TUNNEL_OWNER (same as Sauce Connect).'
+      'Export SAUCE_USERNAME and SAUCE_ACCESS_KEY (and SAUCE_TUNNEL_* if using Sauce Connect). See README — Sauce Labs (cross-browser).'
     );
     return 2;
   }

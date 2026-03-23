@@ -145,7 +145,7 @@ yarn test:functional
 
 ### Cross-browser tests (Sauce Labs) — run locally
 
-Nightly Jenkins uses **`enableCrossBrowserTest`** + Sauce Connect; on your machine you start the tunnel yourself, then run **`yarn test:crossbrowsersauce`** (or **`yarn test:crossbrowser`**) from the **repository root** (not under `src/test/ui`).
+Nightly Jenkins uses **`enableCrossBrowserTest`** + Sauce Connect; on your machine you start the tunnel yourself, then run **`yarn test:crossbrowserui`** (or **`yarn test:crossbrowser`**) from the **repository root** (not under `src/test/ui`).
 
 1. **Install dependencies** (once), from repo root:
    ```bash
@@ -173,13 +173,13 @@ Nightly Jenkins uses **`enableCrossBrowserTest`** + Sauce Connect; on your machi
    - Other keys your **`global-setup.config.ts`** / specs expect (e.g. **`DATA_STORE_URL_BASE`**, **`CHANGE_ID`**) — same as local **`yarn test:functional`**.
 6. **Run cross-browser** from **repo root**:
    ```bash
-   yarn test:crossbrowsersauce
+   yarn test:crossbrowserui
    ```
-   This runs **`scripts/crossbrowser/runSauceCrossbrowser.ts`** → **`saucectl run`** using **`.sauce/config.yml`** (suites use **`grep: @crossbrowser`** and the specs listed in **`testMatch`**).
+   This runs **`scripts/crossbrowser/runSauceCrossbrowser.ts`** → **`saucectl run`** using **`.sauce/config.yml`** (suites use **`grep` / `testMatch`** as defined in the YAML).
 
 #### Hybrid: APIs on agent, browser on Sauce (`test:crossbrowsergrid`)
 
-**`yarn test:crossbrowsergrid`** — Playwright and API calls run **on your machine or Jenkins**; only **Chrome** runs on Sauce via Selenium Grid ([Sauce](https://docs.saucelabs.com/web-apps/automated-testing/playwright/selenium-grid/), [Playwright](https://playwright.dev/docs/selenium-grid)). Use when **`saucectl`** cannot reach internal APIs. Same **`SAUCE_*`** and tunnel env as above; optional **`.env.sauce.local`** at repo root. **Chrome only** (experimental).
+**`yarn test:crossbrowsergrid`** — Playwright and API calls run **on your machine or Jenkins**; only **Chrome** runs on Sauce via Selenium Grid ([Sauce](https://docs.saucelabs.com/web-apps/automated-testing/playwright/selenium-grid/), [Playwright](https://playwright.dev/docs/selenium-grid)). Use when **`saucectl`** cannot reach internal APIs. Export **`SAUCE_USERNAME`**, **`SAUCE_ACCESS_KEY`**, and tunnel vars as for saucectl. **Chrome only** (experimental).
 
 **More detail:** **`docs/sauce-jenkins.md`**.
 

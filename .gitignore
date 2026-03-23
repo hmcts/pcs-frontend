@@ -20,7 +20,6 @@ mochawesome-report/
 npm-debug.log.*
 
 .env
-.env.sauce.local
 .project
 .settings/
 dist/

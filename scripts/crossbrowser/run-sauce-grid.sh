@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test:crossbrowsergrid — Playwright local; .env.sauce.local optional; exit 2 skips Allure (missing creds).
+# test:crossbrowsergrid — Playwright on agent; remote Chrome on Sauce. Exit 2 = missing creds (skip Allure).
 set -u
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

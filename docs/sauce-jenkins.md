@@ -20,15 +20,15 @@
 | **Tunnel env**      | Export **`SAUCE_TUNNEL_NAME`** and **`SAUCE_TUNNEL_OWNER`** (match **`sc -i`** / Sauce UI). Jenkins defaults do **not** apply when **`BUILD_TAG`** / **`JENKINS_URL`** are unset.                                                               |
 | **Sauce API creds** | Export **`SAUCE_USERNAME`** and **`SAUCE_ACCESS_KEY`** (your Sauce account).                                                                                                                                                                    |
 | **Idam / app**      | Export **`PCS_FRONTEND_IDAM_SECRET`** and **`IDAM_PCS_USER_PASSWORD`**. If you **skip `createUser`** and log in as a fixed user, also export **`IDAM_PCS_USER_EMAIL`** (it is forwarded in **`.sauce/config.yml`**). Optionally **`TEST_URL`**. |
-| **Run**             | `yarn test:crossbrowsersauce` or `yarn test:crossbrowser` (alias; tunnel already up). Proxy/HTTP proxy vars must be set in the shell if your network requires them.                                                                             |
+| **Run**             | `yarn test:crossbrowserui` or `yarn test:crossbrowser` (alias; tunnel already up). Set proxy env in the shell if required.                                                                                                                      |
 
 ---
 
 ## What runs (both environments)
 
-**`yarn test:crossbrowsersauce`** (or **`yarn test:crossbrowser`**) → **`scripts/crossbrowser/runSauceCrossbrowser.ts`** → **`saucectl run`** (all suites in **`.sauce/config.yml`**). Each suite uses Playwright **`grep: "@nightly"`** (see **`params`** in the YAML). **`testMatch`** limits which spec files run.
+**`yarn test:crossbrowserui`** (or **`yarn test:crossbrowser`**) → **`scripts/crossbrowser/runSauceCrossbrowser.ts`** → **`saucectl run`** (all suites in **`.sauce/config.yml`**). Suite **`params`** (e.g. **`grep`**) and **`testMatch`** are defined in the YAML.
 
-**Hybrid:** **`yarn test:crossbrowsergrid`** — Playwright + APIs on the agent; browser on Sauce only (see **`playwright.saucegrid.config.ts`**).
+**Hybrid:** **`yarn test:crossbrowsergrid`** → **`playwright.saucegrid.config.ts`** — Playwright + APIs on the agent; remote Chrome on Sauce (Selenium Grid).
 
 ## How env reaches the Sauce VM
 

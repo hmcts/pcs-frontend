@@ -179,32 +179,16 @@ yarn test:accessibility
 
 #### Sauce Labs (cross-browser)
 
-These tests run on Sauce via [saucectl](https://docs.saucelabs.com/dev/cli/saucectl/) using `.sauce/config.yml`. Install dependencies first so `saucectl` is available:
+| Script                            | What it does                                                                                                                                                                                                                                                                         |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`yarn test:crossbrowserui`**    | [saucectl](https://docs.saucelabs.com/dev/cli/saucectl/) — tests and browser run **on Sauce** per **`.sauce/config.yml`**. Runner mints S2S/Idam on the agent first; see **`docs/sauce-jenkins.md`**.                                                                                |
+| **`yarn test:crossbrowser`**      | Same as **`test:crossbrowserui`** (alias for Jenkins / older docs).                                                                                                                                                                                                                  |
+| **`yarn test:crossbrowsergrid`**  | **Hybrid:** Playwright + APIs on **your machine or Jenkins**; only **Chrome** on Sauce via Selenium Grid ([docs](https://docs.saucelabs.com/web-apps/automated-testing/playwright/selenium-grid/)). Set **`SAUCE_USERNAME`**, **`SAUCE_ACCESS_KEY`**, optional **`SAUCE_TUNNEL_*`**. |
+| **`yarn test:crossbrowserlocal`** | **No Sauce** — local Chromium, **`@crossbrowser`** specs only.                                                                                                                                                                                                                       |
 
-```bash
-yarn install
-```
+**saucectl (`test:crossbrowserui`):** install deps so `saucectl` exists (`yarn install`), export Sauce + tunnel vars from [user settings](https://app.saucelabs.com/user-settings), start **Sauce Connect** with a tunnel id that matches **`SAUCE_TUNNEL_NAME`**, then run **`yarn test:crossbrowserui`**. Set **`HTTP_PROXY` / `HTTPS_PROXY`** in the shell if your network requires them.
 
-Set Sauce credentials (from [Sauce Labs user settings](https://app.saucelabs.com/user-settings)) and tunnel metadata so the script can attach to your Sauce Connect tunnel:
-
-```bash
-export SAUCE_USERNAME="your-sauce-username"
-export SAUCE_ACCESS_KEY="your-access-key"
-export SAUCE_TUNNEL_NAME="your-tunnel-id"    # same as `sc -i` / Sauce Connect
-export SAUCE_TUNNEL_OWNER="your-sauce-username"
-```
-
-Start **Sauce Connect** (`sc`) with a tunnel name that matches `SAUCE_TUNNEL_NAME`, then from the repo root:
-
-```bash
-yarn test:crossbrowsersauce
-```
-
-(`yarn test:crossbrowser` is the same command — kept for Jenkins / scripts.) Set **`HTTP_PROXY` / `HTTPS_PROXY`** (or your team’s proxy env) in the shell before running if you need them.
-
-**Hybrid (APIs on your machine, browser on Sauce):** `yarn test:crossbrowsergrid`.
-
-For local Playwright-only runs against `@crossbrowser` (no Sauce), use `yarn test:crossbrowserlocal`. More detail: `docs/sauce-jenkins.md` and `src/test/ui/test-README.md`.
+More detail: **`docs/sauce-jenkins.md`** and **`src/test/ui/test-README.md`**.
 
 ### Security
 
@@ -238,12 +222,14 @@ There is a configuration section related with those headers, where you can speci
 
 - `referrerPolicy` - value of the `Referrer-Policy` header
 
-Here's an example setup:
+Here's an example setup (JSON):
 
-```json
-    "security": {
-      "referrerPolicy": "origin",
-    }
+```
+{
+  "security": {
+    "referrerPolicy": "origin"
+  }
+}
 ```
 
 Make sure you have those values set correctly for your application.
