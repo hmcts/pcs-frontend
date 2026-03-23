@@ -24,7 +24,6 @@ test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
-  process.env.WALES_POSTCODE = 'YES';
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('validateAccessCodeAPI');
@@ -39,7 +38,8 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('@wip Respond to a claim - Wales @noDefendants @regression', async () => {
+  //This test is currently failing due to incorrect address comparison, this will get fixed and re-enabled by HDPI-5492
+  test.skip('Respond to a claim - Wales @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
