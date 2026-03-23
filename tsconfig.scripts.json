@@ -10,6 +10,6 @@
     "skipLibCheck": true,
     "noUnusedLocals": true
   },
-  "include": ["scripts/**/*.ts", "playwright.sauce.config.ts"],
+  "include": ["scripts/**/*.ts", "playwright.sauce.config.ts", "playwright.saucegrid.config.ts"],
   "exclude": []
 }

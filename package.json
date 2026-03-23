@@ -38,6 +38,7 @@
     "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $(git rev-parse --short HEAD) --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:openAllureReport": "yarn allure open allure-report",
     "test:crossbrowser": "yarn exec ts-node --transpile-only scripts/crossbrowser/runSauceCrossbrowser.ts",
+    "test:crossbrowser:grid": "bash scripts/crossbrowser/run-sauce-grid.sh",
     "test:crossbrowserlocal": "yarn playwright install && yarn playwright test --project chrome --grep @crossbrowser; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"

@@ -141,7 +141,7 @@ module.exports = defineConfig([
     },
   },
   {
-    files: ['scripts/**/*.ts', 'playwright.sauce.config.ts'],
+    files: ['scripts/**/*.ts', 'playwright.sauce.config.ts', 'playwright.saucegrid.config.ts'],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: 2018,

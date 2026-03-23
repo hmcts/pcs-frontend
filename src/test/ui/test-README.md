@@ -177,7 +177,11 @@ Nightly Jenkins uses **`enableCrossBrowserTest`** + Sauce Connect; on your machi
    ```
    This runs **`scripts/crossbrowser/runSauceCrossbrowser.ts`** → **`saucectl run`** using **`.sauce/config.yml`** (suites use **`grep: @crossbrowser`** and the specs listed in **`testMatch`**).
 
-**More detail (Jenkins vs local, vault, timeouts):** see **`docs/sauce-jenkins.md`**.
+#### Hybrid: local Playwright + Sauce browser (Selenium Grid)
+
+**`yarn test:crossbrowser:grid`** — Playwright runs locally; only the browser is on Sauce ([Sauce](https://docs.saucelabs.com/web-apps/automated-testing/playwright/selenium-grid/), [Playwright](https://playwright.dev/docs/selenium-grid)). Use when **`saucectl`** cannot reach internal APIs. Same **`SAUCE_*`** and tunnel env as above; optional **`.env.sauce.local`** at repo root. **Chrome only** (experimental).
+
+**More detail:** **`docs/sauce-jenkins.md`**.
 
 **Troubleshooting:** if `saucectl` cannot reach Sauce or the tunnel never becomes ready, ensure Sauce Connect is running and **`SAUCE_TUNNEL_NAME`** / **`SAUCE_TUNNEL_OWNER`** match step 4. See [Sauce Connect](https://docs.saucelabs.com/secure-connections/sauce-connect-5/) for CLI flags (region, tunnel name).
 

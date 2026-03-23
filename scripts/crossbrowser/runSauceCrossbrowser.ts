@@ -2,6 +2,8 @@ import { spawnSync } from 'node:child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { loadSauceEnvFiles } from './loadSauceEnv';
+
 const root = path.join(__dirname, '../..');
 
 function saucectlInstalled(): boolean {
@@ -28,6 +30,7 @@ function resolveTunnel(): { name: string; owner: string } | number {
 }
 
 function main(): number {
+  loadSauceEnvFiles(root);
   const tunnel = resolveTunnel();
   if (typeof tunnel === 'number') {
     return tunnel;
