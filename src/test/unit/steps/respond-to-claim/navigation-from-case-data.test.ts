@@ -14,7 +14,18 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     }) as unknown as Request;
 
-  it('routes contact preferences telephone step from validated case data', async () => {
+  it('routes contact preferences telephone step from current step answer when provided', async () => {
+    const req = createReq({ isDefendantContactByPhone: false });
+
+    await expect(
+      getNextStep(req, 'contact-preferences-telephone', flowConfig, {}, { contactByTelephone: 'yes' })
+    ).resolves.toBe('contact-preferences-text-message');
+    await expect(
+      getNextStep(req, 'contact-preferences-telephone', flowConfig, {}, { contactByTelephone: 'no' })
+    ).resolves.toBe('dispute-claim-interstitial');
+  });
+
+  it('falls back to validated case data when current step answer is unavailable', async () => {
     const optedInReq = createReq({ isDefendantContactByPhone: true });
     const optedOutReq = createReq({ isDefendantContactByPhone: false });
 
@@ -26,7 +37,20 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes confirmation of notice step from validated case data', async () => {
+  it('routes confirmation of notice step from current step answer when provided', async () => {
+    const req = createReq({
+      defendantResponsesConfirmNoticeGiven: 'yes',
+      noticeDate: '2026-01-15',
+      noticeServed: 'YES',
+      claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+    });
+
+    await expect(
+      getNextStep(req, 'confirmation-of-notice-given', flowConfig, {}, { confirmNoticeGiven: 'imNotSure' })
+    ).resolves.toBe('rent-arrears-dispute');
+  });
+
+  it('routes confirmation of notice step from validated case data when current step answer is unavailable', async () => {
     const noticeDateProvidedReq = createReq({
       defendantResponsesConfirmNoticeGiven: 'yes',
       noticeDate: '2026-01-15',

@@ -65,13 +65,14 @@ export const step: StepDefinition = createFormStep({
   ],
 
   beforeRedirect: async req => {
-    const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
-    if (!emailForm) {
-      return;
-    }
+    const emailForm = req.body as Record<string, unknown>;
 
     const emailSelected = emailForm.contactByEmailOrPost === 'email';
     const postSelected = emailForm.contactByEmailOrPost === 'post';
+
+    if (!emailSelected && !postSelected) {
+      return;
+    }
 
     const existingEmailAddress =
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.emailAddress;
@@ -79,7 +80,11 @@ export const step: StepDefinition = createFormStep({
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {
         party: {
-          emailAddress: emailSelected ? emailForm['contactByEmailOrPost.email'] : existingEmailAddress ? '' : undefined,
+          emailAddress: emailSelected
+            ? (emailForm['contactByEmailOrPost.email'] as string | undefined)
+            : existingEmailAddress
+              ? ''
+              : undefined,
         },
       },
       defendantResponses: {
