@@ -11,6 +11,8 @@ import {
   isWelshProperty,
 } from '../utils';
 
+import { getPreviousStepForYourHouseholdAndCircumstances } from './yourHouseholdCircumstancesPreviousStep';
+
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
 export const flowConfig: JourneyFlowConfig = {
@@ -373,35 +375,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
-      previousStep: async (req: Request, formData: Record<string, unknown>) => {
-        const repaymentsAgreed = formData['repayments-agreed'] as Record<string, unknown> | undefined;
-        const confirmRepaymentsAgreed = repaymentsAgreed?.confirmRepaymentsAgreed;
-
-        // If user did not choose "No" on repayments-agreed, route always comes directly from that step.
-        // This also protects against stale installment data in session from earlier journey attempts.
-        if (confirmRepaymentsAgreed !== 'no') {
-          return 'repayments-agreed';
-        }
-
-        // "No" only routes through installment steps for rent arrears cases.
-        const rentArrearsClaim = await isRentArrearsClaim(req);
-        if (!rentArrearsClaim) {
-          return 'repayments-agreed';
-        }
-
-        const installmentPayments = formData['installment-payments'] as Record<string, unknown> | undefined;
-        const confirmInstallmentOffer = installmentPayments?.confirmInstallmentOffer;
-
-        if (confirmInstallmentOffer === 'yes') {
-          return 'how-much-afford-to-pay';
-        }
-        if (confirmInstallmentOffer === 'no') {
-          return 'installment-payments';
-        }
-
-        // Defensive fallback for partially-complete sessions.
-        return 'repayments-agreed';
-      },
+      previousStep: (req: Request) => getPreviousStepForYourHouseholdAndCircumstances(req),
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {
