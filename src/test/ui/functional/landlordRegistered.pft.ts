@@ -20,5 +20,5 @@ export async function landlordRegisteredNavigationTests(): Promise<void> {
   // --skipping this below line until pageNavigation validation supports to window handling-- story created HDPI-5329 in QA improvements board.
   //await performValidation('pageNavigation', registeredLandlord.publicRegisterLink,'Public Register');
   await performAction('clickRadioButton', landlordRegistered.yesRadioOption);
-  await performValidation('pageNavigation', landlordRegistered.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', landlordRegistered.saveForLaterButton, dashboard.mainHeader());
 }

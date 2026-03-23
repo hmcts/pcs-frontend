@@ -7,5 +7,5 @@ export async function disputeClaimInterstitialNavigationTests(): Promise<void> {
     disputeClaimInterstitial.backLink,
     contactPreferencesTextMessage.mainHeader
   );
-  await performValidation('pageNavigation', disputeClaimInterstitial.cancelLink, dashboard.mainHeader);
+  await performValidation('pageNavigation', disputeClaimInterstitial.cancelLink, dashboard.mainHeader());
 }

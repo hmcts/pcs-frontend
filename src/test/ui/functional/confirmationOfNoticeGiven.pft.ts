@@ -15,5 +15,5 @@ export async function confirmationOfNoticeGivenErrorValidation(): Promise<void> 
 export async function confirmationOfNoticeGivenNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', confirmationOfNoticeGiven.backLink, tenancyDateUnknown.mainHeader);
   await performAction('clickRadioButton', confirmationOfNoticeGiven.yesRadioOption);
-  await performValidation('pageNavigation', confirmationOfNoticeGiven.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', confirmationOfNoticeGiven.saveForLaterButton, dashboard.mainHeader());
 }

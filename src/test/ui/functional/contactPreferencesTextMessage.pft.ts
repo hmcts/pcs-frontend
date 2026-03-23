@@ -19,5 +19,5 @@ export async function contactPreferencesTextMessageNavigationTests(): Promise<vo
     question: contactPreferencesTextMessage.contactByTextMessageQuestion,
     option: contactPreferencesTextMessage.yesRadioOption,
   });
-  await performValidation('pageNavigation', contactPreferencesTextMessage.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', contactPreferencesTextMessage.saveForLaterButton, dashboard.mainHeader());
 }

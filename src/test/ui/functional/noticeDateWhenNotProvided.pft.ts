@@ -16,5 +16,5 @@ export async function noticeDateWhenNotProvidedErrorValidation(): Promise<void> 
 
 export async function noticeDateWhenNotProvidedNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', noticeDateWhenNotProvided.backLink, confirmationOfNoticeGiven.mainHeader);
-  await performValidation('pageNavigation', noticeDateWhenNotProvided.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', noticeDateWhenNotProvided.saveForLaterButton, dashboard.mainHeader());
 }
