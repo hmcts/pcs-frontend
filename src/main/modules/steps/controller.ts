@@ -138,7 +138,8 @@ export const createPostController = (
         });
       }
 
-      setFormData(req, stepName, req.body);
+      const { action: _, ...bodyWithoutAction } = req.body || {};
+      setFormData(req, stepName, bodyWithoutAction);
 
       if (beforeRedirect) {
         try {

@@ -108,6 +108,27 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
   },
+  getInitialFormData: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const existingAddress = validatedCase?.defendantContactDetailsPartyAddress;
+
+    if (!existingAddress) {
+      return {};
+    }
+
+    if (validatedCase?.hasDefendantContactDetailsPartyAddress) {
+      return { correspondenceAddressConfirm: 'yes' };
+    }
+
+    return {
+      correspondenceAddressConfirm: 'no',
+      'correspondenceAddressConfirm.addressLine1': existingAddress.AddressLine1 || '',
+      'correspondenceAddressConfirm.addressLine2': existingAddress.AddressLine2 || '',
+      'correspondenceAddressConfirm.townOrCity': existingAddress.PostTown || '',
+      'correspondenceAddressConfirm.county': existingAddress.County || '',
+      'correspondenceAddressConfirm.postcode': existingAddress.PostCode || '',
+    };
+  },
   beforeRedirect: async req => {
     let possessionClaimResponse: PossessionClaimResponse;
 

@@ -14,7 +14,18 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     }) as unknown as Request;
 
-  it('routes contact preferences telephone step from validated case data', async () => {
+  it('routes contact preferences telephone step from current step answer when provided', async () => {
+    const req = createReq({ isDefendantContactByPhone: false });
+
+    await expect(
+      getNextStep(req, 'contact-preferences-telephone', flowConfig, {}, { contactByTelephone: 'yes' })
+    ).resolves.toBe('contact-preferences-text-message');
+    await expect(
+      getNextStep(req, 'contact-preferences-telephone', flowConfig, {}, { contactByTelephone: 'no' })
+    ).resolves.toBe('dispute-claim-interstitial');
+  });
+
+  it('falls back to validated case data when current step answer is unavailable', async () => {
     const optedInReq = createReq({ isDefendantContactByPhone: true });
     const optedOutReq = createReq({ isDefendantContactByPhone: false });
 
@@ -26,7 +37,20 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes confirmation of notice step from validated case data', async () => {
+  it('routes confirmation of notice step from current step answer when provided', async () => {
+    const req = createReq({
+      defendantResponsesConfirmNoticeGiven: 'yes',
+      noticeDate: '2026-01-15',
+      noticeServed: 'YES',
+      claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+    });
+
+    await expect(
+      getNextStep(req, 'confirmation-of-notice-given', flowConfig, {}, { confirmNoticeGiven: 'imNotSure' })
+    ).resolves.toBe('rent-arrears-dispute');
+  });
+
+  it('routes confirmation of notice step from validated case data when current step answer is unavailable', async () => {
     const noticeDateProvidedReq = createReq({
       defendantResponsesConfirmNoticeGiven: 'yes',
       noticeDate: '2026-01-15',
@@ -68,6 +92,25 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
       'dispute-claim-interstitial'
+    );
+  });
+
+  it('derives date-of-birth back navigation from CCD defendant name-known state', async () => {
+    const nameKnownReq = createReq({ claimantEnteredDefendantDetailsNameKnown: 'YES' });
+    const nameUnknownReq = createReq({ claimantEnteredDefendantDetailsNameKnown: 'NO' });
+
+    await expect(getPreviousStep(nameKnownReq, 'defendant-date-of-birth', flowConfig, {})).resolves.toBe(
+      'defendant-name-confirmation'
+    );
+    await expect(getPreviousStep(nameUnknownReq, 'defendant-date-of-birth', flowConfig, {})).resolves.toBe(
+      'defendant-name-capture'
+    );
+  });
+
+  it('uses valid static previous step for household interstitial path', async () => {
+    const req = createReq({});
+    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
+      'repayments-agreed'
     );
   });
 });

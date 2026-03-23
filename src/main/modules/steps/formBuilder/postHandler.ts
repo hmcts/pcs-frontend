@@ -156,7 +156,7 @@ export function createPostHandler(
         return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
       }
 
-      const redirectPath = await navigation.getNextStepUrl(req, stepName);
+      const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction as Record<string, unknown>);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

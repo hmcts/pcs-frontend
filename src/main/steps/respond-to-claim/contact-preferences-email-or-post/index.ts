@@ -63,15 +63,41 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  getInitialFormData: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const existingEmail =
+      validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.emailAddress ?? undefined;
+    const preferenceType = validatedCase?.data?.possessionClaimResponse?.defendantResponses?.preferenceType;
+
+    if (
+      preferenceType === 'EMAIL' ||
+      validatedCase?.defendantResponsesContactByEmail === 'YES' ||
+      (typeof existingEmail === 'string' && existingEmail.trim().length > 0)
+    ) {
+      return {
+        contactByEmailOrPost: 'email',
+        ...(existingEmail ? { 'contactByEmailOrPost.email': existingEmail } : {}),
+      };
+    }
+
+    if (preferenceType === 'POST' || validatedCase?.defendantResponsesContactByPost === 'YES') {
+      return {
+        contactByEmailOrPost: 'post',
+      };
+    }
+
+    return {};
+  },
 
   beforeRedirect: async req => {
-    const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
-    if (!emailForm) {
-      return;
-    }
+    const emailForm = req.body as Record<string, unknown>;
 
     const emailSelected = emailForm.contactByEmailOrPost === 'email';
     const postSelected = emailForm.contactByEmailOrPost === 'post';
+
+    if (!emailSelected && !postSelected) {
+      return;
+    }
 
     const existingEmailAddress =
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.emailAddress;
@@ -79,7 +105,11 @@ export const step: StepDefinition = createFormStep({
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {
         party: {
-          emailAddress: emailSelected ? emailForm['contactByEmailOrPost.email'] : existingEmailAddress ? '' : undefined,
+          emailAddress: emailSelected
+            ? (emailForm['contactByEmailOrPost.email'] as string | undefined)
+            : existingEmailAddress
+              ? ''
+              : undefined,
         },
       },
       defendantResponses: {

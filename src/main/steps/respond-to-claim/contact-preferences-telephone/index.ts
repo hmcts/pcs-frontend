@@ -73,6 +73,26 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  getInitialFormData: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const contactByPhone = validatedCase?.defendantResponsesContactByPhone;
+    const phoneNumber = validatedCase?.defendantContactDetailsPartyPhoneNumber;
+
+    if (contactByPhone === 'YES') {
+      return {
+        contactByTelephone: 'yes',
+        ...(phoneNumber ? { 'contactByTelephone.phoneNumber': phoneNumber } : {}),
+      };
+    }
+
+    if (contactByPhone === 'NO') {
+      return {
+        contactByTelephone: 'no',
+      };
+    }
+
+    return {};
+  },
 
   beforeRedirect: async req => {
     const telephoneForm = req.body as Record<string, unknown>;

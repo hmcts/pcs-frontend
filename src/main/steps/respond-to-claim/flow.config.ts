@@ -14,6 +14,44 @@ import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
+function getContactByTelephoneAnswer(
+  req: Request,
+  currentStepData: Record<string, unknown> = {}
+): 'yes' | 'no' | undefined {
+  const currentAnswer = currentStepData.contactByTelephone;
+  if (currentAnswer === 'yes' || currentAnswer === 'no') {
+    return currentAnswer;
+  }
+
+  // Back-navigation fallback must always come from CCD data.
+  const fromCcd = req.res?.locals?.validatedCase?.isDefendantContactByPhone;
+  if (fromCcd === true) {
+    return 'yes';
+  }
+  if (fromCcd === false) {
+    return 'no';
+  }
+
+  return undefined;
+}
+
+function getConfirmNoticeGivenAnswer(
+  req: Request,
+  currentStepData: Record<string, unknown> = {}
+): 'yes' | 'no' | 'imNotSure' | undefined {
+  const currentAnswer = currentStepData.confirmNoticeGiven;
+  if (currentAnswer === 'yes' || currentAnswer === 'no' || currentAnswer === 'imNotSure') {
+    return currentAnswer;
+  }
+
+  const ccdAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+  if (ccdAnswer === 'yes' || ccdAnswer === 'no' || ccdAnswer === 'imNotSure') {
+    return ccdAnswer;
+  }
+
+  return undefined;
+}
+
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
@@ -100,13 +138,19 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-telephone': {
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> =>
-            !!req.res?.locals?.validatedCase?.isDefendantContactByPhone,
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => getContactByTelephoneAnswer(req, currentStepData) === 'yes',
           nextStep: 'contact-preferences-text-message',
         },
         {
-          condition: async (req: Request): Promise<boolean> =>
-            !req.res?.locals?.validatedCase?.isDefendantContactByPhone,
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => getContactByTelephoneAnswer(req, currentStepData) === 'no',
           nextStep: 'dispute-claim-interstitial',
         },
       ],
@@ -203,8 +247,12 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
             if (confirmNoticeGiven !== 'yes') {
               return false;
             }
@@ -214,8 +262,12 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'confirmation-of-notice-date-when-provided',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
             if (confirmNoticeGiven !== 'yes') {
               return false;
             }
@@ -225,8 +277,12 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'confirmation-of-notice-date-when-not-provided',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
             // Treat any non-yes value as "not yes" to avoid falling through
             // to notice-date pages when CCD returns an unexpected string.
             if (confirmNoticeGiven === 'yes') {
@@ -238,8 +294,12 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'rent-arrears-dispute',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
             // Treat any non-yes value as "not yes" to avoid falling through
             // to notice-date pages when CCD returns an unexpected string.
             if (confirmNoticeGiven === 'yes') {
@@ -326,7 +386,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
-      previousStep: 'repayments',
+      previousStep: 'repayments-agreed',
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {

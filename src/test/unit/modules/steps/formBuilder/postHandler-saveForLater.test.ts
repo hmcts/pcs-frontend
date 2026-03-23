@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 
 import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
 import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
+import * as flowModule from '@modules/steps/flow';
 import { createPostHandler } from '@modules/steps/formBuilder/postHandler';
 import * as dashboardModule from '@routes/dashboard';
 
@@ -81,6 +82,48 @@ describe('PostHandler - Save for Later Fix', () => {
   });
 
   describe('Fix #3: Save for Later Functionality', () => {
+    it('passes current step post payload to navigation for forward routing', async () => {
+      const getNextStepUrl = jest.fn().mockResolvedValue('/case/1771325608502536/respond-to-claim/contact-preferences');
+      (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
+        getNextStepUrl,
+      });
+
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respond-to-claim',
+        undefined,
+        undefined,
+        {
+          journeyName: 'respondToClaim',
+          basePath: '/case/:caseReference/respond-to-claim',
+          stepOrder: ['free-legal-advice', 'contact-preferences'],
+          steps: {
+            'free-legal-advice': {
+              defaultNext: 'contact-preferences',
+            },
+          },
+        }
+      );
+
+      mockRequest.body = {
+        hadLegalAdvice: 'yes',
+      };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(getNextStepUrl).toHaveBeenCalledWith(
+        mockRequest,
+        'free-legal-advice',
+        expect.objectContaining({ hadLegalAdvice: 'yes' })
+      );
+      expect(mockResponse.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1771325608502536/respond-to-claim/contact-preferences'
+      );
+    });
+
     it('should validate form before saving for later', async () => {
       const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim');
 
@@ -113,7 +156,9 @@ describe('PostHandler - Save for Later Fix', () => {
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       // Should save to session
-      expect(mockRequest.session?.formData?.['free-legal-advice']).toEqual({
+      expect(
+        (mockRequest.session as { formData?: Record<string, unknown> } | undefined)?.formData?.['free-legal-advice']
+      ).toEqual({
         hadLegalAdvice: 'yes',
       });
 

@@ -1,3 +1,5 @@
+import { format, parseISO } from 'date-fns';
+
 import { formatDatePartsToISODate } from '../../utils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
@@ -36,6 +38,25 @@ export const step: StepDefinition = createFormStep({
       },
     },
   ],
+  getInitialFormData: req => {
+    const tenancyStartDate = req.res?.locals?.validatedCase?.defendantResponsesTenancyStartDate;
+    if (!tenancyStartDate) {
+      return {};
+    }
+
+    const parsed = parseISO(tenancyStartDate);
+    if (Number.isNaN(parsed.getTime())) {
+      return {};
+    }
+
+    return {
+      tenancyStartDate: {
+        day: format(parsed, 'd'),
+        month: format(parsed, 'M'),
+        year: format(parsed, 'yyyy'),
+      },
+    };
+  },
   beforeRedirect: async req => {
     const dateObject = req.body?.tenancyStartDate;
     const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
