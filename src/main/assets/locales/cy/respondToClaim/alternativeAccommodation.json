@@ -1,0 +1,24 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "question": "cyWould you have somewhere else to live if you had to leave your home?",
+  "dateLabel": "cyWhen would you be able to move in (optional)?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "notSure": "cyI’m not sure"
+  },
+  "errors": {
+    "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
+      "notRealDate": "cyThe date you'd be able to move in must be a real date ",
+      "futureDate": "cyThe date you'd be able to move in must be in the future",
+      "invalidValue": "cyThe date you'd be able to move in must be a real date ",
+      "missingOne": "cyThe date you'd be able to move in must include a {{missingField}}",
+      "missingTwo": "cyThe date you'd be able to move in must include a {{first}} and {{second}}"
+    },
+    "confirmAlternativeAccommodation": "cySelect if you’d have somewhere else to live if you had to leave your home"
+  }
+}
