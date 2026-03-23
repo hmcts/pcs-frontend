@@ -14,7 +14,7 @@
       "month": "cyMonth",
       "year": "cyYear",
       "notRealDate": "cyThe date you'd be able to move in must be a real date ",
-      "futureDate": "cyThe date you'd be able to move in must be in the future",
+      "pastDate": "cyThe date you'd be able to move in must be in the future",
       "invalidValue": "cyThe date you'd be able to move in must be a real date ",
       "missingOne": "cyThe date you'd be able to move in must include a {{missingField}}",
       "missingTwo": "cyThe date you'd be able to move in must include a {{first}} and {{second}}"

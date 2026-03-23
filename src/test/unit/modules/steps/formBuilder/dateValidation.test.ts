@@ -185,7 +185,7 @@ describe('dateValidation', () => {
 
       it('should use translations object for year less than 1900 when provided', () => {
         const translations = { yearMustBeSameOrAfter: 'Custom year {{minYear}} message' };
-        const result = validateDateField('15', '06', '1899', true, undefined, false, true, translations);
+        const result = validateDateField('15', '06', '1899', true, undefined, false, true, false, translations);
         expect(result?.message).toBe('Custom year 1900 message');
         expect(result?.erroneousParts).toEqual(['year']);
       });
@@ -308,6 +308,7 @@ describe('dateValidation', () => {
           undefined,
           true,
           false,
+          false,
           translations
         );
         expect(result?.message).toBe('Custom future date error');
@@ -425,9 +426,92 @@ describe('dateValidation', () => {
           undefined,
           true,
           true,
+          false,
           translations
         );
         expect(result?.message).toBe('Custom future date error from translations');
+      });
+    });
+
+    describe('noPastDate validation', () => {
+      it('should return error for a past date when noPastDate is true', () => {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const t = createMockT({ 'errors.date.pastDate': 'Date must be today or in the future' });
+        const result = validateDateField(
+          yesterday.getDate().toString(),
+          (yesterday.getMonth() + 1).toString(),
+          yesterday.getFullYear().toString(),
+          true,
+          t,
+          false,
+          false,
+          true
+        );
+        expect(result?.message).toBe('Date must be today or in the future');
+      });
+
+      it('should accept todays date when noPastDate is true', () => {
+        const today = new Date();
+        const result = validateDateField(
+          today.getDate().toString(),
+          (today.getMonth() + 1).toString(),
+          today.getFullYear().toString(),
+          true,
+          undefined,
+          false,
+          false,
+          true
+        );
+        expect(result).toBeNull();
+      });
+
+      it('should accept a future date when noPastDate is true', () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const result = validateDateField(
+          tomorrow.getDate().toString(),
+          (tomorrow.getMonth() + 1).toString(),
+          tomorrow.getFullYear().toString(),
+          true,
+          undefined,
+          false,
+          false,
+          true
+        );
+        expect(result).toBeNull();
+      });
+
+      it('should return error for todays date when noPastDate and noCurrentDate are both true', () => {
+        const today = new Date();
+        const t = createMockT({ 'errors.date.pastDate': 'Date must be in the future' });
+        const result = validateDateField(
+          today.getDate().toString(),
+          (today.getMonth() + 1).toString(),
+          today.getFullYear().toString(),
+          true,
+          t,
+          false,
+          true,
+          true
+        );
+        expect(result?.message).toBe('Date must be in the future');
+      });
+
+      it('should accept a future date when noPastDate and noCurrentDate are both true', () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const result = validateDateField(
+          tomorrow.getDate().toString(),
+          (tomorrow.getMonth() + 1).toString(),
+          tomorrow.getFullYear().toString(),
+          true,
+          undefined,
+          false,
+          true,
+          true
+        );
+        expect(result).toBeNull();
       });
     });
   });
@@ -451,6 +535,11 @@ describe('dateValidation', () => {
     it('should return correct translation key for futureDate', () => {
       const result = getDateTranslationKey('futureDate');
       expect(result).toBe('dateFutureDate');
+    });
+
+    it('should return correct translation key for pastDate', () => {
+      const result = getDateTranslationKey('pastDate');
+      expect(result).toBe('datePastDate');
     });
 
     it('should return null for unknown key', () => {

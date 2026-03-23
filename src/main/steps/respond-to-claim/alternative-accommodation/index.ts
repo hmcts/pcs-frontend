@@ -29,6 +29,7 @@ export const step: StepDefinition = createFormStep({
               name: 'alternativeAccommodationDate',
               type: 'date',
               required: false,
+              noPastDate: true,
               legendClasses: 'govuk-label--s govuk-!-font-weight-bold',
               translationKey: {
                 label: 'dateLabel',
