@@ -1,7 +1,8 @@
-# Dependencies – Sauce runs npm install from package-lock.json
+# Dependencies – preExec runs npm install on the Sauce VM; do not upload local installs
 node_modules/
 .yarn/cache/
 .yarn/unplugged/
+.yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
 
@@ -19,13 +20,23 @@ coverage/
 .vscode/
 .DS_Store
 
-# Test reports
+# Test reports & local outputs
 allure-report/
 allure-results/
 playwright-report/
 test-results/
 blob-report/
 playwright/.cache/
+functional-output/
+smoke-output/
+pact/
+
+# Java / Gradle (not needed for Playwright suite)
+src/test/java/build/
+src/test/java/.gradle/
+
+# Local-only / tooling clones (keep paths short for Windows VMs)
+cnp-jenkins-library-hdpi/
 
 # Secrets
 .env
