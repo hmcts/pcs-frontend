@@ -59,6 +59,7 @@ export class ActionRegistry {
     ['enterTenancyStartDetailsUnKnown', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
     ['selectTenancyStartDateKnown', new RespondToClaimAction()],
+    ['tenancyOrContractTypeDetails', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
   ]);
 
