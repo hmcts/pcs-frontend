@@ -19,7 +19,7 @@ export async function repaymentsAgreedErrorValidation(): Promise<void> {
 }
 
 export async function repaymentsAgreedNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', repaymentsAgreed.backLink, repaymentsMade.mainHeader);
   await performAction('clickRadioButton', repaymentsAgreed.noRadioOption);
   await performValidation('pageNavigation', repaymentsAgreed.saveForLaterButton, dashboard.mainHeader);
-  await performValidation('pageNavigation', repaymentsAgreed.backLink, repaymentsMade.mainHeader);
 }
