@@ -61,12 +61,6 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
-    afterAlways('functionalTest:preview') {
-      archiveFunctionalTestReports()
-    }
-    afterAlways('fullFunctionalTest:preview') {
-      archiveFunctionalTestReports()
-    }
   }
 
   onMaster() {
