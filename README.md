@@ -1,4 +1,4 @@
-# pcs-frontend - SDM COMMENT
+# pcs-frontend
 
 ## Getting Started
 
