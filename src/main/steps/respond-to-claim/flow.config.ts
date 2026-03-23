@@ -31,7 +31,7 @@ export const flowConfig: JourneyFlowConfig = {
     'installment-payments',
     'how-much-afford-to-pay',
     'correspondence-address',
-    'contact-preferences',
+    'contact-preferences-email-or-post',
     'contact-preferences-telephone',
     'contact-preferences-text-message',
     'dispute-claim-interstitial',
@@ -94,9 +94,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'correspondence-address': {
       previousStep: 'defendant-date-of-birth',
-      defaultNext: 'contact-preferences',
+      defaultNext: 'contact-preferences-email-or-post',
     },
-    'contact-preferences': {
+    'contact-preferences-email-or-post': {
       previousStep: 'correspondence-address',
       defaultNext: 'contact-preferences-telephone',
     },
@@ -113,7 +113,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'dispute-claim-interstitial',
         },
       ],
-      previousStep: 'contact-preferences',
+      previousStep: 'contact-preferences-email-or-post',
     },
     'contact-preferences-text-message': {
       defaultNext: 'dispute-claim-interstitial',
