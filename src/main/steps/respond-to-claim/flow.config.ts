@@ -95,6 +95,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'contact-preferences',
     },
     'contact-preferences': {
+      previousStep: 'correspondence-address',
       defaultNext: 'contact-preferences-telephone',
     },
     'contact-preferences-telephone': {
@@ -326,7 +327,6 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'repayments-agreed',
     },
     'repayments-agreed': {
-      previousStep: 'repayments-made',
       routes: [
         {
           condition: async (
@@ -334,15 +334,24 @@ export const flowConfig: JourneyFlowConfig = {
             _formData: Record<string, unknown>,
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
-            const choseNo = currentStepData?.confirmRepaymentsAgreed === 'no';
-            if (!choseNo) {
+            if (currentStepData.repaymentsAgreed !== 'no') {
               return false;
             }
             return isRentArrearsClaim(req);
           },
           nextStep: 'installment-payments',
         },
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> =>
+            currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
+          nextStep: 'your-household-and-circumstances',
+        },
       ],
+      previousStep: 'repayments-made',
       defaultNext: 'your-household-and-circumstances',
     },
     'installment-payments': {

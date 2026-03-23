@@ -30,6 +30,11 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
+const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
+jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
+  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+}));
+
 const t = ((key: string) => {
   const translations: Record<string, string> = {
     pageTitle: 'Instalments',
@@ -93,6 +98,7 @@ describe('respond-to-claim installments step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
   });
 
   it('exposes correct step url and view', () => {
@@ -134,7 +140,10 @@ describe('respond-to-claim installments step', () => {
     const res = { status: jest.fn().mockReturnThis(), render: jest.fn() } as any;
     const next = jest.fn();
 
-    await step.postController!.post(
+    if (!step.postController) {
+      throw new Error('expected postController');
+    }
+    await step.postController.post(
       createReq({
         body: {
           action: 'continue',
@@ -164,8 +173,27 @@ describe('respond-to-claim installments step', () => {
     const res = { redirect: jest.fn() } as any;
     const next = jest.fn();
 
-    await step.postController!.post(req, res, next);
+    if (!step.postController) {
+      throw new Error('expected postController');
+    }
+    await step.postController.post(req, res, next);
 
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          installmentAmount: '123.45',
+          installmentFrequency: 'monthly',
+        }),
+      }),
+      {
+        defendantResponses: {
+          paymentAgreement: {
+            additionalRentContribution: '12345',
+            additionalContributionFrequency: 'monthly',
+          },
+        },
+      }
+    );
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 });

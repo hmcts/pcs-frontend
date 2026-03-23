@@ -37,20 +37,16 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
 
 const t = ((key: string) => {
   const translations: Record<string, string> = {
-    pageTitle: 'Repayments agreed',
+    pageTitle: 'Instalment payments',
     caption: 'Respond to a property possession claim',
-    question: 'Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?',
+    heading: 'Instalment offer',
+    paragraph1: 'Paragraph one',
+    paragraph2: 'Paragraph two',
+    paragraph3: 'Paragraph three',
+    paragraph4: 'Paragraph four',
+    question: 'Do you want to pay in instalments?',
     'options.yes': 'Yes',
     'options.no': 'No',
-    'options.or': 'or',
-    'options.imNotSure': "I'm not sure",
-    textAreaLabel:
-      'Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made',
-    textAreaHint: 'You can enter up to 500 characters',
-    'errors.repaymentsAgreed':
-      "Select if you've come to any agreement with Treetops Housing to repay the arrears since 20th May 2025",
-    'errors.repaymentsAgreed.repaymentsAgreedDetails':
-      'Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made',
     'buttons.saveAndContinue': 'Save and continue',
     'buttons.continue': 'Continue',
     'buttons.saveForLater': 'Save for later',
@@ -68,35 +64,25 @@ const t = ((key: string) => {
 }) as unknown as (key: string, options?: unknown) => string;
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { step } from '../../../../main/steps/respond-to-claim/repayments-agreed';
+import { step } from '../../../../main/steps/respond-to-claim/installment-payments';
 
-describe('respond-to-claim repayments-agreed step', () => {
+describe('respond-to-claim installment-payments step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (overrides: Record<string, unknown> = {}): any => ({
     body: {},
-    originalUrl: '/case/1234567890123456/respond-to-claim/repayments-agreed',
+    originalUrl: '/case/1234567890123456/respond-to-claim/installment-payments',
     query: { lang: 'en' },
     params: { caseReference: '1234567890123456' },
     session: {
       formData: {},
-      user: { accessToken: 'token' },
+      ccdCase: { id: '1234567890123456' },
     },
     app: { locals: { nunjucksEnv } },
     i18n: { getResourceBundle: jest.fn(() => ({})) },
-    res: {
-      locals: {
-        validatedCase: {
-          id: '1234567890123456',
-          data: {
-            possessionClaimResponse: {
-              claimantOrganisations: [{ value: 'Treetops Housing' }],
-            },
-          },
-        },
-      },
-    },
+    res: { locals: { validatedCase: { id: '1234567890123456' } } },
+
     ...overrides,
   });
 
@@ -105,19 +91,19 @@ describe('respond-to-claim repayments-agreed step', () => {
     mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
   });
 
-  it('exposes correct step url and default form view', () => {
-    expect(step.name).toBe('repayments-agreed');
-    expect(step.url).toBe('/case/:caseReference/respond-to-claim/repayments-agreed');
-    expect(step.view).toContain('formBuilder.njk');
+  it('exposes correct step url and view', () => {
+    expect(step.name).toBe('installment-payments');
+    expect(step.url).toBe('/case/:caseReference/respond-to-claim/installment-payments');
+    expect(step.view).toContain('instalmentOffer.njk');
   });
 
-  it('POST saves NO with defendantResponses.paymentAgreement', async () => {
+  it('POST saves YES to defendantResponses.paymentAgreement', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
 
     const req = createReq({
       body: {
         action: 'continue',
-        repaymentsAgreed: 'no',
+        confirmInstallmentOffer: 'yes',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -131,40 +117,9 @@ describe('respond-to-claim repayments-agreed step', () => {
 
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
-        paymentAgreement: {
-          repaymentPlanAgreed: 'NO',
-          repaymentAgreedDetails: undefined,
-        },
+        paymentAgreement: { repayArrearsInstalments: 'YES' },
       },
     });
-  });
-
-  it('POST saves YES with details', async () => {
-    (validateForm as jest.Mock).mockReturnValue({});
-
-    const req = createReq({
-      body: {
-        action: 'continue',
-        repaymentsAgreed: 'yes',
-        'repaymentsAgreed.repaymentsAgreedDetails': 'Paid £50 weekly',
-      },
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    const next = jest.fn();
-
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-    await step.postController.post(req, res, next);
-
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        paymentAgreement: {
-          repaymentPlanAgreed: 'YES',
-          repaymentAgreedDetails: 'Paid £50 weekly',
-        },
-      },
-    });
+    expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 });

@@ -222,20 +222,19 @@ function repaymentsAgreedMapper(formData: FormFieldValue): Record<string, unknow
     return {};
   }
 
-  const { confirmRepaymentsAgreed, repaymentsAgreementInfo } = formData as {
-    confirmRepaymentsAgreed?: unknown;
-    repaymentsAgreementInfo?: unknown;
-  };
+  const data = formData;
+  const repaymentsAgreed = data.repaymentsAgreed;
+  const repaymentsAgreedDetails = data['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined;
 
   const result: Record<string, unknown> = {};
 
-  if (typeof confirmRepaymentsAgreed === 'string') {
-    const mapped = yesNoNotSureEnum('repaymentPlanAgreed')(confirmRepaymentsAgreed);
+  if (typeof repaymentsAgreed === 'string') {
+    const mapped = yesNoNotSureEnum('repaymentPlanAgreed')(repaymentsAgreed);
     Object.assign(result, mapped);
   }
 
-  if (typeof repaymentsAgreementInfo === 'string' && repaymentsAgreementInfo.trim()) {
-    result.repaymentAgreedDetails = repaymentsAgreementInfo.trim();
+  if (typeof repaymentsAgreedDetails === 'string' && repaymentsAgreedDetails.trim()) {
+    result.repaymentAgreedDetails = repaymentsAgreedDetails.trim();
   }
 
   return result;
@@ -257,7 +256,8 @@ function instalmentsMapper(formData: FormFieldValue): Record<string, unknown> {
   if (typeof installmentAmount === 'string' && installmentAmount.trim()) {
     const amountNumber = Number(installmentAmount.trim());
     if (Number.isFinite(amountNumber)) {
-      result.additionalRentContribution = amountNumber;
+      // pcs-api MoneyGBP JSON is a pence string (MoneyGBPDeserializer).
+      result.additionalRentContribution = String(Math.round(amountNumber * 100));
     } else {
       logger.warn('instalmentsMapper received non-numeric installmentAmount');
     }
@@ -277,22 +277,22 @@ export const STEP_FIELD_MAPPING: Record<string, StepMapping> = {
     valueMapper: yesNoEnum('receivedFreeLegalAdvice'),
   },
   'repayments-made': {
-    backendPath: 'possessionClaimResponse.paymentAgreement',
+    backendPath: 'possessionClaimResponse.defendantResponses.paymentAgreement',
     frontendFields: ['confirmRepaymentsMade', 'repaymentsInfo'],
     valueMapper: repaymentsMadeMapper,
   },
   'repayments-agreed': {
-    backendPath: 'possessionClaimResponse.paymentAgreement',
-    frontendFields: ['confirmRepaymentsAgreed', 'repaymentsAgreementInfo'],
+    backendPath: 'possessionClaimResponse.defendantResponses.paymentAgreement',
+    frontendFields: ['repaymentsAgreed', 'repaymentsAgreed.repaymentsAgreedDetails'],
     valueMapper: repaymentsAgreedMapper,
   },
   'installment-payments': {
-    backendPath: 'possessionClaimResponse.paymentAgreement',
+    backendPath: 'possessionClaimResponse.defendantResponses.paymentAgreement',
     frontendField: 'confirmInstallmentOffer',
     valueMapper: yesNoEnum('repayArrearsInstalments'),
   },
   'how-much-afford-to-pay': {
-    backendPath: 'possessionClaimResponse.paymentAgreement',
+    backendPath: 'possessionClaimResponse.defendantResponses.paymentAgreement',
     frontendFields: ['installmentAmount', 'installmentFrequency'],
     valueMapper: instalmentsMapper,
   },

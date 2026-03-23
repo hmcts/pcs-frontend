@@ -1,40 +1,136 @@
+import type { Request } from 'express';
+
+import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
+import { createFormStep } from '@modules/steps';
+
+function mapRepaymentsAgreedToCcdValue(repaymentsAgreed: string | undefined): 'YES' | 'NO' | 'NOT_SURE' {
+  if (repaymentsAgreed === 'yes') {
+    return 'YES';
+  }
+  if (repaymentsAgreed === 'no') {
+    return 'NO';
+  }
+  return 'NOT_SURE';
+}
+
+function mapCcdRepaymentPlanToFormValue(
+  repaymentPlanAgreed: 'YES' | 'NO' | 'NOT_SURE' | null | undefined
+): 'yes' | 'no' | 'imNotSure' | undefined {
+  if (repaymentPlanAgreed === 'YES') {
+    return 'yes';
+  }
+  if (repaymentPlanAgreed === 'NO') {
+    return 'no';
+  }
+  if (repaymentPlanAgreed === 'NOT_SURE') {
+    return 'imNotSure';
+  }
+  return undefined;
+}
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',
   journeyFolder: 'respondToClaim',
+  showCancelButton: false,
   stepDir: __dirname,
   flowConfig,
+  beforeRedirect: async req => {
+    const repaymentsForm = req.body as Record<string, unknown>;
+    const repaymentsAgreed = repaymentsForm.repaymentsAgreed as string | undefined;
+
+    if (!repaymentsForm) {
+      return;
+    }
+    const existingRepaymentDetails =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
+        ?.repaymentAgreedDetails;
+
+    let repaymentAgreedDetails: string | undefined;
+    if (repaymentsAgreed === 'yes') {
+      repaymentAgreedDetails = repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined;
+    } else if (existingRepaymentDetails) {
+      repaymentAgreedDetails = '';
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        paymentAgreement: {
+          repaymentPlanAgreed: mapRepaymentsAgreedToCcdValue(repaymentsAgreed),
+          repaymentAgreedDetails,
+        },
+      },
+    };
+
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+  },
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    question: 'question',
+  },
+  getInitialFormData: (req: Request) => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const paymentAgreement = caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+    const repaymentPlanAgreed = paymentAgreement?.repaymentPlanAgreed;
+    const repaymentAgreedDetails = paymentAgreement?.repaymentAgreedDetails;
+
+    const formValue = mapCcdRepaymentPlanToFormValue(repaymentPlanAgreed);
+
+    if (formValue === undefined) {
+      return {};
+    }
+
+    const initial: Record<string, unknown> = { repaymentsAgreed: formValue };
+
+    if (formValue === 'yes' && repaymentAgreedDetails) {
+      initial['repaymentsAgreed.repaymentsAgreedDetails'] = repaymentAgreedDetails;
+    }
+
+    return initial;
+  },
+  extendGetContent: (req: Request) => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    const claimIssueDate = '20th May 2025';
+
+    return {
+      claimantName,
+      claimIssueDate,
+    };
   },
   fields: [
     {
-      name: 'confirmRepaymentsAgreed',
+      name: 'repaymentsAgreed',
       type: 'radio',
       required: true,
+      translationKey: { label: 'question' },
       legendClasses: 'govuk-visually-hidden',
-      translationKey: {
-        label: 'question',
-      },
       options: [
         {
           value: 'yes',
           translationKey: 'options.yes',
           subFields: {
-            repaymentsAgreementInfo: {
-              name: 'repaymentsAgreementInfo',
+            repaymentsAgreedDetails: {
+              name: 'repaymentsAgreedDetails',
               type: 'character-count',
               maxLength: 500,
               required: true,
-              errorMessage: 'errors.repaymentsAgreementInfo',
-              characterCountMessageKey: 'textAreaHint',
-              labelClasses: 'govuk-label--s govuk-!-font-weight-regular',
+              labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
               translationKey: {
                 label: 'textAreaLabel',
+              },
+              validator: (value: unknown) => {
+                const text = (value as string)?.trim();
+                const allowedCharsRegex = /^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u;
+
+                if (allowedCharsRegex.test(text)) {
+                  return true;
+                }
+                return 'errors.repaymentsAgreed.repaymentsAgreedDetails.invalid';
               },
             },
           },
@@ -45,20 +141,4 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  extendGetContent: req => {
-    const caseData = req.res?.locals?.validatedCase?.data as
-      | { claimantName?: string; claimIssueDate?: string }
-      | undefined;
-
-    const claimantName = caseData?.claimantName || 'Treetops Housing';
-    const claimIssueDate = caseData?.claimIssueDate || '20th May 2025';
-
-    const t = getTranslationFunction(req, 'repayments-agreed', ['common']);
-
-    return {
-      claimantName,
-      claimIssueDate,
-      heading: t('question', { claimantName, claimIssueDate }),
-    };
-  },
 });

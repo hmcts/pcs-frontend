@@ -209,8 +209,10 @@ describe('autoSaveDraftToCCD', () => {
 
       expect(mockUpdateDraftRespondToClaim).toHaveBeenCalledWith('access-token', 'ccd-case-id', {
         possessionClaimResponse: {
-          paymentAgreement: {
-            repayArrearsInstalments: 'YES',
+          defendantResponses: {
+            paymentAgreement: {
+              repayArrearsInstalments: 'YES',
+            },
           },
         },
       });
@@ -239,9 +241,11 @@ describe('autoSaveDraftToCCD', () => {
 
       expect(mockUpdateDraftRespondToClaim).toHaveBeenCalledWith('access-token', 'ccd-case-id', {
         possessionClaimResponse: {
-          paymentAgreement: {
-            additionalRentContribution: 148.5,
-            additionalContributionFrequency: 'monthly',
+          defendantResponses: {
+            paymentAgreement: {
+              additionalRentContribution: '14850',
+              additionalContributionFrequency: 'monthly',
+            },
           },
         },
       });
@@ -270,9 +274,11 @@ describe('autoSaveDraftToCCD', () => {
 
       expect(mockUpdateDraftRespondToClaim).toHaveBeenCalledWith('access-token', 'ccd-case-id', {
         possessionClaimResponse: {
-          paymentAgreement: {
-            anyPaymentsMade: 'NO',
-            paymentDetails: 'some payment details',
+          defendantResponses: {
+            paymentAgreement: {
+              anyPaymentsMade: 'NO',
+              paymentDetails: 'some payment details',
+            },
           },
         },
       });
@@ -282,8 +288,8 @@ describe('autoSaveDraftToCCD', () => {
       const { req, res } = createReqRes({
         stepName: 'repayments-agreed',
         sessionFormData: {
-          confirmRepaymentsAgreed: 'imNotSure',
-          repaymentsAgreementInfo: 'agreement details',
+          repaymentsAgreed: 'imNotSure',
+          'repaymentsAgreed.repaymentsAgreedDetails': 'agreement details',
         },
       });
 
@@ -291,9 +297,11 @@ describe('autoSaveDraftToCCD', () => {
 
       expect(mockUpdateDraftRespondToClaim).toHaveBeenCalledWith('access-token', 'ccd-case-id', {
         possessionClaimResponse: {
-          paymentAgreement: {
-            repaymentPlanAgreed: 'NOT_SURE',
-            repaymentAgreedDetails: 'agreement details',
+          defendantResponses: {
+            paymentAgreement: {
+              repaymentPlanAgreed: 'NOT_SURE',
+              repaymentAgreedDetails: 'agreement details',
+            },
           },
         },
       });
@@ -312,9 +320,11 @@ describe('autoSaveDraftToCCD', () => {
 
       expect(mockUpdateDraftRespondToClaim).toHaveBeenCalledWith('access-token', 'ccd-case-id', {
         possessionClaimResponse: {
-          paymentAgreement: {
-            // amount mapping should be skipped, but frequency should still be mapped
-            additionalContributionFrequency: 'monthly',
+          defendantResponses: {
+            paymentAgreement: {
+              // amount mapping should be skipped, but frequency should still be mapped
+              additionalContributionFrequency: 'monthly',
+            },
           },
         },
       });
@@ -328,7 +338,7 @@ describe('autoSaveDraftToCCD', () => {
       const original = STEP_FIELD_MAPPING[testStepName];
 
       (STEP_FIELD_MAPPING as Record<string, unknown>)[testStepName] = {
-        backendPath: 'possessionClaimResponse.paymentAgreement',
+        backendPath: 'possessionClaimResponse.defendantResponses.paymentAgreement',
         valueMapper: () => ({ testLeafField: 'OK' }),
       };
 
@@ -341,8 +351,10 @@ describe('autoSaveDraftToCCD', () => {
 
       expect(mockUpdateDraftRespondToClaim).toHaveBeenCalledWith('access-token', 'ccd-case-id', {
         possessionClaimResponse: {
-          paymentAgreement: {
-            testLeafField: 'OK',
+          defendantResponses: {
+            paymentAgreement: {
+              testLeafField: 'OK',
+            },
           },
         },
       });
