@@ -73,8 +73,25 @@ export const step: StepDefinition = createFormStep({
     question: 'question',
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const paymentAgreement = caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+    const caseData = req.res?.locals?.validatedCase?.data as
+      | {
+          possessionClaimResponse?: {
+            defendantResponses?: {
+              paymentAgreement?: {
+                repaymentPlanAgreed?: 'YES' | 'NO' | 'NOT_SURE' | null;
+                repaymentAgreedDetails?: string;
+              };
+            };
+            paymentAgreement?: {
+              repaymentPlanAgreed?: 'YES' | 'NO' | 'NOT_SURE' | null;
+              repaymentAgreedDetails?: string;
+            };
+          };
+        }
+      | undefined;
+
+    const pcr = caseData?.possessionClaimResponse;
+    const paymentAgreement = pcr?.defendantResponses?.paymentAgreement ?? pcr?.paymentAgreement;
     const repaymentPlanAgreed = paymentAgreement?.repaymentPlanAgreed;
     const repaymentAgreedDetails = paymentAgreement?.repaymentAgreedDetails;
 
