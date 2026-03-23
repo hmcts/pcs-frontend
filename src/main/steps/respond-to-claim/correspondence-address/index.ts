@@ -5,6 +5,7 @@ import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interf
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
+import { arrayToString } from '../../../utils/arrayToString';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -241,7 +242,7 @@ function getExistingAddress(req: Request): { formattedAddress: string } {
   // Check addressKnown field from CCD - if "YES" then address exists
   if (addressKnown === 'YES' && address) {
     const formattedAddress =
-      [
+      arrayToString([
         address.AddressLine1,
         address.AddressLine2,
         address.AddressLine3,
@@ -249,10 +250,7 @@ function getExistingAddress(req: Request): { formattedAddress: string } {
         address.County,
         address.PostCode,
         address.Country,
-      ]
-        .map(v => (v ?? '').trim())
-        .filter(Boolean)
-        .join(', ') + '?';
+      ]) + '?';
 
     return { formattedAddress };
   }

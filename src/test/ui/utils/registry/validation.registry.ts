@@ -8,6 +8,7 @@ import {
   BannerAlertValidation,
   FormLabelValueValidation,
   InputErrorValidation,
+  InputTextValueValidation,
   MainHeaderValidation,
   OptionListValidation,
   RadioButtonValidation,
@@ -30,6 +31,7 @@ export class ValidationRegistry {
     ['waitUntilElementDisappears', new VisibilityValidation()],
     ['autoValidatePageContent', new PageContentValidation()],
     ['pageNavigation', new PageNavigationValidation()],
+    ['inputTextValue', new InputTextValueValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {
