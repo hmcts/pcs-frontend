@@ -14,7 +14,7 @@ import {
   landlordLicensed,
   landlordRegistered,
   startNow,
-  //tenancyDetails,
+  tenancyDetails,
 } from '../data/page-data';
 import { writtenTerms } from '../data/page-data/writtenTerms.page.data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -72,6 +72,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: landlordLicensed.iamNotSureRadioOption,
     });
     await performValidation('mainHeader', writtenTerms.mainHeader);
-    // await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performValidation('mainHeader', tenancyDetails.mainHeader);
   });
 });
