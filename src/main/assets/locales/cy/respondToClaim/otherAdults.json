@@ -1,0 +1,16 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "question": "cyDo any other adults live in your home?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "imNotSure": "cyI’m not sure"
+  },
+  "textAreaLabel": "cyGive details about the other adults living in your home",
+  "textAreaHintText": "cyYou should include details about how many adults live in your home, their relationship to you, as well as anything else you think the court should know about them",
+  "errors": {
+    "confirmOtherAdults": "cySelect if any other adults live in your home",
+    "otherAdultsInfo": "cyGive details about the other adults living in your home"
+  }
+}
