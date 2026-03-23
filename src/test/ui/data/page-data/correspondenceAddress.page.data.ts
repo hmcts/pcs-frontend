@@ -1,4 +1,4 @@
-import { address } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { address } from '../../utils/actions/custom-actions';
 export const correspondenceAddress = {
   get correspondenceAddressKnownMainHeader(): string {
     return `Is your correspondence address ${address}?`;
@@ -59,4 +59,7 @@ export const correspondenceAddress = {
       { type: `empty`, label: `Postcode`, errMessage: `Enter a valid UK postcode` },
     ],
   },
+  feedbackLink : `feedback (opens in new tab)`,
+  feedbackParagraph : `Tell us what you think!`,
+  pageSlug :`date-of-birth`
 };
