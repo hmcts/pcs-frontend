@@ -1,6 +1,7 @@
 import type { PossessionClaimResponse, YesNoValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { normalizeYesNoValue } from '../../utils';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
@@ -47,10 +48,12 @@ export const step: StepDefinition = createFormStep({
       | undefined;
 
     const stored = caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement?.repayArrearsInstalments;
-    if (stored === 'YES') {
+    const normalizedStored = normalizeYesNoValue(stored);
+
+    if (normalizedStored === 'YES') {
       return { confirmInstallmentOffer: 'yes' };
     }
-    if (stored === 'NO') {
+    if (normalizedStored === 'NO') {
       return { confirmInstallmentOffer: 'no' };
     }
 

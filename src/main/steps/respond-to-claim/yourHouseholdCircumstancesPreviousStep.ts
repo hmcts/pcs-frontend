@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import type { YesNoNotSureValue, YesNoValue } from '../../interfaces/ccdCase.interface';
-import { isRentArrearsClaim } from '../utils';
+import { isRentArrearsClaim, normalizeYesNoValue } from '../utils';
 
 type PaymentAgreementShape = {
   repaymentPlanAgreed?: YesNoNotSureValue;
@@ -69,7 +69,7 @@ export async function getPreviousStepForYourHouseholdAndCircumstances(req: Reque
     return 'repayments-agreed';
   }
 
-  const instalOffer = paymentAgreement?.repayArrearsInstalments;
+  const instalOffer = normalizeYesNoValue(paymentAgreement?.repayArrearsInstalments);
 
   if (instalOffer === 'YES') {
     if (hasInstalmentAmountOrFrequency(paymentAgreement)) {
