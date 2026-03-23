@@ -611,7 +611,7 @@ describe('formBuilder helpers', () => {
         ];
 
         const errors = validateForm(req, fields);
-        expect(errors.name).toBeDefined();
+        expect(errors.name).toBe('This field is required');
       });
 
       it('should return error for required textarea field with only whitespace', () => {
@@ -625,7 +625,7 @@ describe('formBuilder helpers', () => {
         ];
 
         const errors = validateForm(req, fields);
-        expect(errors.description).toBeDefined();
+        expect(errors.description).toBe('This field is required');
       });
 
       it('should return error for required character-count field with only whitespace', () => {
@@ -639,7 +639,7 @@ describe('formBuilder helpers', () => {
         ];
 
         const errors = validateForm(req, fields);
-        expect(errors.comments).toBeDefined();
+        expect(errors.comments).toBe('This field is required');
       });
 
       it('should return error for missing required checkbox field', () => {
