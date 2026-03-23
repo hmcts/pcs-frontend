@@ -24,7 +24,15 @@ function getContactByTelephoneAnswer(
   }
 
   // Back-navigation fallback must always come from CCD data.
-  return req.res?.locals?.validatedCase?.isDefendantContactByPhone ? 'yes' : 'no';
+  const fromCcd = req.res?.locals?.validatedCase?.isDefendantContactByPhone;
+  if (fromCcd === true) {
+    return 'yes';
+  }
+  if (fromCcd === false) {
+    return 'no';
+  }
+
+  return undefined;
 }
 
 function getConfirmNoticeGivenAnswer(
@@ -378,7 +386,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
-      previousStep: 'repayments',
+      previousStep: 'repayments-agreed',
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {

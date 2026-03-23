@@ -31,6 +31,11 @@ export const step: StepDefinition = createFormStep({
       },
     },
   ],
+  getInitialFormData: () => {
+    // This screen captures a respondent-entered optional date which is not
+    // currently exposed via validatedCase model getters.
+    return {};
+  },
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
 

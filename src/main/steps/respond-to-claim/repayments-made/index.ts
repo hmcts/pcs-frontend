@@ -44,6 +44,10 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  getInitialFormData: () => {
+    // Repayments answers are not currently exposed via validatedCase model getters.
+    return {};
+  },
   extendGetContent: req => {
     const validatedCase = req.res?.locals?.validatedCase;
     const claimantName = getClaimantName(req);

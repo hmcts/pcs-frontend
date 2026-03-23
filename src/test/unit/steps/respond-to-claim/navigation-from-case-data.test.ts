@@ -94,4 +94,23 @@ describe('respond-to-claim navigation from CCD case data', () => {
       'dispute-claim-interstitial'
     );
   });
+
+  it('derives date-of-birth back navigation from CCD defendant name-known state', async () => {
+    const nameKnownReq = createReq({ claimantEnteredDefendantDetailsNameKnown: 'YES' });
+    const nameUnknownReq = createReq({ claimantEnteredDefendantDetailsNameKnown: 'NO' });
+
+    await expect(getPreviousStep(nameKnownReq, 'defendant-date-of-birth', flowConfig, {})).resolves.toBe(
+      'defendant-name-confirmation'
+    );
+    await expect(getPreviousStep(nameUnknownReq, 'defendant-date-of-birth', flowConfig, {})).resolves.toBe(
+      'defendant-name-capture'
+    );
+  });
+
+  it('uses valid static previous step for household interstitial path', async () => {
+    const req = createReq({});
+    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
+      'repayments-agreed'
+    );
+  });
 });

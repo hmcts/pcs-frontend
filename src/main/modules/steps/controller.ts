@@ -138,7 +138,8 @@ export const createPostController = (
         });
       }
 
-      setFormData(req, stepName, req.body);
+      const { action: _, ...bodyWithoutAction } = req.body || {};
+      setFormData(req, stepName, bodyWithoutAction);
 
       if (beforeRedirect) {
         try {
@@ -151,8 +152,7 @@ export const createPostController = (
         }
       }
 
-      const { action: _, ...bodyWithoutAction } = req.body || {};
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

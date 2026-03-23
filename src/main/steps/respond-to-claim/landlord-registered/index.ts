@@ -37,6 +37,14 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  getInitialFormData: req => {
+    const landlordRegistered = req.res?.locals?.validatedCase?.defendantResponses?.landlordRegistered;
+    if (landlordRegistered === 'YES' || landlordRegistered === 'NO' || landlordRegistered === 'NOT_SURE') {
+      return { landlordRegistered };
+    }
+
+    return {};
+  },
   beforeRedirect: async req => {
     const landlordRegistered: YesNoNotSureValue | undefined = req.body?.landlordRegistered;
 
