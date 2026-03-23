@@ -83,8 +83,7 @@ export const step: StepDefinition = createFormStep({
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const circumstances =
-      caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const circumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
 
     if (!circumstances?.shareAdditionalCircumstances) {
       return {};
