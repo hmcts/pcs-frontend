@@ -2,7 +2,8 @@ import { spawnSync } from 'node:child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { loadSauceEnvFiles } from './loadSauceEnv';
+import { IdamUtils, ServiceAuthUtils } from '@hmcts/playwright-common';
+
 import { accessTokenApiData, s2STokenApiData } from '../../src/test/ui/data/api-data';
 import { user } from '../../src/test/ui/data/user-data';
 
@@ -14,34 +15,22 @@ function saucectlInstalled(): boolean {
   return fs.existsSync(bin) || fs.existsSync(winCmd);
 }
 
-/**
- * Same S2S lease as global-setup / Full E2E, but runs HERE (Jenkins agent or your machine with VPN).
- * Sauce VMs cannot resolve *.internal — saucectl forwards SERVICE_AUTH_TOKEN via .sauce/config.yml.
- */
 async function ensureS2STokenOnRunnerHost(): Promise<void> {
   if (process.env.SERVICE_AUTH_TOKEN?.trim()) {
-    console.log('SERVICE_AUTH_TOKEN already set; not fetching S2S again.');
     return;
   }
-  const { ServiceAuthUtils } = await import('@hmcts/playwright-common');
   process.env.S2S_URL = s2STokenApiData.s2sUrl;
   process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
     microservice: s2STokenApiData.microservice,
   });
 }
 
-/**
- * Same Idam password grant as global-setup / Full E2E, on the runner host.
- * Sauce VMs often fail DNS/outbound to idam-api from Node — forward BEARER_TOKEN via .sauce/config.yml.
- */
 async function ensureBearerTokenOnRunnerHost(): Promise<void> {
   if (process.env.BEARER_TOKEN?.trim()) {
-    console.log('BEARER_TOKEN already set; not fetching Idam again.');
     return;
   }
   process.env.IDAM_WEB_URL = accessTokenApiData.idamUrl;
   process.env.IDAM_TESTING_SUPPORT_URL = accessTokenApiData.idamTestingSupportUrl;
-  const { IdamUtils } = await import('@hmcts/playwright-common');
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
     username: user.claimantSolicitor.email,
     password: user.claimantSolicitor.password,
@@ -62,7 +51,7 @@ function resolveTunnel(): { name: string; owner: string } | number {
   }
   if (!name || !owner) {
     console.error(
-      'Set SAUCE_TUNNEL_NAME and SAUCE_TUNNEL_OWNER (same as local `sc -i` / dashboard). On HMCTS Jenkins use enableCrossBrowserTest + reform_tunnel.'
+      'Set SAUCE_TUNNEL_NAME and SAUCE_TUNNEL_OWNER (same as Sauce Connect). On Jenkins use enableCrossBrowserTest + reform_tunnel.'
     );
     return 1;
   }
@@ -70,18 +59,13 @@ function resolveTunnel(): { name: string; owner: string } | number {
 }
 
 async function main(): Promise<number> {
-  loadSauceEnvFiles(root);
-
   const tunnel = resolveTunnel();
   if (typeof tunnel === 'number') {
     return tunnel;
   }
 
   if (!saucectlInstalled()) {
-    console.error(
-      'saucectl is not installed. From the repo root run: yarn install\n' +
-        '(saucectl is a devDependency; it must be present under node_modules/.bin.)'
-    );
+    console.error('saucectl not found — run: yarn install');
     return 1;
   }
 
@@ -90,7 +74,7 @@ async function main(): Promise<number> {
     await ensureBearerTokenOnRunnerHost();
   } catch (e) {
     console.error(
-      'S2S or Idam token fetch failed on this machine (need PCS_FRONTEND_IDAM_SECRET + IDAM_PCS_USER_PASSWORD + VPN / same network as Full E2E Chrome).',
+      'S2S or Idam token fetch failed (PCS_FRONTEND_IDAM_SECRET, IDAM_PCS_USER_PASSWORD, VPN/network as for Full E2E).',
       e
     );
     return 1;
@@ -101,13 +85,14 @@ async function main(): Promise<number> {
   args.push('--tunnel-owner', tunnel.owner);
   args.push('--tunnel-timeout', process.env.SAUCE_TUNNEL_TIMEOUT ?? '3m');
 
-  const result = spawnSync('yarn', args, {
-    cwd: root,
-    stdio: 'inherit',
-    env: process.env,
-    shell: process.platform === 'win32',
-  });
-  return result.status ?? 1;
+  return (
+    spawnSync('yarn', args, {
+      cwd: root,
+      stdio: 'inherit',
+      env: process.env,
+      shell: process.platform === 'win32',
+    }).status ?? 1
+  );
 }
 
 main()

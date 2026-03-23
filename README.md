@@ -197,8 +197,12 @@ export SAUCE_TUNNEL_OWNER="your-sauce-username"
 Start **Sauce Connect** (`sc`) with a tunnel name that matches `SAUCE_TUNNEL_NAME`, then from the repo root:
 
 ```bash
-yarn test:crossbrowser
+yarn test:crossbrowsersauce
 ```
+
+(`yarn test:crossbrowser` is the same command — kept for Jenkins / scripts.) Set **`HTTP_PROXY` / `HTTPS_PROXY`** (or your team’s proxy env) in the shell before running if you need them.
+
+**Hybrid (APIs on your machine, browser on Sauce):** `yarn test:crossbrowsergrid`.
 
 For local Playwright-only runs against `@crossbrowser` (no Sauce), use `yarn test:crossbrowserlocal`. More detail: `docs/sauce-jenkins.md` and `src/test/ui/test-README.md`.
 

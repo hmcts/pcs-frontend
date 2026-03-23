@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-/** Load `.env.sauce.local` then `.env` from repo root if vars are not already set. */
+/** Used by `test:crossbrowsergrid` only — loads `.env.sauce.local` then `.env` if vars are unset. */
 export function loadSauceEnvFiles(rootDir: string): void {
   for (const name of ['.env.sauce.local', '.env']) {
     loadEnvFile(path.join(rootDir, name));

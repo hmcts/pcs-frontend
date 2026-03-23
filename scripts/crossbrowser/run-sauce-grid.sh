@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Hybrid Sauce Grid: Node loads .env.sauce.local via loadSauceEnv.ts; Allure skipped on exit 2 (missing creds).
+# test:crossbrowsergrid — Playwright local; .env.sauce.local optional; exit 2 skips Allure (missing creds).
 set -u
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

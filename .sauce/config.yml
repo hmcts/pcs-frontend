@@ -1,4 +1,4 @@
-# All suites run in one go: yarn test:crossbrowser → saucectl run (see scripts/crossbrowser/runSauceCrossbrowser.ts).
+# Entry: yarn test:crossbrowsersauce (alias: yarn test:crossbrowser) → saucectl run.
 apiVersion: v1alpha
 kind: playwright
 
@@ -22,7 +22,7 @@ npm:
     - url: https://registry.npmjs.org
   usePackageLock: false
 
-# $VAR expanded by saucectl from the machine running `yarn test:crossbrowser` (Jenkins agent env / local shell). No saucectl `-e` needed.
+# $VAR expanded by saucectl from the agent running test:crossbrowsersauce (proxy/HTTP_* from that shell).
 env:
   CI: 'true'
   TEST_URL: '$TEST_URL'

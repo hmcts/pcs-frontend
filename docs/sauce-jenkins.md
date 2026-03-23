@@ -20,13 +20,15 @@
 | **Tunnel env**      | Export **`SAUCE_TUNNEL_NAME`** and **`SAUCE_TUNNEL_OWNER`** (match **`sc -i`** / Sauce UI). Jenkins defaults do **not** apply when **`BUILD_TAG`** / **`JENKINS_URL`** are unset.                                                               |
 | **Sauce API creds** | Export **`SAUCE_USERNAME`** and **`SAUCE_ACCESS_KEY`** (your Sauce account).                                                                                                                                                                    |
 | **Idam / app**      | Export **`PCS_FRONTEND_IDAM_SECRET`** and **`IDAM_PCS_USER_PASSWORD`**. If you **skip `createUser`** and log in as a fixed user, also export **`IDAM_PCS_USER_EMAIL`** (it is forwarded in **`.sauce/config.yml`**). Optionally **`TEST_URL`**. |
-| **Run**             | `yarn test:crossbrowser` (with tunnel already up).                                                                                                                                                                                              |
+| **Run**             | `yarn test:crossbrowsersauce` or `yarn test:crossbrowser` (alias; tunnel already up). Proxy/HTTP proxy vars must be set in the shell if your network requires them.                                                                             |
 
 ---
 
 ## What runs (both environments)
 
-**`yarn test:crossbrowser`** → **`scripts/crossbrowser/runSauceCrossbrowser.ts`** → **`saucectl run`** (all suites in **`.sauce/config.yml`**). Each suite uses Playwright **`grep: "@nightly"`** (see **`params`** in the YAML). **`testMatch`** limits which spec files run.
+**`yarn test:crossbrowsersauce`** (or **`yarn test:crossbrowser`**) → **`scripts/crossbrowser/runSauceCrossbrowser.ts`** → **`saucectl run`** (all suites in **`.sauce/config.yml`**). Each suite uses Playwright **`grep: "@nightly"`** (see **`params`** in the YAML). **`testMatch`** limits which spec files run.
+
+**Hybrid:** **`yarn test:crossbrowsergrid`** — Playwright + APIs on the agent; browser on Sauce only (see **`playwright.saucegrid.config.ts`**).
 
 ## How env reaches the Sauce VM
 
@@ -34,7 +36,7 @@
 
 ## S2S
 
-**`S2S_SECRET`** is not passed through **`.sauce/config.yml`**. **`global-setup.config.ts`** uses **`s2SToken.api.data.ts`** and **`ServiceAuthUtils().retrieveToken()`** to set **`SERVICE_AUTH_TOKEN`** (same as local Playwright).
+**`S2S_SECRET`** is not passed through **`.sauce/config.yml`**. On the **Jenkins agent**, **`runSauceCrossbrowser.ts`** obtains **`SERVICE_AUTH_TOKEN`** (and Idam **`BEARER_TOKEN`**) before **`saucectl`**, and forwards them via **`.sauce/config.yml`**. On the **Sauce VM**, **`global-setup.config.ts`** skips those network calls when the tokens are already set (same pattern as local Playwright when tokens are not pre-set).
 
 ## Pre-exec timeout (300s)
 

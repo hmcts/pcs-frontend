@@ -2,7 +2,7 @@ import * as process from 'node:process';
 
 import { defineConfig, devices } from '@playwright/test';
 
-/** Local Playwright + remote Chrome on Sauce (Selenium Grid / CDP). See `yarn test:crossbrowser:grid`. */
+/** Selenium Grid: Playwright runs locally; Chrome on Sauce. Use `yarn test:crossbrowsergrid`. */
 export default defineConfig({
   testDir: './src/test/ui',
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
