@@ -35,9 +35,6 @@ pact/
 src/test/java/build/
 src/test/java/.gradle/
 
-# Local-only / tooling clones (keep paths short for Windows VMs)
-cnp-jenkins-library-hdpi/
-
 # Secrets
 .env
 .env.*
