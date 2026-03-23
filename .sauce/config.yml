@@ -40,7 +40,7 @@ suites:
       # Sauce caps all preExec at 300s total; full install often needs --no-audit/--ignore-scripts (skip husky prepare).
       - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
       - npx ts-node --transpile-only ./scripts/sauce-remove-playwright.ts
-    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+    testMatch: [".*e2eTest/.*\\.spec\\.ts"]
     passThreshold: 1
     params:
       browserName: 'chromium'

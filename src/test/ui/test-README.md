@@ -179,7 +179,7 @@ Nightly Jenkins uses **`enableCrossBrowserTest`** + Sauce Connect; on your machi
 
 **More detail (Jenkins vs local, vault, timeouts):** see **`docs/sauce-jenkins.md`**.
 
-**Troubleshooting:** if `saucectl` cannot reach Sauce (e.g. proxy errors), check corporate **`HTTP_PROXY` / `HTTPS_PROXY`** and **`NO_PROXY`** for `*.saucelabs.com`. If tests cannot reach HMCTS internal URLs from the Sauce VM, ensure Sauce Connect is running and the tunnel name/owner match step 4.
+**Troubleshooting:** if `saucectl` cannot reach Sauce or the tunnel never becomes ready, ensure Sauce Connect is running and **`SAUCE_TUNNEL_NAME`** / **`SAUCE_TUNNEL_OWNER`** match step 4. See [Sauce Connect](https://docs.saucelabs.com/secure-connections/sauce-connect-5/) for CLI flags (region, tunnel name).
 
 ## 8. Troubleshooting
 
