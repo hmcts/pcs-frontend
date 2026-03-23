@@ -71,7 +71,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', licensedLandlord.continueButton);
     await performAction('selectWrittenTerms', {
       question: writtenTerms.hasYourLandlordSentYourWrittenTermsQuestion,
-      radioOption: writtenTerms.iamNotSureRadioOption,
+      radioOption: writtenTerms.noRadioOption,
     });
     await performValidation('mainHeader', tenancyDetails.mainHeader);
   });
