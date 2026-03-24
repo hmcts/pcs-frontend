@@ -21,5 +21,5 @@ export const rentArrears = {
   theAmountYouBelieveErrorMessage: `The amount you believe you owe in rent arrears must be £0.00 or above`,
   lessThanBillionErrorMessage: `The amount you believe you owe in rent arrears must be less than £1 billion`,
   doYouOweThisAmountErrorMessage: `Do you owe this amount in rent arrears?`,
-  enterAmountInCorrectFormat: `Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write £148.00)`,
+  enterAmountInCorrectFormatErrorMessage: `Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write £148.00)`,
 };

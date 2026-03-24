@@ -45,7 +45,7 @@ export async function rentArrearsErrorValidation(): Promise<void> {
   await performAction('clickButton', rentArrears.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: rentArrears.thereIsAProblemErrorMessageHeader,
-    message: rentArrears.enterAmountInCorrectFormat,
+    message: rentArrears.enterAmountInCorrectFormatErrorMessage,
   });
 }
 
