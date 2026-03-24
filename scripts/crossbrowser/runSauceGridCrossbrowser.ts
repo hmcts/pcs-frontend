@@ -14,6 +14,8 @@ function buildCapabilitiesJson(): string {
 
   const sauceOptions: Record<string, unknown> = {
     devTools: true,
+    /** Enables Network + browser console in Sauce Test Details (Extended Debugging). */
+    extendedDebugging: true,
     username,
     accessKey,
     name: process.env.SAUCE_JOB_NAME ?? 'pcs-frontend-crossbrowser-grid',
