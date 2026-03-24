@@ -14,6 +14,7 @@ A structured, maintainable test automation solution built on Playwright that:
 ui/
 ├── config/                    # Configuration files
 │   └── global-setup.config.ts  # Global test setup configuration
+├── scripts/                   # CLI helpers (Sauce hybrid, Allure slack, etc.)
 ├── data/                      # Test data files
 ├── functional/                # Test/spec files
 ├── utils/                     # Core framework utilities

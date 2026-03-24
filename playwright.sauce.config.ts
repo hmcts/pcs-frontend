@@ -1,5 +1,7 @@
 /**
- * Default Playwright config for local runs, PR, and CI (no Sauce Labs Selenium Grid).
+ * Sauce Labs hybrid: Playwright on the agent, browser via Selenium Grid (`SELENIUM_REMOTE_URL`).
+ * Used only by `src/test/ui/scripts/run-playwright-sauce*.{sh,ts}` (`yarn test:sauce:*`).
+ * Reuses viewport/capture defaults from `./playwright.config`; Sauce-only reporters and launch args are below.
  */
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
@@ -16,22 +18,20 @@ export const artifactCapture = {
   trace: 'on-first-retry' as const,
 };
 
-export const VERY_SHORT_TIMEOUT = 1000;
-export const SHORT_TIMEOUT = 5000;
-export const actionRetries = 10;
-export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
-
-const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
-if (enable_all_page_functional_tests === 'true') {
-  process.env.ENABLE_CONTENT_VALIDATION = 'true';
-  process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true';
-  process.env.ENABLE_NAVIGATION_TESTS = 'true';
+function sauceViewport(): { width: number; height: number } {
+  const w = Number.parseInt(process.env.SAUCE_VIEWPORT_WIDTH ?? '1280', 10);
+  const h = Number.parseInt(process.env.SAUCE_VIEWPORT_HEIGHT ?? '960', 10);
+  return {
+    width: Number.isFinite(w) ? w : 1280,
+    height: Number.isFinite(h) ? h : 960,
+  };
 }
 
-export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'false';
-export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
-export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
-export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'false';
+function sauceChromiumLaunchArgs(viewport: { width: number; height: number }) {
+  return {
+    args: ['--start-maximized', `--window-size=${viewport.width},${viewport.height}`, '--window-position=0,0'],
+  };
+}
 
 function buildReporters(): PlaywrightTestConfig['reporter'] {
   const reporters: PlaywrightTestConfig['reporter'] = [['list']];
@@ -49,12 +49,26 @@ function buildReporters(): PlaywrightTestConfig['reporter'] {
   } catch {
     /* optional */
   }
+  try {
+    requireFromProject.resolve('@saucelabs/playwright-reporter');
+    reporters.push([
+      '@saucelabs/playwright-reporter',
+      {
+        region: process.env.SAUCE_PLAYWRIGHT_REGION || 'eu-central-1',
+        buildName: process.env.BUILD_NUMBER || process.env.BUILD_ID || 'local',
+        tags: ['pcs-frontend', 'crossbrowser', 'playwright'],
+      },
+    ]);
+  } catch {
+    /* optional */
+  }
   return reporters;
 }
 
 function buildProjects(): PlaywrightTestConfig['projects'] {
   const isMultiBrowserProfile = !!process.env.CI || process.env.ENABLE_MULTI_BROWSER_PROJECTS === 'true';
-  const viewport = DEFAULT_VIEWPORT;
+  const viewport = sauceViewport();
+  const sauceLaunch = sauceChromiumLaunchArgs(viewport);
 
   const projects: NonNullable<PlaywrightTestConfig['projects']> = [
     {
@@ -66,6 +80,7 @@ function buildProjects(): PlaywrightTestConfig['projects'] {
         javaScriptEnabled: true,
         viewport,
         headless: !!process.env.CI,
+        launchOptions: sauceLaunch,
       },
     },
   ];
@@ -73,6 +88,9 @@ function buildProjects(): PlaywrightTestConfig['projects'] {
   if (!isMultiBrowserProfile) {
     return projects;
   }
+
+  const edgeViewport = viewport;
+  const edgeLaunch = sauceChromiumLaunchArgs(edgeViewport);
 
   projects.push(
     {
@@ -126,8 +144,9 @@ function buildProjects(): PlaywrightTestConfig['projects'] {
         channel: 'msedge',
         ...artifactCapture,
         javaScriptEnabled: true,
-        viewport: DEFAULT_VIEWPORT,
+        viewport: edgeViewport,
         headless: !!process.env.CI,
+        launchOptions: edgeLaunch,
       },
     }
   );

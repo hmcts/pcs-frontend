@@ -8,13 +8,13 @@ import { user } from '../data/user-data';
 
 async function globalSetupConfig(): Promise<void> {
   if (!process.env.CI) {
-    clearEmvLocks();
+    clearEnvLocks();
   }
   await getS2SToken();
   await getAccessToken();
 }
 
-const clearEmvLocks = (): void => {
+const clearEnvLocks = (): void => {
   const lockDir = path.join(process.cwd(), 'test-results', 'pft-locks');
   fs.rmSync(lockDir, { recursive: true, force: true });
 };

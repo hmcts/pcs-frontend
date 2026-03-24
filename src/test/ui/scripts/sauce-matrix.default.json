@@ -1,5 +1,5 @@
 {
-  "_comment": "Active `matrix` rows are executed by bin/run-playwright-sauce-matrix.mjs (EU Central hub). Playwright → Selenium Grid → Sauce only drives Chromium-based browsers on the remote VM; see https://playwright.dev/docs/selenium-grid and README (test:sauce:chrome). Rows under `_disabled_matrix` are not run — kept as documentation with reasons.",
+  "_comment": "Executed by src/test/ui/scripts/run-playwright-sauce-matrix.ts (EU hub). Rows under `_disabled_matrix` are documentation only.",
   "matrix": [
     { "id": "eu-win-chrome", "platformName": "Windows 11", "browserName": "chrome", "playwrightProject": "chrome" },
     { "id": "eu-mac-chrome", "platformName": "macOS 13", "browserName": "chrome", "playwrightProject": "chrome" },
@@ -19,7 +19,7 @@
   ],
   "_disabled_matrix": [
     {
-      "_reason": "Playwright Selenium Grid path to Sauce does not run Firefox remotely; use CI (multi-browser projects) or run Playwright with ENABLE_MULTI_BROWSER_PROJECTS=true locally, or another Sauce product.",
+      "_reason": "Sauce Selenium Grid does not run Firefox remotely; use local Playwright with ENABLE_MULTI_BROWSER_PROJECTS=true or another Sauce product.",
       "id": "eu-win-firefox",
       "platformName": "Windows 11",
       "browserName": "firefox",

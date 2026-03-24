@@ -5,17 +5,6 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "playwright": {
-    "testTags": {
-      "@regression": "yarn test:functional (default FUNCTIONAL_TEST_SCOPE). Broader functional runs when combined with pipeline env.",
-      "@PR": "PR pipeline functional scope (Jenkinsfile_CNP); tests tagged for preview runs.",
-      "@nightly": "yarn test:E2eChrome | test:E2eFirefox | test:E2eSafari | test:E2eEdge; yarn test:sauce:chrome:nightly | test:sauce:matrix:nightly (E2E_GREP=@nightly).",
-      "@crossbrowser": "yarn test:sauce:chrome | test:sauce:matrix (default E2E_GREP=@crossbrowser). Sauce hybrid (Chrome/Edge on Sauce).",
-      "@accessibility": "yarn test:accessibility",
-      "@noDefendants": "Scenario filter in respond-to-claim specs (grep / conditional flows), not a separate npm script."
-    },
-    "artifacts": "Screenshots and video: see playwright.config.ts artifactCapture (full-page screenshot per test + full test video retained on pass and fail). Traces: on-first-retry only."
-  },
   "scripts": {
     "docker:login:hmctsprod": "az acr login --name hmctsprod",
     "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development USE_SSL=true OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback yarn start:dev",
@@ -35,20 +24,18 @@
     "test:coverage": "jest --coverage",
     "test:routes": "jest -c jest.routes.config.ts",
     "test:a11y": "echo 'Accessibility tests implemented later in the pipeline'",
-    "test:accessibility": "yarn playwright install && yarn playwright test --project chrome --grep @accessibility; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:accessibility": "yarn playwright install && yarn playwright test --config playwright.config.ts --project chrome --grep @accessibility; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:smoke": "NODE_TLS_REJECT_UNAUTHORIZED=0 jest -c jest.smoke.config.ts",
-    "test:functional": "yarn playwright install && yarn playwright test --project chrome --grep \"${FUNCTIONAL_TEST_SCOPE:-@regression}\"; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
-    "test:fullfunctional": "yarn playwright install && yarn playwright test --project chrome; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:functional": "yarn playwright install && yarn playwright test --config playwright.config.ts --project chrome --grep \"${FUNCTIONAL_TEST_SCOPE:-@regression}\"; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:fullfunctional": "yarn playwright install && yarn playwright test --config playwright.config.ts --project chrome; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:changed": "yarn playwright install && ts-node ./src/test/functional/helpers/runChangedTestHelper.ts; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
-    "test:E2eChrome": "yarn playwright install && yarn playwright test --project chrome --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
-    "test:E2eFirefox": "yarn playwright install && yarn playwright test --project firefox --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
-    "test:E2eSafari": "yarn playwright install && yarn playwright test --project webkit --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
-    "test:E2eEdge": "yarn playwright install msedge && yarn playwright test --project MicrosoftEdge --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
-    "test:sauce:chrome": "bash bin/run-playwright-sauce.sh",
-    "test:sauce:chrome:nightly": "E2E_GREP='@nightly' bash bin/run-playwright-sauce.sh",
-    "test:sauce:matrix": "node bin/run-playwright-sauce-matrix.mjs",
-    "test:sauce:matrix:nightly": "E2E_GREP='@nightly' node bin/run-playwright-sauce-matrix.mjs",
-    "test:crossbrowser": "yarn test:sauce:matrix:nightly",
+    "test:E2eChrome": "yarn playwright install && yarn playwright test --config playwright.config.ts --project chrome --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:E2eFirefox": "yarn playwright install && yarn playwright test --config playwright.config.ts --project firefox --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:E2eSafari": "yarn playwright install && yarn playwright test --config playwright.config.ts --project webkit --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:E2eEdge": "yarn playwright install && yarn playwright test --config playwright.config.ts --project MicrosoftEdge --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:sauce:chrome:nightly": "E2E_GREP='@nightly' bash src/test/ui/scripts/run-playwright-sauce.sh",
+    "test:sauce:matrix:nightly": "E2E_GREP='@nightly' yarn exec ts-node --transpile-only src/test/ui/scripts/run-playwright-sauce-matrix.ts",
+    "test:crossbrowser": "yarn test:sauce:chrome:nightly",
     "test:pact": "jest -c jest.pact.config.ts --runInBand",
     "pact:publish": "ts-node src/test/contract/publish/*.ts",
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",

@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# Run Playwright on this machine (Jenkins agent / local) while the browser runs on Sauce Labs.
-# API calls in globalSetup / beforeEach use HMCTS network from here — same model as probate-frontend WebDriver → Sauce.
-# See https://docs.saucelabs.com/web-apps/automated-testing/playwright/selenium-grid/
-# and https://playwright.dev/docs/selenium-grid
+# Hybrid: Playwright on agent, browser on Sauce (Selenium Grid). See https://playwright.dev/docs/selenium-grid
 set -euo pipefail
 
 if [[ -z "${SAUCE_USERNAME:-}" || -z "${SAUCE_ACCESS_KEY:-}" ]]; then
@@ -13,8 +10,6 @@ fi
 export SELENIUM_REMOTE_URL="${SELENIUM_REMOTE_URL:-https://ondemand.eu-central-1.saucelabs.com/wd/hub}"
 export SAUCE_PLAYWRIGHT_REGION="${SAUCE_PLAYWRIGHT_REGION:-eu-central-1}"
 
-# Smaller desktop = larger UI in Sauce video. Must be a Sauce-supported resolution for the OS/browser (1280x720 is not valid on Windows 11 Chrome).
-# See https://docs.saucelabs.com/dev/test-configuration-options/#screenresolution
 export SAUCE_SCREEN_RESOLUTION="${SAUCE_SCREEN_RESOLUTION:-1280x960}"
 
 export SELENIUM_REMOTE_CAPABILITIES="$(
@@ -40,15 +35,9 @@ E2E_GREP="${E2E_GREP:-@crossbrowser}"
 
 yarn playwright install
 EXIT_CODE=0
-yarn playwright test --project chrome --grep "${E2E_GREP}" --headed "$@" || EXIT_CODE=$?
+yarn playwright test --config playwright.sauce.config.ts --project chrome --grep "${E2E_GREP}" --headed "$@" || EXIT_CODE=$?
 allure generate --clean
 ts-node src/test/ui/config/clean-attachments.config.ts
 
-echo ""
-echo "── Reports ──"
-echo "  Allure (local):  yarn test:openAllureReport   →  allure-report/index.html"
-echo "  Sauce (EU):      https://app.eu-central-1.saucelabs.com/  (Automated → filter by build or tags: pcs-frontend, crossbrowser)"
-echo "  With @saucelabs/playwright-reporter enabled, job/result links also appear in the Playwright output above."
-echo ""
-
+echo "Allure: yarn test:openAllureReport  ·  Sauce EU: https://app.eu-central-1.saucelabs.com/"
 exit "$EXIT_CODE"

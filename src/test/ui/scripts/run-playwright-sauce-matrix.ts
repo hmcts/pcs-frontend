@@ -1,24 +1,28 @@
-#!/usr/bin/env node
 /**
- * Run @crossbrowser Playwright tests on Sauce across multiple OS × browser (EU Central hub).
- * Requires SAUCE_USERNAME, SAUCE_ACCESS_KEY. Matrix file: SAUCE_MATRIX_FILE or bin/sauce-matrix.default.json (only the `matrix` array runs; `_disabled_matrix` documents unsupported combos).
- * @see https://playwright.dev/docs/selenium-grid — remote path supports Chrome/Edge on Grid.
+ * Sauce matrix: EU Selenium hub, SAUCE_MATRIX_FILE or sauce-matrix.default.json (same directory).
  */
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { join } from 'node:path';
 
 const EU_HUB = 'https://ondemand.eu-central-1.saucelabs.com/wd/hub';
 const EU_REPORTER_REGION = 'eu-central-1';
 
-function buildCapabilities({ platformName, browserName, jobName }) {
+interface MatrixRow {
+  id: string;
+  platformName: string;
+  browserName: string;
+  playwrightProject: string;
+}
+
+interface MatrixFile {
+  matrix: MatrixRow[];
+}
+
+function buildCapabilities(params: { platformName: string; browserName: string; jobName: string }) {
+  const { platformName, browserName, jobName } = params;
   const screenResolution = process.env.SAUCE_SCREEN_RESOLUTION || '1280x960';
   const build = process.env.BUILD_NUMBER || process.env.BUILD_ID || 'local';
-  // Playwright on Sauce uses CDP (se:cdp); Sauce exposes it when devTools is true (Chrome + Edge Chromium).
-  // Edge was missing devTools → Playwright got no CDP URL → browserType.launch: Cannot read properties of undefined (reading 'startsWith').
   const cdpBrowsers = new Set(['chrome', 'MicrosoftEdge']);
   const devTools = cdpBrowsers.has(browserName);
   return {
@@ -37,16 +41,16 @@ function buildCapabilities({ platformName, browserName, jobName }) {
   };
 }
 
-function main() {
+function main(): void {
   if (!process.env.SAUCE_USERNAME || !process.env.SAUCE_ACCESS_KEY) {
     console.error('Set SAUCE_USERNAME and SAUCE_ACCESS_KEY.');
     process.exit(1);
   }
 
   const matrixPath = process.env.SAUCE_MATRIX_FILE || join(__dirname, 'sauce-matrix.default.json');
-  let data;
+  let data: MatrixFile;
   try {
-    data = JSON.parse(readFileSync(matrixPath, 'utf8'));
+    data = JSON.parse(readFileSync(matrixPath, 'utf8')) as MatrixFile;
   } catch (e) {
     console.error(`Cannot read matrix: ${matrixPath}`, e);
     process.exit(1);
@@ -59,8 +63,7 @@ function main() {
   }
 
   const yarn = process.platform === 'win32' ? 'yarn.cmd' : 'yarn';
-  // Selenium → Sauce matrix uses --project chrome / MicrosoftEdge; those channels need local browser stubs (not only bundled chromium).
-  let install = spawnSync(yarn, ['playwright', 'install', 'chrome', 'msedge'], { stdio: 'inherit', shell: false });
+  const install = spawnSync(yarn, ['playwright', 'install', 'chrome', 'msedge'], { stdio: 'inherit', shell: false });
   if (install.status !== 0) {
     process.exit(install.status ?? 1);
   }
@@ -80,7 +83,6 @@ function main() {
     const cap = buildCapabilities({ platformName, browserName, jobName });
     const env = {
       ...process.env,
-      // playwright.config.ts only registers firefox/webkit/MicrosoftEdge projects when this is set (or CI).
       ENABLE_MULTI_BROWSER_PROJECTS: 'true',
       SELENIUM_REMOTE_URL: EU_HUB,
       SELENIUM_REMOTE_CAPABILITIES: JSON.stringify(cap),
@@ -96,7 +98,18 @@ function main() {
 
     const r = spawnSync(
       yarn,
-      ['playwright', 'test', '--project', playwrightProject, '--grep', grepTag, '--headed', ...process.argv.slice(2)],
+      [
+        'playwright',
+        'test',
+        '--config',
+        'playwright.sauce.config.ts',
+        '--project',
+        playwrightProject,
+        '--grep',
+        grepTag,
+        '--headed',
+        ...process.argv.slice(2),
+      ],
       { stdio: 'inherit', env, shell: false }
     );
     if (r.status !== 0) {
@@ -110,12 +123,7 @@ function main() {
     cwd: process.cwd(),
   });
 
-  console.error('');
-  console.error('── Reports ──');
-  console.error('  Allure (local):  yarn test:openAllureReport');
-  console.error('  Sauce:           https://app.eu-central-1.saucelabs.com/');
-  console.error('');
-
+  console.error('Allure: yarn test:openAllureReport  ·  Sauce: https://app.eu-central-1.saucelabs.com/');
   process.exit(anyFailed ? 1 : 0);
 }
 
