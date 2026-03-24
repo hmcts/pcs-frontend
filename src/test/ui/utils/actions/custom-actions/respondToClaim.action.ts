@@ -146,6 +146,7 @@ export class RespondToClaimAction implements IAction {
       option: contactByPhoneData.radioOption,
     });
     if (contactByPhoneData.radioOption === contactPreferencesTelephone.yesRadioOption) {
+      process.env.CONTACT_PREFERENCES_TELEPHONE = 'YES';
       await performAction(
         'inputText',
         contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
