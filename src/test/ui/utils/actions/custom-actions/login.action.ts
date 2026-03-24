@@ -7,7 +7,7 @@ export class LoginAction implements IAction {
   async execute(page: Page, action: string, userType?: actionData, roles?: actionData): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['createUser', () => this.createUser(userType as string, roles as string[])],
-      ['login', () => this.login()],
+      ['login', () => this.login(page)],
       ['generateCitizenAccessToken', () => this.generateCitizenAccessToken()],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -17,8 +17,37 @@ export class LoginAction implements IAction {
     await actionToPerform();
   }
 
-  private async login() {
+  /**
+   * GOV.UK cookie banner on Idam / hmcts-access can steal focus or update the DOM while Playwright runs CDP
+   * actions — dismiss it before typing credentials (no-op if already accepted or absent).
+   */
+  private async acceptGovUkCookieBannerIfPresent(page: Page): Promise<void> {
+    const banner = page.locator('.govuk-cookie-banner');
+    const bannerVisible = await banner.isVisible({ timeout: 2_000 }).catch(() => false);
+    if (!bannerVisible) {
+      return;
+    }
+
+    const acceptPreferred = page.getByRole('button', {
+      name: /accept (analytics|additional) cookies/i,
+    });
+    try {
+      await acceptPreferred.first().waitFor({ state: 'visible', timeout: 5_000 });
+      await acceptPreferred.first().click();
+      await banner.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
+    } catch {
+      try {
+        await banner.getByRole('button', { name: /^accept/i }).first().click({ timeout: 3_000 });
+        await banner.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
+      } catch {
+        /* non-standard banner — continue; login may still work */
+      }
+    }
+  }
+
+  private async login(page: Page) {
     console.log('[login] Signing in with Idam email:', process.env.IDAM_PCS_USER_EMAIL ?? '(unset)');
+    await this.acceptGovUkCookieBannerIfPresent(page);
     await performAction('inputText', 'Email address', process.env.IDAM_PCS_USER_EMAIL);
     await performAction('inputText', 'Password', process.env.IDAM_PCS_USER_PASSWORD);
     await performAction('clickButton', 'Sign in');
