@@ -6,23 +6,11 @@
 
 {% block content %}
 
-  {% if propertyAddress %}
-    <h1 class="govuk-heading-m govuk-!-margin-bottom-4">
-      {{ propertyAddress }}
-    </h1>
-  {% endif %}
-
-  {% if dashboardCaseReference %}
-    <p class="govuk-body govuk-!-margin-bottom-4">
-      Case number: {{ dashboardCaseReference }}
-    </p>
-  {% endif %}
-
     
       {% if propertyAddress %}
-        <h2 class="govuk-heading-m govuk-!-margin-bottom-4">
+        <h1 class="govuk-heading-m govuk-!-margin-bottom-4">
           {{ propertyAddress }}
-        </h2>
+        </h1>
       {% endif %}
 
       {% if dashboardCaseReference %}
