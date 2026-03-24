@@ -24,7 +24,7 @@ export const step: StepDefinition = createFormStep({
       errorMessage: 'errors.exceptionalHardship',
       options: [
         {
-          value: 'YES',
+          value: 'yes',
           translationKey: 'options.yes',
           subFields: {
             exceptionalHardshipDetails: {
@@ -41,7 +41,7 @@ export const step: StepDefinition = createFormStep({
           },
         },
         {
-          value: 'NO',
+          value: 'no',
           translationKey: 'options.no',
         },
       ],
@@ -63,14 +63,19 @@ export const step: StepDefinition = createFormStep({
     };
   },
   beforeRedirect: async req => {
-    const exceptionalHardship = req.body?.exceptionalHardship as YesNoValue | undefined;
+    const exceptionalHardshipValue = req.body?.exceptionalHardship as string | undefined;
 
-    if (!exceptionalHardship) {
+    if (
+      !exceptionalHardshipValue ||
+      (exceptionalHardshipValue !== 'yes' && exceptionalHardshipValue !== 'no')
+    ) {
       return;
     }
 
+    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
+    const exceptionalHardship = ccdMapping[exceptionalHardshipValue];
     const exceptionalHardshipDetails =
-      exceptionalHardship === 'YES'
+      exceptionalHardshipValue === 'yes'
         ? (req.body?.['exceptionalHardship.exceptionalHardshipDetails'] as string | undefined)
         : undefined;
 
@@ -88,19 +93,18 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const householdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const existingAnswer = householdCircumstances?.exceptionalHardship as string | undefined;
 
-    // YesOrNo (CCD SDK type) serialises as "Yes"/"No"; normalise to uppercase to match radio option values
-    const exceptionalHardship = householdCircumstances?.exceptionalHardship
-      ? (String(householdCircumstances.exceptionalHardship).toUpperCase() as YesNoValue)
-      : undefined;
+    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
+    const exceptionalHardshipValue = existingAnswer ? mapping[existingAnswer] : undefined;
 
-    if (!exceptionalHardship) {
+    if (!exceptionalHardshipValue) {
       return {};
     }
 
     return {
-      exceptionalHardship,
-      ...(exceptionalHardship === 'YES' && householdCircumstances?.exceptionalHardshipDetails
+      exceptionalHardship: exceptionalHardshipValue,
+      ...(exceptionalHardshipValue === 'yes' && householdCircumstances?.exceptionalHardshipDetails
         ? {
             'exceptionalHardship.exceptionalHardshipDetails': householdCircumstances.exceptionalHardshipDetails,
           }

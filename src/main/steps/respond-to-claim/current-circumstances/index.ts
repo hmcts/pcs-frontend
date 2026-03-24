@@ -24,7 +24,7 @@ export const step: StepDefinition = createFormStep({
       errorMessage: 'errors.shareCircumstances',
       options: [
         {
-          value: 'YES',
+          value: 'yes',
           translationKey: 'options.yes',
           subFields: {
             circumstancesDetails: {
@@ -41,7 +41,7 @@ export const step: StepDefinition = createFormStep({
           },
         },
         {
-          value: 'NO',
+          value: 'no',
           translationKey: 'options.no',
         },
       ],
@@ -60,21 +60,23 @@ export const step: StepDefinition = createFormStep({
     };
   },
   beforeRedirect: async req => {
-    const shareCircumstances = req.body?.shareCircumstances as YesNoValue | undefined;
+    const shareCircumstances = req.body?.shareCircumstances as string | undefined;
 
-    if (!shareCircumstances) {
+    if (!shareCircumstances || (shareCircumstances !== 'yes' && shareCircumstances !== 'no')) {
       return;
     }
 
+    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
+    const shareAdditionalCircumstances = ccdMapping[shareCircumstances];
     const additionalCircumstancesDetails =
-      shareCircumstances === 'YES'
+      shareCircumstances === 'yes'
         ? (req.body?.['shareCircumstances.circumstancesDetails'] as string | undefined)
         : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances: {
-          shareAdditionalCircumstances: shareCircumstances,
+          shareAdditionalCircumstances,
           additionalCircumstancesDetails,
         },
       },
@@ -85,11 +87,10 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const circumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const existingAnswer = circumstances?.shareAdditionalCircumstances as string | undefined;
 
-    // YesOrNo (CCD SDK type) serialises as "Yes"/"No"; normalise to uppercase to match radio option values
-    const shareCircumstances = circumstances?.shareAdditionalCircumstances
-      ? (String(circumstances.shareAdditionalCircumstances).toUpperCase() as YesNoValue)
-      : undefined;
+    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
+    const shareCircumstances = existingAnswer ? mapping[existingAnswer] : undefined;
 
     if (!shareCircumstances) {
       return {};
@@ -97,7 +98,7 @@ export const step: StepDefinition = createFormStep({
 
     return {
       shareCircumstances,
-      ...(shareCircumstances === 'YES' && circumstances?.additionalCircumstancesDetails
+      ...(shareCircumstances === 'yes' && circumstances?.additionalCircumstancesDetails
         ? { 'shareCircumstances.circumstancesDetails': circumstances.additionalCircumstancesDetails }
         : {}),
     };
