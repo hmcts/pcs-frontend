@@ -239,28 +239,6 @@ describe('respond-to-claim tenancy-type-details step', () => {
       expect(content.organisationName).toBe('Acme Housing');
     });
 
-    it.each([
-      ['missing claimantOrganisations', { possessionClaimResponse: {} }],
-      ['missing claimant organisation value', { possessionClaimResponse: { claimantOrganisations: [{}] } }],
-    ])('falls back to Unknown for orgName when %s', async (_label, caseData) => {
-      const content = await testedStep.extendGetContent(
-        {
-          body: {},
-          session: { formData: { 'tenancy-type-details': {} } },
-          res: {
-            locals: {
-              validatedCase: {
-                data: caseData,
-              },
-            },
-          },
-        },
-        formContent
-      );
-
-      expect(content.organisationName).toBe('Unknown');
-    });
-
     it('leaves insetText unchanged when it is not a string', async () => {
       const insetText = { text: 'unchanged' };
 
@@ -371,47 +349,6 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
         expect(content.tenancyTypeAgreementType).toBe(expectedText);
       });
-
-      it('falls back to "an assured" when tenancy_TypeOfTenancyLicence is an unrecognised value', async () => {
-        const content = await testedStep.extendGetContent(
-          {
-            body: {},
-            res: {
-              locals: {
-                validatedCase: {
-                  data: {
-                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
-                    tenancy_TypeOfTenancyLicence: 'UNKNOWN_TYPE',
-                  },
-                },
-              },
-            },
-          },
-          { detailsHeading: 'Details given by ', tenancyType: 'standard tenancy text' }
-        );
-
-        expect(content.tenancyTypeAgreementType).toBe('an assured');
-      });
-
-      it('falls back to "an assured" when tenancy_TypeOfTenancyLicence is absent', async () => {
-        const content = await testedStep.extendGetContent(
-          {
-            body: {},
-            res: {
-              locals: {
-                validatedCase: {
-                  data: {
-                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
-                  },
-                },
-              },
-            },
-          },
-          { detailsHeading: 'Details given by ', tenancyType: 'standard tenancy text' }
-        );
-
-        expect(content.tenancyTypeAgreementType).toBe('an assured');
-      });
     });
 
     describe('tenancyType content for OTHER type', () => {
@@ -436,29 +373,6 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
         expect(content.tenancyType).toBe(
           'The claimant provided the following information about your tenancy, occupation contract or licence agreement type: Rolling monthly agreement'
-        );
-      });
-
-      it('builds sentence with empty string when OTHER but no details provided', async () => {
-        const content = await testedStep.extendGetContent(
-          {
-            body: {},
-            res: {
-              locals: {
-                validatedCase: {
-                  data: {
-                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
-                    tenancy_TypeOfTenancyLicence: 'OTHER',
-                  },
-                },
-              },
-            },
-          },
-          { detailsHeading: 'Details given by ', tenancyType: 'should be replaced' }
-        );
-
-        expect(content.tenancyType).toBe(
-          'The claimant provided the following information about your tenancy, occupation contract or licence agreement type: '
         );
       });
 

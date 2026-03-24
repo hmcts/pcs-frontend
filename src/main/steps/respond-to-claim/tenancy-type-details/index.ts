@@ -141,19 +141,19 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: async (req, formContent) => {
     const existingTenancyTypeCorrect = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
-      ?.tenancyTypeCorrect as TenancyTypeCorrectValue | undefined;
+      ?.tenancyTypeCorrect as TenancyTypeCorrectValue;
     const existingCorrectedTenancyType = req.res?.locals.validatedCase?.data?.possessionClaimResponse
-      ?.defendantResponses?.tenancyType as string | undefined;
+      ?.defendantResponses?.tenancyType as string;
     const tenancyTypeConfirm =
-      (req.body?.tenancyTypeConfirm as string | undefined) ||
+      (req.body?.tenancyTypeConfirm as string) ||
       (existingTenancyTypeCorrect ? CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect] : undefined);
     const correctType =
-      (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
-      (req.body?.correctType as string | undefined) ||
+      (req.body?.['tenancyTypeConfirm.correctType'] as string) ||
+      (req.body?.correctType as string) ||
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : undefined);
 
-    const orgName =
-      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]?.value || 'Unknown';
+    const orgName = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
+      ?.value as string;
     const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as string;
     const otherTenancyTypeDetails = req.res?.locals.validatedCase?.data
       ?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string;
@@ -165,9 +165,7 @@ export const step: StepDefinition = createFormStep({
         : formContent.detailsHeading;
     const tenancyType =
       tenancyTypeOfTenancyLicence === 'OTHER'
-        ? `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${
-            otherTenancyTypeDetails || ''
-          }`
+        ? `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${otherTenancyTypeDetails}`
         : formContent.tenancyType;
 
     return {
