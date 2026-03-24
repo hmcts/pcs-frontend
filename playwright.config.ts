@@ -9,6 +9,12 @@ export const actionRetries = 10;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
 
+/** Include firefox/webkit/mobile projects (not only chrome) on CI, Sauce Labs (saucectl), or when explicitly enabled. */
+const isMultiBrowserProfile =
+  !!process.env.CI ||
+  !!process.env.SAUCE_USERNAME ||
+  process.env.SAUCECTL === 'true';
+
 const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
 if (enable_all_page_functional_tests === 'true') {
   process.env.ENABLE_CONTENT_VALIDATION = 'true';
@@ -63,7 +69,7 @@ export default defineConfig({
         headless: !!process.env.CI,
       },
     },
-    ...(process.env.CI
+    ...(isMultiBrowserProfile
       ? [
           {
             name: 'firefox',

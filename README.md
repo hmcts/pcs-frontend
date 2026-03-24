@@ -171,6 +171,26 @@ There are also several custom test scripts available:
 - `test:E2eFirefox` - runs the full E2E suite in Firefox
 - `test:E2eSafari` - runs the full E2E suite in Safari
 
+#### Cross-browser E2E on Sauce Labs (saucectl)
+
+Functional UI tests can be executed on [Sauce Labs](https://saucelabs.com/) using the official [Playwright on Sauce](https://docs.saucelabs.com/web-apps/automated-testing/playwright/) flow (`saucectl`). Configuration lives in [`.sauce/config.yml`](.sauce/config.yml).
+
+Prerequisites:
+
+- Sauce credentials: `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` (e.g. export locally or inject from Jenkins / Azure Key Vault).
+- The same environment variables required for functional tests (see the end of this README), including IDAM and API settings. When using `saucectl`, the **Playwright process runs on Sauce Labs’ cloud**, so HTTP calls in `globalSetup` and `beforeEach` (IDAM, PCS API, CCD, etc.) are issued **from Sauce’s network**, not from the Jenkins agent. If your pipeline uses **internal** URLs (for example `*.service.core-compute-*.internal`), you must either use **public/preview URLs** for those endpoints when running on Sauce, or run **[Sauce Connect](https://docs.saucelabs.com/secure-connections/sauce-connect-5/)** so cloud tests can reach your network. Pass secrets into the job using the `env` block in `.sauce/config.yml` or `saucectl run --env KEY=value`.
+
+Run (after `yarn install`):
+
+```bash
+export SAUCE_USERNAME=your-sauce-user
+export SAUCE_ACCESS_KEY=your-sauce-key
+# plus PCS_FRONTEND_IDAM_SECRET, TEST_URL, PCS_API_URL, NODE_CONFIG_ENV=test, etc.
+yarn test:sauce
+```
+
+Suites are defined for Chrome (Windows 11), Firefox (Windows 11), and WebKit (macOS) against `src/test/ui/e2eTest/**/*.spec.ts`, with `grep: '@nightly'` to align with the existing nightly E2E scripts. Adjust `.sauce/config.yml` if you need a different tag or scope.
+
 Running accessibility tests:
 
 ```bash
