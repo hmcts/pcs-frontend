@@ -44,14 +44,12 @@ export const step: StepDefinition = createFormStep({
         },
       },
     };
-    console.log('Possession claim response to save to CCD', possessionClaimResponse);
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: req => {
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
     const householdCircumstances: HouseholdCircumstances | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    console.log('Household circumstances from CCD', householdCircumstances);
     const dependantChildrenCcd: YesNoCapitalised | undefined = householdCircumstances?.dependantChildren;
 
     if (!dependantChildrenCcd) {
