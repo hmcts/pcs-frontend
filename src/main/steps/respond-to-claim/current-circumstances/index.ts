@@ -19,7 +19,7 @@ export const step: StepDefinition = createFormStep({
       name: 'shareCircumstances',
       type: 'radio',
       required: true,
-      legendClasses: 'govuk-fieldset__legend--l',
+      legendClasses: 'govuk-fieldset__legend--m',
       translationKey: { label: 'question' },
       errorMessage: 'errors.shareCircumstances',
       options: [
@@ -68,7 +68,9 @@ export const step: StepDefinition = createFormStep({
 
     const shareAdditionalCircumstances = shareCircumstances === 'yes' ? 'YES' : 'NO';
     const additionalCircumstancesDetails =
-      shareCircumstances === 'yes' ? (req.body?.circumstancesDetails as string | undefined) : undefined;
+      shareCircumstances === 'yes'
+        ? (req.body?.['shareCircumstances.circumstancesDetails'] as string | undefined)
+        : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
@@ -89,12 +91,26 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
 
-    const shareCircumstances = circumstances.shareAdditionalCircumstances === 'YES' ? 'yes' : 'no';
+    // Map CCD enum to frontend value
+    const shareCircumstances =
+      circumstances.shareAdditionalCircumstances === 'YES'
+        ? 'yes'
+        : circumstances.shareAdditionalCircumstances === 'NO'
+          ? 'no'
+          : circumstances.shareAdditionalCircumstances === 'Yes'
+            ? 'yes'
+            : circumstances.shareAdditionalCircumstances === 'No'
+              ? 'no'
+              : undefined;
+
+    if (!shareCircumstances) {
+      return {};
+    }
 
     return {
       shareCircumstances,
       ...(shareCircumstances === 'yes' && circumstances.additionalCircumstancesDetails
-        ? { circumstancesDetails: circumstances.additionalCircumstancesDetails }
+        ? { 'shareCircumstances.circumstancesDetails': circumstances.additionalCircumstancesDetails }
         : {}),
     };
   },
