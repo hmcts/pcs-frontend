@@ -1,4 +1,10 @@
-import { nonRentArrearsDispute } from '../data/page-data';
+import {
+  dashboard,
+  nonRentArrearsDispute,
+  noticeDateWhenNotProvided,
+  noticeDateWhenProvided, rentArrearsDispute, tenancyDateDetails,
+  tenancyDateUnknown,
+} from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
@@ -35,4 +41,19 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
     nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
     nonRentArrearsDispute.explainClaimTextInput
   );
+}
+
+export async function noRentArrearsNavigationTests(): Promise<void> {
+  if (process.env.NOTICE_DATE_PROVIDED === 'NO') {
+    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenNotProvided.mainHeader);
+  } else if (process.env.NOTICE_DATE_PROVIDED === 'YES') {
+    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenProvided.mainHeader);
+  } else if (process.env.TENANCY_START_DATE_KNOWN === 'NO') {
+    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateUnknown.mainHeader);
+  } else if (process.env.TENANCY_START_DATE_KNOWN === 'YES') {
+    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateDetails.mainHeader);
+  } else if(process.env.RENT_NON_RENT === 'YES') {
+    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrearsDispute.mainHeader);
+  }
+  await performValidation('pageNavigation', nonRentArrearsDispute.saveForLaterButton, dashboard.mainHeader);
 }
