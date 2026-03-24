@@ -86,7 +86,7 @@ export const step: StepDefinition = createFormStep({
       errorMessage: 'errors.appliedForUniversalCredit.required',
       translationKey: { label: 'pageTitle' },
       legendClasses: 'govuk-fieldset__legend--l',
-      legendIsPageHeading: true,
+      isPageHeading: true,
       options: [
         {
           value: 'yes',

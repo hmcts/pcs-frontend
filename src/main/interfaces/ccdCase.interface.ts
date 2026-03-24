@@ -36,6 +36,27 @@ export interface Address {
   Country?: string;
 }
 
+export interface HouseholdCircumstances {
+  dependantChildren?: YesNoValue;
+  shareIncomeExpenseDetails?: YesNoValue;
+  incomeFromJobs?: YesNoValue;
+  incomeFromJobsAmount?: string;
+  incomeFromJobsFrequency?: string;
+  pension?: YesNoValue;
+  pensionAmount?: string;
+  pensionFrequency?: string;
+  universalCreditIncome?: YesNoValue;
+  universalCreditIncomeAmount?: string;
+  universalCreditIncomeFrequency?: string;
+  universalCredit?: YesNoValue;
+  ucApplicationDate?: string;
+  otherBenefits?: YesNoValue;
+  otherBenefitsAmount?: string;
+  otherBenefitsFrequency?: string;
+  moneyFromElsewhere?: YesNoValue;
+  moneyFromElsewhereDetails?: string;
+}
+
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: {
@@ -57,6 +78,7 @@ export interface PossessionClaimResponse {
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
+    householdCircumstances?: HouseholdCircumstances;
   };
 }
 
