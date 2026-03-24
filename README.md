@@ -16,7 +16,7 @@ A better alternative to installing nodejs directly is to use a version manager l
 then running the command
 
 ```
-nvm use
+nvm use 
 ```
 
 will ensure you are running the same version of node as determined in the CICD pipelines (it autodetects the .nvmrc file within this repository).
