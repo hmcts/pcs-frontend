@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import { flowConfig as respondToClaimFlowConfig } from '../../steps/professional-respond-to-claim/flow.config';
+import { flowConfig as respondToClaimFlowConfig } from '../../steps/respond-to-claim/flow.config';
 import { flowConfig as professionalRespondToClaimFlowConfig } from '../../steps/professional-respond-to-claim/flow.config';
 
 import { Logger } from '@modules/logger';

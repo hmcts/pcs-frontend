@@ -5,7 +5,7 @@ import { createGetController, professionalStepNavigation } from '../../../module
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
-const stepName = 'start-now';
+const stepName = 'professional-start-now';
 
 export const step: StepDefinition = {
   url: `${PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE}/start-now`,
@@ -29,7 +29,6 @@ export const step: StepDefinition = {
       // Get next step URL and redirect
       const redirectPath = await professionalStepNavigation.getNextStepUrl(req, stepName, req.body);
 
-      console.log("redirect-STARTNOW", redirectPath)
 
       if (!redirectPath) {
         // No next step defined - show not found page

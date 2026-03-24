@@ -2,23 +2,19 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
-import path from "path";
+
 export const step: StepDefinition = createFormStep({
-  stepName: 'free-legal-advice',
+  stepName: 'professional-free-legal-advice',
   journeyFolder: 'professionalRespondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate:  path.join(__dirname, "..", "..", "respond-to-claim/free-legal-advice/freeLegalAdvice.njk"),
+  customTemplate: `${__dirname}/freeLegalAdvice.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
     caption: 'caption',
     subHeading1: 'subHeading1',
     paragraph1: 'paragraph1',
-    listItem1: 'listItem1',
-    listItem2: 'listItem2',
-    listItem3: 'listItem3',
-    listItem4: 'listItem4',
     paragraph2: 'paragraph2',
     bullet1: 'bullet1',
     bullet2: 'bullet2',

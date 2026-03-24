@@ -11,20 +11,20 @@ export const flowConfig: JourneyFlowConfig = {
   basePath: PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'professionalRespondToClaim',
   stepOrder: [
-    'start-now',
-    'free-legal-advice',
-    'defendant-name-confirmation',
+    'professional-start-now',
+    'professional-free-legal-advice',
+    'professional-defendant-name-confirmation',
   ],
   steps: {
-    'start-now': {
-      defaultNext: 'free-legal-advice',
+    'professional-start-now': {
+      defaultNext: 'professional-free-legal-advice',
     },
-    'free-legal-advice': {
+    'professional-free-legal-advice': {
       routes: [
         {
           // Route to defendant name confirmation if defendant is known
           condition: async (req: Request) => isDefendantNameKnown(req),
-          nextStep: 'defendant-name-confirmation',
+          nextStep: 'professional-defendant-name-confirmation',
         },
         {
           // Route to defendant name capture if defendant is unknown
@@ -34,7 +34,7 @@ export const flowConfig: JourneyFlowConfig = {
       ],
       defaultNext: 'defendant-name-capture',
     },
-    'defendant-name-confirmation': {
+    'professional-defendant-name-confirmation': {
       defaultNext: 'defendant-date-of-birth',
     },
   },
