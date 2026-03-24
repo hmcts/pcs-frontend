@@ -7,8 +7,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 function buildReporters(): PlaywrightTestConfig['reporter'] {
   const reporters: PlaywrightTestConfig['reporter'] = [['list']];
+  const requireFromProject = createRequire(join(process.cwd(), 'package.json'));
   try {
-    const requireFromProject = createRequire(join(process.cwd(), 'package.json'));
     requireFromProject.resolve('allure-playwright');
     reporters.push([
       'allure-playwright',
@@ -22,6 +22,22 @@ function buildReporters(): PlaywrightTestConfig['reporter'] {
     ]);
   } catch {
     // Allure is a devDependency; omit when unavailable (e.g. Sauce Playwright runner VM).
+  }
+  // When using Selenium → Sauce (not saucectl), upload a Playwright report to Sauce and print dashboard links.
+  if (process.env.SELENIUM_REMOTE_URL) {
+    try {
+      requireFromProject.resolve('@saucelabs/playwright-reporter');
+      reporters.push([
+        '@saucelabs/playwright-reporter',
+        {
+          region: 'eu-central-1',
+          buildName: process.env.BUILD_NUMBER || process.env.BUILD_ID || 'local',
+          tags: ['pcs-frontend', 'crossbrowser', 'playwright'],
+        },
+      ]);
+    } catch {
+      // Add devDependency @saucelabs/playwright-reporter for Sauce UI links and result upload.
+    }
   }
   return reporters;
 }
@@ -67,7 +83,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 3 : 0,
-  workers: env === 'preview' ? 4 : 4,
+  workers: env === 'preview' ? 1 : 1,
   timeout: 600 * 1000,
   expect: { timeout: 30 * 1000 },
   use: { actionTimeout: 30 * 1000, navigationTimeout: 30 * 1000 },
@@ -82,8 +98,8 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
-        screenshot: 'only-on-failure',
-        video: 'retain-on-failure',
+        screenshot: 'on',
+        video: 'on',
         trace: 'on-first-retry',
         javaScriptEnabled: true,
         viewport: effectiveViewport,
@@ -97,8 +113,8 @@ export default defineConfig({
             use: {
               ...devices['Desktop Firefox'],
               channel: 'firefox',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
+              screenshot: 'on' as const,
+              video: 'on' as const,
               trace: 'on-first-retry' as const,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
@@ -110,8 +126,8 @@ export default defineConfig({
             use: {
               ...devices['Desktop Safari'],
               channel: 'webkit',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
+              screenshot: 'on' as const,
+              video: 'on' as const,
               trace: 'on-first-retry' as const,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
@@ -123,8 +139,8 @@ export default defineConfig({
             use: {
               ...devices['Pixel 5'],
               channel: 'MobileChrome',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
+              screenshot: 'on' as const,
+              video: 'on' as const,
               trace: 'on-first-retry' as const,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
@@ -136,8 +152,8 @@ export default defineConfig({
             use: {
               ...devices['iPhone 12'],
               channel: 'MobileSafari',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
+              screenshot: 'on' as const,
+              video: 'on' as const,
               trace: 'on-first-retry' as const,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
@@ -149,8 +165,8 @@ export default defineConfig({
             use: {
               ...devices['Desktop Edge'],
               channel: 'MicrosoftEdge',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
+              screenshot: 'on' as const,
+              video: 'on' as const,
               trace: 'on-first-retry' as const,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,

@@ -4435,6 +4435,38 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@saucelabs/playwright-reporter@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "@saucelabs/playwright-reporter@npm:1.6.0"
+  dependencies:
+    "@saucelabs/sauce-json-reporter": "npm:4.1.0"
+    "@saucelabs/testcomposer": "npm:3.0.1"
+    axios: "npm:1.7.5"
+    debug: "npm:^4.3.6"
+    ua-parser-js: "npm:^1.0.39"
+  peerDependencies:
+    "@playwright/test": ^1.16.3
+  checksum: 10/2521082d91dfb3fbaae014ed8819b5bd2318a0452265f48039cfa806de1998f63fa5ae55b6516b2efbd62ff5ed854c3c52372236d8ec04809223bc30740517bb
+  languageName: node
+  linkType: hard
+
+"@saucelabs/sauce-json-reporter@npm:4.1.0":
+  version: 4.1.0
+  resolution: "@saucelabs/sauce-json-reporter@npm:4.1.0"
+  checksum: 10/2d2bbe0b683b16df51c5bb5ea4df5fbcff35645fd468894ab7a3356311edf8d3bdafc9e9c90fb2d897943912c48e123286d3df78271c66127640ae224024e52e
+  languageName: node
+  linkType: hard
+
+"@saucelabs/testcomposer@npm:3.0.1":
+  version: 3.0.1
+  resolution: "@saucelabs/testcomposer@npm:3.0.1"
+  dependencies:
+    axios: "npm:^1.7.5"
+    form-data: "npm:^4.0.0"
+  checksum: 10/453a6c2790e84ff69ca5a1fc8288dfc0ea39465aec540cc330f34a27b77e987f793383e112400a40764e4c0541a04eb4d1730989b365f09456fcfbfdaf1fb55e
+  languageName: node
+  linkType: hard
+
 "@sentry/core@npm:9.47.1":
   version: 9.47.1
   resolution: "@sentry/core@npm:9.47.1"
@@ -7254,7 +7286,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.3.5, debug@npm:^4.3.7, debug@npm:^4.4.0, debug@npm:^4.4.1, debug@npm:^4.4.3":
+"debug@npm:4, debug@npm:^4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.3.5, debug@npm:^4.3.6, debug@npm:^4.3.7, debug@npm:^4.4.0, debug@npm:^4.4.1, debug@npm:^4.4.3":
   version: 4.4.3
   resolution: "debug@npm:4.4.3"
   dependencies:
@@ -12423,6 +12455,7 @@ __metadata:
     "@pact-foundation/pact": "npm:^15.0.0"
     "@pact-foundation/pact-cli": "npm:^16.0.7"
     "@playwright/test": "npm:^1.49.0"
+    "@saucelabs/playwright-reporter": "npm:^1.6.0"
     "@types/body-parser": "npm:^1.19.2"
     "@types/config": "npm:^3.3.5"
     "@types/connect-redis": "npm:^0.0.23"
@@ -15161,7 +15194,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ua-parser-js@npm:^1.0.2":
+"ua-parser-js@npm:^1.0.2, ua-parser-js@npm:^1.0.39":
   version: 1.0.41
   resolution: "ua-parser-js@npm:1.0.41"
   bin:

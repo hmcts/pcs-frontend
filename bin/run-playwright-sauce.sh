@@ -40,4 +40,12 @@ EXIT_CODE=0
 yarn playwright test --project chrome --grep '@crossbrowser' --headed "$@" || EXIT_CODE=$?
 allure generate --clean
 ts-node src/test/ui/config/clean-attachments.config.ts
+
+echo ""
+echo "── Reports ──"
+echo "  Allure (local):  yarn test:openAllureReport   →  allure-report/index.html"
+echo "  Sauce (EU):      https://app.eu-central-1.saucelabs.com/  (Automated → filter by build or tags: pcs-frontend, crossbrowser)"
+echo "  With @saucelabs/playwright-reporter enabled, job/result links also appear in the Playwright output above."
+echo ""
+
 exit "$EXIT_CODE"

@@ -194,6 +194,11 @@ This runs [`bin/run-playwright-sauce.sh`](bin/run-playwright-sauce.sh), which se
 
 Sauce video / readability: the script defaults to **`screenResolution` 1280×960** (a resolution Sauce allows on Windows 11 + Chrome; **1280×720 is not valid** on that combo) and Playwright uses a matching **viewport**. Override with `SAUCE_SCREEN_RESOLUTION`, `SAUCE_VIEWPORT_WIDTH`, and `SAUCE_VIEWPORT_HEIGHT` if needed—pick a value from [Sauce supported resolutions](https://docs.saucelabs.com/dev/test-configuration-options/#screenresolution) for your platform. The login step logs **`[E2E] Signing in with: …`** (the test user email) to the console when using remote Selenium—check the job’s **Logs** in Sauce if the recording is still hard to read.
 
+**Reports after `yarn test:sauce`**
+
+- **Allure (local HTML):** generated at **`allure-report/`** — open with **`yarn test:openAllureReport`** (same as other functional scripts).
+- **Sauce Labs:** unlike `saucectl`, the CLI does not print a single “build URL” by default. Jobs still appear under your account (EU: [Sauce app](https://app.eu-central-1.saucelabs.com/) → **Automated** / **Test results**; filter by **build** `BUILD_NUMBER` or tags **`pcs-frontend`**, **`crossbrowser`**). The repo also enables **`@saucelabs/playwright-reporter`** when `SELENIUM_REMOTE_URL` is set (Sauce browser runs), which **uploads** a Playwright report to Sauce and typically **prints dashboard links** in the test output—watch the console for those lines after the run.
+
 Running accessibility tests:
 
 ```bash
