@@ -4,7 +4,7 @@ kind: playwright
 
 sauce:
   region: eu-central-1
-  concurrency: 3
+  concurrency: 1
   metadata:
     tags:
       - pcs-frontend
@@ -37,7 +37,8 @@ reporters:
 #   PCS_FRONTEND_IDAM_SECRET: $PCS_FRONTEND_IDAM_SECRET
 
 suites:
-  - name: pcs-e2e-chrome-win
+  # Cross-browser smoke on Sauce: only tests tagged @crossbrowser (see e2e specs).
+  - name: pcs-crossbrowser-chrome-win
     platformName: Windows 11
     screenResolution: 1920x1080
     testMatch:
@@ -45,24 +46,25 @@ suites:
     params:
       browserName: chrome
       project: chrome
-      grep: '@nightly'
+      grep: '@crossbrowser'
 
-  - name: pcs-e2e-firefox-win
-    platformName: Windows 11
-    screenResolution: 1920x1080
-    testMatch:
-      - src/test/ui/e2eTest/.*\.spec\.ts
-    params:
-      browserName: firefox
-      project: firefox
-      grep: '@nightly'
-
-  - name: pcs-e2e-webkit-mac
-    platformName: macOS 13
-    screenResolution: 1920x1080
-    testMatch:
-      - src/test/ui/e2eTest/.*\.spec\.ts
-    params:
-      browserName: webkit
-      project: webkit
-      grep: '@nightly'
+  # Uncomment when you want additional browsers on Sauce.
+  # - name: pcs-crossbrowser-firefox-win
+  #   platformName: Windows 11
+  #   screenResolution: 1920x1080
+  #   testMatch:
+  #     - src/test/ui/e2eTest/.*\.spec\.ts
+  #   params:
+  #     browserName: firefox
+  #     project: firefox
+  #     grep: '@crossbrowser'
+  #
+  # - name: pcs-crossbrowser-webkit-mac
+  #   platformName: macOS 13
+  #   screenResolution: 1920x1080
+  #   testMatch:
+  #     - src/test/ui/e2eTest/.*\.spec\.ts
+  #   params:
+  #     browserName: webkit
+  #     project: webkit
+  #     grep: '@crossbrowser'

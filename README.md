@@ -189,7 +189,7 @@ export SAUCE_ACCESS_KEY=your-sauce-key
 yarn test:sauce
 ```
 
-Suites are defined for Chrome (Windows 11), Firefox (Windows 11), and WebKit (macOS) against `src/test/ui/e2eTest/**/*.spec.ts`, with `grep: '@nightly'` to align with the existing nightly E2E scripts. Adjust `.sauce/config.yml` if you need a different tag or scope.
+Suites currently run **Chrome on Windows 11** only, with `grep: '@crossbrowser'` so only tests carrying that tag are executed (add `@crossbrowser` to scenarios you want on Sauce). Firefox and WebKit suites are commented out in [`.sauce/config.yml`](.sauce/config.yml) until you enable them.
 
 Running accessibility tests:
 
