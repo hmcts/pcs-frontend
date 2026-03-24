@@ -19,14 +19,14 @@ const clearEmvLocks = (): void => {
   fs.rmSync(lockDir, { recursive: true, force: true });
 };
 
-export const getS2SToken = async (): Promise<void> => {
+const getS2SToken = async (): Promise<void> => {
   process.env.S2S_URL = s2STokenApiData.s2sUrl;
   process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
     microservice: s2STokenApiData.microservice,
   });
 };
 
-export const getAccessToken = async (): Promise<void> => {
+const getAccessToken = async (): Promise<void> => {
   process.env.IDAM_WEB_URL = accessTokenApiData.idamUrl;
   process.env.IDAM_TESTING_SUPPORT_URL = accessTokenApiData.idamTestingSupportUrl;
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({

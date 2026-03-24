@@ -103,14 +103,13 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 3 : 0,
-  workers: env === 'preview' ? 1 : 1,
+  workers: env === 'preview' ? 4 : 4,
   timeout: 600 * 1000,
   expect: { timeout: 30 * 1000 },
   use: { actionTimeout: 30 * 1000, navigationTimeout: 30 * 1000 },
   /* Report slow tests if they take longer than 5 mins */
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
-  globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
   reporter: buildReporters(),
   projects: [
     {

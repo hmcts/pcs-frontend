@@ -13,8 +13,7 @@ A structured, maintainable test automation solution built on Playwright that:
 ```
 ui/
 ├── config/                    # Configuration files
-│   ├── global-setup.config.ts  # Global test setup configuration
-│   └── global-teardown.config.ts # Global teardown configuration
+│   └── global-setup.config.ts  # Global test setup configuration
 ├── data/                      # Test data files
 ├── functional/                # Test/spec files
 ├── utils/                     # Core framework utilities
@@ -31,11 +30,8 @@ ui/
 │   │   ├── action.registry.ts # Action registry
 │   │   └── validation.registry.ts # Validation registry
 │   └── controller.ts          # Controls the usage of actions and validations
-├── testREADME.md              # Framework documentation
-└── update-testReadMe.ts       # Documentation auto-update script
+└── test-README.md             # Framework documentation
 ```
-
-_Note: The `update-testReadMe.ts` script automatically updates this documentation file with available actions/validations through the global teardown hook that runs in local development environments._
 
 ## 2. Core Architecture
 

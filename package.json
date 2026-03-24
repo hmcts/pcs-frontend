@@ -48,6 +48,7 @@
     "test:sauce:chrome:nightly": "E2E_GREP='@nightly' bash bin/run-playwright-sauce.sh",
     "test:sauce:matrix": "node bin/run-playwright-sauce-matrix.mjs",
     "test:sauce:matrix:nightly": "E2E_GREP='@nightly' node bin/run-playwright-sauce-matrix.mjs",
+    "test:crossbrowser": "yarn test:sauce:matrix:nightly",
     "test:pact": "jest -c jest.pact.config.ts --runInBand",
     "pact:publish": "ts-node src/test/contract/publish/*.ts",
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",
