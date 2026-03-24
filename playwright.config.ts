@@ -62,6 +62,17 @@ const effectiveViewport = useSauceSizedViewport
       height: Number.isFinite(sauceH) ? sauceH : 960,
     }
   : DEFAULT_VIEWPORT;
+
+/** Sauce Selenium: one large Chromium window (avoids tiny app window in a corner vs empty data:, tab). Matches SAUCE_SCREEN_RESOLUTION / viewport. */
+const sauceChromiumLaunchOptions = useSauceSizedViewport
+  ? {
+      args: [
+        '--start-maximized',
+        `--window-size=${effectiveViewport.width},${effectiveViewport.height}`,
+        '--window-position=0,0',
+      ],
+    }
+  : undefined;
 export const VERY_SHORT_TIMEOUT = 1000;
 export const SHORT_TIMEOUT = 5000;
 export const actionRetries = 10;
@@ -112,6 +123,7 @@ export default defineConfig({
         javaScriptEnabled: true,
         viewport: effectiveViewport,
         headless: !!process.env.CI,
+        ...(sauceChromiumLaunchOptions ? { launchOptions: sauceChromiumLaunchOptions } : {}),
       },
     },
     ...(isMultiBrowserProfile
@@ -167,8 +179,9 @@ export default defineConfig({
               channel: 'msedge',
               ...artifactCapture,
               javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
+              viewport: useSauceSizedViewport ? effectiveViewport : DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
+              ...(sauceChromiumLaunchOptions ? { launchOptions: sauceChromiumLaunchOptions } : {}),
             },
           },
         ]
