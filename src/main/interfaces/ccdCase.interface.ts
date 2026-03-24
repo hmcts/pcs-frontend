@@ -41,6 +41,10 @@ export interface Address {
   Country?: string;
 }
 
+export interface CaseData {
+  possessionClaimResponse?: PossessionClaimResponse;
+}
+
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: {

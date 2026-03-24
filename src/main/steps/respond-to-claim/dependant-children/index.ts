@@ -4,7 +4,7 @@ import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResp
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
-import type { HouseholdCircumstances, YesNoCapitalised } from '../../../interfaces/ccdCase.interface';
+import type { CaseData, HouseholdCircumstances, YesNoCapitalised } from '../../../interfaces/ccdCase.interface';
 
 
 export const step: StepDefinition = createFormStep({
@@ -44,7 +44,7 @@ export const step: StepDefinition = createFormStep({
       defendantResponses: {
         householdCircumstances: {
           dependantChildren: dependantChildrenCcd,
-          ...(dependantChildrenDetails !== undefined ? { dependantChildrenDetails } : {}),
+          dependantChildrenDetails : dependantChildrenDetails ?? '',
         },
       },
     };
@@ -52,8 +52,8 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const householdCircumstances: HouseholdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
+    const householdCircumstances: HouseholdCircumstances | undefined = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     console.log('Household circumstances from CCD', householdCircumstances);
     const dependantChildrenCcd: YesNoCapitalised | undefined = householdCircumstances?.dependantChildren;
 
