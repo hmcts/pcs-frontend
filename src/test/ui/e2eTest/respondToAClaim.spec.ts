@@ -33,19 +33,17 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
 
-  // If NoticeDateProvided = no → navigate to Notice Date Unknown
+// Notice date provided
   if (testInfo.title.includes('NoticeDateProvided - No')) {
     process.env.NOTICE_DATE_PROVIDED = 'NO';
-    // If NoticeDateProvided = yes → navigate to Notice Date Known
   } else if (testInfo.title.includes('NoticeDateProvided - Yes')) {
     process.env.NOTICE_DATE_PROVIDED = 'YES';
   }
-  // If NoticeServed = no and tenancy start date is unknown → navigate to Tenancy Start Date Known
-  else if (testInfo.title.includes('NoticeServed - No') && testInfo.title.includes('noDefendants')) {
-    process.env.TENANCY_START_DATE_KNOWN = 'NO';
-  } //If NoticeServed = no and tenancy start date is known → navigate to Tenancy Start Date known
-  else if (testInfo.title.includes('NoticeServed - No') && !testInfo.title.includes('noDefendants')) {
-    process.env.TENANCY_START_DATE_KNOWN = 'YES';
+
+// Tenancy start date logic (independent)
+  if (testInfo.title.includes('NoticeServed - No')) {
+    process.env.TENANCY_START_DATE_KNOWN =
+      testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   }
 
   if (testInfo.title.includes('@noDefendants')) {
