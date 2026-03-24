@@ -2,8 +2,7 @@ export const writtenTerms = {
   mainHeader: `Written Terms`,
   respondToClaimParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
-  ItIsRequiredUnderTheRentingParagraph: `It is required under the Renting Homes Wales Act 2016 for a landlord to send you
-   written terms of the occupation contract.`,
+  itIsRequiredUnderTheRentingParagraph: `It is required under the Renting Homes Wales Act 2016 for a landlord to send you written terms of the occupation contract.`,
   hasYourLandlordSentYouWrittenTermsQuestion: `Has your landlord sent you written terms of the occupation contract?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
