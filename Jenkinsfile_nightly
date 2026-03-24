@@ -81,11 +81,14 @@ withNightlyPipeline(type, product, component) {
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
-    if (params.SAUCE_MATRIX_E2E_TESTS) {
-      runSauceMatrixE2ETests(yarnBuilder)
-    }
     if (params.ACCESSIBILITY_TESTS) {
       runAccessibilityTests(yarnBuilder)
+    }
+    if (params.SAUCE_MATRIX_E2E_TESTS) {
+      enableCrossBrowserTest(120)
+    }
+    afterAlways('crossBrowserTest') {
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/test-results/**,**/playwright-report/**,.sauce/**'
     }
   }
 }
@@ -147,36 +150,6 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
         artifacts: 'definitions/test/playwright-report/**'
       )
       sendAllureReportToSlack(browser, "Full_20${browser}_20E2E_20Test_20Report/")
-    }
-  }
-}
-
-def runSauceMatrixE2ETests(yarnBuilder) {
-  stage('Sauce Labs matrix E2E (@nightly)') {
-    node {
-      checkout scm
-      sh 'rm -rf allure-results allure-report'
-      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        withEnv([
-          "SAUCE_JOB_NAME=pcs-frontend-nightly-${env.BUILD_NUMBER}",
-          'E2E_GREP=@nightly',
-        ]) {
-          yarnBuilder.yarn('test:sauce:matrix:nightly')
-        }
-      }
-      publishHTML([
-        allowMissing: true,
-        alwaysLinkToLastBuild: true,
-        keepAll: true,
-        reportDir: 'allure-report',
-        reportFiles: 'index.html',
-        reportName: 'Sauce matrix E2E (@nightly) Report'
-      ])
-      steps.archiveArtifacts(
-        allowEmptyArchive: true,
-        artifacts: 'definitions/test/playwright-report/**'
-      )
-      sendAllureReportToSlack('Sauce matrix', 'Sauce_20matrix_20E2E_20__40nightly__41_20Report/')
     }
   }
 }
