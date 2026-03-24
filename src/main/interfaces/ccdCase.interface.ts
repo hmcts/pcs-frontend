@@ -60,6 +60,8 @@ export interface PossessionClaimResponse {
     householdCircumstances?: {
       shareAdditionalCircumstances?: YesNoValue;
       additionalCircumstancesDetails?: string;
+      exceptionalHardship?: YesNoValue;
+      exceptionalHardshipDetails?: string;
     };
   };
 }
