@@ -5,5 +5,8 @@ export { isRentArrearsClaim } from './isRentArrearsClaim';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getPreviousPageForArrears } from './journeyHelpers';
+export { getStepBeforeDisputePages } from './journeyHelpers';
+export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
+export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { formatDatePartsToISODate } from './dateUtils';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
