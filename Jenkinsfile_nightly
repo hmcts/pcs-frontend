@@ -89,6 +89,9 @@ withNightlyPipeline(type, product, component) {
     }
     afterAlways('crossBrowserTest') {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/test-results/**,**/playwright-report/**,.sauce/**'
+      if (params.SAUCE_MATRIX_E2E_TESTS) {
+        archiveSauceCrossBrowserAllureReport()
+      }
     }
   }
 }
@@ -174,6 +177,23 @@ def runAccessibilityTests(yarnBuilder) {
       sendAllureReportToSlack('Chrome', 'Accessibility_20Test_20Report/')
     }
   }
+}
+
+def archiveSauceCrossBrowserAllureReport() {
+  try {
+    publishHTML([
+      allowMissing         : true,
+      alwaysLinkToLastBuild: true,
+      keepAll              : true,
+      reportDir            : 'allure-report',
+      reportFiles          : 'index.html',
+      reportName           : 'PCS Frontend Sauce Cross Browser Report'
+    ])
+  } catch (Error) {
+    unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+  }
+  env.E2E_PLATFORM = 'Sauce Labs'
+  sendAllureReportToSlack('Sauce matrix', 'PCS_20Frontend_20Sauce_20Cross_20Browser_20Report/')
 }
 
 def sendAllureReportToSlack(String browser, String reportSuffix) {
