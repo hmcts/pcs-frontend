@@ -1,0 +1,40 @@
+{
+  "_comment": "Active `matrix` rows are executed by bin/run-playwright-sauce-matrix.mjs (EU Central hub). Playwright → Selenium Grid → Sauce only drives Chromium-based browsers on the remote VM; see https://playwright.dev/docs/selenium-grid and README (test:sauce:chrome). Rows under `_disabled_matrix` are not run — kept as documentation with reasons.",
+  "matrix": [
+    { "id": "eu-win-chrome", "platformName": "Windows 11", "browserName": "chrome", "playwrightProject": "chrome" },
+    { "id": "eu-mac-chrome", "platformName": "macOS 13", "browserName": "chrome", "playwrightProject": "chrome" },
+    { "id": "eu-linux-chrome", "platformName": "Linux", "browserName": "chrome", "playwrightProject": "chrome" },
+    { "id": "eu-win-edge", "platformName": "Windows 11", "browserName": "MicrosoftEdge", "playwrightProject": "MicrosoftEdge" },
+    { "id": "eu-mac-edge", "platformName": "macOS 13", "browserName": "MicrosoftEdge", "playwrightProject": "MicrosoftEdge" }
+  ],
+  "_disabled_matrix": [
+    {
+      "_reason": "Playwright Selenium Grid path to Sauce does not run Firefox remotely; use CI (multi-browser projects) or run Playwright with ENABLE_MULTI_BROWSER_PROJECTS=true locally, or another Sauce product.",
+      "id": "eu-win-firefox",
+      "platformName": "Windows 11",
+      "browserName": "firefox",
+      "playwrightProject": "firefox"
+    },
+    {
+      "_reason": "WebKit/Safari is not supported on Playwright → Selenium Grid → Sauce; run WebKit locally or use native Appium/WebDriver on Sauce outside this script.",
+      "id": "eu-mac-webkit",
+      "platformName": "macOS 13",
+      "browserName": "safari",
+      "playwrightProject": "webkit"
+    },
+    {
+      "_reason": "Mobile Chrome emulation (Playwright project MobileChrome) is not targeted by this desktop Selenium Grid Sauce flow; use local mobile projects or Sauce real-device offerings.",
+      "id": "eu-android-mobilechrome",
+      "platformName": "Linux",
+      "browserName": "chrome",
+      "playwrightProject": "MobileChrome"
+    },
+    {
+      "_reason": "Mobile Safari emulation (Playwright project MobileSafari) is not targeted by this desktop Selenium Grid Sauce flow; use local mobile projects or Sauce real-device offerings.",
+      "id": "eu-ios-mobilesafari",
+      "platformName": "macOS 13",
+      "browserName": "safari",
+      "playwrightProject": "MobileSafari"
+    }
+  ]
+}

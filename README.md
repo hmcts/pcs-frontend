@@ -187,17 +187,19 @@ Run:
 export SAUCE_USERNAME=your-sauce-user
 export SAUCE_ACCESS_KEY=your-sauce-key
 # plus PCS_FRONTEND_IDAM_SECRET, TEST_URL, PCS_API_URL, NODE_CONFIG_ENV=test, etc.
-yarn test:sauce
+yarn test:sauce:chrome
 ```
 
 This runs [`bin/run-playwright-sauce.sh`](bin/run-playwright-sauce.sh), which sets `SELENIUM_REMOTE_URL` / `SELENIUM_REMOTE_CAPABILITIES` for the **EU** hub and executes `playwright test --project chrome --grep '@crossbrowser' --headed`. Only tests tagged `@crossbrowser` are in scope. Playwright’s Selenium Grid path is **experimental** and today supports **Chrome / Edge** via CDP on the grid; **not** Firefox/WebKit through this mechanism.
 
 Sauce video / readability: the script defaults to **`screenResolution` 1280×960** (a resolution Sauce allows on Windows 11 + Chrome; **1280×720 is not valid** on that combo) and Playwright uses a matching **viewport**. Override with `SAUCE_SCREEN_RESOLUTION`, `SAUCE_VIEWPORT_WIDTH`, and `SAUCE_VIEWPORT_HEIGHT` if needed—pick a value from [Sauce supported resolutions](https://docs.saucelabs.com/dev/test-configuration-options/#screenresolution) for your platform. The login step logs **`[E2E] Signing in with: …`** (the test user email) to the console when using remote Selenium—check the job’s **Logs** in Sauce if the recording is still hard to read.
 
-**Reports after `yarn test:sauce`**
+**Reports after `yarn test:sauce:chrome`**
 
 - **Allure (local HTML):** generated at **`allure-report/`** — open with **`yarn test:openAllureReport`** (same as other functional scripts).
 - **Sauce Labs:** unlike `saucectl`, the CLI does not print a single “build URL” by default. Jobs still appear under your account (EU: [Sauce app](https://app.eu-central-1.saucelabs.com/) → **Automated** / **Test results**; filter by **build** `BUILD_NUMBER` or tags **`pcs-frontend`**, **`crossbrowser`**). The repo also enables **`@saucelabs/playwright-reporter`** when `SELENIUM_REMOTE_URL` is set (Sauce browser runs), which **uploads** a Playwright report to Sauce and typically **prints dashboard links** in the test output—watch the console for those lines after the run.
+
+**Sauce (Firefox / WebKit):** Playwright’s **Selenium Grid** integration only supports **Chrome** and **Edge** on Sauce VMs ([Playwright Selenium Grid](https://playwright.dev/docs/selenium-grid)). **Firefox** and **WebKit** are **not** driven on Sauce through `SELENIUM_REMOTE_URL`; use **`yarn test:sauce:chrome`** (single Chrome) or **`yarn test:sauce:matrix`** (multi-OS Chrome + Edge). For Firefox/WebKit coverage, run Playwright in **CI** (projects are registered when `CI=true`) or set **`ENABLE_MULTI_BROWSER_PROJECTS=true`** and invoke `--project firefox` / `--project webkit` yourself.
 
 Running accessibility tests:
 

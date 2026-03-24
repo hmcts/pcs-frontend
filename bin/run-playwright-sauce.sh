@@ -11,6 +11,7 @@ if [[ -z "${SAUCE_USERNAME:-}" || -z "${SAUCE_ACCESS_KEY:-}" ]]; then
 fi
 
 export SELENIUM_REMOTE_URL="${SELENIUM_REMOTE_URL:-https://ondemand.eu-central-1.saucelabs.com/wd/hub}"
+export SAUCE_PLAYWRIGHT_REGION="${SAUCE_PLAYWRIGHT_REGION:-eu-central-1}"
 
 # Smaller desktop = larger UI in Sauce video. Must be a Sauce-supported resolution for the OS/browser (1280x720 is not valid on Windows 11 Chrome).
 # See https://docs.saucelabs.com/dev/test-configuration-options/#screenresolution

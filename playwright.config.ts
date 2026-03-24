@@ -27,10 +27,11 @@ function buildReporters(): PlaywrightTestConfig['reporter'] {
   if (process.env.SELENIUM_REMOTE_URL) {
     try {
       requireFromProject.resolve('@saucelabs/playwright-reporter');
+      const sauceReporterRegion = process.env.SAUCE_PLAYWRIGHT_REGION || 'eu-central-1';
       reporters.push([
         '@saucelabs/playwright-reporter',
         {
-          region: 'eu-central-1',
+          region: sauceReporterRegion,
           buildName: process.env.BUILD_NUMBER || process.env.BUILD_ID || 'local',
           tags: ['pcs-frontend', 'crossbrowser', 'playwright'],
         },
@@ -60,9 +61,11 @@ export const actionRetries = 10;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
 
-/** Include firefox/webkit/mobile projects on CI or when ENABLE_MULTI_BROWSER_PROJECTS=true (not tied to Sauce env). */
+/** Include firefox/webkit/mobile projects on CI or when ENABLE_MULTI_BROWSER_PROJECTS=true (Sauce matrix sets this for Edge). */
 const isMultiBrowserProfile =
   !!process.env.CI || process.env.ENABLE_MULTI_BROWSER_PROJECTS === 'true';
+
+// Sauce Selenium Grid (SELENIUM_REMOTE_URL) only runs chrome + MicrosoftEdge from the matrix. Other projects are for CI or manual runs — see bin/sauce-matrix.default.json _disabled_matrix.
 
 const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
 if (enable_all_page_functional_tests === 'true') {
@@ -164,7 +167,7 @@ export default defineConfig({
             name: 'MicrosoftEdge',
             use: {
               ...devices['Desktop Edge'],
-              channel: 'MicrosoftEdge',
+              channel: 'msedge',
               screenshot: 'on' as const,
               video: 'on' as const,
               trace: 'on-first-retry' as const,
