@@ -74,7 +74,8 @@ async function main(): Promise<number> {
     await ensureBearerTokenOnRunnerHost();
     console.log(
       '[crossbrowser] Idam UI login email (forwarded as IDAM_PCS_USER_EMAIL):',
-      process.env.IDAM_PCS_USER_EMAIL?.trim() || '(unset — set on agent if specs use fixed login; else createUser sets email on VM)'
+      process.env.IDAM_PCS_USER_EMAIL?.trim() ||
+        '(unset — set on agent if specs use fixed login; else createUser sets email on VM)'
     );
     console.log('[crossbrowser] Bearer token user (global-setup mints for):', user.claimantSolicitor.email);
   } catch (e) {

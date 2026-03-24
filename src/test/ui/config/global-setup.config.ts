@@ -13,8 +13,7 @@ async function globalSetupConfig(): Promise<void> {
   logIdamTestIdentity();
 }
 
-const UI_LOGIN_EMAIL_UNSET =
-  '(unset — export IDAM_PCS_USER_EMAIL on the agent or use createUser in the spec)';
+const UI_LOGIN_EMAIL_UNSET = '(unset — export IDAM_PCS_USER_EMAIL on the agent or use createUser in the spec)';
 
 /** Logs which Idam users the run uses (password-safe). Check Sauce job stdout / Playwright logs if login/API calls fail. */
 const logIdamTestIdentity = (): void => {
