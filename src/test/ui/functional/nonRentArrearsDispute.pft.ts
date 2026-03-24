@@ -2,7 +2,9 @@ import {
   dashboard,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
-  noticeDateWhenProvided, rentArrearsDispute, tenancyDateDetails,
+  noticeDateWhenProvided,
+  rentArrearsDispute,
+  tenancyDateDetails,
   tenancyDateUnknown,
 } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
@@ -52,7 +54,7 @@ export async function noRentArrearsNavigationTests(): Promise<void> {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateUnknown.mainHeader);
   } else if (process.env.TENANCY_START_DATE_KNOWN === 'YES') {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateDetails.mainHeader);
-  } else if(process.env.RENT_NON_RENT === 'YES') {
+  } else if (process.env.RENT_NON_RENT === 'YES') {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrearsDispute.mainHeader);
   }
   await performValidation('pageNavigation', nonRentArrearsDispute.saveForLaterButton, dashboard.mainHeader);
