@@ -7,9 +7,9 @@
     "yes": "Yes",
     "no": "No",
     "or": "or",
-    "imNotSure": "I'm not sure"
+    "imNotSure": "I’m not sure"
   },
   "errors": {
-    "writtenTerms": "Select if your landlord has sent you written terms of the occupation contract"
+    "writtenTerms": "Select if the landlord has sent you written terms of the occupation contract"
   }
 }
