@@ -50,6 +50,8 @@ export async function rentArrearsErrorValidation(): Promise<void> {
 }
 
 export async function rentArrearsNavigationTests(): Promise<void> {
+  await performAction('clickRadioButton', rentArrears.yesRadioOption);
+  await performValidation('pageNavigation', rentArrears.saveForLaterButton, dashboard.mainHeader);
   if (process.env.NOTICE_DATE_PROVIDED === 'NO') {
     await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenNotProvided.mainHeader);
   } else if (process.env.NOTICE_DATE_PROVIDED === 'YES') {
@@ -59,5 +61,4 @@ export async function rentArrearsNavigationTests(): Promise<void> {
   } else if (process.env.TENANCY_START_DATE_KNOWN === 'YES') {
     await performValidation('pageNavigation', rentArrears.backLink, tenancyDateDetails.mainHeader);
   }
-  await performValidation('pageNavigation', rentArrears.saveForLaterButton, dashboard.mainHeader);
 }
