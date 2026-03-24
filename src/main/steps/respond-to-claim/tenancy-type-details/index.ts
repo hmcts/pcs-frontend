@@ -154,15 +154,10 @@ export const step: StepDefinition = createFormStep({
 
     const orgName =
       req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]?.value || 'Unknown';
-    const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as
-      | string
-      | undefined;
-    const otherTenancyTypeDetails = req.res?.locals.validatedCase?.data?.tenancy_DetailsOfOtherTypeOfTenancyLicence as
-      | string
-      | undefined;
-    const tenancyTypeAgreementType = tenancyTypeOfTenancyLicence
-      ? TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence] || 'an assured'
-      : 'an assured';
+    const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as string;
+    const otherTenancyTypeDetails = req.res?.locals.validatedCase?.data
+      ?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string;
+    const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
 
     const detailsHeading =
       typeof formContent.detailsHeading === 'string'
