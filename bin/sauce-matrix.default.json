@@ -4,8 +4,18 @@
     { "id": "eu-win-chrome", "platformName": "Windows 11", "browserName": "chrome", "playwrightProject": "chrome" },
     { "id": "eu-mac-chrome", "platformName": "macOS 13", "browserName": "chrome", "playwrightProject": "chrome" },
     { "id": "eu-linux-chrome", "platformName": "Linux", "browserName": "chrome", "playwrightProject": "chrome" },
-    { "id": "eu-win-edge", "platformName": "Windows 11", "browserName": "MicrosoftEdge", "playwrightProject": "MicrosoftEdge" },
-    { "id": "eu-mac-edge", "platformName": "macOS 13", "browserName": "MicrosoftEdge", "playwrightProject": "MicrosoftEdge" }
+    {
+      "id": "eu-win-edge",
+      "platformName": "Windows 11",
+      "browserName": "MicrosoftEdge",
+      "playwrightProject": "MicrosoftEdge"
+    },
+    {
+      "id": "eu-mac-edge",
+      "platformName": "macOS 13",
+      "browserName": "MicrosoftEdge",
+      "playwrightProject": "MicrosoftEdge"
+    }
   ],
   "_disabled_matrix": [
     {

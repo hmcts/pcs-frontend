@@ -28,9 +28,7 @@ function buildCapabilities({ platformName, browserName, jobName }) {
       username: process.env.SAUCE_USERNAME,
       accessKey: process.env.SAUCE_ACCESS_KEY,
       ...(devTools ? { devTools: true } : {}),
-      ...(process.env.SAUCE_SELENIUM_VERSION
-        ? { seleniumVersion: process.env.SAUCE_SELENIUM_VERSION }
-        : {}),
+      ...(process.env.SAUCE_SELENIUM_VERSION ? { seleniumVersion: process.env.SAUCE_SELENIUM_VERSION } : {}),
       screenResolution,
       name: jobName,
       build,
@@ -91,12 +89,14 @@ function main() {
 
     const grepTag = process.env.E2E_GREP || '@crossbrowser';
 
-    console.error(`\n── Sauce matrix: ${id} (${platformName} ${browserName} → --project ${playwrightProject} --grep ${grepTag}) ──\n`);
+    console.error(
+      `\n── Sauce matrix: ${id} (${platformName} ${browserName} → --project ${playwrightProject} --grep ${grepTag}) ──\n`
+    );
 
     const r = spawnSync(
       yarn,
       ['playwright', 'test', '--project', playwrightProject, '--grep', grepTag, '--headed', ...process.argv.slice(2)],
-      { stdio: 'inherit', env, shell: false },
+      { stdio: 'inherit', env, shell: false }
     );
     if (r.status !== 0) {
       anyFailed = true;

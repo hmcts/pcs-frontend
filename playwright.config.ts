@@ -80,8 +80,7 @@ export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
 
 /** Include firefox/webkit/mobile projects on CI or when ENABLE_MULTI_BROWSER_PROJECTS=true (Sauce matrix sets this for Edge). */
-const isMultiBrowserProfile =
-  !!process.env.CI || process.env.ENABLE_MULTI_BROWSER_PROJECTS === 'true';
+const isMultiBrowserProfile = !!process.env.CI || process.env.ENABLE_MULTI_BROWSER_PROJECTS === 'true';
 
 // Sauce Selenium Grid (SELENIUM_REMOTE_URL) only runs chrome + MicrosoftEdge from the matrix. Other projects are for CI or manual runs — see bin/sauce-matrix.default.json _disabled_matrix.
 
