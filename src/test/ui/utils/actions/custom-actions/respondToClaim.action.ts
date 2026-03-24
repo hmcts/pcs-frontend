@@ -271,7 +271,7 @@ export class RespondToClaimAction implements IAction {
       option: doYouWantToDisputeOption.disputeOption,
     });
 
-    if (doYouWantToDisputeOption.disputeOption === nonRentArrearsDispute.yesRadioOption) {
+    if (doYouWantToDisputeOption.disputeOption === 'Yes') {
       await performAction(
         'inputText',
         nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
