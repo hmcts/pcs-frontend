@@ -54,10 +54,10 @@ export async function rentArrearsNavigationTests(): Promise<void> {
     await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenNotProvided.mainHeader);
   } else if (process.env.NOTICE_DATE_PROVIDED === 'YES') {
     await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenProvided.mainHeader);
-  } else if (process.env.TENANCY_START_DATE_KNOWN === 'YES') {
-    await performValidation('pageNavigation', rentArrears.backLink, tenancyDateDetails.mainHeader);
   } else if (process.env.TENANCY_START_DATE_KNOWN === 'NO') {
     await performValidation('pageNavigation', rentArrears.backLink, tenancyDateUnknown.mainHeader);
+  } else if (process.env.TENANCY_START_DATE_KNOWN === 'YES') {
+    await performValidation('pageNavigation', rentArrears.backLink, tenancyDateDetails.mainHeader);
   }
   await performValidation('pageNavigation', rentArrears.saveForLaterButton, dashboard.mainHeader);
 }
