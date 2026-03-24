@@ -171,16 +171,17 @@ There are also several custom test scripts available:
 - `test:E2eFirefox` - runs the full E2E suite in Firefox
 - `test:E2eSafari` - runs the full E2E suite in Safari
 
-#### Cross-browser E2E on Sauce Labs (saucectl)
+#### Cross-browser E2E on Sauce Labs (browser on Sauce, tests on agent)
 
-Functional UI tests can be executed on [Sauce Labs](https://saucelabs.com/) using the official [Playwright on Sauce](https://docs.saucelabs.com/web-apps/automated-testing/playwright/) flow (`saucectl`). Configuration lives in [`.sauce/config.yml`](.sauce/config.yml).
+This repo does **not** use Sauce `saucectl` (which uploads and runs the whole test suite on Sauce VMs). Instead it follows the same idea as **probate-frontend**: **Playwright runs on your machine or Jenkins agent** (so `globalSetup`, `beforeEach`, and all **API calls** use **HMCTS** network access), **only the browser** is driven on Sauce via Playwright’s **Selenium Grid** integration ([Sauce Playwright + Selenium Grid](https://docs.saucelabs.com/web-apps/automated-testing/playwright/selenium-grid/), [Playwright Selenium Grid](https://playwright.dev/docs/selenium-grid)).
 
 Prerequisites:
 
-- Sauce credentials: `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` (e.g. export locally or inject from Jenkins / Azure Key Vault).
-- The same environment variables required for functional tests (see the end of this README), including IDAM and API settings. When using `saucectl`, the **Playwright process runs on Sauce Labs’ cloud**, so HTTP calls in `globalSetup` and `beforeEach` (IDAM, PCS API, CCD, etc.) are issued **from Sauce’s network**, not from the Jenkins agent. If your pipeline uses **internal** URLs (for example `*.service.core-compute-*.internal`), you must either use **public/preview URLs** for those endpoints when running on Sauce, or run **[Sauce Connect](https://docs.saucelabs.com/secure-connections/sauce-connect-5/)** so cloud tests can reach your network. Pass secrets into the job using the `env` block in `.sauce/config.yml` or `saucectl run --env KEY=value`.
+- `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` (e.g. export locally or inject from Jenkins / Azure Key Vault).
+- The same env vars as other functional tests (`PCS_FRONTEND_IDAM_SECRET`, `TEST_URL`, `PCS_API_URL`, `NODE_CONFIG_ENV=test`, etc.).
+- The **browser** must reach your **app URL** (public preview or [Sauce Connect](https://docs.saucelabs.com/secure-connections/sauce-connect-5/) if the UI is not internet‑reachable).
 
-Run (after `yarn install`):
+Run:
 
 ```bash
 export SAUCE_USERNAME=your-sauce-user
@@ -189,7 +190,9 @@ export SAUCE_ACCESS_KEY=your-sauce-key
 yarn test:sauce
 ```
 
-Suites currently run **Chrome on Windows 11** only, with `grep: '@crossbrowser'` so only tests carrying that tag are executed (add `@crossbrowser` to scenarios you want on Sauce). Firefox and WebKit suites are commented out in [`.sauce/config.yml`](.sauce/config.yml) until you enable them.
+This runs [`bin/run-playwright-sauce.sh`](bin/run-playwright-sauce.sh), which sets `SELENIUM_REMOTE_URL` / `SELENIUM_REMOTE_CAPABILITIES` for the **EU** hub and executes `playwright test --project chrome --grep '@crossbrowser' --headed`. Only tests tagged `@crossbrowser` are in scope. Playwright’s Selenium Grid path is **experimental** and today supports **Chrome / Edge** via CDP on the grid; **not** Firefox/WebKit through this mechanism.
+
+Sauce video / readability: the script defaults to **`screenResolution` 1280×960** (a resolution Sauce allows on Windows 11 + Chrome; **1280×720 is not valid** on that combo) and Playwright uses a matching **viewport**. Override with `SAUCE_SCREEN_RESOLUTION`, `SAUCE_VIEWPORT_WIDTH`, and `SAUCE_VIEWPORT_HEIGHT` if needed—pick a value from [Sauce supported resolutions](https://docs.saucelabs.com/dev/test-configuration-options/#screenresolution) for your platform. The login step logs **`[E2E] Signing in with: …`** (the test user email) to the console when using remote Selenium—check the job’s **Logs** in Sauce if the recording is still hard to read.
 
 Running accessibility tests:
 

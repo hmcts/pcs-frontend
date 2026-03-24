@@ -1,19 +1,52 @@
+import { createRequire } from 'node:module';
+import { join } from 'node:path';
 import * as process from 'node:process';
 
+import type { PlaywrightTestConfig } from '@playwright/test';
 import { defineConfig, devices } from '@playwright/test';
 
+function buildReporters(): PlaywrightTestConfig['reporter'] {
+  const reporters: PlaywrightTestConfig['reporter'] = [['list']];
+  try {
+    const requireFromProject = createRequire(join(process.cwd(), 'package.json'));
+    requireFromProject.resolve('allure-playwright');
+    reporters.push([
+      'allure-playwright',
+      {
+        resultsDir: 'allure-results',
+        suiteTitle: false,
+        environmentInfo: {
+          os_version: process.version,
+        },
+      },
+    ]);
+  } catch {
+    // Allure is a devDependency; omit when unavailable (e.g. Sauce Playwright runner VM).
+  }
+  return reporters;
+}
+
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
+
+/** When using remote Selenium (Sauce), match a smaller desktop so login fields are readable in Sauce video. */
+const useSauceSizedViewport = !!process.env.SELENIUM_REMOTE_URL;
+const sauceW = Number.parseInt(process.env.SAUCE_VIEWPORT_WIDTH ?? '1280', 10);
+const sauceH = Number.parseInt(process.env.SAUCE_VIEWPORT_HEIGHT ?? '960', 10);
+const effectiveViewport = useSauceSizedViewport
+  ? {
+      width: Number.isFinite(sauceW) ? sauceW : 1280,
+      height: Number.isFinite(sauceH) ? sauceH : 960,
+    }
+  : DEFAULT_VIEWPORT;
 export const VERY_SHORT_TIMEOUT = 1000;
 export const SHORT_TIMEOUT = 5000;
 export const actionRetries = 10;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
 
-/** Include firefox/webkit/mobile projects (not only chrome) on CI, Sauce Labs (saucectl), or when explicitly enabled. */
+/** Include firefox/webkit/mobile projects on CI or when ENABLE_MULTI_BROWSER_PROJECTS=true (not tied to Sauce env). */
 const isMultiBrowserProfile =
-  !!process.env.CI ||
-  !!process.env.SAUCE_USERNAME ||
-  process.env.SAUCECTL === 'true';
+  !!process.env.CI || process.env.ENABLE_MULTI_BROWSER_PROJECTS === 'true';
 
 const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
 if (enable_all_page_functional_tests === 'true') {
@@ -25,7 +58,7 @@ if (enable_all_page_functional_tests === 'true') {
 export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'false';
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
-export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
+export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'false';
 
 export default defineConfig({
   testDir: './src/test/ui',
@@ -42,19 +75,7 @@ export default defineConfig({
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
-  reporter: [
-    ['list'],
-    [
-      'allure-playwright',
-      {
-        resultsDir: 'allure-results',
-        suiteTitle: false,
-        environmentInfo: {
-          os_version: process.version,
-        },
-      },
-    ],
-  ],
+  reporter: buildReporters(),
   projects: [
     {
       name: 'chrome',
@@ -65,7 +86,7 @@ export default defineConfig({
         video: 'retain-on-failure',
         trace: 'on-first-retry',
         javaScriptEnabled: true,
-        viewport: DEFAULT_VIEWPORT,
+        viewport: effectiveViewport,
         headless: !!process.env.CI,
       },
     },

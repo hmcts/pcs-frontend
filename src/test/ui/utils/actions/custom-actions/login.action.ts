@@ -19,6 +19,9 @@ export class LoginAction implements IAction {
   }
 
   private async login() {
+    if (process.env.SELENIUM_REMOTE_URL) {
+      console.log(`[E2E] Signing in with: ${process.env.IDAM_PCS_USER_EMAIL ?? '(unset)'}`);
+    }
     await performAction('inputText', 'Email address', process.env.IDAM_PCS_USER_EMAIL);
     await performAction('inputText', 'Password', process.env.IDAM_PCS_USER_PASSWORD);
     await performAction('clickButton', 'Sign in');
