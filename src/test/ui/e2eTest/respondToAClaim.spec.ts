@@ -33,6 +33,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
   if (testInfo.title.includes('@noDefendants')) {
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
