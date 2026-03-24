@@ -50,10 +50,6 @@ export const flowConfig: JourneyFlowConfig = {
     'exceptional-hardship',
     'income-and-expenditure',
     'regular-income',
-    'universal-credit',
-    'priority-debts',
-    'priority-debt-details',
-    'regular-expenses',
     'end-now',
   ],
   steps: {
@@ -372,65 +368,6 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'regular-income': {
       previousStep: 'income-and-expenditure',
-      routes: [
-        {
-          // AC13: If Universal Credit checkbox selected, skip universal-credit step
-          condition: async (
-            _req: Request,
-            formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            const persisted = formData?.['regular-income'] as Record<string, unknown> | undefined;
-            const selectedIncome = (currentStepData.regularIncome ?? persisted?.regularIncome) as
-              | string
-              | string[]
-              | undefined;
-            const incomeArray = Array.isArray(selectedIncome) ? selectedIncome : selectedIncome ? [selectedIncome] : [];
-
-            return incomeArray.includes('universalCredit');
-          },
-          nextStep: 'priority-debts',
-        },
-      ],
-      defaultNext: 'universal-credit',
-    },
-    'universal-credit': {
-      previousStep: 'regular-income',
-      defaultNext: 'priority-debts',
-    },
-    'priority-debts': {
-      previousStep: async (req: Request, formData: Record<string, unknown>): Promise<string> => {
-        // Check if user selected UC on regular-income page
-        const regularIncomeData = formData?.['regular-income'] as Record<string, unknown> | undefined;
-        const selectedIncome = regularIncomeData?.regularIncome as string | string[] | undefined;
-        const incomeArray = Array.isArray(selectedIncome) ? selectedIncome : selectedIncome ? [selectedIncome] : [];
-
-        // If UC was selected, user came directly from regular-income (skipped universal-credit)
-        if (incomeArray.includes('universalCredit')) {
-          return 'regular-income';
-        }
-
-        // Otherwise, user came from universal-credit step
-        return 'universal-credit';
-      },
-      routes: [
-        {
-          condition: async (req, formData) => formData.hasPriorityDebts === 'yes',
-          nextStep: 'priority-debt-details',
-        },
-        {
-          condition: async (req, formData) => formData.hasPriorityDebts === 'no',
-          nextStep: 'regular-expenses',
-        },
-      ],
-      defaultNext: 'priority-debt-details',
-    },
-    'priority-debt-details': {
-      previousStep: 'priority-debts',
-      defaultNext: 'regular-expenses',
-    },
-    'regular-expenses': {
-      previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
     },
   },
