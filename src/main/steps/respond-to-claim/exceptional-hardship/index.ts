@@ -65,10 +65,7 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const exceptionalHardshipValue = req.body?.exceptionalHardship as string | undefined;
 
-    if (
-      !exceptionalHardshipValue ||
-      (exceptionalHardshipValue !== 'yes' && exceptionalHardshipValue !== 'no')
-    ) {
+    if (!exceptionalHardshipValue || (exceptionalHardshipValue !== 'yes' && exceptionalHardshipValue !== 'no')) {
       return;
     }
 
