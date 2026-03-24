@@ -11,10 +11,9 @@ export const VERY_SHORT_TIMEOUT = 1000;
 export const SHORT_TIMEOUT = 5000;
 export const actionRetries = 10;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
-const env = process.env.ENVIRONMENT?.toLowerCase() || 'preview';
 
 const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
-if (enable_all_page_functional_tests === 'true') {
+if (enable_all_page_functional_tests.toLowerCase() === 'true') {
   process.env.ENABLE_CONTENT_VALIDATION = 'true';
   process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true';
   process.env.ENABLE_NAVIGATION_TESTS = 'true';
@@ -31,11 +30,11 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 3 : 0,
-  workers: env === 'preview' ? 4 : 4,
-  timeout: 600 * 1000,
-  expect: { timeout: 30 * 1000 },
-  use: { actionTimeout: 30 * 1000, navigationTimeout: 30 * 1000 },
+  retries: process.env.CI ? 1 : 0,
+  workers: 4,
+  timeout: 300 * 1000,
+  expect: { timeout: 10 * 1000 },
+  use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
   /* Report slow tests if they take longer than 5 mins */
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
