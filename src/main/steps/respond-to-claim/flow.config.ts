@@ -44,8 +44,8 @@ export const flowConfig: JourneyFlowConfig = {
     'your-household-and-circumstances',
     'do-you-have-any-dependant-children',
     'do-you-have-any-other-dependants',
-    'other-adults',
-    'alternative-accommodation',
+    'do-any-other-adults-live-in-your-home',
+    'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
     'your-circumstances',
     'exceptional-hardship',
     'income-and-expenditure',
@@ -338,18 +338,18 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'do-you-have-any-other-dependants': {
       previousStep: 'do-you-have-any-dependant-children',
-      defaultNext: 'other-adults',
+      defaultNext: 'do-any-other-adults-live-in-your-home',
     },
-    'other-adults': {
+    'do-any-other-adults-live-in-your-home': {
       previousStep: 'do-you-have-any-other-dependants',
-      defaultNext: 'alternative-accommodation',
+      defaultNext: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
     },
-    'alternative-accommodation': {
-      previousStep: 'other-adults',
+    'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home': {
+      previousStep: 'do-any-other-adults-live-in-your-home',
       defaultNext: 'your-circumstances',
     },
     'your-circumstances': {
-      previousStep: 'alternative-accommodation',
+      previousStep: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
       defaultNext: 'exceptional-hardship',
     },
     'exceptional-hardship': {

@@ -6,7 +6,7 @@ import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResp
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'alternative-accommodation',
+  stepName: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,

@@ -1,6 +1,6 @@
 import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 
-import { step as alternativeAccommodation } from './alternative-accommodation';
+import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
@@ -22,7 +22,7 @@ import { step as incomeAndExpenditure } from './income-and-expenditure';
 import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
-import { step as otherAdults } from './other-adults';
+import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
@@ -66,8 +66,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'your-household-and-circumstances': yourHouseholdAndCircumstances,
   'do-you-have-any-dependant-children': doYouHaveAnyDependantChildren,
   'do-you-have-any-other-dependants': doYouHaveAnyOtherDependants,
-  'other-adults': otherAdults,
-  'alternative-accommodation': alternativeAccommodation,
+  'do-any-other-adults-live-in-your-home': doAnyOtherAdultsLiveInYourHome,
+  'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home':
+    wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   'your-circumstances': yourCircumstances,
   'exceptional-hardship': exceptionalHardship,
   'income-and-expenditure': incomeAndExpenditure,
