@@ -1,4 +1,4 @@
-import { dashboard, landlordLicensed } from '../data/page-data';
+import { dashboard, landlordLicensed, landlordRegistered } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function landlordLicensedErrorValidation(): Promise<void> {
@@ -10,7 +10,7 @@ export async function landlordLicensedErrorValidation(): Promise<void> {
 }
 
 export async function landlordLicensedNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', landlordLicensed.backLink, landlordLicensed.mainHeader);
+  await performValidation('pageNavigation', landlordLicensed.backLink, landlordRegistered.mainHeader);
   await performAction('clickRadioButton', landlordLicensed.yesRadioOption);
   await performValidation('pageNavigation', landlordLicensed.saveForLaterButton, dashboard.mainHeader);
 }
