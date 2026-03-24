@@ -10,4 +10,8 @@ export const paymentInterstitial = {
   continueButton: `Continue`,
   cancelLink: `Cancel`,
   backLink: `Back`,
+  feedbackLink: `feedback (opens in new tab)`,
+  feedbackParagraph: `Tell us what you think!`,
+  pageSlug: `payment-interstitial`,
+
 };

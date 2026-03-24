@@ -15,4 +15,7 @@ export const repaymentsMade = {
   mustBeUnderCharacterLimitErrorMessage: `Must be 500 characters or fewer`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
+  feedbackLink: `feedback (opens in new tab)`,
+  feedbackParagraph: `Tell us what you think!`,
+  pageSlug: `repayments-made`,
 };
