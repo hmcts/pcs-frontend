@@ -12,42 +12,49 @@ import { createFormStep } from '@modules/steps';
 const MAX_INCOME_AMOUNT = 1_000_000_000; // £1 billion maximum
 const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 decimal places
 
-// Amount validator helper (copied from rent-arrears-dispute pattern)
-const validateAmount = (value: unknown): boolean | string => {
-  if (typeof value !== 'string') {
-    return true;
-  }
-
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return true;
-  } // Let required validation handle empty values
-
-  const normalized = trimmed.replace(/,/g, '');
-  const numericValue = parseFloat(normalized);
-
-  if (!Number.isNaN(numericValue)) {
-    if (numericValue < 0) {
-      return 'errors.amount.negative';
+const createAmountValidator =
+  (largeAmountErrorKey: string) =>
+  (value: unknown): boolean | string => {
+    if (typeof value !== 'string') {
+      return true;
     }
-    if (numericValue > MAX_INCOME_AMOUNT) {
-      return 'errors.amount.tooLarge';
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return true;
+    } // Let required validation handle empty values
+
+    const normalized = trimmed.replace(/,/g, '');
+    const numericValue = parseFloat(normalized);
+
+    if (!Number.isNaN(numericValue)) {
+      if (numericValue < 0) {
+        return 'errors.amount.negative';
+      }
+      // AC: £1bn or more should error
+      if (numericValue >= MAX_INCOME_AMOUNT) {
+        return largeAmountErrorKey;
+      }
     }
-  }
 
-  if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
-    return 'errors.amount.invalidFormat';
-  }
+    if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
+      return 'errors.amount.invalidFormat';
+    }
 
-  return true;
-};
+    return true;
+  };
+
+const validateIncomeFromJobsAmount = createAmountValidator('errors.incomeFromJobsAmount.largeAmount');
+const validatePensionAmount = createAmountValidator('errors.pensionAmount.largeAmount');
+const validateUniversalCreditAmount = createAmountValidator('errors.universalCreditAmount.largeAmount');
+const validateOtherBenefitsAmount = createAmountValidator('errors.otherBenefitsAmount.largeAmount');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'regular-income',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: `${__dirname}/regularIncome.njk`,
+  showCancelButton: false,
 
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
@@ -60,8 +67,8 @@ export const step: StepDefinition = createFormStep({
     const formData: Record<string, unknown> = {};
     const selectedIncome: string[] = [];
 
-    // Income from jobs
-    if (hc.incomeFromJobs === 'YES') {
+    // Income from jobs - Case-insensitive check to handle backend variations (YES/Yes/yes)
+    if (hc.incomeFromJobs && (hc.incomeFromJobs as string).toUpperCase() === 'YES') {
       selectedIncome.push('incomeFromJobs');
       if (hc.incomeFromJobsAmount) {
         formData['regularIncome.incomeFromJobsAmount'] = penceToPounds(hc.incomeFromJobsAmount as string);
@@ -71,8 +78,8 @@ export const step: StepDefinition = createFormStep({
       }
     }
 
-    // Pension
-    if (hc.pension === 'YES') {
+    // Pension - Case-insensitive check to handle backend variations (YES/Yes/yes)
+    if (hc.pension && (hc.pension as string).toUpperCase() === 'YES') {
       selectedIncome.push('pension');
       if (hc.pensionAmount) {
         formData['regularIncome.pensionAmount'] = penceToPounds(hc.pensionAmount as string);
@@ -82,8 +89,9 @@ export const step: StepDefinition = createFormStep({
       }
     }
 
-    // Universal Credit (Note: amount/frequency may not exist - see BA clarification)
-    if (hc.universalCreditIncome === 'YES') {
+    // Universal Credit - Case-insensitive check to handle backend variations (YES/Yes/yes)
+    // Note: amount/frequency may not exist - see BA clarification
+    if (hc.universalCreditIncome && (hc.universalCreditIncome as string).toUpperCase() === 'YES') {
       selectedIncome.push('universalCredit');
       // UC amount/frequency commented out pending BA clarification
       // if (hc.universalCreditAmount) {
@@ -96,8 +104,8 @@ export const step: StepDefinition = createFormStep({
       // }
     }
 
-    // Other benefits
-    if (hc.otherBenefits === 'YES') {
+    // Other benefits - Case-insensitive check to handle backend variations (YES/Yes/yes)
+    if (hc.otherBenefits && (hc.otherBenefits as string).toUpperCase() === 'YES') {
       selectedIncome.push('otherBenefits');
       if (hc.otherBenefitsAmount) {
         formData['regularIncome.otherBenefitsAmount'] = penceToPounds(hc.otherBenefitsAmount as string);
@@ -107,8 +115,8 @@ export const step: StepDefinition = createFormStep({
       }
     }
 
-    // Money from elsewhere
-    if (hc.moneyFromElsewhere === 'YES') {
+    // Money from elsewhere - Case-insensitive check to handle backend variations (YES/Yes/yes)
+    if (hc.moneyFromElsewhere && (hc.moneyFromElsewhere as string).toUpperCase() === 'YES') {
       selectedIncome.push('moneyFromElsewhere');
       if (hc.moneyFromElsewhereDetails) {
         formData['regularIncome.moneyFromElsewhereDetails'] = hc.moneyFromElsewhereDetails;
@@ -207,6 +215,7 @@ export const step: StepDefinition = createFormStep({
 
   translationKeys: {
     caption: 'caption',
+    heading: 'pageTitle',
     pageTitle: 'pageTitle',
     hintText: 'hintText',
   },
@@ -216,7 +225,9 @@ export const step: StepDefinition = createFormStep({
       name: 'regularIncome',
       type: 'checkbox',
       required: false, // Page is optional - can select zero checkboxes
+      legendClasses: 'govuk-visually-hidden',
       translationKey: {
+        label: 'pageTitle',
         hint: 'hintText',
       },
       options: [
@@ -241,7 +252,7 @@ export const step: StepDefinition = createFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateAmount,
+              validator: validateIncomeFromJobsAmount,
             },
             incomeFromJobsFrequency: {
               name: 'incomeFromJobsFrequency',
@@ -279,7 +290,7 @@ export const step: StepDefinition = createFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateAmount,
+              validator: validatePensionAmount,
             },
             pensionFrequency: {
               name: 'pensionFrequency',
@@ -317,7 +328,7 @@ export const step: StepDefinition = createFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateAmount,
+              validator: validateUniversalCreditAmount,
             },
             universalCreditFrequency: {
               name: 'universalCreditFrequency',
@@ -355,7 +366,7 @@ export const step: StepDefinition = createFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateAmount,
+              validator: validateOtherBenefitsAmount,
             },
             otherBenefitsFrequency: {
               name: 'otherBenefitsFrequency',
@@ -383,8 +394,10 @@ export const step: StepDefinition = createFormStep({
               maxLength: 500,
               required: true,
               errorMessage: 'errors.moneyFromElsewhereDetails.required',
+              labelClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.moneyFromElsewhereDetails',
+                label: 'subFields.moneyFromElsewhereDetailsLabel',
+                hint: 'subFields.moneyFromElsewhereDetailsHint',
               },
             },
           },

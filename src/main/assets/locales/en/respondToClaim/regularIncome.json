@@ -12,7 +12,8 @@
   "subFields": {
     "amount": "Total amount received",
     "frequency": "Received every:",
-    "moneyFromElsewhereDetails": "Give details about the other sources of income and how much you usually receive"
+    "moneyFromElsewhereDetailsLabel": "Give details",
+    "moneyFromElsewhereDetailsHint": "Give details about the other sources of income and how much you usually receive"
   },
   "frequency": {
     "week": "Week",
@@ -20,25 +21,29 @@
   },
   "errors": {
     "incomeFromJobsAmount": {
-      "required": "Enter the total amount you receive from all jobs you do"
+      "required": "Enter the total amount you receive from all jobs you do",
+      "largeAmount": "The total amount you receive from all jobs you do each week or month must be less than £1 billion"
     },
     "incomeFromJobsFrequency": {
       "required": "Select how frequently you receive income from all jobs you do"
     },
     "pensionAmount": {
-      "required": "Enter the total amount you receive from a state or private pension"
+      "required": "Enter the total amount you receive from a state or private pension",
+      "largeAmount": "The total amount you receive from pension (state and private) each week or month must be less than £1 billion"
     },
     "pensionFrequency": {
       "required": "Select how frequently you receive income from a state or private pension"
     },
     "universalCreditAmount": {
-      "required": "Enter the total amount you receive from Universal Credit"
+      "required": "Enter the total amount you receive from Universal Credit",
+      "largeAmount": "The total amount you receive from Universal Credit each week or month must be less than £1 billion"
     },
     "universalCreditFrequency": {
       "required": "Select how frequently you receive Universal Credit"
     },
     "otherBenefitsAmount": {
-      "required": "Enter the total amount you receive from other benefits and credits"
+      "required": "Enter the total amount you receive from other benefits and credits",
+      "largeAmount": "The total amount you receive from other benefits and credit each week or month must be less than £1 billion"
     },
     "otherBenefitsFrequency": {
       "required": "Select how frequently you receive income from other benefits and credits"
