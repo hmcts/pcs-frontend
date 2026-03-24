@@ -45,6 +45,13 @@ function buildReporters(): PlaywrightTestConfig['reporter'] {
 
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
 
+/** Full-page screenshot at end of each test + full session video, kept for pass and fail (not only-on-failure). */
+const artifactCapture = {
+  screenshot: { mode: 'on' as const, fullPage: true },
+  video: 'on' as const,
+  trace: 'on-first-retry' as const,
+};
+
 /** When using remote Selenium (Sauce), match a smaller desktop so login fields are readable in Sauce video. */
 const useSauceSizedViewport = !!process.env.SELENIUM_REMOTE_URL;
 const sauceW = Number.parseInt(process.env.SAUCE_VIEWPORT_WIDTH ?? '1280', 10);
@@ -101,9 +108,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
-        screenshot: 'on',
-        video: 'on',
-        trace: 'on-first-retry',
+        ...artifactCapture,
         javaScriptEnabled: true,
         viewport: effectiveViewport,
         headless: !!process.env.CI,
@@ -116,9 +121,7 @@ export default defineConfig({
             use: {
               ...devices['Desktop Firefox'],
               channel: 'firefox',
-              screenshot: 'on' as const,
-              video: 'on' as const,
-              trace: 'on-first-retry' as const,
+              ...artifactCapture,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
@@ -129,9 +132,7 @@ export default defineConfig({
             use: {
               ...devices['Desktop Safari'],
               channel: 'webkit',
-              screenshot: 'on' as const,
-              video: 'on' as const,
-              trace: 'on-first-retry' as const,
+              ...artifactCapture,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
@@ -142,9 +143,7 @@ export default defineConfig({
             use: {
               ...devices['Pixel 5'],
               channel: 'MobileChrome',
-              screenshot: 'on' as const,
-              video: 'on' as const,
-              trace: 'on-first-retry' as const,
+              ...artifactCapture,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
@@ -155,9 +154,7 @@ export default defineConfig({
             use: {
               ...devices['iPhone 12'],
               channel: 'MobileSafari',
-              screenshot: 'on' as const,
-              video: 'on' as const,
-              trace: 'on-first-retry' as const,
+              ...artifactCapture,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
@@ -168,9 +165,7 @@ export default defineConfig({
             use: {
               ...devices['Desktop Edge'],
               channel: 'msedge',
-              screenshot: 'on' as const,
-              video: 'on' as const,
-              trace: 'on-first-retry' as const,
+              ...artifactCapture,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,

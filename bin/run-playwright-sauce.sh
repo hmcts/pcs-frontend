@@ -36,9 +36,11 @@ console.log(JSON.stringify(cap));
 NODE
 )"
 
+E2E_GREP="${E2E_GREP:-@crossbrowser}"
+
 yarn playwright install
 EXIT_CODE=0
-yarn playwright test --project chrome --grep '@crossbrowser' --headed "$@" || EXIT_CODE=$?
+yarn playwright test --project chrome --grep "${E2E_GREP}" --headed "$@" || EXIT_CODE=$?
 allure generate --clean
 ts-node src/test/ui/config/clean-attachments.config.ts
 

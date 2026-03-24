@@ -30,6 +30,16 @@ properties([
       description: 'Tick the checkbox to run E2E tests in Webkit.'
     ),
     booleanParam(
+      name: 'EDGE_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in Microsoft Edge on the Jenkins agent (local browser).'
+    ),
+    booleanParam(
+      name: 'SAUCE_MATRIX_E2E_TESTS',
+      defaultValue: false,
+      description: 'Run @nightly E2E on Sauce Labs (multi-OS Chrome + Edge via hybrid Selenium Grid). Requires SAUCE_USERNAME / SAUCE_ACCESS_KEY in Key Vault — see Jenkinsfile secrets.'
+    ),
+    booleanParam(
       name: 'ACCESSIBILITY_TESTS',
       defaultValue: true,
       description: 'Tick the checkbox to run Accessibility tests.'
@@ -71,6 +81,9 @@ withNightlyPipeline(type, product, component) {
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
+    if (params.SAUCE_MATRIX_E2E_TESTS) {
+      runSauceMatrixE2ETests(yarnBuilder)
+    }
     if (params.ACCESSIBILITY_TESTS) {
       runAccessibilityTests(yarnBuilder)
     }
@@ -108,6 +121,9 @@ def runE2ETests(yarnBuilder) {
   if (params.WEBKIT_TESTS) {
     runE2ETestsForBrowser(yarnBuilder, 'Safari')
   }
+  if (params.EDGE_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'Edge')
+  }
 }
 
 def runE2ETestsForBrowser(yarnBuilder, String browser) {
@@ -131,6 +147,36 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
         artifacts: 'definitions/test/playwright-report/**'
       )
       sendAllureReportToSlack(browser, "Full_20${browser}_20E2E_20Test_20Report/")
+    }
+  }
+}
+
+def runSauceMatrixE2ETests(yarnBuilder) {
+  stage('Sauce Labs matrix E2E (@nightly)') {
+    node {
+      checkout scm
+      sh 'rm -rf allure-results allure-report'
+      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+        withEnv([
+          "SAUCE_JOB_NAME=pcs-frontend-nightly-${env.BUILD_NUMBER}",
+          'E2E_GREP=@nightly',
+        ]) {
+          yarnBuilder.yarn('test:sauce:matrix:nightly')
+        }
+      }
+      publishHTML([
+        allowMissing: true,
+        alwaysLinkToLastBuild: true,
+        keepAll: true,
+        reportDir: 'allure-report',
+        reportFiles: 'index.html',
+        reportName: 'Sauce matrix E2E (@nightly) Report'
+      ])
+      steps.archiveArtifacts(
+        allowEmptyArchive: true,
+        artifacts: 'definitions/test/playwright-report/**'
+      )
+      sendAllureReportToSlack('Sauce matrix', 'Sauce_20matrix_20E2E_20__40nightly__41_20Report/')
     }
   }
 }

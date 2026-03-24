@@ -89,11 +89,13 @@ function main() {
       SAUCE_JOB_NAME: jobName,
     };
 
-    console.error(`\n── Sauce matrix: ${id} (${platformName} ${browserName} → --project ${playwrightProject}) ──\n`);
+    const grepTag = process.env.E2E_GREP || '@crossbrowser';
+
+    console.error(`\n── Sauce matrix: ${id} (${platformName} ${browserName} → --project ${playwrightProject} --grep ${grepTag}) ──\n`);
 
     const r = spawnSync(
       yarn,
-      ['playwright', 'test', '--project', playwrightProject, '--grep', '@crossbrowser', '--headed', ...process.argv.slice(2)],
+      ['playwright', 'test', '--project', playwrightProject, '--grep', grepTag, '--headed', ...process.argv.slice(2)],
       { stdio: 'inherit', env, shell: false },
     );
     if (r.status !== 0) {
