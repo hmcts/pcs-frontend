@@ -38,7 +38,7 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
         lastName = pinData.lastName;
         const addressObj = pinData.address;
         if (pinData.address) {
-          address = `${addressObj.AddressLine1}, ${addressObj.PostTown}, ${addressObj.PostCode}, ${addressObj.Country}`;
+          address = `${addressObj.AddressLine1}, ${addressObj.PostTown}, ${addressObj.PostCode}`;
         }
         return;
       }
