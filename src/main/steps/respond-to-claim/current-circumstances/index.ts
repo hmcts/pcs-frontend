@@ -1,4 +1,4 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { PossessionClaimResponse, YesNoValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
@@ -24,7 +24,7 @@ export const step: StepDefinition = createFormStep({
       errorMessage: 'errors.shareCircumstances',
       options: [
         {
-          value: 'yes',
+          value: 'YES',
           translationKey: 'options.yes',
           subFields: {
             circumstancesDetails: {
@@ -41,7 +41,7 @@ export const step: StepDefinition = createFormStep({
           },
         },
         {
-          value: 'no',
+          value: 'NO',
           translationKey: 'options.no',
         },
       ],
@@ -60,22 +60,21 @@ export const step: StepDefinition = createFormStep({
     };
   },
   beforeRedirect: async req => {
-    const shareCircumstances = req.body?.shareCircumstances as string | undefined;
+    const shareCircumstances = req.body?.shareCircumstances as YesNoValue | undefined;
 
     if (!shareCircumstances) {
       return;
     }
 
-    const shareAdditionalCircumstances = shareCircumstances === 'yes' ? 'YES' : 'NO';
     const additionalCircumstancesDetails =
-      shareCircumstances === 'yes'
+      shareCircumstances === 'YES'
         ? (req.body?.['shareCircumstances.circumstancesDetails'] as string | undefined)
         : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances: {
-          shareAdditionalCircumstances,
+          shareAdditionalCircumstances: shareCircumstances,
           additionalCircumstancesDetails,
         },
       },
@@ -87,21 +86,10 @@ export const step: StepDefinition = createFormStep({
     const caseData = req.res?.locals?.validatedCase?.data;
     const circumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
 
-    if (!circumstances?.shareAdditionalCircumstances) {
-      return {};
-    }
-
-    // Map CCD enum to frontend value
-    const shareCircumstances =
-      circumstances.shareAdditionalCircumstances === 'YES'
-        ? 'yes'
-        : circumstances.shareAdditionalCircumstances === 'NO'
-          ? 'no'
-          : circumstances.shareAdditionalCircumstances === 'Yes'
-            ? 'yes'
-            : circumstances.shareAdditionalCircumstances === 'No'
-              ? 'no'
-              : undefined;
+    // YesOrNo (CCD SDK type) serialises as "Yes"/"No"; normalise to uppercase to match radio option values
+    const shareCircumstances = circumstances?.shareAdditionalCircumstances
+      ? (String(circumstances.shareAdditionalCircumstances).toUpperCase() as YesNoValue)
+      : undefined;
 
     if (!shareCircumstances) {
       return {};
@@ -109,7 +97,7 @@ export const step: StepDefinition = createFormStep({
 
     return {
       shareCircumstances,
-      ...(shareCircumstances === 'yes' && circumstances.additionalCircumstancesDetails
+      ...(shareCircumstances === 'YES' && circumstances?.additionalCircumstancesDetails
         ? { 'shareCircumstances.circumstancesDetails': circumstances.additionalCircumstancesDetails }
         : {}),
     };

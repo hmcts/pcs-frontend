@@ -16,7 +16,7 @@
   },
   "textAreaLabel": "cyGive details about the exceptional hardship you’d experience",
   "errors": {
-    "wouldExperienceExceptionalHardship": "cyChoose yes or no",
+    "exceptionalHardship": "cyChoose yes or no",
     "exceptionalHardshipDetails": "cyEnter details about the exceptional hardship you’d experience"
   }
 }

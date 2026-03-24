@@ -1,4 +1,4 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { PossessionClaimResponse, YesNoValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
@@ -16,15 +16,15 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'wouldExperienceExceptionalHardship',
+      name: 'exceptionalHardship',
       type: 'radio',
       required: true,
       legendClasses: 'govuk-fieldset__legend--m',
       translationKey: { label: 'question' },
-      errorMessage: 'errors.wouldExperienceExceptionalHardship',
+      errorMessage: 'errors.exceptionalHardship',
       options: [
         {
-          value: 'yes',
+          value: 'YES',
           translationKey: 'options.yes',
           subFields: {
             exceptionalHardshipDetails: {
@@ -41,7 +41,7 @@ export const step: StepDefinition = createFormStep({
           },
         },
         {
-          value: 'no',
+          value: 'NO',
           translationKey: 'options.no',
         },
       ],
@@ -63,21 +63,15 @@ export const step: StepDefinition = createFormStep({
     };
   },
   beforeRedirect: async req => {
-    const wouldExperienceExceptionalHardship = req.body?.wouldExperienceExceptionalHardship as string | undefined;
+    const exceptionalHardship = req.body?.exceptionalHardship as YesNoValue | undefined;
 
-    if (!wouldExperienceExceptionalHardship) {
+    if (!exceptionalHardship) {
       return;
     }
 
-    const enumMapping: Record<string, 'YES' | 'NO'> = {
-      yes: 'YES',
-      no: 'NO',
-    };
-
-    const exceptionalHardship = enumMapping[wouldExperienceExceptionalHardship];
     const exceptionalHardshipDetails =
-      wouldExperienceExceptionalHardship === 'yes'
-        ? (req.body?.['wouldExperienceExceptionalHardship.exceptionalHardshipDetails'] as string | undefined)
+      exceptionalHardship === 'YES'
+        ? (req.body?.['exceptionalHardship.exceptionalHardshipDetails'] as string | undefined)
         : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
@@ -93,32 +87,22 @@ export const step: StepDefinition = createFormStep({
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const existingAnswer =
-      caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances?.exceptionalHardship;
-    const exceptionalHardshipDetails =
-      caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances?.exceptionalHardshipDetails;
+    const householdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
 
-    // Map CCD enum to frontend value
-    const formValue =
-      existingAnswer === 'YES'
-        ? 'yes'
-        : existingAnswer === 'NO'
-          ? 'no'
-          : existingAnswer === 'Yes'
-            ? 'yes'
-            : existingAnswer === 'No'
-              ? 'no'
-              : undefined;
+    // YesOrNo (CCD SDK type) serialises as "Yes"/"No"; normalise to uppercase to match radio option values
+    const exceptionalHardship = householdCircumstances?.exceptionalHardship
+      ? (String(householdCircumstances.exceptionalHardship).toUpperCase() as YesNoValue)
+      : undefined;
 
-    if (!formValue) {
+    if (!exceptionalHardship) {
       return {};
     }
 
     return {
-      wouldExperienceExceptionalHardship: formValue,
-      ...(formValue === 'yes' && exceptionalHardshipDetails
+      exceptionalHardship,
+      ...(exceptionalHardship === 'YES' && householdCircumstances?.exceptionalHardshipDetails
         ? {
-            'wouldExperienceExceptionalHardship.exceptionalHardshipDetails': exceptionalHardshipDetails,
+            'exceptionalHardship.exceptionalHardshipDetails': householdCircumstances.exceptionalHardshipDetails,
           }
         : {}),
     };
