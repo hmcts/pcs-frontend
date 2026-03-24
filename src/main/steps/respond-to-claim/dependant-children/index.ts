@@ -1,11 +1,9 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { CaseData , HouseholdCircumstances, PossessionClaimResponse, YesNoCapitalised } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
-import type { CaseData, HouseholdCircumstances, YesNoCapitalised } from '../../../interfaces/ccdCase.interface';
-
 
 export const step: StepDefinition = createFormStep({
   stepName: 'do-you-have-any-dependant-children',
@@ -36,15 +34,13 @@ export const step: StepDefinition = createFormStep({
     }
 
     const dependantChildrenDetails: string | undefined =
-      dependantChildrenCcd === 'Yes'
-        ? (req.body?.['dependantChildren.dependantChildrenDetails'])
-        : undefined;
+      dependantChildrenCcd === 'Yes' ? req.body?.['dependantChildren.dependantChildrenDetails'] : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances: {
           dependantChildren: dependantChildrenCcd,
-          dependantChildrenDetails : dependantChildrenDetails ?? '',
+          dependantChildrenDetails: dependantChildrenDetails ?? '',
         },
       },
     };
@@ -53,7 +49,8 @@ export const step: StepDefinition = createFormStep({
   },
   getInitialFormData: req => {
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
-    const householdCircumstances: HouseholdCircumstances | undefined = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const householdCircumstances: HouseholdCircumstances | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     console.log('Household circumstances from CCD', householdCircumstances);
     const dependantChildrenCcd: YesNoCapitalised | undefined = householdCircumstances?.dependantChildren;
 
