@@ -266,17 +266,6 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
-    // let rentArrears_Total: string | null = null;
-    // let claimantName: string | null = null;
-    // if (rentArrearsInfo.tenancy === 'flexible') {
-    //   rentArrears_Total = `${submitCaseApiData.submitCasePayloadFlexibleTenancyDate.rentArrears_Total}`;
-    //   claimantName = `${submitCaseApiData.submitCasePayloadFlexibleTenancyDate.claimantName}`;
-    // }
-    // if (rentArrearsInfo.tenancy === 'introductory') {
-    //   rentArrears_Total = `${submitCaseApiData.submitCasePayloadIntroductoryTenancy.rentArrears_Total}`;
-    //   claimantName = `${submitCaseApiData.submitCasePayloadIntroductoryTenancy.claimantName}`;
-    // }
-
     await performValidation('text', {
       elementType: 'subHeader',
       text: `Amount you owe in rent arrears given by ${submitCaseApiData.submitCasePayload.claimantName}:`,

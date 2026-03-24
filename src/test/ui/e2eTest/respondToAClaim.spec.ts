@@ -32,6 +32,22 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else {
     process.env.NOTICE_SERVED = 'YES';
   }
+
+  // If NoticeDateProvided = no → navigate to Notice Date Unknown
+  if (testInfo.title.includes('NoticeDateProvided - No')) {
+    process.env.NOTICE_DATE_PROVIDED = 'NO';
+    // If NoticeDateProvided = yes → navigate to Notice Date Known
+  } else if (testInfo.title.includes('NoticeDateProvided - Yes')) {
+    process.env.NOTICE_DATE_PROVIDED = 'YES';
+  }
+  // If NoticeServed = no and tenancy start date is unknown → navigate to Tenancy Start Date Known
+  else if (testInfo.title.includes('NoticeServed - No') && testInfo.title.includes('noDefendants')) {
+    process.env.TENANCY_START_DATE_KNOWN = 'NO';
+  } //If NoticeServed = no and tenancy start date is known → navigate to Tenancy Start Date known
+  else if (testInfo.title.includes('NoticeServed - No') && !testInfo.title.includes('noDefendants')) {
+    process.env.TENANCY_START_DATE_KNOWN = 'YES';
+  }
+
   if (testInfo.title.includes('@noDefendants')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
@@ -410,7 +426,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No NoticeDateProvided - No - RentArrearsDispute @rentNonRent @regression', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,

@@ -1,4 +1,11 @@
-import { dashboard, rentArrears } from '../data/page-data';
+import {
+  dashboard,
+  noticeDateWhenNotProvided,
+  noticeDateWhenProvided,
+  rentArrears,
+  tenancyDateDetails,
+  tenancyDateUnknown,
+} from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function rentArrearsErrorValidation(): Promise<void> {
@@ -43,14 +50,14 @@ export async function rentArrearsErrorValidation(): Promise<void> {
 }
 
 export async function rentArrearsNavigationTests(): Promise<void> {
-  // if NoticeDateProvided = no then go to NoticeDateUnknown
-  // if NoticeDateProvided = yes then go to NoticeDateKnown
-  // if NoticeServed = No then go to
-  //   await performValidation(
-  //     'pageNavigation',
-  //     rentArrears.backLink,
-  //     not.getMainHeader(claimantsName)
-  //   );
-
+  if (process.env.NOTICE_DATE_PROVIDED === 'NO') {
+    await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenNotProvided.mainHeader);
+  } else if (process.env.NOTICE_DATE_PROVIDED === 'YES') {
+    await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenProvided.mainHeader);
+  } else if (process.env.TENANCY_START_DATE_KNOWN === 'YES') {
+    await performValidation('pageNavigation', rentArrears.backLink, tenancyDateDetails.mainHeader);
+  } else if (process.env.TENANCY_START_DATE_KNOWN === 'NO') {
+    await performValidation('pageNavigation', rentArrears.backLink, tenancyDateUnknown.mainHeader);
+  }
   await performValidation('pageNavigation', rentArrears.saveForLaterButton, dashboard.mainHeader);
 }
