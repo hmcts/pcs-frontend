@@ -1,16 +1,16 @@
-import { landlordRegistered } from '../data/page-data';
+import { licensedLandlord } from '../data/page-data';
 import { writtenTerms } from '../data/page-data/writtenTerms.page.data';
 import { performAction, performValidation } from '../utils/controller';
 
-export async function landlordRegisteredErrorValidation(): Promise<void> {
-  await performAction('clickButton', landlordRegistered.saveAndContinueButton);
+export async function writtenTermsErrorValidation(): Promise<void> {
+  await performAction('clickButton', writtenTerms.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: landlordRegistered.thereIsAProblemErrorMessageHeader,
-    message: landlordRegistered.selectIfYouAgreeWithLandlordsClaimRegisteredErrorMessage,
+    header: writtenTerms.thereIsAProblemErrorMessageHeader,
+    message: writtenTerms.selectIfTheLandlordHasSentYouWrittenTermsOfTheOccupationContractErrorMessage,
   });
 }
-export async function landlordRegisteredNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', writtenTerms.backLink, writtenTerms.mainHeader);
+export async function writtenTermsNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', writtenTerms.backLink, licensedLandlord.mainHeader);
   await performAction('clickRadioButton', writtenTerms.yesRadioOption);
   await performValidation('pageNavigation', writtenTerms.saveForLaterButton, 'Dashboard');
 }
