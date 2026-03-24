@@ -41,6 +41,10 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 },
         headless: false,
+        // Explicit so device preset cannot override; grid runs need these for test-results + Sauce session.
+        screenshot: 'on',
+        video: 'on',
+        trace: 'on-first-retry',
       },
     },
   ],

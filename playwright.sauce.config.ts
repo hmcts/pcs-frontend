@@ -25,6 +25,10 @@ export default defineConfig({
         channel: 'chromium',
         viewport: { width: 1920, height: 1080 },
         headless: true,
+        // Must be after device spread — presets can override top-level use and drop video/screenshots.
+        screenshot: 'on',
+        video: 'on',
+        trace: 'retain-on-failure',
       },
     },
     {
@@ -33,6 +37,9 @@ export default defineConfig({
         ...devices['Desktop Firefox'],
         viewport: { width: 1920, height: 1080 },
         headless: true,
+        screenshot: 'on',
+        video: 'on',
+        trace: 'retain-on-failure',
       },
     },
   ],

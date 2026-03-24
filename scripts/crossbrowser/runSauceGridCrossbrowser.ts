@@ -16,6 +16,9 @@ function buildCapabilitiesJson(): string {
     devTools: true,
     /** Enables Network + browser console in Sauce Test Details (Extended Debugging). */
     extendedDebugging: true,
+    /** Sauce UI session recording (separate from Playwright test-results video). */
+    recordVideo: true,
+    recordScreenshots: true,
     username,
     accessKey,
     name: process.env.SAUCE_JOB_NAME ?? 'pcs-frontend-crossbrowser-grid',
