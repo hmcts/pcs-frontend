@@ -59,7 +59,8 @@ function main() {
   }
 
   const yarn = process.platform === 'win32' ? 'yarn.cmd' : 'yarn';
-  let install = spawnSync(yarn, ['playwright', 'install'], { stdio: 'inherit', shell: false });
+  // Selenium → Sauce matrix uses --project chrome / MicrosoftEdge; those channels need local browser stubs (not only bundled chromium).
+  let install = spawnSync(yarn, ['playwright', 'install', 'chrome', 'msedge'], { stdio: 'inherit', shell: false });
   if (install.status !== 0) {
     process.exit(install.status ?? 1);
   }

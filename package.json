@@ -43,7 +43,7 @@
     "test:E2eChrome": "yarn playwright install && yarn playwright test --project chrome --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:E2eFirefox": "yarn playwright install && yarn playwright test --project firefox --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:E2eSafari": "yarn playwright install && yarn playwright test --project webkit --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
-    "test:E2eEdge": "yarn playwright install && yarn playwright test --project MicrosoftEdge --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:E2eEdge": "yarn playwright install msedge && yarn playwright test --project MicrosoftEdge --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:sauce:chrome": "bash bin/run-playwright-sauce.sh",
     "test:sauce:chrome:nightly": "E2E_GREP='@nightly' bash bin/run-playwright-sauce.sh",
     "test:sauce:matrix": "node bin/run-playwright-sauce-matrix.mjs",
