@@ -22,6 +22,7 @@ const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
+  process.env.WALES_POSTCODE = 'YES';
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
   await performAction('fetchPINsAPI');
@@ -38,8 +39,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  //This test is currently failing due to incorrect address comparison, this will get fixed and re-enabled by HDPI-5492
-  test.skip('Respond to a claim - Wales @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
