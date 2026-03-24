@@ -37,7 +37,10 @@ export class LoginAction implements IAction {
       await banner.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
     } catch {
       try {
-        await banner.getByRole('button', { name: /^accept/i }).first().click({ timeout: 3_000 });
+        await banner
+          .getByRole('button', { name: /^accept/i })
+          .first()
+          .click({ timeout: 3_000 });
         await banner.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
       } catch {
         /* non-standard banner — continue; login may still work */
