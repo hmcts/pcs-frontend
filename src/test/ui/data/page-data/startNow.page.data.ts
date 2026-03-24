@@ -23,4 +23,7 @@ export const startNow = {
   contactUsForHelpText: `Contact us for help`,
   backLink: `Back`,
   cymraegLink: `Cymraeg`,
+  feedbackLink: `feedback (opens in new tab)`,
+  feedbackParagraph: `Tell us what you think!`,
+  pageSlug: `start-now`,
 };

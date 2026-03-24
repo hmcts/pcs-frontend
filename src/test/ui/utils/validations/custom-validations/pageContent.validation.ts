@@ -149,6 +149,8 @@ export class PageContentValidation implements IValidation {
         key.includes('Input') ||
         key.includes('Hidden') ||
         key.includes('Validation') ||
+        key.includes('feedbackParagraph') ||
+        key.includes('pageSlug') ||
         key.includes('ErrorMessage')
       ) {
         continue;
