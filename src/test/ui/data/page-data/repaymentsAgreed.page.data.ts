@@ -17,5 +17,5 @@ export const repaymentsAgreed = {
   backLink: 'Back',
   thereIsAProblemErrorMessageHeader: 'There is a problem',
   getSelectAgreementErrorMessage: (claimantsName: string) =>
-    `Select if you've come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025`,
+    `Select if you’ve come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025`,
 };
