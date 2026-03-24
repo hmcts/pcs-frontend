@@ -29,5 +29,5 @@ export async function repaymentsMadeNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', repaymentsMade.backLink, paymentInterstitial.mainHeader);
   await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
   await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsTextInput);
-  await performValidation('pageNavigation', repaymentsMade.saveForLaterButton, dashboard.mainHeader());
+  await performValidation('pageNavigation', repaymentsMade.saveForLaterButton, dashboard.mainHeader);
 }

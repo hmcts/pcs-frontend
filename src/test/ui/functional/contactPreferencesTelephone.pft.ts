@@ -52,5 +52,5 @@ export async function contactPreferencesTelephoneNavigationTests(): Promise<void
     contactPreferenceEmailOrPost.mainHeader
   );
   await performAction('clickRadioButton', contactPreferencesTelephone.noRadioOption);
-  await performValidation('pageNavigation', contactPreferencesTelephone.saveForLaterButton, dashboard.mainHeader());
+  await performValidation('pageNavigation', contactPreferencesTelephone.saveForLaterButton, dashboard.mainHeader);
 }

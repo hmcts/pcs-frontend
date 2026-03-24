@@ -47,5 +47,5 @@ export async function tenancyDateUnknownNavigationTests(): Promise<void> {
     ['inputText', tenancyDateUnknown.monthTextLabel, '09'],
     ['inputText', tenancyDateUnknown.yearTextLabel, '2025']
   );
-  await performValidation('pageNavigation', tenancyDateUnknown.saveForLaterButton, dashboard.mainHeader());
+  await performValidation('pageNavigation', tenancyDateUnknown.saveForLaterButton, dashboard.mainHeader);
 }
