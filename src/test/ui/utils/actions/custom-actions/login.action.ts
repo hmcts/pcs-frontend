@@ -18,6 +18,7 @@ export class LoginAction implements IAction {
   }
 
   private async login() {
+    console.log('[login] Signing in with Idam email:', process.env.IDAM_PCS_USER_EMAIL ?? '(unset)');
     await performAction('inputText', 'Email address', process.env.IDAM_PCS_USER_EMAIL);
     await performAction('inputText', 'Password', process.env.IDAM_PCS_USER_PASSWORD);
     await performAction('clickButton', 'Sign in');
@@ -41,6 +42,7 @@ export class LoginAction implements IAction {
         roleNames: roles,
       },
     });
+    console.log('[login] Created Idam user for tests:', email);
     await this.generateCitizenAccessToken();
   }
 

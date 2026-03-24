@@ -10,7 +10,24 @@ async function globalSetupConfig(): Promise<void> {
   }
   await getS2SToken();
   await getAccessToken();
+  logIdamTestIdentity();
 }
+
+const UI_LOGIN_EMAIL_UNSET =
+  '(unset — export IDAM_PCS_USER_EMAIL on the agent or use createUser in the spec)';
+
+/** Logs which Idam users the run uses (password-safe). Check Sauce job stdout / Playwright logs if login/API calls fail. */
+const logIdamTestIdentity = (): void => {
+  const uiLoginEmail = process.env.IDAM_PCS_USER_EMAIL?.trim() || UI_LOGIN_EMAIL_UNSET;
+  const bearerUserEmail = user.claimantSolicitor.email;
+  console.log('[global-setup] Idam UI login email (IDAM_PCS_USER_EMAIL):', uiLoginEmail);
+  console.log('[global-setup] Bearer token minted for (claimantSolicitor in global-setup):', bearerUserEmail);
+  if (uiLoginEmail !== UI_LOGIN_EMAIL_UNSET && uiLoginEmail !== bearerUserEmail) {
+    console.warn(
+      '[global-setup] UI login email differs from bearer user — ensure that is intentional (API vs UI identity).'
+    );
+  }
+};
 
 const clearEmvLocks = (): void => {
   const lockDir = path.join(process.cwd(), 'test-results', 'pft-locks');
