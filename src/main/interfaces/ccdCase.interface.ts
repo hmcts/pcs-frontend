@@ -13,6 +13,8 @@ export type ContactPreference = 'EMAIL' | 'POST' | null;
 export interface HouseholdCircumstances {
   dependantChildren?: YesNoCapitalised;
   dependantChildrenDetails?: string;
+  otherDependants?: YesNoCapitalised;
+  otherDependantDetails?: string;
 }
 
 export interface CcdUserCase {

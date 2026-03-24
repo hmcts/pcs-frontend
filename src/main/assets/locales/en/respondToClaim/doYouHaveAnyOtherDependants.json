@@ -1,0 +1,16 @@
+{
+  "pageTitle": "Other dependants",
+  "caption": "Respond to a property possession claim",
+  "heading": "Do you have any other dependants?",
+  "otherDependantsHint": "Dependants are people you look after financially, like elderly relatives.",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "otherDependantDetailsLabel": "Give details about your other dependants",
+  "otherDependantDetailsHint": "You should include details about how many other dependants you have, how old they are and anything else you think the court should know about them",
+  "errors": {
+    "otherDependants": "Select if you have any other dependants.",
+    "otherDependantDetails": "Give details about your other dependants."
+  }
+}
