@@ -14,9 +14,9 @@
     "yes": "Yes",
     "no": "No"
   },
-  "textAreaLabel": "Give details about the exceptional hardship you'd experience",
+  "textAreaLabel": "Give details about the exceptional hardship you’d experience",
   "errors": {
     "wouldExperienceExceptionalHardship": "Choose yes or no",
-    "exceptionalHardshipDetails": "Enter details about the exceptional hardship you'd experience"
+    "exceptionalHardshipDetails": "Enter details about the exceptional hardship you’d experience"
   }
 }
