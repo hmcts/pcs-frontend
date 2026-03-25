@@ -4,7 +4,7 @@ export const rentArrears = {
   rentAmountTextInput: `1000.00`,
   incorrectFormatTextInput: `1000`,
   negativeTextInput: `-100.00`,
-  billionTextInput: `1000001.00`,
+  billionTextInput: `1000000001.00`,
   doYouOweThisQuestion: `Do you owe this amount in rent arrears?`,
   howMuchDoYouBelieveHiddenTextLabel: `How much do you believe you owe in rent arrears?`,
   rentArrearsAreMoneyParagraph: `Rent arrears are money you owe in rent payments.`,
