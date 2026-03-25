@@ -284,7 +284,7 @@ export class RespondToClaimAction implements IAction {
       question: rentArrears.doYouOweThisQuestion,
       option: rentArrearsInfo.option,
     });
-    if (rentArrearsInfo.option === rentArrears.noRadioOption) {
+    if (rentArrearsInfo.option === 'No') {
       await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
     }
     await performAction('clickButton', rentArrears.saveAndContinueButton);
