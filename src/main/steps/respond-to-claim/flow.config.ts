@@ -2,13 +2,16 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
-  cameFromIncomeAndExpenditure,
   getPreviousPageForArrears,
+  hasSelectedUniversalCredit,
   isDefendantNameKnown,
+  isFinanceDetailsProvided,
+  isFromIncomeAndExpenditure,
   isNoticeDateProvided,
   isNoticeServed,
   isRentArrearsClaim,
   isTenancyStartDateKnown,
+  isUniversalCreditSelected,
   isWelshProperty,
 } from '../utils';
 
@@ -361,22 +364,14 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'exceptional-hardship',
       routes: [
         {
-          condition: async (
-            req: Request,
-            formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            return currentStepData.provideFinanceDetails === 'no';
+          condition: async (req: Request): Promise<boolean> => {
+            return !(await isFinanceDetailsProvided(req));
           },
           nextStep: 'upload-docs',
         },
         {
-          condition: async (
-            req: Request,
-            formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            return currentStepData.provideFinanceDetails === 'yes';
+          condition: async (req: Request): Promise<boolean> => {
+            return isFinanceDetailsProvided(req);
           },
           nextStep: 'regular-income',
         },
@@ -387,24 +382,14 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'income-and-expenditure',
       routes: [
         {
-          condition: async (
-            req: Request,
-            formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            const regularIncome = currentStepData.regularIncome;
-            return [regularIncome].flat().filter(Boolean).includes('universalCredit');
+          condition: async (req: Request): Promise<boolean> => {
+            return isUniversalCreditSelected(req);
           },
           nextStep: 'priority-debts',
         },
         {
-          condition: async (
-            req: Request,
-            formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            const regularIncome = currentStepData.regularIncome;
-            return ![regularIncome].flat().filter(Boolean).includes('universalCredit');
+          condition: async (req: Request): Promise<boolean> => {
+            return !(await isUniversalCreditSelected(req));
           },
           nextStep: 'have-you-applied-for-universal-credit',
         },
@@ -412,9 +397,14 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
+      previousStep: 'regular-income',
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
+      previousStep: async (req: Request): Promise<string> => {
+        const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
+        return selectedUniversalCredit ? 'regular-income' : 'have-you-applied-for-universal-credit';
+      },
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {
@@ -424,10 +414,14 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'upload-docs',
     },
     'upload-docs': {
+      previousStep: async (req: Request): Promise<string> => {
+        const fromIncomeExpenditure = await isFromIncomeAndExpenditure(req);
+        return fromIncomeExpenditure ? 'income-and-expenditure' : 'what-other-regular-expenses-do-you-have';
+      },
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
-            return cameFromIncomeAndExpenditure(req);
+            return isFromIncomeAndExpenditure(req);
           },
           nextStep: 'income-and-expenditure',
         },
