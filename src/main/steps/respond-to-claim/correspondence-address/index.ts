@@ -39,6 +39,7 @@ const fieldsConfig: FormFieldConfig[] = [
             name: 'addressLine1',
             type: 'text',
             required: true,
+            errorMessage: 'errors.correspondenceAddressConfirm.addressLine1',
             translationKey: {
               label: 'labels.addressLine1',
             },
@@ -61,6 +62,7 @@ const fieldsConfig: FormFieldConfig[] = [
             name: 'townOrCity',
             type: 'text',
             required: true,
+            errorMessage: 'errors.correspondenceAddressConfirm.townOrCity',
             translationKey: {
               label: 'labels.townOrCity',
             },
