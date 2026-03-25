@@ -39,7 +39,6 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
         const addressObj = pinData.address;
         if (pinData.address) {
           const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country } = addressObj;
-
           address = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country]
             .filter(value => value && value.trim() !== '')
             .join(', ');
