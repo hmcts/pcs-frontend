@@ -37,6 +37,7 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as universalCredit } from './universal-credit';
+import { step as uploadDocs } from './upload-docs';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -73,8 +74,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'exceptional-hardship': exceptionalHardship,
   'income-and-expenditure': incomeAndExpenditure,
   'regular-income': regularIncome,
-  'universal-credit': universalCredit,
+  'have-you-applied-for-universal-credit': universalCredit,
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,
-  'regular-expenses': regularExpenses,
+  'what-other-regular-expenses-do-you-have': regularExpenses,
+  'upload-docs': uploadDocs,
 };

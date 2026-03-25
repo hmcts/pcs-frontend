@@ -50,7 +50,11 @@ export const flowConfig: JourneyFlowConfig = {
     'exceptional-hardship',
     'income-and-expenditure',
     'regular-income',
-    'end-now',
+    'have-you-applied-for-universal-credit',
+    'priority-debts',
+    'priority-debt-details',
+    'what-other-regular-expenses-do-you-have',
+    'upload-docs',
   ],
   steps: {
     'start-now': {
@@ -354,21 +358,40 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'income-and-expenditure': {
       previousStep: 'exceptional-hardship',
-      routes: [
-        {
-          condition: async (req, formData) => formData.provideFinanceDetails === 'yes',
-          nextStep: 'regular-income',
-        },
-        {
-          condition: async (req, formData) => formData.provideFinanceDetails === 'no',
-          nextStep: 'end-now',
-        },
-      ],
       defaultNext: 'regular-income',
     },
     'regular-income': {
       previousStep: 'income-and-expenditure',
-      defaultNext: 'end-now',
+      routes: [
+        {
+          condition: async (req: Request, formData: Record<string, unknown>): Promise<boolean> => {
+            const regularIncome = (formData['regular-income'] as Record<string, unknown>)?.regularIncome;
+            return [regularIncome].flat().filter(Boolean).includes('universalCredit');
+          },
+          nextStep: 'priority-debts',
+        },
+        {
+          condition: async (req: Request, formData: Record<string, unknown>): Promise<boolean> => {
+            const regularIncome = (formData['regular-income'] as Record<string, unknown>)?.regularIncome;
+            return ![regularIncome].flat().filter(Boolean).includes('universalCredit');
+          },
+          nextStep: 'have-you-applied-for-universal-credit',
+        },
+      ],
+      defaultNext: 'have-you-applied-for-universal-credit',
     },
+    'have-you-applied-for-universal-credit': {
+      defaultNext: 'priority-debts',
+    },
+    'priority-debts': {
+      defaultNext: 'priority-debt-details',
+    },
+    'priority-debt-details': {
+      defaultNext: 'what-other-regular-expenses-do-you-have',
+    },
+    'what-other-regular-expenses-do-you-have': {
+      defaultNext: 'upload-docs',
+    },
+    'upload-docs': {},
   },
 };
