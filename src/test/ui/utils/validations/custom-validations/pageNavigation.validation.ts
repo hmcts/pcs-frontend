@@ -41,11 +41,15 @@ export class PageNavigationValidation implements IValidation {
   }
 
   async validate(page: Page, validation: string, navigateButton: string, fieldName: validationRecord): Promise<void> {
-    PageNavigationValidation.currentPageUrl = page.url();
+    const originalUrl = page.url();
+    PageNavigationValidation.currentPageUrl = originalUrl;
+    console.log(`[DEBUG] Starting validation. Original URL: ${originalUrl}`);
+
     let newPage: Page | null = null;
     let isNewWindow = false;
 
     if (navigateButton) {
+      console.log(`[DEBUG] Clicking button: ${navigateButton}`);
       const popupPromise = page
         .context()
         .waitForEvent('page')
@@ -53,34 +57,54 @@ export class PageNavigationValidation implements IValidation {
 
       if (navigateButton.includes('Back') || navigateButton.includes('feedback')) {
         await performAction('clickLink', navigateButton);
-        await page.waitForTimeout(1000);
       } else {
         await performAction('clickButton', navigateButton);
       }
 
+      console.log(`[DEBUG] Button clicked, checking for popup...`);
       const popup = await Promise.race([popupPromise, new Promise(resolve => setTimeout(() => resolve(null), 1000))]);
 
       if (popup) {
         newPage = popup as Page;
         isNewWindow = true;
-        await newPage.waitForLoadState();
+        console.log(`[DEBUG] Popup detected, waiting for load. Popup URL: ${newPage.url()}`);
+        await newPage.waitForLoadState('domcontentloaded');
+        console.log(`[DEBUG] Popup loaded. URL: ${newPage.url()}`);
+      } else {
+        console.log(`[DEBUG] No popup detected, waiting for page navigation`);
+        // Wait for page to navigate after click
+        await page.waitForLoadState('domcontentloaded');
+        console.log(`[DEBUG] Page navigation completed. Current URL: ${page.url()}`);
       }
     }
 
     const pageToValidate = isNewWindow && newPage ? newPage : page;
+    console.log(`[DEBUG] Validating page: ${pageToValidate.url()}`);
 
     try {
       await this.validatePageNavigation(pageToValidate, fieldName);
+      console.log(`[DEBUG] Validation completed successfully`);
+    } catch (error) {
+      console.log(`[DEBUG] Validation failed:`, error);
+      throw error;
     } finally {
       if (newPage && !newPage.isClosed()) {
+        console.log(`[DEBUG] Closing popup window`);
         await newPage.close();
       }
+      // Only navigate back if we're on a different page and no new window was opened
       if (
         PageNavigationValidation.currentPageUrl &&
         !isNewWindow &&
         page.url() !== PageNavigationValidation.currentPageUrl
       ) {
+        console.log(`[DEBUG] Navigating back to original URL: ${PageNavigationValidation.currentPageUrl}`);
         await performAction('navigateToUrl', PageNavigationValidation.currentPageUrl);
+        console.log(`[DEBUG] Navigation completed. Current URL: ${page.url()}`);
+      } else {
+        console.log(
+          `[DEBUG] Skipping navigation back. Current URL: ${page.url()}, Original URL: ${PageNavigationValidation.currentPageUrl}, isNewWindow: ${isNewWindow}`
+        );
       }
     }
   }
@@ -96,17 +120,23 @@ export class PageNavigationValidation implements IValidation {
     let expectedUrlPattern = '';
 
     try {
+      // Wait for page to be fully ready
+      await page.waitForLoadState('domcontentloaded');
+      console.log(`[DEBUG] Page ready for validation: ${page.url()}`);
+
       if (fieldName && typeof fieldName === 'object') {
         const validationData = fieldName as any;
 
         if (validationData.element) {
           expectedElementText = validationData.element;
+          console.log(`[DEBUG] Looking for element with text: "${expectedElementText}"`);
           const locator = page.locator(
             `h1, h1.govuk-heading-xl, h1.govuk-heading-l, span:text-is("${expectedElementText}")`
           );
           try {
-            await expect(locator).toHaveText(expectedElementText);
+            await expect(locator).toHaveText(expectedElementText, { timeout: 5000 });
             actualElementText = expectedElementText;
+            console.log(`[DEBUG] Element found successfully`);
           } catch (error) {
             elementPassed = false;
             actualElementText =
@@ -115,6 +145,7 @@ export class PageNavigationValidation implements IValidation {
                 .textContent()
                 .catch(() => 'Not found')) || 'Not found';
             elementError = error instanceof Error ? error.message.split('\n')[0] : String(error);
+            console.log(`[DEBUG] Element not found. Actual: "${actualElementText}"`);
           }
         }
 
@@ -122,6 +153,7 @@ export class PageNavigationValidation implements IValidation {
           try {
             expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=respond-to-claim/${validationData.pageSlug}`;
             actualUrl = page.url();
+            console.log(`[DEBUG] Validating URL. Expected: ${expectedUrlPattern}, Actual: ${actualUrl}`);
             if (actualUrl !== expectedUrlPattern) {
               urlPassed = false;
               urlError = `URL mismatch. Expected: ${expectedUrlPattern}, Actual: ${actualUrl}`;
@@ -134,9 +166,11 @@ export class PageNavigationValidation implements IValidation {
         }
       } else {
         expectedElementText = String(fieldName);
+        console.log(`[DEBUG] Looking for header with text: "${expectedElementText}"`);
         const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
-        await expect(locator).toHaveText(expectedElementText);
+        await expect(locator).toHaveText(expectedElementText, { timeout: 5000 });
         actualElementText = expectedElementText;
+        console.log(`[DEBUG] Header found successfully`);
       }
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
@@ -202,12 +236,8 @@ export class PageNavigationValidation implements IValidation {
       if (typeof fieldName === 'object' && fieldName !== null) {
         const obj = fieldName as any;
         const parts: string[] = [];
-        if (obj.element) {
-          parts.push(`element: "${obj.element}"`);
-        }
-        if (obj.pageSlug) {
-          parts.push(`pageSlug: "${obj.pageSlug}"`);
-        }
+        if (obj.element) {parts.push(`element: "${obj.element}"`);}
+        if (obj.pageSlug) {parts.push(`pageSlug: "${obj.pageSlug}"`);}
         expectedValue = `{ ${parts.join(', ')} }`;
       } else {
         expectedValue = String(fieldName);
@@ -224,6 +254,7 @@ export class PageNavigationValidation implements IValidation {
         error: error instanceof Error ? error.message.split('\n')[0] : String(error),
         hasPFTFile,
       });
+      throw error;
     }
   }
 
