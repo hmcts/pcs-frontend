@@ -38,7 +38,6 @@ export const step: StepDefinition = createFormStep({
               name: 'email',
               type: 'text',
               required: true,
-              errorMessage: 'errors.contactByEmailOrPost.email',
               labelClasses: 'govuk-!-font-weight-bold',
               classes: 'govuk-input govuk-input--width-10',
               translationKey: {
