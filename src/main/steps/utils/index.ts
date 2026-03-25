@@ -11,3 +11,4 @@ export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { formatDatePartsToISODate } from './dateUtils';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
+export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
