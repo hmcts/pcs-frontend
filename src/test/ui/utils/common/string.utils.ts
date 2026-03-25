@@ -7,5 +7,9 @@ export function exactTextWithOptionalWhitespaceRegex(text: string): RegExp {
 }
 
 export function formatCurrency(value: number | string): string {
+  const num = Number(value);
+  if (isNaN(num)) {
+    throw new Error(`Invalid currency value: ${value}`);
+  }
   return `£${(Number(value) / 100).toFixed(2)}`;
 }
