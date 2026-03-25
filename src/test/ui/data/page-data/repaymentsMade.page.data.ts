@@ -16,6 +16,5 @@ export const repaymentsMade = {
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `repayments-made`,
 };

@@ -18,6 +18,5 @@ export const disputeClaimInterstitial = {
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `dispute-claim-interstitial`,
 };

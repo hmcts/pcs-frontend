@@ -28,7 +28,6 @@ export const tenancyDateDetails = {
   yearMissingErrorMessage: `Your tenancy start date must include a year`,
   futureDateErrorMessage: `Tenancy start date must be in the past`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `tenancy-date-details`,
 };
 

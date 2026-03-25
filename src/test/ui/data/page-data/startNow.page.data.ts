@@ -24,6 +24,5 @@ export const startNow = {
   backLink: `Back`,
   cymraegLink: `Cymraeg`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `start-now`,
 };

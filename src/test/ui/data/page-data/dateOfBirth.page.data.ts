@@ -26,6 +26,5 @@ export const dateOfBirth = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `date-of-birth`,
 };

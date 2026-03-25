@@ -59,7 +59,6 @@ export const correspondenceAddress = {
       { type: `empty`, label: `Postcode`, errMessage: `Enter a valid UK postcode` },
     ],
   },
-  feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
-  pageSlug: `date-of-birth`,
+  /* feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `date-of-birth`,*/
 };

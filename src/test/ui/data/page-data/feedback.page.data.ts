@@ -1,4 +1,4 @@
-export const feedbackLink = {
+export const feedback = {
   finishSurveyButton: `Finish Survey`,
   tellUsWhatYouThinkParagraph: `Tell us what you think!`,
   weReallyAppreciateYourFeedbackParagraph: `We'd really appreciate your feedback, but please note, you will not receive a reply to comments left here`,

@@ -1,17 +1,17 @@
-import { dashboard, freeLegalAdvice, startNow } from '../data/page-data';
+import { dashboard, feedback, freeLegalAdvice, startNow } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function freeLegalAdviceErrorValidation(): Promise<void> {
-  /*await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
+  await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: freeLegalAdvice.thereIsAProblemErrorMessageHeader,
     message: freeLegalAdvice.youMustSayAboutFreeLegalAdviceErrorMessage,
-  });*/
+  });
 }
 
 export async function freeLegalAdviceNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', freeLegalAdvice.feedbackLink, {
-    element: freeLegalAdvice.feedbackParagraph,
+    element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: freeLegalAdvice.pageSlug,
   });
   await performValidation('pageNavigation', freeLegalAdvice.backLink, startNow.mainHeader);

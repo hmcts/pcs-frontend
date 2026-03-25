@@ -25,6 +25,5 @@ export const defendantNameConfirmation = {
   enterFirstNameMaxLengthErrorMessage: `First name must be 60 characters or less`,
   enterLastNameMaxLengthErrorMessage: `Last name must be 60 characters or less`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `defendant-name-confirmation`,
 };

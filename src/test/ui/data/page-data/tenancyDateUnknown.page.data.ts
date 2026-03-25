@@ -18,6 +18,5 @@ export const tenancyDateUnknown = {
   realDateErrorMessage: 'Tenancy start date must be a real date',
   backLink: 'Back',
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `tenancy-date-unknown`,
 };

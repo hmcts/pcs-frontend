@@ -12,6 +12,5 @@ export const contactPreferencesTextMessage = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouWantErrorMessage: `Select if you want to be contacted by text message.`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `contact-preferences-text-message`,
 };

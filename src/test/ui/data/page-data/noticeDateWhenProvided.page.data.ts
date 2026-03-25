@@ -19,7 +19,6 @@ export const noticeDateWhenProvided = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   theDateYouReceiveNoticeErrorMessage: `The date you received notice must either be today’s date or in the past`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `confirmation-of-notice-date-when-provided`,
 };
 

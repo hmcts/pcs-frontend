@@ -26,6 +26,5 @@ export const freeLegalAdvice = {
   youMustSayAboutFreeLegalAdviceErrorMessage: `You must say if you've had any free legal advice`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `free-legal-advice`,
 };

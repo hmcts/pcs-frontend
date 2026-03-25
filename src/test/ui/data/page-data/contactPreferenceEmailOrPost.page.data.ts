@@ -23,6 +23,5 @@ export const contactPreferenceEmailOrPost = {
   enterEmailAddressErrorMessage: `Enter your email address`,
   invalidEmailAddressErrorMessage: `Enter an email address in the correct format, like name@example.com`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
-  pageSlug: `contact-preference-email-or-post`,
+  pageSlug: `contact-preferences-email-or-post`,
 };

@@ -19,6 +19,5 @@ export const contactPreferencesTelephone = {
   enterUKPhoneNumberErrorMessage: `Enter a UK phone number`,
   enterUKPhoneNumberFormatErrorMessage: `Enter a phone number, like 01632 960 001 or 07700 900 982`,
   feedbackLink: `feedback (opens in new tab)`,
-  feedbackParagraph: `Tell us what you think!`,
   pageSlug: `contact-preferences-telephone`,
 };
