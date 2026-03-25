@@ -1,4 +1,4 @@
-import { repaymentsAgreed} from '../data/page-data';
+import { repaymentsAgreed } from '../data/page-data';
 import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
