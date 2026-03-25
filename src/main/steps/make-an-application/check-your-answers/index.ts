@@ -1,4 +1,3 @@
-import { Logger } from '@modules/logger';
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -8,6 +7,8 @@ import { createGetController, getTranslationFunction } from '../../../modules/st
 import { DASHBOARD_ROUTE, getDashboardUrl } from '../../../routes/dashboard';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { MAKE_AN_APPLICATION_ROUTE } from '../flow.config';
+
+import { Logger } from '@modules/logger';
 
 const STEP_NAME = 'check-your-answers';
 const logger = Logger.getLogger('check-your-answers');
@@ -38,7 +39,7 @@ export const step: StepDefinition = {
             rows: [
               {
                 key: {
-                  text: t(`answers.chooseAnApplication.label`),
+                  text: t('answers.chooseAnApplication.label'),
                 },
                 value: {
                   text: t(`answers.chooseAnApplication.options.${typeOfApplication}`),
@@ -48,7 +49,7 @@ export const step: StepDefinition = {
                     {
                       href: './choose-an-application',
                       text: t('change'),
-                      visuallyHiddenText: t(`answers.chooseAnApplication.changeHint`),
+                      visuallyHiddenText: t('answers.chooseAnApplication.changeHint'),
                     },
                   ],
                 },
