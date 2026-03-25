@@ -364,15 +364,15 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'income-and-expenditure',
       routes: [
         {
-          condition: async (req: Request, formData: Record<string, unknown>): Promise<boolean> => {
-            const regularIncome = (formData['regular-income'] as Record<string, unknown>)?.regularIncome;
+          condition: async (req: Request): Promise<boolean> => {
+            const regularIncome = req.session?.formData?.['regular-income']?.regularIncome;
             return [regularIncome].flat().filter(Boolean).includes('universalCredit');
           },
           nextStep: 'priority-debts',
         },
         {
-          condition: async (req: Request, formData: Record<string, unknown>): Promise<boolean> => {
-            const regularIncome = (formData['regular-income'] as Record<string, unknown>)?.regularIncome;
+          condition: async (req: Request): Promise<boolean> => {
+            const regularIncome = req.session?.formData?.['regular-income']?.regularIncome;
             return ![regularIncome].flat().filter(Boolean).includes('universalCredit');
           },
           nextStep: 'have-you-applied-for-universal-credit',
