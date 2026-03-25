@@ -37,7 +37,6 @@ export interface Address {
 }
 
 export interface HouseholdCircumstances {
-  dependantChildren?: YesNoValue;
   shareIncomeExpenseDetails?: YesNoValue;
   incomeFromJobs?: YesNoValue;
   incomeFromJobsAmount?: string;
