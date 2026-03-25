@@ -19,21 +19,7 @@ describe('componentBuilders', () => {
     errorText: undefined,
     index: 0,
     hasTitle: false,
-    t: ((key: string, options?: Record<string, unknown>) => {
-      if (key === 'characterCount' && options?.returnObjects) {
-        return {
-          charactersUnderLimitText: 'You have %{count} characters remaining',
-          charactersAtLimitText: 'You have reached the character limit',
-          charactersOverLimitText: 'You have %{count} characters too many',
-        };
-      }
-
-      if (key === 'custom.counter.copy') {
-        return 'Custom counter copy';
-      }
-
-      return key;
-    }) as unknown as TFunction,
+    t: ((key: string) => key) as unknown as TFunction,
     nunjucksEnv: mockNunjucksEnv,
     ...overrides,
   });
@@ -42,7 +28,7 @@ describe('componentBuilders', () => {
     jest.clearAllMocks();
   });
 
-  it('applies default character-count translation object messages', () => {
+  it('builds character-count field with componentType and maxlength', () => {
     const field: FormFieldConfig = {
       name: 'details',
       type: 'character-count',
@@ -53,32 +39,7 @@ describe('componentBuilders', () => {
     const result = buildComponentConfig(buildArgs(field));
 
     expect(result.componentType).toBe('characterCount');
-    expect(result.component.charactersUnderLimitText).toBe('You have %{count} characters remaining');
-    expect(result.component.charactersAtLimitText).toBe('You have reached the character limit');
-    expect(result.component.charactersOverLimitText).toBe('You have %{count} characters too many');
-  });
-
-  it('applies static character-count message when characterCountMessageKey resolves', () => {
-    const field: FormFieldConfig = {
-      name: 'details',
-      type: 'character-count',
-      maxLength: 500,
-      characterCountMessageKey: 'custom.counter.copy',
-      translationKey: { label: 'details' },
-    };
-
-    const result = buildComponentConfig(buildArgs(field));
-
-    expect(result.component.textareaDescriptionText).toBe('Custom counter copy');
-    expect(result.component.charactersUnderLimitText).toEqual({
-      one: 'Custom counter copy',
-      other: 'Custom counter copy',
-    });
-    expect(result.component.charactersAtLimitText).toBe('Custom counter copy');
-    expect(result.component.charactersOverLimitText).toEqual({
-      one: 'Custom counter copy',
-      other: 'Custom counter copy',
-    });
+    expect(result.component.maxlength).toBe(500);
   });
 
   it('builds radios with divider and conditional HTML from text and subfields', () => {

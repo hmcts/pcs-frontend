@@ -33,14 +33,6 @@ export interface FormFieldConfig {
   required?: boolean | ((formData: Record<string, unknown>, allData: Record<string, unknown>) => boolean);
   pattern?: string;
   maxLength?: number;
-  /**
-   * Optional override for GOV.UK character-count component messages.
-   *
-   * When provided (and the field type is `character-count`), the component builder will
-   * render the bottom counter messages using this translation key instead of the
-   * default "You have X characters remaining" copy.
-   */
-  characterCountMessageKey?: string;
   errorMessage?: string;
   label?: string | ((translations: Record<string, string>) => string);
   labelClasses?: string;

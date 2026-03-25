@@ -26,40 +26,6 @@ function createFieldsetLegend(
   };
 }
 
-function applyCharacterCountMessages({
-  field,
-  component,
-  t,
-}: {
-  field: FormFieldConfig;
-  component: Record<string, unknown>;
-  t: TFunction;
-}): void {
-  if (!field.maxLength) {
-    return;
-  }
-
-  if (field.characterCountMessageKey) {
-    const staticCountText = t(field.characterCountMessageKey);
-    if (staticCountText && staticCountText !== field.characterCountMessageKey) {
-      component.textareaDescriptionText = staticCountText;
-      component.charactersUnderLimitText = { one: staticCountText, other: staticCountText };
-      component.charactersAtLimitText = staticCountText;
-      component.charactersOverLimitText = { one: staticCountText, other: staticCountText };
-    }
-    return;
-  }
-
-  const characterCount = t('characterCount', { returnObjects: true }) as Record<string, unknown> | string;
-  if (characterCount && typeof characterCount === 'object') {
-    Object.assign(component, {
-      charactersUnderLimitText: characterCount.charactersUnderLimitText,
-      charactersAtLimitText: characterCount.charactersAtLimitText,
-      charactersOverLimitText: characterCount.charactersOverLimitText,
-    });
-  }
-}
-
 export function buildComponentConfig({
   field,
   label,
@@ -127,12 +93,6 @@ export function buildComponentConfig({
         isPageHeading: isFirstField,
         classes: field.labelClasses,
       };
-
-      applyCharacterCountMessages({
-        field,
-        component,
-        t,
-      });
 
       componentType = 'characterCount';
       break;
