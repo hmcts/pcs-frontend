@@ -109,6 +109,26 @@ describe('componentBuilders', () => {
     expect(items[1].checked).toBe(true);
   });
 
+  it('passes hintClasses onto the GOV.UK hint object for text inputs', () => {
+    const field: FormFieldConfig = {
+      name: 'amount',
+      type: 'text',
+      translationKey: { label: 'amount' },
+      hintClasses: 'govuk-!-margin-bottom-1',
+    };
+
+    const result = buildComponentConfig(
+      buildArgs(field, {
+        hint: 'Enter a number',
+      })
+    );
+
+    expect(result.component.hint).toEqual({
+      text: 'Enter a number',
+      classes: 'govuk-!-margin-bottom-1',
+    });
+  });
+
   it('falls back to input component type for unknown field types', () => {
     const field = {
       name: 'legacy',
