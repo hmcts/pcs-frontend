@@ -10,3 +10,4 @@ export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
 export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { formatDatePartsToISODate } from './dateUtils';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
+export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';

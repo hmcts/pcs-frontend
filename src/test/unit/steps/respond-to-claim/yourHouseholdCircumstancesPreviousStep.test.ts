@@ -1,10 +1,10 @@
 import type { Request } from 'express';
 
-import { getPreviousStepForYourHouseholdAndCircumstances } from '../../../../main/steps/respond-to-claim/yourHouseholdCircumstancesPreviousStep';
-import * as stepUtils from '../../../../main/steps/utils';
+import { getPreviousStepForYourHouseholdAndCircumstances } from '../../../../main/steps/utils/getPreviousStepForYourHouseholdAndCircumstances';
+import { isRentArrearsClaim } from '../../../../main/steps/utils/isRentArrearsClaim';
 
-jest.mock('../../../../main/steps/utils', () => ({
-  ...jest.requireActual('../../../../main/steps/utils'),
+jest.mock('../../../../main/steps/utils/isRentArrearsClaim', () => ({
+  ...jest.requireActual('../../../../main/steps/utils/isRentArrearsClaim'),
   isRentArrearsClaim: jest.fn(),
 }));
 
@@ -42,7 +42,7 @@ function makeReqFlatPaymentAgreement(paymentAgreement: Record<string, unknown>):
 
 describe('getPreviousStepForYourHouseholdAndCircumstances', () => {
   beforeEach(() => {
-    jest.mocked(stepUtils.isRentArrearsClaim).mockResolvedValue(true);
+    jest.mocked(isRentArrearsClaim).mockResolvedValue(true);
   });
 
   it('returns repayments-agreed when repaymentPlanAgreed is absent', async () => {
@@ -56,7 +56,7 @@ describe('getPreviousStepForYourHouseholdAndCircumstances', () => {
   });
 
   it('returns repayments-agreed when not a rent arrears claim', async () => {
-    jest.mocked(stepUtils.isRentArrearsClaim).mockResolvedValue(false);
+    jest.mocked(isRentArrearsClaim).mockResolvedValue(false);
     const req = makeReq({ repaymentPlanAgreed: 'NO' });
     await expect(getPreviousStepForYourHouseholdAndCircumstances(req)).resolves.toBe('repayments-agreed');
   });

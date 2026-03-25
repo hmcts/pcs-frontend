@@ -2,6 +2,7 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
+  getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
@@ -11,8 +12,6 @@ import {
   isTenancyStartDateKnown,
   isWelshProperty,
 } from '../utils';
-
-import { getPreviousStepForYourHouseholdAndCircumstances } from './yourHouseholdCircumstancesPreviousStep';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 

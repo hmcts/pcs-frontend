@@ -1,7 +1,9 @@
 import type { Request } from 'express';
 
 import type { YesNoNotSureValue, YesNoValue } from '../../interfaces/ccdCase.interface';
-import { isRentArrearsClaim, normalizeYesNoValue } from '../utils';
+
+import { isRentArrearsClaim } from './isRentArrearsClaim';
+import { normalizeYesNoValue } from './normalizeYesNoValue';
 
 type PaymentAgreementShape = {
   repaymentPlanAgreed?: YesNoNotSureValue;
