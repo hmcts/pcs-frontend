@@ -3,9 +3,7 @@
   "question": "Do any other adults live in your home?",
   "options": {
     "yes": "Yes",
-    "no": "No",
-    "or": "or",
-    "imNotSure": "I’m not sure"
+    "no": "No"
   },
   "textAreaLabel": "Give details about the other adults living in your home",
   "textAreaHintText": "You should include details about how many adults live in your home, their relationship to you, as well as anything else you think the court should know about them",
