@@ -41,9 +41,8 @@ export class PageNavigationValidation implements IValidation {
   }
 
   async validate(page: Page, validation: string, navigateButton: string, fieldName: validationRecord): Promise<void> {
-    const originalUrl = page.url();
-    PageNavigationValidation.currentPageUrl = originalUrl;
-    console.log(`[DEBUG] Starting validation. Original URL: ${originalUrl}`);
+    PageNavigationValidation.currentPageUrl = page.url();
+    console.log(`[DEBUG] Starting validation. Original URL: ${page.url()}`);
 
     let newPage: Page | null = null;
     let isNewWindow = false;
@@ -65,14 +64,21 @@ export class PageNavigationValidation implements IValidation {
       const popup = await Promise.race([popupPromise, new Promise(resolve => setTimeout(() => resolve(null), 1000))]);
 
       if (popup) {
-        newPage = popup as Page;
-        isNewWindow = true;
-        console.log(`[DEBUG] Popup detected, waiting for load. Popup URL: ${newPage.url()}`);
-        await newPage.waitForLoadState('domcontentloaded');
-        console.log(`[DEBUG] Popup loaded. URL: ${newPage.url()}`);
+        const popupPage = popup as Page;
+        // Only treat as new window if it's a real page (not about:blank)
+        if (popupPage.url() !== 'about:blank') {
+          newPage = popupPage;
+          isNewWindow = true;
+          console.log(`[DEBUG] Real popup detected, waiting for load. Popup URL: ${newPage.url()}`);
+          await newPage.waitForLoadState('domcontentloaded');
+          console.log(`[DEBUG] Popup loaded. URL: ${newPage.url()}`);
+        } else {
+          // It's a false popup (like from back button), ignore it
+          console.log(`[DEBUG] Detected about:blank popup, ignoring (likely from back button)`);
+          await popupPage.close();
+        }
       } else {
         console.log(`[DEBUG] No popup detected, waiting for page navigation`);
-        // Wait for page to navigate after click
         await page.waitForLoadState('domcontentloaded');
         console.log(`[DEBUG] Page navigation completed. Current URL: ${page.url()}`);
       }
@@ -120,7 +126,6 @@ export class PageNavigationValidation implements IValidation {
     let expectedUrlPattern = '';
 
     try {
-      // Wait for page to be fully ready
       await page.waitForLoadState('domcontentloaded');
       console.log(`[DEBUG] Page ready for validation: ${page.url()}`);
 
@@ -236,12 +241,8 @@ export class PageNavigationValidation implements IValidation {
       if (typeof fieldName === 'object' && fieldName !== null) {
         const obj = fieldName as any;
         const parts: string[] = [];
-        if (obj.element) {
-          parts.push(`element: "${obj.element}"`);
-        }
-        if (obj.pageSlug) {
-          parts.push(`pageSlug: "${obj.pageSlug}"`);
-        }
+        if (obj.element) {parts.push(`element: "${obj.element}"`);}
+        if (obj.pageSlug) {parts.push(`pageSlug: "${obj.pageSlug}"`);}
         expectedValue = `{ ${parts.join(', ')} }`;
       } else {
         expectedValue = String(fieldName);
