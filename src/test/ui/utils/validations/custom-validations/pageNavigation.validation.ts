@@ -42,13 +42,10 @@ export class PageNavigationValidation implements IValidation {
 
   async validate(page: Page, validation: string, navigateButton: string, fieldName: validationRecord): Promise<void> {
     PageNavigationValidation.currentPageUrl = page.url();
-    console.log(`[DEBUG] Starting validation. Original URL: ${page.url()}`);
-
     let newPage: Page | null = null;
     let isNewWindow = false;
 
     if (navigateButton) {
-      console.log(`[DEBUG] Clicking button: ${navigateButton}`);
       const popupPromise = page
         .context()
         .waitForEvent('page')
@@ -60,57 +57,39 @@ export class PageNavigationValidation implements IValidation {
         await performAction('clickButton', navigateButton);
       }
 
-      console.log(`[DEBUG] Button clicked, checking for popup...`);
       const popup = await Promise.race([popupPromise, new Promise(resolve => setTimeout(() => resolve(null), 1000))]);
 
       if (popup) {
         const popupPage = popup as Page;
-        // Only treat as new window if it's a real page (not about:blank)
-        if (popupPage.url() !== 'about:blank') {
+        // Wait a bit for the popup to load its real URL
+        await page.waitForTimeout(500);
+
+        // Only treat as new window if it's a real page (not about:blank and not an axe popup)
+        if (popupPage.url() !== 'about:blank' && !popupPage.url().includes('axe')) {
           newPage = popupPage;
           isNewWindow = true;
-          console.log(`[DEBUG] Real popup detected, waiting for load. Popup URL: ${newPage.url()}`);
-          await newPage.waitForLoadState('domcontentloaded');
-          console.log(`[DEBUG] Popup loaded. URL: ${newPage.url()}`);
+          await newPage.waitForLoadState();
         } else {
-          // It's a false popup (like from back button), ignore it
-          console.log(`[DEBUG] Detected about:blank popup, ignoring (likely from back button)`);
+          // It's a false popup (axe or about:blank), close it and continue
           await popupPage.close();
         }
-      } else {
-        console.log(`[DEBUG] No popup detected, waiting for page navigation`);
-        await page.waitForLoadState('domcontentloaded');
-        console.log(`[DEBUG] Page navigation completed. Current URL: ${page.url()}`);
       }
     }
 
     const pageToValidate = isNewWindow && newPage ? newPage : page;
-    console.log(`[DEBUG] Validating page: ${pageToValidate.url()}`);
 
     try {
       await this.validatePageNavigation(pageToValidate, fieldName);
-      console.log(`[DEBUG] Validation completed successfully`);
-    } catch (error) {
-      console.log(`[DEBUG] Validation failed:`, error);
-      throw error;
     } finally {
       if (newPage && !newPage.isClosed()) {
-        console.log(`[DEBUG] Closing popup window`);
         await newPage.close();
       }
-      // Only navigate back if we're on a different page and no new window was opened
       if (
         PageNavigationValidation.currentPageUrl &&
         !isNewWindow &&
         page.url() !== PageNavigationValidation.currentPageUrl
       ) {
-        console.log(`[DEBUG] Navigating back to original URL: ${PageNavigationValidation.currentPageUrl}`);
         await performAction('navigateToUrl', PageNavigationValidation.currentPageUrl);
-        console.log(`[DEBUG] Navigation completed. Current URL: ${page.url()}`);
-      } else {
-        console.log(
-          `[DEBUG] Skipping navigation back. Current URL: ${page.url()}, Original URL: ${PageNavigationValidation.currentPageUrl}, isNewWindow: ${isNewWindow}`
-        );
       }
     }
   }
