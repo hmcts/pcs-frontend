@@ -24,7 +24,7 @@
     "rentArrearsAmountCorrection": {
       "required": "Enter the amount you believe you owe in rent arrears",
       "negativeAmount": "The amount you believe you owe in rent arrears must be £0.00 or above",
-      "largeAmount": "Enter how much you believe you owe in rent arrears, in the correct format, up to £1,000,000,000.00",
+      "largeAmount": "The amount you believe you owe in rent arrears must be less than £1 billion",
       "invalidFormat": "Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write £148.00)"
     },
     "rentArrears.rentArrearsAmountCorrection": "Enter the amount you believe you owe in rent arrears"
