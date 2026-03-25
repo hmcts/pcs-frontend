@@ -67,6 +67,14 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
+    householdCircumstances?: {
+      universalCredit?: YesNoValue;
+      ucApplicationDate?: string;
+      priorityDebts?: YesNoValue;
+      debtTotal?: string;
+      debtContribution?: string;
+      debtContributionFrequency?: string;
+    };
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
