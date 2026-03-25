@@ -25,8 +25,39 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
-  test('Validate address on the dashboard is same as property address @regression', async () => {
+  test('Validate address, case number and Links on the dashboard @regression', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
+    await performValidation('text', { elementType: 'subHeader', text: dashboard.helpAndSupportHeader });
+    await performAction(
+      'clickLinkAndVerifySameTabTitle',
+      dashboard.helpWithFeesLink,
+      dashboard.getHelpPayingCourtAndTribunalFeesHeader
+    );
+    await performAction(
+      'clickLinkAndVerifySameTabTitle',
+      dashboard.findOutAboutMediationLink,
+      dashboard.aGuideToCivilMediationHeader
+    );
+    await performAction(
+      'clickLinkAndVerifySameTabTitle',
+      dashboard.whatToExpectAtAHearingLink,
+      dashboard.whatToExpectComingToACourtOrTribunalHeader
+    );
+    await performAction(
+      'clickLinkAndVerifySameTabTitle',
+      dashboard.representMyselfAtAHearingLink,
+      dashboard.representYourselfInCourtHeader
+    );
+    await performAction(
+      'clickLinkAndVerifySameTabTitle',
+      dashboard.findLegalAdviceLink,
+      dashboard.findLegalAdviceAndInformationHeader
+    );
+    await performAction(
+      'clickLinkAndVerifySameTabTitle',
+      dashboard.findInformationAboutMyCourtLink,
+      dashboard.findACourtOrTribunalHeader
+    );
   });
 });

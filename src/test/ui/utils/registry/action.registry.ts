@@ -16,6 +16,7 @@ import {
   SelectAction,
   UploadFileAction,
   clickLinkAndVerifyNewTabTitleAction,
+  clickLinkAndVerifySameTabTitleAction,
 } from '../actions/element-actions';
 import { ClickLinkAction } from '../actions/element-actions/clickLink.action';
 import { IAction } from '../interfaces';
@@ -27,6 +28,7 @@ export class ActionRegistry {
     ['clickSummary', new ClickSummaryAction()],
     ['clickLink', new ClickLinkAction()],
     ['clickLinkAndVerifyNewTabTitle', new clickLinkAndVerifyNewTabTitleAction()],
+    ['clickLinkAndVerifySameTabTitle', new clickLinkAndVerifySameTabTitleAction()],
     ['clickRadioButton', new ClickRadioButtonAction()],
     ['clickTab', new ClickTabAction()],
     ['inputText', new InputTextAction()],
