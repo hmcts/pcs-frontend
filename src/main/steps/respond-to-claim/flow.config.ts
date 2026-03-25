@@ -2,6 +2,7 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
+  cameFromIncomeAndExpenditure,
   getPreviousPageForArrears,
   isDefendantNameKnown,
   isNoticeDateProvided,
@@ -358,6 +359,28 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'income-and-expenditure': {
       previousStep: 'exceptional-hardship',
+      routes: [
+        {
+          condition: async (
+            req: Request,
+            formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            return currentStepData.provideFinanceDetails === 'no';
+          },
+          nextStep: 'upload-docs',
+        },
+        {
+          condition: async (
+            req: Request,
+            formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            return currentStepData.provideFinanceDetails === 'yes';
+          },
+          nextStep: 'regular-income',
+        },
+      ],
       defaultNext: 'regular-income',
     },
     'regular-income': {
@@ -400,6 +423,15 @@ export const flowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have': {
       defaultNext: 'upload-docs',
     },
-    'upload-docs': {},
+    'upload-docs': {
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            return cameFromIncomeAndExpenditure(req);
+          },
+          nextStep: 'income-and-expenditure',
+        },
+      ],
+    },
   },
 };

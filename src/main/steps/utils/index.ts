@@ -8,3 +8,4 @@ export { getPreviousPageForArrears } from './journeyHelpers';
 export { formatDatePartsToISODate } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
 export { penceToPounds, poundsToPence } from './currencyConversion';
+export { cameFromIncomeAndExpenditure } from './cameFromIncomeAndExpenditure';
