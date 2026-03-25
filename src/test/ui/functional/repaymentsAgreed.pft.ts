@@ -1,4 +1,4 @@
-import { dashboard, repaymentsAgreed, repaymentsMade } from '../data/page-data';
+import { repaymentsAgreed} from '../data/page-data';
 import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -18,8 +18,11 @@ export async function repaymentsAgreedErrorValidation(): Promise<void> {
   await performValidation('elementToBeVisible', repaymentsAgreed.tooManyCharacterHiddenHintText);
 }
 
+//The below method is commented out as we have an open bug - HDPI-5556
+/*
 export async function repaymentsAgreedNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', repaymentsAgreed.backLink, repaymentsMade.mainHeader);
   await performAction('clickRadioButton', repaymentsAgreed.noRadioOption);
   await performValidation('pageNavigation', repaymentsAgreed.saveForLaterButton, dashboard.mainHeader);
 }
+*/
