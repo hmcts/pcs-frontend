@@ -241,8 +241,12 @@ export class PageNavigationValidation implements IValidation {
       if (typeof fieldName === 'object' && fieldName !== null) {
         const obj = fieldName as any;
         const parts: string[] = [];
-        if (obj.element) {parts.push(`element: "${obj.element}"`);}
-        if (obj.pageSlug) {parts.push(`pageSlug: "${obj.pageSlug}"`);}
+        if (obj.element) {
+          parts.push(`element: "${obj.element}"`);
+        }
+        if (obj.pageSlug) {
+          parts.push(`pageSlug: "${obj.pageSlug}"`);
+        }
         expectedValue = `{ ${parts.join(', ')} }`;
       } else {
         expectedValue = String(fieldName);
