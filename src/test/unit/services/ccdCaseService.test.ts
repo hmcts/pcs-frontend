@@ -247,7 +247,7 @@ describe('ccdCaseService', () => {
 
     it('submits via a CCD event', async () => {
       const caseId = '1234';
-      const citizenGenAppRequest: CitizenGenAppRequest = { type: GenAppType.ADJOURN };
+      const citizenGenAppRequest: CitizenGenAppRequest = { applicationType: GenAppType.ADJOURN };
       const ccdData: CcdCase = { id: caseId, data: { citizenGenAppRequest } };
       const eventToken = 'event token here';
 
