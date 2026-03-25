@@ -15,8 +15,8 @@ import {
   landlordRegistered,
   startNow,
   tenancyDetails,
+  writtenTerms,
 } from '../data/page-data';
-import { writtenTerms } from '../data/page-data/writtenTerms.page.data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
