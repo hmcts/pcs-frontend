@@ -59,6 +59,7 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'upload-docs',
+    'end-now',
   ],
   steps: {
     'start-now': {
@@ -426,6 +427,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'income-and-expenditure',
         },
       ],
+      defaultNext: 'end-now',
     },
   },
 };
