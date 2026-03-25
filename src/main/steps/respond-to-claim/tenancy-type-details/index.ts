@@ -64,6 +64,7 @@ const CCD_TO_TENANCY_TYPE_CONFIRM: Record<Exclude<TenancyTypeCorrectValue, null>
   NOT_SURE: 'notSure',
 };
 
+// TODO: Welsh translations for tenancy type text will be addressed in the next ticket
 const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   ASSURED_TENANCY: 'an assured',
   SECURE_TENANCY: 'a secure',
@@ -146,11 +147,13 @@ export const step: StepDefinition = createFormStep({
       ?.defendantResponses?.tenancyType as string;
     const tenancyTypeConfirm =
       (req.body?.tenancyTypeConfirm as string) ||
-      (existingTenancyTypeCorrect ? CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect] : undefined);
+      (existingTenancyTypeCorrect ? CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect] : '') ||
+      '';
     const correctType =
       (req.body?.['tenancyTypeConfirm.correctType'] as string) ||
       (req.body?.correctType as string) ||
-      (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : undefined);
+      (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
+      '';
 
     const orgName = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
       ?.value as string;
