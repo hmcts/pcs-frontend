@@ -45,10 +45,9 @@ export interface HouseholdCircumstances {
   pension?: YesNoValue;
   pensionAmount?: string;
   pensionFrequency?: string;
-  universalCreditIncome?: YesNoValue;
-  universalCreditIncomeAmount?: string;
-  universalCreditIncomeFrequency?: string;
   universalCredit?: YesNoValue;
+  universalCreditAmount?: string;
+  universalCreditFrequency?: string;
   ucApplicationDate?: string;
   otherBenefits?: YesNoValue;
   otherBenefitsAmount?: string;

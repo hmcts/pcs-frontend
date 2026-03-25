@@ -91,7 +91,7 @@ export const step: StepDefinition = createFormStep({
 
     // Universal Credit - Case-insensitive check to handle backend variations (YES/Yes/yes)
     // Note: amount/frequency may not exist - see BA clarification
-    if (hc.universalCreditIncome && (hc.universalCreditIncome as string).toUpperCase() === 'YES') {
+    if (hc.universalCredit && (hc.universalCredit as string).toUpperCase() === 'YES') {
       selectedIncome.push('universalCredit');
       // UC amount/frequency commented out pending BA clarification
       // if (hc.universalCreditAmount) {
@@ -165,7 +165,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Universal Credit (checkbox only - amount/frequency pending BA clarification)
-    householdCircumstances.universalCreditIncome = toYesNoEnum(incomeArray.includes('universalCredit') ? 'yes' : 'no');
+    householdCircumstances.universalCredit = toYesNoEnum(incomeArray.includes('universalCredit') ? 'yes' : 'no');
     // UC amount/frequency commented out pending BA clarification
     // if (incomeArray.includes('universalCredit')) {
     //   const amountRaw = req.body?.['regularIncome.universalCreditAmount'] as string | undefined;
