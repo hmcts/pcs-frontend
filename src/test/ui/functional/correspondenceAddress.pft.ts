@@ -82,10 +82,6 @@ export async function correspondenceAddressErrorValidation(): Promise<void> {
 }
 
 export async function correspondenceAddressNavigationTests(): Promise<void> {
-  /* await performValidation('pageNavigation', freeLegalAdvice.feedbackLink, {
-    element: feedback.tellUsWhatYouThinkParagraph,
-    pageSlug: freeLegalAdvice.pageSlug,
-  });*/
   await performValidation('pageNavigation', correspondenceAddress.backLink, dateOfBirth.mainHeader);
   await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
   await performValidation('pageNavigation', correspondenceAddress.saveForLaterButton, dashboard.mainHeader);
