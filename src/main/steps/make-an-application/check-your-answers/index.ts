@@ -17,7 +17,7 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'make-an-application/check-your-answers/checkYour Answers.njk',
+      'make-an-application/check-your-answers/checkYourAnswers.njk',
       STEP_NAME,
       (req: Request) => {
         const t: TFunction = getTranslationFunction(req, STEP_NAME, ['common']);
