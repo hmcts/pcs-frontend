@@ -82,5 +82,5 @@ export enum GenAppType {
 }
 
 export interface CitizenGenAppRequest {
-  type: GenAppType;
+  applicationType: GenAppType;
 }

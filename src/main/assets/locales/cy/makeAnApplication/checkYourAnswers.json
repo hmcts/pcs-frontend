@@ -7,10 +7,14 @@
   },
   "answers": {
     "chooseAnApplication": {
-      "SUSPEND": "cyAsk the court to suspend (delay) the eviction",
-      "ADJOURN": "cyAsk to adjourn (delay) the hearing",
-      "SET_ASIDE": "cyAsk the court to change (set aside) their decision to evict you",
-      "SOMETHING_ELSE": "cySomething else"
+      "label": "cyType of application",
+      "changeHint": "cyChange type of application",
+      "options": {
+        "SUSPEND": "cyAsk the court to suspend (delay) the eviction",
+        "ADJOURN": "cyAsk to adjourn (delay) the hearing",
+        "SET_ASIDE": "cyAsk the court to change (set aside) their decision to evict you",
+        "SOMETHING_ELSE": "cySomething else"
+      }
     }
   }
 }

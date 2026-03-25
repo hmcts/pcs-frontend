@@ -1,34 +1,36 @@
+import { Logger } from '@modules/logger';
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { CitizenGenAppRequest } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, getFormData, getTranslation, getTranslationFunction } from '../../../modules/steps';
+import { createGetController, getTranslationFunction } from '../../../modules/steps';
 import { DASHBOARD_ROUTE, getDashboardUrl } from '../../../routes/dashboard';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { MAKE_AN_APPLICATION_ROUTE } from '../flow.config';
 
-import { Logger } from '@modules/logger';
-
+const STEP_NAME = 'check-your-answers';
 const logger = Logger.getLogger('check-your-answers');
-const stepName = 'check-your-answers';
 
 export const step: StepDefinition = {
   url: `${MAKE_AN_APPLICATION_ROUTE}/check-your-answers`,
-  name: stepName,
+  name: STEP_NAME,
   view: 'make-an-application/check-your-answers/checkYourAnswers.njk',
   stepDir: __dirname,
   getController: () => {
     return createGetController(
       'make-an-application/check-your-answers/checkYourAnswers.njk',
-      stepName,
-      (_req: Request) => {
-        // TODO: Is there a better way to get the translated values into the data?
-        const t: TFunction = _req.t || getTranslationFunction(_req, stepName, ['common']);
+      STEP_NAME,
+      (req: Request) => {
+        const t: TFunction = getTranslationFunction(req, STEP_NAME, ['common']);
 
-        const formData = getFormData(_req, 'choose-an-application');
-        const typeOfApplication = formData['typeOfApplication'];
-        const result = getTranslation(t, `answers.chooseAnApplication.${typeOfApplication}`);
+        const formData = req.session.formData;
+
+        if (!formData) {
+          throw Error('No existing formData in session');
+        }
+
+        const typeOfApplication = formData['choose-an-application']['typeOfApplication'];
 
         return {
           backUrl: DASHBOARD_ROUTE,
@@ -36,17 +38,17 @@ export const step: StepDefinition = {
             rows: [
               {
                 key: {
-                  text: 'Type of application',
+                  text: t(`answers.chooseAnApplication.label`),
                 },
                 value: {
-                  text: result,
+                  text: t(`answers.chooseAnApplication.options.${typeOfApplication}`),
                 },
                 actions: {
                   items: [
                     {
                       href: './choose-an-application',
-                      text: 'Change',
-                      visuallyHiddenText: 'Change type of application',
+                      text: t('change'),
+                      visuallyHiddenText: t(`answers.chooseAnApplication.changeHint`),
                     },
                   ],
                 },
@@ -73,7 +75,7 @@ export const step: StepDefinition = {
       }
 
       const citizenGenAppRequest: CitizenGenAppRequest = {
-        type: formData['choose-an-application']['typeOfApplication'],
+        applicationType: formData['choose-an-application']['typeOfApplication'],
       };
 
       await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {

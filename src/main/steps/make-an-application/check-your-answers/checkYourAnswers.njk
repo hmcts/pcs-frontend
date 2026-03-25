@@ -2,6 +2,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
@@ -23,6 +24,8 @@
         attributes: { type: 'submit', name: 'action', value: 'submit' }
       }) }}
     </div>
+
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
 
