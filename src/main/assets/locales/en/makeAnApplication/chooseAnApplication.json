@@ -5,9 +5,6 @@
   "question": "What do you want to apply for?",
   "hintText": "Some optional hint text here (placeholder)",
   "options": {
-    "suspend": {
-      "label": "Ask the court to suspend (delay) the eviction"
-    },
     "adjourn": {
       "label": "Ask to adjourn (delay) the hearing"
     },

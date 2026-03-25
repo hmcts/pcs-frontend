@@ -17,12 +17,6 @@ export const step: StepDefinition = createFormStep({
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
         {
-          value: 'SUSPEND',
-          translationKey: 'options.suspend.label',
-          // TODO: Hint text translation support to be added as part of HDPI-5208
-          hint: "You can ask a judge to 'suspend the eviction'. This means stopping or delaying the eviction.",
-        },
-        {
           value: 'ADJOURN',
           translationKey: 'options.adjourn.label',
           // TODO: Hint text translation support to be added as part of HDPI-5208
