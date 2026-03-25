@@ -8,10 +8,7 @@ import { DASHBOARD_ROUTE, getDashboardUrl } from '../../../routes/dashboard';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { MAKE_AN_APPLICATION_ROUTE } from '../flow.config';
 
-import { Logger } from '@modules/logger';
-
 const STEP_NAME = 'check-your-answers';
-const logger = Logger.getLogger('check-your-answers');
 
 export const step: StepDefinition = {
   url: `${MAKE_AN_APPLICATION_ROUTE}/check-your-answers`,
@@ -20,7 +17,7 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'make-an-application/check-your-answers/checkYourAnswers.njk',
+      'make-an-application/check-your-answers/checkYour Answers.njk',
       STEP_NAME,
       (req: Request) => {
         const t: TFunction = getTranslationFunction(req, STEP_NAME, ['common']);
@@ -64,7 +61,6 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       const formData = req.session.formData;
-      logger.info('Submitting data', JSON.stringify(formData, null, 2));
 
       const ccdCase = res.locals.validatedCase;
       if (!ccdCase) {

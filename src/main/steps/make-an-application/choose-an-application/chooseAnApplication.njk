@@ -25,14 +25,12 @@
 
     <div class="govuk-button-group">
       {{ govukButton({
-        text: saveAndContinue,
-        attributes: { type: 'submit', name: 'action', value: 'continue' }
+          text: t('buttons.continue', { ns: 'common' }),
+          attributes: { type: 'submit', name: 'action', value: 'continue' }
       }) }}
-      {{ govukButton({
-        text: saveForLater,
-        classes: 'govuk-button--secondary',
-        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
-      }) }}
+      <p class="govuk-body">
+        <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+      </p>
     </div>
 
     {{ csrfProtection(csrfToken) }}
