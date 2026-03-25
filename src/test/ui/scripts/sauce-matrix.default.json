@@ -1,5 +1,5 @@
 {
-  "_comment": "Executed by run-playwright-sauce-matrix.ts (EU hub). Only `matrix` runs. `_disabled_matrix` lists Windows, macOS, Android (and Linux desktop) × Chrome, Firefox, Edge, Safari combinations not supported by Playwright → Selenium Grid → Sauce in this repo; see `_reason`.",
+  "_comment": "EU hub via run-playwright-sauce-matrix.ts. `matrix` = all OS × browser combos supported by Playwright → Selenium Grid → Sauce hybrid (CDP: Chrome + MicrosoftEdge on desktop only). `_disabled_matrix` = Firefox, Safari/WebKit, Android, etc.",
   "matrix": [
     {
       "id": "eu-win-chrome",
@@ -24,6 +24,18 @@
       "platformName": "macOS 13",
       "browserName": "MicrosoftEdge",
       "playwrightProject": "MicrosoftEdge"
+    },
+    {
+      "id": "eu-linux-chrome",
+      "platformName": "Linux",
+      "browserName": "chrome",
+      "playwrightProject": "chrome"
+    },
+    {
+      "id": "eu-linux-edge",
+      "platformName": "Linux",
+      "browserName": "MicrosoftEdge",
+      "playwrightProject": "MicrosoftEdge"
     }
   ],
   "_disabled_matrix": [
@@ -35,7 +47,7 @@
       "playwrightProject": "firefox"
     },
     {
-      "_reason": "Apple Safari is not offered on Windows on Sauce for this flow; Safari/WebKit for E2E is macOS-only and not supported via this Grid integration anyway (see eu-mac-safari).",
+      "_reason": "Apple Safari is not offered on Windows on Sauce for this flow; Safari/WebKit is not supported via this Grid integration (see eu-mac-safari).",
       "id": "eu-win-safari",
       "platformName": "Windows 11",
       "browserName": "safari",
@@ -84,32 +96,18 @@
       "playwrightProject": "webkit"
     },
     {
-      "_reason": "Linux desktop Chrome is not in the target platform set (Windows, macOS, Android). Re-add to `matrix` if you want Linux coverage on Sauce.",
-      "id": "eu-linux-chrome",
-      "platformName": "Linux",
-      "browserName": "chrome",
-      "playwrightProject": "chrome"
-    },
-    {
-      "_reason": "Same Firefox Grid limitation as Windows/macOS; Linux not in target platform set.",
-      "id": "eu-linux-firefox",
-      "platformName": "Linux",
-      "browserName": "firefox",
-      "playwrightProject": "firefox"
-    },
-    {
-      "_reason": "Linux desktop Edge supported in theory for Grid, but not in target platform set (Windows, macOS, Android). Re-add to `matrix` if required.",
-      "id": "eu-linux-edge",
-      "platformName": "Linux",
-      "browserName": "MicrosoftEdge",
-      "playwrightProject": "MicrosoftEdge"
-    },
-    {
       "_reason": "Safari does not run on Linux; WebKit locally uses project `webkit` on the agent, not Sauce Grid here.",
       "id": "eu-linux-safari",
       "platformName": "Linux",
       "browserName": "safari",
       "playwrightProject": "webkit"
+    },
+    {
+      "_reason": "Same Firefox Grid limitation as Windows/macOS.",
+      "id": "eu-linux-firefox",
+      "platformName": "Linux",
+      "browserName": "firefox",
+      "playwrightProject": "firefox"
     }
   ]
 }
