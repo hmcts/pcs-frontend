@@ -90,18 +90,14 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Universal Credit - Case-insensitive check to handle backend variations (YES/Yes/yes)
-    // Note: amount/frequency may not exist - see BA clarification
     if (hc.universalCredit && (hc.universalCredit as string).toUpperCase() === 'YES') {
       selectedIncome.push('universalCredit');
-      // UC amount/frequency commented out pending BA clarification
-      // if (hc.universalCreditAmount) {
-      //   const amountInPence = parseFloat(hc.universalCreditAmount as string);
-      //   const amountInPounds = amountInPence / 100;
-      //   formData['regularIncome.universalCreditAmount'] = amountInPounds.toFixed(2);
-      // }
-      // if (hc.universalCreditFrequency) {
-      //   formData['regularIncome.universalCreditFrequency'] = (hc.universalCreditFrequency as string).toLowerCase();
-      // }
+      if (hc.universalCreditAmount) {
+        formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);
+      }
+      if (hc.universalCreditFrequency) {
+        formData['regularIncome.universalCreditFrequency'] = (hc.universalCreditFrequency as string).toLowerCase();
+      }
     }
 
     // Other benefits - Case-insensitive check to handle backend variations (YES/Yes/yes)
@@ -164,23 +160,19 @@ export const step: StepDefinition = createFormStep({
       }
     }
 
-    // Universal Credit (checkbox only - amount/frequency pending BA clarification)
+    // Universal Credit
     householdCircumstances.universalCredit = toYesNoEnum(incomeArray.includes('universalCredit') ? 'yes' : 'no');
-    // UC amount/frequency commented out pending BA clarification
-    // if (incomeArray.includes('universalCredit')) {
-    //   const amountRaw = req.body?.['regularIncome.universalCreditAmount'] as string | undefined;
-    //   const frequency = req.body?.['regularIncome.universalCreditFrequency'] as string | undefined;
-    //   if (amountRaw) {
-    //     const normalized = amountRaw.replace(/,/g, '');
-    //     const amountInPounds = parseFloat(normalized);
-    //     if (!Number.isNaN(amountInPounds)) {
-    //       householdCircumstances.universalCreditAmount = String(Math.round(amountInPounds * 100));
-    //     }
-    //   }
-    //   if (frequency) {
-    //     householdCircumstances.universalCreditFrequency = frequency.toUpperCase();
-    //   }
-    // }
+    if (incomeArray.includes('universalCredit')) {
+      const amountRaw = req.body?.['regularIncome.universalCreditAmount'] as string | undefined;
+      const frequency = req.body?.['regularIncome.universalCreditFrequency'] as string | undefined;
+
+      if (amountRaw) {
+        householdCircumstances.universalCreditAmount = poundsToPence(amountRaw);
+      }
+      if (frequency) {
+        householdCircumstances.universalCreditFrequency = frequency.toUpperCase();
+      }
+    }
 
     // Other benefits
     householdCircumstances.otherBenefits = toYesNoEnum(incomeArray.includes('otherBenefits') ? 'yes' : 'no');
