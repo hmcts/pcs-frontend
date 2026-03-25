@@ -1,4 +1,5 @@
 import {
+  confirmationOfNoticeGiven,
   dashboard,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
@@ -52,6 +53,10 @@ export async function rentArrearsErrorValidation(): Promise<void> {
 export async function rentArrearsNavigationTests(): Promise<void> {
   if (process.env.NOTICE_DATE_PROVIDED === 'NO') {
     await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenNotProvided.mainHeader);
+  }
+
+  if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
+    await performValidation('pageNavigation', rentArrears.backLink, confirmationOfNoticeGiven.mainHeader);
   }
 
   if (process.env.NOTICE_DATE_PROVIDED === 'YES') {

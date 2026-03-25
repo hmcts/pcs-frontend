@@ -39,7 +39,9 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else if (testInfo.title.includes('NoticeDateProvided - Yes')) {
     process.env.NOTICE_DATE_PROVIDED = 'YES';
   }
-
+  if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
+    process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
+  }
   // Tenancy start date logic (independent)
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
