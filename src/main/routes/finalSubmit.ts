@@ -18,6 +18,7 @@ import { oidcMiddleware } from '../middleware/oidc';
 import { http } from '../modules/http';
 
 import { Logger } from '@modules/logger';
+import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('finalSubmit');
 
@@ -119,10 +120,12 @@ export default function finalSubmitRoutes(app: Application): void {
 
       logger.info(`Response submitted successfully for case ${caseId}`);
 
-      return res.redirect(303, `/case/${caseId}/confirmation`);
+      // Use safeRedirect303 to prevent open redirect vulnerabilities
+      return safeRedirect303(res, `/case/${caseId}/confirmation`, '/', ['/case']);
     } catch (error) {
       logger.error(`Failed to submit response for case ${caseId}:`, error);
-      return res.redirect(303, `/case/${caseId}/final-submit?error=failed`);
+      // Use safeRedirect303 to prevent open redirect vulnerabilities
+      return safeRedirect303(res, `/case/${caseId}/final-submit?error=failed`, '/', ['/case']);
     }
   });
 

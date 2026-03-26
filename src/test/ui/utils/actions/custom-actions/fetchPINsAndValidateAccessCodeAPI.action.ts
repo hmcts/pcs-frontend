@@ -9,6 +9,7 @@ import { IAction } from '../../interfaces';
 export let pins: string[] = [];
 export let firstName: string = '';
 export let lastName: string = '';
+export let address: string = '';
 
 export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
   async execute(page: Page, action: string): Promise<void> {
@@ -35,6 +36,13 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
         const pinData = response.data[pins[0]];
         firstName = pinData.firstName;
         lastName = pinData.lastName;
+        const addressObj = pinData.address;
+        if (pinData.address) {
+          const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country } = addressObj;
+          address = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country]
+            .filter(value => value && typeof value === 'string' && value.trim() !== '')
+            .join(', ');
+        }
         return;
       }
       await new Promise(res => setTimeout(res, delayMs));
