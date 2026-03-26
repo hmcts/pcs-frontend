@@ -74,7 +74,7 @@ export const step: StepDefinition = createFormStep({
         formData['regularIncome.incomeFromJobsAmount'] = penceToPounds(hc.incomeFromJobsAmount as string);
       }
       if (hc.incomeFromJobsFrequency) {
-        formData['regularIncome.incomeFromJobsFrequency'] = (hc.incomeFromJobsFrequency as string).toLowerCase();
+        formData['regularIncome.incomeFromJobsFrequency'] = hc.incomeFromJobsFrequency;
       }
     }
 
@@ -85,7 +85,7 @@ export const step: StepDefinition = createFormStep({
         formData['regularIncome.pensionAmount'] = penceToPounds(hc.pensionAmount as string);
       }
       if (hc.pensionFrequency) {
-        formData['regularIncome.pensionFrequency'] = (hc.pensionFrequency as string).toLowerCase();
+        formData['regularIncome.pensionFrequency'] = hc.pensionFrequency;
       }
     }
 
@@ -96,7 +96,7 @@ export const step: StepDefinition = createFormStep({
         formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);
       }
       if (hc.universalCreditFrequency) {
-        formData['regularIncome.universalCreditFrequency'] = (hc.universalCreditFrequency as string).toLowerCase();
+        formData['regularIncome.universalCreditFrequency'] = hc.universalCreditFrequency;
       }
     }
 
@@ -107,7 +107,7 @@ export const step: StepDefinition = createFormStep({
         formData['regularIncome.otherBenefitsAmount'] = penceToPounds(hc.otherBenefitsAmount as string);
       }
       if (hc.otherBenefitsFrequency) {
-        formData['regularIncome.otherBenefitsFrequency'] = (hc.otherBenefitsFrequency as string).toLowerCase();
+        formData['regularIncome.otherBenefitsFrequency'] = hc.otherBenefitsFrequency;
       }
     }
 
@@ -142,7 +142,7 @@ export const step: StepDefinition = createFormStep({
         householdCircumstances.incomeFromJobsAmount = poundsToPence(amountRaw);
       }
       if (frequency) {
-        householdCircumstances.incomeFromJobsFrequency = frequency.toUpperCase();
+        householdCircumstances.incomeFromJobsFrequency = frequency;
       }
     }
 
@@ -156,7 +156,7 @@ export const step: StepDefinition = createFormStep({
         householdCircumstances.pensionAmount = poundsToPence(amountRaw);
       }
       if (frequency) {
-        householdCircumstances.pensionFrequency = frequency.toUpperCase();
+        householdCircumstances.pensionFrequency = frequency;
       }
     }
 
@@ -170,7 +170,7 @@ export const step: StepDefinition = createFormStep({
         householdCircumstances.universalCreditAmount = poundsToPence(amountRaw);
       }
       if (frequency) {
-        householdCircumstances.universalCreditFrequency = frequency.toUpperCase();
+        householdCircumstances.universalCreditFrequency = frequency;
       }
     }
 
@@ -184,7 +184,7 @@ export const step: StepDefinition = createFormStep({
         householdCircumstances.otherBenefitsAmount = poundsToPence(amountRaw);
       }
       if (frequency) {
-        householdCircumstances.otherBenefitsFrequency = frequency.toUpperCase();
+        householdCircumstances.otherBenefitsFrequency = frequency;
       }
     }
 
@@ -255,8 +255,8 @@ export const step: StepDefinition = createFormStep({
                 label: 'subFields.frequency',
               },
               options: [
-                { value: 'week', translationKey: 'frequency.week' },
-                { value: 'month', translationKey: 'frequency.month' },
+                { value: 'WEEKLY', translationKey: 'frequency.week' },
+                { value: 'MONTHLY', translationKey: 'frequency.month' },
               ],
             },
           },
@@ -293,8 +293,8 @@ export const step: StepDefinition = createFormStep({
                 label: 'subFields.frequency',
               },
               options: [
-                { value: 'week', translationKey: 'frequency.week' },
-                { value: 'month', translationKey: 'frequency.month' },
+                { value: 'WEEKLY', translationKey: 'frequency.week' },
+                { value: 'MONTHLY', translationKey: 'frequency.month' },
               ],
             },
           },
@@ -331,8 +331,8 @@ export const step: StepDefinition = createFormStep({
                 label: 'subFields.frequency',
               },
               options: [
-                { value: 'week', translationKey: 'frequency.week' },
-                { value: 'month', translationKey: 'frequency.month' },
+                { value: 'WEEKLY', translationKey: 'frequency.week' },
+                { value: 'MONTHLY', translationKey: 'frequency.month' },
               ],
             },
           },
@@ -369,8 +369,8 @@ export const step: StepDefinition = createFormStep({
                 label: 'subFields.frequency',
               },
               options: [
-                { value: 'week', translationKey: 'frequency.week' },
-                { value: 'month', translationKey: 'frequency.month' },
+                { value: 'WEEKLY', translationKey: 'frequency.week' },
+                { value: 'MONTHLY', translationKey: 'frequency.month' },
               ],
             },
           },
