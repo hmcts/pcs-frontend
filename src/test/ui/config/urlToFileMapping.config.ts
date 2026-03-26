@@ -22,5 +22,4 @@ export default {
   'landlord-licensed': 'landlordLicensed',
   'written-terms': 'writtenTerms',
   'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
-  'written-terms': 'writtenTerms',
 };
