@@ -60,6 +60,7 @@ export class ActionRegistry {
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
     ['repaymentsAgreed', new RespondToClaimAction()],
     ['selectTenancyStartDateKnown', new RespondToClaimAction()],
+    ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
   ]);
 
