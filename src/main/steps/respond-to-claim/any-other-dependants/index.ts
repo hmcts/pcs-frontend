@@ -2,7 +2,7 @@ import type {
   CaseData,
   HouseholdCircumstances,
   PossessionClaimResponse,
-  YesNoCapitalised,
+  YesNoValue,
 } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
@@ -29,7 +29,7 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const enumMapping: Record<string, YesNoCapitalised> = {
+    const enumMapping: Record<string, YesNoValue> = {
       yes: 'Yes',
       no: 'No',
     };
@@ -56,7 +56,7 @@ export const step: StepDefinition = createFormStep({
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
     const householdCircumstances: HouseholdCircumstances | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const otherDependantsCcd: YesNoCapitalised | undefined = householdCircumstances?.otherDependants;
+    const otherDependantsCcd: YesNoValue | undefined = householdCircumstances?.otherDependants;
 
     if (!otherDependantsCcd) {
       return {};
