@@ -1,4 +1,4 @@
-import { landlordLicensed, writtenTerms } from '../data/page-data';
+import { dashboard, landlordLicensed, writtenTerms } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function writtenTermsErrorValidation(): Promise<void> {
@@ -11,5 +11,5 @@ export async function writtenTermsErrorValidation(): Promise<void> {
 export async function writtenTermsNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', writtenTerms.backLink, landlordLicensed.mainHeader);
   await performAction('clickRadioButton', writtenTerms.yesRadioOption);
-  await performValidation('pageNavigation', writtenTerms.saveForLaterButton, 'Dashboard');
+  await performValidation('pageNavigation', writtenTerms.saveForLaterButton, dashboard.mainHeader);
 }
