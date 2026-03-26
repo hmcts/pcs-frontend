@@ -44,7 +44,6 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
-    question: 'question',
   },
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
@@ -88,8 +87,9 @@ export const step: StepDefinition = createFormStep({
       name: 'repaymentsAgreed',
       type: 'radio',
       required: true,
-      translationKey: { label: 'question' },
-      legendClasses: 'govuk-visually-hidden',
+      isPageHeading: true,
+      translationKey: { label: 'heading' },
+      legendClasses: 'govuk-fieldset__legend--l',
       options: [
         {
           value: 'yes',
@@ -100,6 +100,7 @@ export const step: StepDefinition = createFormStep({
               type: 'character-count',
               maxLength: 500,
               required: true,
+              isPageHeading: false,
               labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
               translationKey: {
                 label: 'textAreaLabel',
@@ -122,4 +123,5 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  customTemplate: `${__dirname}/repaymentsAgreed.njk`,
 });
