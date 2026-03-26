@@ -32,15 +32,7 @@ describe('contact-preferences-email-or-post', () => {
         locals: {
           validatedCase: {
             id: '123',
-            data: {
-              possessionClaimResponse: {
-                defendantContactDetails: {
-                  party: {
-                    emailAddress: 'existing@example.com',
-                  },
-                },
-              },
-            },
+            defendantContactDetailsPartyEmailAddress: 'existing@example.com',
           },
         },
       },

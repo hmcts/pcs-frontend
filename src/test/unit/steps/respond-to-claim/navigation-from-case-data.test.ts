@@ -87,9 +87,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const welshReq = createReq({ legislativeCountry: 'Wales' });
     const englishReq = createReq({ legislativeCountry: 'England' });
 
-    await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
-      'landlord-registered'
-    );
+    await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
       'dispute-claim-interstitial'
     );
