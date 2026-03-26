@@ -20,7 +20,8 @@ import {
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
- writtenTerms } from '../../../data/page-data';
+  writtenTerms,
+} from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
