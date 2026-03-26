@@ -5,6 +5,7 @@ import { Page } from '@playwright/test';
 
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { IValidation } from '../../interfaces';
+import { pftDebugReport, truncateForLog } from '../../pft-debug-log';
 
 const ELEMENT_TYPES = [
   'Button',
@@ -139,6 +140,13 @@ export class PageContentValidation implements IValidation {
     const pageData = await this.getPageData(pageName);
 
     if (!pageData) {
+      await pftDebugReport({
+        page,
+        pageLabel: pageName,
+        category: 'page content',
+        expected: `Page data file exists for "${pageName}" (data/page-data/${pageName}.page.data.ts)`,
+        actual: 'No page data file found',
+      });
       return;
     }
 
@@ -161,6 +169,27 @@ export class PageContentValidation implements IValidation {
     }
 
     PageContentValidation.validationResults.set(pageUrl, pageResults);
+
+    const failed = pageResults.filter(r => r.status === 'fail');
+    const total = pageResults.length;
+    const expectedSummary =
+      total === 0
+        ? `No content fields to check for "${pageName}"`
+        : `All ${total} content field(s) from page data should be visible on "${pageName}"`;
+    const actualSummary =
+      total === 0
+        ? 'Nothing to validate'
+        : failed.length === 0
+          ? `All ${total} matched (visible)`
+          : `${failed.length} not visible: ${failed.map(f => `${f.element} → "${truncateForLog(f.expected, 120)}"`).join('; ')}`;
+
+    await pftDebugReport({
+      page,
+      pageLabel: pageName,
+      category: 'page content',
+      expected: expectedSummary,
+      actual: actualSummary,
+    });
   }
 
   private async getPageData(pageName: string): Promise<object | null> {

@@ -5,6 +5,7 @@ import { Page, expect } from '@playwright/test';
 
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
+import { pftDebugReport } from '../../pft-debug-log';
 
 type NavigationTestResult = {
   pageUrl: string;
@@ -90,6 +91,14 @@ export class PageNavigationValidation implements IValidation {
       if (hasPFTFile) {
         PageNavigationValidation.pagesPassed.add(pageName);
       }
+
+      await pftDebugReport({
+        page,
+        pageLabel: pageName,
+        category: 'page navigation',
+        expected: `h1 text: "${expectedHeader}"`,
+        actual: `h1 text: "${expectedHeader}"`,
+      });
     } catch (error) {
       const actualText = await page
         .locator('h1')
@@ -110,6 +119,14 @@ export class PageNavigationValidation implements IValidation {
         actual: actualText || 'Not found',
         error: error instanceof Error ? error.message.split('\n')[0] : String(error),
         hasPFTFile,
+      });
+
+      await pftDebugReport({
+        page,
+        pageLabel: pageName,
+        category: 'page navigation',
+        expected: `h1 text: "${expectedHeader}"`,
+        actual: `h1 text: "${(actualText || 'Not found').trim()}"`,
       });
     }
   }
@@ -137,6 +154,14 @@ export class PageNavigationValidation implements IValidation {
       if (hasPFTFile) {
         PageNavigationValidation.pagesPassed.add(pageName);
       }
+
+      await pftDebugReport({
+        page,
+        pageLabel: pageName,
+        category: 'page navigation',
+        expected: `h1 after navigation: "${expectedHeader}"`,
+        actual: `h1: "${(actualText || '').trim()}"`,
+      });
     } catch (error) {
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const actualText = await page
@@ -156,6 +181,14 @@ export class PageNavigationValidation implements IValidation {
         actual: actualText || 'Not found',
         error: error instanceof Error ? error.message.split('\n')[0] : String(error),
         hasPFTFile,
+      });
+
+      await pftDebugReport({
+        page,
+        pageLabel: pageName,
+        category: 'page navigation',
+        expected: `h1 after navigation: "${expectedHeader}"`,
+        actual: `h1: "${(actualText || 'Not found').trim()}"`,
       });
     }
   }

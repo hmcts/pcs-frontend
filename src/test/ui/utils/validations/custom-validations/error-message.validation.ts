@@ -4,6 +4,7 @@ import * as path from 'path';
 import { Page } from '@playwright/test';
 
 import { IValidation, validationData, validationRecord } from '../../interfaces';
+import { pftDebugReport } from '../../pft-debug-log';
 
 type ValidationResult = {
   pageUrl: string;
@@ -103,6 +104,14 @@ export class ErrorMessageValidation implements IValidation {
 
     const pageUrl = page.url();
     const pageName = await ErrorMessageValidation.getPageNameFromUrl(pageUrl, page);
+
+    await pftDebugReport({
+      page,
+      pageLabel: pageName,
+      category: 'error messages',
+      expected,
+      actual: actualText || 'Not found',
+    });
 
     ErrorMessageValidation.results.push({
       pageUrl,
