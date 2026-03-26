@@ -15,7 +15,7 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  <form method="post" action="{{ url }}">
+  <form method="post" action="{{ url }}" novalidate>
 
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
