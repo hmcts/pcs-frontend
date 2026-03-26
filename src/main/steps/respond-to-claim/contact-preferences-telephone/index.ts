@@ -109,6 +109,7 @@ export const step: StepDefinition = createFormStep({
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {
         party: {
+          phoneNumberProvided: contactByTelephone === 'yes' ? 'YES' : 'NO',
           phoneNumber:
             contactByTelephone === 'yes'
               ? (telephoneForm['contactByTelephone.phoneNumber'] as string | undefined)

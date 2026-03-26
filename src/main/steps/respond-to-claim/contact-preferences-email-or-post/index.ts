@@ -112,6 +112,8 @@ export const step: StepDefinition = createFormStep({
         },
       },
       defendantResponses: {
+        contactByEmail: emailSelected ? 'YES' : 'NO',
+        contactByPost: postSelected ? 'YES' : 'NO',
         preferenceType: emailSelected ? 'EMAIL' : postSelected ? 'POST' : undefined,
       },
     };

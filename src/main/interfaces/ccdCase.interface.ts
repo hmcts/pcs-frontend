@@ -80,6 +80,7 @@ export interface CcdDefendantParty {
 export interface CcdDefendantResponses {
   freeLegalAdvice?: string;
   confirmNoticeGiven?: string;
+  noticeDate?: string;
   tenancyStartDateCorrect?: string;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;

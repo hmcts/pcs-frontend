@@ -282,6 +282,10 @@ export class CcdCaseModel {
     return String(raw).trim();
   }
 
+  get defendantResponsesNoticeDate(): string | undefined {
+    return this.defendantResponses?.noticeDate ?? undefined;
+  }
+
   /**
    * First provided notice date from CCD case data, regardless of channel.
    *

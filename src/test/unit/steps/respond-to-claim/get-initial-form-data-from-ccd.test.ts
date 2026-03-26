@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 
 import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
+import { step as noticeDateWhenNotProvidedStep } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-not-provided';
 import { step as noticeDateWhenProvidedStep } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-provided';
 import { step as contactByEmailOrPostStep } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
 import { step as contactByTelephoneStep } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
@@ -181,6 +182,64 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
         }),
       })
     );
+  });
+
+  it('prefills manually entered correspondence address from CCD instead of session', async () => {
+    const validatedCase = {
+      id: '1771325608502536',
+      hasDefendantContactDetailsPartyAddress: false,
+      defendantContactDetailsPartyAddress: {
+        AddressLine1: '22 Example Street',
+        AddressLine2: 'Flat 3',
+        PostTown: 'Cardiff',
+        County: 'South Glamorgan',
+        PostCode: 'CF10 1AA',
+      },
+    };
+    const { req, res } = createReqRes(validatedCase as unknown as CcdCaseModel, {
+      'correspondence-address': { correspondenceAddressConfirm: 'yes' },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const controller = (correspondenceAddressStep.getController as any)();
+    await controller.get(req, res);
+
+    const renderData = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ correspondenceAddressConfirm: 'no' }));
+    expect(renderData.correspondenceAddressLine1).toBe('22 Example Street');
+    expect(renderData.correspondenceAddressLine2).toBe('Flat 3');
+    expect(renderData.correspondenceTownOrCity).toBe('Cardiff');
+    expect(renderData.correspondenceCounty).toBe('South Glamorgan');
+    expect(renderData.correspondencePostcode).toBe('CF10 1AA');
+  });
+
+  it('prefills notice date from validatedCase respondent response instead of session', async () => {
+    const validatedCase = new CcdCaseModel({
+      id: '1771325608502536',
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            noticeDate: '2024-09-27',
+          },
+        },
+      },
+    } as CcdCase);
+    const { req, res } = createReqRes(validatedCase, {
+      'confirmation-of-notice-date-when-not-provided': {
+        noticeDate: { day: '1', month: '1', year: '2020' },
+      },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const controller = (noticeDateWhenNotProvidedStep.getController as any)();
+    await controller.get(req, res);
+
+    const renderData = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderData.fieldValues.noticeDate).toEqual({
+      day: '27',
+      month: '9',
+      year: '2024',
+    });
   });
 
   it('does not fall back to session values when CCD initial data intentionally returns empty object', async () => {
