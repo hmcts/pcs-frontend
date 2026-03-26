@@ -42,10 +42,10 @@ export class RespondToClaimAction implements IAction {
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
-      ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord, 'repaymentsMade')],
+      ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
-      ['repaymentsAgreed', () => this.repaymentsMade(fieldName as actionRecord, 'repaymentsAgreed')],
+      ['repaymentsAgreed', () => this.repaymentsMade(fieldName as actionRecord)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
@@ -199,10 +199,10 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
 
-  private async repaymentsMade(repaymentsData: actionRecord, actionType: string): Promise<void> {
+  private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
     let question: string;
     let inputLabel: string;
-    if (actionType === 'repaymentsAgreed') {
+    if (repaymentsData.action === 'repaymentsAgreed') {
       question = repaymentsAgreed.getMainHeader(claimantsName);
       inputLabel = repaymentsAgreed.giveDetailsHiddenHintText;
     } else {

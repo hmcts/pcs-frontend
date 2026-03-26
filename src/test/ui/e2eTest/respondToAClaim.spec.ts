@@ -111,9 +111,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.noRadioOption,
+      action: 'repaymentsAgreed',
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
   });
@@ -163,9 +165,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.amNotSureRadioOption,
+      action: 'repaymentsAgreed',
     });
     await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
@@ -215,9 +219,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.noRadioOption,
+      action: 'repaymentsAgreed',
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
   });
@@ -263,10 +269,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.yesRadioOption,
+      action: 'repaymentsMade',
       repaymentInfo: repaymentsMade.detailsTextInput,
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.yesRadioOption,
+      action: 'repaymentsAgreed',
       repaymentInfo: repaymentsAgreed.detailsTextInput,
     });
     await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
@@ -313,9 +321,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.noRadioOption,
+      action: 'repaymentsAgreed',
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
   });
@@ -358,9 +368,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.amNotSureRadioOption,
+      action: 'repaymentsAgreed',
     });
     await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
@@ -407,9 +419,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.yesRadioOption,
+      action: 'repaymentsAgreed',
       repaymentInfo: repaymentsAgreed.detailsTextInput,
     });
     await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
@@ -458,9 +472,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.amNotSureRadioOption,
+      action: 'repaymentsAgreed',
     });
     await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
@@ -506,9 +522,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.noRadioOption,
+      action: 'repaymentsAgreed',
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
   });
@@ -551,9 +569,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.noRadioOption,
+      action: 'repaymentsAgreed',
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
   });
@@ -596,9 +616,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
+      action: 'repaymentsMade',
     });
     await performAction('repaymentsAgreed', {
       repaymentOption: repaymentsAgreed.amNotSureRadioOption,
+      action: 'repaymentsAgreed',
     });
     await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
