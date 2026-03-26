@@ -1,0 +1,18 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{# Shared step buttons helper used by steps #}
+{% macro stepButtons(primaryText, secondaryText) %}
+  <div class="govuk-button-group">
+    {{ govukButton({
+      text: primaryText,
+      attributes: { name: 'action', value: 'continue' }
+    }) }}
+    {% if secondaryText %}
+      {{ govukButton({
+        text: secondaryText,
+        classes: 'govuk-button--secondary',
+        attributes: { name: 'action', value: 'saveForLater' }
+      }) }}
+    {% endif %}
+  </div>
+{% endmacro %}
