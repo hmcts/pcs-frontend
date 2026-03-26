@@ -2,9 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
-{% block pageTitle %}
-  {{ pageTitle }} - HM Courts & Tribunals Service – GOV.UK
-{% endblock %}
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 {% block mainContent %}
   {% if caption %}
     <span class="govuk-caption-l">{{ caption }}</span>

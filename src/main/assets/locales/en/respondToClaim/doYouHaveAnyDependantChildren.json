@@ -3,10 +3,6 @@
   "caption": "Respond to a property possession claim",
   "heading": "Do you have any dependant children?",
   "dependantChildrenHint": "Dependant children are children you look after financially.",
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
   "dependantChildrenDetailsLabel": "Give details about your dependant children",
   "dependantChildrenDetailsHint": "You should include details about how many dependant children you have and how old they are",
   "errors": {
