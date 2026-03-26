@@ -23,5 +23,6 @@ export * from './repaymentsAgreed.page.data';
 export * from './tenancyDateUnknown.page.data';
 export * from './tenancyDateDetails.page.data';
 export * from './dashboard.page.data';
-export * from './licensedLandlord.page.data';
+export * from './landlordLicensed.page.data';
+export * from './writtenTerms.page.data';
 export * from './feedback.page.data';
