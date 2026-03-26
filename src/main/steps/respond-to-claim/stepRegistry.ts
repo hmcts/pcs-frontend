@@ -37,6 +37,7 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
+import { step as writtenTerms } from './written-terms';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -51,6 +52,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
   'landlord-licensed': landlordLicensed,
+  'written-terms': writtenTerms,
   'tenancy-type-details': tenancyTypeDetails,
   'tenancy-date-details': tenancyDateDetails,
   'tenancy-date-unknown': tenancyDateUnknown,
