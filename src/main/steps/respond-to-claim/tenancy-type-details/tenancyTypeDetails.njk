@@ -1,9 +1,9 @@
 {# Tenancy Details template (matches GOV.UK layout shown) #}
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
@@ -29,17 +29,7 @@
         {{ govukRadios(field.component) }}
       {% endif %}
     {% endfor %}
-    <div class="govuk-button-group">
-      {{ govukButton({ text: saveAndContinue }) }}
-      {{ govukButton({
-        text: saveForLater,
-        classes: "govuk-button--secondary",
-        attributes: { name: "action", value: "saveForLater" }
-      }) }}
-    </div>
-    <p class="govuk-body">
-      <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
-    </p>
+    {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
