@@ -11,6 +11,21 @@ export function poundsStringToPence(value: string): number | undefined {
   return undefined;
 }
 
+/** MoneyGBP-style values stored as whole pence (digit-only string or numeric pence). */
+export function ccdPenceToPoundsString(value: unknown): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+    const pence = Number(value.trim());
+    return Number.isFinite(pence) ? (pence / 100).toFixed(2) : undefined;
+  }
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return (value / 100).toFixed(2);
+  }
+  return undefined;
+}
+
 function penceToPoundsString(value: unknown): string | undefined {
   const getPenceAmount = (amountValue: unknown): number | undefined => {
     if (typeof amountValue === 'number' && Number.isFinite(amountValue)) {
