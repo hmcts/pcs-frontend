@@ -1,0 +1,14 @@
+{
+  "caption": "Respond to a property possession claim",
+  "heading": "What’s your client’s name?",
+  "pageTitle": "Your client’s name",
+  "firstNameLabel": "First name",
+  "lastNameLabel": "Last name",
+  "contactUs": "Contact us for help",
+  "errors": {
+    "firstName": "Enter your client’s first name",
+    "firstNameMaxLength": "First name must be 60 characters or less",
+    "lastName": "Enter your client’s last name",
+    "lastNameMaxLength": "Last name must be 60 characters or less"
+  }
+}

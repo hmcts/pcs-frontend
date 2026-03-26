@@ -1,0 +1,24 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Contact preference",
+  "title": "Contact preference",
+  "content": "<p class=\"govuk-body\">Important documents like orders will always be sent by post.</p><p class=\"govuk-body\"> You can choose whether case updates should be sent to you by post or email while you are acting for your client. For example, when a hearing has been scheduled or a document is ready to view online.</p>",
+
+  "labels": {
+    "question": "How should you receive updates while acting for your client?",
+    "options": {
+      "byEmail": "By email",
+      "byPost": "By post"
+    },
+    "emailLabel": "Enter your email address"
+  },
+  "buttons": {
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  },
+  "errors": {
+    "contactByEmailOrPost": "Select how you should receive updates while acting for your client",
+    "contactByEmailOrPost.email": "Enter your email address",
+    "contactByEmailOrPost.email.invalid": "Enter an email address in the correct format, like name@example.com"
+  }
+}

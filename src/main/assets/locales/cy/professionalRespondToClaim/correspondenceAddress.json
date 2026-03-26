@@ -1,0 +1,38 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyYour client’s correspondence address",
+  "legend": "cyIs your client’s correspondence address ",
+  "legendNa": "cyWhat’s your client’s correspondence address?",
+  "legend.hint": "cyThis is the address provided by Treetops Housing",
+  "legend.hintNa": "cyThe correspondence address is your client’s postal address.",
+  "labels": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "enterAddress": "cyEnter your client’s correspondence address",
+    "enterPostcode": "cyEnter a UK postcode",
+    "enterManually": "cyEnter an address manually",
+    "enterManuallySubText": "cyYou can enter your client’s address details in the fields below.",
+    "selectAddress": "cySelect an address",
+    "selectAddressLabel": "cySelect an address",
+    "addressHeading": "cyWhat’s your client’s correspondence address?",
+    "addressLine1": "cyAddress line 1",
+    "addressLine2": "cyAddress line 2 (optional)",
+    "townOrCity": "cyTown or city",
+    "county": "cyCounty (optional)",
+    "postcode": "cyPostcode"
+  },
+  "buttons": {
+    "findAddress": "cyFind address",
+    "saveAndContinue": "cySave and continue",
+    "saveForLater": "cySave for later"
+  },
+  "errors": {
+    "lookupPostcode": "cyEnter a valid UK postcode",
+    "postcodeNotFound": "cyPostcode not found. Please check and try again.",
+    "selectAddress": "cyPlease select an address",
+    "correspondenceAddressConfirm": "cyPlease confirm your client’s address by selecting the options below",
+    "correspondenceAddressConfirm.addressLine1": "cyEnter address line 1, typically the building and street",
+    "correspondenceAddressConfirm.townOrCity": "cyEnter town or city",
+    "correspondenceAddressConfirm.postcode": "cyEnter a valid UK postcode"
+  }
+}

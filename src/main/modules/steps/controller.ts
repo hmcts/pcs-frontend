@@ -5,9 +5,10 @@ import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
 import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
-import { stepNavigation } from './flow';
+import { createStepNavigation, stepNavigation } from './flow';
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
 import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
+import { getActiveFlowConfig, getActiveTranslationFolders } from './runtime';
 
 import { Logger } from '@modules/logger';
 
@@ -34,12 +35,20 @@ export const createGetController = (
   view: string,
   stepName: string,
   extendContent?: (req: Request) => StepFormData | Promise<StepFormData>,
-  journeyFolder?: string
+  journeyFolder?: string,
+  translationFolder?: string,
+  translationFolders?: string[]
 ): GetController => {
   return new GetController(view, async (req: Request) => {
+    const activeTranslationFolders = journeyFolder
+      ? getActiveTranslationFolders(req, translationFolder || journeyFolder, translationFolders)
+      : [];
+    const activeFlowConfig = getActiveFlowConfig(req);
+    const navigation = activeFlowConfig ? createStepNavigation(activeFlowConfig) : stepNavigation;
+
     if (journeyFolder && req.i18n) {
       try {
-        await loadStepNamespace(req, stepName, journeyFolder);
+        await loadStepNamespace(req, stepName, activeTranslationFolders);
       } catch (error) {
         logger.warn(`Failed to load namespace for step ${stepName}:`, error);
       }
@@ -77,7 +86,7 @@ export const createGetController = (
       answer: postData.answer ?? formData?.answer,
       choices: postData.choices ?? formData?.choices,
       error: postData.error,
-      backUrl: await stepNavigation.getBackUrl(req, stepName),
+      backUrl: await navigation.getBackUrl(req, stepName),
       ...commonI18nTranslations,
       ...commonContent,
       ...stepTranslations,
@@ -105,13 +114,21 @@ export const createPostController = (
   getFields: (t: TFunction) => FormFieldConfig[],
   view: string,
   beforeRedirect?: PostControllerCallback,
-  journeyFolder?: string
+  journeyFolder?: string,
+  translationFolder?: string,
+  translationFolders?: string[]
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } => {
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
+      const activeTranslationFolders = journeyFolder
+        ? getActiveTranslationFolders(req, translationFolder || journeyFolder, translationFolders)
+        : [];
+      const activeFlowConfig = getActiveFlowConfig(req);
+      const navigation = activeFlowConfig ? createStepNavigation(activeFlowConfig) : stepNavigation;
+
       if (journeyFolder && req.i18n) {
         try {
-          await loadStepNamespace(req, stepName, journeyFolder);
+          await loadStepNamespace(req, stepName, activeTranslationFolders);
         } catch (error) {
           logger.warn(`Failed to load namespace for step ${stepName}:`, error);
         }
@@ -134,7 +151,7 @@ export const createPostController = (
           lang: reqLang,
           pageUrl: req.originalUrl || '/',
           t,
-          backUrl: await stepNavigation.getBackUrl(req, stepName),
+          backUrl: await navigation.getBackUrl(req, stepName),
         });
       }
 
@@ -151,7 +168,7 @@ export const createPostController = (
         }
       }
 
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await navigation.getNextStepUrl(req, stepName, req.body);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

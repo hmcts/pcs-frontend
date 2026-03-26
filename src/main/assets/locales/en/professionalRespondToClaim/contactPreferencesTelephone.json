@@ -1,0 +1,23 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Contact by telephone",
+  "heading": "Contact by telephone",
+  "subtitle": "We might need to contact you by telephone with urgent updates about your client’s case.",
+  "labels": {
+    "question": "Are you happy to be contacted by telephone while acting for your client?",
+    "options": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "phoneNumberLabel": "UK phone number"
+  },
+  "buttons": {
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  },
+  "errors": {
+    "contactByTelephone": "Select whether you’re happy to be contacted by telephone while acting for your client",
+    "contactByTelephone.phoneNumber": "Enter a UK phone number",
+    "contactByTelephone.phoneNumber.invalid": "Enter a phone number, like 01632 960 001 or 07700 900 982"
+  }
+}

@@ -12,6 +12,7 @@ import { getDashboardUrl } from '../../../routes/dashboard';
 import { safeRedirect303 } from '../../../utils/safeRedirect';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
+import { getActiveFlowConfig, getActiveTranslationFolders } from '../runtime';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
@@ -26,11 +27,25 @@ import {
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
 
+function saveSession(req: Request): Promise<void> {
+  return new Promise((resolve, reject) => {
+    req.session.save(err => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
 export function createPostHandler(
   fields: FormFieldConfig[],
   stepName: string,
   viewPath: string,
   journeyFolder: string,
+  translationFolder?: string,
+  translationFolders?: string[],
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
   flowConfig?: JourneyFlowConfig,
@@ -49,11 +64,17 @@ export function createPostHandler(
     });
   }
   // Use provided flowConfig or fall back to default stepNavigation
-  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
-
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
-      await loadStepNamespace(req, stepName, journeyFolder);
+      const activeTranslationFolders = getActiveTranslationFolders(
+        req,
+        translationFolder || journeyFolder,
+        translationFolders
+      );
+      const activeFlowConfig = getActiveFlowConfig(req, flowConfig);
+      const navigation = activeFlowConfig ? createStepNavigation(activeFlowConfig) : stepNavigation;
+
+      await loadStepNamespace(req, stepName, activeTranslationFolders);
 
       const t: TFunction = getTranslationFunction(req, stepName, ['common']);
       const action = req.body.action as string | undefined;
@@ -144,6 +165,8 @@ export function createPostHandler(
       }
 
       if (action === 'saveForLater') {
+        await saveSession(req);
+
         const caseId = req.res?.locals.validatedCase?.id;
         const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
 
@@ -159,6 +182,8 @@ export function createPostHandler(
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }
+
+      await saveSession(req);
 
       // Allow all internal paths since this is a generic form builder
       safeRedirect303(res, redirectPath, '/', ['/']);

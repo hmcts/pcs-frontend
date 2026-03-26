@@ -1,0 +1,25 @@
+{
+  "pageTitle": "Start now",
+  "title": "Respond to a property possession claim online on behalf of your client",
+  "description": "There’s no fee to respond to a claim. The response must be submitted within 14 days of your client receiving the claim pack in the post. </p><p class=\"govuk-body\">This service is also available <a href=\"?lang=cy\" class=\"govuk-link language\">in Welsh (Cymraeg)</a>.",
+  "buttons": {
+    "startNow": "Start now"
+  },
+  "completingYourResponse": "Completing the response for your client",
+  "saveDraftInfo": "You can save the response as a draft and return to it later. You’ll be able to review and edit the answers before submitting it on your client’s behalf.",
+  "uploadDocumentsInfo": "After you finish answering the questions, you can upload any documents to support your client’s response.",
+  "claimantVisibilityInfo": "The claimant will be able to see any documents you upload and the answers you provide on your client’s behalf.",
+  "whatYouWillNeed": "What you’ll need to complete the response",
+  "provideDetailsInfo": "You’ll be asked to provide or confirm details about your client, such as:",
+  "listItemName": "your client’s name",
+  "listItemDateOfBirth": "your client’s date of birth",
+  "listItemDependants": "any dependants your client supports financially",
+  "listItemCircumstances": "your client’s circumstances and any exceptional hardship they’d experience if they had to leave their home",
+  "shareDetailsInfo": "You can also share details about your client’s:",
+  "listItemIncomeExpenses": "income and expenses",
+  "listItemPriorityDebts": "priority debts",
+  "financialSituationInfo": "You do not have to answer questions about your client’s financial situation, but sharing this information can help a judge understand their circumstances.",
+  "supportToUseHmctsServices": "Support to use HMCTS services",
+  "hmctsSupportInfo": "If your client needs support to use HMCTS services, like step-free access to a court for their hearing, you can either request this as part of the response, or at a later time.",
+  "previousStepUrl": "/"
+}

@@ -32,17 +32,14 @@ export function getStepTranslationPath(stepName: string, folder: string): string
   return `${folder}/${getStepNamespace(stepName)}`;
 }
 
-export async function loadStepNamespace(req: Request, stepName: string, folder: string): Promise<void> {
+export async function loadStepNamespace(req: Request, stepName: string, folder: string | string[]): Promise<void> {
   if (!req.i18n) {
     return;
   }
 
   const stepNamespace = getStepNamespace(stepName);
   const lang = getMainRequestLanguage(req);
-
-  if (req.i18n.getResourceBundle(lang, stepNamespace)) {
-    return;
-  }
+  const folders = Array.isArray(folder) ? [...folder].reverse() : [folder];
 
   const localesDir = await findLocalesDir();
   if (!localesDir) {
@@ -52,35 +49,44 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
     return;
   }
 
-  const translationPath = getStepTranslationPath(stepName, folder);
-  const filePath = path.join(localesDir, lang, `${translationPath}.json`);
+  let loadedAnyBundle = false;
 
-  const resolvedPath = path.resolve(filePath);
-  const resolvedLocalesDir = path.resolve(localesDir);
-  if (!resolvedPath.startsWith(resolvedLocalesDir)) {
-    if (isDevelopment) {
-      logger.warn(`Invalid translation path detected: ${translationPath}`);
+  for (const currentFolder of folders) {
+    const translationPath = getStepTranslationPath(stepName, currentFolder);
+    const filePath = path.join(localesDir, lang, `${translationPath}.json`);
+
+    const resolvedPath = path.resolve(filePath);
+    const resolvedLocalesDir = path.resolve(localesDir);
+    if (!resolvedPath.startsWith(resolvedLocalesDir)) {
+      if (isDevelopment) {
+        logger.warn(`Invalid translation path detected: ${translationPath}`);
+      }
+      continue;
     }
-    return;
-  }
 
-  try {
-    await fs.access(resolvedPath);
-    const fileContent = await fs.readFile(resolvedPath, 'utf8');
-    const translations = JSON.parse(fileContent);
-    req.i18n.addResourceBundle(lang, stepNamespace, translations, true, true);
-
-    await new Promise<void>((resolve, reject) => {
-      req.i18n!.loadNamespaces(stepNamespace, err => (err ? reject(err) : resolve()));
-    });
-  } catch (error) {
-    if (isDevelopment) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      if (!errorMessage.includes('ENOENT')) {
-        logger.error(`Failed to load translation file for ${stepName}:`, error);
+    try {
+      await fs.access(resolvedPath);
+      const fileContent = await fs.readFile(resolvedPath, 'utf8');
+      const translations = JSON.parse(fileContent);
+      req.i18n.addResourceBundle(lang, stepNamespace, translations, true, true);
+      loadedAnyBundle = true;
+    } catch (error) {
+      if (isDevelopment) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (!errorMessage.includes('ENOENT')) {
+          logger.error(`Failed to load translation file for ${stepName}:`, error);
+        }
       }
     }
   }
+
+  if (!loadedAnyBundle) {
+    return;
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    req.i18n!.loadNamespaces(stepNamespace, err => (err ? reject(err) : resolve()));
+  });
 }
 
 export function getStepTranslations(req: Request, stepName: string): TranslationContent {

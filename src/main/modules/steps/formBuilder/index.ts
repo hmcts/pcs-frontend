@@ -8,6 +8,7 @@ import { getDashboardUrl } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
+import { getActiveFlowConfig, getActiveTranslationFolders } from '../runtime';
 
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
@@ -30,6 +31,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const {
     stepName,
     journeyFolder,
+    translationFolder,
+    translationFolders,
     fields,
     beforeRedirect,
     beforeGet,
@@ -45,8 +48,6 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
-  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
-
   return {
     url: path.join(basePath, stepName),
     name: stepName,
@@ -55,7 +56,15 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     showCancelButton,
     getController: () => {
       return createGetController(viewPath, stepName, async req => {
-        await loadStepNamespace(req, stepName, journeyFolder);
+        const activeTranslationFolders = getActiveTranslationFolders(
+          req,
+          translationFolder || journeyFolder,
+          translationFolders
+        );
+        const activeFlowConfig = getActiveFlowConfig(req, flowConfig);
+        const navigation = activeFlowConfig ? createStepNavigation(activeFlowConfig) : stepNavigation;
+
+        await loadStepNamespace(req, stepName, activeTranslationFolders);
 
         const t: TFunction = getTranslationFunction(req, stepName, ['common']);
 
@@ -101,6 +110,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       stepName,
       viewPath,
       journeyFolder,
+      translationFolder,
+      translationFolders,
       beforeRedirect,
       translationKeys,
       flowConfig,

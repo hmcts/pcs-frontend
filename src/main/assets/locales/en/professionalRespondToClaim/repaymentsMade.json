@@ -1,0 +1,15 @@
+{
+  "pageTitle": "Has your client paid any money to the claimant since the claim issue date?",
+  "caption": "Respond to a property possession claim",
+  "question": "Has your client paid any money to {{claimantName}} since {{claimIssueDate}}?",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "textAreaLabel": "Give details about how much your client paid and when",
+  "textAreaHint": "You can enter up to 500 characters",
+  "errors": {
+    "repaymentsInfo": "Give details about how much your client paid and when",
+    "confirmRepaymentsMade": "Select if your client has paid any money to {{claimantName}} since {{claimIssueDate}}"
+  }
+}

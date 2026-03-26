@@ -5,7 +5,7 @@ import type { JourneyFlowConfig } from '../interfaces/stepFlow.interface';
 import type { StepDefinition } from '../interfaces/stepFormData.interface';
 import { caseReferenceParamMiddleware, oidcMiddleware } from '../middleware';
 import { getValidatedLanguage, stepDependencyCheckMiddleware } from '../modules/steps';
-import { getStepsForJourney, journeyRegistry } from '../steps';
+import { getJourneyConfig, getStepsForJourney, journeyRegistry, type ResolvedJourneyConfig } from '../steps';
 
 import { Logger } from '@modules/logger';
 
@@ -20,17 +20,17 @@ interface StepRegistrationStats {
 /**
  * Get journeys to register based on specific journey filter
  */
-function getJourneysToRegister(specificJourney?: string): [string, { flowConfig: JourneyFlowConfig }][] {
-  const journeysToRegister = specificJourney
-    ? Object.entries(journeyRegistry).filter(([name]) => name === specificJourney)
-    : Object.entries(journeyRegistry);
+function getJourneysToRegister(specificJourney?: string): [string, ResolvedJourneyConfig][] {
+  const journeyNames = specificJourney
+    ? Object.keys(journeyRegistry).filter(name => name === specificJourney)
+    : Object.keys(journeyRegistry);
 
-  if (specificJourney && journeysToRegister.length === 0) {
+  if (specificJourney && journeyNames.length === 0) {
     const availableJourneys = Object.keys(journeyRegistry).join(', ');
     throw new Error(`Journey '${specificJourney}' not found in registry. Available journeys: ${availableJourneys}`);
   }
 
-  return journeysToRegister;
+  return journeyNames.map(name => [name, getJourneyConfig(name)] as [string, ResolvedJourneyConfig]);
 }
 
 /**
@@ -38,15 +38,43 @@ function getJourneysToRegister(specificJourney?: string): [string, { flowConfig:
  */
 function buildGetMiddleware(
   requiresAuth: boolean,
+  journey: ResolvedJourneyConfig,
   flowConfig: JourneyFlowConfig,
   stepMiddleware?: RequestHandler[]
 ): RequestHandler[] {
   const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
+  const journeyContextMiddleware: RequestHandler = (req, res, next) => {
+    res.locals.journeyContext = {
+      journeyName: journey.name,
+      profile: journey.profile,
+      flowConfig,
+      translationFolders: journey.translationFolders,
+    };
+
+    if (req.session) {
+      const sessionWithJourneyData = req.session as typeof req.session & {
+        journeyFormData?: Record<string, Record<string, unknown>>;
+        formData?: Record<string, unknown>;
+      };
+
+      if (!sessionWithJourneyData.journeyFormData) {
+        sessionWithJourneyData.journeyFormData = {};
+      }
+
+      if (!sessionWithJourneyData.journeyFormData[journey.name]) {
+        sessionWithJourneyData.journeyFormData[journey.name] = {};
+      }
+
+      sessionWithJourneyData.formData = sessionWithJourneyData.journeyFormData[journey.name];
+    }
+
+    next();
+  };
   const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
 
   return stepMiddleware
-    ? [...authMiddlewares, dependencyCheck, ...stepMiddleware]
-    : [...authMiddlewares, dependencyCheck];
+    ? [...authMiddlewares, journeyContextMiddleware, dependencyCheck, ...stepMiddleware]
+    : [...authMiddlewares, journeyContextMiddleware, dependencyCheck];
 }
 
 /**
@@ -80,21 +108,22 @@ function createGetHandler(step: StepDefinition, journeyName: string): RequestHan
 function registerStepRoutes(
   router: IRouter,
   step: StepDefinition,
+  journey: ResolvedJourneyConfig,
   flowConfig: JourneyFlowConfig,
   journeyName: string,
   stats: StepRegistrationStats
 ): void {
   const stepConfig = flowConfig.steps[step.name];
   const requiresAuth = stepConfig?.requiresAuth !== false;
-  const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
+  const postMiddlewares = buildGetMiddleware(requiresAuth, journey, flowConfig);
 
   if (step.getController) {
-    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfig, step.middleware);
+    const allGetMiddleware = buildGetMiddleware(requiresAuth, journey, flowConfig, step.middleware);
     router.get(step.url, ...allGetMiddleware, createGetHandler(step, journeyName));
   }
 
   if (step.postController?.post) {
-    router.post(step.url, ...authMiddlewares, step.postController.post);
+    router.post(step.url, ...postMiddlewares, step.postController.post);
   }
 
   stats.totalSteps++;
@@ -129,7 +158,7 @@ export function registerSteps(router: IRouter, specificJourney?: string): void {
     });
 
     for (const step of journeySteps) {
-      registerStepRoutes(router, step, flowConfig, journeyName, stats);
+      registerStepRoutes(router, step, journey, flowConfig, journeyName, stats);
     }
 
     logger.debug(`Journey ${journeyName} registered`, {

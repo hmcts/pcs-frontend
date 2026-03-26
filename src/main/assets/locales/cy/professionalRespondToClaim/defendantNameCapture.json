@@ -1,0 +1,14 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "heading": "cyWhat’s your client’s name?",
+  "pageTitle": "cyYour client’s name",
+  "firstNameLabel": "cyFirst name",
+  "lastNameLabel": "cyLast name",
+  "contactUs": "cyContact us for help",
+  "errors": {
+    "firstName": "cyEnter your client’s first name",
+    "firstNameMaxLength": "cyFirst name must be 60 characters or less",
+    "lastName": "cyEnter your client’s last name",
+    "lastNameMaxLength": "cyLast name must be 60 characters or less"
+  }
+}

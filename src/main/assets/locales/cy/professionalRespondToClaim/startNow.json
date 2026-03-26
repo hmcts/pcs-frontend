@@ -1,0 +1,25 @@
+{
+  "pageTitle": "cyStart now",
+  "title": "cyRespond to a property possession claim online on behalf of your client",
+  "description": "cyThere’s no fee to respond to a claim. The response must be submitted within 14 days of your client receiving the claim pack in the post. </p><p class=\"govuk-body\">cyThis service is also available <a href=\"?lang=en\" class=\"govuk-link language\">in English</a>.",
+  "buttons": {
+    "startNow": "cyStart now"
+  },
+  "completingYourResponse": "cyCompleting the response for your client",
+  "saveDraftInfo": "cyYou can save the response as a draft and return to it later. You’ll be able to review and edit the answers before submitting it on your client’s behalf.",
+  "uploadDocumentsInfo": "cyAfter you finish answering the questions, you can upload any documents to support your client’s response.",
+  "claimantVisibilityInfo": "cyThe claimant will be able to see any documents you upload and the answers you provide on your client’s behalf.",
+  "whatYouWillNeed": "cyWhat you’ll need to complete the response",
+  "provideDetailsInfo": "cyYou’ll be asked to provide or confirm details about your client, such as:",
+  "listItemName": "cyyour client’s name",
+  "listItemDateOfBirth": "cyyour client’s date of birth",
+  "listItemDependants": "cyany dependants your client supports financially",
+  "listItemCircumstances": "cyyour client’s circumstances and any exceptional hardship they’d experience if they had to leave their home",
+  "shareDetailsInfo": "cyYou can also share details about your client’s:",
+  "listItemIncomeExpenses": "cyincome and expenses",
+  "listItemPriorityDebts": "cypriority debts",
+  "financialSituationInfo": "cyYou do not have to answer questions about your client’s financial situation, but sharing this information can help a judge understand their circumstances.",
+  "supportToUseHmctsServices": "cySupport to use HMCTS services",
+  "hmctsSupportInfo": "cyIf your client needs support to use HMCTS services, like step-free access to a court for their hearing, you can either request this as part of the response, or at a later time.",
+  "previousStepUrl": "/"
+}

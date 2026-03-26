@@ -1,0 +1,19 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyYour client’s date of birth",
+  "dateOfBirthHint": "cyFor example, 31 3 1980",
+  "dateOfBirthLabel": "cyWhat’s your client’s date of birth? (Optional)",
+  "errors": {
+    "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
+      "required": "cyEnter your client’s date of birth",
+      "notRealDate": "cyDate of birth must be a real date",
+      "futureDate": "cyDate of birth must be in the past",
+      "invalidValue": "cyDate of birth must be a real date",
+      "missingOne": "cyYour client’s date of birth must include a {{missingField}}",
+      "missingTwo": "cyYour client’s date of birth must include a {{first}} and {{second}}"
+    }
+  }
+}
