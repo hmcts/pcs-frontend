@@ -27,6 +27,10 @@ import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
+function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
+  return flowConfig?.useSessionFormData !== false;
+}
+
 export function createPostHandler(
   fields: FormFieldConfig[],
   stepName: string,
@@ -64,9 +68,10 @@ export function createPostHandler(
         throw new Error('Nunjucks environment not initialized');
       }
 
-      // Get all form data from session for cross-field validation
-      const allFormData = req.session.formData
-        ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
+      const allFormData = shouldUseSessionFormData(flowConfig)
+        ? req.session.formData
+          ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
+          : {}
         : {};
 
       // Normalize checkbox fields BEFORE validation to ensure checkbox values are arrays
@@ -131,7 +136,9 @@ export function createPostHandler(
       // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
       const { action: _, ...bodyWithoutAction } = req.body;
-      setFormData(req, stepName, bodyWithoutAction);
+      if (shouldUseSessionFormData(flowConfig)) {
+        setFormData(req, stepName, bodyWithoutAction);
+      }
 
       if (beforeRedirect) {
         try {

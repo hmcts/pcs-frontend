@@ -55,6 +55,7 @@ function getConfirmNoticeGivenAnswer(
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
+  useSessionFormData: false,
   stepOrder: [
     'start-now',
     'free-legal-advice',

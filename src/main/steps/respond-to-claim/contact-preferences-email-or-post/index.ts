@@ -1,10 +1,11 @@
 import { isEmail } from 'validator';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-email-or-post',
@@ -65,9 +66,8 @@ export const step: StepDefinition = createFormStep({
   ],
   getInitialFormData: req => {
     const validatedCase = req.res?.locals?.validatedCase;
-    const existingEmail =
-      validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.emailAddress ?? undefined;
-    const preferenceType = validatedCase?.data?.possessionClaimResponse?.defendantResponses?.preferenceType;
+    const existingEmail = validatedCase?.defendantContactDetailsPartyEmailAddress;
+    const preferenceType = validatedCase?.defendantResponsesPreferenceType;
 
     if (
       preferenceType === 'EMAIL' ||
@@ -99,8 +99,7 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const existingEmailAddress =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.emailAddress;
+    const existingEmailAddress = req.res?.locals?.validatedCase?.defendantContactDetailsPartyEmailAddress;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {

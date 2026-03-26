@@ -1,7 +1,7 @@
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { PossessionClaimResponse, YesNoNotSureValue } from '@interfaces/ccdCase.interface';
+import type { PossessionClaimResponse, YesNoNotSureValue } from '@interfaces/ccdCaseData.model';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 

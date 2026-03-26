@@ -5,6 +5,7 @@ import { step as noticeDateWhenProvidedStep } from '../../../../main/steps/respo
 import { step as contactByEmailOrPostStep } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
 import { step as contactByTelephoneStep } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
 import { step as correspondenceAddressStep } from '../../../../main/steps/respond-to-claim/correspondence-address';
+import { step as landlordLicensedStep } from '../../../../main/steps/respond-to-claim/landlord-licensed';
 import { step as tenancyDateDetailsStep } from '../../../../main/steps/respond-to-claim/tenancy-date-details';
 
 import type { CcdCase } from '@interfaces/ccdCase.interface';
@@ -130,6 +131,30 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     expect(dateItems[0].value).toBe('1');
     expect(dateItems[1].value).toBe('12');
     expect(dateItems[2].value).toBe('2025');
+  });
+
+  it('prefills landlord-licensed from validatedCase instead of session', async () => {
+    const validatedCase = new CcdCaseModel({
+      id: '1771325608502536',
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            landlordLicensed: 'NOT_SURE',
+          },
+        },
+      },
+    } as CcdCase);
+    const { req, res } = createReqRes(validatedCase, {
+      'landlord-licensed': { confirmLandlordLicensed: 'yes' },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const controller = (landlordLicensedStep.getController as any)();
+    await controller.get(req, res);
+
+    const renderData = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ confirmLandlordLicensed: 'imNotSure' }));
+    expect(renderData.confirmLandlordLicensed).toBe('imNotSure');
   });
 
   it('prefills correspondence-address confirmation from validatedCase address', async () => {

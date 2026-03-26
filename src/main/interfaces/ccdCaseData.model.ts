@@ -6,10 +6,11 @@ import {
   CcdClaimantEnteredDefendantDetails,
   CcdDefendantParty,
   CcdDefendantResponses,
-  CcdLegacyDefendant,
   PossessionClaimResponse,
   YesNoEnum,
 } from '@interfaces/ccdCase.interface';
+
+export type { CcdCase, PossessionClaimResponse, YesNoNotSureValue } from '@interfaces/ccdCase.interface';
 
 export class CcdCaseModel {
   protected readonly validatedCase: CcdCase;
@@ -129,27 +130,10 @@ export class CcdCaseModel {
     return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
   }
 
-  get legacyDefendant(): CcdLegacyDefendant | undefined {
-    const additionalDefendant = this.data.additionalDefendants?.[0]?.value;
-    return additionalDefendant ?? this.data.defendant1;
-  }
-
   get claimantEnteredDefendantDetails(): CcdClaimantEnteredDefendantDetails {
-    const claimantEntered = this.data.possessionClaimResponse?.claimantEnteredDefendantDetails;
-    if (claimantEntered) {
-      return claimantEntered;
-    }
-
-    const fallback = this.legacyDefendant;
-    if (fallback) {
-      return {
-        nameKnown: fallback.nameKnown,
-        firstName: fallback.firstName,
-        lastName: fallback.lastName,
-      };
-    }
-
-    return {} as CcdClaimantEnteredDefendantDetails;
+    return (
+      this.data.possessionClaimResponse?.claimantEnteredDefendantDetails ?? ({} as CcdClaimantEnteredDefendantDetails)
+    );
   }
 
   get claimantEnteredDefendantDetailsNameKnown(): string {
@@ -167,6 +151,10 @@ export class CcdCaseModel {
 
   get defendantContactDetailsParty(): CcdDefendantParty {
     return this.data.possessionClaimResponse?.defendantContactDetails?.party ?? ({} as CcdDefendantParty);
+  }
+
+  get defendantContactDetailsPartyEmailAddress(): string | undefined {
+    return this.defendantContactDetailsParty.emailAddress ?? undefined;
   }
 
   get defendantContactDetailsPartyAddress(): CcdCaseAddress | undefined {
@@ -240,6 +228,22 @@ export class CcdCaseModel {
 
   get defendantResponsesContactByPost(): string | undefined {
     return this.defendantResponses?.contactByPost ?? undefined;
+  }
+
+  get defendantResponsesPreferenceType(): string | undefined {
+    return this.defendantResponses?.preferenceType ?? undefined;
+  }
+
+  get defendantResponsesLandlordLicensed(): string | undefined {
+    return this.defendantResponses?.landlordLicensed ?? undefined;
+  }
+
+  get introGroundsIntroductoryDemotedOrOtherGrounds(): string[] {
+    return this.data.introGrounds_IntroductoryDemotedOrOtherGrounds ?? [];
+  }
+
+  get secureGroundsWalesDiscretionaryGrounds(): string[] {
+    return this.data.secureGroundsWales_DiscretionaryGrounds ?? [];
   }
 
   get defendantContactDetailsPartyPhoneNumber(): string | undefined {
