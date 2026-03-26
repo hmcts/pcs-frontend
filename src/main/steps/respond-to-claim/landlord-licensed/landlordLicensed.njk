@@ -1,26 +1,45 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
 {% block mainContent %}
+
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Licensed landlord (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for Licensed landlord step.</p>
-  <form method="post" action="{{ url }}">
+
+  {% if caption %}
+    <span class="govuk-caption-l">{{ caption }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+
+  <p class="govuk-body">{{ paragraph | safe }}</p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
+
     <div class="govuk-button-group">
-      {{ govukButton({
-        text: continue,
-        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      {{ govukButton({ 
+        text: saveAndContinue,
+        attributes: { name: 'action', value: 'continue' }
       }) }}
-      {{ govukButton({
+      {{ govukButton({ 
         text: saveForLater,
         classes: 'govuk-button--secondary',
-        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
+        attributes: { name: 'action', value: 'saveForLater' }
       }) }}
     </div>
     {{ csrfProtection(csrfToken) }}
   </form>
+
 {% endblock %}
+
