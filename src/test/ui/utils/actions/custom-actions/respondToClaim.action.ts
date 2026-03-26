@@ -214,7 +214,7 @@ export class RespondToClaimAction implements IAction {
       option: repaymentsData.repaymentOption,
     });
 
-    if (repaymentsData.repaymentOption === 'Yes') {
+    if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
       await performAction('inputText', inputLabel, repaymentsData.repaymentInfo);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
