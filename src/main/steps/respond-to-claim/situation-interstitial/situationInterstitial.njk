@@ -30,16 +30,6 @@
 
   <form method="post" action="{{ url }}" novalidate>
     {{ csrfProtection(csrfToken) }}
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: saveAndContinue,
-        attributes: { type: 'submit', name: 'action', value: 'continue' }
-      }) }}
-      {{ govukButton({
-        text: saveForLater,
-        classes: 'govuk-button--secondary',
-        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
-      }) }}
-    </div>
+    {{ stepButtons(saveAndContinue, saveForLater) }}
   </form>
 {% endblock %}
