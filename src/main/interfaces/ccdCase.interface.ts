@@ -76,17 +76,6 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
-export interface CcdLegacyDefendant {
-  nameKnown?: YesNoValue;
-  firstName?: string;
-  lastName?: string;
-}
-
-export interface CcdLegacyDefendantCollectionItem {
-  value?: CcdLegacyDefendant;
-  id?: string | null;
-}
-
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
   freeLegalAdvice?: string;
@@ -101,6 +90,7 @@ export interface CcdDefendantResponses {
   contactByText?: YesNoValue;
   preferenceType?: ContactPreference;
   landlordRegistered?: YesNoNotSureValue;
+  landlordLicensed?: YesNoNotSureValue;
 }
 
 export interface PossessionClaimResponse {
@@ -120,8 +110,6 @@ export interface CcdCaseData {
   overriddenClaimantName?: string;
   defendantName?: string;
   defendantAddress?: string;
-  defendant1?: CcdLegacyDefendant;
-  additionalDefendants?: CcdLegacyDefendantCollectionItem[];
   rentArrears_Total?: string;
   introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
   secureGroundsWales_DiscretionaryGrounds?: string[];

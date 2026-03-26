@@ -72,6 +72,7 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial',
     'landlord-registered',
     'landlord-licensed',
+    'written-terms',
     'tenancy-type-details',
     'tenancy-date-unknown',
     'tenancy-date-details',
@@ -172,12 +173,17 @@ export const flowConfig: JourneyFlowConfig = {
       ],
       defaultNext: 'tenancy-type-details',
     },
-
     'landlord-registered': {
       defaultNext: 'landlord-licensed',
+      previousStep: 'dispute-claim-interstitial',
     },
     'landlord-licensed': {
+      defaultNext: 'written-terms',
+      previousStep: 'landlord-registered',
+    },
+    'written-terms': {
       defaultNext: 'tenancy-type-details',
+      previousStep: 'landlord-licensed',
     },
     'tenancy-type-details': {
       routes: [
@@ -193,7 +199,7 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: async (req: Request) => {
         const welshProperty = await isWelshProperty(req);
         if (welshProperty) {
-          return 'landlord-registered';
+          return 'written-terms';
         }
         return 'dispute-claim-interstitial';
       },
