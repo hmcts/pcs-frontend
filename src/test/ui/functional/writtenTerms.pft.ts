@@ -1,4 +1,4 @@
-import { landlordLicensed , writtenTerms } from '../data/page-data';
+import { landlordLicensed, writtenTerms } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function writtenTermsErrorValidation(): Promise<void> {
