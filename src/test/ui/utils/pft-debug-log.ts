@@ -68,7 +68,7 @@ export async function pftDebugReport(options: {
 
   console.log(`[PFT] page: ${truncateForLog(options.pageLabel, 200)}`);
   console.log(`[PFT] url: ${shortUrl(options.page.url())}`);
-  console.log(`[PFT] check: ${options.category}`);
+  console.log(`[PFT check: ${options.category}]`);
   console.log(`[PFT] expected: ${truncateForLog(options.expected)}`);
   console.log(`[PFT] actual: ${truncateForLog(options.actual)}`);
   console.log(`[PFT] screenshot: ${screenshotPath}`);
