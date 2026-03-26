@@ -20,6 +20,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     heading: 'heading',
     caption: 'caption',
+    paragraph: 'dependantChildrenParagraph',
   },
   beforeRedirect: async req => {
     const dependantChildren: string = req.body?.dependantChildren;
@@ -79,7 +80,6 @@ export const step: StepDefinition = createFormStep({
       legendClasses: 'govuk-visually-hidden',
       translationKey: {
         label: 'heading',
-        hint: 'dependantChildrenHint',
       },
       errorMessage: 'errors.dependantChildren',
       options: [
@@ -96,9 +96,7 @@ export const step: StepDefinition = createFormStep({
                 label: 'dependantChildrenDetailsLabel',
                 hint: 'dependantChildrenDetailsHint',
               },
-              attributes: {
-                rows: 5,
-              },
+              labelClasses: 'govuk-label--s',
               errorMessage: 'errors.dependantChildrenDetails',
             },
           },
