@@ -1,6 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
@@ -18,12 +18,7 @@
   <h1 class="govuk-heading-l">Repayments agreed (Placeholder)</h1>
   <p class="govuk-body">dummy page</p>
   <form method="post" action="{{ url }}">
-  <div class="govuk-button-group">
-      {{ govukButton({
-        text: t('continue', { ns: 'common' }),
-        attributes: { type: 'submit', name: 'action', value: 'continue' }
-      }) }}
-  </div>
+  {{ stepButtons(continue) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
