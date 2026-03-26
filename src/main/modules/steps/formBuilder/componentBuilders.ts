@@ -75,7 +75,7 @@ export function buildComponentConfig(
       component.attributes = charCountAttributes;
       component.label = {
         text: label,
-        isPageHeading: field.isPageHeading || isFirstField,
+        isPageHeading: field.isPageHeading,
         classes: field.labelClasses,
       };
 
