@@ -36,8 +36,9 @@ import { step as startNow } from './start-now';
 import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
-import { step as universalCredit } from './universal-credit';
+import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 import { step as uploadDocs } from './upload-docs';
+import { step as writtenTerms } from './written-terms';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -52,6 +53,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
   'landlord-licensed': landlordLicensed,
+  'written-terms': writtenTerms,
   'tenancy-type-details': tenancyTypeDetails,
   'tenancy-date-unknown': tenancyDateUnknown,
   'tenancy-date-details': tenancyDateDetails,
@@ -74,7 +76,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'exceptional-hardship': exceptionalHardship,
   'income-and-expenditure': incomeAndExpenditure,
   'regular-income': regularIncome,
-  'have-you-applied-for-universal-credit': universalCredit,
+  'have-you-applied-for-universal-credit': haveYouAppliedForUniversalCredit,
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,
   'what-other-regular-expenses-do-you-have': regularExpenses,
