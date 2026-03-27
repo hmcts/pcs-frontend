@@ -27,6 +27,8 @@ export const tenancyDateDetails = {
   monthMissingErrorMessage: `Your tenancy start date must include a month`,
   yearMissingErrorMessage: `Your tenancy start date must include a year`,
   futureDateErrorMessage: `Tenancy start date must be in the past`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `tenancy-date-details`,
 };
 
 export function convertDateFormatTenancyDate(dateString: string): string {

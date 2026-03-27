@@ -14,4 +14,6 @@ export const defendantNameCapture = {
   enterYourLastNameErrorMessage: `Enter your last name`,
   enterFirstNameMaxLengthErrorMessage: `First name must be 60 characters or less`,
   enterLastNameMaxLengthErrorMessage: `Last name must be 60 characters or less`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `defendant-name-capture`,
 };
