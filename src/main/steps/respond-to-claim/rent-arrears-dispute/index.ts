@@ -7,7 +7,7 @@ export const step: StepDefinition = createFormStep({
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: `${__dirname}/rentArrears.njk`,
+  customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
     heading: 'heading',
     caption: 'caption',
