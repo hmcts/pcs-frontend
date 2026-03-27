@@ -46,32 +46,33 @@ test.beforeEach(async ({ page }, testInfo) => {
   // Tenancy start date logic (independent)
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
-  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
-    testInfo.title.includes(type)
-  );
+    const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
+      testInfo.title.includes(type)
+    );
 
-  switch (tenancyKey) {
-    case 'Introductory':
-      process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
-      process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
-      break;
+    switch (tenancyKey) {
+      case 'Introductory':
+        process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+        process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
+        break;
 
-    case 'Demoted':
-      process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
-      process.env.GROUNDS = 'RENT_ARREARS';
-      break;
+      case 'Demoted':
+        process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
+        process.env.GROUNDS = 'RENT_ARREARS';
+        break;
 
-    case 'Assured':
-      process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
-      break;
+      case 'Assured':
+        process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
+        break;
 
-    case 'Secure':
-      process.env.TENANCY_TYPE = 'SECURE_TENANCY';
-      break;
+      case 'Secure':
+        process.env.TENANCY_TYPE = 'SECURE_TENANCY';
+        break;
 
-    case 'Flexible':
-      process.env.TENANCY_TYPE = 'FLEXIBLE_TENANCY';
-      break;
+      case 'Flexible':
+        process.env.TENANCY_TYPE = 'FLEXIBLE_TENANCY';
+        break;
+    }
   }
 
   if (testInfo.title.includes('@noDefendants')) {

@@ -23,8 +23,7 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
 } from '../../../data/page-data';
-import { formatCurrency } from '../../common/string.utils';
-import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
+import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
@@ -301,9 +300,8 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
     }
     await performAction('clickButton', rentArrears.saveAndContinueButton);
-    
   }
-  
+
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
     const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
     const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
