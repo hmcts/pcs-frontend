@@ -1,7 +1,8 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
@@ -21,16 +22,7 @@
         {% endif %}
       {% endif %}
     {% endfor %}
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: t('buttons.saveAndContinue', { ns: 'common' }),
-        attributes: { type: 'submit', name: 'action', value: 'continue' }
-      }) }}
-      {{ govukButton({
-        text: t('buttons.saveForLater', { ns: 'common' }),
-        classes: "govuk-button--secondary",
-        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
-      }) }}
-    </div>
+    {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}

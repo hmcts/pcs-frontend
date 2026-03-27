@@ -1,10 +1,12 @@
 {% extends "stepsTemplate.njk" %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}
@@ -188,16 +190,8 @@
       {{ postcodeFinderHtml | safe }}
     </div>
     {% endif %}
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: saveAndContinue
-      }) }}
-      {{ govukButton({
-        text: saveForLater,
-        classes: "govuk-button--secondary",
-        attributes: { name: 'action', value: 'saveForLater' }
-      }) }}
-    </div>
+    {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
   </form>
 
 

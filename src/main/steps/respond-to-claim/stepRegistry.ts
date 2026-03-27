@@ -5,7 +5,7 @@ import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
-import { step as contactPreferences } from './contact-preferences';
+import { step as contactPreferencesEmailOrPost } from './contact-preferences-email-or-post';
 import { step as contactPreferencesTelephone } from './contact-preferences-telephone';
 import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
@@ -19,6 +19,7 @@ import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
+import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
@@ -36,6 +37,7 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
+import { step as writtenTerms } from './written-terms';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -44,11 +46,13 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
-  'contact-preferences': contactPreferences,
+  'contact-preferences-email-or-post': contactPreferencesEmailOrPost,
   'contact-preferences-telephone': contactPreferencesTelephone,
   'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
+  'landlord-licensed': landlordLicensed,
+  'written-terms': writtenTerms,
   'tenancy-type-details': tenancyTypeDetails,
   'tenancy-date-unknown': tenancyDateUnknown,
   'tenancy-date-details': tenancyDateDetails,

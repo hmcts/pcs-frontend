@@ -1,10 +1,10 @@
-import { freeLegalAdvice, startNow } from '../data/page-data';
+import { dashboard, freeLegalAdvice, startNow } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function freeLegalAdviceErrorValidation(): Promise<void> {
   await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
   await performValidation('errorMessage', {
-    header: freeLegalAdvice.thereIsAProbelmErrorMessageHeader,
+    header: freeLegalAdvice.thereIsAProblemErrorMessageHeader,
     message: freeLegalAdvice.youMustSayAboutFreeLegalAdviceErrorMessage,
   });
 }
@@ -12,5 +12,5 @@ export async function freeLegalAdviceErrorValidation(): Promise<void> {
 export async function freeLegalAdviceNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', freeLegalAdvice.backLink, startNow.mainHeader);
   await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
-  await performValidation('pageNavigation', freeLegalAdvice.saveForLaterButton, 'Dashboard');
+  await performValidation('pageNavigation', freeLegalAdvice.saveForLaterButton, dashboard.mainHeader);
 }

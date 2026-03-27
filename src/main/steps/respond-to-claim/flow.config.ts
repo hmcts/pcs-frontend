@@ -27,11 +27,13 @@ export const flowConfig: JourneyFlowConfig = {
     'repayments-made',
     'repayments-agreed',
     'correspondence-address',
-    'contact-preferences',
+    'contact-preferences-email-or-post',
     'contact-preferences-telephone',
     'contact-preferences-text-message',
     'dispute-claim-interstitial',
     'landlord-registered',
+    'landlord-licensed',
+    'written-terms',
     'tenancy-type-details',
     'tenancy-date-unknown',
     'tenancy-date-details',
@@ -81,15 +83,18 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-date-of-birth': {
-      previousStep: formData =>
-        'defendant-name-confirmation' in formData ? 'defendant-name-confirmation' : 'defendant-name-capture',
+      previousStep: async (req: Request) => {
+        const nameKnown = await isDefendantNameKnown(req);
+        return nameKnown ? 'defendant-name-confirmation' : 'defendant-name-capture';
+      },
       defaultNext: 'correspondence-address',
     },
     'correspondence-address': {
       previousStep: 'defendant-date-of-birth',
-      defaultNext: 'contact-preferences',
+      defaultNext: 'contact-preferences-email-or-post',
     },
-    'contact-preferences': {
+    'contact-preferences-email-or-post': {
+      previousStep: 'correspondence-address',
       defaultNext: 'contact-preferences-telephone',
     },
     'contact-preferences-telephone': {
@@ -105,7 +110,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'dispute-claim-interstitial',
         },
       ],
-      previousStep: 'contact-preferences',
+      previousStep: 'contact-preferences-email-or-post',
     },
     'contact-preferences-text-message': {
       defaultNext: 'dispute-claim-interstitial',
@@ -123,9 +128,17 @@ export const flowConfig: JourneyFlowConfig = {
       ],
       defaultNext: 'tenancy-type-details',
     },
-
     'landlord-registered': {
+      defaultNext: 'landlord-licensed',
+      previousStep: 'dispute-claim-interstitial',
+    },
+    'landlord-licensed': {
+      defaultNext: 'written-terms',
+      previousStep: 'landlord-registered',
+    },
+    'written-terms': {
       defaultNext: 'tenancy-type-details',
+      previousStep: 'landlord-licensed',
     },
     'tenancy-type-details': {
       routes: [
@@ -138,18 +151,10 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'tenancy-date-unknown',
         },
       ],
-      previousStep: async (req: Request, formData: Record<string, unknown>) => {
-        // Check formData to see which path was actually taken
-        // This honors the actual journey path even if case data changes mid-journey
-        if ('landlord-registered' in formData) {
-          return 'landlord-registered';
-        }
-
-        // Fallback: check current case data for new journeys
-
+      previousStep: async (req: Request) => {
         const welshProperty = await isWelshProperty(req);
         if (welshProperty) {
-          return 'landlord-registered';
+          return 'written-terms';
         }
         return 'dispute-claim-interstitial';
       },
