@@ -12,4 +12,7 @@ export function formatCurrency(value: number | string): string {
     throw new Error(`Invalid currency value: ${value}`);
   }
   return `£${(Number(value) / 100).toFixed(2)}`;
+  
+export function formatTextToLowercaseSeparatedBySpace(value: string): string {
+  return value.toLowerCase().replace(/_/g, ' ').trim();
 }

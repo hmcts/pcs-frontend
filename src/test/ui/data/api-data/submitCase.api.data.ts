@@ -1,5 +1,8 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export const submitCaseApiData = {
   submitCaseEventName: 'resumePossessionClaim',
+  //Introductory and Demoted tenancy with Tenancy Licence date known for Rent arrears only
   get submitCasePayload() {
     return {
       legislativeCountry: 'England',
@@ -83,7 +86,7 @@ export const submitCaseApiData = {
           id: null,
         },
       ],
-      tenancy_TypeOfTenancyLicence: 'DEMOTED_TENANCY',
+      tenancy_TypeOfTenancyLicence: process.env.TENANCY_TYPE,
       tenancy_TenancyLicenceDate: '2026-02-10',
       tenancy_TenancyLicenceDocuments: [],
       showIntroductoryDemotedOtherGroundReasonPage: 'Yes',
