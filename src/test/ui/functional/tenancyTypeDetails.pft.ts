@@ -2,6 +2,12 @@ import { dashboard, disputeClaimInterstitial, tenancyTypeDetails } from '../data
 import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
+let _backNavigationHeader: string | null = null;
+
+export function setTenancyTypeDetailsBackNavigation(header: string): void {
+  _backNavigationHeader = header;
+}
+
 export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
   //mandatory radio button selection
   await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
@@ -20,11 +26,9 @@ export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
 
 export async function tenancyTypeDetailsNavigationTests(): Promise<void> {
   if (claimantsName) {
-    await performValidation(
-      'pageNavigation',
-      tenancyTypeDetails.backLink,
-      disputeClaimInterstitial.getMainHeader(claimantsName)
-    );
+    const backHeader = _backNavigationHeader ?? disputeClaimInterstitial.getMainHeader(claimantsName);
+    _backNavigationHeader = null;
+    await performValidation('pageNavigation', tenancyTypeDetails.backLink, backHeader);
   }
   await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
   await performValidation('pageNavigation', tenancyTypeDetails.saveForLaterButton, dashboard.mainHeader);
