@@ -13,10 +13,12 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   freeLegalAdvice,
+  installmentPayments,
   nonRentArrearsDispute,
   rentArrearsDispute,
   repaymentsAgreed,
   repaymentsMade,
+  situationInterstitialScreen,
   startNow,
   tenancyDateDetails,
   tenancyDetails,
@@ -101,7 +103,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
+    //This is a placeholder page
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @noDefendants @regression', async () => {
@@ -142,6 +157,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @noDefendants @regression', async () => {
@@ -188,9 +216,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @noDefendants @regression', async () => {
@@ -233,10 +265,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.yesRadioOption,
       repaymentInfo: repaymentsMade.detailsTextInput,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
+    });
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute @noDefendants @regression', async () => {
@@ -279,9 +316,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
   });
 
   test('England - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @noDefendants @regression', async () => {
@@ -316,6 +357,18 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterTenancyStartDetailsUnKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -359,9 +412,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
+    });
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
@@ -401,6 +459,18 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - No - RentArrearsDispute @regression', async () => {
@@ -443,9 +513,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - RentArrearsDispute @regression', async () => {
@@ -485,9 +559,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
   });
 
   test('England - RentArrears - NoticeServed - No NoticeDateProvided - No - RentArrearsDispute @regression', async () => {
@@ -527,8 +605,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 });
