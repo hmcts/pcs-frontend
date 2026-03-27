@@ -24,5 +24,6 @@ export async function tenancyTypeDetailsNavigationTests(): Promise<void> {
     tenancyTypeDetails.backLink,
     disputeClaimInterstitial.getMainHeader(claimantsName)
   );
+  await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
   await performValidation('pageNavigation', tenancyTypeDetails.saveForLaterButton, dashboard.mainHeader);
 }
