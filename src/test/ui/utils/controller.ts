@@ -40,7 +40,7 @@ async function detectPageNavigation(): Promise<boolean> {
   if (!startAxeAudit && executor.page.url().includes('start-now')) {
     startAxeAudit = true;
   }
-  if (!startFunctionalTests && executor.page.url().includes('free-legal-advice')) {
+  if (!startFunctionalTests && executor.page.url().includes('start-now')) {
     startFunctionalTests = true;
   }
   const pageNavigated = currentUrl !== previousUrl;

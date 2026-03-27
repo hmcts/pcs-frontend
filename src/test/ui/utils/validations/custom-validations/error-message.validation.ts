@@ -5,6 +5,7 @@ import { Page } from '@playwright/test';
 
 import { IValidation, validationData, validationRecord } from '../../interfaces';
 import { pftDebugReport } from '../../pft-debug-log';
+import { attachValidationFailureScreenshot } from '../../validation-failure-attachment';
 
 type ValidationResult = {
   pageUrl: string;
@@ -104,6 +105,10 @@ export class ErrorMessageValidation implements IValidation {
 
     const pageUrl = page.url();
     const pageName = await ErrorMessageValidation.getPageNameFromUrl(pageUrl, page);
+
+    if (!passed) {
+      await attachValidationFailureScreenshot(page, 'error-messages', pageName);
+    }
 
     await pftDebugReport({
       page,

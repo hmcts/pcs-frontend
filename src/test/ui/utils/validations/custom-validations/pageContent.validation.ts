@@ -6,6 +6,7 @@ import { Page } from '@playwright/test';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { IValidation } from '../../interfaces';
 import { pftDebugReport, truncateForLog } from '../../pft-debug-log';
+import { attachValidationFailureScreenshot } from '../../validation-failure-attachment';
 
 const ELEMENT_TYPES = [
   'Button',
@@ -140,6 +141,7 @@ export class PageContentValidation implements IValidation {
     const pageData = await this.getPageData(pageName);
 
     if (!pageData) {
+      await attachValidationFailureScreenshot(page, 'page-content', pageName);
       await pftDebugReport({
         page,
         pageLabel: pageName,
@@ -182,6 +184,10 @@ export class PageContentValidation implements IValidation {
         : failed.length === 0
           ? `All ${total} matched (visible)`
           : `${failed.length} not visible: ${failed.map(f => `${f.element} → "${truncateForLog(f.expected, 120)}"`).join('; ')}`;
+
+    if (failed.length > 0) {
+      await attachValidationFailureScreenshot(page, 'page-content', pageName);
+    }
 
     await pftDebugReport({
       page,

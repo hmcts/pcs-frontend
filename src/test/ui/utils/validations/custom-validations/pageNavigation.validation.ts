@@ -6,6 +6,7 @@ import { Page, expect } from '@playwright/test';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 import { pftDebugReport } from '../../pft-debug-log';
+import { attachValidationFailureScreenshot } from '../../validation-failure-attachment';
 
 type NavigationTestResult = {
   pageUrl: string;
@@ -121,6 +122,8 @@ export class PageNavigationValidation implements IValidation {
         hasPFTFile,
       });
 
+      await attachValidationFailureScreenshot(page, 'page-navigation', pageName);
+
       await pftDebugReport({
         page,
         pageLabel: pageName,
@@ -182,6 +185,8 @@ export class PageNavigationValidation implements IValidation {
         error: error instanceof Error ? error.message.split('\n')[0] : String(error),
         hasPFTFile,
       });
+
+      await attachValidationFailureScreenshot(page, 'page-navigation', pageName);
 
       await pftDebugReport({
         page,
