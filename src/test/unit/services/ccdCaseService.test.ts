@@ -1,7 +1,7 @@
 import config from 'config';
 
 import { HTTPError } from '../../../main/HttpError';
-import { CaseState } from '../../../main/interfaces/ccdCase.interface';
+import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '../../../main/interfaces/ccdCase.interface';
 import { http } from '../../../main/modules/http';
 import { ccdCaseService } from '../../../main/services/ccdCaseService';
 
@@ -231,6 +231,66 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(
         'Cannot Submit Response to Case, CCD Case Not found'
+      );
+    });
+  });
+
+  describe('submitGeneralApplication', () => {
+    it('throws HTTPError if case id is missing', async () => {
+      await expect(ccdCaseService.submitGeneralApplication(accessToken, { id: '', data: {} })).rejects.toThrow(
+        HTTPError
+      );
+      await expect(ccdCaseService.submitGeneralApplication(accessToken, { id: '', data: {} })).rejects.toThrow(
+        'Cannot submit general application, case ID not specified'
+      );
+    });
+
+    it('submits via a CCD event', async () => {
+      const caseId = '1234';
+      const citizenGenAppRequest: CitizenGenAppRequest = { applicationType: GenAppType.ADJOURN };
+      const ccdData: CcdCase = { id: caseId, data: { citizenGenAppRequest } };
+      const eventToken = 'event token here';
+
+      mockGet.mockResolvedValue({
+        data: {
+          token: eventToken,
+        },
+      });
+
+      mockPost.mockResolvedValue({
+        data: {},
+      });
+
+      await ccdCaseService.submitGeneralApplication(accessToken, ccdData);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/citizenCreateGenApp`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+
+      expect(mockPost).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/events`,
+        {
+          data: {
+            citizenGenAppRequest,
+          },
+          event: {
+            id: 'citizenCreateGenApp',
+            summary: 'Citizen citizenCreateGenApp summary',
+            description: 'Citizen citizenCreateGenApp description',
+          },
+          event_token: eventToken,
+          ignore_warning: false,
+        },
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
       );
     });
   });

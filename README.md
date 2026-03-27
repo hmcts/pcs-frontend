@@ -68,7 +68,7 @@ Run:
 yarn start
 ```
 
-The applications's home page will be available at http://localhost:3209
+The application's home page will be available at http://localhost:3209
 
 ### Running with Docker
 
