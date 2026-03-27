@@ -3,11 +3,14 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'YES' | 'NO' | null;
+export type YesNoValue = 'Yes' | 'No' | null;
 export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
+
+export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
+export type PenceAmount = string;
 
 export interface CcdUserCase {
   id: string;
@@ -37,6 +40,25 @@ export interface Address {
   Country?: string;
 }
 
+export interface HouseholdCircumstances {
+  shareIncomeExpenseDetails?: YesNoValue;
+  incomeFromJobs?: YesNoValue;
+  incomeFromJobsAmount?: PenceAmount;
+  incomeFromJobsFrequency?: FrequencyValue;
+  pension?: YesNoValue;
+  pensionAmount?: PenceAmount;
+  pensionFrequency?: FrequencyValue;
+  universalCredit?: YesNoValue;
+  universalCreditAmount?: PenceAmount;
+  universalCreditFrequency?: FrequencyValue;
+  ucApplicationDate?: string;
+  otherBenefits?: YesNoValue;
+  otherBenefitsAmount?: PenceAmount;
+  otherBenefitsFrequency?: FrequencyValue;
+  moneyFromElsewhere?: YesNoValue;
+  moneyFromElsewhereDetails?: string;
+}
+
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: {
@@ -61,6 +83,7 @@ export interface PossessionClaimResponse {
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
     landlordLicensed?: YesNoNotSureValue;
+    householdCircumstances?: HouseholdCircumstances;
   };
 }
 

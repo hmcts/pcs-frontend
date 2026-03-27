@@ -70,16 +70,16 @@ describe('respond-to-claim tenancy-type-details step', () => {
     });
 
     it.each([
-      ['YES', 'yes'],
-      ['NO', 'no'],
+      ['Yes', 'yes'],
+      ['No', 'no'],
       ['NOT_SURE', 'notSure'],
     ])('returns tenancyTypeConfirm=%s when CCD has %s', (ccdValue, formValue) => {
       const result = testedStep.getInitialFormData(makeReq(ccdValue));
       expect(result).toMatchObject({ tenancyTypeConfirm: formValue });
     });
 
-    it('also returns correctType when CCD value is NO and tenancyType is set', () => {
-      const result = testedStep.getInitialFormData(makeReq('NO', 'Assured shorthold'));
+    it('also returns correctType when CCD value is No and tenancyType is set', () => {
+      const result = testedStep.getInitialFormData(makeReq('No', 'Assured shorthold'));
       expect(result).toEqual({
         tenancyTypeConfirm: 'no',
         'tenancyTypeConfirm.correctType': 'Assured shorthold',
@@ -99,8 +99,8 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
   describe('beforeRedirect', () => {
     it.each([
-      ['yes', 'YES'],
-      ['no', 'NO'],
+      ['yes', 'Yes'],
+      ['no', 'No'],
       ['notSure', 'NOT_SURE'],
       ['maybe', undefined],
       [undefined, undefined],

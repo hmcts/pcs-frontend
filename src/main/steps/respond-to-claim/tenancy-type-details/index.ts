@@ -53,14 +53,14 @@ const fieldsConfig: FormFieldConfig[] = [
 const STEP_NAME = 'tenancy-type-details';
 
 const TENANCY_TYPE_CONFIRM_TO_CCD: Record<string, TenancyTypeCorrectValue> = {
-  yes: 'YES',
-  no: 'NO',
+  yes: 'Yes',
+  no: 'No',
   notSure: 'NOT_SURE',
 };
 
 const CCD_TO_TENANCY_TYPE_CONFIRM: Record<Exclude<TenancyTypeCorrectValue, null>, string> = {
-  YES: 'yes',
-  NO: 'no',
+  Yes: 'yes',
+  No: 'no',
   NOT_SURE: 'notSure',
 };
 
@@ -111,7 +111,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     const initial: Record<string, unknown> = { tenancyTypeConfirm: formValue };
-    if (existingTenancyTypeCorrect === 'NO' && existingCorrectedTenancyType) {
+    if (existingTenancyTypeCorrect === 'No' && existingCorrectedTenancyType) {
       initial['tenancyTypeConfirm.correctType'] = existingCorrectedTenancyType;
     }
     return initial;

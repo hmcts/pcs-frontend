@@ -1,0 +1,15 @@
+{
+  "caption": "Responding to the possession claim",
+  "pageTitle": "Income and expenses",
+  "infoParagraph1": "Details about your income and expenses can be used by a judge to reach a decision on your case, and also to decide how much you could afford to repay if you have rent arrears.",
+  "infoParagraph2": "On the day of the hearing, there may be a duty adviser at the court who can give you advice and represent you for free. They can also use this information to see if there's any additional benefits or support you might be entitled to.",
+  "infoParagraph3": "The claimant will be able to see your answers.",
+  "question": "Do you want to provide details of your income and expenses?",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "provideFinanceDetails": "Select if you want to provide details of your income and expenses"
+  }
+}
