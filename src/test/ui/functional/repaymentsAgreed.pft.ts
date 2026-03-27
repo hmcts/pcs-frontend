@@ -11,7 +11,7 @@ export async function repaymentsAgreedErrorValidation(): Promise<void> {
   });
   await performAction('clickRadioButton', repaymentsAgreed.yesRadioOption);
   await performValidation('elementToBeVisible', repaymentsAgreed.youCanEnterUpToHiddenHintText);
-  await performAction('inputText', repaymentsAgreed.giveDetailsHiddenHintText, overMaxLengthString);
+  await performAction('inputText', repaymentsAgreed.giveDetailsHiddenTextLabel, overMaxLengthString);
   await performValidation('elementToBeVisible', repaymentsAgreed.tooManyCharacterHiddenHintText);
   await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
   await performValidation('errorMessage', {

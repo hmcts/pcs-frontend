@@ -8,7 +8,7 @@ export const repaymentsAgreed = {
   amNotSureRadioOption: `I’m not sure`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  giveDetailsHiddenHintText: `Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made`,
+  giveDetailsHiddenTextLabel: `Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made`,
   youCanEnterUpToHiddenHintText: `You can enter up to 500 characters`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   backLink: `Back`,

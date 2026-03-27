@@ -45,7 +45,7 @@ export class RespondToClaimAction implements IAction {
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
-      ['repaymentsAgreed', () => this.repaymentsMade(fieldName as actionRecord)],
+      ['repaymentsAgreed', () => this.repaymentsAgreed(fieldName as actionRecord)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
@@ -198,26 +198,30 @@ export class RespondToClaimAction implements IAction {
   private async readPaymentInterstitial(): Promise<void> {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
-
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
-    let question: string;
-    let inputLabel: string;
-    if (repaymentsData.action === 'repaymentsAgreed') {
-      question = repaymentsAgreed.getMainHeader(claimantsName);
-      inputLabel = repaymentsAgreed.giveDetailsHiddenHintText;
-    } else {
-      question = repaymentsMade.mainHeader;
-      inputLabel = repaymentsMade.giveDetailsHiddenTextLabel;
-    }
     await performAction('clickRadioButton', {
-      question,
+      question: repaymentsData.question,
       option: repaymentsData.repaymentOption,
     });
-
     if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
-      await performAction('inputText', inputLabel, repaymentsData.repaymentInfo);
+      await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  }
+
+  private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: repaymentsAgreed.getMainHeader(claimantsName),
+      option: repaymentsAgreedData.repaymentAgreedOption,
+    });
+    if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {
+      await performAction(
+        'inputText',
+        repaymentsAgreed.giveDetailsHiddenTextLabel,
+        repaymentsAgreedData.repaymentAgreedInfo
+      );
+    }
+    await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
