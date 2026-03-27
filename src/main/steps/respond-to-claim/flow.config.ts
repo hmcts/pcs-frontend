@@ -326,19 +326,13 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'repayments-made',
       routes: [
         {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ) => currentStepData?.repaymentsAgreed === 'yes' || currentStepData?.repaymentsAgreed === 'imNotSure',
+          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
+            currentStepData?.repaymentsAgreed === 'yes' || currentStepData?.repaymentsAgreed === 'imNotSure',
           nextStep: 'your-household-and-circumstances',
         },
         {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ) => currentStepData?.repaymentsAgreed === 'no',
+          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
+            currentStepData?.repaymentsAgreed === 'no',
           nextStep: 'repayments-agreed',
         },
       ],
