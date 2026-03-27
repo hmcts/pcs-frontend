@@ -292,6 +292,8 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  }
+
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
     const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
     const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
