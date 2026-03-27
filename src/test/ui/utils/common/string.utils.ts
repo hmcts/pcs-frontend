@@ -17,3 +17,7 @@ export function generateRandomString(length: number): string {
 
   return result;
 }
+
+export function formatTextToLowercaseSeparatedBySpace(value: string): string {
+  return value.toLowerCase().replace(/_/g, ' ').trim();
+}

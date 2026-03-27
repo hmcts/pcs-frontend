@@ -5,5 +5,6 @@ export const axe_exclusions = [
   '#nameConfirmation-2', //page: DefendantNameConfirmation, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#confirmTenancyDate-2', //page: tenancyStartDateKnown, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#disputeOtherParts', //page: nonRentArrearsDispute, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#tenancyTypeConfirm-2', //page: tenancyOccupationContractLicenseAgreement, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#contactByEmailOrPost', //page: contactPreferenceEmailOrPost, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
 ];
