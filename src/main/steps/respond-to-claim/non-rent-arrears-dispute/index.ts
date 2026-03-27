@@ -49,23 +49,14 @@ export const step: StepDefinition = createFormStep({
     const caseData = req.res?.locals?.validatedCase?.data;
     const response = caseData?.possessionClaimResponse?.defendantResponses;
 
-    console.log('[non-rent-arrears-dispute] getInitialFormData called');
-    console.log('[non-rent-arrears-dispute] caseData:', JSON.stringify(caseData?.possessionClaimResponse, null, 2));
-    console.log('[non-rent-arrears-dispute] response:', JSON.stringify(response, null, 2));
-    console.log('[non-rent-arrears-dispute] disputeClaim:', response?.disputeClaim);
-    console.log('[non-rent-arrears-dispute] disputeClaimDetails:', response?.disputeClaimDetails);
-
     if (!response?.disputeClaim) {
-      console.log('[non-rent-arrears-dispute] No disputeClaim found, returning empty');
       return {};
     }
 
     // Map backend enum to frontend radio value using utility
     const formValue = fromYesNoEnum(response.disputeClaim as string);
-    console.log('[non-rent-arrears-dispute] formValue from fromYesNoEnum:', formValue);
 
     if (!formValue) {
-      console.log('[non-rent-arrears-dispute] formValue is falsy, returning empty');
       return {};
     }
 
@@ -78,13 +69,10 @@ export const step: StepDefinition = createFormStep({
     if (formValue === 'yes' && response.disputeClaimDetails) {
       const trimmed = (response.disputeClaimDetails as string).trim();
       initialValues['disputeOtherParts.disputeDetails'] = trimmed || '';
-      console.log('[non-rent-arrears-dispute] Added disputeDetails:', trimmed);
     } else {
       initialValues['disputeOtherParts.disputeDetails'] = '';
-      console.log('[non-rent-arrears-dispute] Set disputeDetails to empty string');
     }
 
-    console.log('[non-rent-arrears-dispute] Returning initialValues:', JSON.stringify(initialValues, null, 2));
     return initialValues;
   },
   extendGetContent: (req: Request) => {
