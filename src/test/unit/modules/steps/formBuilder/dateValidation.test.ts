@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 
-import { getDateTranslationKey, validateDateField } from '../../../../../main/modules/steps/formBuilder/dateValidation';
+import { getDateTranslationKey, validateDateField } from '@modules/steps/formBuilder/dateValidation';
 
 describe('dateValidation', () => {
   const createMockT = (translations: Record<string, string> = {}): TFunction => {

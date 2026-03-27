@@ -1,8 +1,8 @@
 import fs, { promises as fsPromises } from 'fs';
 import path from 'path';
 
-import type { Express, NextFunction, Request, Response } from 'express';
 type ExpressRequest = Request;
+import type { Express, NextFunction, Request, Response } from 'express';
 import i18next, { type InitOptions, type TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 import { LanguageDetector, handle as i18nextHandle } from 'i18next-http-middleware';

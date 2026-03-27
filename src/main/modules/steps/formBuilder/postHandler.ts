@@ -1,15 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type {
-  BuiltFormContent,
-  ExtendGetContent,
-  FormFieldConfig,
-  TranslationKeys,
-} from '../../../interfaces/formFieldConfig.interface';
-import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
-import { getDashboardUrl } from '../../../routes/dashboard';
-import { safeRedirect303 } from '../../../utils/safeRedirect';
 import { createStepNavigation, stepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -25,6 +16,20 @@ import {
   validateForm,
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
+
+import type {
+  BuiltFormContent,
+  ExtendGetContent,
+  FormFieldConfig,
+  TranslationKeys,
+} from '@interfaces/formFieldConfig.interface';
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
+import { getDashboardUrl } from '@routes/dashboard';
+import { safeRedirect303 } from '@utils/safeRedirect';
+
+function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
+  return flowConfig?.useSessionFormData !== false;
+}
 
 export function createPostHandler(
   fields: FormFieldConfig[],
@@ -63,9 +68,10 @@ export function createPostHandler(
         throw new Error('Nunjucks environment not initialized');
       }
 
-      // Get all form data from session for cross-field validation
-      const allFormData = req.session.formData
-        ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
+      const allFormData = shouldUseSessionFormData(flowConfig)
+        ? req.session.formData
+          ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
+          : {}
         : {};
 
       // Normalize checkbox fields BEFORE validation to ensure checkbox values are arrays
@@ -130,7 +136,9 @@ export function createPostHandler(
       // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
       const { action: _, ...bodyWithoutAction } = req.body;
-      setFormData(req, stepName, bodyWithoutAction);
+      if (shouldUseSessionFormData(flowConfig)) {
+        setFormData(req, stepName, bodyWithoutAction);
+      }
 
       if (beforeRedirect) {
         try {
@@ -155,7 +163,7 @@ export function createPostHandler(
         return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
       }
 
-      const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
+      const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction as Record<string, unknown>);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

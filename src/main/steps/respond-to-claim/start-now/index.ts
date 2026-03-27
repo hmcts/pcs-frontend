@@ -1,9 +1,10 @@
 import type { Request, Response } from 'express';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, stepNavigation } from '../../../modules/steps';
-import { getDashboardUrl } from '../../../routes/dashboard';
 import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
+
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import { createGetController, stepNavigation } from '@modules/steps';
+import { getDashboardUrl } from '@routes/dashboard';
 
 const stepName = 'start-now';
 
@@ -27,7 +28,7 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       // Get next step URL and redirect
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
 
       if (!redirectPath) {
         // No next step defined - show not found page

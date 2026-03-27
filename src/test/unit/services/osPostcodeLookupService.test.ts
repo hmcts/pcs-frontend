@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 
-import { getAddressesByPostcode } from '../../../main/services/osPostcodeLookupService';
+import { getAddressesByPostcode } from '@services/osPostcodeLookupService';
 
 jest.mock('axios');
 jest.mock('config');

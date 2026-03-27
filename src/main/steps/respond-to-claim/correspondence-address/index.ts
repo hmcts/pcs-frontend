@@ -1,20 +1,18 @@
 import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
-import { arrayToString } from '../../../utils/arrayToString';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-const STEP_NAME = 'postcode-finder';
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
+import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { arrayToString } from '@utils/arrayToString';
 
-// Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
-// Session is set in extendGetContent; validation reads it via allData on POST.
-const correspondenceAddressRequired = (_formData: Record<string, unknown>, allData: Record<string, unknown>): boolean =>
-  allData.__isAddressKnown === true;
+// When no existing address is known, the template submits a hidden "no" value,
+// so the radio can be required unconditionally without using session-backed state.
+const correspondenceAddressRequired = (): boolean => true;
 
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
@@ -110,17 +108,38 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
   },
+  getInitialFormData: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const existingAddress = validatedCase?.defendantContactDetailsPartyAddress;
+
+    if (!existingAddress) {
+      return {};
+    }
+
+    if (validatedCase?.hasDefendantContactDetailsPartyAddress) {
+      return { correspondenceAddressConfirm: 'yes' };
+    }
+
+    return {
+      correspondenceAddressConfirm: 'no',
+      'correspondenceAddressConfirm.addressLine1': existingAddress.AddressLine1 || '',
+      'correspondenceAddressConfirm.addressLine2': existingAddress.AddressLine2 || '',
+      'correspondenceAddressConfirm.townOrCity': existingAddress.PostTown || '',
+      'correspondenceAddressConfirm.county': existingAddress.County || '',
+      'correspondenceAddressConfirm.postcode': existingAddress.PostCode || '',
+    };
+  },
   beforeRedirect: async req => {
     let possessionClaimResponse: PossessionClaimResponse;
-    //prepopulate address is correct
+
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
-      // Read fresh CCD data from middleware (available on both GET and POST)
-      const caseData = req.res?.locals.validatedCase?.data;
-      const prepopulateAddress = caseData?.possessionClaimResponse?.defendantContactDetails?.party?.address;
+      const validatedCase = req.res?.locals?.validatedCase;
+      const prepopulateAddress = validatedCase?.defendantContactDetailsPartyAddress;
 
       possessionClaimResponse = {
         defendantContactDetails: {
           party: {
+            addressKnown: 'YES',
             address: prepopulateAddress,
           },
         },
@@ -136,6 +155,7 @@ export const step: StepDefinition = createFormStep({
       possessionClaimResponse = {
         defendantContactDetails: {
           party: {
+            addressKnown: 'NO',
             address: {
               AddressLine1: addressLine1,
               ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
@@ -152,11 +172,18 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'correspondence-address', ['common']);
+    const getAddressValue = (fieldName: string): string => {
+      const formValue = formContent[fieldName];
+      if (typeof formValue === 'string') {
+        return formValue;
+      }
+
+      const bodyValue = req.body?.[fieldName];
+      return typeof bodyValue === 'string' ? bodyValue : '';
+    };
 
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
-
     const isAddressKnown = formattedAddressStr !== '?';
-    setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as
       | { component: { label: { text: string }; fieldset: { legend: { text: string } } } }
@@ -221,26 +248,25 @@ export const step: StepDefinition = createFormStep({
         postcodeNotFound: t('errors.postcodeNotFound'),
         selectAddress: t('errors.selectAddress'),
       },
-      // Extract nested field values for easy template access (only on POST with errors)
-      correspondenceAddressLine1: req.body?.['correspondenceAddressConfirm.addressLine1'] || '',
-      correspondenceAddressLine2: req.body?.['correspondenceAddressConfirm.addressLine2'] || '',
-      correspondenceTownOrCity: req.body?.['correspondenceAddressConfirm.townOrCity'] || '',
-      correspondenceCounty: req.body?.['correspondenceAddressConfirm.county'] || '',
-      correspondencePostcode: req.body?.['correspondenceAddressConfirm.postcode'] || '',
+      // Expose nested values for the custom template on GET and POST.
+      correspondenceAddressLine1: getAddressValue('correspondenceAddressConfirm.addressLine1'),
+      correspondenceAddressLine2: getAddressValue('correspondenceAddressConfirm.addressLine2'),
+      correspondenceTownOrCity: getAddressValue('correspondenceAddressConfirm.townOrCity'),
+      correspondenceCounty: getAddressValue('correspondenceAddressConfirm.county'),
+      correspondencePostcode: getAddressValue('correspondenceAddressConfirm.postcode'),
     };
   },
   fields: fieldsConfig,
 });
 
 function getExistingAddress(req: Request): { formattedAddress: string } {
-  // Read from res.locals.validatedCase (already fetched by caseReference middleware via START callback)
-  const caseData = req.res?.locals.validatedCase?.data;
-  const defendantContactDetails = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
-  const addressKnown = defendantContactDetails?.addressKnown;
-  const address = defendantContactDetails?.address;
+  const { hasDefendantContactDetailsPartyAddress, defendantContactDetailsPartyAddress: address } = req.res?.locals
+    ?.validatedCase ?? {
+    hasDefendantContactDetailsPartyAddress: false,
+    defendantContactDetailsPartyAddress: undefined,
+  };
 
-  // Check addressKnown field from CCD - if "YES" then address exists
-  if (addressKnown === 'YES' && address) {
+  if (hasDefendantContactDetailsPartyAddress && address) {
     const formattedAddress =
       arrayToString([
         address.AddressLine1,

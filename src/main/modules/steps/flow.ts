@@ -1,11 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
 
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import { flowConfig as respondToClaimFlowConfig } from '../../steps/respond-to-claim/flow.config';
 
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('stepDependencyCheck');
+
+function getJourneyFormData(req: Request, flowConfig: JourneyFlowConfig): Record<string, unknown> {
+  if (flowConfig.useSessionFormData === false) {
+    return {};
+  }
+
+  return req.session?.formData || {};
+}
 
 export async function getNextStep(
   req: Request,
@@ -131,14 +139,14 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
       currentStepName: string,
       currentStepData: Record<string, unknown> = {}
     ): Promise<string | null> => {
-      const formData = req.session?.formData || {};
+      const formData = getJourneyFormData(req, flowConfig);
       const caseReference = req.res?.locals.validatedCase?.id;
       const nextStep = await getNextStep(req, currentStepName, flowConfig, formData, currentStepData);
       return nextStep ? getStepUrl(nextStep, flowConfig, caseReference) : null;
     },
 
     getBackUrl: async (req: Request, currentStepName: string): Promise<string | null> => {
-      const formData = req.session?.formData || {};
+      const formData = getJourneyFormData(req, flowConfig);
       const caseReference = req.res?.locals.validatedCase?.id;
       const previousStep = await getPreviousStep(req, currentStepName, flowConfig, formData);
       return previousStep ? getStepUrl(previousStep, flowConfig, caseReference) : null;
@@ -161,7 +169,7 @@ export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = re
       return next();
     }
 
-    const formData = req.session?.formData || {};
+    const formData = getJourneyFormData(req, flowConfig);
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
     if (missingDependency) {

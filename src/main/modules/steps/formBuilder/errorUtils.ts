@@ -1,12 +1,13 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
-import { getDashboardUrl } from '../../../routes/dashboard';
 import { getRequestLanguage } from '../../i18n';
 import { getTranslationFunction } from '../i18n';
 
 import type { DateFieldError } from './dateValidation';
+
+import type { FormFieldConfig, TranslationKeys } from '@interfaces/formFieldConfig.interface';
+import { getDashboardUrl } from '@routes/dashboard';
 
 export interface ErrorSummaryData {
   titleText: string;
