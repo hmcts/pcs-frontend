@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 export const submitCaseApiData = {
   submitCaseEventName: 'resumePossessionClaim',
   //Introductory and Demoted tenancy with Tenancy Licence date known for Rent arrears only
@@ -338,5 +336,6 @@ export const submitCaseApiData = {
       },
     };
   },
+
   submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };
