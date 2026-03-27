@@ -113,31 +113,35 @@ describe('getPreviousPageForArrears', () => {
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });
 
-    it('returns tenancy-date-details when notice not served and tenancy start date is unknown', async () => {
+    it('returns tenancy-date-unknown when notice not served and tenancy start date is unknown', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(false);
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-unknown');
     });
 
-    it('returns tenancy-date-details when notice not served, even if date provided', async () => {
+    it('returns tenancy-date-details when notice not served, even if date provided, and start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true); // Date provided but notice not served
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });
 
-    it('returns tenancy-date-details when notice not served, user said no', async () => {
+    it('returns tenancy-date-details when notice not served, user said no, and start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'no' } };
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });
 
-    it('returns tenancy-date-details when notice not served, user said yes', async () => {
+    it('returns tenancy-date-details when notice not served, user said yes, and start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
       mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
@@ -161,12 +165,13 @@ describe('getPreviousPageForArrears', () => {
       expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
     });
 
-    it('returns tenancy-date-details when session is undefined and notice not served', async () => {
+    it('returns tenancy-date-unknown when session is undefined and notice not served and start date unknown', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(false);
       mockReq = {}; // No session
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-unknown');
     });
   });
 
@@ -195,10 +200,11 @@ describe('getPreviousPageForArrears', () => {
       expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-given');
     });
 
-    it('handles no notice served scenario', async () => {
+    it('handles no notice served scenario with known tenancy start date', async () => {
       // Real scenario: CCD has notice=No, goes straight to rent-arrears-dispute from tenancy-date-details
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });
