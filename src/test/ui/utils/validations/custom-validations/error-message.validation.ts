@@ -277,11 +277,6 @@ export class ErrorMessageValidation implements IValidation {
       }
     }
 
-    // Throw error if there were failures
-    if (failedPages.size > 0 && ErrorMessageValidation.shouldThrowError) {
-      throw new Error(`Error message validation failed: ${failedPages.size} page(s) have failures`);
-    }
-
     if (failedPages.size > 0) {
       console.log('❌ ERROR MESSAGE VALIDATIONS FAILED\n');
     } else if (passedPages.size > 0) {
@@ -291,6 +286,11 @@ export class ErrorMessageValidation implements IValidation {
     }
 
     ErrorMessageValidation.clearResults();
+
+    // Throw after clearing so failures don't cascade into subsequent tests
+    if (failedPages.size > 0 && ErrorMessageValidation.shouldThrowError) {
+      throw new Error(`Error message validation failed: ${failedPages.size} page(s) have failures`);
+    }
   }
 
   static clearResults(): void {

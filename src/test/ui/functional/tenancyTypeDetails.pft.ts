@@ -19,11 +19,13 @@ export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
 }
 
 export async function tenancyTypeDetailsNavigationTests(): Promise<void> {
-  await performValidation(
-    'pageNavigation',
-    tenancyTypeDetails.backLink,
-    disputeClaimInterstitial.getMainHeader(claimantsName)
-  );
+  if (claimantsName) {
+    await performValidation(
+      'pageNavigation',
+      tenancyTypeDetails.backLink,
+      disputeClaimInterstitial.getMainHeader(claimantsName)
+    );
+  }
   await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
   await performValidation('pageNavigation', tenancyTypeDetails.saveForLaterButton, dashboard.mainHeader);
 }
