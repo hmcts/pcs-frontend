@@ -35,16 +35,23 @@ function getDaysInMonth(month: number, year: number): number {
 
 function getDateErrorMessage(
   t?: TFunction,
-  partSpecificKey?: 'futureDate',
+  partSpecificKey?: 'futureDate' | 'pastDate',
   translations?: Record<string, string>
 ): string {
   if (partSpecificKey === 'futureDate' && translations?.dateFutureDate) {
     return translations.dateFutureDate;
   }
+  if (partSpecificKey === 'pastDate' && translations?.datePastDate) {
+    return translations.datePastDate;
+  }
   if (!t) {
     return DEFAULT_DATE_ERROR_MESSAGE;
   }
-  const key = partSpecificKey === 'futureDate' ? 'errors.date.futureDate' : 'errors.date.notRealDate';
+  const keyMap: Record<string, string> = {
+    futureDate: 'errors.date.futureDate',
+    pastDate: 'errors.date.pastDate',
+  };
+  const key = (partSpecificKey && keyMap[partSpecificKey]) || 'errors.date.notRealDate';
   const translated = t(key);
   return translated !== key ? translated : DEFAULT_DATE_ERROR_MESSAGE;
 }
@@ -182,16 +189,17 @@ function validateCompleteDate(
 /**
  * Checks if the date is in the future (when noFutureDate is true)
  */
-function checkFutureDate(
+function checkDateRestrictions(
   day: string,
   month: string,
   year: string,
   noFutureDate: boolean,
   noCurrentDate: boolean,
+  noPastDate: boolean,
   t?: TFunction,
   translations?: Record<string, string>
 ): string | null {
-  if (!noFutureDate) {
+  if (!noFutureDate && !noPastDate) {
     return null;
   }
 
@@ -208,9 +216,15 @@ function checkFutureDate(
   today.setHours(0, 0, 0, 0);
   inputDate.setHours(0, 0, 0, 0);
 
-  const isInvalid = noCurrentDate ? inputDate >= today : inputDate > today;
-  if (isInvalid) {
-    return getDateErrorMessage(t, 'futureDate', translations);
+  let isInvalid = false;
+
+  if (noFutureDate) {
+    // noCurrentDate determines whether to include todays date in the valid range
+    isInvalid = noCurrentDate ? inputDate >= today : inputDate > today;
+    return isInvalid ? getDateErrorMessage(t, 'futureDate', translations) : null;
+  } else if (noPastDate) {
+    isInvalid = noCurrentDate ? inputDate <= today : inputDate < today;
+    return isInvalid ? getDateErrorMessage(t, 'pastDate', translations) : null;
   }
 
   return null;
@@ -230,6 +244,7 @@ export interface DateFieldError {
  * @param t - Translation function for error messages
  * @param noFutureDate - If true, disallows future and current dates
  * @param noCurrentDate - If true, disallows current/todays date
+ * @param noPastDate - If true, disallows past dates
  * @param translations - Optional translations object for error messages
  * @returns DateFieldError object if validation fails, null if valid
  */
@@ -241,6 +256,7 @@ export function validateDateField(
   t?: TFunction,
   noFutureDate = false,
   noCurrentDate = true,
+  noPastDate = false,
   translations?: Record<string, string>
 ): DateFieldError | null {
   const hasDay = !!day;
@@ -337,7 +353,16 @@ export function validateDateField(
   }
 
   // Check for future dates if restricted
-  const futureDateError = checkFutureDate(day, month, year, noFutureDate, noCurrentDate, t, translations);
+  const futureDateError = checkDateRestrictions(
+    day,
+    month,
+    year,
+    noFutureDate,
+    noCurrentDate,
+    noPastDate,
+    t,
+    translations
+  );
   if (futureDateError) {
     // Generic error - anchor to day
     return {
@@ -360,6 +385,7 @@ export function getDateTranslationKey(nestedKey: string): string | null {
     missingOne: 'dateMissingOne',
     missingTwo: 'dateMissingTwo',
     futureDate: 'dateFutureDate',
+    pastDate: 'datePastDate',
   };
   return keyMap[nestedKey] || null;
 }

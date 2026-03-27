@@ -5,4 +5,4 @@ export { isRentArrearsClaim } from './isRentArrearsClaim';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getPreviousPageForArrears } from './journeyHelpers';
-export { formatDatePartsToISODate } from './dateUtils';
+export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';

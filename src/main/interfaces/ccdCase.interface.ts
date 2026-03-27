@@ -58,6 +58,12 @@ export interface PossessionClaimResponse {
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
     landlordLicensed?: YesNoNotSureValue;
+    householdCircumstances?: {
+      alternativeAccommodation?: YesNoNotSureValue;
+      alternativeAccommodationTransferDate?: string;
+      otherTenants?: YesNoValue;
+      otherTenantsDetails?: string;
+    };
   };
 }
 
