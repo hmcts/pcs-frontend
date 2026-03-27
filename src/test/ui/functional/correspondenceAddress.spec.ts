@@ -16,6 +16,8 @@ const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+  process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.NOTICE_SERVED = 'NO';
   } else {
