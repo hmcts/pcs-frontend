@@ -1,14 +1,14 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
-
 import type { Page } from '@playwright/test';
-import { test } from '@playwright/test';
 
 import { enable_pft_debug_log } from '../../../../playwright.config';
 
 /**
- * Opt-in PFT debug: page label, check type, expected vs actual, and a screenshot.
+ * Opt-in PFT debug: console lines for page, url, expected, actual (no filesystem paths).
  * Enable with ENABLE_PFT_DEBUG_LOG=true or PFT_DEBUG_LOG=true.
+ *
+ * Failure screenshots for Allure / CI are attached via `validation-failure-attachment.ts`
+ * (`test.info().attach`), stored under each run’s `test-results/<test-output-dir>/validation-failures/...`
+ * locally and on Jenkins (same workspace-relative layout when you archive `test-results` or open HTML report).
  */
 function isEnabled(): boolean {
   const raw = enable_pft_debug_log || 'false';
@@ -44,38 +44,9 @@ export function truncateForLog(s: string, max = 800): string {
 
 export type PftDebugCategory = 'page content' | 'error messages' | 'page navigation';
 
-/** Output subfolder under `pft-debug/` for screenshots */
-function pftDebugFolderForCategory(category: PftDebugCategory): string {
-  switch (category) {
-    case 'page content':
-      return 'pagecontentvalidation';
-    case 'error messages':
-      return 'pageerrorvalidation';
-    case 'page navigation':
-      return 'pagenavigation';
-    default: {
-      return category;
-    }
-  }
-}
-
-/** Strip characters unsafe or awkward in filenames; keep readable page identifiers */
-function filenameSafePageLabel(label: string): string {
-  const raw = label.trim() || 'page';
-  const safe = raw
-    .replace(/^https?:\/\//i, '')
-    .replace(/[/\\?%*:|"<>]/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-  const truncated = safe.slice(0, 80);
-  return truncated || 'page';
-}
-
 /**
- * Writes a screenshot under this test's output dir, e.g.
- * `test-results/.../pft-debug/pagecontentvalidation/`, `.../pageerrorvalidation/`, `.../pagenavigation/`.
- * Also prints page, check type, expected, actual, and screenshot path.
+ * Prints a single console block when PFT debug is enabled. Does not write screenshots or log paths
+ * (avoids misleading absolute paths in Allure/Jenkins). Use `attachValidationFailureScreenshot` for failure PNGs on the test report.
  */
 export async function pftDebugReport(options: {
   page: Page;
@@ -87,26 +58,13 @@ export async function pftDebugReport(options: {
   if (!isEnabled()) {
     return;
   }
-  let screenshotPath: string;
-  try {
-    const folder = pftDebugFolderForCategory(options.category);
-    const fileName = `pft-${filenameSafePageLabel(options.pageLabel)}-${Date.now()}.png`;
-    const out = test.info().outputPath('pft-debug', folder, fileName);
-    await fs.mkdir(path.dirname(out), { recursive: true });
-    await options.page.screenshot({ path: out, fullPage: true });
-    screenshotPath = out;
-  } catch {
-    screenshotPath = '(screenshot failed)';
-  }
 
-  // One write so Playwright’s list reporter cannot interleave nested test.step() lines between PFT lines.
   const tag = `[PFT check: ${options.category}]`;
   const block = [
     `${tag} page: ${truncateForLog(options.pageLabel, 200)}`,
     `${tag} url: ${shortUrl(options.page.url())}`,
     `${tag} expected: ${truncateForLog(options.expected)}`,
     `${tag} actual: ${truncateForLog(options.actual)}`,
-    `${tag} screenshot: ${screenshotPath}`,
   ].join('\n');
   console.log(block);
 }

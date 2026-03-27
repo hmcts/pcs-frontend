@@ -318,7 +318,7 @@ export class PageContentValidation implements IValidation {
     }
 
     if (failedPages.size > 0) {
-      console.log('\n❌ VALIDATION FAILED:');
+      console.log('\n❌ FAILED PAGE CONTENT VALIDATION:');
       for (const [pageName, pageFailures] of failedPages) {
         console.log(`   Page: ${pageName}`);
         let pageFailureCount = 0;

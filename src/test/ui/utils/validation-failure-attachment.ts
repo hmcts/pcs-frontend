@@ -52,8 +52,10 @@ function filenameSafe(label: string): string {
 }
 
 /**
- * Saves a full-page screenshot and attaches it to the Playwright test report (Allure, HTML, etc.).
- * Independent of PFT debug logging; gated only by the same env flags as each validation type.
+ * On validation failure only: full-page PNG + `test.info().attach` so images appear in Playwright HTML report and Allure
+ * (no absolute paths in console). Files also sit under each run’s output dir:
+ * `test-results/<test-id>/validation-failures/<kind>/` — locally under the repo, on Jenkins under the job workspace
+ * (archive `test-results` or rely on Allure attachments which embed/copy for the report).
  */
 export async function attachValidationFailureScreenshot(
   page: Page,
