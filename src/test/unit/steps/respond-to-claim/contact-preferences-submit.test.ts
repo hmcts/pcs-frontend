@@ -74,6 +74,7 @@ describe('contact preferences submit-time CCD payloads', () => {
         expect.objectContaining({
           defendantContactDetails: {
             party: {
+              phoneNumberProvided: 'YES',
               phoneNumber: '07123456789',
             },
           },

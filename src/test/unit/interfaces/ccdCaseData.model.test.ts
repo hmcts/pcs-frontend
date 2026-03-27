@@ -146,39 +146,25 @@ describe('CcdCaseModel', () => {
       expect(model.defendantContactDetailsPartyName).toBe('Resident');
     });
 
-    it('falls back to legacy defendant fields when claimantEnteredDefendantDetails is absent', () => {
+    it('returns empty claimant-entered details when CCD does not provide them', () => {
       const model = buildModel({
-        data: {
-          defendant1: {
-            nameKnown: 'YES',
-            firstName: 'Test',
-            lastName: 'John',
-          },
-          additionalDefendants: [
-            {
-              value: {
-                nameKnown: 'YES',
-                firstName: 'Peter',
-                lastName: 'Parker',
-              },
-              id: null,
-            },
-          ],
-        },
+        data: {},
       });
 
-      expect(model.claimantEnteredDefendantDetailsNameKnown).toBe('YES');
-      expect(model.claimantEnteredDefendantDetailsName).toBe('Peter Parker');
+      expect(model.claimantEnteredDefendantDetailsNameKnown).toBe('');
+      expect(model.claimantEnteredDefendantDetailsName).toBe('');
     });
 
     it('prefers top-level defendantName when available', () => {
       const model = buildModel({
         data: {
           defendantName: 'Jen Parker',
-          defendant1: {
-            nameKnown: 'YES',
-            firstName: 'Test',
-            lastName: 'John',
+          possessionClaimResponse: {
+            claimantEnteredDefendantDetails: {
+              nameKnown: 'YES',
+              firstName: 'Test',
+              lastName: 'John',
+            },
           },
         },
       });

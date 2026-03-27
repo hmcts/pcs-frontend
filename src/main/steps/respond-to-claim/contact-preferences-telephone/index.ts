@@ -1,7 +1,7 @@
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { PossessionClaimResponse } from '@interfaces/ccdCase.interface';
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
@@ -109,6 +109,7 @@ export const step: StepDefinition = createFormStep({
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {
         party: {
+          phoneNumberProvided: contactByTelephone === 'yes' ? 'YES' : 'NO',
           phoneNumber:
             contactByTelephone === 'yes'
               ? (telephoneForm['contactByTelephone.phoneNumber'] as string | undefined)

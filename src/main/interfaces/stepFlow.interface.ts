@@ -23,6 +23,7 @@ export interface StepConfig {
 export interface JourneyFlowConfig {
   basePath?: string;
   journeyName?: string;
+  useSessionFormData?: boolean;
   stepOrder: string[];
   steps: Record<string, StepConfig>;
 }

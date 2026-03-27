@@ -15,15 +15,14 @@ export const isRentArrearsClaim = async (req: Request): Promise<boolean> => {
     return claimGroundSummaries.some(ground => ground?.value?.isRentArrears?.toUpperCase() === 'YES');
   }
 
-  // Fallback for legacy case data shape used by existing seeded e2e fixtures.
-  const introductoryGrounds = (validatedCase?.data?.introGrounds_IntroductoryDemotedOrOtherGrounds ?? []).map(ground =>
+  const introductoryGrounds = (validatedCase?.introGroundsIntroductoryDemotedOrOtherGrounds ?? []).map(ground =>
     String(ground).toUpperCase()
   );
   if (introductoryGrounds.includes('RENT_ARREARS')) {
     return true;
   }
 
-  const welshDiscretionaryGrounds = (validatedCase?.data?.secureGroundsWales_DiscretionaryGrounds ?? []).map(ground =>
+  const welshDiscretionaryGrounds = (validatedCase?.secureGroundsWalesDiscretionaryGrounds ?? []).map(ground =>
     String(ground).toUpperCase()
   );
   return welshDiscretionaryGrounds.some(ground => ground.includes('RENT_ARREARS'));

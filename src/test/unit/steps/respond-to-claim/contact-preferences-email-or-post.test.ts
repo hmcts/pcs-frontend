@@ -32,15 +32,7 @@ describe('contact-preferences-email-or-post', () => {
         locals: {
           validatedCase: {
             id: '123',
-            data: {
-              possessionClaimResponse: {
-                defendantContactDetails: {
-                  party: {
-                    emailAddress: 'existing@example.com',
-                  },
-                },
-              },
-            },
+            defendantContactDetailsPartyEmailAddress: 'existing@example.com',
           },
         },
       },
@@ -81,6 +73,8 @@ describe('contact-preferences-email-or-post', () => {
           },
         },
         defendantResponses: {
+          contactByEmail: 'YES',
+          contactByPost: 'NO',
           preferenceType: 'EMAIL',
         },
       })
@@ -106,6 +100,8 @@ describe('contact-preferences-email-or-post', () => {
           },
         },
         defendantResponses: {
+          contactByEmail: 'NO',
+          contactByPost: 'YES',
           preferenceType: 'POST',
         },
       })

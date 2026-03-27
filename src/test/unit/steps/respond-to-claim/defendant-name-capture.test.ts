@@ -174,7 +174,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
         },
       },
     });
-    expect(req.session.formData?.['defendant-name-capture']).toEqual({ firstName: 'Jane', lastName: 'Doe' });
+    expect(req.session.formData?.['defendant-name-capture']).toBeUndefined();
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 });

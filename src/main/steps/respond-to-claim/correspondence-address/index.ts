@@ -4,7 +4,7 @@ import isPostalCode from 'validator/lib/isPostalCode';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { PossessionClaimResponse } from '@interfaces/ccdCase.interface';
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
 import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
@@ -139,6 +139,7 @@ export const step: StepDefinition = createFormStep({
       possessionClaimResponse = {
         defendantContactDetails: {
           party: {
+            addressKnown: 'YES',
             address: prepopulateAddress,
           },
         },
@@ -154,6 +155,7 @@ export const step: StepDefinition = createFormStep({
       possessionClaimResponse = {
         defendantContactDetails: {
           party: {
+            addressKnown: 'NO',
             address: {
               AddressLine1: addressLine1,
               ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
@@ -170,6 +172,15 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'correspondence-address', ['common']);
+    const getAddressValue = (fieldName: string): string => {
+      const formValue = formContent[fieldName];
+      if (typeof formValue === 'string') {
+        return formValue;
+      }
+
+      const bodyValue = req.body?.[fieldName];
+      return typeof bodyValue === 'string' ? bodyValue : '';
+    };
 
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
     const isAddressKnown = formattedAddressStr !== '?';
@@ -237,12 +248,12 @@ export const step: StepDefinition = createFormStep({
         postcodeNotFound: t('errors.postcodeNotFound'),
         selectAddress: t('errors.selectAddress'),
       },
-      // Extract nested field values for easy template access (only on POST with errors)
-      correspondenceAddressLine1: req.body?.['correspondenceAddressConfirm.addressLine1'] || '',
-      correspondenceAddressLine2: req.body?.['correspondenceAddressConfirm.addressLine2'] || '',
-      correspondenceTownOrCity: req.body?.['correspondenceAddressConfirm.townOrCity'] || '',
-      correspondenceCounty: req.body?.['correspondenceAddressConfirm.county'] || '',
-      correspondencePostcode: req.body?.['correspondenceAddressConfirm.postcode'] || '',
+      // Expose nested values for the custom template on GET and POST.
+      correspondenceAddressLine1: getAddressValue('correspondenceAddressConfirm.addressLine1'),
+      correspondenceAddressLine2: getAddressValue('correspondenceAddressConfirm.addressLine2'),
+      correspondenceTownOrCity: getAddressValue('correspondenceAddressConfirm.townOrCity'),
+      correspondenceCounty: getAddressValue('correspondenceAddressConfirm.county'),
+      correspondencePostcode: getAddressValue('correspondenceAddressConfirm.postcode'),
     };
   },
   fields: fieldsConfig,
