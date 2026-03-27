@@ -3,7 +3,8 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'YES' | 'NO' | null;
+export type VerticalYesNoValue = 'YES' | 'NO' | null;
+export type YesNoValue = 'Yes' | 'No';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
@@ -42,7 +43,7 @@ export interface PossessionClaimResponse {
       firstName?: string;
       lastName?: string;
       address?: Address;
-      phoneNumberProvided?: YesNoValue;
+      phoneNumberProvided?: VerticalYesNoValue;
       phoneNumber?: string;
       emailAddress?: string;
     };
@@ -50,8 +51,8 @@ export interface PossessionClaimResponse {
   defendantResponses?: {
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
-    contactByPhone?: YesNoValue;
-    contactByText?: YesNoValue;
+    contactByPhone?: VerticalYesNoValue;
+    contactByText?: VerticalYesNoValue;
     preferenceType?: ContactPreference;
     freeLegalAdvice?: string;
     defendantNameConfirmation?: string;

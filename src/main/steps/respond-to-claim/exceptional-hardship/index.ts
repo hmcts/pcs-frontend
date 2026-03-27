@@ -69,7 +69,7 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
+    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'Yes', no: 'No' };
     const exceptionalHardship = ccdMapping[exceptionalHardshipValue];
     const exceptionalHardshipDetails =
       exceptionalHardshipValue === 'yes'

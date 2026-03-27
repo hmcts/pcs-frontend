@@ -66,7 +66,7 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
+    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'Yes', no: 'No' };
     const shareAdditionalCircumstances = ccdMapping[shareCircumstances];
     const additionalCircumstancesDetails =
       shareCircumstances === 'yes'
