@@ -55,6 +55,9 @@ export function buildComponentConfig(
   switch (field.type) {
     case 'text': {
       component.value = (fieldValue as string) || '';
+      if (field.prefix) {
+        component.prefix = field.prefix;
+      }
       componentType = 'input';
       break;
     }
