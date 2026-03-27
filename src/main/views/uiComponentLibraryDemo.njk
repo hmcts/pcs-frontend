@@ -1,0 +1,26 @@
+{% extends "template.njk" %}
+{% from "ui-component-lib/xui-header/macro.njk" import hmctsXuiHeader %}
+{% from "ui-component-lib/footer/macro.njk" import hmctsUiFooter %}
+
+{% set pageTitle = "UI component library demo" %}
+
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
+{% endblock %}
+
+{% block header %}
+  {{ hmctsXuiHeader(headerModel) }}
+{% endblock %}
+
+{% block beforeContent %}{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <h1 id="content" class="govuk-heading-xl">UI component library demo</h1>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  {{ hmctsUiFooter(footerModel) }}
+{% endblock %}
