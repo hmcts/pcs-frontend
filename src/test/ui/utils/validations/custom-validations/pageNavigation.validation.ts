@@ -455,10 +455,6 @@ export class PageNavigationValidation implements IValidation {
       }
     }
 
-    if (failedPages.size > 0 && PageNavigationValidation.shouldThrowError) {
-      throw new Error(`Navigation tests failed: ${failedPages.size} page(s) have failures`);
-    }
-
     if (failedPages.size > 0) {
       console.log('❌ NAVIGATION TESTS FAILED\n');
     } else if (passedPages.size > 0) {
@@ -468,6 +464,11 @@ export class PageNavigationValidation implements IValidation {
     }
 
     PageNavigationValidation.clearResults();
+
+    // Throw after clearing so failures don't cascade into subsequent tests
+    if (failedPages.size > 0 && PageNavigationValidation.shouldThrowError) {
+      throw new Error(`Navigation tests failed: ${failedPages.size} page(s) have failures`);
+    }
   }
 
   static clearResults(): void {

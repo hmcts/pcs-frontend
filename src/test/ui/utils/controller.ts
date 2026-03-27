@@ -9,6 +9,7 @@ import {
 } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
 
+import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
 import {
@@ -182,6 +183,8 @@ function readValuesFromInputObjects(obj: object): string {
 
 export function finaliseAllValidations(): void {
   const errors: Error[] = [];
+
+  TriggerPageFunctionalTestsAction.resetTestedPages();
 
   try {
     PageContentValidation.finaliseTest();

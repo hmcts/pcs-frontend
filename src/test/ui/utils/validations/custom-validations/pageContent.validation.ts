@@ -295,7 +295,6 @@ export class PageContentValidation implements IValidation {
         }
         console.log(`     Total missing on this page: ${pageFailureCount}\n`);
       }
-      throw new Error(`Page content validation failed: ${failedPages.size} pages have missing elements`);
     } else if (totalValidated > 0) {
       console.log('\n✅ VALIDATION PASSED: All intended pages validated successfully!\n');
     } else if (missingFilesCount > 0) {
@@ -303,6 +302,11 @@ export class PageContentValidation implements IValidation {
     }
 
     PageContentValidation.clearValidationResults();
+
+    // Throw after clearing so failures don't cascade into subsequent tests
+    if (failedPages.size > 0) {
+      throw new Error(`Page content validation failed: ${failedPages.size} pages have missing elements`);
+    }
   }
 
   private static getElementTypeStatic(key: string): string {

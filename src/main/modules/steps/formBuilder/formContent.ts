@@ -52,7 +52,7 @@ export function buildFormContent(
   if (translationKeys) {
     for (const [key, value] of Object.entries(translationKeys)) {
       if (value) {
-        translatedContent[key] = t(value);
+        translatedContent[key] = interpolation ? t(value, interpolation) : t(value);
       }
     }
   }
