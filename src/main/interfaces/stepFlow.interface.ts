@@ -18,11 +18,13 @@ export interface StepConfig {
   defaultNext?: string;
   previousStep?: PreviousStep;
   requiresAuth?: boolean;
+  showCondition?: StepCondition
 }
 
 export interface JourneyFlowConfig {
   basePath?: string;
   journeyName?: string;
+  useShowConditions?: boolean;
   stepOrder: string[];
   steps: Record<string, StepConfig>;
 }

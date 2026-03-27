@@ -16,6 +16,10 @@ export async function getNextStep(
 ): Promise<string | null> {
   const stepConfig = flowConfig.steps[currentStepName];
 
+  if (flowConfig.useShowConditions) {
+
+  }
+
   if (stepConfig?.routes) {
     for (const route of stepConfig.routes) {
       if (!route.condition) {
