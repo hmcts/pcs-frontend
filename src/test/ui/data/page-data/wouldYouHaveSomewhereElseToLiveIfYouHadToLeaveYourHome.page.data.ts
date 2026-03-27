@@ -1,0 +1,16 @@
+export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome = {
+  mainHeader: `Would you have somewhere else to live if you had to leave your home?`,
+  respondToClaimParagraph: `Respond to a property possession claim`,
+  backLink: `Back`,
+  whenWouldYouBeableToMoveHiddenTextLabel: `When would you be able to move in (optional)?`,
+  dayTextLabel: 'Day',
+  monthTextLabel: 'Month',
+  yearTextLabel: 'Year',
+  yesRadioOption: `Yes`,
+  noRadioOption: `No`,
+  iamNotSureRadioOption: `I’m not sure`,
+  saveForLaterButton: `Save for later`,
+  cymraegLink: `Cymraeg`,
+  saveAndContinueButton: `Save and continue`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+};

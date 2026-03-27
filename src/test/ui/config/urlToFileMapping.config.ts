@@ -22,4 +22,11 @@ export default {
   'landlord-licensed': 'landlordLicensed',
   'written-terms': 'writtenTerms',
   'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
+  'repayments-agreed': 'repaymentsAgreed',
+  'your-household-and-circumstances': 'yourHouseholdAndCircumstances',
+  'do-you-have-any-dependant-children': 'doYouHaveAnyDependantChildren',
+  'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
+  'do-any-other-adults-live-in-your-home': 'doAnyOtherAdultsLiveInYourHome',
+  'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home':
+    'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
 };
