@@ -368,7 +368,12 @@ describe('respond-to-claim tenancy-type-details step', () => {
               },
             },
           },
-          { detailsHeading: 'Details given by ', tenancyType: 'should be replaced' }
+          {
+            detailsHeading: 'Details given by ',
+            tenancyType: 'should be replaced',
+            tenancyTypeOther:
+              'The claimant provided the following information about your tenancy, occupation contract or licence agreement type: Rolling monthly agreement',
+          }
         );
 
         expect(content.tenancyType).toBe(
