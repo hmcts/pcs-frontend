@@ -1,10 +1,10 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
-{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}Repayments agreed - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
   {% if errorSummary %}
@@ -15,10 +15,16 @@
     <span class="govuk-caption-xl">{{ caption }}</span>
   {% endif %}
 
-  <h1 class="govuk-heading-l">Repayments agreed (Placeholder)</h1>
-  <p class="govuk-body">dummy page</p>
-  <form method="post" action="{{ url }}">
-  {{ stepButtons(continue) }}
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}

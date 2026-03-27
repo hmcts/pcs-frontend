@@ -13,5 +13,19 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
   },
-  fields: [],
+  fields: [
+    {
+      name: 'repaymentsAgreed',
+      type: 'radio',
+      required: true,
+      translationKey: { label: 'pageTitle' },
+      legendClasses: 'govuk-fieldset__legend--m',
+      options: [
+        { value: 'yes', translationKey: 'options.yes' },
+        { value: 'no', translationKey: 'options.no' },
+        { divider: 'options.or' },
+        { value: 'imNotSure', translationKey: 'options.imNotSure' },
+      ],
+    },
+  ],
 });
