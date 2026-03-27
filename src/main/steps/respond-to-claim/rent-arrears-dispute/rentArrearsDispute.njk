@@ -1,10 +1,10 @@
 {% extends "stepsTemplate.njk" %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% from "macros/stepButtons.njk" import stepButtons %}
 
 {% block pageTitle %}
   {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
