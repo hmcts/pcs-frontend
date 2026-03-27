@@ -1,43 +1,32 @@
 /**
- * Utility functions for converting between frontend yes/no values and backend YES/NO enums.
+ * Utility functions for converting between frontend yes/no values and backend Yes/No enums.
  * Used for CCD API integration where boolean choices are represented as enum strings.
  */
 
 import type { YesNoValue } from '../../interfaces/ccdCase.interface';
 
 /**
- * Converts frontend 'yes'/'no' string to backend CCD enum 'YES'/'NO'
- * Case-insensitive conversion to handle any casing from user input
- * @param value - Frontend radio button value ('yes' or 'no')
- * @returns CCD enum value ('YES' or 'NO')
- * @example
- * toYesNoEnum('yes') // returns 'YES'
- * toYesNoEnum('Yes') // returns 'YES'
- * toYesNoEnum('no')  // returns 'NO'
- * toYesNoEnum('NO')  // returns 'NO'
+ * Converts frontend 'yes'/'no' to backend 'Yes'/'No' enum.
+ * @example toYesNoEnum('yes') // returns 'Yes'
  */
 export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
-  return value.toLowerCase() === 'yes' ? 'YES' : 'NO';
+  return value.toLowerCase() === 'yes' ? 'Yes' : 'No';
 }
 
 /**
- * Converts backend CCD enum 'YES'/'NO' to frontend 'yes'/'no' string
- * @param value - CCD enum value ('YES' or 'NO')
- * @returns Frontend radio button value ('yes' or 'no'), or undefined if value is null/invalid
- * @example
- * fromYesNoEnum('YES') // returns 'yes'
- * fromYesNoEnum('NO')  // returns 'no'
- * fromYesNoEnum(null)  // returns undefined
+ * Converts backend 'Yes'/'No' enum to frontend 'yes'/'no'.
+ * Case-insensitive for backward compatibility.
+ * @example fromYesNoEnum('Yes') // returns 'yes'
  */
 export function fromYesNoEnum(value: YesNoValue | string | undefined): 'yes' | 'no' | undefined {
   if (!value) {
     return undefined;
   }
-  const upperValue = value.toUpperCase();
-  if (upperValue === 'YES') {
+  const normalizedValue = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  if (normalizedValue === 'Yes') {
     return 'yes';
   }
-  if (upperValue === 'NO') {
+  if (normalizedValue === 'No') {
     return 'no';
   }
   return undefined;

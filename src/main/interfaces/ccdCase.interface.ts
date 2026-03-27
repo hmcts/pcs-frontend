@@ -3,10 +3,13 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'YES' | 'NO' | null;
+export type YesNoValue = 'Yes' | 'No' | null;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
+
+export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
+export type PenceAmount = string;
 
 export interface CcdUserCase {
   id: string;
@@ -39,18 +42,18 @@ export interface Address {
 export interface HouseholdCircumstances {
   shareIncomeExpenseDetails?: YesNoValue;
   incomeFromJobs?: YesNoValue;
-  incomeFromJobsAmount?: string;
-  incomeFromJobsFrequency?: string;
+  incomeFromJobsAmount?: PenceAmount;
+  incomeFromJobsFrequency?: FrequencyValue;
   pension?: YesNoValue;
-  pensionAmount?: string;
-  pensionFrequency?: string;
+  pensionAmount?: PenceAmount;
+  pensionFrequency?: FrequencyValue;
   universalCredit?: YesNoValue;
-  universalCreditAmount?: string;
-  universalCreditFrequency?: string;
+  universalCreditAmount?: PenceAmount;
+  universalCreditFrequency?: FrequencyValue;
   ucApplicationDate?: string;
   otherBenefits?: YesNoValue;
-  otherBenefitsAmount?: string;
-  otherBenefitsFrequency?: string;
+  otherBenefitsAmount?: PenceAmount;
+  otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
 }

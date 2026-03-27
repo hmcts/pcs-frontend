@@ -42,6 +42,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     infoParagraph1: 'infoParagraph1',
     infoParagraph2: 'infoParagraph2',
+    infoParagraph3: 'infoParagraph3',
     question: 'question',
   },
 

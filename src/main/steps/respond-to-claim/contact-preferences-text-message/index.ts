@@ -1,6 +1,7 @@
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
+import { toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -47,7 +48,7 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        contactByText: textForm.contactByTextMessage === 'yes' ? 'YES' : 'NO',
+        contactByText: toYesNoEnum(textForm.contactByTextMessage),
       },
     };
 

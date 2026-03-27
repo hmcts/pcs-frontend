@@ -1,16 +1,13 @@
 import type { Request } from 'express';
 
+import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
+import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
-
-// Validation constants (copied from rent-arrears-dispute)
-const MAX_INCOME_AMOUNT = 1_000_000_000; // £1 billion maximum
-const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 decimal places
 
 const createAmountValidator =
   (largeAmountErrorKey: string) =>
@@ -67,8 +64,8 @@ export const step: StepDefinition = createFormStep({
     const formData: Record<string, unknown> = {};
     const selectedIncome: string[] = [];
 
-    // Income from jobs - Case-insensitive check to handle backend variations (YES/Yes/yes)
-    if (hc.incomeFromJobs && (hc.incomeFromJobs as string).toUpperCase() === 'YES') {
+    // Income from jobs
+    if (fromYesNoEnum(hc.incomeFromJobs) === 'yes') {
       selectedIncome.push('incomeFromJobs');
       if (hc.incomeFromJobsAmount) {
         formData['regularIncome.incomeFromJobsAmount'] = penceToPounds(hc.incomeFromJobsAmount as string);
@@ -78,8 +75,8 @@ export const step: StepDefinition = createFormStep({
       }
     }
 
-    // Pension - Case-insensitive check to handle backend variations (YES/Yes/yes)
-    if (hc.pension && (hc.pension as string).toUpperCase() === 'YES') {
+    // Pension
+    if (fromYesNoEnum(hc.pension) === 'yes') {
       selectedIncome.push('pension');
       if (hc.pensionAmount) {
         formData['regularIncome.pensionAmount'] = penceToPounds(hc.pensionAmount as string);
@@ -89,8 +86,8 @@ export const step: StepDefinition = createFormStep({
       }
     }
 
-    // Universal Credit - Case-insensitive check to handle backend variations (YES/Yes/yes)
-    if (hc.universalCredit && (hc.universalCredit as string).toUpperCase() === 'YES') {
+    // Universal Credit
+    if (fromYesNoEnum(hc.universalCredit) === 'yes') {
       selectedIncome.push('universalCredit');
       if (hc.universalCreditAmount) {
         formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);
@@ -100,8 +97,8 @@ export const step: StepDefinition = createFormStep({
       }
     }
 
-    // Other benefits - Case-insensitive check to handle backend variations (YES/Yes/yes)
-    if (hc.otherBenefits && (hc.otherBenefits as string).toUpperCase() === 'YES') {
+    // Other benefits
+    if (fromYesNoEnum(hc.otherBenefits) === 'yes') {
       selectedIncome.push('otherBenefits');
       if (hc.otherBenefitsAmount) {
         formData['regularIncome.otherBenefitsAmount'] = penceToPounds(hc.otherBenefitsAmount as string);
@@ -111,8 +108,8 @@ export const step: StepDefinition = createFormStep({
       }
     }
 
-    // Money from elsewhere - Case-insensitive check to handle backend variations (YES/Yes/yes)
-    if (hc.moneyFromElsewhere && (hc.moneyFromElsewhere as string).toUpperCase() === 'YES') {
+    // Money from elsewhere
+    if (fromYesNoEnum(hc.moneyFromElsewhere) === 'yes') {
       selectedIncome.push('moneyFromElsewhere');
       if (hc.moneyFromElsewhereDetails) {
         formData['regularIncome.moneyFromElsewhereDetails'] = hc.moneyFromElsewhereDetails;
