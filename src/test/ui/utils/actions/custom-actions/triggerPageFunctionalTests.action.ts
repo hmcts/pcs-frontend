@@ -9,6 +9,7 @@ import {
   enable_navigation_tests,
 } from '../../../../../../playwright.config';
 import { IAction } from '../../interfaces';
+import { isPftDebugEnabled, pftDebugReport, shortUrl } from '../../pft-debug-log';
 import {
   ErrorMessageValidation,
   PageContentValidation,
@@ -33,10 +34,21 @@ export class TriggerPageFunctionalTestsAction implements IAction {
   }
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
-    const pageName = await this.getFileNameForPage(page);
-    if (!pageName) {
+    const resolution = await this.resolvePageFileName(page);
+    if (!resolution.pageName) {
+      if (enable_content_validation === 'true' && isPftDebugEnabled()) {
+        await pftDebugReport({
+          page,
+          pageLabel: shortUrl(page.url()),
+          category: 'page content',
+          expected: 'URL segment or page heading maps to a page name in urlToFileMapping.config.ts',
+          actual: resolution.unmappedReason ?? 'Could not resolve page from URL mapping',
+        });
+      }
       return;
     }
+
+    const pageName = resolution.pageName;
 
     // Prevent duplicate runs within the same test run (in‑memory)
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
@@ -56,6 +68,17 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         await this.runPageContentValidation(page, pageName);
       } else {
         PageContentValidation.trackMissingDataFile(pageName);
+        if (isPftDebugEnabled()) {
+          await pftDebugReport({
+            page,
+            pageLabel: pageName,
+            category: 'page content',
+            expected: `Page data file ${pageName}.page.data.ts exists under data/page-data/`,
+            actual:
+              `URL maps to "${pageName}" in urlToFileMapping.config.ts, but there is no matching page data file. ` +
+              `Add src/test/ui/data/page-data/${pageName}.page.data.ts (page content / design source for validation).`,
+          });
+        }
       }
     }
 
@@ -170,20 +193,54 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
   }
 
-  private async getFileNameForPage(page: Page): Promise<string | null> {
+  /**
+   * Resolves the PFT page name from the URL using urlToFileMapping.config.ts.
+   * When resolution fails, `unmappedReason` explains why (for PFT debug logging).
+   */
+  private async resolvePageFileName(page: Page): Promise<{
+    pageName: string | null;
+    unmappedReason: string | null;
+    urlSegment: string;
+  }> {
     const urlSegment = this.getUrlSegment(page.url());
-
     const mapping = this.loadMapping();
     if (!mapping) {
-      return null;
+      return {
+        pageName: null,
+        unmappedReason: 'Could not load or parse urlToFileMapping.config.ts',
+        urlSegment,
+      };
     }
 
     if (/^\d+$/.test(urlSegment)) {
       const headerText = await this.getHeaderText(page);
-      return headerText ? (mapping[headerText] ?? null) : null;
+      if (!headerText) {
+        return {
+          pageName: null,
+          unmappedReason: `URL ends with numeric segment "${urlSegment}" but no visible h1/h2 heading was found to map via urlToFileMapping`,
+          urlSegment,
+        };
+      }
+      const pageName = mapping[headerText] ?? null;
+      if (!pageName) {
+        return {
+          pageName: null,
+          unmappedReason: `Heading "${headerText}" is not a key in urlToFileMapping.config.ts (numeric route path)`,
+          urlSegment,
+        };
+      }
+      return { pageName, unmappedReason: null, urlSegment };
     }
 
-    return mapping[urlSegment] ?? null;
+    const pageName = mapping[urlSegment] ?? null;
+    if (!pageName) {
+      return {
+        pageName: null,
+        unmappedReason: `URL segment "${urlSegment}" is not a key in urlToFileMapping.config.ts`,
+        urlSegment,
+      };
+    }
+    return { pageName, unmappedReason: null, urlSegment };
   }
 
   private loadMapping(): Record<string, string> | null {

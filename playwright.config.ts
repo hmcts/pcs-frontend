@@ -21,7 +21,7 @@ export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'f
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
 /** When `true`, page content / error message / page navigation validators log page, check type, expected vs actual, and a screenshot (see `pft-debug-log.ts`). */
-export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || process.env.PFT_DEBUG_LOG || 'false';
+export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || 'true';
 
 export default defineConfig({
   testDir: './src/test/ui',
