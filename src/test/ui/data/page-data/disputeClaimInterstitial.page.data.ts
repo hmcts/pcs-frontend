@@ -17,4 +17,6 @@ export const disputeClaimInterstitial = {
   cancelLink: `Cancel`,
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `dispute-claim-interstitial`,
 };
