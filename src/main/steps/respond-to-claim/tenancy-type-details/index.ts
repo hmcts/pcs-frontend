@@ -88,6 +88,7 @@ export const step: StepDefinition = createFormStep({
     saveForLater: 'saveForLater',
     detailsHeading: 'detailsHeading',
     tenancyType: 'tenancyType',
+    tenancyTypeOther: 'tenancyTypeOther',
   },
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
@@ -167,9 +168,7 @@ export const step: StepDefinition = createFormStep({
         ? `${formContent.detailsHeading}${orgName}${':'}`
         : formContent.detailsHeading;
     const tenancyType =
-      tenancyTypeOfTenancyLicence === 'OTHER'
-        ? `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${otherTenancyTypeDetails}`
-        : formContent.tenancyType;
+      tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
 
     return {
       ...formContent,
@@ -177,6 +176,7 @@ export const step: StepDefinition = createFormStep({
       tenancyType,
       organisationName: orgName,
       orgname: orgName,
+      otherTenancyTypeDetails,
       tenancyTypeAgreementType,
       tenancyTypeConfirm,
       correctType,
