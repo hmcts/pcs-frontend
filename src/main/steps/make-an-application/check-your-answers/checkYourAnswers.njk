@@ -15,6 +15,14 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
+  <div class="govuk-notification-banner" role="region" aria-labelledby="experimental-banner">
+    <div class="govuk-notification-banner__content">
+      <p class="govuk-notification-banner__heading" id="experimental-banner">
+        Placeholder page
+      </p>
+    </div>
+  </div>
+
   {{ govukSummaryList(summaryData) }}
 
   <form method="post" action="{{ url }}" novalidate>
