@@ -600,6 +600,48 @@ describe('formBuilder helpers', () => {
         expect(errors.name).toBeUndefined();
       });
 
+      it('should return error for required text field with only whitespace', () => {
+        const req = createMockRequest({ name: '   ' });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'name',
+            type: 'text',
+            required: true,
+          },
+        ];
+
+        const errors = validateForm(req, fields);
+        expect(errors.name).toBe('This field is required');
+      });
+
+      it('should return error for required textarea field with only whitespace', () => {
+        const req = createMockRequest({ description: '  \n  \t  ' });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'description',
+            type: 'textarea',
+            required: true,
+          },
+        ];
+
+        const errors = validateForm(req, fields);
+        expect(errors.description).toBe('This field is required');
+      });
+
+      it('should return error for required character-count field with only whitespace', () => {
+        const req = createMockRequest({ comments: '     ' });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'comments',
+            type: 'character-count',
+            required: true,
+          },
+        ];
+
+        const errors = validateForm(req, fields);
+        expect(errors.comments).toBe('This field is required');
+      });
+
       it('should return error for missing required checkbox field', () => {
         const req = createMockRequest();
         const fields: FormFieldConfig[] = [

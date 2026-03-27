@@ -39,8 +39,8 @@ export const flowConfig: JourneyFlowConfig = {
     'landlord-licensed',
     'written-terms',
     'tenancy-type-details',
-    'tenancy-date-unknown',
     'tenancy-date-details',
+    'tenancy-date-unknown',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
     'confirmation-of-notice-date-when-not-provided',
@@ -127,7 +127,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !isWelshProperty(req),
+          condition: async (req: Request) => !(await isWelshProperty(req)),
           nextStep: 'tenancy-type-details',
         },
       ],

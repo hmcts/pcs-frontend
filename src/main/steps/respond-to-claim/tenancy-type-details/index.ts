@@ -1,12 +1,185 @@
+import type { Request } from 'express';
+
+import type { PossessionClaimResponse, TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interface';
+import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+// Testing builds
+const fieldsConfig: FormFieldConfig[] = [
+  {
+    name: 'tenancyTypeConfirm',
+    type: 'radio',
+    required: true,
+    legendClasses: 'govuk-fieldset__legend--m govuk-heading-m',
+    translationKey: {
+      label: 'legend',
+    },
+    options: [
+      {
+        value: 'yes',
+        translationKey: 'yes',
+      },
+      {
+        value: 'no',
+        translationKey: 'no',
+        subFields: {
+          correctType: {
+            name: 'correctType',
+            type: 'text',
+            required: true,
+            errorMessage: 'errors.requiredText',
+            classes: 'govuk-input--width-two-thirds',
+            labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
+            maxLength: 60,
+            translationKey: {
+              label: 'correctTypeLabel',
+            },
+          },
+        },
+      },
+      {
+        divider: 'or',
+      },
+      {
+        value: 'notSure',
+        translationKey: 'notSure',
+      },
+    ],
+  },
+];
+
+const STEP_NAME = 'tenancy-type-details';
+
+const TENANCY_TYPE_CONFIRM_TO_CCD: Record<string, TenancyTypeCorrectValue> = {
+  yes: 'Yes',
+  no: 'No',
+  notSure: 'NOT_SURE',
+};
+
+const CCD_TO_TENANCY_TYPE_CONFIRM: Record<Exclude<TenancyTypeCorrectValue, null>, string> = {
+  Yes: 'yes',
+  No: 'no',
+  NOT_SURE: 'notSure',
+};
+
+// TODO: Welsh translations for tenancy type text will be addressed in the next ticket
+const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
+  ASSURED_TENANCY: 'an assured',
+  SECURE_TENANCY: 'a secure',
+  INTRODUCTORY_TENANCY: 'an introductory',
+  FLEXIBLE_TENANCY: 'a flexible',
+  DEMOTED_TENANCY: 'a demoted',
+  OTHER: 'other',
+};
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'tenancy-type-details',
+  stepName: STEP_NAME,
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  fields: [],
-  customTemplate: `${__dirname}/tenancyTypeDetails.njk`,
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    caption: 'caption',
+    heading: 'heading',
+    insetText: 'insetText',
+    saveAndContinue: 'saveAndContinue',
+    saveForLater: 'saveForLater',
+    detailsHeading: 'detailsHeading',
+    tenancyType: 'tenancyType',
+    tenancyTypeOther: 'tenancyTypeOther',
+  },
+  customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
+  fields: fieldsConfig,
+  getInitialFormData: (req: Request) => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const existingTenancyTypeCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeCorrect as
+      | TenancyTypeCorrectValue
+      | undefined;
+    const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses?.tenancyType as
+      | string
+      | undefined;
+
+    if (!existingTenancyTypeCorrect) {
+      return {};
+    }
+
+    const formValue = CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect];
+    if (!formValue) {
+      return {};
+    }
+
+    const initial: Record<string, unknown> = { tenancyTypeConfirm: formValue };
+    if (existingTenancyTypeCorrect === 'No' && existingCorrectedTenancyType) {
+      initial['tenancyTypeConfirm.correctType'] = existingCorrectedTenancyType;
+    }
+    return initial;
+  },
+  beforeRedirect: async req => {
+    const tenancyTypeConfirm = req.body?.tenancyTypeConfirm as string | undefined;
+    const tenancyTypeCorrect = tenancyTypeConfirm ? TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm] : undefined;
+    const correctedTenancyTypeText = (
+      (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
+      (req.body?.correctType as string | undefined)
+    )?.trim();
+    const existingCorrectedTenancyType =
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.tenancyType;
+    const tenancyType =
+      tenancyTypeConfirm === 'no'
+        ? correctedTenancyTypeText || undefined
+        : existingCorrectedTenancyType
+          ? ''
+          : undefined;
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        tenancyTypeCorrect,
+        tenancyType,
+      },
+    };
+
+    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  extendGetContent: async (req, formContent) => {
+    const existingTenancyTypeCorrect = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+      ?.tenancyTypeCorrect as TenancyTypeCorrectValue;
+    const existingCorrectedTenancyType = req.res?.locals.validatedCase?.data?.possessionClaimResponse
+      ?.defendantResponses?.tenancyType as string;
+    const tenancyTypeConfirm =
+      (req.body?.tenancyTypeConfirm as string) ||
+      (existingTenancyTypeCorrect ? CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect] : '') ||
+      '';
+    const correctType =
+      (req.body?.['tenancyTypeConfirm.correctType'] as string) ||
+      (req.body?.correctType as string) ||
+      (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
+      '';
+
+    const orgName = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
+      ?.value as string;
+    const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as string;
+    const otherTenancyTypeDetails = req.res?.locals.validatedCase?.data
+      ?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string;
+    const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
+
+    const detailsHeading =
+      typeof formContent.detailsHeading === 'string'
+        ? `${formContent.detailsHeading}${orgName}${':'}`
+        : formContent.detailsHeading;
+    const tenancyType =
+      tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
+
+    return {
+      ...formContent,
+      detailsHeading,
+      tenancyType,
+      organisationName: orgName,
+      orgname: orgName,
+      otherTenancyTypeDetails,
+      tenancyTypeAgreementType,
+      tenancyTypeConfirm,
+      correctType,
+    };
+  },
 });
