@@ -95,7 +95,7 @@
     "@eslint/js": "^9.29.0",
     "@eslint/plugin-kit": "^0.5.0",
     "@hmcts/playwright-common": "1.0.39",
-    "@pact-foundation/pact": "^15.0.0",
+    "@pact-foundation/pact": "^16.0.0",
     "@pact-foundation/pact-cli": "^16.0.7",
     "@playwright/test": "^1.49.0",
     "@types/body-parser": "^1.19.2",
