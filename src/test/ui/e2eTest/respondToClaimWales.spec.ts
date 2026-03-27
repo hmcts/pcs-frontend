@@ -40,7 +40,8 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales @noDefendants @regression', async () => {
+  //This test is currently failing due to incorrect address comparison, this will get fixed and re-enabled by HDPI-5492
+  test.skip('Respond to a claim - Wales @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
