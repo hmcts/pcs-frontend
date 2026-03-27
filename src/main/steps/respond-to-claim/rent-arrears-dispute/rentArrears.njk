@@ -1,5 +1,7 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/stepButtons.njk" import stepButtons %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
 {% block mainContent %}
@@ -7,17 +9,8 @@
   <h1 class="govuk-heading-l">Rent arrears</h1>
 
   <form method="post" action="{{ url }}" novalidate>
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: t('buttons.continue', { ns: 'common' }),
-        attributes: { type: 'submit', name: 'action', value: 'continue' }
-      }) }}
-      {{ govukButton({
-        text: t('buttons.saveForLater', { ns: 'common' }),
-        classes: 'govuk-button--secondary',
-        attributes: { type: 'submit', name: 'action', value: 'saveForLater' }
-      }) }}
-    </div>
+
+    {{ stepButtons(continue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
