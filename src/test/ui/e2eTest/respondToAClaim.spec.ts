@@ -12,6 +12,9 @@ import {
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
+  doAnyOtherAdultsLiveInYourHome,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
   freeLegalAdvice,
   nonRentArrearsDispute,
   rentArrearsDispute,
@@ -20,7 +23,10 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  yourHouseholdAndCircumstances,
 } from '../data/page-data';
+import { getRelativeDate } from '../utils/common/string.utils';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -242,6 +248,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('clickButton', repaymentsAgreed.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.continueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependants.continueButton);
+    // await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+    //   radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+    //   details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput
+    // });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
   });
 
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
