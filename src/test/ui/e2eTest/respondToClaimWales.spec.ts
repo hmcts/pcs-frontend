@@ -1,5 +1,4 @@
 import { test } from '@playwright/test';
-import config from 'config';
 
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
@@ -19,7 +18,7 @@ import {
 } from '../data/page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);

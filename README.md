@@ -177,6 +177,19 @@ Running accessibility tests:
 yarn test:accessibility
 ```
 
+#### Sauce Labs (cross-browser)
+
+| Script                            | What it does                                                                                                                                                                                                                                                                         |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`yarn test:crossbrowserui`**    | [saucectl](https://docs.saucelabs.com/dev/cli/saucectl/) — tests and browser run **on Sauce** per **`.sauce/config.yml`**. Runner mints S2S/Idam on the agent first; see **`docs/sauce-jenkins.md`**.                                                                                |
+| **`yarn test:crossbrowser`**      | Same as **`test:crossbrowserui`** (alias for Jenkins / older docs).                                                                                                                                                                                                                  |
+| **`yarn test:crossbrowsergrid`**  | **Hybrid:** Playwright + APIs on **your machine or Jenkins**; only **Chrome** on Sauce via Selenium Grid ([docs](https://docs.saucelabs.com/web-apps/automated-testing/playwright/selenium-grid/)). Set **`SAUCE_USERNAME`**, **`SAUCE_ACCESS_KEY`**, optional **`SAUCE_TUNNEL_*`**. |
+| **`yarn test:crossbrowserlocal`** | **No Sauce** — local Chromium, **`@crossbrowser`** specs only.                                                                                                                                                                                                                       |
+
+**saucectl (`test:crossbrowserui`):** install deps so `saucectl` exists (`yarn install`), export Sauce + tunnel vars from [user settings](https://app.saucelabs.com/user-settings), start **Sauce Connect** with a tunnel id that matches **`SAUCE_TUNNEL_NAME`**, then run **`yarn test:crossbrowserui`**. Set **`HTTP_PROXY` / `HTTPS_PROXY`** in the shell if your network requires them.
+
+More detail: **`docs/sauce-jenkins.md`** and **`src/test/ui/test-README.md`**.
+
 ### Security
 
 #### CSRF prevention
@@ -209,12 +222,14 @@ There is a configuration section related with those headers, where you can speci
 
 - `referrerPolicy` - value of the `Referrer-Policy` header
 
-Here's an example setup:
+Here's an example setup (JSON):
 
-```json
-    "security": {
-      "referrerPolicy": "origin",
-    }
+```
+{
+  "security": {
+    "referrerPolicy": "origin"
+  }
+}
 ```
 
 Make sure you have those values set correctly for your application.
