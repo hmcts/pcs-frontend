@@ -33,7 +33,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else {
     process.env.NOTICE_SERVED = 'YES';
   }
-
+  // Assign the tenancy type & grounds in the payload
   const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
     testInfo.title.includes(type)
   );
@@ -62,16 +62,19 @@ test.beforeEach(async ({ page }, testInfo) => {
       break;
   }
 
-  // Notice date provided
+  // Check notice date provided for back link navigation
   if (testInfo.title.includes('NoticeDateProvided - No')) {
     process.env.NOTICE_DATE_PROVIDED = 'NO';
   } else if (testInfo.title.includes('NoticeDateProvided - Yes')) {
     process.env.NOTICE_DATE_PROVIDED = 'YES';
   }
+
+  //Check if No or Im not sure is selected on NoticeDetails page - for back link navigation
   if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
   }
-  // Tenancy start date logic (independent)
+
+  // Tenancy start date logic for noDefendantTest
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   }
@@ -82,8 +85,6 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
-  } else if (testInfo.title.includes('@rentNonRent')) {
-    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
   } else if (testInfo.title.includes('@assured')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
@@ -94,6 +95,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
   } else if (testInfo.title.includes('@rentAndNonRent')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
   } else {
