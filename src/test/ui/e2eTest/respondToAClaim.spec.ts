@@ -77,6 +77,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   // Tenancy start date logic for noDefendantTest and rentNonRent test
   if (testInfo.title.includes('NoticeServed - No') && !testInfo.title.includes('@rentNonRent')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
+    process.env.RENT_NON_RENT = 'NO';
   } else {
     process.env.RENT_NON_RENT = 'YES';
   }
@@ -96,7 +97,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else if (testInfo.title.includes('@other')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
-  } else if (testInfo.title.includes('@rentAndNonRent')) {
+  } else if (testInfo.title.includes('@rentNonRent')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
   } else {

@@ -4,7 +4,6 @@ import {
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
-  rentArrearsDispute,
   tenancyDateDetails,
   tenancyDateUnknown,
 } from '../data/page-data';
@@ -47,18 +46,59 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
 }
 
 export async function noRentArrearsNavigationTests(): Promise<void> {
-  if (process.env.NOTICE_DATE_PROVIDED === 'NO') {
-    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenNotProvided.mainHeader);
-  } else if (process.env.NOTICE_DATE_PROVIDED === 'YES') {
-    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenProvided.mainHeader);
-  } else if (process.env.TENANCY_START_DATE_KNOWN === 'NO') {
-    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateUnknown.mainHeader);
-  } else if (process.env.TENANCY_START_DATE_KNOWN === 'YES') {
-    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateDetails.mainHeader);
-  } else if (process.env.RENT_NON_RENT === 'YES') {
-    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrearsDispute.mainHeader);
-  } else if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
-    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, confirmationOfNoticeGiven.mainHeader);
+  if (process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'YES') {
+    if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
+      await performValidation('pageNavigation', nonRentArrearsDispute.backLink, confirmationOfNoticeGiven.mainHeader);
+    } else {
+      await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenProvided.mainHeader);
+    }
+  } else if (process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'NO') {
+    if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
+      await performValidation('pageNavigation', nonRentArrearsDispute.backLink, confirmationOfNoticeGiven.mainHeader);
+    } else {
+      await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenNotProvided.mainHeader);
+    }
   }
+
+  if (
+    process.env.NOTICE_SERVED === 'NO' &&
+    process.env.TENANCY_START_DATE_KNOWN === 'NO' &&
+    process.env.RENT_NON_RENT === 'NO'
+  ) {
+    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateUnknown.mainHeader);
+  } else if (
+    process.env.NOTICE_SERVED === 'NO' &&
+    process.env.TENANCY_START_DATE_KNOWN === 'YES' &&
+    process.env.RENT_NON_RENT === 'NO'
+  ) {
+    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateDetails.mainHeader);
+   }
+  //enable after 3495 is merged
+
+  // else if (
+  //   process.env.NOTICE_SERVED === 'NO' &&
+  //   process.env.TENANCY_START_DATE_KNOWN === 'YES' &&
+  //   process.env.RENT_NON_RENT === 'YES'
+  // ) {
+  //   await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrearsDispute.mainHeader);
+  // }
+  await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
   await performValidation('pageNavigation', nonRentArrearsDispute.saveForLaterButton, dashboard.mainHeader);
 }
+
+//old implementation
+//   if (process.env.NOTICE_DATE_PROVIDED === 'NO') {
+//     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenNotProvided.mainHeader);
+//   } else if (process.env.NOTICE_DATE_PROVIDED === 'YES') {
+//     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenProvided.mainHeader);
+//   } else if (process.env.TENANCY_START_DATE_KNOWN === 'NO') {
+//     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateUnknown.mainHeader);
+//   } else if (process.env.TENANCY_START_DATE_KNOWN === 'YES') {
+//     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateDetails.mainHeader);
+//   } else if (process.env.RENT_NON_RENT === 'YES') {
+//     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrearsDispute.mainHeader);
+//   } else if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
+//     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, confirmationOfNoticeGiven.mainHeader);
+//   }
+//   await performValidation('pageNavigation', nonRentArrearsDispute.saveForLaterButton, dashboard.mainHeader);
+// }
