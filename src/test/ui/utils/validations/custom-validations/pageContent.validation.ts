@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
-import { attachValidationFailureScreenshot, pftDebugLog, reportValidationFailure } from '../../common/pft-debug-log';
+import { attachValidationFailureScreenshot, reportValidationFailure } from '../../common/pft-debug-log';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { IValidation } from '../../interfaces';
 
@@ -283,40 +283,40 @@ export class PageContentValidation implements IValidation {
     const failedCount = failedPages.size;
     const missingFilesCount = PageContentValidation.missingDataFiles.size;
 
-    pftDebugLog(`\n📊 PAGE CONTENT VALIDATION SUMMARY (Test #${PageContentValidation.testCounter}):`);
-    pftDebugLog(`   Total pages validated: ${totalValidated}`);
-    pftDebugLog(`   Number of pages passed: ${passedCount}`);
-    pftDebugLog(`   Number of pages failed: ${failedCount}`);
-    pftDebugLog(`   Missing data files: ${missingFilesCount}`);
+    console.log(`\n📊 PAGE CONTENT VALIDATION SUMMARY (Test #${PageContentValidation.testCounter}):`);
+    console.log(`   Total pages validated: ${totalValidated}`);
+    console.log(`   Number of pages passed: ${passedCount}`);
+    console.log(`   Number of pages failed: ${failedCount}`);
+    console.log(`   Missing data files: ${missingFilesCount}`);
 
     if (passedCount > 0) {
-      pftDebugLog(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
+      console.log(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
     }
 
     if (failedCount > 0) {
-      pftDebugLog(`   Failed pages: ${Array.from(failedPages.keys()).join(', ')}`);
+      console.log(`   Failed pages: ${Array.from(failedPages.keys()).join(', ')}`);
     }
 
     if (missingFilesCount > 0) {
-      pftDebugLog(`   Page files not found: ${Array.from(PageContentValidation.missingDataFiles).join(', ')}`);
+      console.log(`   Page files not found: ${Array.from(PageContentValidation.missingDataFiles).join(', ')}`);
     }
 
     if (failedPages.size > 0) {
-      pftDebugLog('\n❌ FAILED PAGE CONTENT VALIDATION:');
+      console.log('\n❌ FAILED PAGE CONTENT VALIDATION:');
       for (const [pageName, pageFailures] of failedPages) {
-        pftDebugLog(`   Page: ${pageName}`);
+        console.log(`   Page: ${pageName}`);
         let pageFailureCount = 0;
         for (const [elementType, elements] of pageFailures) {
           pageFailureCount += elements.length;
-          pftDebugLog(`     ${elementType} elements (${elements.length}):`);
-          elements.forEach(element => pftDebugLog(`       - ${element}`));
+          console.log(`     ${elementType} elements (${elements.length}):`);
+          elements.forEach(element => console.log(`       - ${element}`));
         }
-        pftDebugLog(`     Total missing on this page: ${pageFailureCount}\n`);
+        console.log(`     Total missing on this page: ${pageFailureCount}\n`);
       }
     } else if (totalValidated > 0) {
-      pftDebugLog('\n✅ VALIDATION PASSED: All intended pages validated successfully!\n');
+      console.log('\n✅ VALIDATION PASSED: All intended pages validated successfully!\n');
     } else if (missingFilesCount > 0) {
-      pftDebugLog('\n⚠️  NO VALIDATION: Missing data files for all pages\n');
+      console.log('\n⚠️  NO VALIDATION: Missing data files for all pages\n');
     }
 
     PageContentValidation.clearValidationResults();

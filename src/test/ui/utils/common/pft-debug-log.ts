@@ -6,21 +6,11 @@ import { test } from '@playwright/test';
 
 import { enable_pft_debug_log } from '../../../../../playwright.config';
 
-/** Summary / diagnostic `console.log` lines — only when `ENABLE_PFT_DEBUG_LOG=true`. */
-export function pftDebugLog(...args: unknown[]): void {
-  if (enable_pft_debug_log !== 'true') {
-    return;
-  }
-  console.log(...args);
-}
-
 /**
- * Console output:
- * - **`pftDebugLog` / `logTestBeforeEachContext`**: only when `ENABLE_PFT_DEBUG_LOG=true`.
- * - **`pftDebugReport`** (`[PFT check: …]`): only when `ENABLE_PFT_DEBUG_LOG=true`.
+ * Console: `[PFT check: …]` lines only when `ENABLE_PFT_DEBUG_LOG=true` (`enable_pft_debug_log`).
  * Failure PNGs: `test.info().attach` from `attachValidationFailureScreenshot` and from
- * `reportValidationFailure(..., attachScreenshot: true)` — **not** gated by the flag
- * (Allure / HTML report attachments).
+ * `reportValidationFailure(..., attachScreenshot: true)` — not gated by `ENABLE_PFT_DEBUG_LOG`
+ * (Allure/HTML report pick up attachments from test results).
  */
 
 /**
@@ -62,6 +52,9 @@ function envKeysChangedDuringBeforeEach(): string[] {
  * `captureProcessEnvBeforeBeforeEach()` at the start of this `beforeEach`.
  */
 export function logTestBeforeEachContext(): void {
+  if (enable_pft_debug_log !== 'true') {
+    return;
+  }
   const { title } = test.info();
   const changedKeys = envKeysChangedDuringBeforeEach();
   const lines = changedKeys.map(key => `  ${key}=${process.env[key]}`);
@@ -71,7 +64,7 @@ export function logTestBeforeEachContext(): void {
       : envSnapshotBeforeBeforeEach
         ? '  (no process.env keys were added or changed during this beforeEach)'
         : '  (call captureProcessEnvBeforeBeforeEach() at the start of beforeEach to log env changes)';
-  pftDebugLog(['[PFT debug: beforeEach context]', `  test: ${truncateForLog(title, 200)}`, body].join('\n'));
+  console.log(['[PFT debug: beforeEach context]', `  test: ${truncateForLog(title, 200)}`, body].join('\n'));
 }
 
 function truncate(s: string, max: number, trim?: boolean): string {
