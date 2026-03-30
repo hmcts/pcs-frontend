@@ -95,6 +95,7 @@ export interface CcdDefendantResponses {
   preferenceType?: ContactPreference;
   landlordRegistered?: YesNoNotSureValue;
   landlordLicensed?: YesNoNotSureValue;
+  writtenTerms?: YesNoNotSureValue;
 }
 
 export interface PossessionClaimResponse {

@@ -501,7 +501,8 @@ describe('error-handler', () => {
       errorHandler(err, req, res, next);
 
       expect(mockLogger.error).toHaveBeenCalledWith('Request failed', {
-        error: err,
+        errorMessage: 'Test error',
+        stack: 'Error stack trace',
         method: 'GET',
         status: 500,
         url: '/test-url',
