@@ -71,7 +71,7 @@ export async function tenancyDateDetailsNavigationTests(): Promise<void> {
       );
     }
   }
-  
+
   await performValidation('pageNavigation', tenancyDateDetails.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: tenancyDateDetails.pageSlug,

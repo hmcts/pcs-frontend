@@ -72,7 +72,7 @@ export async function noRentArrearsNavigationTests(): Promise<void> {
     process.env.RENT_NON_RENT === 'NO'
   ) {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateDetails.mainHeader);
-   }
+  }
   //enable after 3495 is merged
 
   // else if (
