@@ -80,7 +80,6 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
-    process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else if (testInfo.title.includes('@assured')) {
