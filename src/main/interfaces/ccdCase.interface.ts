@@ -35,8 +35,11 @@ export interface Address {
   PostCode: string;
   Country?: string;
 }
-
+export interface CaseData {
+  possessionClaimResponse?: PossessionClaimResponse;
+}
 export interface PossessionClaimResponse {
+  claimantOrganisations?: { value: string }[];
   defendantContactDetails?: {
     party?: {
       firstName?: string;
@@ -58,6 +61,8 @@ export interface PossessionClaimResponse {
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
     landlordLicensed?: YesNoNotSureValue;
+    possessionNoticeReceived?: YesNoNotSureValue;
+    noticeReceivedDate?: string;
   };
 }
 
