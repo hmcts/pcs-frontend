@@ -1,6 +1,8 @@
 import { getClaimantName } from '../../utils/getClaimantName';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
@@ -15,6 +17,35 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     question: 'question',
     hintText: 'hintText',
+  },
+  beforeRedirect: async req => {
+    const confirmNoticeGiven = req.body?.confirmNoticeGiven as string | undefined;
+    const existingDefendantResponses = req.res?.locals?.validatedCase?.defendantResponses ?? {};
+
+    if (!confirmNoticeGiven) {
+      return;
+    }
+
+    const enumMapping: Record<string, string> = {
+      yes: 'YES',
+      no: 'NO',
+      imNotSure: 'NOT_SURE',
+    };
+
+    const ccdValue = enumMapping[confirmNoticeGiven];
+    if (!ccdValue) {
+      return;
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        ...existingDefendantResponses,
+        confirmNoticeGiven: ccdValue,
+        ...(confirmNoticeGiven === 'yes' ? {} : { noticeDate: '' }),
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: req => {
     const existingAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven as string | undefined;

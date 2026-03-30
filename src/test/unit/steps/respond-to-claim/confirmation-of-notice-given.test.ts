@@ -69,6 +69,7 @@ describe('confirmation-of-notice-given step', () => {
       expect.objectContaining({
         defendantResponses: {
           confirmNoticeGiven: 'NOT_SURE',
+          noticeDate: '',
         },
       })
     );
