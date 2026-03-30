@@ -1,4 +1,4 @@
-import { contactPreferenceEmailOrPost } from '../data/page-data';
+import { contactPreferenceEmailOrPost, feedback } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferenceEmailOrPostErrorValidation(): Promise<void> {
@@ -85,9 +85,14 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
 }
-//--The below method is commented out as we have an open bug - HDPI-5396
-/*export async function contactPreferenceEmailOrPostNavigationTests(): Promise<void> {
-  if (process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN') {
+
+export async function contactPreferenceEmailOrPostNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', contactPreferenceEmailOrPost.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: contactPreferenceEmailOrPost.pageSlug,
+  });
+  //--The below line is commented out as we have an open bug - HDPI-5396
+  /*if (process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN') {
     await performValidation(
       'pageNavigation',
       contactPreferenceEmailOrPost.backLink,
@@ -102,4 +107,5 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
   }
   await performAction('clickRadioButton', contactPreferenceEmailOrPost.byPostRadioOption);
   await performValidation('pageNavigation', contactPreferenceEmailOrPost.saveForLaterButton, dashboard.mainHeader);
-}*/
+   */
+}
