@@ -1,5 +1,5 @@
 import { submitCaseApiData } from '../data/api-data';
-import { dashboard, disputeClaimInterstitial, landlordRegistered } from '../data/page-data';
+import { dashboard, disputeClaimInterstitial, feedback, landlordRegistered } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function landlordRegisteredErrorValidation(): Promise<void> {
@@ -12,6 +12,10 @@ export async function landlordRegisteredErrorValidation(): Promise<void> {
 
 export async function landlordRegisteredNavigationTests(): Promise<void> {
   const claimantsName = submitCaseApiData.submitCasePayload.claimantName;
+  await performValidation('pageNavigation', landlordRegistered.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: landlordRegistered.pageSlug,
+  });
   await performValidation(
     'pageNavigation',
     landlordRegistered.backLink,
