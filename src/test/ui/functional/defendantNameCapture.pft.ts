@@ -1,4 +1,4 @@
-import { dashboard, defendantNameCapture, freeLegalAdvice } from '../data/page-data';
+import { dashboard, defendantNameCapture, feedback, freeLegalAdvice } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(61);
@@ -33,6 +33,10 @@ export async function defendantNameCaptureErrorValidation(): Promise<void> {
   });
 }
 export async function defendantNameCaptureNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', defendantNameCapture.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: defendantNameCapture.pageSlug,
+  });
   await performValidation('pageNavigation', defendantNameCapture.backLink, freeLegalAdvice.mainHeader);
   await defendantNameCaptureInputValuesPrePopulated();
 }
