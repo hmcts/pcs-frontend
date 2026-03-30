@@ -34,7 +34,7 @@
   <div class="govuk-width-container">
     {{ govukPhaseBanner({
       tag: { text: t('phase', 'Alpha') },
-      html: (t('feedback') | safe)
+      html: (t('feedback', { pageTrackingUrl: pageTrackingUrl }) | safe)
     }) }}
 
   </div>
