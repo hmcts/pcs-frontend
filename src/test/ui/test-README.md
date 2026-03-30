@@ -30,6 +30,7 @@ ui/
 │   ├── registry/              # Component registration
 │   │   ├── action.registry.ts # Action registry
 │   │   └── validation.registry.ts # Validation registry
+│   ├── pft-debug-log.ts       # Optional [PFT] debug logging (ENABLE_PFT_DEBUG_LOG)
 │   └── controller.ts          # Controls the usage of actions and validations
 ├── testREADME.md              # Framework documentation
 └── update-testReadMe.ts       # Documentation auto-update script
@@ -62,6 +63,16 @@ The framework's modular design consists of these key layers:
 ```bash
 Playwright 1.30+ | TypeScript 4.9+
 ```
+
+### PFT debug logging (optional)
+
+When debugging **page navigation**, **error message**, or **page content** flows, enable structured console lines prefixed with `[PFT]`:
+
+- Set **`ENABLE_PFT_DEBUG_LOG=true`** or **`PFT_DEBUG_LOG=true`** (e.g. in `.env`, or in CI for a single run).
+- Default is **off** (no extra output).
+- Implementation: `utils/pft-debug-log.ts`. Logs include the current **URL**, **Playwright test title**, **action/validation type**, and safe field summaries. Keys matching password/token patterns are **redacted**; long strings are **truncated**.
+
+`playwright.config.ts` exports **`enable_pft_debug_log`** for consistency with other `ENABLE_*` flags.
 
 ## 4. Actions and Validations
 

@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
+import { reportValidationFailure, truncateForLog } from '../../common/pft-debug-log';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { IValidation } from '../../interfaces';
 
@@ -139,6 +140,14 @@ export class PageContentValidation implements IValidation {
     const pageData = await this.getPageData(pageName);
 
     if (!pageData) {
+      await reportValidationFailure(
+        page,
+        'page-content',
+        pageName,
+        `Page data file exists for "${pageName}" (data/page-data/${pageName}.page.data.ts)`,
+        'No page data file found',
+        false
+      );
       return;
     }
 
@@ -161,6 +170,21 @@ export class PageContentValidation implements IValidation {
     }
 
     PageContentValidation.validationResults.set(pageUrl, pageResults);
+
+    const failed = pageResults.filter(r => r.status === 'fail');
+    const total = pageResults.length;
+    const expectedSummary =
+      total === 0
+        ? `No content fields to check for "${pageName}"`
+        : `All ${total} content field(s) from page data should be visible on "${pageName}"`;
+    const actualSummary =
+      total === 0
+        ? 'Nothing to validate'
+        : failed.length === 0
+          ? `All ${total} matched (visible)`
+          : `${failed.length} not visible: ${failed.map(f => `${f.element} → "${truncateForLog(f.expected, 120)}"`).join('; ')}`;
+
+    await reportValidationFailure(page, 'page-content', pageName, expectedSummary, actualSummary, failed.length > 0);
   }
 
   private async getPageData(pageName: string): Promise<object | null> {
@@ -283,7 +307,7 @@ export class PageContentValidation implements IValidation {
     }
 
     if (failedPages.size > 0) {
-      console.log('\n❌ VALIDATION FAILED:');
+      console.log('\n❌ FAILED PAGE CONTENT VALIDATION:');
       for (const [pageName, pageFailures] of failedPages) {
         console.log(`   Page: ${pageName}`);
         let pageFailureCount = 0;

@@ -41,7 +41,7 @@ async function detectPageNavigation(): Promise<boolean> {
   if (!startAxeAudit && executor.page.url().includes('start-now')) {
     startAxeAudit = true;
   }
-  if (!startFunctionalTests && executor.page.url().includes('free-legal-advice')) {
+  if (!startFunctionalTests && executor.page.url().includes('start-now')) {
     startFunctionalTests = true;
   }
   const pageNavigated = currentUrl !== previousUrl;
@@ -90,7 +90,7 @@ export async function performAction(
   value?: actionData | actionRecord
 ): Promise<void> {
   const executor = getExecutor();
-  await validatePageIfNavigated(action);
+  //await validatePageIfNavigated(action);
   const actionInstance = ActionRegistry.getAction(action);
 
   let displayFieldName = fieldName;

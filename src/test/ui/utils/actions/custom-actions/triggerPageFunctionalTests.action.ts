@@ -7,7 +7,9 @@ import {
   enable_content_validation,
   enable_error_message_validation,
   enable_navigation_tests,
+  enable_pft_debug_log,
 } from '../../../../../../playwright.config';
+import { pftDebugReport, shortUrl } from '../../common/pft-debug-log';
 import { IAction } from '../../interfaces';
 import {
   ErrorMessageValidation,
@@ -34,7 +36,19 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
     const pageName = await this.getFileNameForPage(page);
+    if (enable_pft_debug_log === 'true') {
+      console.log(`[triggerFunctionalTests] entered url=${shortUrl(page.url())} page=${pageName ?? '(unmapped)'}`);
+    }
     if (!pageName) {
+      if (enable_content_validation === 'true') {
+        pftDebugReport({
+          page,
+          pageLabel: shortUrl(page.url()),
+          category: 'page content',
+          expected: 'URL segment or page heading maps to a page name in urlToFileMapping.config.ts',
+          actual: 'Could not resolve page from URL mapping',
+        });
+      }
       return;
     }
 
@@ -56,6 +70,15 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         await this.runPageContentValidation(page, pageName);
       } else {
         PageContentValidation.trackMissingDataFile(pageName);
+        pftDebugReport({
+          page,
+          pageLabel: pageName,
+          category: 'page content',
+          expected: `Page data file ${pageName}.page.data.ts exists under data/page-data/`,
+          actual:
+            `URL maps to "${pageName}" in urlToFileMapping.config.ts, but there is no matching page data file. ` +
+            `Add src/test/ui/data/page-data/${pageName}.page.data.ts (page content / design source for validation).`,
+        });
       }
     }
 

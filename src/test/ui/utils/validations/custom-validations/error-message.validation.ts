@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
+import { reportValidationFailure } from '../../common/pft-debug-log';
 import { IValidation, validationData, validationRecord } from '../../interfaces';
 
 type ValidationResult = {
@@ -103,6 +104,8 @@ export class ErrorMessageValidation implements IValidation {
 
     const pageUrl = page.url();
     const pageName = await ErrorMessageValidation.getPageNameFromUrl(pageUrl, page);
+
+    await reportValidationFailure(page, 'error-messages', pageName, expected, actualText || 'Not found', !passed);
 
     ErrorMessageValidation.results.push({
       pageUrl,

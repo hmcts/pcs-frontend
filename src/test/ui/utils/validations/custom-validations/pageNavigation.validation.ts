@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
+import { reportValidationFailure } from '../../common/pft-debug-log';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
@@ -90,6 +91,15 @@ export class PageNavigationValidation implements IValidation {
       if (hasPFTFile) {
         PageNavigationValidation.pagesPassed.add(pageName);
       }
+
+      await reportValidationFailure(
+        page,
+        'page-navigation',
+        pageName,
+        `h1 text: "${expectedHeader}"`,
+        `h1 text: "${expectedHeader}"`,
+        false
+      );
     } catch (error) {
       const actualText = await page
         .locator('h1')
@@ -111,6 +121,15 @@ export class PageNavigationValidation implements IValidation {
         error: error instanceof Error ? error.message.split('\n')[0] : String(error),
         hasPFTFile,
       });
+
+      await reportValidationFailure(
+        page,
+        'page-navigation',
+        pageName,
+        `h1 text: "${expectedHeader}"`,
+        `h1 text: "${(actualText || 'Not found').trim()}"`,
+        true
+      );
     }
   }
 
@@ -137,6 +156,15 @@ export class PageNavigationValidation implements IValidation {
       if (hasPFTFile) {
         PageNavigationValidation.pagesPassed.add(pageName);
       }
+
+      await reportValidationFailure(
+        page,
+        'page-navigation',
+        pageName,
+        `h1 after navigation: "${expectedHeader}"`,
+        `h1: "${(actualText || '').trim()}"`,
+        false
+      );
     } catch (error) {
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const actualText = await page
@@ -157,6 +185,15 @@ export class PageNavigationValidation implements IValidation {
         error: error instanceof Error ? error.message.split('\n')[0] : String(error),
         hasPFTFile,
       });
+
+      await reportValidationFailure(
+        page,
+        'page-navigation',
+        pageName,
+        `h1 after navigation: "${expectedHeader}"`,
+        `h1: "${(actualText || 'Not found').trim()}"`,
+        true
+      );
     }
   }
 
