@@ -15,18 +15,18 @@ import {
   InputTextAction,
   SelectAction,
   UploadFileAction,
-  clickLinkAndVerifyNewTabTitleAction,
 } from '../actions/element-actions';
 import { ClickLinkAction } from '../actions/element-actions/clickLink.action';
 import { IAction } from '../interfaces';
 
 export class ActionRegistry {
-  private static actions: Map<string, IAction> = new Map([
+  private static actions: Map<string, IAction> = new Map<string, IAction>([
     ['check', new CheckAction()],
     ['clickButton', new ClickButtonAction()],
     ['clickSummary', new ClickSummaryAction()],
     ['clickLink', new ClickLinkAction()],
-    ['clickLinkAndVerifyNewTabTitle', new clickLinkAndVerifyNewTabTitleAction()],
+    ['clickLinkAndVerifyNewTabTitle', new ClickLinkAction()],
+    ['clickLinkAndVerifySameTabTitle', new ClickLinkAction()],
     ['clickRadioButton', new ClickRadioButtonAction()],
     ['clickTab', new ClickTabAction()],
     ['inputText', new InputTextAction()],
