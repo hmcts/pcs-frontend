@@ -54,13 +54,16 @@ interface MappedTaskGroup {
 
 export const DASHBOARD_ROUTE = '/dashboard';
 
-const HELP_SUPPORT_LINKS: { text: string; href: string }[] = [
-  { text: 'Help with fees', href: '#' },
-  { text: 'Find out about mediation', href: '#' },
-  { text: 'What to expect at the hearing', href: '#' },
-  { text: 'Represent myself at the hearing', href: '#' },
-  { text: 'Find legal advice', href: '#' },
-  { text: 'Find information', href: '#' },
+const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
+  { key: 'helpWithFees', href: 'https://www.gov.uk/get-help-with-court-fees' },
+  { key: 'findOutAboutMediation', href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation' },
+  {
+    key: 'whatToExpectAtTheHearing',
+    href: 'https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal',
+  },
+  { key: 'representMyselfAtTheHearing', href: 'https://www.gov.uk/represent-yourself-in-court' },
+  { key: 'findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
+  { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
 export const getDashboardUrl = (caseReference?: string | number): string | null => {

@@ -67,6 +67,7 @@ export interface PossessionClaimResponse {
       exceptionalHardship?: YesNoValue;
       exceptionalHardshipDetails?: string;
     };
+    writtenTerms?: YesNoNotSureValue;
   };
 }
 
