@@ -1,4 +1,3 @@
-
 import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
