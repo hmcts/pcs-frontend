@@ -69,7 +69,7 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
+    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'Yes', no: 'No' };
     const exceptionalHardship = ccdMapping[exceptionalHardshipValue];
     const exceptionalHardshipDetails =
       exceptionalHardshipValue === 'yes'
@@ -92,7 +92,7 @@ export const step: StepDefinition = createFormStep({
     const householdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     const existingAnswer = householdCircumstances?.exceptionalHardship as string | undefined;
 
-    const mapping: Record<string, string> = { YES: 'yes', NO: 'no' };
+    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
     const exceptionalHardshipValue = existingAnswer ? mapping[existingAnswer] : undefined;
 
     if (!exceptionalHardshipValue) {
