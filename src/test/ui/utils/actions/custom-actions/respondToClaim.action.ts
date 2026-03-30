@@ -22,6 +22,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  writtenTerms,
 } from '../../../data/page-data';
 import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -48,6 +49,7 @@ export class RespondToClaimAction implements IAction {
       ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
+      ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
       ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
@@ -196,6 +198,14 @@ export class RespondToClaimAction implements IAction {
       option: licensedLandlordData.radioOption,
     });
     await performAction('clickButton', landlordLicensed.saveAndContinueButton);
+  }
+
+  private async selectWrittenTerms(writtenTermsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: writtenTermsData.question,
+      option: writtenTermsData.radioOption,
+    });
+    await performAction('clickButton', writtenTerms.saveAndContinueButton);
   }
 
   private async readPaymentInterstitial(): Promise<void> {
