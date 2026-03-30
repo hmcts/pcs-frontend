@@ -1,1 +1,0 @@
-{"value":"brace-expansion","children":{"ID":1115432,"Issue":"brace-expansion: Zero-step sequence causes process hang and memory exhaustion","URL":"https://github.com/advisories/GHSA-f886-m6hf-6m8v","Severity":"moderate","Vulnerable Versions":"<5.0.5","Tree Versions":["2.0.2"],"Dependents":["minimatch@npm:10.2.4"]}}
