@@ -48,12 +48,12 @@ export class PageNavigationValidation implements IValidation {
     if (navigateButton) {
       const popupPromise = page
         .context()
-        .waitForEvent('page')
+        .waitForEvent('page', { timeout: 1000 })
         .catch(() => null);
 
       if (navigateButton.includes('Back') || navigateButton.includes('feedback')) {
         await performAction('clickLink', navigateButton);
-        await page.waitForTimeout(200);
+        await page.waitForTimeout(1000);
       } else {
         await performAction('clickButton', navigateButton);
       }
