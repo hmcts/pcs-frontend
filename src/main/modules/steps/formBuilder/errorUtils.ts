@@ -17,7 +17,7 @@ export interface ErrorSummaryData {
 export type FormError = string | DateFieldError;
 
 /** Config type for an error key: top-level name or parent.child under a radio/checkbox option */
-function fieldTypeForErrorKey(fields: FormFieldConfig[], key: string): FormFieldType | undefined {
+export function fieldTypeForErrorKey(fields: FormFieldConfig[], key: string): FormFieldType | undefined {
   const topLevel = fields.find(f => f.name === key);
   if (topLevel) {
     return topLevel.type;
