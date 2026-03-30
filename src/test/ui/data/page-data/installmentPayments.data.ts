@@ -1,4 +1,4 @@
-export const instalmentPayments = {
+export const installmentPayments = {
   mainHeader: `Making an offer to pay your arrears`,
   respondToClaimParagraph: `Respond to a property possession claim`,
   fromYourPreviousAnswerParagraph: `From your previous answers, you have not come to any arrangement with Treetops Housing to pay off your rent arrears.`,
@@ -14,4 +14,6 @@ export const instalmentPayments = {
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectWhetherYouWouldLikeToOfferErrorMessage: `Select whether you would like to offer to pay your arrears in instalments`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `installment-payments`,
 };
