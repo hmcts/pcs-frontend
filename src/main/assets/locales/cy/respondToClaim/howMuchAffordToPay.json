@@ -1,0 +1,22 @@
+{
+  "pageTitle": "cyInstalments",
+  "caption": "cyRespond to a property possession claim",
+  "heading": "cyInstalments",
+  "amountQuestion": "cyHow much could you afford to pay in addition to the current rent?",
+  "amountHint": "cyFor example, £148.00 or £148.50",
+  "frequencyQuestion": "cyHow frequently could you afford to pay this amount?",
+  "frequencyHint": "cyPaid every:",
+  "frequencyOptions": {
+    "weekly": "cyWeekly",
+    "every2Weeks": "cyEvery 2 weeks",
+    "every4Weeks": "cyEvery 4 weeks",
+    "monthly": "cyMonthly"
+  },
+  "errors": {
+    "installmentAmount": "cyEnter how much you could afford to pay in addition to the current rent",
+    "installmentAmountFormat": "cyEnter an amount in the correct format, for example 148.00 or 148.50",
+    "installmentAmountMax": "cyThe amount you could afford to pay in addition to the current rent must be less than £1 billion",
+    "installmentAmountMin": "cyThe amount you could afford to pay in addition to the current rent must be £0.00 or above",
+    "installmentFrequency": "cySelect how frequently you could afford to pay this amount"
+  }
+}
