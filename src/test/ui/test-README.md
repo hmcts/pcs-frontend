@@ -30,7 +30,8 @@ ui/
 │   ├── registry/              # Component registration
 │   │   ├── action.registry.ts # Action registry
 │   │   └── validation.registry.ts # Validation registry
-│   ├── pft-debug-log.ts       # Optional [PFT] debug logging (ENABLE_PFT_DEBUG_LOG)
+│   ├── common/
+│   │   └── pft-debug-log.ts   # PFT debug logging, failure screenshots (see §3)
 │   └── controller.ts          # Controls the usage of actions and validations
 ├── testREADME.md              # Framework documentation
 └── update-testReadMe.ts       # Documentation auto-update script
@@ -64,17 +65,19 @@ The framework's modular design consists of these key layers:
 Playwright 1.30+ | TypeScript 4.9+
 ```
 
-### PFT debug logging (optional)
+### PFT debug logging (`ENABLE_PFT_DEBUG_LOG`)
 
-When debugging **page navigation**, **error message**, or **page content** flows, enable structured console lines prefixed with `[PFT check: …]`:
+Implementation: **`utils/common/pft-debug-log.ts`**. `playwright.config.ts` exports **`enable_pft_debug_log`** (reads `process.env.ENABLE_PFT_DEBUG_LOG`; must be exactly **`true`** or **`false`** when set). If the variable is **unset**, the config defaults to **`true`** (see `playwright.config.ts`). Set **`ENABLE_PFT_DEBUG_LOG=false`** to silence optional console output.
 
-- Set **`ENABLE_PFT_DEBUG_LOG=true`** (e.g. in `.env`, or in CI for a single run). Value must be exactly **`true`** or **`false`**.
-- Default is **off** (no extra console output).
-- Implementation: `utils/common/pft-debug-log.ts`. Lines include **test title**, **page label**, **URL**, **expected**, and **actual** (long strings truncated).
-- **Failure screenshots** (`test.info().attach` → HTML / Allure) are **not** controlled by `ENABLE_PFT_DEBUG_LOG`; they attach when a validation reports a failure and requests a screenshot.
-- **`logTestBeforeEachContext()`** (end of each UI spec `test.beforeEach`): when `ENABLE_PFT_DEBUG_LOG=true`, prints one block with the test title and **only** case/journey env keys that are **set** at that moment (`CLAIMANT_NAME`, `NOTICE_SERVED`, `TENANCY_TYPE`, `CASE_NUMBER`, …). Unset keys are omitted.
+**Console output (flag-gated — only when `enable_pft_debug_log === 'true'`):**
 
-`playwright.config.ts` exports **`enable_pft_debug_log`** alongside other `ENABLE_*` flags.
+- **`pftDebugLog(...)`** — used for end-of-test **summaries** (page content, error-message, and navigation `finaliseTest()` output) and the **`[triggerFunctionalTests] entered …`** line in `triggerPageFunctionalTests`.
+- **`pftDebugReport` / `[PFT check: …]`** — structured lines from `reportValidationFailure` and unmapped-URL handling in the trigger: **test title**, **page label**, **URL**, **expected**, **actual** (long strings truncated).
+- **`logTestBeforeEachContext()`** — requires **`captureProcessEnvBeforeBeforeEach()`** as the **first** line of the same `test.beforeEach`. Prints one block with the test title and every **non-empty** `process.env` key whose value **changed** during that `beforeEach` (diff from the snapshot at the start of the hook).
+
+**Failure screenshots (not gated by the flag):**
+
+- Full-page PNGs via **`test.info().attach`** (HTML / Allure) when a validation attaches on failure — e.g. **`attachValidationFailureScreenshot`**, **`reportValidationFailure(..., attachScreenshot: true)`** (page content mismatch, load/parse errors, error-message failures, navigation failures). If screenshot capture fails, a **`console.warn`** may still appear so the problem is visible even when debug logging is off.
 
 ## 4. Actions and Validations
 
@@ -176,15 +179,16 @@ Smart Mapping: Automatically maps URLs to page data files, including numeric URL
 
 Comprehensive: Validates buttons, headers, links, paragraphs, and other UI elements
 
-Validation Summary -
-After each test, you'll see a detailed report in the respective test stdout:
+Validation summary (stdout) -
+
+The emoji-style **PAGE CONTENT / ERROR MESSAGE / NAVIGATION** summary blocks are emitted via **`pftDebugLog`** and only appear when **`ENABLE_PFT_DEBUG_LOG=true`**. Failures still **throw** and **failure screenshots** still attach to the report when validations fail, independent of that flag.
+
+Example (when debug logging is enabled):
 
 ```
 📊 PAGE CONTENT VALIDATION SUMMARY (Test #1):
-Total pages validated: 3
-Pages passed: 2
-Pages failed: 1
-Missing elements: Submit button, Continue link
+   Total pages validated: 3
+   ...
 ```
 
 ## 9. Functional test automation for pcs-frontend

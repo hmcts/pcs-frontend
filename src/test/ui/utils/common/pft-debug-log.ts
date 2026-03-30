@@ -6,41 +6,72 @@ import { test } from '@playwright/test';
 
 import { enable_pft_debug_log } from '../../../../../playwright.config';
 
+/** Summary / diagnostic `console.log` lines — only when `ENABLE_PFT_DEBUG_LOG=true`. */
+export function pftDebugLog(...args: unknown[]): void {
+  if (enable_pft_debug_log !== 'true') {
+    return;
+  }
+  console.log(...args);
+}
+
 /**
- * Console: `[PFT check: …]` lines only when `ENABLE_PFT_DEBUG_LOG=true` (`enable_pft_debug_log`).
- * Failure PNGs: `test.info().attach` whenever `reportValidationFailure(..., attachScreenshot: true)` runs —
- * not gated by `ENABLE_PFT_DEBUG_LOG` (Allure/HTML report pick up attachments from test results).
+ * Console output:
+ * - **`pftDebugLog` / `logTestBeforeEachContext`**: only when `ENABLE_PFT_DEBUG_LOG=true`.
+ * - **`pftDebugReport`** (`[PFT check: …]`): only when `ENABLE_PFT_DEBUG_LOG=true`.
+ * Failure PNGs: `test.info().attach` from `attachValidationFailureScreenshot` and from
+ * `reportValidationFailure(..., attachScreenshot: true)` — **not** gated by the flag
+ * (Allure / HTML report attachments).
  */
 
-/** Env keys that UI spec `beforeEach` hooks assign (case / journey). Only these are considered for logging. */
-const BEFORE_EACH_ASSIGNED_ENV_KEYS: readonly string[] = [
-  'CLAIMANT_NAME',
-  'NOTICE_SERVED',
-  'TENANCY_TYPE',
-  'GROUNDS',
-  'CLAIMANT_NAME_OVERRIDDEN',
-  'CORRESPONDENCE_ADDRESS',
-  'WALES_POSTCODE',
-  'CASE_NUMBER',
-];
+/**
+ * Shallow snapshot of `process.env` at the **start** of `test.beforeEach` (before any assignments).
+ * Used by `logTestBeforeEachContext()` to log only keys **added or changed** during that hook.
+ */
+let envSnapshotBeforeBeforeEach: NodeJS.ProcessEnv | null = null;
+
+/**
+ * Call as the **first** line of `test.beforeEach` (before `initializeExecutor` / any `process.env` writes).
+ * Pairs with `logTestBeforeEachContext()` at the end of the same hook.
+ */
+export function captureProcessEnvBeforeBeforeEach(): void {
+  envSnapshotBeforeBeforeEach = { ...process.env };
+}
+
+function envKeysChangedDuringBeforeEach(): string[] {
+  const before = envSnapshotBeforeBeforeEach;
+  if (!before) {
+    return [];
+  }
+  const keys: string[] = [];
+  for (const k of Object.keys(process.env)) {
+    const v = process.env[k];
+    if (v === undefined || v === '') {
+      continue;
+    }
+    if (before[k] !== v) {
+      keys.push(k);
+    }
+  }
+  return keys.sort();
+}
 
 /**
  * Call at the **end** of `test.beforeEach` (after `process.env` / case creation is done).
  * Prints one block only when `ENABLE_PFT_DEBUG_LOG=true`.
- * Logs **only** keys above that are **currently set** in `process.env` (skips unset keys).
+ * Logs every **non-empty** `process.env` key whose value **differs** from the snapshot taken by
+ * `captureProcessEnvBeforeBeforeEach()` at the start of this `beforeEach`.
  */
 export function logTestBeforeEachContext(): void {
-  if (enable_pft_debug_log !== 'true') {
-    return;
-  }
   const { title } = test.info();
-  const lines = BEFORE_EACH_ASSIGNED_ENV_KEYS.filter(key => {
-    const v = process.env[key];
-    return v !== undefined && v !== '';
-  }).map(key => `  ${key}=${process.env[key]}`);
+  const changedKeys = envKeysChangedDuringBeforeEach();
+  const lines = changedKeys.map(key => `  ${key}=${process.env[key]}`);
   const body =
-    lines.length > 0 ? lines.join('\n') : '  (none of the tracked beforeEach env keys are set at this point)';
-  console.log(['[PFT debug: beforeEach context]', `  test: ${truncateForLog(title, 200)}`, body].join('\n'));
+    lines.length > 0
+      ? lines.join('\n')
+      : envSnapshotBeforeBeforeEach
+        ? '  (no process.env keys were added or changed during this beforeEach)'
+        : '  (call captureProcessEnvBeforeBeforeEach() at the start of beforeEach to log env changes)';
+  pftDebugLog(['[PFT debug: beforeEach context]', `  test: ${truncateForLog(title, 200)}`, body].join('\n'));
 }
 
 function truncate(s: string, max: number, trim?: boolean): string {
@@ -59,12 +90,15 @@ const validationLabel: Record<ValidationFailureCategory, string> = {
   'page-navigation': 'page navigation',
 };
 
-async function attachValidationFailureScreenshot(
+/**
+ * Full-page screenshot attached to the test report (Allure / HTML). Not gated by `ENABLE_PFT_DEBUG_LOG`.
+ */
+export async function attachValidationFailureScreenshot(
   page: Page,
   category: ValidationFailureCategory,
-  pageLabel: string,
-  debugLabel: string
+  pageLabel: string
 ): Promise<void> {
+  const debugLabel = validationLabel[category];
   try {
     const safe = (pageLabel.trim() || 'page').slice(0, 80);
     const fileName = `failure-${category}-${safe}-${Date.now()}.png`;
@@ -93,7 +127,7 @@ export async function reportValidationFailure(
 ): Promise<void> {
   const label = validationLabel[category];
   if (attachScreenshot) {
-    await attachValidationFailureScreenshot(page, category, pageLabel, label);
+    await attachValidationFailureScreenshot(page, category, pageLabel);
   }
   pftDebugReport({ page, pageLabel, category: label, expected, actual });
 }

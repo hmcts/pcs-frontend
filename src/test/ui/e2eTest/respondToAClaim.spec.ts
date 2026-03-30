@@ -21,12 +21,13 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
 } from '../data/page-data';
-import { logTestBeforeEachContext } from '../utils/common/pft-debug-log';
+import { captureProcessEnvBeforeBeforeEach, logTestBeforeEachContext } from '../utils/common/pft-debug-log';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }, testInfo) => {
+  captureProcessEnvBeforeBeforeEach();
   initializeExecutor(page);
   process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayload.claimantName;
   if (testInfo.title.includes('NoticeServed - No')) {
