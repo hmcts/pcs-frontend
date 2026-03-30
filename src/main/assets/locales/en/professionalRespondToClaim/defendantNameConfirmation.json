@@ -1,0 +1,18 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "PROFESSIONAL-Your name",
+  "nameConfirmationLabel": "PROFESSIONAL-Is your name {{defendantName}}?",
+  "nameConfirmationHint": "This is the name provided by {{organisationName}}",
+  "yesOption": "Yes",
+  "noOption": "No",
+  "firstNameLabel": "First name",
+  "lastNameLabel": "Last name",
+  "contactUs": "Contact us for help",
+  "errors": {
+    "nameConfirmation": "You must say if your name is {{defendantName}}",
+    "firstName": "Enter your first name",
+    "firstNameMaxLength": "First name must be 60 characters or less",
+    "lastName": "Enter your last name",
+    "lastNameMaxLength": "Last name must be 60 characters or less"
+  }
+}

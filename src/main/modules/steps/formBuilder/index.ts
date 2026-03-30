@@ -13,6 +13,7 @@ import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
 import { validateConfigInDevelopment } from './schema';
+import { concatenateJourneyStepName } from '@utils/stepNameFolderCombiner';
 
 export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 
@@ -57,7 +58,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       return createGetController(viewPath, stepName, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
 
-        const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+        const t: TFunction = getTranslationFunction(req, stepName, ['common'], journeyFolder);
 
         const nunjucksEnv = req.app.locals.nunjucksEnv;
         if (!nunjucksEnv) {
@@ -74,7 +75,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         const formContent = buildFormContent(
           fields,
           t,
-          initialFormData || getFormData(req, stepName),
+          initialFormData || getFormData(req, concatenateJourneyStepName(stepName, journeyFolder)),
           {},
           translationKeys,
           nunjucksEnv,

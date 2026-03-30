@@ -33,6 +33,7 @@ export {
   checkStepDependencies,
   createStepNavigation,
   stepNavigation,
+  professionalStepNavigation,
   stepDependencyCheckMiddleware,
 } from './flow';
 

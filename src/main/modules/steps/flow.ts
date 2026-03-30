@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import { flowConfig as respondToClaimFlowConfig } from '../../steps/respond-to-claim/flow.config';
+import { flowConfig as professionalRespondToClaimFlowConfig } from '../../steps/professional-respond-to-claim/flow.config';
 
 import { Logger } from '@modules/logger';
 
@@ -151,6 +152,7 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
 }
 
 export const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
+export const professionalStepNavigation = createStepNavigation(professionalRespondToClaimFlowConfig);
 
 export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = respondToClaimFlowConfig) {
   return (req: Request, res: Response, next: NextFunction): void => {

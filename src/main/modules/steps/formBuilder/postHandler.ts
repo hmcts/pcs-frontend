@@ -25,6 +25,7 @@ import {
   validateForm,
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
+import { concatenateJourneyStepName } from '@utils/stepNameFolderCombiner';
 
 export function createPostHandler(
   fields: FormFieldConfig[],
@@ -55,7 +56,7 @@ export function createPostHandler(
     post: async (req: Request, res: Response, next: NextFunction) => {
       await loadStepNamespace(req, stepName, journeyFolder);
 
-      const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+      const t: TFunction = getTranslationFunction(req, stepName, ['common'], journeyFolder);
       const action = req.body.action as string | undefined;
 
       const nunjucksEnv = req.app.locals.nunjucksEnv;
@@ -130,7 +131,7 @@ export function createPostHandler(
       // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
       const { action: _, ...bodyWithoutAction } = req.body;
-      setFormData(req, stepName, bodyWithoutAction);
+      setFormData(req, concatenateJourneyStepName(stepName, journeyFolder), bodyWithoutAction);
 
       if (beforeRedirect) {
         try {

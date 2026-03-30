@@ -3,6 +3,8 @@ import type { StepDefinition } from '../interfaces/stepFormData.interface';
 
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
+import { flowConfig as professionalRespondToClaimFlowConfig } from './professional-respond-to-claim/flow.config';
+import { stepRegistry as professionalRespondToClaimStepRegistry } from './professional-respond-to-claim/stepRegistry';
 
 export interface JourneyConfig {
   name: string;
@@ -15,6 +17,11 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     name: 'respondToClaim',
     flowConfig: respondToClaimFlowConfig,
     stepRegistry: respondToClaimStepRegistry,
+  },
+  professionalRespondToClaim: {
+    name: 'professionalRespondToClaim',
+    flowConfig: professionalRespondToClaimFlowConfig,
+    stepRegistry: professionalRespondToClaimStepRegistry,
   },
 };
 

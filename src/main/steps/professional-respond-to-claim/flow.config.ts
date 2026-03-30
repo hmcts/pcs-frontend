@@ -1,0 +1,41 @@
+import { type Request } from 'express';
+
+import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
+import {
+  isDefendantNameKnown,
+} from '../utils';
+
+export const PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE = '/professional/case/:caseReference/respond-to-claim';
+
+export const flowConfig: JourneyFlowConfig = {
+  basePath: PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE,
+  journeyName: 'professionalRespondToClaim',
+  stepOrder: [
+    'start-now',
+    'free-legal-advice',
+    'defendant-name-confirmation',
+  ],
+  steps: {
+    'start-now': {
+      defaultNext: 'free-legal-advice',
+    },
+    'free-legal-advice': {
+      routes: [
+        {
+          // Route to defendant name confirmation if defendant is known
+          condition: async (req: Request) => isDefendantNameKnown(req),
+          nextStep: 'defendant-name-confirmation',
+        },
+        {
+          // Route to defendant name capture if defendant is unknown
+          condition: async (req: Request) => !isDefendantNameKnown(req),
+          nextStep: 'defendant-name-capture',
+        },
+      ],
+      defaultNext: 'defendant-name-capture',
+    },
+    'defendant-name-confirmation': {
+      defaultNext: 'defendant-date-of-birth',
+    },
+  },
+};
