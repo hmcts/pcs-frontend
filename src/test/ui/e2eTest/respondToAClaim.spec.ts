@@ -514,7 +514,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayloadRentNonRent.isClaimantNameCorrect);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadRentNonRent.isClaimantNameCorrect
+    );
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadRentNonRent.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,

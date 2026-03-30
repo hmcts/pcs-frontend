@@ -54,20 +54,20 @@ export async function rentArrearsNavigationTests(): Promise<void> {
   console.log('pft - Notice date provided', process.env.NOTICE_DATE_PROVIDED);
   console.log('pft- Notice details page has no or im not sure selection', process.env.NOTICE_DETAILS_NO_NOTSURE);
   if (process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'YES') {
-    if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES'){
+    if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
       await performValidation('pageNavigation', rentArrears.backLink, confirmationOfNoticeGiven.mainHeader);
     } else {
       await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenProvided.mainHeader);
     }
-  } else if ( process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'NO') {
-    if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES'){
+  } else if (process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'NO') {
+    if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
       await performValidation('pageNavigation', rentArrears.backLink, confirmationOfNoticeGiven.mainHeader);
     } else {
       await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenNotProvided.mainHeader);
     }
   }
 
-  if ( process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'NO') {
+  if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'NO') {
     await performValidation('pageNavigation', rentArrears.backLink, tenancyDateUnknown.mainHeader);
   } else if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'YES') {
     await performValidation('pageNavigation', rentArrears.backLink, tenancyDateDetails.mainHeader);
