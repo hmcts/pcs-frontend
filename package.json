@@ -178,7 +178,8 @@
     "jws": "3.2.3",
     "tar": "~7.5.9",
     "lodash": "~4.17.23",
-    "lodash-es": "~4.17.23"
+    "lodash-es": "~4.17.23",
+    "path-to-regexp": "^8.4.0"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
