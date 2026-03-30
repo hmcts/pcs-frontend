@@ -69,7 +69,7 @@ test.beforeEach(async ({ page }, testInfo) => {
       break;
   }
 
-  // Tenancy start date logic (independent)
+  // Tenancy start date logic for noDefendantTest
   if (testInfo.title.includes('NoticeServed - No') && !testInfo.title.includes('@rentNonRent')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   } else {
