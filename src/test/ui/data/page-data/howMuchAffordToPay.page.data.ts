@@ -1,0 +1,20 @@
+export const howMuchAffordToPay = {
+  mainHeader: `Instalments`,
+  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
+  howMuchCouldYouAffordToPayParagraph: `How much could you afford to pay in addition to the current rent?`,
+  forExampleHintText: `For example, £148.00 or £148.50`,
+  howFrequentlyCouldYouAffordToPay: `How frequently could you afford to pay this amount?`,
+  weeklyRadioOption: `Weekly`,
+  every2WeeksRadioOption: `Every 2 weeks`,
+  every4weeksRadioOption: `Every 4 weeks`,
+  monthlyRadioOption: `Monthly`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  backLink: `Back link`,
+  cancelLink: `Cancel link`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  enterHowMuchYouCouldAffordErrorMessage:`Enter how much you could afford to pay in addition to the current rent`,
+  selectHowFrequentlyYouCouldAffordErrorMessage: `Select how frequently you could afford to pay this amount`,
+  enterAmountInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
+  theAmountYouCouldAffordToPayErrorMessage:`The amount you could afford to pay in addition to the current rent must be less than £1 billion`
+};
