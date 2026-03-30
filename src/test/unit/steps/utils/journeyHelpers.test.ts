@@ -14,6 +14,7 @@ describe('getPreviousPageForArrears', () => {
   beforeEach(() => {
     mockReq = {
       res: { locals: {} },
+      session: {},
     };
     jest.clearAllMocks();
     (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
@@ -85,23 +86,23 @@ describe('getPreviousPageForArrears', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true); // Date provided but notice not served
       (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
 
-      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-unknown');
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });
 
-    it('returns tenancy-date-details when notice not served, user said no, and start date is known', async () => {
+    it('returns tenancy-date-details when notice not served, even if user said no, and start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
-      mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'no' } };
+      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'no' };
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });
 
-    it('returns tenancy-date-details when notice not served, user said yes, and start date is known', async () => {
+    it('returns tenancy-date-details when notice not served, even if user said yes, and start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
-      mockReq.session.formData = { 'confirmation-of-notice-given': { confirmNoticeGiven: 'yes' } };
+      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'yes' };
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });

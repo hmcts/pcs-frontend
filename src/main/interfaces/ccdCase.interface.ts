@@ -128,6 +128,7 @@ export interface CcdCaseData {
   notice_NoticePostedDate?: string;
   notice_NoticeOtherElectronicDateTime?: string;
   tenancy_TypeOfTenancyLicence?: string;
+  tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
