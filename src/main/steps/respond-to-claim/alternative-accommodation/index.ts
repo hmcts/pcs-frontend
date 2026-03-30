@@ -86,7 +86,6 @@ export const step: StepDefinition = createFormStep({
     } else if (confirmValue === 'notSure') {
       householdCircumstances.alternativeAccommodation = 'NOT_SURE';
     }
-    
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances,
