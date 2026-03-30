@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import { flowConfig as respondToClaimFlowConfig } from '../../steps/respond-to-claim/flow.config';
 
 import { Logger } from '@modules/logger';
 
@@ -14,11 +13,49 @@ export async function getNextStep(
   formData: Record<string, unknown>,
   currentStepData: Record<string, unknown> = {}
 ): Promise<string | null> {
-  const stepConfig = flowConfig.steps[currentStepName];
 
   if (flowConfig.useShowConditions) {
-
+    // Rule deprecated: https://eslint.org/docs/latest/rules/no-return-await
+    // eslint-disable-next-line no-return-await
+    return await getNextStepByShowCondition(req, currentStepName, flowConfig);
+  } else {
+    // eslint-disable-next-line no-return-await
+    return await getNextStepByRouteConditions(req, currentStepName, flowConfig, formData, currentStepData);
   }
+}
+
+async function getNextStepByShowCondition(req: Request,
+                                          currentStepName: string,
+                                          flowConfig: JourneyFlowConfig) {
+
+  const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
+  // TODO: Handle -1
+
+  for (let stepIndex = currentIndex + 1; stepIndex < flowConfig.stepOrder.length; stepIndex++) {
+    const candidateNextStepName = flowConfig.stepOrder[stepIndex];
+    const candidateNextStep = flowConfig.steps[candidateNextStepName];
+    // TODO: Test
+    if (!candidateNextStep || !candidateNextStep.showCondition) {
+      // No show condition defined
+      return candidateNextStepName;
+    }
+
+    if (candidateNextStep.showCondition(req)) {
+      // Show condition matches
+      return candidateNextStepName;
+    }
+  }
+  // TODO: Handle last page / no matches
+  return flowConfig.stepOrder[0];
+}
+
+async function getNextStepByRouteConditions(req: Request,
+                                            currentStepName: string,
+                                            flowConfig: JourneyFlowConfig,
+                                            formData: Record<string, unknown>,
+                                            currentStepData: Record<string, unknown>) {
+
+  const stepConfig = flowConfig.steps[currentStepName];
 
   if (stepConfig?.routes) {
     for (const route of stepConfig.routes) {
@@ -50,6 +87,45 @@ export async function getPreviousStep(
   flowConfig: JourneyFlowConfig,
   formData: Record<string, unknown> = {}
 ): Promise<string | null> {
+  if (flowConfig.useShowConditions) {
+    // Rule deprecated: https://eslint.org/docs/latest/rules/no-return-await
+    // eslint-disable-next-line no-return-await
+    return await getPreviousStepByShowConditions(req, currentStepName, flowConfig);
+  } else {
+    // eslint-disable-next-line no-return-await
+    return await getPreviousStepByRouteConditions(req, currentStepName, flowConfig, formData);
+  }
+}
+
+async function getPreviousStepByShowConditions(req: Request,
+                                               currentStepName: string,
+                                               flowConfig: JourneyFlowConfig) {
+
+  const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
+  // TODO: Handle -1?
+
+  for (let stepIndex = currentIndex - 1; stepIndex >= 0; stepIndex--) {
+    const candidatePreviousStepName = flowConfig.stepOrder[stepIndex];
+    const candidatePreviousStep = flowConfig.steps[candidatePreviousStepName];
+    if (!candidatePreviousStep || !candidatePreviousStep.showCondition) {
+      // No show condition defined
+      return candidatePreviousStepName;
+    }
+
+    if (candidatePreviousStep.showCondition(req)) {
+      // Show condition matches
+      return candidatePreviousStepName;
+    }
+  }
+  // TODO: Handle first page / no matches
+  return flowConfig.stepOrder[0];
+}
+
+async function getPreviousStepByRouteConditions(req: Request,
+                                            currentStepName: string,
+                                            flowConfig: JourneyFlowConfig,
+                                            formData: Record<string, unknown>) {
+
   const stepConfig = flowConfig.steps[currentStepName];
 
   // If step has explicit previousStep configuration, use it
