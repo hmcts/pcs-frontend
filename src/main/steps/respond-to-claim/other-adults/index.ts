@@ -73,16 +73,11 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const confirmValue = req.body?.confirmOtherAdults as string | undefined;
     const householdCircumstances: Record<string, unknown> = {};
-    const rawDetails = req.body?.['confirmOtherAdults.otherAdultsDetails'] as string | undefined;
-
-    const normalisedDetails = rawDetails
-      ?.replace(/[\r\n\t]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
+    const details = req.body?.['confirmOtherAdults.otherAdultsDetails'] as string | undefined;
 
     if (confirmValue === 'yes') {
       householdCircumstances.otherTenants = 'YES';
-      householdCircumstances.otherTenantsDetails = normalisedDetails;
+      householdCircumstances.otherTenantsDetails = details;
     } else if (confirmValue === 'no') {
       householdCircumstances.otherTenants = 'NO';
     }
