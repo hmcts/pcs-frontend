@@ -66,13 +66,14 @@ Playwright 1.30+ | TypeScript 4.9+
 
 ### PFT debug logging (optional)
 
-When debugging **page navigation**, **error message**, or **page content** flows, enable structured console lines prefixed with `[PFT]`:
+When debugging **page navigation**, **error message**, or **page content** flows, enable structured console lines prefixed with `[PFT check: …]`:
 
-- Set **`ENABLE_PFT_DEBUG_LOG=true`** or **`PFT_DEBUG_LOG=true`** (e.g. in `.env`, or in CI for a single run).
-- Default is **off** (no extra output).
-- Implementation: `utils/pft-debug-log.ts`. Logs include the current **URL**, **Playwright test title**, **action/validation type**, and safe field summaries. Keys matching password/token patterns are **redacted**; long strings are **truncated**.
+- Set **`ENABLE_PFT_DEBUG_LOG=true`** (e.g. in `.env`, or in CI for a single run). Value must be exactly **`true`** or **`false`**.
+- Default is **off** (no extra console output).
+- Implementation: `utils/common/pft-debug-log.ts`. Lines include **test title**, **page label**, **URL**, **expected**, and **actual** (long strings truncated).
+- **Failure screenshots** (`test.info().attach` → HTML / Allure) are **not** controlled by `ENABLE_PFT_DEBUG_LOG`; they attach when a validation reports a failure and requests a screenshot.
 
-`playwright.config.ts` exports **`enable_pft_debug_log`** for consistency with other `ENABLE_*` flags.
+`playwright.config.ts` exports **`enable_pft_debug_log`** alongside other `ENABLE_*` flags.
 
 ## 4. Actions and Validations
 

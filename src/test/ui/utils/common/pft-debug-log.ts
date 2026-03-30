@@ -4,12 +4,13 @@ import * as path from 'path';
 import type { Page } from '@playwright/test';
 import { test } from '@playwright/test';
 
-import {
-  enable_content_validation,
-  enable_error_message_validation,
-  enable_navigation_tests,
-  enable_pft_debug_log,
-} from '../../../../../playwright.config';
+import { enable_pft_debug_log } from '../../../../../playwright.config';
+
+/**
+ * Console: `[PFT check: …]` lines only when `ENABLE_PFT_DEBUG_LOG=true` (`enable_pft_debug_log`).
+ * Failure PNGs: `test.info().attach` whenever `reportValidationFailure(..., attachScreenshot: true)` runs —
+ * not gated by `ENABLE_PFT_DEBUG_LOG` (Allure/HTML report pick up attachments from test results).
+ */
 
 function truncate(s: string, max: number, trim?: boolean): string {
   const t = trim ? s.trim() : s;
@@ -20,12 +21,6 @@ export const shortUrl = (u: string, max = 88) => truncate(u, max);
 export const truncateForLog = (s: string, max = 800) => truncate(s, max, true);
 
 export type ValidationFailureCategory = 'page-content' | 'error-messages' | 'page-navigation';
-
-const validationEnv: Record<ValidationFailureCategory, string> = {
-  'page-content': enable_content_validation,
-  'error-messages': enable_error_message_validation,
-  'page-navigation': enable_navigation_tests,
-};
 
 const validationLabel: Record<ValidationFailureCategory, string> = {
   'page-content': 'page content',
@@ -39,9 +34,6 @@ async function attachValidationFailureScreenshot(
   pageLabel: string,
   debugLabel: string
 ): Promise<void> {
-  if (validationEnv[category] !== 'true') {
-    return;
-  }
   try {
     const safe = (pageLabel.trim() || 'page').slice(0, 80);
     const fileName = `failure-${category}-${safe}-${Date.now()}.png`;
@@ -87,8 +79,10 @@ export function pftDebugReport(options: {
   }
   const { page, pageLabel, category, expected, actual } = options;
   const tag = `[PFT check: ${category}]`;
+  const testTitle = test.info().title;
   console.log(
     [
+      `${tag} test: ${truncateForLog(testTitle, 200)}`,
       `${tag} page: ${truncateForLog(pageLabel, 200)}`,
       `${tag} url: ${shortUrl(page.url())}`,
       `${tag} expected: ${truncateForLog(expected)}`,
