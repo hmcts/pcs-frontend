@@ -24,13 +24,12 @@ export async function getNextStep(
 }
 
 async function getNextStepByShowCondition(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
-  const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
-  // TODO: Handle -1
+  const currentIndex = getStepIndex(flowConfig, currentStepName);
 
   for (let stepIndex = currentIndex + 1; stepIndex < flowConfig.stepOrder.length; stepIndex++) {
     const candidateNextStepName = flowConfig.stepOrder[stepIndex];
     const candidateNextStep = flowConfig.steps[candidateNextStepName];
-    // TODO: Test
+
     if (!candidateNextStep || !candidateNextStep.showCondition) {
       // No show condition defined
       return candidateNextStepName;
@@ -41,8 +40,8 @@ async function getNextStepByShowCondition(req: Request, currentStepName: string,
       return candidateNextStepName;
     }
   }
-  // TODO: Handle last page / no matches
-  return flowConfig.stepOrder[0];
+
+  return null;
 }
 
 async function getNextStepByRouteConditions(
@@ -95,12 +94,12 @@ export async function getPreviousStep(
 }
 
 async function getPreviousStepByShowConditions(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
-  const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
-  // TODO: Handle -1?
+  const currentIndex = getStepIndex(flowConfig, currentStepName);
 
   for (let stepIndex = currentIndex - 1; stepIndex >= 0; stepIndex--) {
     const candidatePreviousStepName = flowConfig.stepOrder[stepIndex];
     const candidatePreviousStep = flowConfig.steps[candidatePreviousStepName];
+
     if (!candidatePreviousStep || !candidatePreviousStep.showCondition) {
       // No show condition defined
       return candidatePreviousStepName;
@@ -111,8 +110,8 @@ async function getPreviousStepByShowConditions(req: Request, currentStepName: st
       return candidatePreviousStepName;
     }
   }
-  // TODO: Handle first page / no matches
-  return flowConfig.stepOrder[0];
+
+  return null;
 }
 
 async function getPreviousStepByRouteConditions(
@@ -227,7 +226,7 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): StepNavigat
   };
 }
 
-export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = respondToClaimFlowConfig) {
+export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const urlParts = req.path.split('/');
     const stepName = urlParts[urlParts.length - 1];
@@ -247,4 +246,12 @@ export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = re
 
     next();
   };
+}
+
+function getStepIndex(flowConfig: JourneyFlowConfig, stepName: string) {
+  const stepIndex = flowConfig.stepOrder.indexOf(stepName);
+  if (stepIndex === -1) {
+    throw new Error(`Step ${stepName} not found in stepOrder`);
+  }
+  return stepIndex;
 }

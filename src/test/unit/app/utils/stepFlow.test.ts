@@ -37,7 +37,78 @@ describe('stepFlow', () => {
     },
   };
 
-  describe('getNextStep', () => {
+  describe('getNextStep with show conditions', () => {
+    const mockReq = {} as Request;
+
+    it('should return next page with missing show condition', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: (_req) => false
+          }
+          // step3 has no showCondition defined
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'step1', flowConfig, {});
+      expect(result).toBe('step3');
+    });
+
+    it('should return next visible page with show condition', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: (_req) => false
+          },
+          step3: {
+            showCondition: (_req) => true
+          }
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'step1', flowConfig, {});
+      expect(result).toBe('step3');
+    });
+
+    it('should return null when no further visible pages', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: (_req) => false
+          },
+          step3: {
+            showCondition: (_req) => false
+          }
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'step1', flowConfig, {});
+      expect(result).toBe(null);
+    });
+
+    it('should throw errorfor unknown step name', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: (_req) => false
+          }
+        }
+      };
+
+      await expect(getNextStep(mockReq, 'step99', flowConfig, {}))
+        .rejects.toThrow('Step step99 not found in stepOrder');
+    });
+  });
+
+  describe('getNextStep without show conditions', () => {
     const mockReq = {} as Request;
 
     it('should return defaultNext when step has defaultNext configured', async () => {
@@ -157,7 +228,78 @@ describe('stepFlow', () => {
     });
   });
 
-  describe('getPreviousStep', () => {
+  describe('getPreviousStep with show conditions', () => {
+    const mockReq = {} as Request;
+
+    it('should return previos page with missing show condition', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: (_req) => false
+          }
+          // step3 has no showCondition defined
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe('step1');
+    });
+
+    it('should return next visible page with show condition', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            showCondition: (_req) => true
+          },
+          step2: {
+            showCondition: (_req) => false
+          }
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe('step1');
+    });
+
+    it('should return null when no earlier visible pages', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            showCondition: (_req) => false
+          },
+          step2: {
+            showCondition: (_req) => false
+          }
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe(null);
+    });
+
+    it('should throw errorfor unknown step name', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: (_req) => false
+          }
+        }
+      };
+
+      await expect(getPreviousStep(mockReq, 'step99', flowConfig, {}))
+        .rejects.toThrow('Step step99 not found in stepOrder');
+    });
+  });
+
+  describe('getPreviousStep without show conditions', () => {
     const mockReq = {} as Request;
 
     it('should return previous step in order', async () => {
@@ -514,24 +656,5 @@ describe('stepFlow', () => {
       expect(next).toHaveBeenCalled();
     });
 
-    it('should use default flow config when not provided', () => {
-      const middleware = stepDependencyCheckMiddleware();
-      const req = {
-        path: '/respond-to-claim/correspondence-address',
-        session: {
-          formData: {},
-        },
-      } as unknown as Request;
-      const res = {
-        redirect: jest.fn(),
-      } as unknown as Response;
-      const next = jest.fn();
-
-      middleware(req, res, next);
-
-      // correspondence-address has no dependencies in respondToClaim flow, so next() should be called
-      expect(next).toHaveBeenCalled();
-      expect(res.redirect).not.toHaveBeenCalled();
-    });
   });
 });
