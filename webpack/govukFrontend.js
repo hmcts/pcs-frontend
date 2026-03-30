@@ -12,6 +12,16 @@ const images = path.resolve(assets, 'images');
 const fonts = path.resolve(assets, 'fonts');
 const rebrand = path.resolve(assets, 'rebrand');
 
+
+const root2 = path.resolve(require.resolve('@hmcts-cft/cft-ui-component-lib', '..'));
+
+const cftWebpack = new CopyWebpackPlugin({
+  patterns: [
+    { from: path.resolve(root2, '../../../src/styles'), to: 'assets/ui-component-lib' },
+    { from: path.resolve(root2, 'nunjucks'), to: '../views/ui-component-lib' },
+  ],
+});
+
 const copyGovukTemplateAssets = new CopyWebpackPlugin({
   patterns: [
     { from: images, to: 'assets/images' },
@@ -26,5 +36,5 @@ const copyGovukTemplateAssets = new CopyWebpackPlugin({
 
 module.exports = {
   paths: { template: root, components, sass, javascript, assets },
-  plugins: [copyGovukTemplateAssets],
+  plugins: [copyGovukTemplateAssets, cftWebpack],
 };
