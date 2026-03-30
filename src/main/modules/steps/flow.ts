@@ -94,7 +94,6 @@ export async function getPreviousStep(
 }
 
 async function getPreviousStepByShowConditions(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
-  // TODO: Test
   const currentStepConfig = flowConfig.steps[currentStepName];
   if (currentStepConfig?.preventBack) {
     return null;
