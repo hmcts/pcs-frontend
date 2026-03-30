@@ -23,8 +23,8 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
-  yourHouseHoldAndCircumstances,
   writtenTerms,
+  yourHouseHoldAndCircumstances,
 } from '../../../data/page-data';
 import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -58,7 +58,6 @@ export class RespondToClaimAction implements IAction {
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
       ['selectHowMuchToPay', () => this.selectHowMuchToPay(fieldName as actionRecord)],
       ['readYourHouseHoldAndCircumstances', () => this.readYourHouseHoldAndCircumstances()],
-
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -238,7 +237,11 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectHowMuchToPay(howMuchToPayData: actionRecord): Promise<void> {
-    await performAction('inputText', howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel, howMuchToPayData.affordToPay);
+    await performAction(
+      'inputText',
+      howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
+      howMuchToPayData.affordToPay
+    );
     await performAction('clickRadioButton', {
       question: howMuchToPayData.question,
       option: howMuchToPayData.radioOption,
