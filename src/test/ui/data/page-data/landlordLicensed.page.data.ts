@@ -13,4 +13,6 @@ export const landlordLicensed = {
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouAgreeWithLandlordsClaimLicensedErrorMessage: `Select if you agree with the landlord’s claim to be licensed`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `landlord-licensed`,
 };
