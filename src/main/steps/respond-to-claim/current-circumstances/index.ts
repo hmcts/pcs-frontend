@@ -66,7 +66,7 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'Yes', no: 'No' };
+    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
     const shareAdditionalCircumstances = ccdMapping[shareCircumstances];
     const additionalCircumstancesDetails =
       shareCircumstances === 'yes'
@@ -89,7 +89,7 @@ export const step: StepDefinition = createFormStep({
     const circumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     const existingAnswer = circumstances?.shareAdditionalCircumstances as string | undefined;
 
-    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
+    const mapping: Record<string, string> = { YES: 'yes', NO: 'no' };
     const shareCircumstances = existingAnswer ? mapping[existingAnswer] : undefined;
 
     if (!shareCircumstances) {
