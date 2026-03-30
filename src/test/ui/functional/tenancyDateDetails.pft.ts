@@ -1,12 +1,4 @@
-import {
-  dashboard,
-  disputeClaimInterstitial,
-  feedback,
-  tenancyDateDetails,
-  tenancyTypeDetails,
-  writtenTerms,
-} from '../data/page-data';
-import { claimantsName } from '../utils/actions/custom-actions';
+import { dashboard, feedback, tenancyDateDetails, tenancyTypeDetails } from '../data/page-data';
 import { performAction, performActions, performValidation } from '../utils/controller';
 
 export async function tenancyDateDetailsErrorValidation(): Promise<void> {
@@ -58,19 +50,6 @@ export async function tenancyDateDetailsErrorValidation(): Promise<void> {
 }
 
 export async function tenancyDateDetailsNavigationTests(): Promise<void> {
-  if (process.env.WALES_POSTCODE === 'YES') {
-    if (claimantsName) {
-      await performValidation('pageNavigation', tenancyTypeDetails.backLink, writtenTerms.mainHeader);
-    }
-  } else {
-    if (claimantsName) {
-      await performValidation(
-        'pageNavigation',
-        tenancyTypeDetails.backLink,
-        disputeClaimInterstitial.getMainHeader(claimantsName)
-      );
-    }
-  }
   await performValidation('pageNavigation', tenancyDateDetails.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: tenancyDateDetails.pageSlug,

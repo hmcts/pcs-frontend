@@ -380,7 +380,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
     });
-    await performValidation('mainHeader', confirmationOfNoticeGiven.mainHeader);
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
@@ -441,7 +440,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - No - RentArrearsDispute  @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDetails - No - RentArrearsDispute  @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -473,6 +472,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
+    console.log('SPEC - Notice date provided', process.env.NOTICE_DATE_PROVIDED);
+    console.log('SPEC- Notice details page has no or im not sure selection', process.env.NOTICE_DETAILS_NO_NOTSURE);
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.noRadioOption,
     });

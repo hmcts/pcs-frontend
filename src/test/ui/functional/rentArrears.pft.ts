@@ -51,6 +51,8 @@ export async function rentArrearsErrorValidation(): Promise<void> {
 }
 
 export async function rentArrearsNavigationTests(): Promise<void> {
+  console.log('pft - Notice date provided', process.env.NOTICE_DATE_PROVIDED);
+  console.log('pft- Notice details page has no or im not sure selection', process.env.NOTICE_DETAILS_NO_NOTSURE);
   if (process.env.NOTICE_DATE_PROVIDED === 'NO') {
     await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenNotProvided.mainHeader);
   }
