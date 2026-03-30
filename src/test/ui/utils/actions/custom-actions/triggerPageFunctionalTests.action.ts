@@ -9,7 +9,8 @@ import {
   enable_navigation_tests,
   enable_pft_debug_log,
 } from '../../../../../../playwright.config';
-import { pftDebugReport, shortUrl } from '../../common/pft-debug-log';
+import { logUnmappedPftUrl } from '../../common/pft-debug-log';
+import { shortUrl } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
 import {
   ErrorMessageValidation,
@@ -40,13 +41,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       console.log(`[triggerFunctionalTests] entered url=${shortUrl(page.url())} page=${pageName ?? '(unmapped)'}`);
     }
     if (!pageName) {
-      pftDebugReport({
-        page,
-        pageLabel: shortUrl(page.url()),
-        category: 'page functional tests',
-        expected: 'A matching key in urlToFileMapping.config.ts',
-        actual: 'No matching key — PFT skipped',
-      });
+      logUnmappedPftUrl(page, shortUrl(page.url()));
       return;
     }
 

@@ -6,80 +6,63 @@ import { test } from '@playwright/test';
 
 import { enable_pft_debug_log } from '../../../../../playwright.config';
 
-// PFT console output respects ENABLE_PFT_DEBUG_LOG. Failure screenshots attach to the report regardless.
+import { shortUrl, truncateForLog } from './string.utils';
 
-let envSnapshotBeforeBeforeEach: NodeJS.ProcessEnv | null = null;
+// PFT: optional console when ENABLE_PFT_DEBUG_LOG; screenshots always on failure paths.
 
-/** First line of `test.beforeEach`; pairs with `logTestBeforeEachContext` at the end. */
+let envBeforeBeforeEach: NodeJS.ProcessEnv | null = null;
+
 export function captureProcessEnvBeforeBeforeEach(): void {
-  envSnapshotBeforeBeforeEach = { ...process.env };
+  envBeforeBeforeEach = { ...process.env };
 }
 
-function envKeysChangedDuringBeforeEach(): string[] {
-  const before = envSnapshotBeforeBeforeEach;
-  if (!before) {
-    return [];
-  }
-  const keys: string[] = [];
-  for (const k of Object.keys(process.env)) {
-    const v = process.env[k];
-    if (v === undefined || v === '') {
-      continue;
-    }
-    if (before[k] !== v) {
-      keys.push(k);
-    }
-  }
-  return keys.sort();
-}
-
-/** End of `test.beforeEach`: logs env keys changed since `captureProcessEnvBeforeBeforeEach` (flag-gated). */
 export function logTestBeforeEachContext(): void {
   if (enable_pft_debug_log !== 'true') {
     return;
   }
-  const { title } = test.info();
-  const changedKeys = envKeysChangedDuringBeforeEach();
-  const lines = changedKeys.map(key => `  ${key}=${process.env[key]}`);
+
+  const before = envBeforeBeforeEach;
+  const changed = before
+    ? Object.keys(process.env)
+        .filter(k => {
+          const v = process.env[k];
+          return v !== undefined && v !== '' && before[k] !== v;
+        })
+        .sort()
+    : [];
+
+  const lines = changed.map(k => `  ${k}=${process.env[k]}`);
   const body =
     lines.length > 0
       ? lines.join('\n')
-      : envSnapshotBeforeBeforeEach
+      : before
         ? '  (no process.env keys were added or changed during this beforeEach)'
         : '  (call captureProcessEnvBeforeBeforeEach() at the start of beforeEach to log env changes)';
+
+  const { title } = test.info();
   console.log(['[PFT debug: beforeEach context]', `  test: ${truncateForLog(title, 200)}`, body].join('\n'));
 }
 
-function truncate(s: string, max: number, trim?: boolean): string {
-  const t = trim ? s.trim() : s;
-  return t.length <= max ? t : `${t.slice(0, max - 1)}…`;
-}
-
-export const shortUrl = (u: string, max = 88) => truncate(u, max);
-export const truncateForLog = (s: string, max = 800) => truncate(s, max, true);
-
 export type ValidationFailureCategory = 'page-content' | 'error-messages' | 'page-navigation';
 
-const validationLabel: Record<ValidationFailureCategory, string> = {
+const categoryLabel: Record<ValidationFailureCategory, string> = {
   'page-content': 'page content',
   'error-messages': 'error messages',
   'page-navigation': 'page navigation',
 };
 
-/** Full-page screenshot → test report attachment. */
 export async function attachValidationFailureScreenshot(
   page: Page,
   category: ValidationFailureCategory,
   pageLabel: string
 ): Promise<void> {
-  const debugLabel = validationLabel[category];
+  const label = categoryLabel[category];
   try {
     const safe = (pageLabel.trim() || 'page').slice(0, 80);
-    const fileName = `failure-${category}-${safe}-${Date.now()}.png`;
-    const out = test.info().outputPath('validation-failures', fileName);
+    const out = test.info().outputPath('validation-failures', `failure-${category}-${safe}-${Date.now()}.png`);
     await fs.mkdir(path.dirname(out), { recursive: true });
     await page.screenshot({ path: out, fullPage: true });
-    await test.info().attach(`Validation failure (${debugLabel}): ${safe}`, {
+    await test.info().attach(`Validation failure (${label}): ${safe}`, {
       path: out,
       contentType: 'image/png',
     });
@@ -91,7 +74,6 @@ export async function attachValidationFailureScreenshot(
   }
 }
 
-/** Screenshot if `attachScreenshot`; console lines only when ENABLE_PFT_DEBUG_LOG. */
 export async function reportValidationFailure(
   page: Page,
   category: ValidationFailureCategory,
@@ -100,14 +82,30 @@ export async function reportValidationFailure(
   actual: string,
   attachScreenshot: boolean
 ): Promise<void> {
-  const label = validationLabel[category];
   if (attachScreenshot) {
     await attachValidationFailureScreenshot(page, category, pageLabel);
   }
-  pftDebugReport({ page, pageLabel, category: label, expected, actual });
+  pftDebugReport({
+    page,
+    pageLabel,
+    category: categoryLabel[category],
+    expected,
+    actual,
+  });
 }
 
-/** Structured `[PFT check: …]` console output (flag-gated). */
+function formatPftCheck(page: Page, pageLabel: string, category: string, expected: string, actual: string): string {
+  const tag = `[PFT check: ${category}]`;
+  const testTitle = test.info().title;
+  return [
+    `${tag} test: ${truncateForLog(testTitle, 200)}`,
+    `${tag} page: ${truncateForLog(pageLabel, 200)}`,
+    `${tag} url: ${shortUrl(page.url())}`,
+    `${tag} expected: ${truncateForLog(expected)}`,
+    `${tag} actual: ${truncateForLog(actual)}`,
+  ].join('\n');
+}
+
 export function pftDebugReport(options: {
   page: Page;
   pageLabel: string;
@@ -115,19 +113,14 @@ export function pftDebugReport(options: {
   expected: string;
   actual: string;
 }): void {
-  if (enable_pft_debug_log !== 'true') {
-    return;
-  }
+  if (enable_pft_debug_log !== 'true') {return;}
   const { page, pageLabel, category, expected, actual } = options;
-  const tag = `[PFT check: ${category}]`;
-  const testTitle = test.info().title;
-  console.log(
-    [
-      `${tag} test: ${truncateForLog(testTitle, 200)}`,
-      `${tag} page: ${truncateForLog(pageLabel, 200)}`,
-      `${tag} url: ${shortUrl(page.url())}`,
-      `${tag} expected: ${truncateForLog(expected)}`,
-      `${tag} actual: ${truncateForLog(actual)}`,
-    ].join('\n')
-  );
+  console.log(formatPftCheck(page, pageLabel, category, expected, actual));
+}
+
+const UNMAPPED_EXPECTED = 'A matching key in urlToFileMapping.config.ts';
+const UNMAPPED_ACTUAL = 'No matching key — PFT skipped';
+
+export function logUnmappedPftUrl(page: Page, pageLabel: string): void {
+  console.log(formatPftCheck(page, pageLabel, 'page functional tests', UNMAPPED_EXPECTED, UNMAPPED_ACTUAL));
 }
