@@ -20,6 +20,7 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const confirmNoticeGiven = req.body?.confirmNoticeGiven as string | undefined;
+    const existingDefendantResponses = req.res?.locals?.validatedCase?.defendantResponses ?? {};
 
     if (!confirmNoticeGiven) {
       return;
@@ -38,7 +39,9 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
+        ...existingDefendantResponses,
         confirmNoticeGiven: ccdValue,
+        ...(confirmNoticeGiven === 'yes' ? {} : { noticeDate: '' }),
       },
     };
 

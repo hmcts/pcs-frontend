@@ -46,7 +46,7 @@
       tag: {
         text: (phase or t('phase') or 'ALPHA') | safe
       },
-      html: ((feedback or t('feedback') or '')) | safe
+      html: ((feedback or t('feedback', { pageTrackingUrl: pageTrackingUrl }) or '')) | safe
     }) }}
   </div>
   {% if backUrl %}

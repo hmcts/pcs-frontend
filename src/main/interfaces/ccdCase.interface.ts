@@ -4,6 +4,7 @@ export enum CaseState {
 }
 
 export type YesNoValue = 'YES' | 'NO' | null;
+export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
 export enum YesNoEnum {
@@ -78,6 +79,8 @@ export interface CcdDefendantParty {
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
+  tenancyTypeCorrect?: TenancyTypeCorrectValue;
+  tenancyType?: string;
   freeLegalAdvice?: string;
   confirmNoticeGiven?: string;
   noticeDate?: string;
@@ -92,6 +95,7 @@ export interface CcdDefendantResponses {
   preferenceType?: ContactPreference;
   landlordRegistered?: YesNoNotSureValue;
   landlordLicensed?: YesNoNotSureValue;
+  writtenTerms?: YesNoNotSureValue;
 }
 
 export interface PossessionClaimResponse {
@@ -124,6 +128,7 @@ export interface CcdCaseData {
   notice_NoticePostedDate?: string;
   notice_NoticeOtherElectronicDateTime?: string;
   tenancy_TypeOfTenancyLicence?: string;
+  tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;

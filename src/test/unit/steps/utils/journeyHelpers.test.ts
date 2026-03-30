@@ -14,6 +14,7 @@ describe('getPreviousPageForArrears', () => {
   beforeEach(() => {
     mockReq = {
       res: { locals: {} },
+      session: {},
     };
     jest.clearAllMocks();
     (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
@@ -80,10 +81,28 @@ describe('getPreviousPageForArrears', () => {
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-unknown');
     });
 
-    it('does not route back to confirmation-of-notice-given when notice was not served', async () => {
+    it('returns tenancy-date-details when notice not served, even if date provided, and start date is known', async () => {
+      (isNoticeServed as jest.Mock).mockResolvedValue(false);
+      (isNoticeDateProvided as jest.Mock).mockResolvedValue(true); // Date provided but notice not served
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
+
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
+    });
+
+    it('returns tenancy-date-details when notice not served, even if user said no, and start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
       mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'no' };
+
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
+    });
+
+    it('returns tenancy-date-details when notice not served, even if user said yes, and start date is known', async () => {
+      (isNoticeServed as jest.Mock).mockResolvedValue(false);
+      (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
+      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'yes' };
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });
@@ -105,6 +124,15 @@ describe('getPreviousPageForArrears', () => {
       (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+    });
+
+    it('returns tenancy-date-unknown when session is undefined and notice not served and start date unknown', async () => {
+      (isNoticeServed as jest.Mock).mockResolvedValue(false);
+      (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(false);
+      mockReq = {}; // No session
+
+      expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-unknown');
     });
   });
 
@@ -131,10 +159,11 @@ describe('getPreviousPageForArrears', () => {
       expect(await getPreviousPageForArrears(mockReq)).toBe('confirmation-of-notice-given');
     });
 
-    it('handles no notice served scenario', async () => {
+    it('handles no notice served scenario with known tenancy start date', async () => {
       // Real scenario: CCD has notice=No, goes straight to rent-arrears-dispute from tenancy-date-details
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
+      (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
 
       expect(await getPreviousPageForArrears(mockReq)).toBe('tenancy-date-details');
     });

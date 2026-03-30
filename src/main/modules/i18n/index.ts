@@ -67,7 +67,6 @@ export type AllowedLang = (typeof allowedLanguages)[number];
 export const COMMON_TRANSLATION_KEYS = [
   'serviceName',
   'phase',
-  'feedback',
   'back',
   'languageToggle',
   'contactUsForHelp',
