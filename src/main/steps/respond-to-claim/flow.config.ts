@@ -138,7 +138,6 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'landlord-licensed': {
       defaultNext: 'written-terms',
-      previousStep: 'landlord-registered',
     },
     'written-terms': {
       defaultNext: 'tenancy-type-details',

@@ -65,7 +65,8 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
 
     if (!shouldSkipLogging) {
       logger.error('Request failed', {
-        error: err,
+        errorMessage: err.message,
+        stack: err.stack,
         method: req.method,
         status,
         url,
