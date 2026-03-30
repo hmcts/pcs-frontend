@@ -30,33 +30,33 @@ export const flowConfig: JourneyFlowConfig = {
   ],
   steps: {
     'ask-to-adjourn-the-court-hearing': {
-      showCondition: (req: Request) => getTypeOfApplication(req) === 'ADJOURN'
+      showCondition: (req: Request) => getTypeOfApplication(req) === 'ADJOURN',
     },
     'ask-to-set-aside-the-decision-to-evict-you': {
-      showCondition: (req: Request) => getTypeOfApplication(req) === 'SET_ASIDE'
+      showCondition: (req: Request) => getTypeOfApplication(req) === 'SET_ASIDE',
     },
     'ask-the-court-to-make-an-order': {
-      showCondition: (req: Request) => getTypeOfApplication(req) === 'SOMETHING_ELSE'
+      showCondition: (req: Request) => getTypeOfApplication(req) === 'SOMETHING_ELSE',
     },
     'is-the-court-hearing-in-the-next-14-days': {
-      showCondition: (req: Request) => getTypeOfApplication(req) === 'ADJOURN'
+      showCondition: (req: Request) => getTypeOfApplication(req) === 'ADJOURN',
     },
     'do-you-need-help-paying-the-fee': {
-      showCondition: (req: Request) => getTypeOfApplication(req) !== 'ADJOURN' || isHearingInNext14Days(req)
+      showCondition: (req: Request) => getTypeOfApplication(req) !== 'ADJOURN' || isHearingInNext14Days(req),
     },
     'have-you-already-applied-for-help': {
-      showCondition: (req: Request) => needHelpPayingTheFee(req)
+      showCondition: (req: Request) => needHelpPayingTheFee(req),
     },
     'you-need-to-apply-for-help-with-your-application-fee': {
-      showCondition: (req: Request) => needHelpPayingTheFee(req) && !alreadyAppliedForHelpWithFees(req)
+      showCondition: (req: Request) => needHelpPayingTheFee(req) && !alreadyAppliedForHelpWithFees(req),
     },
     'are-there-any-reasons-that-this-application-should-not-be-shared': {
-      showCondition: (req: Request) => !otherPartiesAgreed(req)
+      showCondition: (req: Request) => !otherPartiesAgreed(req),
     },
     'upload-documents-to-support-your-application': {
-      showCondition: (req: Request) => documentUploadWanted(req)
-    }
-  }
+      showCondition: (req: Request) => documentUploadWanted(req),
+    },
+  },
 };
 
 function getTypeOfApplication(req: Request): string {

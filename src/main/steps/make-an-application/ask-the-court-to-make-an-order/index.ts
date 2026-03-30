@@ -13,6 +13,6 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
-    paragraph1: 'paragraph1'
+    paragraph1: 'paragraph1',
   },
 });

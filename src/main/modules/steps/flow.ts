@@ -13,7 +13,6 @@ export async function getNextStep(
   formData: Record<string, unknown>,
   currentStepData: Record<string, unknown> = {}
 ): Promise<string | null> {
-
   if (flowConfig.useShowConditions) {
     // Rule deprecated: https://eslint.org/docs/latest/rules/no-return-await
     // eslint-disable-next-line no-return-await
@@ -24,10 +23,7 @@ export async function getNextStep(
   }
 }
 
-async function getNextStepByShowCondition(req: Request,
-                                          currentStepName: string,
-                                          flowConfig: JourneyFlowConfig) {
-
+async function getNextStepByShowCondition(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
   const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
   // TODO: Handle -1
 
@@ -49,12 +45,13 @@ async function getNextStepByShowCondition(req: Request,
   return flowConfig.stepOrder[0];
 }
 
-async function getNextStepByRouteConditions(req: Request,
-                                            currentStepName: string,
-                                            flowConfig: JourneyFlowConfig,
-                                            formData: Record<string, unknown>,
-                                            currentStepData: Record<string, unknown>) {
-
+async function getNextStepByRouteConditions(
+  req: Request,
+  currentStepName: string,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown>,
+  currentStepData: Record<string, unknown>
+) {
   const stepConfig = flowConfig.steps[currentStepName];
 
   if (stepConfig?.routes) {
@@ -97,10 +94,7 @@ export async function getPreviousStep(
   }
 }
 
-async function getPreviousStepByShowConditions(req: Request,
-                                               currentStepName: string,
-                                               flowConfig: JourneyFlowConfig) {
-
+async function getPreviousStepByShowConditions(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
   const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
   // TODO: Handle -1?
 
@@ -121,11 +115,12 @@ async function getPreviousStepByShowConditions(req: Request,
   return flowConfig.stepOrder[0];
 }
 
-async function getPreviousStepByRouteConditions(req: Request,
-                                            currentStepName: string,
-                                            flowConfig: JourneyFlowConfig,
-                                            formData: Record<string, unknown>) {
-
+async function getPreviousStepByRouteConditions(
+  req: Request,
+  currentStepName: string,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown>
+) {
   const stepConfig = flowConfig.steps[currentStepName];
 
   // If step has explicit previousStep configuration, use it

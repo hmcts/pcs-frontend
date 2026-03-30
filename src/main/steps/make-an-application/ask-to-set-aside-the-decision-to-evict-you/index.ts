@@ -14,6 +14,6 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     heading: 'heading',
     paragraph1: 'paragraph1',
-    paragraph2: 'paragraph2'
+    paragraph2: 'paragraph2',
   },
 });

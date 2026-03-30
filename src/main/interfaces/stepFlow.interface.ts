@@ -6,9 +6,7 @@ export type StepCondition = (
   currentStepData: Record<string, unknown>
 ) => Promise<boolean>;
 
-export type ShowCondition = (
-  req: Request,
-) => boolean;
+export type ShowCondition = (req: Request) => boolean;
 
 export interface StepRoute {
   condition?: StepCondition;
@@ -23,7 +21,7 @@ export interface StepConfig {
   defaultNext?: string;
   previousStep?: PreviousStep;
   requiresAuth?: boolean;
-  showCondition?: ShowCondition
+  showCondition?: ShowCondition;
 }
 
 export interface JourneyFlowConfig {

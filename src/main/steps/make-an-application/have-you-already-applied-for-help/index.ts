@@ -27,14 +27,14 @@ export const step: StepDefinition = createFormStep({
               labelClasses: 'govuk-!-font-weight-bold',
               translationKey: {
                 label: 'labels.hwfReference',
-              }
+              },
             },
           },
         },
         {
           value: 'NO',
-          translationKey: 'options.no'
-        }
+          translationKey: 'options.no',
+        },
       ],
     },
   ],

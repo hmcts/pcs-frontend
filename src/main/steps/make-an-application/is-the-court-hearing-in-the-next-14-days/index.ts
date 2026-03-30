@@ -18,12 +18,12 @@ export const step: StepDefinition = createFormStep({
       options: [
         {
           value: 'YES',
-          translationKey: 'options.yes'
+          translationKey: 'options.yes',
         },
         {
           value: 'NO',
-          translationKey: 'options.no'
-        }
+          translationKey: 'options.no',
+        },
       ],
     },
   ],

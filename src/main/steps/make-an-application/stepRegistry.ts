@@ -27,11 +27,12 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'have-you-already-applied-for-help': haveYouAlreadyAppliedForHelp,
   'you-need-to-apply-for-help-with-your-application-fee': youNeedToApplyForHelpWithYourApplicationFee,
   'have-the-other-parties-agreed-to-this-application': haveTheOtherPartiesAgreedToThisApplication,
-  'are-there-any-reasons-that-this-application-should-not-be-shared': areThereAnyReasonsThatThisApplicationShouldNotBeShared,
+  'are-there-any-reasons-that-this-application-should-not-be-shared':
+    areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   'what-order-do-you-want-the-court-to-make-and-why': whatOrderDoYouWantTheCourtToMakeAndWhy,
   'upload-document-to-support-your-application': uploadDocumentToSupportYourApplication,
   'upload-documents-to-support-your-application': uploadDocumentsToSupportYourApplication,
   'which-language-did-you-use-to-complete-this-service': whichLanguageDidYouUseToCompleteThisService,
   'check-your-answers': checkYourAnswers,
-  'application-submitted': applicationSubmitted
+  'application-submitted': applicationSubmitted,
 };
