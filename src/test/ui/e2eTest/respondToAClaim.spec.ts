@@ -72,6 +72,8 @@ test.beforeEach(async ({ page }, testInfo) => {
   //Check if No or Im not sure is selected on NoticeDetails page - for back link navigation
   if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
+  } else {
+    process.env.NOTICE_DETAILS_NO_NOTSURE = 'NO';
   }
 
   // Tenancy start date logic for noDefendantTest
@@ -94,8 +96,9 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else if (testInfo.title.includes('@other')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
-  } else if (testInfo.title.includes('@rentAndNonRent')) {
+  } else if (testInfo.title.includes('@rentNonRent')) {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
+    process.env.TENANCY_START_DATE_KNOWN = 'YES';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
   } else {
@@ -440,7 +443,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDetails - No - RentArrearsDispute  @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -511,9 +514,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayloadRentNonRent.isClaimantNameCorrect);
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
+      tenancyType: submitCaseApiData.submitCasePayloadRentNonRent.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
     });
     await performAction('selectTenancyStartDateKnown', {
