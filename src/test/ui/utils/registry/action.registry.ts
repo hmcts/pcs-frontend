@@ -62,6 +62,7 @@ export class ActionRegistry {
     ['tenancyOrContractTypeDetails', new RespondToClaimAction()],
     ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
+    ['rentArrears', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

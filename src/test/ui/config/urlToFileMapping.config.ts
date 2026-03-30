@@ -13,7 +13,7 @@ export default {
   'confirmation-of-notice-given': 'confirmationOfNoticeGiven',
   'non-rent-arrears-dispute': 'nonRentArrearsDispute',
   'confirmation-of-notice-date-when-provided': 'noticeDateWhenProvided',
-  'rent-arrears-dispute': 'rentArrearsDispute',
+  'rent-arrears-dispute': 'rentArrears',
   'payment-interstitial': 'paymentInterstitial',
   'repayments-made': 'repaymentsMade',
   'landlord-registered': 'landlordRegistered',
