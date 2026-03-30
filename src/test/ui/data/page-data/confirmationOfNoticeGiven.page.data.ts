@@ -17,4 +17,6 @@ export const confirmationOfNoticeGiven = {
   selectIfNoticeOfIntentionGivenErrorMessage(claimantName: string): string {
     return `Select if ${claimantName} gave you notice of their intention to begin possession proceedings`;
   },
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `confirmation-of-notice-given`,
 };
