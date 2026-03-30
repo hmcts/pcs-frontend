@@ -69,6 +69,11 @@ test.beforeEach(async ({ page }, testInfo) => {
       break;
   }
 
+  //Check if No or Im not sure is selected on NoticeDetails page - for back link navigation
+  if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
+    process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
+  }
+
   // Tenancy start date logic for noDefendantTest and rentNonRent test
   if (testInfo.title.includes('NoticeServed - No') && !testInfo.title.includes('@rentNonRent')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';

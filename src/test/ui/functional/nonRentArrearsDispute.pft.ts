@@ -1,4 +1,5 @@
 import {
+  confirmationOfNoticeGiven,
   dashboard,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
@@ -56,6 +57,8 @@ export async function noRentArrearsNavigationTests(): Promise<void> {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateDetails.mainHeader);
   } else if (process.env.RENT_NON_RENT === 'YES') {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrearsDispute.mainHeader);
+  } else if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
+    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, confirmationOfNoticeGiven.mainHeader);
   }
   await performValidation('pageNavigation', nonRentArrearsDispute.saveForLaterButton, dashboard.mainHeader);
 }
