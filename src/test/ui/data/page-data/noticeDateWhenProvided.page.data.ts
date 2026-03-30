@@ -18,6 +18,8 @@ export const noticeDateWhenProvided = {
   signOutLink: `Sign out`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   theDateYouReceiveNoticeErrorMessage: `The date you received notice must either be today’s date or in the past`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `confirmation-of-notice-date-when-provided`,
 };
 
 export function convertDateFormat(dateString: string): string {

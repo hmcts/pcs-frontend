@@ -25,3 +25,4 @@ export * from './tenancyDateDetails.page.data';
 export * from './dashboard.page.data';
 export * from './landlordLicensed.page.data';
 export * from './writtenTerms.page.data';
+export * from './feedback.page.data';

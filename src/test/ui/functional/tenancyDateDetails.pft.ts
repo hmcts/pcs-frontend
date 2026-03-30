@@ -1,6 +1,7 @@
 import {
   dashboard,
   disputeClaimInterstitial,
+  feedback,
   tenancyDateDetails,
   tenancyTypeDetails,
   writtenTerms,
@@ -70,6 +71,11 @@ export async function tenancyDateDetailsNavigationTests(): Promise<void> {
       );
     }
   }
-  await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
+  await performValidation('pageNavigation', tenancyDateDetails.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: tenancyDateDetails.pageSlug,
+  });
+  await performValidation('pageNavigation', tenancyDateDetails.backLink, tenancyTypeDetails.mainHeader);
+  await performAction('clickRadioButton', tenancyDateDetails.yesRadioOption);
   await performValidation('pageNavigation', tenancyDateDetails.saveForLaterButton, dashboard.mainHeader);
 }

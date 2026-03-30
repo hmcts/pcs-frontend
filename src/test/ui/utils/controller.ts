@@ -40,8 +40,6 @@ async function detectPageNavigation(): Promise<boolean> {
   const currentUrl = executor.page.url();
   if (!startAxeAudit && executor.page.url().includes('start-now')) {
     startAxeAudit = true;
-  }
-  if (!startFunctionalTests && executor.page.url().includes('free-legal-advice')) {
     startFunctionalTests = true;
   }
   const pageNavigated = currentUrl !== previousUrl;
@@ -54,7 +52,7 @@ async function detectPageNavigation(): Promise<boolean> {
 }
 
 async function validatePageIfNavigated(action: string): Promise<void> {
-  if (action.includes('click') || action.includes('navigate')) {
+  if (action.includes('click') || action.includes('navigateToUrl')) {
     const pageNavigated = await detectPageNavigation();
     const executor = getExecutor();
     if (pageNavigated) {
