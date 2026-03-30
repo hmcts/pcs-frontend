@@ -1,4 +1,4 @@
-import { dashboard, tenancyDateUnknown, tenancyDetails } from '../data/page-data';
+import { dashboard, feedback, tenancyDateUnknown, tenancyTypeDetails } from '../data/page-data';
 import { performAction, performActions, performValidation } from '../utils/controller';
 
 export async function tenancyDateUnknownErrorValidation(): Promise<void> {
@@ -40,7 +40,11 @@ export async function tenancyDateUnknownErrorValidation(): Promise<void> {
 }
 
 export async function tenancyDateUnknownNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', tenancyDateUnknown.backLink, tenancyDetails.mainHeader);
+  await performValidation('pageNavigation', tenancyDateUnknown.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: tenancyDateUnknown.pageSlug,
+  });
+  await performValidation('pageNavigation', tenancyDateUnknown.backLink, tenancyTypeDetails.mainHeader);
   await performActions(
     'Enter Date',
     ['inputText', tenancyDateUnknown.dayTextLabel, '21'],
