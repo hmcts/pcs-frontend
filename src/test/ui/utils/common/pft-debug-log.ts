@@ -6,23 +6,11 @@ import { test } from '@playwright/test';
 
 import { enable_pft_debug_log } from '../../../../../playwright.config';
 
-/**
- * Console: `[PFT check: …]` lines only when `ENABLE_PFT_DEBUG_LOG=true` (`enable_pft_debug_log`).
- * Failure PNGs: `test.info().attach` from `attachValidationFailureScreenshot` and from
- * `reportValidationFailure(..., attachScreenshot: true)` — not gated by `ENABLE_PFT_DEBUG_LOG`
- * (Allure/HTML report pick up attachments from test results).
- */
+// PFT console output respects ENABLE_PFT_DEBUG_LOG. Failure screenshots attach to the report regardless.
 
-/**
- * Shallow snapshot of `process.env` at the **start** of `test.beforeEach` (before any assignments).
- * Used by `logTestBeforeEachContext()` to log only keys **added or changed** during that hook.
- */
 let envSnapshotBeforeBeforeEach: NodeJS.ProcessEnv | null = null;
 
-/**
- * Call as the **first** line of `test.beforeEach` (before `initializeExecutor` / any `process.env` writes).
- * Pairs with `logTestBeforeEachContext()` at the end of the same hook.
- */
+/** First line of `test.beforeEach`; pairs with `logTestBeforeEachContext` at the end. */
 export function captureProcessEnvBeforeBeforeEach(): void {
   envSnapshotBeforeBeforeEach = { ...process.env };
 }
@@ -45,12 +33,7 @@ function envKeysChangedDuringBeforeEach(): string[] {
   return keys.sort();
 }
 
-/**
- * Call at the **end** of `test.beforeEach` (after `process.env` / case creation is done).
- * Prints one block only when `ENABLE_PFT_DEBUG_LOG=true`.
- * Logs every **non-empty** `process.env` key whose value **differs** from the snapshot taken by
- * `captureProcessEnvBeforeBeforeEach()` at the start of this `beforeEach`.
- */
+/** End of `test.beforeEach`: logs env keys changed since `captureProcessEnvBeforeBeforeEach` (flag-gated). */
 export function logTestBeforeEachContext(): void {
   if (enable_pft_debug_log !== 'true') {
     return;
@@ -83,9 +66,7 @@ const validationLabel: Record<ValidationFailureCategory, string> = {
   'page-navigation': 'page navigation',
 };
 
-/**
- * Full-page screenshot attached to the test report (Allure / HTML). Not gated by `ENABLE_PFT_DEBUG_LOG`.
- */
+/** Full-page screenshot → test report attachment. */
 export async function attachValidationFailureScreenshot(
   page: Page,
   category: ValidationFailureCategory,
@@ -110,6 +91,7 @@ export async function attachValidationFailureScreenshot(
   }
 }
 
+/** Screenshot if `attachScreenshot`; console lines only when ENABLE_PFT_DEBUG_LOG. */
 export async function reportValidationFailure(
   page: Page,
   category: ValidationFailureCategory,
@@ -125,6 +107,7 @@ export async function reportValidationFailure(
   pftDebugReport({ page, pageLabel, category: label, expected, actual });
 }
 
+/** Structured `[PFT check: …]` console output (flag-gated). */
 export function pftDebugReport(options: {
   page: Page;
   pageLabel: string;

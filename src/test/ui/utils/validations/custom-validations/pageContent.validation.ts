@@ -140,8 +140,6 @@ export class PageContentValidation implements IValidation {
     const pageData = await this.getPageData(pageName);
 
     if (!pageData) {
-      // Missing file is already handled in triggerPageFunctionalTests (trackMissingDataFile; no runPageContentValidation).
-      // Here we only surface load/parse/export failures when the file exists.
       const pageDataPath = path.join(__dirname, '../../../data/page-data', `${pageName}.page.data.ts`);
       if (fs.existsSync(pageDataPath)) {
         await reportValidationFailure(
