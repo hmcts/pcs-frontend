@@ -44,7 +44,7 @@ export const step: StepDefinition = createFormStep({
                 if (typeof value !== 'string' || !value.trim()) {
                   return true;
                 }
-                const invalidCharacters = /^(?!.*\p{Extended_Pictographic}).+$/u;
+                const invalidCharacters = /^(?!.*\p{Extended_Pictographic})[\s\S]+$/u;
                 return invalidCharacters.test(value) || 'errors.otherAdultsDetailsInvalidCharacters';
               },
             },
@@ -73,11 +73,16 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const confirmValue = req.body?.confirmOtherAdults as string | undefined;
     const householdCircumstances: Record<string, unknown> = {};
-    const details = req.body?.['confirmOtherAdults.otherAdultsDetails'] as string | undefined;
+    const rawDetails = req.body?.['confirmOtherAdults.otherAdultsDetails'] as string | undefined;
+
+    const normalisedDetails = rawDetails
+      ?.replace(/[\r\n\t]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
 
     if (confirmValue === 'yes') {
       householdCircumstances.otherTenants = 'YES';
-      householdCircumstances.otherTenantsDetails = details;
+      householdCircumstances.otherTenantsDetails = normalisedDetails;
     } else if (confirmValue === 'no') {
       householdCircumstances.otherTenants = 'NO';
     }

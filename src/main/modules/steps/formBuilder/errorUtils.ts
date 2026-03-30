@@ -1,11 +1,16 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
+import type {
+  FormFieldConfig,
+  FormFieldType,
+  TranslationKeys,
+} from '../../../interfaces/formFieldConfig.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { getRequestLanguage } from '../../i18n';
 import { getTranslationFunction } from '../i18n';
 
+import { parseNestedFieldName } from './conditionalFields';
 import type { DateFieldError } from './dateValidation';
 
 export interface ErrorSummaryData {
@@ -14,6 +19,29 @@ export interface ErrorSummaryData {
 }
 
 export type FormError = string | DateFieldError;
+
+/** Config type for an error key: top-level name or parent.child under a radio/checkbox option */
+function fieldTypeForErrorKey(fields: FormFieldConfig[], key: string): FormFieldType | undefined {
+  const topLevel = fields.find(f => f.name === key);
+  if (topLevel) {
+    return topLevel.type;
+  }
+  const nested = parseNestedFieldName(key);
+  if (!nested) {
+    return undefined;
+  }
+  const parent = fields.find(f => f.name === nested.parentFieldName);
+  if (!parent?.options) {
+    return undefined;
+  }
+  for (const option of parent.options) {
+    const sub = option.subFields?.[nested.subFieldName];
+    if (sub) {
+      return sub.type;
+    }
+  }
+  return undefined;
+}
 
 /**
  * Extracts the error message string from a FormError
@@ -43,8 +71,7 @@ export function buildErrorSummary(
   const errorList: { text: string; href: string }[] = [];
 
   for (const [fieldName, error] of Object.entries(errors)) {
-    const fieldConfig = fields.find(f => f.name === fieldName);
-    const fieldType = fieldConfig?.type;
+    const fieldType = fieldTypeForErrorKey(fields, fieldName);
 
     // Extract error message and date part info
     const errorMessage = typeof error === 'string' ? error : error.message;
