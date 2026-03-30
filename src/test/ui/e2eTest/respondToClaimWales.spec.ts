@@ -74,7 +74,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: landlordLicensed.iamNotSureRadioOption,
     });
     await performValidation('mainHeader', writtenTerms.mainHeader);
-    await performAction('clickButton', writtenTerms.saveAndContinueButton);
+    await performAction('selectWrittenTerms', {
+      question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
+      radioOption: writtenTerms.noRadioOption,
+    });
     await performValidation('mainHeader', tenancyTypeDetails.mainHeader);
   });
 });
