@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
-import { reportValidationFailure } from '../../common/pft-debug-log';
+import { pftDebugLog, reportValidationFailure } from '../../common/pft-debug-log';
 import { performAction } from '../../controller';
 import { IValidation, validationRecord } from '../../interfaces';
 
@@ -387,8 +387,8 @@ export class PageNavigationValidation implements IValidation {
       PageNavigationValidation.missingNavigationFiles.size;
 
     if (totalPages === 0) {
-      console.log(`\n📊 NAVIGATION TESTS (Test #${PageNavigationValidation.testCounter}):`);
-      console.log('   No pages checked for navigation tests');
+      pftDebugLog(`\n📊 NAVIGATION TESTS (Test #${PageNavigationValidation.testCounter}):`);
+      pftDebugLog('   No pages checked for navigation tests');
       return;
     }
 
@@ -417,7 +417,7 @@ export class PageNavigationValidation implements IValidation {
             });
           }
         } else {
-          console.log(`   ⚠️  Unattributed failure on ${result.pageName}: ${result.error}`);
+          pftDebugLog(`   ⚠️  Unattributed failure on ${result.pageName}: ${result.error}`);
         }
       }
     }
@@ -439,57 +439,57 @@ export class PageNavigationValidation implements IValidation {
       }
     }
 
-    console.log(`\n📊 NAVIGATION TESTS SUMMARY (Test #${PageNavigationValidation.testCounter}):`);
-    console.log(`   Total pages with navigation tests: ${totalPages}`);
-    console.log(`   Number of pages passed: ${passedPages.size}`);
-    console.log(`   Number of pages failed: ${failedPages.size}`);
-    console.log(
+    pftDebugLog(`\n📊 NAVIGATION TESTS SUMMARY (Test #${PageNavigationValidation.testCounter}):`);
+    pftDebugLog(`   Total pages with navigation tests: ${totalPages}`);
+    pftDebugLog(`   Number of pages passed: ${passedPages.size}`);
+    pftDebugLog(`   Number of pages failed: ${failedPages.size}`);
+    pftDebugLog(
       `   Missing navigation methods: ${PageNavigationValidation.missingNavigationMethods.size + PageNavigationValidation.missingNavigationFiles.size}`
     );
 
     if (passedPages.size > 0) {
-      console.log(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
+      pftDebugLog(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
     }
 
     if (failedPages.size > 0) {
-      console.log(`   Failed pages: ${Array.from(failedPages).join(', ')}`);
+      pftDebugLog(`   Failed pages: ${Array.from(failedPages).join(', ')}`);
     }
 
     if (PageNavigationValidation.missingNavigationMethods.size > 0) {
-      console.log(
+      pftDebugLog(
         `   Navigation methods not found: ${Array.from(PageNavigationValidation.missingNavigationMethods).join(', ')}`
       );
     }
 
     if (PageNavigationValidation.missingNavigationFiles.size > 0) {
-      console.log(
+      pftDebugLog(
         `   Navigation files not found: ${Array.from(PageNavigationValidation.missingNavigationFiles).join(', ')}`
       );
     }
 
     if (failedPages.size > 0) {
-      console.log('\n❌ FAILED NAVIGATION TESTS:');
+      pftDebugLog('\n❌ FAILED NAVIGATION TESTS:');
 
       for (const pageName of Array.from(failedPages).sort()) {
         const details = failureDetails.get(pageName);
-        console.log(`   Page: ${pageName}`);
+        pftDebugLog(`   Page: ${pageName}`);
         if (details) {
-          console.log(`       Expected: ${details.expected}`);
-          console.log(`       Actual: ${details.actual}`);
+          pftDebugLog(`       Expected: ${details.expected}`);
+          pftDebugLog(`       Actual: ${details.actual}`);
           if (details.validationType === 'url') {
-            console.log(`       Note: Page slug URL validation failed`);
+            pftDebugLog(`       Note: Page slug URL validation failed`);
           }
         }
-        console.log('');
+        pftDebugLog('');
       }
     }
 
     if (failedPages.size > 0) {
-      console.log('❌ NAVIGATION TESTS FAILED\n');
+      pftDebugLog('❌ NAVIGATION TESTS FAILED\n');
     } else if (passedPages.size > 0) {
-      console.log('\n✅ ALL NAVIGATION TESTS PASSED\n');
+      pftDebugLog('\n✅ ALL NAVIGATION TESTS PASSED\n');
     } else if (pagesWithNavigationMethods.size > 0) {
-      console.log('\n⚠️  Navigation files found but no tests performed\n');
+      pftDebugLog('\n⚠️  Navigation files found but no tests performed\n');
     }
 
     PageNavigationValidation.clearResults();

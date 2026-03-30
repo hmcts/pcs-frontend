@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
-import { reportValidationFailure } from '../../common/pft-debug-log';
+import { pftDebugLog, reportValidationFailure } from '../../common/pft-debug-log';
 import { IValidation, validationData, validationRecord } from '../../interfaces';
 
 type ValidationResult = {
@@ -218,8 +218,8 @@ export class ErrorMessageValidation implements IValidation {
     const totalPages = ErrorMessageValidation.pagesWithEMV.size + ErrorMessageValidation.missingEMVFiles.size;
 
     if (totalPages === 0) {
-      console.log(`\n📊 ERROR MESSAGE VALIDATION (Test #${ErrorMessageValidation.testCounter}):`);
-      console.log('   No pages checked for error message validation');
+      pftDebugLog(`\n📊 ERROR MESSAGE VALIDATION (Test #${ErrorMessageValidation.testCounter}):`);
+      pftDebugLog('   No pages checked for error message validation');
       return;
     }
 
@@ -247,45 +247,45 @@ export class ErrorMessageValidation implements IValidation {
       passedPages.delete(pageName);
     }
 
-    console.log(`\n📊 ERROR MESSAGE VALIDATION SUMMARY (Test #${ErrorMessageValidation.testCounter}):`);
-    console.log(`   Total pages validated for error messages: ${totalPages}`);
-    console.log(`   Number of pages passed: ${passedPages.size}`);
-    console.log(`   Number of pages failed: ${failedPages.size}`);
-    console.log(`   Number of missing EMV methods: ${ErrorMessageValidation.missingEMVFiles.size}`);
+    pftDebugLog(`\n📊 ERROR MESSAGE VALIDATION SUMMARY (Test #${ErrorMessageValidation.testCounter}):`);
+    pftDebugLog(`   Total pages validated for error messages: ${totalPages}`);
+    pftDebugLog(`   Number of pages passed: ${passedPages.size}`);
+    pftDebugLog(`   Number of pages failed: ${failedPages.size}`);
+    pftDebugLog(`   Number of missing EMV methods: ${ErrorMessageValidation.missingEMVFiles.size}`);
 
     if (passedPages.size > 0) {
-      console.log(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
+      pftDebugLog(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
     }
 
     if (failedPages.size > 0) {
-      console.log(`   Failed pages: ${Array.from(failedPages).join(', ')}`);
+      pftDebugLog(`   Failed pages: ${Array.from(failedPages).join(', ')}`);
     }
 
     if (ErrorMessageValidation.missingEMVFiles.size > 0) {
-      console.log(`   EMV methods not found: ${Array.from(ErrorMessageValidation.missingEMVFiles).join(', ')}`);
+      pftDebugLog(`   EMV methods not found: ${Array.from(ErrorMessageValidation.missingEMVFiles).join(', ')}`);
     }
 
     // Show failure details
     if (failedPages.size > 0) {
-      console.log('\n❌ FAILED ERROR MESSAGE VALIDATIONS:');
+      pftDebugLog('\n❌ FAILED ERROR MESSAGE VALIDATIONS:');
 
       for (const pageName of Array.from(failedPages).sort()) {
         const details = failureDetails.get(pageName);
-        console.log(`   Page: ${pageName}`);
+        pftDebugLog(`   Page: ${pageName}`);
         if (details) {
-          console.log(`       Expected: ${details.expected}`);
-          console.log(`       Actual: ${details.actual}`);
+          pftDebugLog(`       Expected: ${details.expected}`);
+          pftDebugLog(`       Actual: ${details.actual}`);
         }
-        console.log('');
+        pftDebugLog('');
       }
     }
 
     if (failedPages.size > 0) {
-      console.log('❌ ERROR MESSAGE VALIDATIONS FAILED\n');
+      pftDebugLog('❌ ERROR MESSAGE VALIDATIONS FAILED\n');
     } else if (passedPages.size > 0) {
-      console.log('\n✅ ALL ERROR MESSAGE VALIDATIONS PASSED\n');
+      pftDebugLog('\n✅ ALL ERROR MESSAGE VALIDATIONS PASSED\n');
     } else if (ErrorMessageValidation.pagesWithEMV.size > 0) {
-      console.log('\n⚠️  EMV methods found but no validations performed\n');
+      pftDebugLog('\n⚠️  EMV methods found but no validations performed\n');
     }
 
     ErrorMessageValidation.clearResults();

@@ -3,11 +3,7 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
-import {
-  attachValidationFailureScreenshot,
-  pftDebugLog,
-  reportValidationFailure,
-} from '../../common/pft-debug-log';
+import { attachValidationFailureScreenshot, pftDebugLog, reportValidationFailure } from '../../common/pft-debug-log';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { IValidation } from '../../interfaces';
 

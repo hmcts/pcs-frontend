@@ -31,7 +31,7 @@ ui/
 │   │   ├── action.registry.ts # Action registry
 │   │   └── validation.registry.ts # Validation registry
 │   ├── common/
-│   │   └── pft-debug-log.ts   # PFT debug logging, failure screenshots (see §3)
+│   │   └── pft-debug-log.ts   # PFT debug logging, failure screenshots (see section 3)
 │   └── controller.ts          # Controls the usage of actions and validations
 ├── testREADME.md              # Framework documentation
 └── update-testReadMe.ts       # Documentation auto-update script
