@@ -1,4 +1,11 @@
-import { dashboard, tenancyDateDetails, tenancyDetails } from '../data/page-data';
+import {
+  dashboard,
+  disputeClaimInterstitial,
+  tenancyDateDetails,
+  tenancyTypeDetails,
+  writtenTerms,
+} from '../data/page-data';
+import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performActions, performValidation } from '../utils/controller';
 
 export async function tenancyDateDetailsErrorValidation(): Promise<void> {
@@ -50,7 +57,19 @@ export async function tenancyDateDetailsErrorValidation(): Promise<void> {
 }
 
 export async function tenancyDateDetailsNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', tenancyDateDetails.backLink, tenancyDetails.mainHeader);
-  await performAction('clickRadioButton', tenancyDateDetails.yesRadioOption);
+  if (process.env.WALES_POSTCODE === 'YES') {
+    if (claimantsName) {
+      await performValidation('pageNavigation', tenancyTypeDetails.backLink, writtenTerms.mainHeader);
+    }
+  } else {
+    if (claimantsName) {
+      await performValidation(
+        'pageNavigation',
+        tenancyTypeDetails.backLink,
+        disputeClaimInterstitial.getMainHeader(claimantsName)
+      );
+    }
+  }
+  await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
   await performValidation('pageNavigation', tenancyDateDetails.saveForLaterButton, dashboard.mainHeader);
 }
