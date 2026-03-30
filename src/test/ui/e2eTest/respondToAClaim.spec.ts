@@ -557,9 +557,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
-    await performAction('selectNoticeDetails', {
-      option: confirmationOfNoticeGiven.imNotSureRadioOption,
-    });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
     // placeholder page, so need to be replaced with custom action when actual page is implemented
