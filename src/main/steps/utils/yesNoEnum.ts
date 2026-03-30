@@ -3,10 +3,11 @@
  * Used for CCD API integration where boolean choices are represented as enum strings.
  */
 
-import type { YesNoValue } from '../../interfaces/ccdCase.interface';
+import type { VerticalYesNoValue, YesNoValue } from '../../interfaces/ccdCase.interface';
 
 /**
  * Converts frontend 'yes'/'no' to backend 'Yes'/'No' enum.
+ * Used for household circumstances fields.
  * @example toYesNoEnum('yes') // returns 'Yes'
  */
 export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
@@ -27,6 +28,34 @@ export function fromYesNoEnum(value: YesNoValue | string | undefined): 'yes' | '
     return 'yes';
   }
   if (normalizedValue === 'No') {
+    return 'no';
+  }
+  return undefined;
+}
+
+/**
+ * Converts frontend 'yes'/'no' to backend 'YES'/'NO' enum (VerticalYesNo).
+ * Used for vertical radio button fields like contactByPhone, contactByText.
+ * @example toVerticalYesNoEnum('yes') // returns 'YES'
+ */
+export function toVerticalYesNoEnum(value: 'yes' | 'no'): VerticalYesNoValue {
+  return value.toLowerCase() === 'yes' ? 'YES' : 'NO';
+}
+
+/**
+ * Converts backend 'YES'/'NO' enum to frontend 'yes'/'no'.
+ * Case-insensitive for backward compatibility.
+ * @example fromVerticalYesNoEnum('YES') // returns 'yes'
+ */
+export function fromVerticalYesNoEnum(value: VerticalYesNoValue | string | undefined): 'yes' | 'no' | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const upperValue = value.toUpperCase();
+  if (upperValue === 'YES') {
+    return 'yes';
+  }
+  if (upperValue === 'NO') {
     return 'no';
   }
   return undefined;

@@ -10,5 +10,5 @@ export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { getPreviousPageForArrears } from './journeyHelpers';
 export { formatDatePartsToISODate } from './dateUtils';
-export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
+export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
 export { penceToPounds, poundsToPence } from './currencyConversion';
