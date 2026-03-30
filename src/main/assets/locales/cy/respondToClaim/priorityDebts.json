@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Priority debts",
+  "caption": "Respond to a property possession claim",
+  "question": "Do you have any priority debts?",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "havePriorityDebts": "Select if you have any priority debts"
+  }
+}

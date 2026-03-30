@@ -1,0 +1,21 @@
+{
+  "pageTitle": "Have you applied for Universal Credit?",
+  "caption": "Respond to a property possession claim",
+  "question": "Have you applied for Universal Credit?",
+  "dateLabel": "When did you apply?",
+  "dateHint": "For example, 27 9 2022",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "haveAppliedForUniversalCredit": "Select if you’ve applied for Universal Credit",
+    "date": {
+      "required": "Enter the date you applied for Universal Credit",
+      "missingOne": "The date you applied for Universal Credit must include a {{missingField}}",
+      "missingTwo": "The date you applied for Universal Credit must include a {{first}} and {{second}}",
+      "notRealDate": "The date you applied for Universal Credit must be a real date",
+      "futureDate": "The date you applied for Universal Credit must must either be today’s date or in the past"
+    }
+  }
+}
