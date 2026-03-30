@@ -113,7 +113,9 @@ export function pftDebugReport(options: {
   expected: string;
   actual: string;
 }): void {
-  if (enable_pft_debug_log !== 'true') {return;}
+  if (enable_pft_debug_log !== 'true') {
+    return;
+  }
   const { page, pageLabel, category, expected, actual } = options;
   console.log(formatPftCheck(page, pageLabel, category, expected, actual));
 }
