@@ -264,7 +264,6 @@ describe('i18n module', () => {
         const translations: Record<string, string> = {
           serviceName: 'Test Service',
           phase: 'BETA',
-          feedback: 'Feedback',
           back: 'Back',
           languageToggle: 'Language',
           contactUsForHelp: 'Contact',
@@ -277,7 +276,8 @@ describe('i18n module', () => {
 
       expect(result.serviceName).toBe('Test Service');
       expect(result.phase).toBe('BETA');
-      expect(result.feedback).toBe('Feedback');
+      expect(result.back).toBe('Back');
+      expect(result.languageToggle).toBe('Language');
     });
 
     it('should exclude keys that return themselves', () => {
