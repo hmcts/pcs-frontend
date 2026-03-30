@@ -12,6 +12,7 @@ import {
 } from '../i18n';
 
 import { Logger } from '@modules/logger';
+import { concatenateJourneyStepName } from '@utils/stepNameFolderCombiner';
 
 const logger = Logger.getLogger('i18n');
 
@@ -37,7 +38,7 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
     return;
   }
 
-  const stepNamespace = getStepNamespace(stepName);
+  const stepNamespace = concatenateJourneyStepName(getStepNamespace(stepName), folder);
   const lang = getMainRequestLanguage(req);
 
   if (req.i18n.getResourceBundle(lang, stepNamespace)) {
@@ -83,24 +84,24 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
   }
 }
 
-export function getStepTranslations(req: Request, stepName: string): TranslationContent {
+export function getStepTranslations(req: Request, stepName: string, folder:string): TranslationContent {
   if (!req.i18n) {
     return {};
   }
 
   const lang = getMainRequestLanguage(req);
-  const resources = req.i18n.getResourceBundle(lang, getStepNamespace(stepName));
+  const resources = req.i18n.getResourceBundle(lang, concatenateJourneyStepName(getStepNamespace(stepName), folder));
   return (resources as TranslationContent) || {};
 }
 
 /** Gets the translation function for a request with step namespace support. */
-export function getTranslationFunction(req: Request, stepName?: string, namespaces: string[] = ['common']): TFunction {
+export function getTranslationFunction(req: Request, stepName?: string, namespaces: string[] = ['common'], folder? :string): TFunction {
   if (!req.i18n) {
     return getMainTranslationFunction(req, namespaces);
   }
 
   const lang = getMainRequestLanguage(req);
-  const allNamespaces = stepName ? [getStepNamespace(stepName), ...namespaces] : namespaces;
+  const allNamespaces = stepName ? [concatenateJourneyStepName(getStepNamespace(stepName), folder), ...namespaces] : namespaces;
   const fixedT = req.i18n.getFixedT(lang, allNamespaces);
   return fixedT || getMainTranslationFunction(req, namespaces);
 }

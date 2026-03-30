@@ -4,7 +4,7 @@ import { flowConfig } from '../flow.config';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'professional-free-legal-advice',
+  stepName: 'free-legal-advice',
   journeyFolder: 'professionalRespondToClaim',
   stepDir: __dirname,
   flowConfig,

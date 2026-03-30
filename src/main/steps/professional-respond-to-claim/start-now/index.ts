@@ -5,7 +5,7 @@ import { createGetController, professionalStepNavigation } from '../../../module
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
-const stepName = 'professional-start-now';
+const stepName = 'start-now';
 
 export const step: StepDefinition = {
   url: `${PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE}/start-now`,

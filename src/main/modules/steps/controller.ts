@@ -10,6 +10,7 @@ import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
 import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
 
 import { Logger } from '@modules/logger';
+import { concatenateJourneyStepName } from '@utils/stepNameFolderCombiner';
 
 const logger = Logger.getLogger('controllerFactory');
 
@@ -57,7 +58,7 @@ export const createGetController = (
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
 
-    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName) : {};
+    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName, journeyFolder) : {};
     const commonTranslations = req.i18n?.getResourceBundle(lang, 'common') || {};
     const commonContent: Record<string, unknown> = {};
     for (const key of ['change', 'buttons']) {
@@ -138,7 +139,7 @@ export const createPostController = (
         });
       }
 
-      setFormData(req, stepName, req.body);
+      setFormData(req, concatenateJourneyStepName(stepName, journeyFolder), req.body);
 
       if (beforeRedirect) {
         try {
