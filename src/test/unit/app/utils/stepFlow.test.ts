@@ -231,7 +231,7 @@ describe('stepFlow', () => {
   describe('getPreviousStep with show conditions', () => {
     const mockReq = {} as Request;
 
-    it('should return previos page with missing show condition', async () => {
+    it('should return previous page with missing show condition', async () => {
       const flowConfig: JourneyFlowConfig = {
         useShowConditions: true,
         stepOrder: ['step1', 'step2', 'step3'],
@@ -247,7 +247,7 @@ describe('stepFlow', () => {
       expect(result).toBe('step1');
     });
 
-    it('should return next visible page with show condition', async () => {
+    it('should return previous visible page with show condition', async () => {
       const flowConfig: JourneyFlowConfig = {
         useShowConditions: true,
         stepOrder: ['step1', 'step2', 'step3'],
@@ -283,7 +283,53 @@ describe('stepFlow', () => {
       expect(result).toBe(null);
     });
 
-    it('should throw errorfor unknown step name', async () => {
+    it('should return null when back navigation prevented for current step', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step3: {
+            preventBack: true
+          }
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe(null);
+    });
+
+    it('should return previous step even when that is prevented from further back navigation', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            preventBack: true
+          }
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe('step2');
+    });
+
+    it('should ignore preventBack flag for hidden steps', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: (_req) => false,
+            preventBack: true
+          }
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe('step1');
+    });
+
+    it('should throw error for unknown step name', async () => {
       const flowConfig: JourneyFlowConfig = {
         useShowConditions: true,
         stepOrder: ['step1', 'step2', 'step3'],

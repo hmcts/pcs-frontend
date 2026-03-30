@@ -45,10 +45,10 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => getTypeOfApplication(req) !== 'ADJOURN' || isHearingInNext14Days(req),
     },
     'have-you-already-applied-for-help': {
-      showCondition: (req: Request) => needHelpPayingTheFee(req),
+      showCondition: (req: Request) => isHearingInNext14Days(req) && needHelpPayingTheFee(req),
     },
     'you-need-to-apply-for-help-with-your-application-fee': {
-      showCondition: (req: Request) => needHelpPayingTheFee(req) && !alreadyAppliedForHelpWithFees(req),
+      showCondition: (req: Request) => isHearingInNext14Days(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHelpWithFees(req),
     },
     'are-there-any-reasons-that-this-application-should-not-be-shared': {
       showCondition: (req: Request) => !otherPartiesAgreed(req),
@@ -56,6 +56,9 @@ export const flowConfig: JourneyFlowConfig = {
     'upload-documents-to-support-your-application': {
       showCondition: (req: Request) => documentUploadWanted(req),
     },
+    'application-submitted': {
+      preventBack: true
+    }
   },
 };
 

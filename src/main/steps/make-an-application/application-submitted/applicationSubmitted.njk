@@ -1,28 +1,14 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "macros/csrf.njk" import csrfProtection %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
 
-{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
+
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
-  {% if errorSummary %}
-    {{ govukErrorSummary(errorSummary) }}
-  {% endif %}
 
-  <span class="govuk-caption-xl">{{ caption }}</span>
-  <h1 class="govuk-heading-l">{{ heading }}</h1>
-
-  <div class="govuk-notification-banner" role="region" aria-labelledby="experimental-banner">
-    <div class="govuk-notification-banner__content">
-      <p class="govuk-notification-banner__heading" id="experimental-banner">
-        Placeholder page
-      </p>
-    </div>
-  </div>
-
-Application submitted
+{{ govukPanel({
+  titleText: "Application submitted (placeholder)",
+  html: "Your reference number<br><strong>12345678</strong>"
+}) }}
 
 {% endblock %}

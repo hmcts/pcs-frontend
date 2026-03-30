@@ -94,6 +94,12 @@ export async function getPreviousStep(
 }
 
 async function getPreviousStepByShowConditions(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+  // TODO: Test
+  const currentStepConfig = flowConfig.steps[currentStepName];
+  if (currentStepConfig?.preventBack) {
+    return null;
+  }
+
   const currentIndex = getStepIndex(flowConfig, currentStepName);
 
   for (let stepIndex = currentIndex - 1; stepIndex >= 0; stepIndex--) {
@@ -105,10 +111,11 @@ async function getPreviousStepByShowConditions(req: Request, currentStepName: st
       return candidatePreviousStepName;
     }
 
-    if (candidatePreviousStep.showCondition(req)) {
+    if (candidatePreviousStep.showCondition(req) && !candidatePreviousStep.preventBack) {
       // Show condition matches
       return candidatePreviousStepName;
     }
+
   }
 
   return null;

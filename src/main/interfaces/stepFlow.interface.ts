@@ -22,6 +22,7 @@ export interface StepConfig {
   previousStep?: PreviousStep;
   requiresAuth?: boolean;
   showCondition?: ShowCondition;
+  preventBack?: boolean;
 }
 
 export interface JourneyFlowConfig {

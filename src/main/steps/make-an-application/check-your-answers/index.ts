@@ -4,7 +4,6 @@ import type { TFunction } from 'i18next';
 import { CitizenGenAppRequest } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation, getTranslationFunction } from '../../../modules/steps';
-import { DASHBOARD_ROUTE, getDashboardUrl } from '../../../routes/dashboard';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { MAKE_AN_APPLICATION_ROUTE, flowConfig } from '../flow.config';
 
@@ -33,7 +32,6 @@ export const step: StepDefinition = {
         const typeOfApplication = formData['choose-an-application']['typeOfApplication'];
 
         return {
-          backUrl: DASHBOARD_ROUTE,
           summaryData: {
             rows: [
               {
@@ -84,7 +82,9 @@ export const step: StepDefinition = {
         },
       });
 
-      const redirectPath = getDashboardUrl(ccdCase.id);
+      delete req.session.formData;
+
+      const redirectPath = await stepNavigation.getNextStepUrl(req, STEP_NAME, req.body);
 
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');

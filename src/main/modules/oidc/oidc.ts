@@ -131,27 +131,46 @@ export class OIDCModule {
     // Login route
     app.get('/login', async (req: Request, res: Response, next: NextFunction) => {
       try {
-        // Generate a new code verifier and store it in the session
-        req.session.codeVerifier = client.randomPKCECodeVerifier();
-        const codeChallenge = await client.calculatePKCECodeChallenge(req.session.codeVerifier);
+        const tokens = await this.getTokens();
 
-        const parameters: Record<string, string> = {
-          redirect_uri: this.oidcConfig.redirectUri,
-          scope: this.oidcConfig.scope,
-          code_challenge: codeChallenge,
-          code_challenge_method: 'S256',
+        const { access_token, id_token, refresh_token } = tokens;
+
+        const sub = 'citizen@pcs.com';
+        const user: UserInfoResponse = await client.fetchUserInfo(this.clientConfig, access_token, sub);
+
+        req.session.user = {
+          accessToken: access_token,
+          idToken: id_token as string,
+          refreshToken: refresh_token as string,
+          ...user,
         };
 
-        if (!this.clientConfig.serverMetadata().supportsPKCE()) {
-          req.session.nonce = client.randomNonce();
-          parameters.nonce = req.session.nonce;
+        req.session.save(() => {
+          delete req.session.codeVerifier;
+          delete req.session.nonce;
+
+          const returnTo = req.session.returnTo || '/';
+          delete req.session.returnTo;
+          res.redirect(returnTo);
+        });
+      } catch (error) {
+        if (error.error_description) {
+          this.logger.error(`Authentication failed: ${error.error_description}`);
         }
 
-        const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
-        res.redirect(redirectTo.href);
-      } catch (error) {
-        this.logger.error('Login error:', error);
-        next(new OIDCAuthenticationError('Failed to initiate authentication'));
+        this.logger.error('Authentication error details:', {
+          description: error.error_description || 'Authentication error details',
+          error: error.message,
+          code: error.code,
+          status: error.status,
+          name: error.name,
+          stack: error.stack,
+          url: req.url,
+          redirectUri: this.oidcConfig.redirectUri,
+          issuer: this.oidcConfig.issuer,
+          clientId: this.oidcConfig.clientId,
+        });
+        next(new OIDCCallbackError('Failed to complete authentication'));
       }
     });
 
