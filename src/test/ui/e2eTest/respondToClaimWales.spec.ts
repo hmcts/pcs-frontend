@@ -14,7 +14,7 @@ import {
   landlordLicensed,
   landlordRegistered,
   startNow,
-  tenancyDetails,
+  tenancyTypeDetails,
   writtenTerms,
 } from '../data/page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -24,6 +24,7 @@ const home_url = config.get('e2e.testUrl') as string;
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   process.env.WALES_POSTCODE = 'YES';
+  process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
   await performAction('fetchPINsAPI');
@@ -72,10 +73,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: landlordLicensed.isYourLandlordLicensedQuestion,
       radioOption: landlordLicensed.iamNotSureRadioOption,
     });
+    await performValidation('mainHeader', writtenTerms.mainHeader);
     await performAction('selectWrittenTerms', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
       radioOption: writtenTerms.noRadioOption,
     });
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performValidation('mainHeader', tenancyTypeDetails.mainHeader);
   });
 });
