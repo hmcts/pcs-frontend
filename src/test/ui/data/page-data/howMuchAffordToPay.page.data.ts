@@ -13,8 +13,8 @@ export const howMuchAffordToPay = {
   backLink: `Back link`,
   cancelLink: `Cancel link`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  enterHowMuchYouCouldAffordErrorMessage:`Enter how much you could afford to pay in addition to the current rent`,
+  enterHowMuchYouCouldAffordErrorMessage: `Enter how much you could afford to pay in addition to the current rent`,
   selectHowFrequentlyYouCouldAffordErrorMessage: `Select how frequently you could afford to pay this amount`,
   enterAmountInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
-  theAmountYouCouldAffordToPayErrorMessage:`The amount you could afford to pay in addition to the current rent must be less than £1 billion`
+  theAmountYouCouldAffordToPayErrorMessage: `The amount you could afford to pay in addition to the current rent must be less than £1 billion`,
 };

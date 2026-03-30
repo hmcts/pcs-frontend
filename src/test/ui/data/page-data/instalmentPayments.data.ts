@@ -5,7 +5,7 @@ export const instalmentPayments = {
   youCanOfferToPayParagraph: `You can offer to pay off your arrears in instalments and say how much you’d be able to afford to pay and how frequently.`,
   atTheHearingParagraph: `At the hearing, the judge will look at your offer and the details of your income and expenses you choose to share. They will decide if your offer is affordable.`,
   youBeAbleToTellTheJudgeParagraph: `You’ll be able to tell the judge if the amount you can afford to pay has changed.`,
-  wouldYouLikeToOfferToPayQuestion:`Would you like to offer to pay your arrears in instalments?`,
+  wouldYouLikeToOfferToPayQuestion: `Would you like to offer to pay your arrears in instalments?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   saveAndContinueButton: `Save and continue`,
@@ -13,5 +13,5 @@ export const instalmentPayments = {
   backLink: `Back link`,
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  selectWhetherYouWouldLikeToOfferErrorMessage:`Select whether you would like to offer to pay your arrears in instalments`,
+  selectWhetherYouWouldLikeToOfferErrorMessage: `Select whether you would like to offer to pay your arrears in instalments`,
 };
