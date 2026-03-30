@@ -22,4 +22,6 @@ export const contactPreferenceEmailOrPost = {
   selectHowYouWantToReceiveUpdatesErrorMessage: `Select how you want to receive updates`,
   enterEmailAddressErrorMessage: `Enter your email address`,
   invalidEmailAddressErrorMessage: `Enter an email address in the correct format, like name@example.com`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `contact-preferences-email-or-post`,
 };

@@ -7,13 +7,11 @@ import { initializeExecutor, performAction, performValidation } from '../utils/c
 
 const home_url = config.get('e2e.testUrl') as string;
 
-test.beforeEach(async ({ page }, testInfo) => {
+test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
-  if (testInfo.title.includes('NoticeServed - No')) {
-    process.env.NOTICE_SERVED = 'NO';
-  } else {
-    process.env.NOTICE_SERVED = 'YES';
-  }
+  process.env.NOTICE_SERVED = 'NO';
+  process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+  process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   await performAction('fetchPINsAPI');

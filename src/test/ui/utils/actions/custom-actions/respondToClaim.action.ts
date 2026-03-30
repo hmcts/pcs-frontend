@@ -21,7 +21,9 @@ import {
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
+  tenancyTypeDetails,
 } from '../../../data/page-data';
+import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
@@ -48,6 +50,7 @@ export class RespondToClaimAction implements IAction {
       ['repaymentsAgreed', () => this.repaymentsAgreed(fieldName as actionRecord)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
+      ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -286,6 +289,41 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  }
+
+  private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
+    const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
+    const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
+
+    if (
+      tenancyType === 'assured tenancy' ||
+      tenancyType === 'introductory tenancy' ||
+      tenancyType === 'secure tenancy' ||
+      tenancyType === 'flexible tenancy' ||
+      tenancyType === 'demoted tenancy'
+    ) {
+      await performValidation('text', {
+        elementType: 'listItem',
+        text: `The property is let under ${article} ${tenancyType} agreement`,
+      });
+    } else if (tenancyType === 'other') {
+      await performValidation('text', {
+        elementType: 'listItem',
+        text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+      });
+    }
+    await performAction('clickRadioButton', {
+      question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
+      option: tenancyTypeDetailsInfo.tenancyOption,
+    });
+    if (tenancyTypeDetailsInfo.tenancyOption === 'No' && tenancyTypeDetailsInfo.tenancyTypeInfo) {
+      await performAction(
+        'inputText',
+        tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+        tenancyTypeDetailsInfo.tenancyTypeInfo
+      );
+    }
+    await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
