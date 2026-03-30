@@ -44,8 +44,8 @@ export const step: StepDefinition = createFormStep({
                 if (typeof value !== 'string' || !value.trim()) {
                   return true;
                 }
-                const invalidCharacters = /^(?!.*\p{Extended_Pictographic})[\s\S]+$/u;
-                return invalidCharacters.test(value) || 'errors.otherAdultsDetailsInvalidCharacters';
+                const invalidCharacters = /[\p{Extended_Pictographic}\u200D\uFE0F]/u;
+                return !invalidCharacters.test(value) || 'errors.otherAdultsDetailsInvalidCharacters';
               },
             },
           },
