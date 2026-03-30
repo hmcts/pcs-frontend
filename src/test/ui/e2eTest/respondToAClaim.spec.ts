@@ -21,6 +21,7 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
 } from '../data/page-data';
+import { logTestBeforeEachContext } from '../utils/common/pft-debug-log';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -93,6 +94,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
+  logTestBeforeEachContext();
 });
 
 test.afterEach(async () => {

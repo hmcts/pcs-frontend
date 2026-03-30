@@ -72,6 +72,7 @@ When debugging **page navigation**, **error message**, or **page content** flows
 - Default is **off** (no extra console output).
 - Implementation: `utils/common/pft-debug-log.ts`. Lines include **test title**, **page label**, **URL**, **expected**, and **actual** (long strings truncated).
 - **Failure screenshots** (`test.info().attach` → HTML / Allure) are **not** controlled by `ENABLE_PFT_DEBUG_LOG`; they attach when a validation reports a failure and requests a screenshot.
+- **`logTestBeforeEachContext()`** (end of each UI spec `test.beforeEach`): when `ENABLE_PFT_DEBUG_LOG=true`, prints one block with the test title and **only** case/journey env keys that are **set** at that moment (`CLAIMANT_NAME`, `NOTICE_SERVED`, `TENANCY_TYPE`, `CASE_NUMBER`, …). Unset keys are omitted.
 
 `playwright.config.ts` exports **`enable_pft_debug_log`** alongside other `ENABLE_*` flags.
 

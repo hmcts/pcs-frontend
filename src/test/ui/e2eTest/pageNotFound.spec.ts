@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { logTestBeforeEachContext } from '../utils/common/pft-debug-log';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -11,6 +12,7 @@ test.beforeEach(async ({ page }) => {
   await performAction('navigateToUrl', home_url);
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('login');
+  logTestBeforeEachContext();
 });
 
 test.afterEach(async () => {

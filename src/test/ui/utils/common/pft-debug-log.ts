@@ -12,6 +12,37 @@ import { enable_pft_debug_log } from '../../../../../playwright.config';
  * not gated by `ENABLE_PFT_DEBUG_LOG` (Allure/HTML report pick up attachments from test results).
  */
 
+/** Env keys that UI spec `beforeEach` hooks assign (case / journey). Only these are considered for logging. */
+const BEFORE_EACH_ASSIGNED_ENV_KEYS: readonly string[] = [
+  'CLAIMANT_NAME',
+  'NOTICE_SERVED',
+  'TENANCY_TYPE',
+  'GROUNDS',
+  'CLAIMANT_NAME_OVERRIDDEN',
+  'CORRESPONDENCE_ADDRESS',
+  'WALES_POSTCODE',
+  'CASE_NUMBER',
+];
+
+/**
+ * Call at the **end** of `test.beforeEach` (after `process.env` / case creation is done).
+ * Prints one block only when `ENABLE_PFT_DEBUG_LOG=true`.
+ * Logs **only** keys above that are **currently set** in `process.env` (skips unset keys).
+ */
+export function logTestBeforeEachContext(): void {
+  if (enable_pft_debug_log !== 'true') {
+    return;
+  }
+  const { title } = test.info();
+  const lines = BEFORE_EACH_ASSIGNED_ENV_KEYS.filter(key => {
+    const v = process.env[key];
+    return v !== undefined && v !== '';
+  }).map(key => `  ${key}=${process.env[key]}`);
+  const body =
+    lines.length > 0 ? lines.join('\n') : '  (none of the tracked beforeEach env keys are set at this point)';
+  console.log(['[PFT debug: beforeEach context]', `  test: ${truncateForLog(title, 200)}`, body].join('\n'));
+}
+
 function truncate(s: string, max: number, trim?: boolean): string {
   const t = trim ? s.trim() : s;
   return t.length <= max ? t : `${t.slice(0, max - 1)}…`;
