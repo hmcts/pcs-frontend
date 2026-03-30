@@ -27,6 +27,9 @@ export interface FormFieldConfig {
   name: string;
   type: FormFieldType;
   id?: string;
+  prefix?: {
+    text: string;
+  };
   required?: boolean | ((formData: Record<string, unknown>, allData: Record<string, unknown>) => boolean);
   pattern?: string;
   maxLength?: number;

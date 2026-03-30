@@ -26,19 +26,31 @@ function createFieldsetLegend(
   };
 }
 
-export function buildComponentConfig(
-  field: FormFieldConfig,
-  label: string,
-  hint: string | undefined,
-  fieldValue: unknown,
-  translatedOptions: { value?: string; text?: string; divider?: string }[] | undefined,
-  hasError: boolean,
-  errorText: string | undefined,
-  index: number,
-  hasTitle: boolean,
-  t: TFunction,
-  nunjucksEnv: Environment
-): ComponentConfig {
+export function buildComponentConfig({
+  field,
+  label,
+  hint,
+  fieldValue,
+  translatedOptions,
+  hasError,
+  errorText,
+  index,
+  hasTitle,
+  t,
+  nunjucksEnv,
+}: {
+  field: FormFieldConfig;
+  label: string;
+  hint: string | undefined;
+  fieldValue: unknown;
+  translatedOptions: { value?: string; text?: string; divider?: string }[] | undefined;
+  hasError: boolean;
+  errorText: string | undefined;
+  index: number;
+  hasTitle: boolean;
+  t: TFunction;
+  nunjucksEnv: Environment;
+}): ComponentConfig {
   const isFirstField = index === 0 && !hasTitle;
   const component: Record<string, unknown> = {
     id: field.name,
@@ -55,6 +67,9 @@ export function buildComponentConfig(
   switch (field.type) {
     case 'text': {
       component.value = (fieldValue as string) || '';
+      if (field.prefix) {
+        component.prefix = field.prefix;
+      }
       componentType = 'input';
       break;
     }
@@ -78,20 +93,6 @@ export function buildComponentConfig(
         isPageHeading: isFirstField,
         classes: field.labelClasses,
       };
-
-      // Add translated character count messages
-      // i18next handles pluralization via the 'one' and 'other' keys in the translation object
-      // The GOV.UK component will use these keys to select the correct plural form
-      if (field.maxLength) {
-        const characterCount = t('characterCount', { returnObjects: true }) as Record<string, unknown> | string;
-        if (characterCount && typeof characterCount === 'object') {
-          Object.assign(component, {
-            charactersUnderLimitText: characterCount.charactersUnderLimitText,
-            charactersAtLimitText: characterCount.charactersAtLimitText,
-            charactersOverLimitText: characterCount.charactersOverLimitText,
-          });
-        }
-      }
 
       componentType = 'characterCount';
       break;

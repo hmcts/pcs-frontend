@@ -1,4 +1,4 @@
-import { format, parseISO } from 'date-fns';
+import { DateTime } from 'luxon';
 
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
@@ -80,11 +80,11 @@ export const step: StepDefinition = createFormStep({
         const draftData: Record<string, unknown> = { confirmTenancyDate: formValue };
 
         if (existingDateIsCorrect === 'NO' && existingTenancyStartDate) {
-          const parsed = parseISO(existingTenancyStartDate);
+          const parsed = DateTime.fromISO(existingTenancyStartDate).setZone('Europe/London');
           draftData.tenancyStartDate = {
-            day: format(parsed, 'd'),
-            month: format(parsed, 'M'),
-            year: format(parsed, 'yyyy'),
+            day: parsed.toFormat('d'),
+            month: parsed.toFormat('M'),
+            year: parsed.toFormat('yyyy'),
           };
         }
 
@@ -133,7 +133,9 @@ export const step: StepDefinition = createFormStep({
     const existingStartDate = getTenancyStartDate(caseData);
 
     // Format tenancy date with ordinal
-    const tenancyStartDate = existingStartDate ? format(parseISO(existingStartDate), 'do LLLL yyyy') : undefined;
+    const tenancyStartDate = existingStartDate
+      ? DateTime.fromISO(existingStartDate).setZone('Europe/London').setLocale('en-gb').toFormat('do LLLL yyyy')
+      : undefined;
 
     const t = getTranslationFunction(req, 'tenancy-date-details', ['common']);
     const bulletPoint = t('bulletPoint', { returnObjects: true, tenancyStartDate });
