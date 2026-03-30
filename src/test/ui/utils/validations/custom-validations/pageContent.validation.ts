@@ -146,7 +146,7 @@ export class PageContentValidation implements IValidation {
         pageName,
         `Page data file exists for "${pageName}" (data/page-data/${pageName}.page.data.ts)`,
         'No page data file found',
-        false
+        true
       );
       return;
     }

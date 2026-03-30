@@ -191,13 +191,23 @@ export class PageNavigationValidation implements IValidation {
         }
       }
 
+      const expectedNavLog = [
+        expectedElementText && `element: "${expectedElementText}"`,
+        expectedUrlPattern && `url: "${expectedUrlPattern}"`,
+      ]
+        .filter(Boolean)
+        .join('; ');
+      const actualNavLog = [actualElementText && `element: "${actualElementText}"`, `url: "${actualUrl || page.url()}"`]
+        .filter(Boolean)
+        .join('; ');
+
       await reportValidationFailure(
         page,
         'page-navigation',
         pageName,
-        `h1 after navigation: "${expectedHeader}"`,
-        `h1: "${(actualText || '').trim()}"`,
-        false
+        expectedNavLog || 'page navigation validation',
+        actualNavLog,
+        !overallPassed
       );
     } catch (error) {
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
@@ -239,7 +249,7 @@ export class PageNavigationValidation implements IValidation {
         page,
         'page-navigation',
         pageName,
-        `h1 after navigation: "${expectedHeader}"`,
+        `h1 after navigation: "${expectedValue}"`,
         `h1: "${(actualText || 'Not found').trim()}"`,
         true
       );
