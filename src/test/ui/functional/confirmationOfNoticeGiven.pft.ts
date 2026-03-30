@@ -1,5 +1,5 @@
 import { submitCaseApiData } from '../data/api-data';
-import { confirmationOfNoticeGiven, dashboard, tenancyDateUnknown } from '../data/page-data';
+import { confirmationOfNoticeGiven, dashboard, feedback, tenancyDateUnknown } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 let claimantName = '';
@@ -19,6 +19,10 @@ export async function confirmationOfNoticeGivenErrorValidation(): Promise<void> 
 }
 
 export async function confirmationOfNoticeGivenNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', confirmationOfNoticeGiven.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: confirmationOfNoticeGiven.pageSlug,
+  });
   await performValidation('pageNavigation', confirmationOfNoticeGiven.backLink, tenancyDateUnknown.mainHeader);
   await performAction('clickRadioButton', confirmationOfNoticeGiven.yesRadioOption);
   await performValidation('pageNavigation', confirmationOfNoticeGiven.saveForLaterButton, dashboard.mainHeader);
