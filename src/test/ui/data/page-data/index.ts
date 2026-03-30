@@ -29,3 +29,4 @@ export * from './installmentPayments.data';
 export * from './howMuchAffordToPay.page.data';
 export * from './yourHouseHoldAndCircumstances.page.data';
 export * from './doYouHaveAnyDependantChildren.page.data';
+export * from './feedback.page.data';

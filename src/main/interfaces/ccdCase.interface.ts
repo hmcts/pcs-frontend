@@ -69,6 +69,7 @@ export interface PossessionClaimResponse {
       additionalContributionFrequency?: string;
     };
     landlordLicensed?: YesNoNotSureValue;
+    writtenTerms?: YesNoNotSureValue;
   };
 }
 
