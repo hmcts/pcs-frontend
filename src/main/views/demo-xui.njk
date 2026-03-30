@@ -1,0 +1,38 @@
+{% extends "govuk/template.njk" %}
+{% from "xui-header/macro.njk" import hmctsXuiHeader %}
+{% from "footer/macro.njk" import hmctsUiFooter %}
+
+{% block pageTitle %}XUI Header & Footer Demo{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  {% include "webpack/css.njk" %}
+  <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
+{% endblock %}
+
+{% block header %}
+  {{ hmctsXuiHeader(headerModel) }}
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">XUI Component Library Demo</h1>
+  <p class="govuk-body-l">This page demonstrates the XUI header and footer components from <code>@hmcts-cft/cft-ui-component-lib</code>.</p>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-m">Header</h2>
+      <p class="govuk-body">The header above uses the <code>hmctsXuiHeader</code> macro with the <code>caseworker-civil</code> role, rendering navigation items including Case list, Create case, Find case and Search.</p>
+
+      <h2 class="govuk-heading-m">Footer</h2>
+      <p class="govuk-body">The footer below uses the <code>hmctsUiFooter</code> macro with default navigation links (Accessibility, Terms and conditions, Cookies, Privacy policy, Get help).</p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  {{ hmctsUiFooter(footerModel) }}
+{% endblock %}
+
+{% block bodyEnd %}
+  {% include "webpack/js.njk" %}
+{% endblock %}
