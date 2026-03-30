@@ -14,7 +14,7 @@ import {
   landlordLicensed,
   landlordRegistered,
   startNow,
-  tenancyDetails,
+  tenancyTypeDetails,
   writtenTerms,
 } from '../data/page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -74,6 +74,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', writtenTerms.mainHeader);
     await performAction('clickButton', writtenTerms.saveAndContinueButton);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
+    await performValidation('mainHeader', tenancyTypeDetails.mainHeader);
   });
 });
