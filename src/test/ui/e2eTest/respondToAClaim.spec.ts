@@ -379,7 +379,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', installmentPayments.mainHeader);
   });
 
-  test('England - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @noDefendants @regression', async () => {
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -588,7 +587,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('England - Demoted - RentArrears - NoticeServed - No NoticeDateProvided - No - RentArrearsDispute @regression', async () => {
-  test('RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - RentArrearsDispute @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -682,3 +680,5 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 });
+
+
