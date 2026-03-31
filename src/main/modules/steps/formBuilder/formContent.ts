@@ -52,7 +52,7 @@ export function buildFormContent(
   if (translationKeys) {
     for (const [key, value] of Object.entries(translationKeys)) {
       if (value) {
-        translatedContent[key] = t(value);
+        translatedContent[key] = interpolation ? t(value, interpolation) : t(value);
       }
     }
   }
@@ -72,7 +72,6 @@ export function buildFormContent(
     errorSummary,
     serviceName: t('serviceName'),
     phase: t('phase'),
-    feedback: t('feedback'),
     back: t('back'),
     contactUsForHelp: t('contactUsForHelp'),
     contactUsForHelpText: t('contactUsForHelpText'),

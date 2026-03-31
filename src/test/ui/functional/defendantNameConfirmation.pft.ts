@@ -1,4 +1,4 @@
-import { defendantNameConfirmation, freeLegalAdvice } from '../data/page-data';
+import { defendantNameConfirmation, feedback, freeLegalAdvice } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 import { defendantNameCaptureInputValuesPrePopulated } from './defendantNameCapture.pft';
@@ -46,6 +46,10 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
   });
 }
 export async function defendantNameConfirmationNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', defendantNameConfirmation.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: defendantNameConfirmation.pageSlug,
+  });
   await performValidation('pageNavigation', defendantNameConfirmation.backLink, freeLegalAdvice.mainHeader);
   await performAction('clickRadioButton', {
     question: defendantNameConfirmation.mainHeader,

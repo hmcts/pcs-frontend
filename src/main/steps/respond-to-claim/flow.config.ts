@@ -35,8 +35,8 @@ export const flowConfig: JourneyFlowConfig = {
     'landlord-licensed',
     'written-terms',
     'tenancy-type-details',
-    'tenancy-date-unknown',
     'tenancy-date-details',
+    'tenancy-date-unknown',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
     'confirmation-of-notice-date-when-not-provided',
@@ -56,6 +56,7 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'end-now',
+    'installment-payments',
   ],
   steps: {
     'start-now': {
@@ -122,7 +123,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !isWelshProperty(req),
+          condition: async (req: Request) => !(await isWelshProperty(req)),
           nextStep: 'tenancy-type-details',
         },
       ],
@@ -134,7 +135,6 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'landlord-licensed': {
       defaultNext: 'written-terms',
-      previousStep: 'landlord-registered',
     },
     'written-terms': {
       defaultNext: 'tenancy-type-details',
@@ -323,19 +323,27 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'repayments-agreed',
     },
     'repayments-agreed': {
-      previousStep: 'repayments-made',
       routes: [
         {
-          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
-            currentStepData?.repaymentsAgreed === 'yes' || currentStepData?.repaymentsAgreed === 'imNotSure',
-          nextStep: 'your-household-and-circumstances',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.repaymentsAgreed === 'no',
+
+          nextStep: 'installment-payments',
         },
         {
-          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
-            currentStepData?.repaymentsAgreed === 'no',
-          nextStep: 'repayments-agreed',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> =>
+            currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
+          nextStep: 'your-household-and-circumstances',
         },
       ],
+      previousStep: 'repayments-made',
     },
     'your-household-and-circumstances': {
       previousStep: 'repayments-agreed',
@@ -388,6 +396,10 @@ export const flowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
+    },
+    'installment-payments': {
+      previousStep: 'repayments-agreed',
+      defaultNext: 'your-household-and-circumstances',
     },
   },
 };

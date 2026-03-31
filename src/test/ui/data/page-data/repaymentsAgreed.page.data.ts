@@ -1,5 +1,4 @@
 export const repaymentsAgreed = {
-  mainHeader: `Repayments agreed (Placeholder)`,
   respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   getMainHeader: (claimantsName: string) =>
     `Have you come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025?`,
