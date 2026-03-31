@@ -18,6 +18,7 @@ import {
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   paymentInterstitial,
+  repaymentsAgreed,
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
@@ -49,6 +50,7 @@ export class RespondToClaimAction implements IAction {
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['repaymentsAgreed', () => this.repaymentsAgreed(fieldName as actionRecord)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
@@ -216,17 +218,30 @@ export class RespondToClaimAction implements IAction {
   private async readPaymentInterstitial(): Promise<void> {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
-
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: repaymentsMade.mainHeader,
+      question: repaymentsData.question,
       option: repaymentsData.repaymentOption,
     });
-
     if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
       await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  }
+
+  private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: repaymentsAgreed.getMainHeader(claimantsName),
+      option: repaymentsAgreedData.repaymentAgreedOption,
+    });
+    if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {
+      await performAction(
+        'inputText',
+        repaymentsAgreed.giveDetailsHiddenTextLabel,
+        repaymentsAgreedData.repaymentAgreedInfo
+      );
+    }
+    await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
