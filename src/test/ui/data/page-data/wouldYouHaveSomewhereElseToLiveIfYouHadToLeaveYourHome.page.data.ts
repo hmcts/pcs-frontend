@@ -12,5 +12,6 @@ export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   saveAndContinueButton: `Save and continue`,
+  selectIfYouHadAlternativeAccommodationErrorMessage: `Select if you’d have somewhere else to live if you had to leave your home`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
 };
