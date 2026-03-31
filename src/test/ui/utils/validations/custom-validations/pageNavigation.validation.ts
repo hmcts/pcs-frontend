@@ -352,16 +352,21 @@ export class PageNavigationValidation implements IValidation {
   static finaliseTest(): void {
     PageNavigationValidation.testCounter++;
 
-    const pagesWithNavigationMethods = new Set<string>();
+    const pagesWithNavigationTests = new Set<string>();
 
     for (const pageName of PageNavigationValidation.pagesWithNavigation) {
-      pagesWithNavigationMethods.add(pageName);
+      pagesWithNavigationTests.add(pageName);
     }
 
-    const totalPages =
-      pagesWithNavigationMethods.size +
-      PageNavigationValidation.missingNavigationMethods.size +
-      PageNavigationValidation.missingNavigationFiles.size;
+    for (const pageName of PageNavigationValidation.missingNavigationMethods) {
+      pagesWithNavigationTests.add(pageName);
+    }
+
+    for (const pageName of PageNavigationValidation.missingNavigationFiles) {
+      pagesWithNavigationTests.add(pageName);
+    }
+
+    const totalPages = pagesWithNavigationTests.size;
 
     if (totalPages === 0) {
       console.log(`\n📊 NAVIGATION TESTS SUMMARY (Test #${PageNavigationValidation.testCounter}):`);
@@ -371,7 +376,7 @@ export class PageNavigationValidation implements IValidation {
 
     const failureDetails = new Map<string, { expected: string; actual: string; validationType?: string }>();
     const failedPages = new Set<string>();
-    const passedPages = new Set<string>();
+    const actuallyPassedPages = new Set<string>();
 
     for (const result of PageNavigationValidation.navigationResults) {
       if (!result.passed) {
@@ -393,25 +398,25 @@ export class PageNavigationValidation implements IValidation {
               validationType: result.validationType,
             });
           }
-        } else {
-          console.log(`   ⚠️  Unattributed failure on ${result.pageName}: ${result.error}`);
         }
-      }
-    }
-
-    for (const result of PageNavigationValidation.navigationResults) {
-      if (
-        result.passed &&
-        result.hasPFTFile &&
-        !failedPages.has(result.pageName) &&
-        !failedPages.has(result.sourcePage || '')
-      ) {
-        passedPages.add(result.pageName);
       }
     }
 
     for (const pageName of PageNavigationValidation.pagesPassed) {
       if (!failedPages.has(pageName)) {
+        actuallyPassedPages.add(pageName);
+      }
+    }
+
+    for (const result of PageNavigationValidation.navigationResults) {
+      if (result.passed && result.hasPFTFile && !failedPages.has(result.pageName) && !failedPages.has(result.sourcePage || '')) {
+        actuallyPassedPages.add(result.pageName);
+      }
+    }
+
+    const passedPages = new Set<string>();
+    for (const pageName of pagesWithNavigationTests) {
+      if (!failedPages.has(pageName) && actuallyPassedPages.has(pageName)) {
         passedPages.add(pageName);
       }
     }
@@ -467,7 +472,7 @@ export class PageNavigationValidation implements IValidation {
       console.log('❌ NAVIGATION TESTS FAILED\n');
     } else if (passedPages.size > 0) {
       console.log('\n✅ ALL NAVIGATION TESTS PASSED\n');
-    } else if (pagesWithNavigationMethods.size > 0) {
+    } else if (pagesWithNavigationTests.size > 0) {
       console.log('\n⚠️  Navigation files found but no tests performed\n');
     }
 
