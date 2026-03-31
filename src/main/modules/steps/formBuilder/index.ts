@@ -41,7 +41,6 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     flowConfig,
     showCancelButton,
     customTemplate,
-    professionalHeaders
   } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
@@ -95,8 +94,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           backUrl: await navigation.getBackUrl(req, stepName),
           showCancelButton,
           url: req.originalUrl, // Form action URL - POST to current page
-          headerModel: professionalHeaders?.header,
-          footerModel: professionalHeaders?.footer
+          // headerModel: headerModel,
+          // footerModel: footerModel
         };
       });
     },

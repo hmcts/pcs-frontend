@@ -27,6 +27,7 @@ export class GetController {
     const content = await this.generateContent(req);
     res.render(this.view, {
       ...content,
+      ...res.locals.extraHeaders
     });
   };
 }
@@ -86,6 +87,7 @@ export const createGetController = (
 
     if (extendContent) {
       const extended = await extendContent(req);
+      
       return { ...baseContent, ...extended };
     }
 

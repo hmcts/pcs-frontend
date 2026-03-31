@@ -4,7 +4,6 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
-import path from "path";
 export const step: StepDefinition = createFormStep({
   stepName: 'defendant-name-confirmation',
   journeyFolder: 'professionalRespondToClaim',
@@ -12,7 +11,7 @@ export const step: StepDefinition = createFormStep({
   basePath: '/respond-to-claim',
   flowConfig,
 
-  customTemplate:   path.join(__dirname, "..", "..", "respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk"),
+  customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
