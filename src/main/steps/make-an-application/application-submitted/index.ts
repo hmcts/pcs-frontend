@@ -10,6 +10,6 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/applicationSubmitted.njk`,
   fields: [],
   translationKeys: {
-    pageTitle: 'pageTitle'
+    pageTitle: 'pageTitle',
   },
 });

@@ -46,8 +46,8 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step2: {
-            showCondition: (_req) => false
-          }
+            showCondition: _req => false,
+          },
           // step3 has no showCondition defined
         },
       };
@@ -62,11 +62,11 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step2: {
-            showCondition: (_req) => false
+            showCondition: _req => false,
           },
           step3: {
-            showCondition: (_req) => true
-          }
+            showCondition: _req => true,
+          },
         },
       };
 
@@ -80,11 +80,11 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step2: {
-            showCondition: (_req) => false
+            showCondition: _req => false,
           },
           step3: {
-            showCondition: (_req) => false
-          }
+            showCondition: _req => false,
+          },
         },
       };
 
@@ -98,13 +98,14 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step2: {
-            showCondition: (_req) => false
-          }
-        }
+            showCondition: _req => false,
+          },
+        },
       };
 
-      await expect(getNextStep(mockReq, 'step99', flowConfig, {}))
-        .rejects.toThrow('Step step99 not found in stepOrder');
+      await expect(getNextStep(mockReq, 'step99', flowConfig, {})).rejects.toThrow(
+        'Step step99 not found in stepOrder'
+      );
     });
   });
 
@@ -237,8 +238,8 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step2: {
-            showCondition: (_req) => false
-          }
+            showCondition: _req => false,
+          },
           // step3 has no showCondition defined
         },
       };
@@ -253,11 +254,11 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step1: {
-            showCondition: (_req) => true
+            showCondition: _req => true,
           },
           step2: {
-            showCondition: (_req) => false
-          }
+            showCondition: _req => false,
+          },
         },
       };
 
@@ -271,11 +272,11 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step1: {
-            showCondition: (_req) => false
+            showCondition: _req => false,
           },
           step2: {
-            showCondition: (_req) => false
-          }
+            showCondition: _req => false,
+          },
         },
       };
 
@@ -289,8 +290,8 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step3: {
-            preventBack: true
-          }
+            preventBack: true,
+          },
         },
       };
 
@@ -304,8 +305,8 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step2: {
-            preventBack: true
-          }
+            preventBack: true,
+          },
         },
       };
 
@@ -319,9 +320,9 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step2: {
-            showCondition: (_req) => false,
-            preventBack: true
-          }
+            showCondition: _req => false,
+            preventBack: true,
+          },
         },
       };
 
@@ -335,13 +336,14 @@ describe('stepFlow', () => {
         stepOrder: ['step1', 'step2', 'step3'],
         steps: {
           step2: {
-            showCondition: (_req) => false
-          }
-        }
+            showCondition: _req => false,
+          },
+        },
       };
 
-      await expect(getPreviousStep(mockReq, 'step99', flowConfig, {}))
-        .rejects.toThrow('Step step99 not found in stepOrder');
+      await expect(getPreviousStep(mockReq, 'step99', flowConfig, {})).rejects.toThrow(
+        'Step step99 not found in stepOrder'
+      );
     });
   });
 
@@ -701,6 +703,5 @@ describe('stepFlow', () => {
 
       expect(next).toHaveBeenCalled();
     });
-
   });
 });

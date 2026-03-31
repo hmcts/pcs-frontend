@@ -114,7 +114,6 @@ async function getPreviousStepByShowConditions(req: Request, currentStepName: st
       // Show condition matches
       return candidatePreviousStepName;
     }
-
   }
 
   return null;

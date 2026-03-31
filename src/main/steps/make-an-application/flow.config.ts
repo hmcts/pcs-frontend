@@ -48,7 +48,8 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => isHearingInNext14Days(req) && needHelpPayingTheFee(req),
     },
     'you-need-to-apply-for-help-with-your-application-fee': {
-      showCondition: (req: Request) => isHearingInNext14Days(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHelpWithFees(req),
+      showCondition: (req: Request) =>
+        isHearingInNext14Days(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHelpWithFees(req),
     },
     'are-there-any-reasons-that-this-application-should-not-be-shared': {
       showCondition: (req: Request) => !otherPartiesAgreed(req),
@@ -57,8 +58,8 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => documentUploadWanted(req),
     },
     'application-submitted': {
-      preventBack: true
-    }
+      preventBack: true,
+    },
   },
 };
 
