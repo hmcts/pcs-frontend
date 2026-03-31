@@ -69,6 +69,10 @@ withNightlyPipeline(type, product, component) {
   enableFortifyScan()
   enableCrossBrowserTest()
 
+  before('crossBrowserTest') {
+    env.SAUCE_TUNNEL_NAME = 'reformtunnel' // withSauceConnect in cnp-jenkins-library
+  }
+
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)

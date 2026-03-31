@@ -40,7 +40,7 @@
     "test:saucelab": "bash bin/saucelab-run.sh direct",
     "test:saucelab:tunnel": "bash bin/saucelab-run.sh tunnel",
     "test:saucelab:tunnel-proxy": "bash bin/saucelab-run.sh tunnel-proxy",
-    "test:crossbrowser": "bash -c 'export SAUCE_TUNNEL_NAME=\"${SAUCE_TUNNEL_NAME:-reformtunnel}\"; exec bash bin/saucelab-run.sh tunnel'",
+    "test:crossbrowser": "bash bin/saucelab-run.sh tunnel",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"
   },
