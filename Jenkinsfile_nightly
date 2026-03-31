@@ -67,6 +67,10 @@ withNightlyPipeline(type, product, component) {
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
   enableFortifyScan()
+  // Same tunnel name as cnp-jenkins-library withSauceConnect --tunnel-name reformtunnel; saucectl reads SAUCE_TUNNEL_NAME.
+  before('crossBrowserTest') {
+    env.SAUCE_TUNNEL_NAME = 'reformtunnel'
+  }
   enableCrossBrowserTest()
 
   afterAlways('fortify-scan') {

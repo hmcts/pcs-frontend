@@ -37,10 +37,9 @@
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",
     "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $(git rev-parse --short HEAD) --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:openAllureReport": "yarn allure open allure-report",
-    "test:saucelab": "bash bin/saucelab-run.sh direct",
-    "test:saucelab:tunnel": "bash bin/saucelab-run.sh tunnel",
-    "test:saucelab:tunnel-proxy": "bash bin/saucelab-run.sh tunnel-proxy",
-    "test:crossbrowser": "bash bin/saucelab-run.sh tunnel",
+    "test:saucelab": "yarn exec saucectl run -c .sauce/config.yml",
+    "test:saucelab:tunnel": "yarn exec saucectl run -c .sauce/config.yml --tunnel-name ${SAUCE_TUNNEL_NAME}",
+    "test:crossbrowser": "yarn exec saucectl run -c .sauce/config.yml --tunnel-name ${SAUCE_TUNNEL_NAME}",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"
   },
