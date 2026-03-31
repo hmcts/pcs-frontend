@@ -192,8 +192,7 @@ export const step: StepDefinition = createFormStep({
         tenancyType = formContent.tenancyType;
       }
     } else {
-      tenancyType =
-        tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
+      tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
     return {

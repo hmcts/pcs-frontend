@@ -22,8 +22,8 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
 }));
 
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 import { isWelshProperty } from '../../../../main/steps/utils/isWelshProperty';
+import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 type TenancyTypeDetailsStep = {
   getInitialFormData: (req: {
@@ -432,30 +432,27 @@ describe('respond-to-claim tenancy-type-details step', () => {
       it.each([
         ['STANDARD_CONTRACT', 'a standard', 'The property is let under a standard occupation contract'],
         ['SECURE_CONTRACT', 'a secure', 'The property is let under a secure occupation contract'],
-      ])(
-        'sets tenancyType via tenancyTypeWales interpolation for %s',
-        async (licenceType, _fragment, expectedText) => {
-          const content = await testedStep.extendGetContent(
-            {
-              body: {},
-              res: {
-                locals: {
-                  validatedCase: {
-                    data: {
-                      legislativeCountry: 'Wales',
-                      possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
-                      occupationLicenceTypeWales: licenceType,
-                    },
+      ])('sets tenancyType via tenancyTypeWales interpolation for %s', async (licenceType, _fragment, expectedText) => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    legislativeCountry: 'Wales',
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                    occupationLicenceTypeWales: licenceType,
                   },
                 },
               },
             },
-            { detailsHeading: 'Details given by ', tenancyType: 'ignored' }
-          );
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'ignored' }
+        );
 
-          expect(content.tenancyType).toBe(expectedText);
-        }
-      );
+        expect(content.tenancyType).toBe(expectedText);
+      });
 
       it('calls t(tenancyTypeOther) directly with otherLicenceTypeDetails for OTHER', async () => {
         const content = await testedStep.extendGetContent(
