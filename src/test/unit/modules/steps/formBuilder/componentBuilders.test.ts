@@ -250,6 +250,7 @@ describe('componentBuilders', () => {
           type: 'character-count',
           maxLength: 200,
           labelClasses: 'govuk-label--m',
+          isPageHeading: true,
         };
 
         const result = buildComponentConfig(

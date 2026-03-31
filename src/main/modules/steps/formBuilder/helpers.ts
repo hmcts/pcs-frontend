@@ -405,7 +405,6 @@ export function validateForm(
           'This field is required';
       }
 
-      // Run validator function if provided (field-level validation)
       if (field.validator && value !== undefined && value !== null && value !== '') {
         try {
           const validatorResult = field.validator(value, formData, validationAllData);
