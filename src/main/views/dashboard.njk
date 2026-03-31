@@ -28,7 +28,6 @@
                 }}
               {% endfor %}
             </div>
-
             {% for dashboardTaskGroup in taskGroups %}
               {{ taskGroup(dashboardTaskGroup) }}
             {% endfor %}
@@ -46,6 +45,9 @@
                     </li>
                   {% endfor %}
                 </ul>
+              </nav>
+              <nav role="navigation" aria-label="{{ t('dashboard:contactInformationAriaLabel') }}">
+                {% include "components/contact-us-details.njk" %}
               </nav>
             </aside>
         </div>
