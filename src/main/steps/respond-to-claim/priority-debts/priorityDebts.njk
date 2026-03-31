@@ -1,14 +1,46 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "macros/csrf.njk" import csrfProtection %}
+{% block pageTitle %}
+  {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Priority debts (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for Priority Debts step.</p>
-  <form method="post" action="{{ url }}">
+  <span class="govuk-caption-l">{{ caption }}</span>
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+  <p class="govuk-body">{{ paragraph1 }}</p>
+  <p class="govuk-body">{{ paragraph2 }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ bullet1 }}</li>
+    <li>{{ bullet2 }}</li>
+    <li>{{ bullet3 }}</li>
+    <li>{{ bullet4 }}</li>
+    <li>{{ bullet5 }}</li>
+    <li>{{ bullet6 }}</li>
+    <li>{{ bullet7 }}</li>
+    <li>{{ bullet8 }}</li>
+    <li>{{ bullet9 }}</li>
+  </ul>
+  <p class="govuk-body">
+    <a
+      class="govuk-link"
+      href="https://www.citizensadvice.org.uk/debt-and-money/help-with-debt/dealing-with-your-debts/work-out-which-debts-to-deal-with-first/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {{ guidanceLinkText }}
+    </a>.
+  </p>
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
     {{ stepButtons(continue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
