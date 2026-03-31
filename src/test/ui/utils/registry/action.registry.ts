@@ -65,8 +65,8 @@ export class ActionRegistry {
     ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
     ['selectIfAnyOtherAdultsLiveInYourHouse', new RespondToClaimAction()],
-    ['selectWouldYouHaveSomewhereElseToLive', new RespondToClaimAction()],
     ['selectAlternativeAccommodation', new RespondToClaimAction()],
+    ['rentArrears', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
