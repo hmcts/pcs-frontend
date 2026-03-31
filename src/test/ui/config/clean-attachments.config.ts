@@ -25,7 +25,7 @@ for (const file of files) {
       if (cleaned.attachments && Array.isArray(cleaned.attachments)) {
         const before = cleaned.attachments.length;
         cleaned.attachments = cleaned.attachments.filter((a: any) => {
-          const isSmallVideo = a.type === 'video/webm' && a.size < 100000;
+          const isSmallVideo = a.type === 'video/webm' && a.size < 50000;
           if (isSmallVideo) {
             _removedCount++;
           }
