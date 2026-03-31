@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 export const submitCaseApiData = {
   submitCaseEventName: 'resumePossessionClaim',
@@ -572,8 +572,8 @@ export const submitCaseApiData = {
       rentArrears_StatementDocuments: [
         {
           value: {
-            document_url: `http://dm-store-aat.service.core-compute-aat.internal/documents/${uuidv4()}`,
-            document_binary_url: `http://dm-store-aat.service.core-compute-aat.internal/documents/${uuidv4()}/binary`,
+            document_url: `http://dm-store-aat.service.core-compute-aat.internal/documents/${randomUUID()}`,
+            document_binary_url: `http://dm-store-aat.service.core-compute-aat.internal/documents/${randomUUID()}/binary`,
             document_filename: `Rent Arrears ${Date.now()}.docx`,
           },
         },

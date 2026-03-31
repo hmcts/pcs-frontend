@@ -1,4 +1,3 @@
-import { IdamUtils } from '@hmcts/playwright-common';
 import { Page } from '@playwright/test';
 
 import { performAction } from '../../controller';
@@ -25,6 +24,7 @@ export class LoginAction implements IAction {
   }
 
   private async createUser(userType: string, roles: string[]): Promise<void> {
+    const { IdamUtils } = await import('@hmcts/playwright-common');
     const token = process.env.BEARER_TOKEN as string;
     const password = process.env.IDAM_PCS_USER_PASSWORD as string;
     const random7Digit = Math.floor(1000000 + Math.random() * 9000000);
@@ -45,6 +45,7 @@ export class LoginAction implements IAction {
   }
 
   private async generateCitizenAccessToken(): Promise<void> {
+    const { IdamUtils } = await import('@hmcts/playwright-common');
     process.env.CITIZEN_ACCESS_TOKEN = await new IdamUtils().generateIdamToken({
       username: process.env.IDAM_PCS_USER_EMAIL,
       password: process.env.IDAM_PCS_USER_PASSWORD,

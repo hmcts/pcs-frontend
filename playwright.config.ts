@@ -1,6 +1,6 @@
 import * as process from 'node:process';
 
-import { defineConfig, devices } from '@playwright/test';
+import { type ReporterDescription, defineConfig, devices } from '@playwright/test';
 
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
 export const VERY_SHORT_TIMEOUT = 1000;
@@ -20,6 +20,20 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
+const reporters: ReporterDescription[] = [['list']];
+if (process.env.PLAYWRIGHT_SKIP_ALLURE !== 'true') {
+  reporters.push([
+    'allure-playwright',
+    {
+      resultsDir: 'allure-results',
+      suiteTitle: false,
+      environmentInfo: {
+        os_version: process.version,
+      },
+    },
+  ]);
+}
+
 export default defineConfig({
   testDir: './src/test/ui',
   /* Run tests in files in parallel */
@@ -35,19 +49,7 @@ export default defineConfig({
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
-  reporter: [
-    ['list'],
-    [
-      'allure-playwright',
-      {
-        resultsDir: 'allure-results',
-        suiteTitle: false,
-        environmentInfo: {
-          os_version: process.version,
-        },
-      },
-    ],
-  ],
+  reporter: reporters,
   projects: [
     {
       name: 'chrome',

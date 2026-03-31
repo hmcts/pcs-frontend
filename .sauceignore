@@ -1,0 +1,25 @@
+# Bundle sent to Sauce Labs — keep this lean (see https://docs.saucelabs.com/web-apps/automated-testing/playwright/advanced/#tailoring-your-test-file-bundle)
+.git/
+.github/
+.idea/
+.vscode/
+.DS_Store
+*.log
+node_modules/
+.yarn/cache/
+.yarn/unplugged/
+dist/
+coverage/
+test-results/
+playwright-report/
+allure-report/
+allure-results/
+blob-report/
+playwright/.cache/
+pact/
+src/test/java/
+functional-output/
+smoke-output/
+mochawesome-report/
+src/main/public/
+src/main/resources/localhost-ssl/

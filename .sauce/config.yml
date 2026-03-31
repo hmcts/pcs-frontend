@@ -1,0 +1,49 @@
+# Run on Sauce Labs: set SAUCE_USERNAME and SAUCE_ACCESS_KEY (or run `saucectl configure`).
+# For non-public app URLs, configure Sauce Connect and set sauce.tunnel below.
+# Docs: https://docs.saucelabs.com/web-apps/automated-testing/playwright/yaml/
+apiVersion: v1alpha
+kind: playwright
+
+sauce:
+  region: eu-central-1
+  concurrency: 5
+  metadata:
+    tags:
+      - pcs-frontend
+      - pcssaucelab
+
+defaults:
+  timeout: 30m
+
+playwright:
+  version: 1.58.1
+  configFile: playwright.config.ts
+
+nodeVersion: v22
+
+rootDir: ./
+
+# Explicit installs: the runner does not reliably install devDependencies from package.json (global-setup and tests need this).
+npm:
+  packages:
+    '@hmcts/playwright-common': '1.0.39'
+
+# Sauce Playwright runner does not bundle devDependencies; skip Allure reporter there (see playwright.config.ts).
+env:
+  PLAYWRIGHT_SKIP_ALLURE: 'true'
+
+suites:
+  - name: "pcssaucelab @pcssaucelab (Chrome)"
+    platformName: Windows 11
+    screenResolution: 1920x1080
+    testMatch:
+      - '**/*.spec.ts'
+    params:
+      browserName: chrome
+      project: chrome
+      headless: true
+      grep: '@pcssaucelab'
+
+reporters:
+  spotlight:
+    enabled: true

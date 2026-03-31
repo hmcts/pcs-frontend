@@ -47,6 +47,7 @@ version
 /allure-results/
 /blob-report/
 /playwright/.cache/
+/artifacts/
 /.yarn/cache/
 /.yarn/unplugged/
 /pact/
