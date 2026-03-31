@@ -14,4 +14,6 @@ export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome = {
   saveAndContinueButton: `Save and continue`,
   selectIfYouHadAlternativeAccommodationErrorMessage: `Select if you’d have somewhere else to live if you had to leave your home`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home`,
 };

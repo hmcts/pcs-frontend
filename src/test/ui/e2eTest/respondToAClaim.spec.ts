@@ -276,10 +276,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-        await performAction('repaymentsAgreed', {
+    await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
@@ -434,11 +435,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-        await performAction('repaymentsAgreed', {
+    await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);;
+    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
+    await performAction('clickButton', situationInterstitialScreen.continueButton);
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);

@@ -14,4 +14,6 @@ export const doAnyOtherAdultsLiveInYourHome = {
   selectIfAnyOtherAdultsErrorMessage: `Select if any other adults live in your home`,
   giveDetailsAboutOtherAdultsErrorMessage: 'Give details about the other adults living in your home',
   mustBe500ErrorMessage: `Must be 500 characters or fewer`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `do-any-other-adults-live-in-your-home`,
 };
