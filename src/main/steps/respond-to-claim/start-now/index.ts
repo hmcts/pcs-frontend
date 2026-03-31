@@ -1,4 +1,4 @@
-import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
+// import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import type { Request, Response } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
@@ -8,14 +8,14 @@ import { RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
 const stepName = 'start-now';
 
-const headerModel = buildHeaderModel({
-  xuiBaseUrl: 'http://pcs-api-aat.service.core-compute-aat.internal',
-  user: { roles: ['caseworker-civil'] },
-});
-// Override default assetsPath to match where webpack copies the assets
-headerModel.assetsPath = '/assets/ui-component-lib';
+// const headerModel = buildHeaderModel({
+//   xuiBaseUrl: 'http://pcs-api-aat.service.core-compute-aat.internal',
+//   user: { roles: ['caseworker-civil'] },
+// });
+// // Override default assetsPath to match where webpack copies the assets
+// headerModel.assetsPath = '/assets/ui-component-lib';
 
-const footerModel = buildFooterModel();
+// const footerModel = buildFooterModel();
 
 
 export const step: StepDefinition = {
@@ -30,8 +30,8 @@ export const step: StepDefinition = {
       (req: Request) => {
         return {
           backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-          headerModel,
-          footerModel,
+          // headerModel,
+          // footerModel,
         };
       },
       'respondToClaim'

@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 
 import type { JourneyFlowConfig } from './stepFlow.interface';
+import { FooterModel, HeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 
 export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup';
 export type ComponentType =
@@ -107,9 +108,15 @@ export interface FormBuilderConfig {
   basePath?: string;
   flowConfig?: JourneyFlowConfig;
   showCancelButton?: boolean;
+  professionalHeaders?: ProfessionalHeadersConfig; 
 }
 
 export interface ComponentConfig {
   component: Record<string, unknown>;
   componentType: ComponentType;
+}
+
+export interface ProfessionalHeadersConfig {
+  header: HeaderModel;
+  footer: FooterModel;
 }

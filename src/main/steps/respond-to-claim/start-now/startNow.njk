@@ -3,24 +3,8 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
-{% from "xui-header/macro.njk" import hmctsXuiHeader %}
-{% from "footer/macro.njk" import hmctsUiFooter %}
-
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
-
-{% block head %}
-  {{ super() }}
-  <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
-{% endblock %}
-
-{% block header %}
-  {{ hmctsXuiHeader(headerModel) }}
-{% endblock %}
-
-{% block footer %}
-  {{ hmctsUiFooter(footerModel) }}
-{% endblock %}
 
 
 {% block serviceNavigation %}

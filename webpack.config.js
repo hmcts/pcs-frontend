@@ -5,7 +5,6 @@ const sourcePath = path.resolve(__dirname, 'src/main/assets/js');
 const govukFrontend = require(path.resolve(__dirname, 'webpack/govukFrontend'));
 const scss = require(path.resolve(__dirname, 'webpack/scss'));
 const HtmlWebpack = require(path.resolve(__dirname, 'webpack/htmlWebpack'));
-const cftUiComponent = require(path.resolve(__dirname, 'webpack/cftUiComponent'));
 
 const locales = path.resolve(__dirname, 'src/main/assets/locales');
 
@@ -18,7 +17,6 @@ module.exports = {
     ...govukFrontend.plugins,
     ...scss.plugins,
     ...HtmlWebpack.plugins,
-    ...cftUiComponent.plugins,
     new CopyWebpackPlugin({
       patterns: [{ from: locales, to: 'locales' }],
     }),

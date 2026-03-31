@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, professionalStepNavigation } from '../../../modules/steps';
@@ -7,6 +8,16 @@ import { PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE } from '../flow.config';
 
 const stepName = 'start-now';
 
+const headerModel = buildHeaderModel({
+  xuiBaseUrl: 'http://pcs-api-aat.service.core-compute-aat.internal',
+  user: { roles: ['caseworker-civil'] },
+});
+// Override default assetsPath to match where webpack copies the assets
+headerModel.assetsPath = '/assets/ui-component-lib';
+
+const footerModel = buildFooterModel();
+
+
 export const step: StepDefinition = {
   url: `${PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE}/start-now`,
   name: stepName,
@@ -14,11 +25,13 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   getController: () => {
     return createGetController(
-      'respond-to-claim/start-now/startNow.njk',
+      'professional-respond-to-claim/start-now/startNow.njk',
       stepName,
       (req: Request) => {
         return {
           backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+          headerModel,
+          footerModel,
         };
       },
       'professionalRespondToClaim'
