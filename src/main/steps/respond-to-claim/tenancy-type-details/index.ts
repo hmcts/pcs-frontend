@@ -3,10 +3,11 @@ import type { Request } from 'express';
 import type { PossessionClaimResponse, TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { isWelshProperty } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
-// Testing builds
+
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'tenancyTypeConfirm',
@@ -64,7 +65,6 @@ const CCD_TO_TENANCY_TYPE_CONFIRM: Record<Exclude<TenancyTypeCorrectValue, null>
   NOT_SURE: 'notSure',
 };
 
-// TODO: Welsh translations for tenancy type text will be addressed in the next ticket
 const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   ASSURED_TENANCY: 'an assured',
   SECURE_TENANCY: 'a secure',
@@ -72,6 +72,12 @@ const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   FLEXIBLE_TENANCY: 'a flexible',
   DEMOTED_TENANCY: 'a demoted',
   OTHER: 'other',
+};
+
+/** Fragments for `tenancyTypeWales` locale interpolation (Welsh occupation contract types). */
+const WALES_CONTRACT_TYPE_TO_TEXT: Record<string, string> = {
+  STANDARD_CONTRACT: 'a standard',
+  SECURE_CONTRACT: 'a secure',
 };
 
 export const step: StepDefinition = createFormStep({
@@ -156,19 +162,39 @@ export const step: StepDefinition = createFormStep({
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
       '';
 
-    const orgName = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
-      ?.value as string;
-    const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as string;
-    const otherTenancyTypeDetails = req.res?.locals.validatedCase?.data
-      ?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string;
+    const caseData = req.res?.locals.validatedCase?.data;
+    const welsh = await isWelshProperty(req);
+    const orgName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string;
+    const tenancyTypeOfTenancyLicence = caseData?.tenancy_TypeOfTenancyLicence as string;
+    const occupationLicenceTypeWales = caseData?.occupationLicenceTypeWales as string | undefined;
+    // England: tenancy_* (TenancyLicenceDetails). Wales: flat keys from OccupationLicenceDetailsWales (pcs-api).
+    const otherTenancyTypeDetails = welsh
+      ? (caseData?.otherLicenceTypeDetails as string | undefined)
+      : (caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string | undefined);
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
+    const welshTenancyTypeAgreementType = occupationLicenceTypeWales
+      ? WALES_CONTRACT_TYPE_TO_TEXT[occupationLicenceTypeWales]
+      : undefined;
 
     const detailsHeading =
       typeof formContent.detailsHeading === 'string'
         ? `${formContent.detailsHeading}${orgName}${':'}`
         : formContent.detailsHeading;
-    const tenancyType =
-      tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
+
+    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+    let tenancyType: unknown;
+    if (welsh) {
+      if (occupationLicenceTypeWales === 'OTHER') {
+        tenancyType = t('tenancyTypeOther', { otherTenancyTypeDetails });
+      } else if (welshTenancyTypeAgreementType) {
+        tenancyType = t('tenancyTypeWales', { welshTenancyTypeAgreementType });
+      } else {
+        tenancyType = formContent.tenancyType;
+      }
+    } else {
+      tenancyType =
+        tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
+    }
 
     return {
       ...formContent,
