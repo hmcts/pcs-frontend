@@ -39,6 +39,7 @@ const fieldsConfig: FormFieldConfig[] = [
             name: 'addressLine1',
             type: 'text',
             required: true,
+            errorMessage: 'errors.correspondenceAddressConfirm.addressLine1',
             translationKey: {
               label: 'labels.addressLine1',
             },
@@ -61,6 +62,7 @@ const fieldsConfig: FormFieldConfig[] = [
             name: 'townOrCity',
             type: 'text',
             required: true,
+            errorMessage: 'errors.correspondenceAddressConfirm.townOrCity',
             translationKey: {
               label: 'labels.townOrCity',
             },
@@ -172,7 +174,8 @@ export const step: StepDefinition = createFormStep({
       radio.component.fieldset.legend.text = prepopulateHeading;
     }
 
-    // Override value used in njk File with our dynamic value.
+    // TODO: Refactor to avoid mutating module-scoped `fieldsConfig` per request.
+    // Use the same pattern as `rent-arrears-dispute` (static validator returning a translation key).
     // Dynamically inject validator with translation function
     const postcodeField = fieldsConfig[0].options?.[1]?.subFields?.postcode;
     if (postcodeField) {

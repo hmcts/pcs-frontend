@@ -18,7 +18,9 @@
   },
   "errors": {
     "contactByEmailOrPost": "Select how you want to receive updates",
-    "contactByEmailOrPost.email": "Enter your email address",
+    "email": {
+      "required": "Enter your email address"
+    },
     "contactByEmailOrPost.email.invalid": "Enter an email address in the correct format, like name@example.com"
   }
 }
