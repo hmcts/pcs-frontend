@@ -54,6 +54,7 @@ export class PageNavigationValidation implements IValidation {
 
       if (navigateButton.includes('Back') || navigateButton.includes('feedback')) {
         await performAction('clickLink', navigateButton);
+        await page.waitForTimeout(200);
       } else {
         await performAction('clickButton', navigateButton);
       }
