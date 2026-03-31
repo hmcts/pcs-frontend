@@ -1,3 +1,3 @@
 export * from './oidc';
 export * from './caseReference';
-export * from './proHeaders'
+export * from './professionalHeaders'

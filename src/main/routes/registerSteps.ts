@@ -3,7 +3,7 @@ import type { RequestHandler } from 'express';
 
 import type { JourneyFlowConfig } from '../interfaces/stepFlow.interface';
 import type { StepDefinition } from '../interfaces/stepFormData.interface';
-import { caseReferenceParamMiddleware, oidcMiddleware, proHeaderMiddleware } from '../middleware';
+import { caseReferenceParamMiddleware, oidcMiddleware, professionalHeaderMiddleware } from '../middleware';
 import { getValidatedLanguage, stepDependencyCheckMiddleware } from '../modules/steps';
 import { getStepsForJourney, journeyRegistry } from '../steps';
 
@@ -45,8 +45,8 @@ function buildGetMiddleware(
   const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
 
   return stepMiddleware
-    ? [...authMiddlewares, dependencyCheck, proHeaderMiddleware, ...stepMiddleware]
-    : [...authMiddlewares, dependencyCheck, proHeaderMiddleware];
+    ? [...authMiddlewares, dependencyCheck, professionalHeaderMiddleware, ...stepMiddleware]
+    : [...authMiddlewares, dependencyCheck, professionalHeaderMiddleware];
 }
 
 /**

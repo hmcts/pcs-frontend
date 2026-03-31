@@ -11,7 +11,7 @@ headerModel.assetsPath = '/assets/ui-component-lib';
 const footerModel = buildFooterModel();
 
 
-export const proHeaderMiddleware: RequestHandler = async (
+export const professionalHeaderMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
