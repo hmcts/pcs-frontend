@@ -10,6 +10,23 @@ import { shortUrl, truncateForLog } from './string.utils';
 
 // PFT: optional console when ENABLE_PFT_DEBUG_LOG; screenshots always on failure paths.
 
+function isSensitiveEnvKey(key: string): boolean {
+  const u = key.toUpperCase();
+  return (
+    u.includes('TOKEN') ||
+    u.includes('PASSWORD') ||
+    u.includes('SECRET') ||
+    u.includes('CREDENTIAL')
+  );
+}
+
+function formatEnvLineForLog(key: string): string {
+  if (isSensitiveEnvKey(key)) {
+    return `  ${key}=<redacted>`;
+  }
+  return `  ${key}=${process.env[key]}`;
+}
+
 let envBeforeBeforeEach: NodeJS.ProcessEnv | null = null;
 
 export function captureProcessEnvBeforeBeforeEach(): void {
@@ -31,7 +48,7 @@ export function logTestBeforeEachContext(): void {
         .sort()
     : [];
 
-  const lines = changed.map(k => `  ${k}=${process.env[k]}`);
+  const lines = changed.map(formatEnvLineForLog);
   const body =
     lines.length > 0
       ? lines.join('\n')
