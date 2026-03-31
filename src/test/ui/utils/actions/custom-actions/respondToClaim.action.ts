@@ -11,6 +11,8 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
   freeLegalAdvice,
   landlordLicensed,
   landlordRegistered,
@@ -20,6 +22,7 @@ import {
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
+  yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -41,6 +44,9 @@ export class RespondToClaimAction implements IAction {
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
+      ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
+      ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
+      ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
@@ -271,6 +277,42 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  }
+
+  private async readYourHouseholdAndCircumstances(): Promise<void> {
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+  }
+
+  private async doYouHaveAnyOtherDependants(otherDependantsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
+      option: otherDependantsData.otherDependantsOption,
+    });
+
+    if (otherDependantsData.otherDependantsOption === doYouHaveAnyOtherDependants.yesRadioOption) {
+      await performAction(
+        'inputText',
+        doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
+        otherDependantsData.otherDependantsInfo
+      );
+    }
+    await performAction('clickButton', doYouHaveAnyOtherDependants.saveAndContinueButton);
+  }
+
+  private async doYouHaveAnyDependantChildren(dependantChildrenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
+      option: dependantChildrenData.dependantChildrenOption,
+    });
+
+    if (dependantChildrenData.dependantChildrenOption === doYouHaveAnyDependantChildren.yesRadioOption) {
+      await performAction(
+        'inputText',
+        doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
+        dependantChildrenData.dependantChildrenInfo
+      );
+    }
+    await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

@@ -25,3 +25,7 @@ export * from './tenancyDateDetails.page.data';
 export * from './dashboard.page.data';
 export * from './landlordLicensed.page.data';
 export * from './writtenTerms.page.data';
+export * from './doYouHaveAnyDependantChildren.page.data';
+export * from './yourHouseholdAndCircumstances.page.data';
+export * from './doYouHaveAnyOtherDependants.page.data';
+export * from './doAnyOtherAdultsLiveInYourHome.page.data';

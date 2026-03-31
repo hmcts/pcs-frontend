@@ -12,6 +12,9 @@ import {
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
+  doAnyOtherAdultsLiveInYourHome,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
   freeLegalAdvice,
   nonRentArrearsDispute,
   rentArrearsDispute,
@@ -102,6 +105,23 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    // No option is not implemented in PR 969, hence commented out the below code for now.
+    // Need to run these again once 3542 story is merged.
+    /*
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
+    */
   });
 
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @noDefendants @regression', async () => {
@@ -142,6 +162,26 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @noDefendants @regression', async () => {
@@ -191,6 +231,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @noDefendants @regression', async () => {
@@ -237,6 +288,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentInfo: repaymentsMade.detailsTextInput,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('Non-RentArrears - NoticeServed - Yes NoticeDetails - No - NonRentArrearsDispute @noDefendants @regression', async () => {
@@ -281,7 +345,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('England - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @noDefendants @regression', async () => {
@@ -316,6 +392,27 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterTenancyStartDetailsUnKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -362,6 +459,22 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
@@ -401,6 +514,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - No - RentArrearsDispute @regression', async () => {
@@ -446,6 +570,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('RentArrears - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - RentArrearsDispute @regression', async () => {
@@ -488,6 +623,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('England - RentArrears - NoticeServed - No NoticeDateProvided - No - RentArrearsDispute @regression', async () => {
@@ -530,5 +678,18 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 });
