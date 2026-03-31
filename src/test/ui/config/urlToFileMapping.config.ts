@@ -20,6 +20,7 @@ export default {
   'tenancy-date-unknown': 'tenancyDateUnknown',
   'tenancy-date-details': 'tenancyDateDetails',
   'tenancy-type-details': 'tenancyTypeDetails',
+  'repayments-agreed': 'repaymentsAgreed',
   'landlord-licensed': 'landlordLicensed',
   'written-terms': 'writtenTerms',
   'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
