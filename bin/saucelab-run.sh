@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# saucectl wrappers: direct | tunnel (set SAUCE_TUNNEL_NAME) | tunnel-proxy (also exports HTTP_PROXY etc. for saucectl; ./sc -x is separate)
+# direct | tunnel (no HTTP(S)_PROXY for saucectl) | tunnel-proxy (use exported HTTP_PROXY/HTTPS_PROXY for saucectl; ./sc -x is separate)
 set -euo pipefail
 
 cd "$(dirname "$0")/.." || exit 1
@@ -22,6 +22,7 @@ case "$MODE" in
     if [[ -n "${SAUCE_TUNNEL_OWNER:-}" ]]; then
       EXTRA+=(--tunnel-owner "$SAUCE_TUNNEL_OWNER")
     fi
+    unset HTTP_PROXY HTTPS_PROXY NO_PROXY
     exec "${SAUCECTL[@]}" "${EXTRA[@]}" "$@"
     ;;
   tunnel-proxy)
@@ -29,7 +30,10 @@ case "$MODE" in
       echo "ERROR: Set SAUCE_TUNNEL_NAME to your running Sauce Connect tunnel name." >&2
       exit 1
     fi
-    # For saucectl only; Sauce Connect proxy is configured on ./sc, not here.
+    if [[ -z "${HTTP_PROXY:-}" && -z "${HTTPS_PROXY:-}" ]]; then
+      echo "Note: HTTP_PROXY/HTTPS_PROXY unset — export them before yarn if saucectl needs your corporate proxy (e.g. http://proxyout.reform.hmcts.net:8080)." >&2
+    fi
+    # For saucectl only; ./sc -x is separate.
     export HTTP_PROXY HTTPS_PROXY NO_PROXY
     EXTRA=(--tunnel-name "$SAUCE_TUNNEL_NAME")
     if [[ -n "${SAUCE_TUNNEL_OWNER:-}" ]]; then

@@ -168,8 +168,9 @@ There are also several custom test scripts available:
 
 - `yarn test:changed` - runs only changed spec files
 - `yarn test:saucelab` - Sauce (`@pcssaucelab`), no tunnel; needs `SAUCE_USERNAME` / `SAUCE_ACCESS_KEY`
-- `yarn test:saucelab:tunnel` - set `SAUCE_TUNNEL_NAME` (optional `SAUCE_TUNNEL_OWNER`) for Sauce Connect
-- `yarn test:saucelab:tunnel-proxy` - like tunnel, plus proxy env for `saucectl` (not for `./sc`)
+- `yarn test:saucelab:tunnel` - tunnel mode; **clears** `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` for `saucectl` (no proxy). Set `SAUCE_TUNNEL_NAME` (optional `SAUCE_TUNNEL_OWNER`)
+- `yarn test:saucelab:tunnel-proxy` - tunnel mode **with** proxy: `export HTTP_PROXY` / `HTTPS_PROXY` (and `NO_PROXY` if needed) **before** `yarn` — only this script passes them through to `saucectl` (not for `./sc -x`)
+- `yarn test:crossbrowser` - used by the [nightly pipeline](Jenkinsfile_nightly) (`enableCrossBrowserTest` in [cnp-jenkins-library](https://github.com/hmcts/cnp-jenkins-library)): runs `saucectl` with tunnel (defaults `SAUCE_TUNNEL_NAME` to `reformtunnel` to match Jenkins `withSauceConnect`). Override `SAUCE_TUNNEL_NAME` locally if needed.
 - `test:E2eChrome` - runs the full E2E suite in Chrome
 - `test:E2eFirefox` - runs the full E2E suite in Firefox
 - `test:E2eSafari` - runs the full E2E suite in Safari
