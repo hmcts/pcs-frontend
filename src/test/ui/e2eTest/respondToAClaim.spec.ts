@@ -252,12 +252,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependantChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependants.continueButton);
-    // await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-    //   radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-    //   details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput
-    // });
     await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
     });
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
@@ -398,6 +395,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performValidation('mainHeader', repaymentsAgreed.mainHeader);
+    await performAction('clickButton', repaymentsAgreed.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.continueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependants.continueButton);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
+    });
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {

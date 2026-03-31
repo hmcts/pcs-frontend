@@ -21,8 +21,8 @@ import {
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
-  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   tenancyTypeDetails,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
 } from '../../../data/page-data';
 import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
