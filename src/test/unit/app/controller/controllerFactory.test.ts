@@ -78,7 +78,6 @@ describe('createGetController', () => {
       const translations: Record<string, string> = {
         serviceName: 'Test Service',
         phase: 'ALPHA',
-        feedback: 'Feedback text',
         back: 'Back',
         languageToggle: 'Language toggle',
       };
@@ -115,7 +114,6 @@ describe('createGetController', () => {
         backUrl: null,
         serviceName: 'Test Service',
         phase: 'ALPHA',
-        feedback: 'Feedback text',
         back: 'Back',
         languageToggle: 'Language toggle',
       })
@@ -127,7 +125,6 @@ describe('createGetController', () => {
       const translations: Record<string, string> = {
         serviceName: 'Test Service',
         phase: 'ALPHA',
-        feedback: 'Feedback text',
         back: 'Back',
         languageToggle: 'Language toggle',
       };
@@ -163,7 +160,6 @@ describe('createGetController', () => {
         backUrl: null,
         serviceName: 'Test Service',
         phase: 'ALPHA',
-        feedback: 'Feedback text',
         back: 'Back',
         languageToggle: 'Language toggle',
       })
@@ -175,7 +171,6 @@ describe('createGetController', () => {
       const translations: Record<string, string> = {
         serviceName: 'Test Service',
         phase: 'ALPHA',
-        feedback: 'Feedback text',
         back: 'Back',
         languageToggle: 'Language toggle',
       };
@@ -208,7 +203,6 @@ describe('createGetController', () => {
         backUrl: null,
         serviceName: 'Test Service',
         phase: 'ALPHA',
-        feedback: 'Feedback text',
         back: 'Back',
         languageToggle: 'Language toggle',
       })

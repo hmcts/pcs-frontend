@@ -1,0 +1,18 @@
+export const landlordLicensed = {
+  mainHeader: `Licensed landlord`,
+  respondToClaimParagraph: `Respond to a property possession claim`,
+  backLink: `Back`,
+  youCanCheckIfYourLandlord: `You can check if your landlord is licensed by searching the`,
+  isYourLandlordLicensedQuestion: `Is your landlord licensed?`,
+  publicRegisterLink: `Public Register (opens in new tab)`,
+  yesRadioOption: `Yes`,
+  noRadioOption: `No`,
+  iamNotSureRadioOption: `I’m not sure`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  cymraegLink: `Cymraeg`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfYouAgreeWithLandlordsClaimLicensedErrorMessage: `Select if you agree with the landlord’s claim to be licensed`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `landlord-licensed`,
+};

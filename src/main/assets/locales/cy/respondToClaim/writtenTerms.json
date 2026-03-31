@@ -1,0 +1,15 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyWritten terms",
+  "introText": "cyIt is required under the Renting Homes Wales Act 2016 for a landlord to send you written terms of the occupation contract.",
+  "question": "cyHas your landlord sent you written terms of the occupation contract?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "imNotSure": "cyI’m not sure"
+  },
+  "errors": {
+    "writtenTerms": "cySelect if the landlord has sent you written terms of the occupation contract"
+  }
+}

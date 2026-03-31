@@ -33,9 +33,10 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial',
     'landlord-registered',
     'landlord-licensed',
+    'written-terms',
     'tenancy-type-details',
-    'tenancy-date-unknown',
     'tenancy-date-details',
+    'tenancy-date-unknown',
     'confirmation-of-notice-given',
     'confirmation-of-notice-date-when-provided',
     'confirmation-of-notice-date-when-not-provided',
@@ -121,18 +122,22 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !isWelshProperty(req),
+          condition: async (req: Request) => !(await isWelshProperty(req)),
           nextStep: 'tenancy-type-details',
         },
       ],
       defaultNext: 'tenancy-type-details',
     },
-
     'landlord-registered': {
       defaultNext: 'landlord-licensed',
+      previousStep: 'dispute-claim-interstitial',
     },
     'landlord-licensed': {
+      defaultNext: 'written-terms',
+    },
+    'written-terms': {
       defaultNext: 'tenancy-type-details',
+      previousStep: 'landlord-licensed',
     },
     'tenancy-type-details': {
       routes: [
@@ -145,18 +150,10 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'tenancy-date-unknown',
         },
       ],
-      previousStep: async (req: Request, formData: Record<string, unknown>) => {
-        // Check formData to see which path was actually taken
-        // This honors the actual journey path even if case data changes mid-journey
-        if ('landlord-registered' in formData) {
-          return 'landlord-registered';
-        }
-
-        // Fallback: check current case data for new journeys
-
+      previousStep: async (req: Request) => {
         const welshProperty = await isWelshProperty(req);
         if (welshProperty) {
-          return 'landlord-registered';
+          return 'written-terms';
         }
         return 'dispute-claim-interstitial';
       },
