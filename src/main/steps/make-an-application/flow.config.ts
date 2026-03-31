@@ -22,7 +22,7 @@ export const flowConfig: JourneyFlowConfig = {
     'have-the-other-parties-agreed-to-this-application',
     'are-there-any-reasons-that-this-application-should-not-be-shared',
     'what-order-do-you-want-the-court-to-make-and-why',
-    'upload-document-to-support-your-application',
+    'do-you-want-to-upload-documents-to-support-your-application',
     'upload-documents-to-support-your-application',
     'which-language-did-you-use-to-complete-this-service',
     'check-your-answers',
@@ -84,5 +84,5 @@ function otherPartiesAgreed(req: Request): boolean {
 }
 
 function documentUploadWanted(req: Request): boolean {
-  return getFormData(req, 'upload-document-to-support-your-application').uploadDocuments === 'YES';
+  return getFormData(req, 'do-you-want-to-upload-documents-to-support-your-application').uploadDocuments === 'YES';
 }

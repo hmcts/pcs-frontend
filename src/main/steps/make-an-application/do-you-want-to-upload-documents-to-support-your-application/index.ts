@@ -3,7 +3,7 @@ import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'upload-document-to-support-your-application',
+  stepName: 'do-you-want-to-upload-documents-to-support-your-application',
   journeyFolder: 'makeAnApplication',
   stepDir: __dirname,
   flowConfig,
