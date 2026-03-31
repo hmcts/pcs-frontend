@@ -21,7 +21,6 @@ import {
   rentArrearsDispute,
   repaymentsAgreed,
   repaymentsMade,
-  situationInterstitialScreen,
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
@@ -161,15 +160,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
-    // No option is not implemented in PR 969, hence commented out the below code for now.
-    // Need to run these again once 3542 story is merged.
-    /*
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
-    */
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
@@ -233,7 +237,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
@@ -286,10 +289,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
     await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -298,10 +302,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
   });
 
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -351,9 +351,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.yesRadioOption,
       repaymentInfo: repaymentsMade.detailsTextInput,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedInfo: repaymentsAgreed.detailsTextInputAmount,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -390,8 +390,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyTypeDetails.mainHeader);
+    await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: '15',
       tsMonth: '11',
@@ -422,11 +422,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
-      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
-    });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -471,9 +466,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsMade', {
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedInfo: repaymentsAgreed.detailsTextInputAmount,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -534,10 +529,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
-    await performAction('repaymentsMade', {
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
@@ -551,11 +542,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
-      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
-    });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
@@ -597,8 +583,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', rentArrearsDispute.mainHeader);
     await performAction('clickButton', rentArrearsDispute.continueButton);
+    await performAction('repaymentsMade', {
+      repaymentOption: repaymentsMade.yesRadioOption,
+      repaymentInfo: repaymentsMade.detailsTextInput,
+    });
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentsAgreedInfo: repaymentsAgreed.detailsTextInputAmount,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -632,8 +623,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    await performAction('clickButton', tenancyDetails.saveAndContinueButton);
+    await performValidation('mainHeader', tenancyTypeDetails.mainHeader);
+    await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.noRadioOption,
       day: '01',
@@ -653,10 +644,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
     await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -665,10 +657,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
-    });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - No - RentArrearsDispute  @regression', async () => {
@@ -716,7 +704,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
@@ -726,14 +713,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
-      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+      otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
   });
 
   test('England - Demoted - RentArrears - NoticeServed - No NoticeDateProvided - No - RentArrearsDispute @regression', async () => {
@@ -778,9 +760,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsMade.mainHeader,
       repaymentOption: repaymentsMade.noRadioOption,
     });
-    await performValidation('mainHeader', repaymentsAgreed.mainHeader);
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentsAgreedInfo: repaymentsAgreed.detailsTextInputAmount,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -792,9 +774,5 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
   });
 });

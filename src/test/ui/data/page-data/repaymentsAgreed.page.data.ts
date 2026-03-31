@@ -16,4 +16,6 @@ export const repaymentsAgreed = {
   getSelectAgreementErrorMessage: (claimantsName: string) =>
     `Select if you’ve come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025`,
   mustBe500CharactersOrFewerErrorMessage: `Must be 500 characters or fewer`,
+  detailsTextInputAmount: `1000`,
+  detailsCharLimitInputText: `abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz1234567`,
 };

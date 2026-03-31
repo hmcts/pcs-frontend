@@ -23,9 +23,9 @@ import {
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
-  yourHouseholdAndCircumstances,
   tenancyTypeDetails,
   writtenTerms,
+  yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
 import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -341,6 +341,8 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  }
+
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
     const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
     const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
