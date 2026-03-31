@@ -39,7 +39,7 @@
     "test:openAllureReport": "yarn allure open allure-report",
     "test:saucelab": "yarn exec saucectl run -c .sauce/config.yml",
     "test:saucelab:tunnel": "yarn exec saucectl run -c .sauce/config.yml --tunnel-name ${SAUCE_TUNNEL_NAME}",
-    "test:crossbrowser": "yarn exec saucectl run -c .sauce/config.yml --tunnel-name ${SAUCE_TUNNEL_NAME}",
+    "test:crossbrowser": "yarn exec saucectl run -c .sauce/config.yml --tunnel-name reformtunnel",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"
   },
