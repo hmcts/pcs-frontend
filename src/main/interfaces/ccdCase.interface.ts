@@ -69,6 +69,8 @@ export interface PossessionClaimResponse {
     contactByPhone?: VerticalYesNoValue;
     contactByText?: VerticalYesNoValue;
     preferenceType?: ContactPreference;
+    rentArrearsAmountConfirmation?: string;
+    rentArrearsAmount?: string;
     freeLegalAdvice?: string;
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
@@ -81,6 +83,11 @@ export interface PossessionClaimResponse {
     };
     householdCircumstances?: HouseholdCircumstances;
   };
+  claimantEnteredDefendantDetails?: {
+    firstName?: string;
+    lastName?: string;
+  };
+  claimantOrganisations?: { value: string }[];
 }
 
 export interface StartCallbackData {

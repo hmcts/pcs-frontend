@@ -19,6 +19,7 @@ import {
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   paymentInterstitial,
+  rentArrears,
   repaymentsAgreed,
   repaymentsMade,
   tenancyDateDetails,
@@ -27,7 +28,7 @@ import {
   writtenTerms,
   yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
-import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
+import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
@@ -58,6 +59,7 @@ export class RespondToClaimAction implements IAction {
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
+      ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
     ]);
@@ -305,6 +307,30 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  }
+
+  private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
+    await performValidation('text', {
+      elementType: 'subHeader',
+      text: `Amount you owe in rent arrears given by ${submitCaseApiData.submitCasePayload.claimantName}:`,
+    });
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `When making their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
+    });
+    const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `${rentArrearsAmount}`,
+    });
+    await performAction('clickRadioButton', {
+      question: rentArrears.doYouOweThisQuestion,
+      option: rentArrearsInfo.option,
+    });
+    if (rentArrearsInfo.option === 'No') {
+      await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
+    }
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
   }
 
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
