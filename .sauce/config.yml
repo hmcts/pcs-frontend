@@ -28,7 +28,7 @@ env:
   PLAYWRIGHT_SKIP_ALLURE: 'true'
 
 suites:
-  - name: "pcssaucelab @pcssaucelab (Chrome)"
+  - name: 'pcssaucelab @pcssaucelab (Chrome)'
     platformName: Windows 11
     screenResolution: 1920x1080
     testMatch:

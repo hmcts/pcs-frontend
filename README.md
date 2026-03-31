@@ -167,9 +167,9 @@ By default, the tests will run against http://localhost:3209/, please update the
 There are also several custom test scripts available:
 
 - `yarn test:changed` - runs only changed spec files
-- `yarn test:saucelab` - Sauce Labs: `@pcssaucelab` tests, no Sauce Connect tunnel (requires `SAUCE_USERNAME` / `SAUCE_ACCESS_KEY`; see `.sauce/config.yml`)
-- `yarn test:saucelab:tunnel` - same, but uses an existing tunnel: set `SAUCE_TUNNEL_NAME` (optional `SAUCE_TUNNEL_OWNER`)
-- `yarn test:saucelab:tunnel-proxy` - same as tunnel, and re-exports `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` for **`saucectl`** only. Proxy options on `./sc` do not set these; use this script only if `saucectl` must use a proxy too
+- `yarn test:saucelab` - Sauce (`@pcssaucelab`), no tunnel; needs `SAUCE_USERNAME` / `SAUCE_ACCESS_KEY`
+- `yarn test:saucelab:tunnel` - set `SAUCE_TUNNEL_NAME` (optional `SAUCE_TUNNEL_OWNER`) for Sauce Connect
+- `yarn test:saucelab:tunnel-proxy` - like tunnel, plus proxy env for `saucectl` (not for `./sc`)
 - `test:E2eChrome` - runs the full E2E suite in Chrome
 - `test:E2eFirefox` - runs the full E2E suite in Firefox
 - `test:E2eSafari` - runs the full E2E suite in Safari
@@ -215,9 +215,11 @@ There is a configuration section related with those headers, where you can speci
 Here's an example setup:
 
 ```json
-    "security": {
-      "referrerPolicy": "origin",
-    }
+{
+  "security": {
+    "referrerPolicy": "origin"
+  }
+}
 ```
 
 Make sure you have those values set correctly for your application.
