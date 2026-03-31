@@ -437,9 +437,5 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
     },
-    'installment-payments': {
-      previousStep: 'repayments-agreed',
-      defaultNext: 'your-household-and-circumstances',
-    },
   },
 };

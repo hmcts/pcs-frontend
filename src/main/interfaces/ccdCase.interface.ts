@@ -70,11 +70,6 @@ export interface PossessionClaimResponse {
     };
     landlordLicensed?: YesNoNotSureValue;
     writtenTerms?: YesNoNotSureValue;
-
-    paymentAgreement?: {
-      repaymentPlanAgreed?: YesNoNotSureValue;
-      repaymentAgreedDetails?: string;
-    };
   };
 }
 
