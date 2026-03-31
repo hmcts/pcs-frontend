@@ -16,7 +16,7 @@
   },
   "textAreaLabel": "cyGive details about the exceptional hardship you’d experience",
   "errors": {
-    "exceptionalHardship": "cyChoose yes or no",
-    "exceptionalHardshipDetails": "cyEnter details about the exceptional hardship you’d experience"
+    "exceptionalHardship": "cySelect if you’d experience exceptional hardship if you were asked to leave your home",
+    "exceptionalHardshipDetails": "cyGive details about the exceptional hardship you’d experience"
   }
 }

@@ -16,7 +16,7 @@
   },
   "textAreaLabel": "Give details about the exceptional hardship you’d experience",
   "errors": {
-    "exceptionalHardship": "Choose yes or no",
-    "exceptionalHardshipDetails": "Enter details about the exceptional hardship you’d experience"
+    "exceptionalHardship": "Select if you’d experience exceptional hardship if you were asked to leave your home",
+    "exceptionalHardshipDetails": "Give details about the exceptional hardship you’d experience"
   }
 }

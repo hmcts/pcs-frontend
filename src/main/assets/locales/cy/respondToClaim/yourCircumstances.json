@@ -13,7 +13,7 @@
   },
   "textAreaLabel": "cyGive details about your circumstances",
   "errors": {
-    "shareCircumstances": "cyChoose yes or no",
-    "circumstancesDetails": "cyEnter details about your circumstances"
+    "shareCircumstances": "cySelect if you’d like to share anything about your circumstances",
+    "circumstancesDetails": "cyGive details about your circumstances"
   }
 }
