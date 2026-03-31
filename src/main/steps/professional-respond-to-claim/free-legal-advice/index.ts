@@ -1,13 +1,10 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFreeLegalAdviceBase, mapFromCcdEnum } from '../../common/freeLegalAdviceBase';
 
-
-export const step: StepDefinition = createFormStep({
-  stepName: 'free-legal-advice',
+export const step: StepDefinition = createFreeLegalAdviceBase({
   journeyFolder: 'professionalRespondToClaim',
-  stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/freeLegalAdvice.njk`,
   translationKeys: {
@@ -27,19 +24,11 @@ export const step: StepDefinition = createFormStep({
     // Read from CCD (fresh data from START callback via res.locals.validatedCase)
     // Same pattern as correspondence-address - no session dependency
     const caseData = req.res?.locals.validatedCase?.data;
-    const existingAnswer = caseData?.possessionClaimResponse?.defendantResponses?.receivedFreeLegalAdvice;
+    const existingAnswer = caseData?.possessionClaimResponse?.defendantResponses?.receivedFreeLegalAdvice; // Only prepopulate on GET (not on POST with validation errors)
 
-    // Only prepopulate on GET (not on POST with validation errors)
     if (existingAnswer && !req.body?.hadLegalAdvice) {
       // Map CCD enum to frontend value
-      const formValue =
-        existingAnswer === 'YES'
-          ? 'yes'
-          : existingAnswer === 'NO'
-            ? 'no'
-            : existingAnswer === 'PREFER_NOT_TO_SAY'
-              ? 'preferNotToSay'
-              : undefined;
+      const formValue = mapFromCcdEnum(existingAnswer);
 
       if (formValue) {
         // Prepopulate radio button from CCD data
@@ -55,21 +44,4 @@ export const step: StepDefinition = createFormStep({
 
     return formContent;
   },
-  fields: [
-    {
-      name: 'hadLegalAdvice',
-      type: 'radio',
-      required: true,
-      legendClasses: 'govuk-fieldset__legend--m',
-      translationKey: {
-        label: 'question',
-      },
-      options: [
-        { value: 'yes', translationKey: 'options.yes' },
-        { value: 'no', translationKey: 'options.no' },
-        { divider: 'options.or' },
-        { value: 'preferNotToSay', translationKey: 'options.preferNotToSay' },
-      ],
-    },
-  ],
 });
