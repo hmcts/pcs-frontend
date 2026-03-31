@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { FormFieldConfig } from '../../../../main/interfaces/formFieldConfig.interface';
+import { JourneyFlowConfig } from '../../../../main/interfaces/stepFlow.interface';
 import { type FormBuilderConfig, createFormStep } from '../../../../main/modules/steps';
 
 const mockGetFormData = jest.fn();
@@ -9,7 +10,7 @@ const mockSetFormData = jest.fn();
 const mockValidateForm = jest.fn();
 
 jest.mock('../../../../main/modules/steps/controller', () => ({
-  createGetController: jest.fn((view, stepName, extendContent) => ({
+  createGetController: jest.fn((view, stepName, stepNavigation, extendContent) => ({
     get: jest.fn(async (req: Request, res: Response) => {
       const content = extendContent ? await extendContent(req) : {};
       return res.render(view, content);
@@ -37,10 +38,6 @@ const mockGetNextStepUrl = jest.fn();
 const mockGetBackUrl = jest.fn();
 
 jest.mock('../../../../main/modules/steps/flow', () => ({
-  stepNavigation: {
-    getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
-    getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
-  },
   createStepNavigation: jest.fn(() => ({
     getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
     getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
@@ -66,10 +63,16 @@ describe('formBuilder', () => {
   });
 
   const mockStepDir = '/test/step/dir';
+  const flowConfig: JourneyFlowConfig = {
+    stepOrder: [],
+    steps: {},
+  };
+
   const baseConfig: FormBuilderConfig = {
     stepName: 'test-step',
     journeyFolder: 'testJourney',
     stepDir: mockStepDir,
+    flowConfig,
     fields: [
       {
         name: 'testField',
@@ -146,6 +149,14 @@ describe('formBuilder', () => {
   });
 
   describe('createFormStep', () => {
+    it('should throw an error if no flowConfig', () => {
+      const config = {
+        ...baseConfig,
+        flowConfig: undefined,
+      };
+      expect(() => createFormStep(config)).toThrow('flowConfig must be provided');
+    });
+
     it('should create a step definition with correct URL', () => {
       const step = createFormStep(baseConfig);
       expect(step.url).toBe('/steps/test-journey/test-step');
