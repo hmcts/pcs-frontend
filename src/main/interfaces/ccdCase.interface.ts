@@ -82,7 +82,6 @@ export interface PossessionClaimResponse {
     firstName?: string;
     lastName?: string;
   };
-  claimantOrganisations?: { value: string }[];
 }
 
 export interface StartCallbackData {

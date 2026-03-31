@@ -3,7 +3,7 @@
  * Used for CCD API integration where boolean choices are represented as enum strings.
  */
 
-import type { YesNoValue } from '../../interfaces/ccdCase.interface';
+import type { VerticalYesNoValue } from '../../interfaces/ccdCase.interface';
 
 /**
  * Converts frontend 'yes'/'no' string to backend CCD enum 'YES'/'NO'
@@ -13,7 +13,7 @@ import type { YesNoValue } from '../../interfaces/ccdCase.interface';
  * toYesNoEnum('yes') // returns 'YES'
  * toYesNoEnum('no')  // returns 'NO'
  */
-export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
+export function toYesNoEnum(value: 'yes' | 'no'): VerticalYesNoValue {
   return value === 'yes' ? 'YES' : 'NO';
 }
 
@@ -26,7 +26,7 @@ export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
  * fromYesNoEnum('NO')  // returns 'no'
  * fromYesNoEnum(null)  // returns undefined
  */
-export function fromYesNoEnum(value: YesNoValue | string | undefined): 'yes' | 'no' | undefined {
+export function fromYesNoEnum(value: VerticalYesNoValue | string | undefined): 'yes' | 'no' | undefined {
   if (value === 'YES') {
     return 'yes';
   }
