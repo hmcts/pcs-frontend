@@ -11,8 +11,8 @@ export type ContactPreference = 'EMAIL' | 'POST' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 
 export type PaymentAgreement = {
-  anyPaymentsMade: YesNoValue;
-  paymentDetails: string;
+  anyPaymentsMade?: YesNoValue;
+  paymentDetails?: string;
   repaymentPlanAgreed?: YesNoNotSureValue;
   repaymentAgreedDetails?: string;
 };
