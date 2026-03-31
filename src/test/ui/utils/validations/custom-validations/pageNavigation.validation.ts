@@ -409,7 +409,12 @@ export class PageNavigationValidation implements IValidation {
     }
 
     for (const result of PageNavigationValidation.navigationResults) {
-      if (result.passed && result.hasPFTFile && !failedPages.has(result.pageName) && !failedPages.has(result.sourcePage || '')) {
+      if (
+        result.passed &&
+        result.hasPFTFile &&
+        !failedPages.has(result.pageName) &&
+        !failedPages.has(result.sourcePage || '')
+      ) {
         actuallyPassedPages.add(result.pageName);
       }
     }
