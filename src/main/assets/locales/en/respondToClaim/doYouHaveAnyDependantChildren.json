@@ -6,7 +6,7 @@
   "dependantChildrenDetailsLabel": "Give details about your dependant children",
   "dependantChildrenDetailsHint": "You should include details about how many dependant children you have and how old they are",
   "errors": {
-    "dependantChildren": "Select if you have any dependant children.",
-    "dependantChildrenDetails": "Give details about your dependant children."
+    "dependantChildren": "Select if you have any dependant children",
+    "dependantChildrenDetails": "Give details about your dependant children"
   }
 }
