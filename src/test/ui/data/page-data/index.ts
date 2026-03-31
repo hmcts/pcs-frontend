@@ -14,7 +14,7 @@ export * from './confirmationOfNoticeGiven.page.data';
 export * from './noticeDateWhenProvided.page.data';
 export * from './noticeDateWhenNotProvided.page.data';
 export * from './contactPreferenceEmailOrPost.page.data';
-export * from './rentArrearsDispute.page.data';
+export * from './rentArrears.page.data';
 export * from './nonRentArrearsDispute.page.data';
 export * from './counterClaim.page.data';
 export * from './repaymentsMade.page.data';

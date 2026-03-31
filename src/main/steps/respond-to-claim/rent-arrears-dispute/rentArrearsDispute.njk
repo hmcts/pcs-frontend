@@ -2,15 +2,47 @@
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
+{% block pageTitle %}
+  {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
+
 {% block mainContent %}
-  <span class="govuk-caption-xl">Responding to the claim</span>
-  <h1 class="govuk-heading-l">Rent arrears</h1>
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+
+  <div class="govuk-inset-text">
+    <p class="govuk-body">{{ insetIntroText }}</p>
+    <p class="govuk-body">{{ insetDetailsText }}</p>
+    <p class="govuk-body">{{ insetConditionalYesText }}</p>
+  </div>
+
+  <h2 class="govuk-heading-s">{{ amountOwedHeading }}</h2>
+
+  <p class="govuk-body">{{ rentArrearsAmount }}</p>
 
   <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.component and field.componentType %}
+        {% if field.componentType == 'radios' %}
+          {{ govukRadios(field.component) }}
+        {% elif field.componentType == 'characterCount' %}
+          {{ govukCharacterCount(field.component) }}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
 
-    {{ stepButtons(continue, saveForLater) }}
+    {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
