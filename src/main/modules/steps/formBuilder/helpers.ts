@@ -196,9 +196,14 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
   const visitField = (field: FormFieldConfig): void => {
     addMaxLengthTranslation(field.name);
 
-    // Keep existing nested error support for non-nested names (e.g., date fields)
-    if (!field.name.includes('.')) {
-      for (const nestedKey of nestedKeys) {
+    // For nested fields (e.g., 'parent.child'), extract base name for translation lookup
+    const baseFieldName = field.name.split('.').pop() || field.name;
+
+    // Load error translations for both full field name and base field name
+    // This supports both direct fields and subFields
+    for (const nestedKey of nestedKeys) {
+      // Check full field name pattern (e.g., errors.fieldName.required)
+      if (!field.name.includes('.')) {
         const nestedErrorKey = `errors.${field.name}.${nestedKey}`;
         const nestedError = t(nestedErrorKey);
         if (nestedError && nestedError !== nestedErrorKey) {
@@ -209,6 +214,16 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
             }
           }
           stepSpecificErrors[`${field.name}.${nestedKey}`] = nestedError;
+        }
+      }
+
+      // Also check base field name pattern for subFields (e.g., errors.childFieldName.required)
+      // This allows subFields to have translations like errors.rentArrearsAmountCorrection.required
+      if (field.name.includes('.') && baseFieldName !== field.name) {
+        const baseErrorKey = `errors.${baseFieldName}.${nestedKey}`;
+        const baseError = t(baseErrorKey);
+        if (baseError && baseError !== baseErrorKey) {
+          stepSpecificErrors[`${field.name}.${nestedKey}`] = baseError;
         }
       }
     }
@@ -383,11 +398,15 @@ export function validateForm(
       if (isRequired && isMissing) {
         // Check translations first (which contains translated errorMessage), then field.errorMessage, then defaults
         // field.errorMessage can be either a translation key or a direct message
+        // Check for field-specific required error first (e.g., 'fieldName.required'), then generic field error
         errors[fieldName] =
-          translations?.[fieldName] || field.errorMessage || translations?.defaultRequired || 'This field is required';
+          translations?.[`${fieldName}.required`] ||
+          translations?.[fieldName] ||
+          field.errorMessage ||
+          translations?.defaultRequired ||
+          'This field is required';
       }
 
-      // Run validator function if provided (field-level validation)
       if (field.validator && value !== undefined && value !== null && value !== '') {
         try {
           const validatorResult = field.validator(value, formData, validationAllData);

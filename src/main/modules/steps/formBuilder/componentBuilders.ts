@@ -55,6 +55,9 @@ export function buildComponentConfig(
   switch (field.type) {
     case 'text': {
       component.value = (fieldValue as string) || '';
+      if (field.prefix) {
+        component.prefix = field.prefix;
+      }
       componentType = 'input';
       break;
     }
@@ -75,7 +78,7 @@ export function buildComponentConfig(
       component.attributes = charCountAttributes;
       component.label = {
         text: label,
-        isPageHeading: isFirstField,
+        isPageHeading: field.isPageHeading,
         classes: field.labelClasses,
       };
 

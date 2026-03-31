@@ -7,7 +7,7 @@ export type YesNoValue = 'YES' | 'NO' | null;
 export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
-export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
+export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 
 export interface CcdUserCase {
   id: string;
@@ -56,12 +56,18 @@ export interface PossessionClaimResponse {
     contactByPhone?: YesNoValue;
     contactByText?: YesNoValue;
     preferenceType?: ContactPreference;
+    rentArrearsAmountConfirmation?: string;
+    rentArrearsAmount?: string;
     freeLegalAdvice?: string;
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
     landlordLicensed?: YesNoNotSureValue;
     writtenTerms?: YesNoNotSureValue;
+    paymentAgreement?: {
+      repaymentPlanAgreed?: YesNoNotSureValue;
+      repaymentAgreedDetails?: string;
+    };
     householdCircumstances?: {
       alternativeAccommodation?: YesNoNotSureValue;
       alternativeAccommodationTransferDate?: string;
@@ -69,6 +75,11 @@ export interface PossessionClaimResponse {
       otherTenantsDetails?: string;
     };
   };
+  claimantEnteredDefendantDetails?: {
+    firstName?: string;
+    lastName?: string;
+  };
+  claimantOrganisations?: { value: string }[];
 }
 
 export interface StartCallbackData {
