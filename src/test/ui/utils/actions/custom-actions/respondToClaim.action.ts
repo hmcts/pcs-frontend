@@ -17,10 +17,14 @@ import {
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   paymentInterstitial,
+  repaymentsAgreed,
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
+  tenancyTypeDetails,
+  writtenTerms,
 } from '../../../data/page-data';
+import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
@@ -44,8 +48,11 @@ export class RespondToClaimAction implements IAction {
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
       ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      ['repaymentsAgreed', () => this.repaymentsAgreed(fieldName as actionRecord)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
+      ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
+      ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -193,20 +200,41 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', landlordLicensed.saveAndContinueButton);
   }
 
+  private async selectWrittenTerms(writtenTermsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: writtenTermsData.question,
+      option: writtenTermsData.radioOption,
+    });
+    await performAction('clickButton', writtenTerms.saveAndContinueButton);
+  }
+
   private async readPaymentInterstitial(): Promise<void> {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
-
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: repaymentsMade.mainHeader,
+      question: repaymentsData.question,
       option: repaymentsData.repaymentOption,
     });
-
     if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
       await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  }
+
+  private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: repaymentsAgreed.getMainHeader(claimantsName),
+      option: repaymentsAgreedData.repaymentAgreedOption,
+    });
+    if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {
+      await performAction(
+        'inputText',
+        repaymentsAgreed.giveDetailsHiddenTextLabel,
+        repaymentsAgreedData.repaymentAgreedInfo
+      );
+    }
+    await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
@@ -271,6 +299,41 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  }
+
+  private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
+    const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
+    const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
+
+    if (
+      tenancyType === 'assured tenancy' ||
+      tenancyType === 'introductory tenancy' ||
+      tenancyType === 'secure tenancy' ||
+      tenancyType === 'flexible tenancy' ||
+      tenancyType === 'demoted tenancy'
+    ) {
+      await performValidation('text', {
+        elementType: 'listItem',
+        text: `The property is let under ${article} ${tenancyType} agreement`,
+      });
+    } else if (tenancyType === 'other') {
+      await performValidation('text', {
+        elementType: 'listItem',
+        text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+      });
+    }
+    await performAction('clickRadioButton', {
+      question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
+      option: tenancyTypeDetailsInfo.tenancyOption,
+    });
+    if (tenancyTypeDetailsInfo.tenancyOption === 'No' && tenancyTypeDetailsInfo.tenancyTypeInfo) {
+      await performAction(
+        'inputText',
+        tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+        tenancyTypeDetailsInfo.tenancyTypeInfo
+      );
+    }
+    await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

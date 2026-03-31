@@ -4,9 +4,10 @@ export enum CaseState {
 }
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
+export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoValue = 'Yes' | 'No';
 
-export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
+export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
@@ -61,6 +62,8 @@ export interface PossessionClaimResponse {
     };
   };
   defendantResponses?: {
+    tenancyTypeCorrect?: TenancyTypeCorrectValue;
+    tenancyType?: string;
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
     contactByPhone?: VerticalYesNoValue;
@@ -70,7 +73,12 @@ export interface PossessionClaimResponse {
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
-    landlordLicensed?: YesNoNotSureValue;
+    writtenTerms?: YesNoNotSureValue;
+
+    paymentAgreement?: {
+      repaymentPlanAgreed?: YesNoNotSureValue;
+      repaymentAgreedDetails?: string;
+    };
     householdCircumstances?: HouseholdCircumstances;
   };
 }
