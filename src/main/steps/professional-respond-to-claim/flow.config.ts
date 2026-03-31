@@ -8,6 +8,7 @@ import {
 export const PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE = '/professional/case/:caseReference/respond-to-claim';
 
 export const flowConfig: JourneyFlowConfig = {
+  isProfessional: true,
   basePath: PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'professionalRespondToClaim',
   stepOrder: [

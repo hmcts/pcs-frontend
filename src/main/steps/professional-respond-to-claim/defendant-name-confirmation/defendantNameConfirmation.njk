@@ -1,0 +1,16 @@
+{% extends "../../respond-to-claim/defendant-name-confirmation/defendantNameConfirmation.njk" %}
+{% from "xui-header/macro.njk" import hmctsXuiHeader %}
+{% from "footer/macro.njk" import hmctsUiFooter %}
+
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
+{% endblock %}
+
+{% block header %}
+  {{ hmctsXuiHeader(headerModel) }}
+{% endblock %}
+
+{% block footer %}
+  {{ hmctsUiFooter(footerModel) }}
+{% endblock %}
