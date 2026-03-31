@@ -64,6 +64,9 @@ export class ActionRegistry {
     ['tenancyOrContractTypeDetails', new RespondToClaimAction()],
     ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
+    ['readYourHouseholdAndCircumstances', new RespondToClaimAction()],
+    ['doYouHaveAnyDependantChildren', new RespondToClaimAction()],
+    ['doYouHaveAnyOtherDependants', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
