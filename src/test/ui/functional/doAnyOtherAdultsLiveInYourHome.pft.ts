@@ -12,16 +12,17 @@ export async function doAnyOtherAdultsLiveInYourHomeErrorValidation(): Promise<v
 
   //no input text provided for 'Yes' radio option
   await performAction('clickRadioButton', doAnyOtherAdultsLiveInYourHome.yesRadioOption);
+  await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doAnyOtherAdultsLiveInYourHome.thereIsAProblemErrorMessageHeader,
     message: doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsErrorMessage,
   });
-  await performAction('clickRadioButton', doAnyOtherAdultsLiveInYourHome.yesRadioOption);
   await performAction(
     'inputText',
     doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
     generateRandomString(501)
   );
+
   await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doAnyOtherAdultsLiveInYourHome.thereIsAProblemErrorMessageHeader,

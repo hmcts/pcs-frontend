@@ -335,9 +335,9 @@ export class RespondToClaimAction implements IAction {
     if (moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayTextLabel, moveInDetails.day],
-        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthTextLabel, moveInDetails.month],
-        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearTextLabel, moveInDetails.year]
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, moveInDetails.day],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, moveInDetails.month],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, moveInDetails.year]
       );
     }
     await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
