@@ -51,19 +51,46 @@ export class PageNavigationValidation implements IValidation {
         .waitForEvent('page')
         .catch(() => null);
 
+      const closePromise = page.waitForEvent('close').catch(() => null);
+
       if (navigateButton.includes('Back') || navigateButton.includes('feedback')) {
         await performAction('clickLink', navigateButton);
-        await page.waitForTimeout(1000);
+
+        // if (!page.isClosed()) {
+        //   await page.waitForTimeout(1000);
+        // }
       } else {
         await performAction('clickButton', navigateButton);
       }
 
-      const popup = await Promise.race([popupPromise, new Promise(resolve => setTimeout(() => resolve(null), 1000))]);
+      const popup = await Promise.race([
+        popupPromise,
+        closePromise,
+        new Promise(resolve => setTimeout(() => resolve(null), 1000)),
+      ]);
 
-      if (popup && (popup as Page).url() !== 'about:blank') {
-        newPage = popup as Page;
-        isNewWindow = true;
-        await newPage.waitForLoadState();
+      let newTestPage: Page | null = null;
+
+      if (popup) {
+        try {
+          const testPage = popup as Page;
+          if (!testPage.isClosed() && testPage.url() !== 'about:blank') {
+            newTestPage = testPage;
+          }
+        } catch (err) {
+          console.log('Page likely closed while checking url/isClosed:' + err);
+          newTestPage = null;
+        }
+      }
+
+      if (newTestPage) {
+        try {
+          await newTestPage.waitForLoadState();
+          newPage = newTestPage;
+          isNewWindow = true;
+        } catch (e) {
+          console.log('Page closed during load-state wait → ignore:' + e);
+        }
       }
     }
 
