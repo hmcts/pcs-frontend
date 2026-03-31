@@ -3,12 +3,13 @@ import type { TFunction } from 'i18next';
 
 import { CitizenGenAppRequest } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, getTranslationFunction } from '../../../modules/steps';
-import { DASHBOARD_ROUTE, getDashboardUrl } from '../../../routes/dashboard';
+import { createGetController, createStepNavigation, getTranslationFunction } from '../../../modules/steps';
+import { getDashboardUrl } from '../../../routes/dashboard';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { MAKE_AN_APPLICATION_ROUTE } from '../flow.config';
+import { MAKE_AN_APPLICATION_ROUTE, flowConfig } from '../flow.config';
 
 const STEP_NAME = 'check-your-answers';
+const stepNavigation = createStepNavigation(flowConfig);
 
 export const step: StepDefinition = {
   url: `${MAKE_AN_APPLICATION_ROUTE}/check-your-answers`,
@@ -19,6 +20,7 @@ export const step: StepDefinition = {
     return createGetController(
       'make-an-application/check-your-answers/checkYourAnswers.njk',
       STEP_NAME,
+      stepNavigation,
       (req: Request) => {
         const t: TFunction = getTranslationFunction(req, STEP_NAME, ['common']);
 
@@ -31,7 +33,6 @@ export const step: StepDefinition = {
         const typeOfApplication = formData['choose-an-application']['typeOfApplication'];
 
         return {
-          backUrl: DASHBOARD_ROUTE,
           summaryData: {
             rows: [
               {
