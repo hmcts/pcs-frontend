@@ -196,6 +196,7 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
   const visitField = (field: FormFieldConfig): void => {
     addMaxLengthTranslation(field.name);
 
+    // For nested fields (e.g., 'parent.child'), extract base name for translation lookup
     const baseFieldName = field.name.split('.').pop() || field.name;
 
     // Load error translations for both full field name and base field name
@@ -217,7 +218,7 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
       }
 
       // Also check base field name pattern for subFields (e.g., errors.childFieldName.required)
-      // This allows subFields to have translations like errors.disputeDetails.required
+      // This allows subFields to have translations like errors.rentArrearsAmountCorrection.required
       if (field.name.includes('.') && baseFieldName !== field.name) {
         const baseErrorKey = `errors.${baseFieldName}.${nestedKey}`;
         const baseError = t(baseErrorKey);

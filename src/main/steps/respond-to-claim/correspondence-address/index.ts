@@ -174,7 +174,7 @@ export const step: StepDefinition = createFormStep({
       radio.component.fieldset.legend.text = prepopulateHeading;
     }
 
-    // TODO(HDPI-5385): Refactor to avoid mutating module-scoped `fieldsConfig` per request.
+    // TODO: Refactor to avoid mutating module-scoped `fieldsConfig` per request.
     // Use the same pattern as `rent-arrears-dispute` (static validator returning a translation key).
     // Dynamically inject validator with translation function
     const postcodeField = fieldsConfig[0].options?.[1]?.subFields?.postcode;
