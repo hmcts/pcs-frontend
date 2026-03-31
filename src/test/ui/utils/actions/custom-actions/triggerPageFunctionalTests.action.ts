@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Page } from '@playwright/test';
+import { Page, test } from '@playwright/test';
 
 import {
   enable_content_validation,
@@ -21,7 +21,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
 
-  // Temporary in-memory storage for pages tested in current test run
   private static pagesTestedInCurrentRun = new Set<string>();
 
   static resetTestedPages(): void {
@@ -38,15 +37,18 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       return;
     }
 
-    // Prevent duplicate runs within the same test run (in‑memory)
+    // Check lock file before running tests
+    const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
+    if (fs.existsSync(lockPath)) {
+      return; // Skip if lock file exists (page already passed all tests)
+    }
+
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
       return;
     }
 
-    // Always run the tests (ignore lock file for execution decision)
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.add(pageName);
 
-    // Run all enabled tests, tracking failures
     const pageDataFilePath = path.join(TriggerPageFunctionalTestsAction.PAGE_DATA_DIR, `${pageName}.page.data.ts`);
     const pageDataFileExists = fs.existsSync(pageDataFilePath);
 
@@ -69,32 +71,39 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       if (enable_navigation_tests === 'true') {
         PageNavigationValidation.trackMissingNavigationFile(pageName);
       }
-      // No PFT file means no functional tests to run – nothing to lock
       return;
     }
 
     let errorValidationFailed = false;
     let navigationTestsFailed = false;
 
-    if (enable_error_message_validation === 'true') {
-      try {
-        await this.runErrorMessageValidation(page, pageName, pftFilePath);
-      } catch {
-        errorValidationFailed = true;
+    // Parent step that groups all functional tests for this page
+    await test.step(`PFT triggered for page - ${pageName}`, async () => {
+      if (enable_error_message_validation === 'true') {
+        await test.step(`EMV triggered for page - ${pageName}`, async () => {
+          try {
+            await this.runErrorMessageValidation(page, pageName, pftFilePath);
+          } catch (error) {
+            ErrorMessageValidation.trackValidationError(pageName, error);
+            errorValidationFailed = true;
+          }
+        });
       }
-    }
 
-    if (enable_navigation_tests === 'true') {
-      try {
-        await this.runNavigationTests(page, pageName, pftFilePath);
-      } catch {
-        navigationTestsFailed = true;
+      if (enable_navigation_tests === 'true') {
+        await test.step(`Navigation tests triggered for page - ${pageName}`, async () => {
+          try {
+            await this.runNavigationTests(page, pageName, pftFilePath);
+          } catch (error) {
+            PageNavigationValidation.trackNavigationFailure(pageName, error);
+            navigationTestsFailed = true;
+          }
+        });
       }
-    }
-
-    const anyTestFailed = errorValidationFailed || navigationTestsFailed;
+    });
 
     // Update the permanent lock file based on the test outcome
+    const anyTestFailed = errorValidationFailed || navigationTestsFailed;
     if (anyTestFailed) {
       // Failure: ensure lock file is removed (if it existed)
       this.deleteLockFile(pageName);
@@ -122,8 +131,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       if (fs.existsSync(lockPath)) {
         fs.unlinkSync(lockPath);
       }
-    } catch (_error) {
-      console.error(_error);
+    } catch {
+      // Ignore lock file deletion errors
     }
   }
 

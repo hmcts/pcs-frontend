@@ -31,6 +31,7 @@ export class PageNavigationValidation implements IValidation {
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static currentPageUrl: string = '';
   private static currentSourcePage: string | null = null;
+  private static navigationFailed = false;
 
   static setSourcePage(pageName: string): void {
     PageNavigationValidation.currentSourcePage = pageName;
@@ -53,7 +54,6 @@ export class PageNavigationValidation implements IValidation {
 
       if (navigateButton.includes('Back') || navigateButton.includes('feedback')) {
         await performAction('clickLink', navigateButton);
-        await page.waitForTimeout(200);
       } else {
         await performAction('clickButton', navigateButton);
       }
@@ -105,7 +105,7 @@ export class PageNavigationValidation implements IValidation {
             `h1, h1.govuk-heading-xl, h1.govuk-heading-l, span:text-is("${expectedElementText}")`
           );
           try {
-            await expect(locator).toHaveText(expectedElementText);
+            await expect(locator).toHaveText(expectedElementText, { timeout: 5000 });
             actualElementText = expectedElementText;
           } catch (error) {
             elementPassed = false;
@@ -135,7 +135,7 @@ export class PageNavigationValidation implements IValidation {
       } else {
         expectedElementText = String(fieldName);
         const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
-        await expect(locator).toHaveText(expectedElementText);
+        await expect(locator).toHaveText(expectedElementText, { timeout: 5000 });
         actualElementText = expectedElementText;
       }
 
@@ -156,6 +156,7 @@ export class PageNavigationValidation implements IValidation {
           hasPFTFile,
           validationType: 'element',
         });
+        PageNavigationValidation.navigationFailed = true;
       }
 
       if (!urlPassed && fieldName && typeof fieldName === 'object' && (fieldName as any).pageSlug) {
@@ -171,6 +172,7 @@ export class PageNavigationValidation implements IValidation {
           hasPFTFile,
           validationType: 'url',
         });
+        PageNavigationValidation.navigationFailed = true;
       }
 
       if (overallPassed) {
@@ -224,6 +226,7 @@ export class PageNavigationValidation implements IValidation {
         error: error instanceof Error ? error.message.split('\n')[0] : String(error),
         hasPFTFile,
       });
+      PageNavigationValidation.navigationFailed = true;
     }
   }
 
@@ -244,6 +247,7 @@ export class PageNavigationValidation implements IValidation {
   }
 
   static trackNavigationFailure(pageName: string, error?: unknown): void {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     PageNavigationValidation.navigationResults.push({
       pageUrl: '',
       pageName,
@@ -251,10 +255,11 @@ export class PageNavigationValidation implements IValidation {
       testName: 'Navigation Tests Execution',
       passed: false,
       expected: 'Navigation tests should execute successfully',
-      actual: 'Execution failed',
-      error: error instanceof Error ? error.message.split('\n')[0] : String(error),
+      actual: errorMessage,
+      error: errorMessage,
       hasPFTFile: true,
     });
+    PageNavigationValidation.navigationFailed = true;
   }
 
   private static async hasPFTFile(pageName: string): Promise<boolean> {
@@ -358,7 +363,7 @@ export class PageNavigationValidation implements IValidation {
       PageNavigationValidation.missingNavigationFiles.size;
 
     if (totalPages === 0) {
-      console.log(`\n📊 NAVIGATION TESTS (Test #${PageNavigationValidation.testCounter}):`);
+      console.log(`\n📊 NAVIGATION TESTS SUMMARY (Test #${PageNavigationValidation.testCounter}):`);
       console.log('   No pages checked for navigation tests');
       return;
     }
@@ -445,17 +450,19 @@ export class PageNavigationValidation implements IValidation {
         const details = failureDetails.get(pageName);
         console.log(`   Page: ${pageName}`);
         if (details) {
-          console.log(`       Expected: ${details.expected}`);
-          console.log(`       Actual: ${details.actual}`);
-          if (details.validationType === 'url') {
-            console.log(`       Note: Page slug URL validation failed`);
+          let errorMessage = details.actual;
+          if (errorMessage.includes('expect(locator).toHaveText(expected) failed')) {
+            errorMessage = `"${details.expected}" element not found`;
           }
+          console.log(`       Error: ${errorMessage}`);
         }
         console.log('');
       }
     }
 
-    if (failedPages.size > 0) {
+    const hasFailures = failedPages.size > 0 || PageNavigationValidation.navigationFailed;
+
+    if (hasFailures) {
       console.log('❌ NAVIGATION TESTS FAILED\n');
     } else if (passedPages.size > 0) {
       console.log('\n✅ ALL NAVIGATION TESTS PASSED\n');
@@ -463,11 +470,19 @@ export class PageNavigationValidation implements IValidation {
       console.log('\n⚠️  Navigation files found but no tests performed\n');
     }
 
+    const shouldThrow = hasFailures && PageNavigationValidation.shouldThrowError;
+    const errors = Array.from(failureDetails.entries()).map(([page, details]) => {
+      let errorMessage = details.actual;
+      if (errorMessage.includes('expect(locator).toHaveText(expected) failed')) {
+        errorMessage = `"${details.expected}" element not found`;
+      }
+      return `${page}: ${errorMessage}`;
+    });
+
     PageNavigationValidation.clearResults();
 
-    // Throw after clearing so failures don't cascade into subsequent tests
-    if (failedPages.size > 0 && PageNavigationValidation.shouldThrowError) {
-      throw new Error(`Navigation tests failed: ${failedPages.size} page(s) have failures`);
+    if (shouldThrow && errors.length > 0) {
+      throw new Error(`Navigation tests failed:\n\n${errors.join('\n\n')}`);
     }
   }
 
@@ -479,5 +494,6 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.missingNavigationFiles.clear();
     PageNavigationValidation.currentPageUrl = '';
     PageNavigationValidation.currentSourcePage = null;
+    PageNavigationValidation.navigationFailed = false;
   }
 }
