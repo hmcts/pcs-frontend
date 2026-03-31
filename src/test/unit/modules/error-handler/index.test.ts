@@ -463,7 +463,7 @@ describe('error-handler', () => {
       errorHandler(err, req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.locals.errorTitle).toBe('Bad request');
+      expect(res.locals.errorTitle).toBe('Not Authorised');
     });
 
     it('should use fallback translation function if i18n is not available', () => {

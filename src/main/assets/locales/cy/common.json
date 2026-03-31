@@ -105,10 +105,6 @@
     }
   },
   "errorPages": {
-    "400": {
-      "title": "cyBad request",
-      "paragraph": "cyThe request you made is not valid. Please check the request and try again."
-    },
     "403": {
       "title": "cyNot Authorised",
       "paragraph": "cySorry you do not have access to this account."

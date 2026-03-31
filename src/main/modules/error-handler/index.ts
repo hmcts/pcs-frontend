@@ -11,10 +11,16 @@ import { Logger } from '@modules/logger';
 const logger = Logger.getLogger('error-handler');
 
 function getErrorMessages(status: number, t: TFunction): { title: string; paragraph: string } {
-  if (status === 400 || status === 403 || status === 404) {
+  if (status === 400 || status === 403) {
     return {
-      title: t(`errorPages.${status}.title`),
-      paragraph: t(`errorPages.${status}.paragraph`),
+      title: t('errorPages.403.title'),
+      paragraph: t('errorPages.403.paragraph'),
+    };
+  }
+  if (status === 404) {
+    return {
+      title: t('errorPages.404.title'),
+      paragraph: t('errorPages.404.paragraph'),
     };
   }
   return {
