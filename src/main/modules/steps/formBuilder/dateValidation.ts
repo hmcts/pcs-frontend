@@ -279,11 +279,10 @@ export function validateDateField(
       missingParts.push('year');
     }
 
-    // If all parts missing or 2+ parts missing, it's a generic error (anchor to day)
-    // If exactly one part missing, specify that part
+    // Always set erroneousParts (including when 2+ are missing) so the error summary can link to the first missing box in day → month → year order
     return {
       message: requiredError,
-      erroneousParts: missingParts.length === 1 ? missingParts : undefined,
+      erroneousParts: missingParts,
     };
   }
 

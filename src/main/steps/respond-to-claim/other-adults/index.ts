@@ -20,6 +20,7 @@ export const step: StepDefinition = createFormStep({
       name: 'confirmOtherAdults',
       type: 'radio',
       required: true,
+      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l',
       translationKey: {
         label: 'question',

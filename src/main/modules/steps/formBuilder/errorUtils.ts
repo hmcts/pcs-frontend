@@ -76,12 +76,9 @@ export function buildErrorSummary(
     // Determine the anchor ID for the error link
     let anchorId: string;
     if (fieldType === 'date') {
-      // For date fields, use erroneous parts info if available
-      if (erroneousParts && erroneousParts.length === 1) {
-        // Single specific part error - anchor to that part
+      if (erroneousParts && erroneousParts.length) {
         anchorId = `${fieldName}-${erroneousParts[0]}`;
       } else {
-        // Generic error or multiple parts - anchor to day
         anchorId = `${fieldName}-day`;
       }
     } else if (fieldType === 'radio' || fieldType === 'checkbox') {

@@ -21,6 +21,7 @@ export const step: StepDefinition = createFormStep({
       name: 'confirmAlternativeAccommodation',
       type: 'radio',
       required: true,
+      isPageHeading: true,
       translationKey: { label: 'question' },
       legendClasses: 'govuk-fieldset__legend--l',
       errorMessage: 'errors.confirmAlternativeAccommodation',
