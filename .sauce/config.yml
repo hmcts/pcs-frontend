@@ -1,6 +1,3 @@
-# Run on Sauce Labs: set SAUCE_USERNAME and SAUCE_ACCESS_KEY (or run `saucectl configure`).
-# For non-public app URLs, configure Sauce Connect and set sauce.tunnel below.
-# Docs: https://docs.saucelabs.com/web-apps/automated-testing/playwright/yaml/
 apiVersion: v1alpha
 kind: playwright
 
@@ -23,12 +20,10 @@ nodeVersion: v22
 
 rootDir: ./
 
-# Explicit installs: the runner does not reliably install devDependencies from package.json (global-setup and tests need this).
 npm:
   packages:
     '@hmcts/playwright-common': '1.0.39'
 
-# Sauce Playwright runner does not bundle devDependencies; skip Allure reporter there (see playwright.config.ts).
 env:
   PLAYWRIGHT_SKIP_ALLURE: 'true'
 

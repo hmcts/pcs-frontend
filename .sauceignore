@@ -1,4 +1,4 @@
-# Bundle sent to Sauce Labs — keep this lean (see https://docs.saucelabs.com/web-apps/automated-testing/playwright/advanced/#tailoring-your-test-file-bundle)
+# Keep Sauce upload small: https://docs.saucelabs.com/web-apps/automated-testing/playwright/advanced/#tailoring-your-test-file-bundle
 .git/
 .github/
 .idea/
