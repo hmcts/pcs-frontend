@@ -60,7 +60,7 @@ export class RespondToClaimAction implements IAction {
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
-      ['selectHowMuchToPay', () => this.selectHowMuchToPay(fieldName as actionRecord)],
+      ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
       ['readYourHouseHoldAndCircumstances', () => this.readYourHouseHoldAndCircumstances()],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -230,15 +230,29 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   }
 
-  private async installmentPayments(instalmentData: actionRecord): Promise<void> {
+  private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: instalmentData.question,
-      option: instalmentData.radioOption,
+      question: repaymentsAgreed.getMainHeader(claimantsName),
+      option: repaymentsAgreedData.repaymentAgreedOption,
+    });
+    if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {
+      await performAction(
+        'inputText',
+        repaymentsAgreed.giveDetailsHiddenTextLabel,
+        repaymentsAgreedData.repaymentAgreedInfo
+      );
+    }
+    await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  }
+  private async installmentPayments(installmentData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: installmentData.question,
+      option: installmentData.radioOption,
     });
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
   }
 
-  private async selectHowMuchToPay(howMuchToPayData: actionRecord): Promise<void> {
+  private async selectHowMuchAffordToPay(howMuchToPayData: actionRecord): Promise<void> {
     await performAction(
       'inputText',
       howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
@@ -253,19 +267,6 @@ export class RespondToClaimAction implements IAction {
 
   private async readYourHouseHoldAndCircumstances(): Promise<void> {
     await performAction('clickButton', yourHouseHoldAndCircumstances.saveAndContinueButton);
-  private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
-    await performAction('clickRadioButton', {
-      question: repaymentsAgreed.getMainHeader(claimantsName),
-      option: repaymentsAgreedData.repaymentAgreedOption,
-    });
-    if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {
-      await performAction(
-        'inputText',
-        repaymentsAgreed.giveDetailsHiddenTextLabel,
-        repaymentsAgreedData.repaymentAgreedInfo
-      );
-    }
-    await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {

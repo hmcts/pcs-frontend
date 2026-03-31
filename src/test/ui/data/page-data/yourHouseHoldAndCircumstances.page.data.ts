@@ -11,4 +11,7 @@ export const yourHouseHoldAndCircumstances = {
   theClaimantWillSeeYourAnswerParagraph: `The claimant will be able to see your answers.`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
+  backLink: `Back`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `your-household-and-circumstances`,
 };

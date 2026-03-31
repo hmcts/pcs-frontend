@@ -65,7 +65,7 @@ export class ActionRegistry {
     ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
     ['installmentPayments', new RespondToClaimAction()],
-    ['selectHowMuchToPay', new RespondToClaimAction()],
+    ['selectHowMuchAffordToPay', new RespondToClaimAction()],
     ['repaymentsAgreed', new RespondToClaimAction()],
     ['readYourHouseHoldAndCircumstances', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
