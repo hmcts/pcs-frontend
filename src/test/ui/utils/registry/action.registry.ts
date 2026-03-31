@@ -59,6 +59,7 @@ export class ActionRegistry {
     ['selectWrittenTerms', new RespondToClaimAction()],
     ['enterTenancyStartDetailsUnKnown', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
+    ['repaymentsAgreed', new RespondToClaimAction()],
     ['selectTenancyStartDateKnown', new RespondToClaimAction()],
     ['tenancyOrContractTypeDetails', new RespondToClaimAction()],
     ['selectLandlordLicensed', new RespondToClaimAction()],
@@ -67,6 +68,7 @@ export class ActionRegistry {
     ['selectHowMuchToPay', new RespondToClaimAction()],
     ['repaymentsAgreed', new RespondToClaimAction()],
     ['readYourHouseHoldAndCircumstances', new RespondToClaimAction()],
+    ['rentArrears', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

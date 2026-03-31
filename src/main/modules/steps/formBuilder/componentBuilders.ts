@@ -90,7 +90,7 @@ export function buildComponentConfig({
       component.attributes = charCountAttributes;
       component.label = {
         text: label,
-        isPageHeading: isFirstField,
+        isPageHeading: field.isPageHeading,
         classes: field.labelClasses,
       };
 
@@ -99,7 +99,7 @@ export function buildComponentConfig({
     }
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
-      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
 
       // Build items with conditional content and subFields support
       component.items =

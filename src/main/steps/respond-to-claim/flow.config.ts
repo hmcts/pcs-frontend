@@ -60,6 +60,7 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'end-now',
+    'installment-payments',
   ],
   steps: {
     'start-now': {
