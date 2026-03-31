@@ -20,4 +20,3 @@ export const doYouHaveAnyOtherDependants = {
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `do-you-have-any-other-dependants`,
 };
-

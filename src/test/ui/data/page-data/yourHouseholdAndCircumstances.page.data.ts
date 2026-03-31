@@ -2,10 +2,10 @@ export const yourHouseholdAndCircumstances = {
   mainHeader: `Your household and circumstances`,
   respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   youMustNowAnswerParagraph: `You must now answer some questions about your household and personal circumstances. This will help a judge understand your situation.`,
-  youWillBeParagraph:`You’ll be asked about:`,
+  youWillBeParagraph: `You’ll be asked about:`,
   anyDependantsList: `any dependants you have (people you look after financially)`,
   otherAdultsList: `other adults that live in your home`,
-  whetherYouWouldList:`whether you would have anywhere else to live if you were asked to leave your home`,
+  whetherYouWouldList: `whether you would have anywhere else to live if you were asked to leave your home`,
   anyPersonalList: `any personal circumstances that have led to your case that you think a judge should know about`,
   anyExceptionalHardshipList: `any exceptional hardship you’d experience if you were asked to leave your home`,
   theClaimantWillBeParagraph: `The claimant will be able to see your answers.`,
@@ -16,4 +16,3 @@ export const yourHouseholdAndCircumstances = {
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `your-household-and-circumstances`,
 };
-
