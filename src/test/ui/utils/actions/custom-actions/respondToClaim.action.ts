@@ -308,6 +308,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async readYourHouseholdAndCircumstances(): Promise<void> {
+    process.env.REPAYMENTS_AGREED = 'NO';
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
   }
 
