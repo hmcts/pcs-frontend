@@ -1,9 +1,11 @@
 import {
   dashboard,
-  nonRentArrearsDispute,
+  installmentPayments,
+  repaymentsAgreed,
   //feedback,
   yourHouseholdAndCircumstances,
 } from '../data/page-data';
+import { claimantsName } from '../utils/actions/custom-actions';
 import { performValidation } from '../utils/controller';
 
 export async function yourHouseholdAndCircumstancesNavigationTests(): Promise<void> {
@@ -11,6 +13,18 @@ export async function yourHouseholdAndCircumstancesNavigationTests(): Promise<vo
     // element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: yourHouseholdAndCircumstances.pageSlug,
   });
-  await performValidation('pageNavigation', yourHouseholdAndCircumstances.backLink, nonRentArrearsDispute.mainHeader);
+  if (process.env.REPAYMENTS_AGREED === 'NO') {
+    if (claimantsName) {
+      await performValidation('pageNavigation', yourHouseholdAndCircumstances.backLink, installmentPayments.mainHeader);
+    }
+  } else {
+    if (claimantsName) {
+      await performValidation(
+        'pageNavigation',
+        yourHouseholdAndCircumstances.backLink,
+        repaymentsAgreed.getMainHeader(claimantsName)
+      );
+    }
+  }
   await performValidation('pageNavigation', yourHouseholdAndCircumstances.cancelLink, dashboard.mainHeader);
 }

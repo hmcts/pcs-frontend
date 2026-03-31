@@ -73,42 +73,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: landlordLicensed.isYourLandlordLicensedQuestion,
       radioOption: landlordLicensed.iamNotSureRadioOption,
     });
-    await performValidation('mainHeader', writtenTerms.mainHeader);
-    await performAction('clickButton', writtenTerms.saveAndContinueButton);
-    await performValidation('mainHeader', tenancyDetails.mainHeader);
-    // Commented the below lines as the wales pages of tenancy section are not implemented yet.
-    /*
-    await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetails.noRadioOption,
-      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
-    });
-    await performAction('enterTenancyStartDetailsUnKnown');
-    await performAction('selectNoticeDetails', {
-      option: confirmationOfNoticeGiven.yesRadioOption,
-    });
-    await performAction('enterNoticeDateUnknown');
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.mainHeader,
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
-    });
-    await performAction('readYourHouseholdAndCircumstances');
-    await performAction('doYouHaveAnyDependantChildren', {
-      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
-    });
-    await performAction('doYouHaveAnyDependantChildren', {
-      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
-    });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
-  */
     await performAction('selectWrittenTerms', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
       radioOption: writtenTerms.noRadioOption,
