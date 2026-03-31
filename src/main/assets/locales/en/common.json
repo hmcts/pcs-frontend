@@ -101,6 +101,10 @@
     }
   },
   "errorPages": {
+    "400": {
+      "title": "Bad request",
+      "paragraph": "The request you made is not valid. Please check the request and try again."
+    },
     "403": {
       "title": "Not Authorised",
       "paragraph": "Sorry you do not have access to this account."
