@@ -167,10 +167,10 @@ By default, the tests will run against http://localhost:3209/, please update the
 There are also several custom test scripts available:
 
 - `yarn test:changed` - runs only changed spec files
-- `yarn test:saucelab` - Sauce (`@pcssaucelab`), no tunnel; needs `SAUCE_USERNAME` / `SAUCE_ACCESS_KEY`
-- `yarn test:saucelab:tunnel` - tunnel mode; **clears** `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` for `saucectl` (no proxy). Set `SAUCE_TUNNEL_NAME` (optional `SAUCE_TUNNEL_OWNER`)
-- `yarn test:saucelab:tunnel-proxy` - tunnel mode **with** proxy: `export HTTP_PROXY` / `HTTPS_PROXY` (and `NO_PROXY` if needed) **before** `yarn` — only this script passes them through to `saucectl` (not for `./sc -x`)
-- `yarn test:crossbrowser` - nightly (`enableCrossBrowserTest`); runs `saucectl` in tunnel mode. Jenkins sets `SAUCE_TUNNEL_NAME=reformtunnel` in [Jenkinsfile_nightly](Jenkinsfile_nightly) to match [withSauceConnect](https://github.com/hmcts/cnp-jenkins-library/blob/master/vars/withSauceConnect.groovy). Locally: `export SAUCE_TUNNEL_NAME=…` then `yarn test:crossbrowser`.
+- `yarn test:saucelab` - Sauce (`@pcssaucelab`), no tunnel; needs `SAUCE_USERNAME` / `SAUCE_ACCESS_KEY`; **clears** `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` for `saucectl` (same as tunnel mode)
+- `yarn test:saucelab:tunnel` - tunnel mode; **clears** `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` for `saucectl`. `SAUCE_TUNNEL_NAME` defaults to `reformtunnel` if unset (same as [withSauceConnect](https://github.com/hmcts/cnp-jenkins-library/blob/master/vars/withSauceConnect.groovy)); override for a different tunnel. Optional `SAUCE_TUNNEL_OWNER`
+- `yarn test:saucelab:tunnel-proxy` - tunnel mode **with** proxy: `export HTTP_PROXY` / `HTTPS_PROXY` (and `NO_PROXY` if needed) **before** `yarn` — only this script passes them through to `saucectl` (not for `./sc -x`). Same default `SAUCE_TUNNEL_NAME` as tunnel mode
+- `yarn test:crossbrowser` - nightly (`enableCrossBrowserTest`); runs `saucectl` in tunnel mode. Tunnel name defaults to `reformtunnel` in [bin/saucelab-run.sh](bin/saucelab-run.sh) when `SAUCE_TUNNEL_NAME` is unset (matches [withSauceConnect](https://github.com/hmcts/cnp-jenkins-library/blob/master/vars/withSauceConnect.groovy)).
 - `test:E2eChrome` - runs the full E2E suite in Chrome
 - `test:E2eFirefox` - runs the full E2E suite in Firefox
 - `test:E2eSafari` - runs the full E2E suite in Safari
