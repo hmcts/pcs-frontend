@@ -1,4 +1,9 @@
-import type { PossessionClaimResponse, YesNoValue, CaseData, PaymentAgreement } from '../../../interfaces/ccdCase.interface';
+import type {
+  CaseData,
+  PaymentAgreement,
+  PossessionClaimResponse,
+  YesNoValue,
+} from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
@@ -45,20 +50,21 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  beforeRedirect: async (req) => {
+  beforeRedirect: async req => {
     const confirmRepaymentsMade: YesNoValue | undefined = req.body?.confirmRepaymentsMade;
     if (!confirmRepaymentsMade) {
       return;
     }
 
-    const paymentDetails: string | undefined = confirmRepaymentsMade === 'Yes' ? req.body?.['confirmRepaymentsMade.repaymentsInfo'] : undefined;
+    const paymentDetails: string | undefined =
+      confirmRepaymentsMade === 'Yes' ? req.body?.['confirmRepaymentsMade.repaymentsInfo'] : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        paymentAgreement:{
+        paymentAgreement: {
           anyPaymentsMade: confirmRepaymentsMade,
-          paymentDetails: paymentDetails ?? ''
-        }
+          paymentDetails: paymentDetails ?? '',
+        },
       },
     };
 
@@ -66,7 +72,8 @@ export const step: StepDefinition = createFormStep({
   },
   getInitialFormData: req => {
     const caseData: CaseData = req.res?.locals.validatedCase?.data;
-    const paymentAgreement: PaymentAgreement | undefined = caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+    const paymentAgreement: PaymentAgreement | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
     const confirmRepaymentsMade: YesNoValue | undefined = paymentAgreement?.anyPaymentsMade;
     if (!confirmRepaymentsMade) {
       return {};
@@ -78,7 +85,7 @@ export const step: StepDefinition = createFormStep({
         confirmRepaymentsMade: 'Yes',
         'confirmRepaymentsMade.repaymentsInfo': repaymentsInfo ?? '',
       };
-    } 
+    }
     return {
       confirmRepaymentsMade: 'No',
     };

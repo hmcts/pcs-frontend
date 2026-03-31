@@ -63,8 +63,7 @@ export const step: StepDefinition = createFormStep({
   },
 
   beforeRedirect: async (req: Request) => {
-    const dateObject: { day?: string; month?: string; year?: string } | undefined =
-      req.body?.noticeReceivedDate;
+    const dateObject: { day?: string; month?: string; year?: string } | undefined = req.body?.noticeReceivedDate;
     const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
     const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
     const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';

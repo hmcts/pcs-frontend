@@ -49,7 +49,6 @@ export const step: StepDefinition = createFormStep({
     if (!dateTime.isValid) {
       return {};
     }
-    console.log('dateTime', dateTime);
 
     return {
       noticeReceivedDate: {
