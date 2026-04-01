@@ -1,9 +1,4 @@
-import {
-  dashboard,
-  //  feedback,
-  doYouHaveAnyDependantChildren,
-  doYouHaveAnyOtherDependants,
-} from '../data/page-data';
+import { dashboard, doYouHaveAnyDependantChildren, doYouHaveAnyOtherDependants, feedback } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function doYouHaveAnyOtherDependantsErrorValidation(): Promise<void> {
@@ -33,9 +28,9 @@ export async function doYouHaveAnyOtherDependantsErrorValidation(): Promise<void
   });
 }
 
-export async function doYouHaveAnyDependantChildrenNavigationTests(): Promise<void> {
+export async function doYouHaveAnyOtherDependantsNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', doYouHaveAnyOtherDependants.feedbackLink, {
-    // element: feedback.tellUsWhatYouThinkParagraph,
+    element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: doYouHaveAnyOtherDependants.pageSlug,
   });
   await performValidation(
@@ -43,5 +38,6 @@ export async function doYouHaveAnyDependantChildrenNavigationTests(): Promise<vo
     doYouHaveAnyOtherDependants.backLink,
     doYouHaveAnyDependantChildren.mainHeader
   );
+  await performAction('clickRadioButton', doYouHaveAnyOtherDependants.noRadioOption);
   await performValidation('pageNavigation', doYouHaveAnyOtherDependants.saveForLaterButton, dashboard.mainHeader);
 }
