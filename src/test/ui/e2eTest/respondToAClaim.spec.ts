@@ -457,7 +457,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('enterTenancyStartDetailsUnKnown');
-     await performAction('disputingOtherPartsOfTheClaim', {
+    await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
     await performValidation('mainHeader', counterClaim.mainHeader);
