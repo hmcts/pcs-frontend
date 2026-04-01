@@ -26,7 +26,7 @@ export * from './dashboard.page.data';
 export * from './situationInterstitialScreen.page.data';
 export * from './landlordLicensed.page.data';
 export * from './writtenTerms.page.data';
-export * from './installmentPayments.data';
+export * from './installmentPayments.page.data';
 export * from './howMuchAffordToPay.page.data';
 export * from './yourHouseHoldAndCircumstances.page.data';
 export * from './doYouHaveAnyDependantChildren.page.data';

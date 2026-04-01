@@ -10,7 +10,7 @@ export const installmentPayments = {
   noRadioOption: `No`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  backLink: `Back link`,
+  backLink: `Back`,
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectWhetherYouWouldLikeToOfferErrorMessage: `Select whether you would like to offer to pay your arrears in instalments`,

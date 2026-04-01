@@ -14,15 +14,16 @@ export async function yourHouseholdAndCircumstancesNavigationTests(): Promise<vo
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: yourHouseHoldAndCircumstances.pageSlug,
   });
-  if (process.env.REPAYMENT_AGREED === 'YES' || process.env.REPAYMENT_AGREED === 'I’M NOT SURE') {
+  if (process.env.REPAYMENT_AGREED === 'NO'){
+    await performValidation('pageNavigation', yourHouseHoldAndCircumstances.backLink, howMuchAffordToPay.mainHeader);
+  } else if (process.env.REPAYMENT_AGREED !== 'NO'){
     await performValidation(
       'pageNavigation',
       yourHouseHoldAndCircumstances.backLink,
       repaymentsAgreed.getMainHeader(claimantsName)
     );
-  } else if (process.env.REPAYMENT_AGREED === 'NO') {
-    await performValidation('pageNavigation', yourHouseHoldAndCircumstances.backLink, howMuchAffordToPay.mainHeader);
-  } else if (process.env.INSTALLMENT_PAYMENT === 'NO') {
+  }
+  if (process.env.INSTALLMENT_PAYMENT === 'NO') {
     await performValidation('pageNavigation', yourHouseHoldAndCircumstances.backLink, installmentPayments.mainHeader);
   }
   await performValidation('pageNavigation', yourHouseHoldAndCircumstances.saveForLaterButton, dashboard.mainHeader);
