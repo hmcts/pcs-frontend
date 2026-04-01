@@ -88,6 +88,8 @@ export interface PossessionClaimResponse {
     landlordLicensed?: YesNoNotSureValue;
     writtenTerms?: YesNoNotSureValue;
     householdCircumstances?: HouseholdCircumstances;
+    disputeClaim?: YesNoValue;
+    disputeClaimDetails?: string;
 
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
