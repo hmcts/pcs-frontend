@@ -4,6 +4,9 @@ kind: playwright
 sauce:
   region: eu-central-1
   concurrency: 5
+  # Substituted from the host when running saucectl (same as CLI --tunnel-name).
+  tunnel:
+    name: $SAUCE_TUNNEL_NAME
   metadata:
     tags:
       - pcs-frontend
@@ -27,6 +30,7 @@ npm:
 env:
   PLAYWRIGHT_SKIP_ALLURE: 'true'
   IDAM_PCS_USER_PASSWORD: $IDAM_PCS_USER_PASSWORD
+  SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
 suites:
   - name: 'pcssaucelab @pcssaucelab (Chrome)'

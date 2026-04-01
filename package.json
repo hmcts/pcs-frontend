@@ -39,8 +39,8 @@
     "test:openAllureReport": "yarn allure open allure-report",
     "test:local": "yarn playwright install && yarn playwright test src/test/ui/e2eTest/sauceSmoke.spec.ts --project chrome --grep @pcssaucelab; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:saucelab": "yarn exec saucectl run -c .sauce/config.yml",
-    "test:saucelab:tunnel": "yarn exec saucectl run -c .sauce/config.yml --tunnel-name ${SAUCE_TUNNEL_NAME}",
-    "test:crossbrowser": "yarn exec saucectl run -c .sauce/config.yml --tunnel-name reformtunnel",
+    "test:saucelab:tunnel": "yarn exec saucectl run -c .sauce/config.yml",
+    "test:crossbrowser": "SAUCE_TUNNEL_NAME=reformtunnel yarn exec saucectl run -c .sauce/config.yml",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"
   },
