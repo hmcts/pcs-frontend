@@ -1,12 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+import { resolveIdamPassword } from '../utils/idamPassword';
+
 test.describe('Sauce smoke', () => {
   test('Manage case exui test @pcssaucelab', async ({ page }) => {
     const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-solicitor-automation@test.com';
-    const b64 = process.env.IDAM_PCS_USER_PASSWORD_B64?.trim();
-    const password = b64
-      ? Buffer.from(b64, 'base64').toString('utf8').trim()
-      : (process.env.IDAM_PCS_USER_PASSWORD ?? '').trim();
+    const password = resolveIdamPassword();
     test.skip(!password);
     await page.goto('https://manage-case.aat.platform.hmcts.net', { waitUntil: 'domcontentloaded' });
     await page.getByRole('textbox', { name: 'Email address' }).fill(email);
