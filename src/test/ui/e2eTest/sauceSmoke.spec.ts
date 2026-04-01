@@ -2,25 +2,20 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Sauce smoke', () => {
   test('Manage case exui test @pcssaucelab', async ({ page }, testInfo) => {
-    const email =
-      process.env.IDAM_PCS_USER_EMAIL?.trim() ||
-      'pcs-solicitor-automation@test.com';
+    const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-solicitor-automation@test.com';
     const password = (process.env.IDAM_PCS_USER_PASSWORD ?? '').trim();
     test.skip(!password, 'IDAM_PCS_USER_PASSWORD is missing or empty.');
-    await testInfo.attach(
-      'sauce-env-diagnostics.json',
-      {
-        body: Buffer.from(
-          JSON.stringify({
-            passwordLength: password.length,
-            emailLength: email.length,
-            idamPasswordEnvPresent: process.env.IDAM_PCS_USER_PASSWORD != null,
-          }),
-          'utf-8',
-        ),
-        contentType: 'application/json',
-      },
-    );
+    await testInfo.attach('sauce-env-diagnostics.json', {
+      body: Buffer.from(
+        JSON.stringify({
+          passwordLength: password.length,
+          emailLength: email.length,
+          idamPasswordEnvPresent: process.env.IDAM_PCS_USER_PASSWORD !== undefined,
+        }),
+        'utf-8'
+      ),
+      contentType: 'application/json',
+    });
 
     await page.goto('https://manage-case.aat.platform.hmcts.net', {
       waitUntil: 'domcontentloaded',
