@@ -10,7 +10,7 @@ type AuthTestFixtures = {
 const setupAuth: TestFixture<void, object> = async (
   // eslint-disable-next-line no-empty-pattern -- required by Playwright fixture API
   {},
-  use,
+  use
 ) => {
   await ensureAuthTokens();
   await use(undefined);

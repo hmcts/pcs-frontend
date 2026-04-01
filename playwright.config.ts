@@ -30,8 +30,7 @@ function isAllurePlaywrightInstalled(): boolean {
   }
 }
 
-const useAllureReporter =
-  process.env.PLAYWRIGHT_SKIP_ALLURE !== 'true' && isAllurePlaywrightInstalled();
+const useAllureReporter = process.env.PLAYWRIGHT_SKIP_ALLURE !== 'true' && isAllurePlaywrightInstalled();
 
 export default defineConfig({
   testDir: './src/test/ui',

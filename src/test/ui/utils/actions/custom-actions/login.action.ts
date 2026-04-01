@@ -2,8 +2,8 @@ import { IdamUtils } from '@hmcts/playwright-common';
 import { Page } from '@playwright/test';
 
 import { performAction } from '../../controller';
-import { IAction, actionData } from '../../interfaces';
 import { resolveIdamPassword } from '../../idamPassword';
+import { IAction, actionData } from '../../interfaces';
 
 export class LoginAction implements IAction {
   async execute(page: Page, action: string, userType?: actionData, roles?: actionData): Promise<void> {
