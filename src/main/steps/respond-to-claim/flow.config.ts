@@ -54,8 +54,8 @@ export const flowConfig: JourneyFlowConfig = {
     'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
     'your-circumstances',
     'exceptional-hardship',
-    'income-and-expenditure',
-    'regular-income',
+    'income-and-expenses',
+    'what-regular-income-do-you-receive',
     'have-you-applied-for-universal-credit',
     'priority-debts',
     'priority-debt-details',
@@ -391,9 +391,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'exceptional-hardship': {
       previousStep: 'your-circumstances',
-      defaultNext: 'income-and-expenditure',
+      defaultNext: 'income-and-expenses',
     },
-    'income-and-expenditure': {
+    'income-and-expenses': {
       previousStep: 'exceptional-hardship',
       routes: [
         {
@@ -406,13 +406,13 @@ export const flowConfig: JourneyFlowConfig = {
           condition: async (req: Request): Promise<boolean> => {
             return isFinanceDetailsProvided(req);
           },
-          nextStep: 'regular-income',
+          nextStep: 'what-regular-income-do-you-receive',
         },
       ],
-      defaultNext: 'regular-income',
+      defaultNext: 'what-regular-income-do-you-receive',
     },
-    'regular-income': {
-      previousStep: 'income-and-expenditure',
+    'what-regular-income-do-you-receive': {
+      previousStep: 'income-and-expenses',
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
@@ -430,13 +430,13 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
-      previousStep: 'regular-income',
+      previousStep: 'what-regular-income-do-you-receive',
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
       previousStep: async (req: Request): Promise<string> => {
         const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
-        return selectedUniversalCredit ? 'regular-income' : 'have-you-applied-for-universal-credit';
+        return selectedUniversalCredit ? 'what-regular-income-do-you-receive' : 'have-you-applied-for-universal-credit';
       },
       defaultNext: 'priority-debt-details',
     },

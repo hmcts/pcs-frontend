@@ -47,7 +47,7 @@ const validateUniversalCreditAmount = createAmountValidator('errors.universalCre
 const validateOtherBenefitsAmount = createAmountValidator('errors.otherBenefitsAmount.largeAmount');
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'regular-income',
+  stepName: 'what-regular-income-do-you-receive',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
