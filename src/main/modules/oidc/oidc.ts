@@ -36,6 +36,9 @@ export class OIDCModule {
 
       try {
         const issuer = new URL(this.oidcConfig.issuer);
+        const discoveryOptions = this.shouldAllowInsecureDiscovery(issuer)
+          ? { execute: [client.allowInsecureRequests] }
+          : undefined;
 
         this.logger.info('Fetching OIDC configuration from:', { issuer: this.oidcConfig.issuer });
 
@@ -44,7 +47,7 @@ export class OIDCModule {
         const clientSecret = config.get<string>('secrets.pcs.pcs-frontend-idam-secret');
 
         // Create the client configuration with the server discovery
-        this.clientConfig = await client.discovery(issuer, clientId, clientSecret);
+        this.clientConfig = await client.discovery(issuer, clientId, clientSecret, undefined, discoveryOptions);
         return this.clientConfig;
       } catch (error) {
         this.logger.error('Failed to setup OIDC client:', error);
@@ -54,6 +57,14 @@ export class OIDCModule {
     })();
 
     return this.clientConfigPromise;
+  }
+
+  private shouldAllowInsecureDiscovery(issuer: URL): boolean {
+    if (issuer.protocol !== 'http:') {
+      return false;
+    }
+
+    return ['localhost', '127.0.0.1'].includes(issuer.hostname);
   }
 
   private async ensureClientConfig(): Promise<Configuration> {
@@ -134,12 +145,15 @@ export class OIDCModule {
         // Generate a new code verifier and store it in the session
         req.session.codeVerifier = client.randomPKCECodeVerifier();
         const codeChallenge = await client.calculatePKCECodeChallenge(req.session.codeVerifier);
+        const state = client.randomState();
+        (req.session as typeof req.session & { oidcState?: string }).oidcState = state;
 
         const parameters: Record<string, string> = {
           redirect_uri: this.oidcConfig.redirectUri,
           scope: this.oidcConfig.scope,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
+          state,
         };
 
         if (!this.clientConfig.serverMetadata().supportsPKCE()) {
@@ -148,7 +162,14 @@ export class OIDCModule {
         }
 
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
-        res.redirect(redirectTo.href);
+        req.session.save(saveError => {
+          if (saveError) {
+            this.logger.error('Failed to persist OIDC session state before redirect:', saveError);
+            return next(new OIDCAuthenticationError('Failed to initiate authentication'));
+          }
+
+          res.redirect(redirectTo.href);
+        });
       } catch (error) {
         this.logger.error('Login error:', error);
         next(new OIDCAuthenticationError('Failed to initiate authentication'));
@@ -159,14 +180,25 @@ export class OIDCModule {
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
       try {
         const { codeVerifier, nonce } = req.session;
+        const { oidcState } = req.session as typeof req.session & { oidcState?: string };
 
         const callbackUrl = OIDCModule.getCurrentUrl(req);
 
-        const tokens: TokenEndpointResponse = await client.authorizationCodeGrant(this.clientConfig, callbackUrl, {
+        const authorizationChecks: Parameters<typeof client.authorizationCodeGrant>[2] = {
           pkceCodeVerifier: codeVerifier,
-          expectedNonce: nonce,
+          expectedState: oidcState,
           idTokenExpected: true,
-        });
+        };
+
+        if (nonce) {
+          authorizationChecks.expectedNonce = nonce;
+        }
+
+        const tokens: TokenEndpointResponse = await client.authorizationCodeGrant(
+          this.clientConfig,
+          callbackUrl,
+          authorizationChecks
+        );
 
         const { access_token, id_token, refresh_token } = tokens;
 
@@ -186,6 +218,7 @@ export class OIDCModule {
         req.session.save(() => {
           delete req.session.codeVerifier;
           delete req.session.nonce;
+          delete (req.session as typeof req.session & { oidcState?: string }).oidcState;
 
           const returnTo = req.session.returnTo || '/';
           delete req.session.returnTo;
