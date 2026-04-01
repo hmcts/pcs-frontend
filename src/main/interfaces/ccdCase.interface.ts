@@ -63,6 +63,10 @@ export interface PossessionClaimResponse {
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
+    landlordLicensed?: YesNoNotSureValue;
+    writtenTerms?: YesNoNotSureValue;
+    disputeClaim?: YesNoValue;
+    disputeClaimDetails?: string;
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
@@ -70,8 +74,6 @@ export interface PossessionClaimResponse {
       additionalRentContribution?: unknown;
       additionalContributionFrequency?: string;
     };
-    landlordLicensed?: YesNoNotSureValue;
-    writtenTerms?: YesNoNotSureValue;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;
