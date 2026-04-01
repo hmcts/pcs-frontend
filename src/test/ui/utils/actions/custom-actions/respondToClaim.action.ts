@@ -343,6 +343,8 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  }
+
   private async disputingOtherPartsOfTheClaim(doYouWantToDisputeOption: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
