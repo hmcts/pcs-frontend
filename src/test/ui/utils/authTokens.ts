@@ -34,7 +34,7 @@ export async function getAccessToken(): Promise<void> {
   });
 }
 
-/** S2S + Idam — invoked from `authTest` worker fixture once per worker (not globalSetup, not per test). */
+/** S2S + Idam — invoked from `authTest` `beforeEach` (not globalSetup). */
 export async function ensureAuthTokens(): Promise<void> {
   await getS2SToken();
   await getAccessToken();
