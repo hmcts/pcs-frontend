@@ -34,7 +34,7 @@
     "test:E2eSafari": "yarn playwright install && yarn playwright test --project webkit --grep @nightly; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:local": "yarn playwright install && yarn playwright test --project chrome --grep @saucelab; EXIT_CODE=$?;",
     "test:saucelab": "yarn exec saucectl run -c .sauce/config.yml",
-    "test:crossbrowser": "SAUCE_TUNNEL_NAME=reformtunnel yarn exec saucectl run -c .sauce/config-crossbrowser.yml",
+    "test:crossbrowser": "SAUCE_TUNNEL_NAME=reformtunnel yarn exec saucectl run -c .sauce/config-cross.yml",
     "test:pact": "jest -c jest.pact.config.ts --runInBand",
     "pact:publish": "ts-node src/test/contract/publish/*.ts",
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",
