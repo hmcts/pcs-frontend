@@ -10,9 +10,9 @@ export const professionalHeaderMiddleware: RequestHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-    // response token  
+
     const decoded = jose.decodeJwt(req.session.user!.idToken);
-    
+
     const headerModel = buildHeaderModel({
       xuiBaseUrl: 'http://pcs-api-aat.service.core-compute-aat.internal', // TODO move to env
       user: { roles: <string[]>decoded.roles },

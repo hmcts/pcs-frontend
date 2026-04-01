@@ -25,4 +25,5 @@ export interface JourneyFlowConfig {
   journeyName?: string;
   stepOrder: string[];
   steps: Record<string, StepConfig>;
+  isProfessional?: boolean;
 }
