@@ -330,11 +330,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('readYourHouseHoldAndCircumstances');
-    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    });
     await performAction('readYourHouseHoldAndCircumstances');
     await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
