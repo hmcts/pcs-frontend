@@ -31,7 +31,7 @@ npm:
     '@hmcts/playwright-common': '1.0.39'
 
 env:
-  PLAYWRIGHT_SCREENSHOT_ON: 'true'
+  PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
   PLAYWRIGHT_SKIP_ALLURE: 'true'
   CI: 'true'
   NODE_CONFIG_ENV: test

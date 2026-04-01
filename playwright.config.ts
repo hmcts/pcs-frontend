@@ -32,6 +32,21 @@ function isAllurePlaywrightInstalled(): boolean {
 
 const useAllureReporter = process.env.PLAYWRIGHT_SKIP_ALLURE !== 'true' && isAllurePlaywrightInstalled();
 
+/** Set only in `.sauce/config.yml` — full video, screenshots after each test, and trace (not used on local Jenkins E2E unless you export it). */
+const sauceFullJourneyArtifacts = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
+
+const captureSettings = sauceFullJourneyArtifacts
+  ? {
+      screenshot: 'on' as const,
+      video: 'on' as const,
+      trace: 'on' as const,
+    }
+  : {
+      screenshot: 'only-on-failure' as const,
+      video: 'retain-on-failure' as const,
+      trace: 'on-first-retry' as const,
+    };
+
 export default defineConfig({
   testDir: './src/test/ui',
   /* Run tests in files in parallel */
@@ -68,9 +83,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
-        screenshot: 'only-on-failure',
-        video: 'retain-on-failure',
-        trace: 'on-first-retry',
+        ...captureSettings,
         javaScriptEnabled: true,
         viewport: DEFAULT_VIEWPORT,
         headless: !!process.env.CI,
@@ -83,9 +96,7 @@ export default defineConfig({
             use: {
               ...devices['Desktop Firefox'],
               channel: 'firefox',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
@@ -96,9 +107,7 @@ export default defineConfig({
             use: {
               ...devices['Desktop Safari'],
               channel: 'webkit',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
@@ -109,9 +118,7 @@ export default defineConfig({
             use: {
               ...devices['Pixel 5'],
               channel: 'MobileChrome',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
@@ -122,9 +129,7 @@ export default defineConfig({
             use: {
               ...devices['iPhone 12'],
               channel: 'MobileSafari',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
@@ -135,9 +140,7 @@ export default defineConfig({
             use: {
               ...devices['Desktop Edge'],
               channel: 'MicrosoftEdge',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
