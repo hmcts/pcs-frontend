@@ -1,3 +1,6 @@
+# Sauce Labs: Playwright @nightly tests on Chrome, Firefox, and WebKit (one suite per browser).
+# Run: yarn test:crossbrowser  (with tunnel + env from vault / CI, same as test:saucelab).
+# Jenkins: call via YarnBuilder / shared library after loadVaultSecrets + env (see Jenkinsfile_CNP patterns).
 apiVersion: v1alpha
 kind: playwright
 
@@ -10,7 +13,7 @@ sauce:
     tags:
       - pcs-frontend
       - playwright
-      - saucelab
+      - crossbrowser
 
 defaults:
   timeout: 30m
@@ -48,10 +51,9 @@ env:
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
 suites:
-  - name: 'PCS @saucelab (Chrome)'
+  - name: 'PCS @nightly (Chrome)'
     platformName: Windows 11
     screenResolution: 1920x1080
-    # Required by saucectl. Prefer paths with / (often normalized on Sauce); second line matches Windows \\.
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
       - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
@@ -59,7 +61,31 @@ suites:
       browserName: chrome
       project: chrome
       headless: true
-      grep: '@saucelab'
+      grep: '@nightly'
+
+  - name: 'PCS @nightly (Firefox)'
+    platformName: Windows 11
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: firefox
+      project: firefox
+      headless: true
+      grep: '@nightly'
+
+  - name: 'PCS @nightly (WebKit)'
+    platformName: Windows 11
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: webkit
+      project: webkit
+      headless: true
+      grep: '@nightly'
 
 reporters:
   spotlight:
