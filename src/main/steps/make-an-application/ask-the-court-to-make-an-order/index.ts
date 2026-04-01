@@ -1,6 +1,11 @@
+import { Request } from 'express';
+
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+
+import { FeeType, getFee } from '@services/feeLookupService';
+import { formatFee } from '@utils/feeFormatter';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'ask-the-court-to-make-an-order',
@@ -14,5 +19,48 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     heading: 'heading',
     paragraph1: 'paragraph1',
+    examplesIntro: 'examplesIntro',
+    example1: 'example1',
+    example2: 'example2',
+    example3: 'example3',
+    example4: 'example4',
+    forExampleYouCanUseThisTo: 'forExampleYouCanUseThisTo',
+    addAnExtraParty: 'addAnExtraParty',
+    reliefFromSanctions: 'reliefFromSanctions',
+    serveAClaimOutsideEnglandAndWales: 'serveAClaimOutsideEnglandAndWales',
+    transferForEnforcement: 'transferForEnforcement',
+    cannotSuspendOnlineIntro: 'cannotSuspendOnlineIntro',
+    toApplyByPost: 'toApplyByPost',
+    readGuidance: 'readGuidance',
+    fillInFormForSuspend: 'fillInFormForSuspend',
+    whatYouWillNeedToApply: 'whatYouWillNeedToApply',
+    youWillNeedToKnow: 'youWillNeedToKnow',
+    ifYouCanPayTheCourtFee: 'ifYouCanPayTheCourtFee',
+    whatYouWantTheCourtToDo: 'whatYouWantTheCourtToDo',
+    whyYouAreAskingTheCourt: 'whyYouAreAskingTheCourt',
+    youMayNeedToProvideEvidence: 'youMayNeedToProvideEvidence',
+    beforeYouStart: 'beforeYouStart',
+    onceYouStart: 'onceYouStart',
+    weWillNotSaveYourAnswers: 'weWillNotSaveYourAnswers',
+    howMuchWillItCost: 'howMuchWillItCost',
+    usualCosts: 'usualCosts',
+    youHaveAlreadyToldTheOtherParty: 'youHaveAlreadyToldTheOtherParty',
+    theyDidNotAgreeToIt: 'theyDidNotAgreeToIt',
+    youWillSeeTheFinalApplicationFee: 'youWillSeeTheFinalApplicationFee',
+    ifYouAreWorriedAboutPayingFees: 'ifYouAreWorriedAboutPayingFees',
+    youMayBeEligibleForHWF: 'youMayBeEligibleForHWF',
+    applyByPost: 'applyByPost',
+    ifPreferToRespondByPost: 'ifPreferToRespondByPost',
+    fillInFormForPost: 'fillInFormForPost',
+    findYourLocalCourt: 'findYourLocalCourt',
+    sendTheCompletedFormToTheCourt: 'sendTheCompletedFormToTheCourt',
+  },
+  extendGetContent: async (_req: Request) => {
+    const standardFee = await getFee(FeeType.genAppStandardFee);
+    const maxFee = await getFee(FeeType.genAppMaxFee);
+    return {
+      formattedStandardFee: formatFee(standardFee),
+      formattedMaxFee: formatFee(maxFee),
+    };
   },
 });

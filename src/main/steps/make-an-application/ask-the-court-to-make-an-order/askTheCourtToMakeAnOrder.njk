@@ -1,6 +1,7 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
@@ -11,21 +12,34 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  <div class="govuk-notification-banner" role="region" aria-labelledby="experimental-banner">
-    <div class="govuk-notification-banner__content">
-      <p class="govuk-notification-banner__heading" id="experimental-banner">
-        Placeholder page
-      </p>
-    </div>
+  <p class="govuk-body">
+  {{ paragraph1 }}
+  </p>
+
+  <p class="govuk-body">
+   {{ forExampleYouCanUseThisTo }}
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ addAnExtraParty }}</li>
+    <li>{{ reliefFromSanctions }}</li>
+    <li>{{ serveAClaimOutsideEnglandAndWales }}</li>
+    <li>{{ transferForEnforcement }}</li>
+  </ul>
+  </p>
+
+  <div class="govuk-inset-text">
+    <p class="govuk-body">{{ cannotSuspendOnlineIntro }}</p>
+    <p class="govuk-body">{{ toApplyByPost }}</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li><a href="https://www.gov.uk/repossession/delay-eviction" target="_blank"
+        rel="noopener noreferrer" class="govuk-link">{{ readGuidance }}</a>
+      </li>
+      <li><a href="https://www.gov.uk/government/publications/form-n244-application-notice" target="_blank"
+        rel="noopener noreferrer" class="govuk-link">{{ fillInFormForSuspend }}</a>
+      </li>
+    </ul>
   </div>
-
-  <p class="govuk-body">
-  {{paragraph1}}
-  </p>
-
-  <p class="govuk-body">
-  {{paragraph2}}
-  </p>
 
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">
@@ -37,6 +51,46 @@
     </div>
 
     {{ csrfProtection(csrfToken) }}
-
   </form>
+
+  <h2 class="govuk-heading-m">{{ whatYoullNeedToApply }}</h2>
+  <p class="govuk-body">
+  {{ youWillNeedToKnow }}
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ ifYouCanPayTheCourtFee }}</li>
+    <li>{{ whatYouWantTheCourtToDo }}</li>
+    <li>{{ whyYouAreAskingTheCourt }}</li>
+  </ul>
+  <p class="govuk-body">
+    {{ youMayNeedToProvideEvidence }}
+  </p>
+
+  <div class="govuk-inset-text">
+    <p class="govuk-body">{{ beforeYouStart }}</p>
+    <p class="govuk-body">{{ onceYouStart }}</p>
+    <p class="govuk-body">{{ weWillNotSaveYourAnswers }}</p>
+  </div>
+
+  <h2 class="govuk-heading-m">{{ howMuchWillItCost }}</h2>
+  <p class="govuk-body">{{ usualCosts }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ youHaveAlreadyToldTheOtherParty }}</li>
+    <li>{{ theyDidNotAgreeToIt }}</li>
+  </ul>
+  <p class="govuk-body">{{ youWillSeeTheFinalApplicationFee }}</p>
+
+  <h2 class="govuk-heading-m">{{ ifYouAreWorriedAboutPayingFees }}</h2>
+  <p class="govuk-body">{{ youMayBeEligibleForHWF | safe }}</p>
+
+  <h2 class="govuk-heading-m">{{ applyByPost }}</h2>
+  <p class="govuk-body">{{ ifPreferToRespondByPost }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a href="https://www.gov.uk/government/publications/form-n244-application-notice" target="_blank"
+        rel="noopener noreferrer" class="govuk-link">{{ fillInFormForPost }}</a>
+    </li>
+    <li>{{ findYourLocalCourt }}</li>
+    <li>{{ sendTheCompletedFormToTheCourt }}</li>
+  </ul>
+
 {% endblock %}

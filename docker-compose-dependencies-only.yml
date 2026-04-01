@@ -1,0 +1,24 @@
+services:
+  cache:
+    image: bitnami/redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - cache-data:/bitnami/redis/data
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      timeout: 2s
+      retries: 10
+
+  wiremock:
+    image: 'wiremock/wiremock:latest'
+    ports:
+      - '8180:8080'
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
+
+volumes:
+  cache-data:
