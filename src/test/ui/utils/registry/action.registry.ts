@@ -1,6 +1,7 @@
 import {
   CreateCaseAPIAction,
   FetchPINsAndValidateAccessCodeAPIAction,
+  GenAppsAction,
   LoginAction,
   NavigateToUrlAction,
   RespondToClaimAction,
@@ -66,6 +67,7 @@ export class ActionRegistry {
     ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
+    ['chooseAnApplication', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {
