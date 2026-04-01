@@ -41,7 +41,6 @@ test.describe('Sauce smoke', () => {
     await performAction('createUser', 'citizen', ['citizen']);
     await performAction('login');
     await page.waitForTimeout(5000);
-
   });
 
   test('Service Token s2s - 200 @pcssaucelab', async ({ request }) => {
