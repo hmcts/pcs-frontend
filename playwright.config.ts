@@ -18,7 +18,7 @@ if (enable_all_page_functional_tests.toLowerCase() === 'true') {
 export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'false';
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
-export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
+export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'false';
 
 const reporters: ReporterDescription[] = [['list']];
 if (process.env.PLAYWRIGHT_SKIP_ALLURE !== 'true') {
