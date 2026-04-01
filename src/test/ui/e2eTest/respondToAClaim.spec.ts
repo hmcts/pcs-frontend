@@ -79,12 +79,11 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'NO';
   }
 
-  //Check if Yes or Im not sure is selected on RepaymentAgreed page(Rent Arrears) - for back link navigation
+  //Check if No is selected on RepaymentAgreed page(Rent Arrears) - for back link navigation
   if (testInfo.title.includes('RentArrears - Demoted')) {
     process.env.REPAYMENT_AGREED = 'NO';
   }
-  if(testInfo.title.includes('InstallmentPayment - No'))
-  {
+  if (testInfo.title.includes('InstallmentPayment - No')) {
     process.env.INSTALLMENT_PAYMENT = 'NO';
   }
 

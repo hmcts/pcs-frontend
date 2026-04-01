@@ -14,9 +14,9 @@ export async function yourHouseholdAndCircumstancesNavigationTests(): Promise<vo
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: yourHouseHoldAndCircumstances.pageSlug,
   });
-  if (process.env.REPAYMENT_AGREED === 'NO'){
+  if (process.env.REPAYMENT_AGREED === 'NO') {
     await performValidation('pageNavigation', yourHouseHoldAndCircumstances.backLink, howMuchAffordToPay.mainHeader);
-  } else if (process.env.REPAYMENT_AGREED !== 'NO'){
+  } else if (process.env.REPAYMENT_AGREED !== 'NO') {
     await performValidation(
       'pageNavigation',
       yourHouseHoldAndCircumstances.backLink,
