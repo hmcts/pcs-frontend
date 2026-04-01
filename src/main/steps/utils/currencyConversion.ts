@@ -17,6 +17,7 @@ const logger = Logger.getLogger('currencyConversion');
  * penceToPounds(null)    // returns undefined
  */
 export function penceToPounds(pence: string | number | undefined): string | undefined {
+  // Explicit check: 0 is valid (£0.00), !pence would incorrectly reject it
   if (pence === undefined || pence === null || pence === '') {
     return undefined;
   }
