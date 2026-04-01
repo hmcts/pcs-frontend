@@ -2,13 +2,9 @@
   "caption": "cyResponding to the possession claim",
   "pageTitle": "cyIncome and expenses",
   "infoParagraph1": "cyDetails about your income and expenses can be used by a judge to reach a decision on your case, and also to decide how much you could afford to repay if you have rent arrears.",
-  "infoParagraph2": "cyOn the day of the hearing, there may be a duty adviser at the court who can give you advice and represent you for free. They can also use this information to see if there's any additional benefits or support you might be entitled to.",
+  "infoParagraph2": "cyOn the day of the hearing, there may be a duty adviser at the court who can give you advice and represent you for free. They can also use this information to see if there’s any additional benefits or support you might be entitled to.",
   "infoParagraph3": "cyThe claimant will be able to see your answers.",
   "question": "cyDo you want to provide details of your income and expenses?",
-  "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
-  },
   "errors": {
     "provideFinanceDetails": "cySelect if you want to provide details of your income and expenses"
   }
