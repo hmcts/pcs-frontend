@@ -131,8 +131,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       if (fs.existsSync(lockPath)) {
         fs.unlinkSync(lockPath);
       }
-    } catch {
-      // Ignore lock file deletion errors
+    } catch (_error) {
+      console.error(_error);
     }
   }
 
