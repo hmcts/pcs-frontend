@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 
 import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
 import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 import * as flowModule from '@modules/steps/flow';
 import { createPostHandler } from '@modules/steps/formBuilder/postHandler';
 import * as dashboardModule from '@routes/dashboard';
@@ -9,6 +10,11 @@ import * as dashboardModule from '@routes/dashboard';
 jest.mock('@routes/dashboard');
 jest.mock('@modules/i18n');
 jest.mock('@modules/steps/flow');
+
+const flowConfig: JourneyFlowConfig = {
+  stepOrder: [],
+  steps: {},
+};
 
 describe('PostHandler - Save for Later Fix', () => {
   let mockRequest: Partial<Request>;
@@ -85,27 +91,22 @@ describe('PostHandler - Save for Later Fix', () => {
     it('passes current step post payload to navigation for forward routing', async () => {
       const getNextStepUrl = jest.fn().mockResolvedValue('/case/1771325608502536/respond-to-claim/contact-preferences');
       (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
+        getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
         getNextStepUrl,
       });
 
-      const { post } = createPostHandler(
-        fields,
-        'free-legal-advice',
-        'test.njk',
-        'respond-to-claim',
-        undefined,
-        undefined,
-        {
-          journeyName: 'respondToClaim',
-          basePath: '/case/:caseReference/respond-to-claim',
-          stepOrder: ['free-legal-advice', 'contact-preferences'],
-          steps: {
-            'free-legal-advice': {
-              defaultNext: 'contact-preferences',
-            },
+      const testFlowConfig: JourneyFlowConfig = {
+        journeyName: 'respondToClaim',
+        basePath: '/case/:caseReference/respond-to-claim',
+        stepOrder: ['free-legal-advice', 'contact-preferences'],
+        steps: {
+          'free-legal-advice': {
+            defaultNext: 'contact-preferences',
           },
-        }
-      );
+        },
+      };
+
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', testFlowConfig);
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',
@@ -125,7 +126,7 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('should validate form before saving for later', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim');
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
 
       // Empty form + save for later
       mockRequest.body = { action: 'saveForLater' };
@@ -143,7 +144,8 @@ describe('PostHandler - Save for Later Fix', () => {
         fields,
         'free-legal-advice',
         'test.njk',
-        'respond-to-claim',
+        'respondToClaim',
+        flowConfig,
         mockBeforeRedirect
       );
 
@@ -170,7 +172,7 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('should use case ID from res.locals.validatedCase', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim');
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',
@@ -190,7 +192,7 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('should handle missing case ID gracefully', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim');
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',
@@ -213,7 +215,8 @@ describe('PostHandler - Save for Later Fix', () => {
         fields,
         'free-legal-advice',
         'test.njk',
-        'respond-to-claim',
+        'respondToClaim',
+        flowConfig,
         mockBeforeRedirect
       );
 
@@ -233,7 +236,8 @@ describe('PostHandler - Save for Later Fix', () => {
         fields,
         'free-legal-advice',
         'test.njk',
-        'respond-to-claim',
+        'respondToClaim',
+        flowConfig,
         mockBeforeRedirect
       );
 

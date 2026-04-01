@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
+import { HTTPError } from '../HttpError';
+import { CcdCaseModel } from '../interfaces/ccdCaseData.model';
+
 import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
@@ -18,9 +20,7 @@ export async function caseReferenceParamMiddleware(
 
   if (!sanitisedCaseReference) {
     logger.error('Invalid case reference format', { caseReference });
-    return res.status(404).render('error', {
-      error: 'Invalid case reference format',
-    });
+    return next(new HTTPError('Invalid case reference format', 404));
   }
 
   // Validate case exists and user has access
@@ -29,9 +29,7 @@ export async function caseReferenceParamMiddleware(
 
     if (!accessToken) {
       logger.error('User not authenticated - no access token', { caseReference: sanitisedCaseReference });
-      return res.status(404).render('error', {
-        error: 'Case not found or access denied',
-      });
+      return next(new HTTPError('Authentication required', 401));
     }
 
     const validatedCase = await ccdCaseService.getCaseById(accessToken, sanitisedCaseReference);
@@ -39,15 +37,17 @@ export async function caseReferenceParamMiddleware(
     // Store validated case as hydrated CcdCaseModel
     res.locals.validatedCase = new CcdCaseModel(validatedCase);
 
-    next();
+    return next();
   } catch (error) {
+    const httpError = error instanceof HTTPError ? error : new HTTPError('Internal server error', 500);
+
     logger.error('Case access validation failed', {
       caseReference: sanitisedCaseReference,
       error: error instanceof Error ? error.message : 'Unknown error',
+      status: httpError.status,
       url: req.originalUrl,
     });
-    return res.status(404).render('error', {
-      error: 'Case not found or access denied',
-    });
+
+    return next(httpError);
   }
 }

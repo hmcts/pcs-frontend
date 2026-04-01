@@ -93,9 +93,15 @@ export interface CcdDefendantResponses {
   contactByPost?: YesNoValue;
   contactByText?: YesNoValue;
   preferenceType?: ContactPreference;
+  rentArrearsAmountConfirmation?: string;
+  rentArrearsAmount?: string;
   landlordRegistered?: YesNoNotSureValue;
   landlordLicensed?: YesNoNotSureValue;
   writtenTerms?: YesNoNotSureValue;
+  paymentAgreement?: {
+    repaymentPlanAgreed?: YesNoNotSureValue;
+    repaymentAgreedDetails?: string;
+  };
 }
 
 export interface PossessionClaimResponse {

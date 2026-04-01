@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { flowConfig as respondToClaimFlowConfig } from '../../steps/respond-to-claim/flow.config';
-
 import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 import { Logger } from '@modules/logger';
 
@@ -124,7 +122,7 @@ export function checkStepDependencies(
   return null;
 }
 
-export function createStepNavigation(flowConfig: JourneyFlowConfig): {
+export type StepNavigation = {
   getNextStepUrl: (
     req: Request,
     currentStepName: string,
@@ -132,7 +130,9 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
   ) => Promise<string | null>;
   getBackUrl: (req: Request, currentStepName: string) => Promise<string | null>;
   getStepUrl: (stepName: string, caseReference?: string) => string;
-} {
+};
+
+export function createStepNavigation(flowConfig: JourneyFlowConfig): StepNavigation {
   return {
     getNextStepUrl: async (
       req: Request,
@@ -158,9 +158,7 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): {
   };
 }
 
-export const stepNavigation = createStepNavigation(respondToClaimFlowConfig);
-
-export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig = respondToClaimFlowConfig) {
+export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const urlParts = req.path.split('/');
     const stepName = urlParts[urlParts.length - 1];

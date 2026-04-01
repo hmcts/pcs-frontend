@@ -3,13 +3,13 @@ import type { TFunction } from 'i18next';
 
 import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
-import { stepNavigation } from './flow';
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
 import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
 
 import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
 import type { StepFormData } from '@interfaces/stepFormData.interface';
 import { Logger } from '@modules/logger';
+import { StepNavigation } from '@modules/steps/flow';
 
 const logger = Logger.getLogger('controllerFactory');
 
@@ -33,6 +33,7 @@ export class GetController {
 export const createGetController = (
   view: string,
   stepName: string,
+  stepNavigation: StepNavigation,
   extendContent?: (req: Request) => StepFormData | Promise<StepFormData>,
   journeyFolder?: string
 ): GetController => {
@@ -102,6 +103,7 @@ export const createPostRedirectController = (nextUrl: string): { post: (req: Req
 
 export const createPostController = (
   stepName: string,
+  stepNavigation: StepNavigation,
   getFields: (t: TFunction) => FormFieldConfig[],
   view: string,
   beforeRedirect?: PostControllerCallback,

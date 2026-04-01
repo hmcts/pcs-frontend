@@ -42,7 +42,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       defendantResponsesConfirmNoticeGiven: 'yes',
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
-      claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+      data: {
+        claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+      },
     });
 
     await expect(
@@ -59,7 +61,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const rentArrearsReq = createReq({
       defendantResponsesConfirmNoticeGiven: 'imNotSure',
       noticeServed: 'YES',
-      claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+      data: {
+        claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+      },
     });
 
     await expect(getNextStep(noticeDateProvidedReq, 'confirmation-of-notice-given', flowConfig, {})).resolves.toBe(
@@ -75,7 +79,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       defendantResponsesConfirmNoticeGiven: 'NOT SURE',
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
-      claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+      data: {
+        claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+      },
     });
 
     await expect(getNextStep(unexpectedValueReq, 'confirmation-of-notice-given', flowConfig, {})).resolves.toBe(
