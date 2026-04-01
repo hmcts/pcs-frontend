@@ -51,7 +51,7 @@ export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErro
     message: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.realDateErrorMessage,
   });
 
-  //This error message will trigger if present date is provided
+  //This error message will trigger if present date is entered
   await performAction('selectAlternativeAccommodation', {
     radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
     ...getRelativeDate(0),
