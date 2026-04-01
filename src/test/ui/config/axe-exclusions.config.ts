@@ -8,4 +8,5 @@ export const axe_exclusions = [
   '#repaymentsAgreed', //page: repaymentsAgreed, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#contactByEmailOrPost', //page: contactPreferenceEmailOrPost, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#rentArrears-2', //page: rentArrears, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#disputeOtherParts', //page: nonRentArrears, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
 ];
