@@ -27,7 +27,7 @@ test.describe('Sauce smoke', () => {
   test('Service Token s2s - 200 @pcssaucelab', async ({ request }) => {
     const res = await request.post(
       'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease',
-      { headers: { 'Content-Type': 'application/json' }, data: { microservice: 'pcs_api' } },
+      { headers: { 'Content-Type': 'application/json' }, data: { microservice: 'pcs_api' } }
     );
     expect(res.status()).toBe(200);
   });
