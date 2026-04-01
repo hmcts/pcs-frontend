@@ -19,14 +19,18 @@ import {
 import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';
 import { resolveIdamPassword } from '../utils/idamPassword';
 
-const PCS_AAT_URL = 'https://pcs.aat.platform.hmcts.net/';
-const MANAGE_CASE_URL = 'https://manage-case.aat.platform.hmcts.net';
+const DEFAULT_PCS_FRONTEND_URL = 'https://pcs.aat.platform.hmcts.net';
+const DEFAULT_MANAGE_CASE_URL = 'https://manage-case.aat.platform.hmcts.net';
 
 /** Same as `config` e2e.testUrl — env-only so Sauce runner (no `config` package) can load this file. */
 function resolveE2eBaseUrl(): string {
   const trimmed = process.env.TEST_URL?.trim();
-  const raw = trimmed && trimmed.length > 0 ? trimmed : PCS_AAT_URL.replace(/\/$/, '');
+  const raw = trimmed && trimmed.length > 0 ? trimmed : DEFAULT_PCS_FRONTEND_URL;
   return raw.endsWith('/') ? raw : `${raw}/`;
+}
+
+function resolveManageCaseUrl(): string {
+  return process.env.MANAGE_CASE_URL?.trim() || DEFAULT_MANAGE_CASE_URL;
 }
 
 async function attachFullPagePng(testInfo: TestInfo, page: Page, filename: string) {
@@ -41,7 +45,7 @@ test.describe('Sauce smoke', () => {
     const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-solicitor-automation@test.com';
     const password = resolveIdamPassword();
     test.skip(!password);
-    await page.goto(MANAGE_CASE_URL, { waitUntil: 'domcontentloaded' });
+    await page.goto(resolveManageCaseUrl(), { waitUntil: 'domcontentloaded' });
     await attachFullPagePng(testInfo, page, 'mc-ui-01-sign-in.png');
     await page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await page.getByRole('textbox', { name: 'Password' }).fill(password);
@@ -80,7 +84,7 @@ test.describe('Sauce smoke', () => {
     await getAccessToken();
 
     initializeExecutor(page);
-    await performAction('navigateToUrl', PCS_AAT_URL);
+    await performAction('navigateToUrl', resolveE2eBaseUrl());
     await attachFullPagePng(testInfo, page, 'pcs-ui-01-after-navigate.png');
     await performAction('createUser', 'citizen', ['citizen']);
     await attachFullPagePng(testInfo, page, 'pcs-ui-02-after-create-user.png');

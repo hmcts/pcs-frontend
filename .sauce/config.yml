@@ -26,20 +26,40 @@ npm:
   packages:
     '@hmcts/playwright-common': '1.0.39'
 
-# Substituted from the host when running saucectl (export in shell / Jenkins vault).
+# Substituted from the host when running saucectl (Jenkins vault / `export` in shell).
+# AAT defaults (match Jenkinsfile_nightly setFunctionalTestEnvVars / onMaster TEST_URL):
+#   export TEST_URL='https://pcs.aat.platform.hmcts.net/'
+#   export PCS_API_URL='http://pcs-api-aat.service.core-compute-aat.internal'
+#   export DATA_STORE_URL_BASE='http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+#   export MANAGE_CASE_URL='https://manage-case.aat.platform.hmcts.net'
 env:
-  # End-of-test screenshots in Playwright report / Sauce (chrome project only).
+  # Playwright / reporting
   PLAYWRIGHT_SCREENSHOT_ON: 'true'
   PLAYWRIGHT_SKIP_ALLURE: 'true'
   CI: 'true'
   NODE_CONFIG_ENV: test
+
+  # PCS frontend base (sauceSmoke: resolveE2eBaseUrl, respond-to-claim journey)
+  TEST_URL: $TEST_URL
+
+  # EXUI Manage Case smoke — optional override; default in spec is AAT
+  MANAGE_CASE_URL: $MANAGE_CASE_URL
+
+  # Backend APIs (createCase / submitCase / fetchPINs / validateAccessCode — see src/test/ui/data/api-data)
+  PCS_API_URL: $PCS_API_URL
+  DATA_STORE_URL_BASE: $DATA_STORE_URL_BASE
+
+  # Optional: case type suffix PCS-{id} for preview / pcs-api PR (Jenkins pcs-api-pr label)
+  PCS_API_CHANGE_ID: $PCS_API_CHANGE_ID
+
+  # IDAM (getAccessToken, login, createUser, resolveIdamPassword)
   PCS_FRONTEND_IDAM_SECRET: $PCS_FRONTEND_IDAM_SECRET
   IDAM_PCS_USER_EMAIL: $IDAM_PCS_USER_EMAIL
   IDAM_PCS_USER_PASSWORD: $IDAM_PCS_USER_PASSWORD
   IDAM_PCS_USER_PASSWORD_B64: $IDAM_PCS_USER_PASSWORD_B64
+
+  # Sauce Connect — reach internal *.service.core-compute-aat.internal URLs
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
-  # Optional: PCS base URL for `config` / tests that read TEST_URL
-  TEST_URL: $TEST_URL
 
 suites:
   - name: 'pcssaucelab @pcssaucelab (Chrome)'
