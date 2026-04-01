@@ -37,6 +37,14 @@ const fieldsConfig: FormFieldConfig[] = [
             translationKey: {
               label: 'correctTypeLabel',
             },
+            validator: (value: unknown): boolean | string => {
+              if (typeof value !== 'string' || !value.trim()) {
+                return true;
+              }
+
+              const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
+              return !invalidCharacters.test(value) || 'errors.correctTypeInvalidCharacters';
+            },
           },
         },
       },
@@ -72,12 +80,6 @@ const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   FLEXIBLE_TENANCY: 'a flexible',
   DEMOTED_TENANCY: 'a demoted',
   OTHER: 'other',
-};
-
-/** Fragments for `tenancyTypeWales` locale interpolation (Welsh occupation contract types). */
-const WALES_CONTRACT_TYPE_TO_TEXT: Record<string, string> = {
-  STANDARD_CONTRACT: 'a standard',
-  SECURE_CONTRACT: 'a secure',
 };
 
 export const step: StepDefinition = createFormStep({
@@ -172,10 +174,6 @@ export const step: StepDefinition = createFormStep({
       ? (caseData?.otherLicenceTypeDetails as string | undefined)
       : (caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string | undefined);
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
-    const welshTenancyTypeAgreementType = occupationLicenceTypeWales
-      ? WALES_CONTRACT_TYPE_TO_TEXT[occupationLicenceTypeWales]
-      : undefined;
-
     const detailsHeading =
       typeof formContent.detailsHeading === 'string'
         ? `${formContent.detailsHeading}${orgName}${':'}`
@@ -186,8 +184,10 @@ export const step: StepDefinition = createFormStep({
     if (welsh) {
       if (occupationLicenceTypeWales === 'OTHER') {
         tenancyType = t('tenancyTypeOther', { otherTenancyTypeDetails });
-      } else if (welshTenancyTypeAgreementType) {
-        tenancyType = t('tenancyTypeWales', { welshTenancyTypeAgreementType });
+      } else if (occupationLicenceTypeWales === 'STANDARD_CONTRACT') {
+        tenancyType = t('tenancyTypeWalesStandard');
+      } else if (occupationLicenceTypeWales === 'SECURE_CONTRACT') {
+        tenancyType = t('tenancyTypeWalesSecure');
       } else {
         tenancyType = formContent.tenancyType;
       }
