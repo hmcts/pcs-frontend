@@ -26,12 +26,18 @@ npm:
   packages:
     '@hmcts/playwright-common': '1.0.39'
 
+# Substituted from the host when running saucectl (export in shell / Jenkins vault).
 env:
   PLAYWRIGHT_SKIP_ALLURE: 'true'
+  CI: 'true'
+  NODE_CONFIG_ENV: test
+  PCS_FRONTEND_IDAM_SECRET: $PCS_FRONTEND_IDAM_SECRET
   IDAM_PCS_USER_EMAIL: $IDAM_PCS_USER_EMAIL
   IDAM_PCS_USER_PASSWORD: $IDAM_PCS_USER_PASSWORD
   IDAM_PCS_USER_PASSWORD_B64: $IDAM_PCS_USER_PASSWORD_B64
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
+  # Optional: PCS base URL for `config` / tests that read TEST_URL
+  TEST_URL: $TEST_URL
 
 suites:
   - name: 'pcssaucelab @pcssaucelab (Chrome)'
