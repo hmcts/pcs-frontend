@@ -59,7 +59,7 @@ export interface PossessionClaimResponse {
     };
   };
   defendantResponses?: {
-    tenancyTypeCorrect?: TenancyTypeCorrectValue;
+    tenancyTypeCorrect?: YesNoNotSureValue;
     tenancyType?: string;
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
