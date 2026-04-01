@@ -14,6 +14,7 @@
   "textAreaLabel": "Give details about your circumstances",
   "errors": {
     "shareCircumstances": "Select if you’d like to share anything about your circumstances",
-    "circumstancesDetails": "Give details about your circumstances"
+    "circumstancesDetails": "Give details about your circumstances",
+    "circumstancesDetailsInvalidCharacters": "The details of your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }

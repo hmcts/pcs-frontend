@@ -37,6 +37,14 @@ export const step: StepDefinition = createFormStep({
               attributes: {
                 rows: 5,
               },
+              validator: (value: unknown): boolean | string => {
+                if (typeof value !== 'string' || !value.trim()) {
+                  return true;
+                }
+
+                const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
+                return !invalidCharacters.test(value) || 'errors.circumstancesDetailsInvalidCharacters';
+              },
             },
           },
         },
