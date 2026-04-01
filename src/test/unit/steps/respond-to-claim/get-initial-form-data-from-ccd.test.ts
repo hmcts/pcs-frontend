@@ -158,10 +158,11 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     expect(renderData.confirmLandlordLicensed).toBe('imNotSure');
   });
 
-  it('prefills correspondence-address confirmation from validatedCase address', async () => {
+  it('hydrates manual correspondence address fields from CCD without pre-selecting yes', async () => {
     const validatedCase = {
       id: '1771325608502536',
       hasDefendantContactDetailsPartyAddress: true,
+      defendantContactDetailsPartyAddressKnown: 'YES',
       defendantContactDetailsPartyAddress: {
         AddressLine1: '10 Second Avenue',
         PostTown: 'London',
@@ -174,20 +175,18 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     const controller = (correspondenceAddressStep.getController as any)();
     await controller.get(req, res);
 
-    expect(res.render).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        fieldValues: expect.objectContaining({
-          correspondenceAddressConfirm: 'yes',
-        }),
-      })
-    );
+    const renderData = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderData.fieldValues.correspondenceAddressConfirm).toBe('');
+    expect(renderData.correspondenceAddressLine1).toBe('10 Second Avenue');
+    expect(renderData.correspondenceTownOrCity).toBe('London');
+    expect(renderData.correspondencePostcode).toBe('W3 7RX');
   });
 
   it('prefills manually entered correspondence address from CCD instead of session', async () => {
     const validatedCase = {
       id: '1771325608502536',
       hasDefendantContactDetailsPartyAddress: false,
+      defendantContactDetailsPartyAddressKnown: 'NO',
       defendantContactDetailsPartyAddress: {
         AddressLine1: '22 Example Street',
         AddressLine2: 'Flat 3',

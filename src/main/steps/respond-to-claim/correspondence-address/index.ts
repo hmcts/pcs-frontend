@@ -10,9 +10,8 @@ import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import { arrayToString } from '@utils/arrayToString';
 
-// When no existing address is known, the template submits a hidden "no" value,
-// so the radio can be required unconditionally without using session-backed state.
-const correspondenceAddressRequired = (): boolean => true;
+const correspondenceAddressRequired = (_formData: Record<string, unknown>, allData: Record<string, unknown>): boolean =>
+  allData.__isAddressKnown === true;
 
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
@@ -116,18 +115,22 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
 
-    if (validatedCase?.hasDefendantContactDetailsPartyAddress) {
-      return { correspondenceAddressConfirm: 'yes' };
-    }
-
-    return {
-      correspondenceAddressConfirm: 'no',
+    const manualAddressFields = {
       'correspondenceAddressConfirm.addressLine1': existingAddress.AddressLine1 || '',
       'correspondenceAddressConfirm.addressLine2': existingAddress.AddressLine2 || '',
       'correspondenceAddressConfirm.townOrCity': existingAddress.PostTown || '',
       'correspondenceAddressConfirm.county': existingAddress.County || '',
       'correspondenceAddressConfirm.postcode': existingAddress.PostCode || '',
     };
+
+    if (validatedCase?.defendantContactDetailsPartyAddressKnown === 'NO') {
+      return {
+        correspondenceAddressConfirm: 'no',
+        ...manualAddressFields,
+      };
+    }
+
+    return manualAddressFields;
   },
   beforeRedirect: async req => {
     let possessionClaimResponse: PossessionClaimResponse;
