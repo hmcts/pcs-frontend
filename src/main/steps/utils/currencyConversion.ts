@@ -3,6 +3,10 @@
  * Backend stores currency amounts as integers in pence to avoid floating point issues.
  */
 
+import { Logger } from '@modules/logger';
+
+const logger = Logger.getLogger('currencyConversion');
+
 /**
  * Converts pence (backend) to pounds (frontend display)
  * @param pence - Amount in pence as string or number
@@ -20,6 +24,7 @@ export function penceToPounds(pence: string | number | undefined): string | unde
   const penceValue = typeof pence === 'string' ? parseFloat(pence) : pence;
 
   if (Number.isNaN(penceValue)) {
+    logger.warn(`Invalid pence value (NaN): ${pence}`);
     return undefined;
   }
 
@@ -47,6 +52,7 @@ export function poundsToPence(pounds: string | undefined): string | undefined {
   const poundsValue = parseFloat(normalized);
 
   if (Number.isNaN(poundsValue)) {
+    logger.warn(`Invalid pounds value (NaN): ${pounds}`);
     return undefined;
   }
 
