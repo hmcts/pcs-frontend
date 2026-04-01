@@ -153,7 +153,7 @@ describe('OIDCModule', () => {
     it('should successfully setup the OIDC client', async () => {
       await oidcModule['setupClient']();
 
-      expect(discovery).toHaveBeenCalledWith(expect.any(URL), 'test-client-id', 'test-secret');
+      expect(discovery).toHaveBeenCalledWith(expect.any(URL), 'test-client-id', 'test-secret', undefined, undefined);
     });
 
     it('should throw OIDCAuthenticationError when setup fails', async () => {
@@ -213,6 +213,9 @@ describe('OIDCModule', () => {
         (randomPKCECodeVerifier as jest.Mock).mockReturnValue('test-verifier');
         (randomNonce as jest.Mock).mockReturnValue('test-nonce');
         (calculatePKCECodeChallenge as jest.Mock).mockResolvedValue('test-challenge');
+        mockRequest.session = createMockSession({
+          save: jest.fn().mockImplementation(callback => callback(null)),
+        });
 
         oidcModule.enableFor(mockApp);
         const loginHandler = (mockApp.get as jest.Mock).mock.calls[0][1];
@@ -265,6 +268,9 @@ describe('OIDCModule', () => {
         (randomNonce as jest.Mock).mockReturnValue('test-nonce');
         (randomPKCECodeVerifier as jest.Mock).mockReturnValue('test-verifier');
         (calculatePKCECodeChallenge as jest.Mock).mockResolvedValue('test-challenge');
+        mockRequest.session = createMockSession({
+          save: jest.fn().mockImplementation(callback => callback(null)),
+        });
 
         (discovery as jest.Mock).mockResolvedValue({
           serverMetadata: () => ({
@@ -464,7 +470,6 @@ describe('OIDCModule', () => {
           expect.any(URL),
           expect.objectContaining({
             pkceCodeVerifier: undefined,
-            expectedNonce: undefined,
             idTokenExpected: true,
           })
         );

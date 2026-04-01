@@ -146,15 +146,12 @@ export class OIDCModule {
         // Generate a new code verifier and store it in the session
         req.session.codeVerifier = client.randomPKCECodeVerifier();
         const codeChallenge = await client.calculatePKCECodeChallenge(req.session.codeVerifier);
-        const state = client.randomState();
-        (req.session as typeof req.session & { oidcState?: string }).oidcState = state;
 
         const parameters: Record<string, string> = {
           redirect_uri: this.oidcConfig.redirectUri,
           scope: this.oidcConfig.scope,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
-          state,
         };
 
         if (!this.clientConfig.serverMetadata().supportsPKCE()) {
@@ -163,6 +160,7 @@ export class OIDCModule {
         }
 
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
+        // Persist OIDC session values before redirecting to avoid losing them on the callback round-trip.
         req.session.save(saveError => {
           if (saveError) {
             this.logger.error('Failed to persist OIDC session state before redirect:', saveError);
@@ -181,13 +179,11 @@ export class OIDCModule {
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
       try {
         const { codeVerifier, nonce } = req.session;
-        const { oidcState } = req.session as typeof req.session & { oidcState?: string };
 
         const callbackUrl = OIDCModule.getCurrentUrl(req);
 
         const authorizationChecks: Parameters<typeof client.authorizationCodeGrant>[2] = {
           pkceCodeVerifier: codeVerifier,
-          expectedState: oidcState,
           idTokenExpected: true,
         };
 
@@ -219,7 +215,6 @@ export class OIDCModule {
         req.session.save(() => {
           delete req.session.codeVerifier;
           delete req.session.nonce;
-          delete (req.session as typeof req.session & { oidcState?: string }).oidcState;
 
           const returnTo = req.session.returnTo || '/';
           delete req.session.returnTo;
