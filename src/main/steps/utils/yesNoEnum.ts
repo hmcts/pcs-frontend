@@ -23,11 +23,11 @@ export function fromYesNoEnum(value: YesNoValue | string | undefined): 'yes' | '
   if (!value) {
     return undefined;
   }
-  const normalizedValue = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-  if (normalizedValue === 'Yes') {
+  const lowerValue = value.toLowerCase();
+  if (lowerValue === 'yes') {
     return 'yes';
   }
-  if (normalizedValue === 'No') {
+  if (lowerValue === 'no') {
     return 'no';
   }
   return undefined;
@@ -51,11 +51,11 @@ export function fromVerticalYesNoEnum(value: VerticalYesNoValue | string | undef
   if (!value) {
     return undefined;
   }
-  const upperValue = value.toUpperCase();
-  if (upperValue === 'YES') {
+  const lowerValue = value.toLowerCase();
+  if (lowerValue === 'yes') {
     return 'yes';
   }
-  if (upperValue === 'NO') {
+  if (lowerValue === 'no') {
     return 'no';
   }
   return undefined;
