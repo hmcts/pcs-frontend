@@ -1,7 +1,6 @@
 import type { Request } from 'express';
 import { DateTime } from 'luxon';
 
-
 import type { CaseData, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
