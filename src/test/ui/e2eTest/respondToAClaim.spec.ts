@@ -21,7 +21,6 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
-  situationInterstitialScreen,
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
@@ -244,7 +243,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
+    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyOtherDependants.mainHeader);
+    await performAction('clickButton', doYouHaveAnyOtherDependants.continueButton);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
@@ -369,7 +381,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
+    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyOtherDependants.mainHeader);
+    await performAction('clickButton', doYouHaveAnyOtherDependants.continueButton);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -407,6 +432,32 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterTenancyStartDetailsUnKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
     await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.mainHeader,
+      repaymentOption: repaymentsMade.yesRadioOption,
+      repaymentInfo: repaymentsMade.detailsTextInput,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
+    });
+    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyOtherDependants.mainHeader);
+    await performAction('clickButton', doYouHaveAnyOtherDependants.continueButton);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -526,7 +577,18 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyOtherDependants.mainHeader);
+    await performAction('clickButton', doYouHaveAnyOtherDependants.continueButton);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
@@ -561,8 +623,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
-    console.log('SPEC - Notice date provided', process.env.NOTICE_DATE_PROVIDED);
-    console.log('SPEC- Notice details page has no or im not sure selection', process.env.NOTICE_DETAILS_NO_NOTSURE);
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.noRadioOption,
     });
