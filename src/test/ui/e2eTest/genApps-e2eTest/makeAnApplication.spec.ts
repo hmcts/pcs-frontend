@@ -32,9 +32,9 @@ test.afterEach(async () => {
 test.describe('Make an Application - e2e Journey @nightly', async () => {
   test('Select an Application - Ask to Adjourn journey', async () => {
     await performAction('chooseAnApplication', {
-        question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-        option: chooseAnApplication.delayRadioOption
-      });
+      question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
+      option: chooseAnApplication.delayRadioOption,
+    });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);
     await performValidation('mainHeader', dashboard.mainHeader);

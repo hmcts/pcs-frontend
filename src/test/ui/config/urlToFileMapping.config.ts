@@ -25,5 +25,5 @@ export default {
   'written-terms': 'writtenTerms',
   'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
   'choose-an-application': 'chooseAnApplication',
-  'check-your-answers': 'checkYourAnswers'
+  'check-your-answers': 'checkYourAnswers',
 };
