@@ -5,7 +5,7 @@ export const nonRentArrearsDispute = {
   partOfClaimParagraph: `You should`,
   toSeeIfParagraph: `to see if there’s any other parts of the claim that are incorrect or you disagree with.`,
   viewTheClaimLink: `view the claim (opens in new tab)`,
-  mainHeaderGovServiceHiddenNewTab: `GOV.UK - The best place to find government services and information`,
+  titleGovServiceHiddenNewTab: `GOV.UK - The best place to find government services and information`,
   thisIncludesParagraph: `This includes:`,
   groundsForPossessionList: `${process.env.CLAIMANT_NAME}’s grounds for possession (their reasons for making the claim)`,
   anyDocumentsList: `any documents they’ve uploaded to support their claim`,
