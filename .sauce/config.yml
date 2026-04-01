@@ -5,7 +5,7 @@ sauce:
   region: eu-central-1
   concurrency: 5
   tunnel:
-  name: $SAUCE_TUNNEL_NAME
+    name: $SAUCE_TUNNEL_NAME
   metadata:
     tags:
       - pcs-frontend
