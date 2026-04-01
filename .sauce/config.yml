@@ -28,6 +28,8 @@ npm:
 
 # Substituted from the host when running saucectl (export in shell / Jenkins vault).
 env:
+  # End-of-test screenshots in Playwright report / Sauce (chrome project only).
+  PLAYWRIGHT_SCREENSHOT_ON: 'true'
   PLAYWRIGHT_SKIP_ALLURE: 'true'
   CI: 'true'
   NODE_CONFIG_ENV: test
