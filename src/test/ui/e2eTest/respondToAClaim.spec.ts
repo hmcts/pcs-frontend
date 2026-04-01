@@ -35,6 +35,14 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else {
     process.env.NOTICE_SERVED = 'YES';
   }
+
+  // Notice date provided
+  if (testInfo.title.includes('NoticeDateProvided - No')) {
+    process.env.NOTICE_DATE_PROVIDED = 'NO';
+  } else if (testInfo.title.includes('NoticeDateProvided - Yes')) {
+    process.env.NOTICE_DATE_PROVIDED = 'YES';
+  }
+
   // Assign the tenancy type & grounds in the payload
   const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
     testInfo.title.includes(type)
@@ -64,6 +72,19 @@ test.beforeEach(async ({ page }, testInfo) => {
       break;
   }
 
+  //Check if No or Im not sure is selected on NoticeDetails page - for back link navigation
+  if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
+    process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
+  }
+
+  // Tenancy start date logic for noDefendantTest and rentNonRent test
+  if (testInfo.title.includes('NoticeServed - No') && !testInfo.title.includes('@rentNonRent')) {
+    process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
+    process.env.RENT_NON_RENT = 'NO';
+  } else {
+    process.env.RENT_NON_RENT = 'YES';
+  }
+
   // Check notice date provided for back link navigation
   if (testInfo.title.includes('NoticeDateProvided - No')) {
     process.env.NOTICE_DATE_PROVIDED = 'NO';
@@ -84,6 +105,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   if (testInfo.title.includes('@noDefendants')) {
+    process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
@@ -170,8 +192,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknown');
     //This is a placeholder page
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
@@ -225,8 +248,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -281,8 +305,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -333,8 +358,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.imNotSureRadioOption,
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.yesRadioOption,
+      disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -384,8 +411,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('enterTenancyStartDetailsUnKnown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -529,8 +557,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
-    console.log('SPEC - Notice date provided', process.env.NOTICE_DATE_PROVIDED);
-    console.log('SPEC- Notice details page has no or im not sure selection', process.env.NOTICE_DETAILS_NO_NOTSURE);
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.noRadioOption,
     });
@@ -589,8 +615,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('rentArrears', {
       option: rentArrears.yesRadioOption,
     });
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
