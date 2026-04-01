@@ -19,7 +19,7 @@ export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
  * Case-insensitive for backward compatibility.
  * @example fromYesNoEnum('Yes') // returns 'yes'
  */
-export function fromYesNoEnum(value: YesNoValue | string | undefined): 'yes' | 'no' | undefined {
+export function fromYesNoEnum(value: YesNoValue | string | null | undefined): 'yes' | 'no' | undefined {
   if (!value) {
     return undefined;
   }
@@ -47,7 +47,7 @@ export function toVerticalYesNoEnum(value: 'yes' | 'no'): VerticalYesNoValue {
  * Case-insensitive for backward compatibility.
  * @example fromVerticalYesNoEnum('YES') // returns 'yes'
  */
-export function fromVerticalYesNoEnum(value: VerticalYesNoValue | string | undefined): 'yes' | 'no' | undefined {
+export function fromVerticalYesNoEnum(value: VerticalYesNoValue | string | null | undefined): 'yes' | 'no' | undefined {
   if (!value) {
     return undefined;
   }
