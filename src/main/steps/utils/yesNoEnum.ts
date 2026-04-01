@@ -27,9 +27,7 @@ export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
  * fromYesNoEnum('No')  // returns 'no'
  * fromYesNoEnum(null)  // returns undefined
  */
-export function fromYesNoEnum(
-  value: YesNoValue | 'YES' | 'NO' | string | undefined | null
-): 'yes' | 'no' | undefined {
+export function fromYesNoEnum(value: YesNoValue | 'YES' | 'NO' | string | undefined | null): 'yes' | 'no' | undefined {
   if (value === 'Yes' || value === 'YES') {
     return 'yes';
   }
