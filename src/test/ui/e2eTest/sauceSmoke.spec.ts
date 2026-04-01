@@ -15,7 +15,7 @@ async function attachFullPagePng(testInfo: TestInfo, page: Page, filename: strin
 }
 
 test.describe('Sauce smoke', () => {
-  test('Manage case exui test @pcssaucelab', async ({ page }, testInfo) => {
+  test('Manage case exui test', async ({ page }, testInfo) => {
     const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-solicitor-automation@test.com';
     const password = resolveIdamPassword();
     test.skip(!password);
@@ -68,7 +68,7 @@ test.describe('Sauce smoke', () => {
     await attachFullPagePng(testInfo, page, 'pcs-ui-03-after-login.png');
   });
 
-  test('Service Token s2s - 200 @pcssaucelab', async ({ request }) => {
+  test('Service Token s2s - 200', async ({ request }) => {
     const res = await request.post(
       'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease',
       { headers: { 'Content-Type': 'application/json' }, data: { microservice: 'pcs_api' } }
