@@ -1,7 +1,6 @@
 import assert from 'node:assert';
 
 import { type Page, type TestInfo, expect, test } from '@playwright/test';
-import config from 'config';
 
 import { getAccessToken, getS2SToken } from '../config/global-setup.config';
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
@@ -22,7 +21,13 @@ import { resolveIdamPassword } from '../utils/idamPassword';
 
 const PCS_AAT_URL = 'https://pcs.aat.platform.hmcts.net/';
 const MANAGE_CASE_URL = 'https://manage-case.aat.platform.hmcts.net';
-const homeUrl = config.get('e2e.testUrl') as string;
+
+/** Same as `config` e2e.testUrl — env-only so Sauce runner (no `config` package) can load this file. */
+function resolveE2eBaseUrl(): string {
+  const trimmed = process.env.TEST_URL?.trim();
+  const raw = trimmed && trimmed.length > 0 ? trimmed : PCS_AAT_URL.replace(/\/$/, '');
+  return raw.endsWith('/') ? raw : `${raw}/`;
+}
 
 async function attachFullPagePng(testInfo: TestInfo, page: Page, filename: string) {
   await testInfo.attach(filename, {
@@ -94,7 +99,7 @@ test.describe('Sauce smoke', () => {
     await getS2SToken();
     await getAccessToken();
 
-    const baseUrl = homeUrl.endsWith('/') ? homeUrl : `${homeUrl}/`;
+    const baseUrl = resolveE2eBaseUrl();
 
     initializeExecutor(page);
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayload.claimantName;
