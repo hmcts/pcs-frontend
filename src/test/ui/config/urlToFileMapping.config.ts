@@ -11,6 +11,7 @@ export default {
   'date-of-birth': 'dateOfBirth',
   'confirmation-of-notice-date-when-not-provided': 'noticeDateWhenNotProvided',
   'confirmation-of-notice-given': 'confirmationOfNoticeGiven',
+  'non-rent-arrears-dispute': 'nonRentArrearsDispute',
   'confirmation-of-notice-date-when-provided': 'noticeDateWhenProvided',
   'rent-arrears-dispute': 'rentArrears',
   'payment-interstitial': 'paymentInterstitial',

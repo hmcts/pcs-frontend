@@ -64,6 +64,8 @@ export interface PossessionClaimResponse {
     landlordRegistered?: YesNoNotSureValue;
     landlordLicensed?: YesNoNotSureValue;
     writtenTerms?: YesNoNotSureValue;
+    disputeClaim?: YesNoValue;
+    disputeClaimDetails?: string;
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;

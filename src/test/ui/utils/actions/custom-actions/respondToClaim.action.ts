@@ -15,6 +15,7 @@ import {
   freeLegalAdvice,
   landlordLicensed,
   landlordRegistered,
+  nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   paymentInterstitial,
@@ -55,6 +56,7 @@ export class RespondToClaimAction implements IAction {
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
+      ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
@@ -341,6 +343,20 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  private async disputingOtherPartsOfTheClaim(doYouWantToDisputeOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
+      option: doYouWantToDisputeOption.disputeOption,
+    });
+
+    if (doYouWantToDisputeOption.disputeOption === 'Yes') {
+      await performAction(
+        'inputText',
+        nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
+        doYouWantToDisputeOption.disputeInfo
+      );
+    }
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
   }
 
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
