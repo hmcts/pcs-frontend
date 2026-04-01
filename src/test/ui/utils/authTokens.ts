@@ -23,7 +23,7 @@ export async function getAccessToken(): Promise<void> {
   });
 }
 
-/** S2S + Idam tokens (same as former globalSetup). */
+/** S2S + Idam tokens — invoked from `authTest` `beforeEach` (not globalSetup). */
 export async function ensureAuthTokens(): Promise<void> {
   await getS2SToken();
   await getAccessToken();
