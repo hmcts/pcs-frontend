@@ -1,6 +1,3 @@
-import { test } from '@playwright/test';
-import config from 'config';
-
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   correspondenceAddress,
@@ -10,9 +7,10 @@ import {
   freeLegalAdvice,
   startNow,
 } from '../data/page-data';
+import { test } from '../fixtures/authTest';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = `${(process.env.TEST_URL?.trim() || 'http://localhost:3209').replace(/\/$/, '')}/`;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);

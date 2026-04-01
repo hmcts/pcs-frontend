@@ -1,0 +1,30 @@
+import { IdamUtils, ServiceAuthUtils } from '@hmcts/playwright-common';
+
+import { accessTokenApiData, s2STokenApiData } from '../data/api-data';
+import { user } from '../data/user-data';
+
+export async function getS2SToken(): Promise<void> {
+  process.env.S2S_URL = s2STokenApiData.s2sUrl;
+  process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
+    microservice: s2STokenApiData.microservice,
+  });
+}
+
+export async function getAccessToken(): Promise<void> {
+  process.env.IDAM_WEB_URL = accessTokenApiData.idamUrl;
+  process.env.IDAM_TESTING_SUPPORT_URL = accessTokenApiData.idamTestingSupportUrl;
+  process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
+    username: user.claimantSolicitor.email,
+    password: user.claimantSolicitor.password,
+    grantType: 'password',
+    clientId: 'pcs-frontend',
+    clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,
+    scope: 'profile openid roles',
+  });
+}
+
+/** S2S + Idam tokens (same as former globalSetup). */
+export async function ensureAuthTokens(): Promise<void> {
+  await getS2SToken();
+  await getAccessToken();
+}
