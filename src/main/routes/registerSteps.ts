@@ -1,13 +1,13 @@
 import { Application, IRouter, Router } from 'express';
 import type { RequestHandler } from 'express';
 
-import type { JourneyFlowConfig } from '../interfaces/stepFlow.interface';
-import type { StepDefinition } from '../interfaces/stepFormData.interface';
 import { caseReferenceParamMiddleware, oidcMiddleware } from '../middleware';
-import { getValidatedLanguage, stepDependencyCheckMiddleware } from '../modules/steps';
-import { getStepsForJourney, journeyRegistry } from '../steps';
 
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { Logger } from '@modules/logger';
+import { getValidatedLanguage, stepDependencyCheckMiddleware } from '@modules/steps';
+import { getStepsForJourney, journeyRegistry } from '@steps';
 
 const logger = Logger.getLogger('registerSteps');
 

@@ -1,10 +1,11 @@
 import type { Request, Response } from 'express';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDashboardUrl } from '../../../routes/dashboard';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '@modules/steps';
+import { getDashboardUrl } from '@routes/dashboard';
 
 const stepName = 'dispute-claim-interstitial';
 const stepNavigation = createStepNavigation(flowConfig);
@@ -26,14 +27,12 @@ export const step: StepDefinition = {
           throw new Error('Translation function not available');
         }
 
-        // Get claimant name from CCD callback data (res.locals.validatedCase)
-        // Use only data from CCD - no hardcoded fallbacks
-        const claimantName = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
-          ?.value as string | undefined;
+        const claimantName = getClaimantName(req);
+        const { id: caseId } = req.res?.locals?.validatedCase ?? { id: '' };
 
         return {
           backUrl: await stepNavigation.getBackUrl(req, stepName),
-          dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+          dashboardUrl: getDashboardUrl(caseId),
           // these keys override the translations from the step namespace but interpolate the claimantName
           cancel: t('buttons.cancel', { ns: 'common' }),
           heading: t('heading', { claimantName }),
@@ -46,7 +45,7 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       // Get next step URL and redirect
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
 
       if (!redirectPath) {
         // No next step defined - show not found page

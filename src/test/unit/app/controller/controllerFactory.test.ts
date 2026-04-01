@@ -6,15 +6,14 @@ import {
   createGetController,
   createPostController,
   createPostRedirectController,
-} from '../../../../main/modules/steps/controller';
-
+} from '@modules/steps/controller';
 import { StepNavigation } from '@modules/steps/flow';
 
 const mockGetFormData = jest.fn();
 const mockSetFormData = jest.fn();
 const mockValidateForm = jest.fn();
 
-jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
+jest.mock('@modules/steps/formBuilder/helpers', () => ({
   getFormData: (...args: unknown[]) => mockGetFormData(...args),
   setFormData: (...args: unknown[]) => mockSetFormData(...args),
   validateForm: (...args: unknown[]) => mockValidateForm(...args),
@@ -23,7 +22,7 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => ({
 const mockGetRequestLanguage = jest.fn();
 const mockGetTranslationFunction = jest.fn();
 
-jest.mock('../../../../main/modules/steps/i18n', () => ({
+jest.mock('@modules/steps/i18n', () => ({
   getValidatedLanguage: jest.fn(() => 'en'),
   getRequestLanguage: (...args: unknown[]) => mockGetRequestLanguage(...args),
   getTranslationFunction: (...args: unknown[]) => mockGetTranslationFunction(...args),
@@ -37,7 +36,6 @@ const stepNavigation: StepNavigation = {
   getNextStepUrl: jest.fn(() => Promise.resolve('/next-step')),
   getStepUrl: jest.fn(() => '/step-url'),
 };
-
 describe('createGetController', () => {
   const mockContent = {
     serviceName: 'Test Service',
@@ -332,7 +330,7 @@ describe('createPostController', () => {
     await controller.post(req, res, next);
 
     expect(mockSetFormData).toHaveBeenCalledWith(req, stepName, { field1: 'value1' });
-    expect(stepNavigation.getNextStepUrl).toHaveBeenCalledWith(req, stepName, { field1: 'value1' });
+    expect(stepNavigation.getNextStepUrl).toHaveBeenCalledWith(req, stepName);
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 
