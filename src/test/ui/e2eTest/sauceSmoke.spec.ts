@@ -1,14 +1,39 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Sauce smoke @pcssaucelab', () => {
-  test('Manage case exui test', async ({ page }) => {
-    const password = process.env.IDAM_PCS_USER_PASSWORD || '';
-    await page.goto('https://manage-case.aat.platform.hmcts.net');
+test.describe('Sauce smoke', () => {
+  test('Manage case exui test @pcssaucelab', async ({ page }, testInfo) => {
+    const email =
+      process.env.IDAM_PCS_USER_EMAIL?.trim() ||
+      'pcs-solicitor-automation@test.com';
+    const password = (process.env.IDAM_PCS_USER_PASSWORD ?? '').trim();
+    test.skip(!password, 'IDAM_PCS_USER_PASSWORD is missing or empty.');
+    await testInfo.attach(
+      'sauce-env-diagnostics.json',
+      {
+        body: Buffer.from(
+          JSON.stringify({
+            passwordLength: password.length,
+            emailLength: email.length,
+            idamPasswordEnvPresent: process.env.IDAM_PCS_USER_PASSWORD != null,
+          }),
+          'utf-8',
+        ),
+        contentType: 'application/json',
+      },
+    );
+
+    await page.goto('https://manage-case.aat.platform.hmcts.net', {
+      waitUntil: 'domcontentloaded',
+    });
     await page.getByRole('textbox', { name: 'Email address' }).click();
-    await page.getByRole('textbox', { name: 'Email address' }).fill('pcs-solicitor-automation@test.com');
+    await page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await page.getByRole('textbox', { name: 'Email address' }).press('Tab');
-    await page.getByRole('textbox', { name: 'Password' }).fill(password);
+    const passwordField = page.getByRole('textbox', { name: 'Password' });
+    await passwordField.fill(password);
     await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page.getByRole('link', { name: 'Create case' })).toBeVisible({
+      timeout: 90_000,
+    });
     await page.getByRole('link', { name: 'Create case' }).click();
     await page.getByLabel('Case type').selectOption('PCS');
     await page.getByRole('button', { name: 'Start' }).click();
