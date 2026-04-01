@@ -59,7 +59,7 @@ export const step: StepDefinition = createFormStep({
 
     const result: Record<string, unknown> = { confirmAlternativeAccommodation: formValue };
 
-    if (formValue === 'yes' && existingDate) {
+    if (existingDate) {
       result.alternativeAccommodationDate = parseISOToDateParts(existingDate);
     }
 
