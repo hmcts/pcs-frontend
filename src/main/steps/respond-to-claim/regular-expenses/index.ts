@@ -151,9 +151,7 @@ export const step: StepDefinition = createFormStep({
     if (fromYesNoEnum(hc.fuelParkingTransport) === 'yes') {
       selected.push('fuelParkingTransport');
       if (hc.fuelParkingTransportAmount) {
-        formData['regularExpenses.fuelParkingTransportAmount'] = penceToPounds(
-          hc.fuelParkingTransportAmount as string
-        );
+        formData['regularExpenses.fuelParkingTransportAmount'] = penceToPounds(hc.fuelParkingTransportAmount as string);
       }
       if (hc.fuelParkingTransportFrequency) {
         formData['regularExpenses.fuelParkingTransportFrequency'] = hc.fuelParkingTransportFrequency;
