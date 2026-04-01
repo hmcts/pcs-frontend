@@ -214,7 +214,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
-    await performValidation('readYourHouseHoldAndCircumstances');
+    await performAction('readYourHouseHoldAndCircumstances');
     await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
@@ -272,7 +272,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('readYourHouseHoldAndCircumstances');
+    await performAction('readYourHouseHoldAndCircumstances');
     await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
@@ -335,7 +335,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
-    await performValidation('readYourHouseHoldAndCircumstances');
+    await performAction('readYourHouseHoldAndCircumstances');
     await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
@@ -392,7 +392,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('readYourHouseHoldAndCircumstances');
+    await performAction('readYourHouseHoldAndCircumstances');
     await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
