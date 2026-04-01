@@ -16,6 +16,7 @@ import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
 import { step as doYouHaveAnyDependantChildren } from './dependant-children';
 import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
+import { step as endNow } from './end-now';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenses } from './income-and-expenditure';
@@ -52,6 +53,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'contact-preferences-telephone': contactPreferencesTelephone,
   'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
+  'end-now': endNow,
   'landlord-registered': landlordRegistered,
   'landlord-licensed': landlordLicensed,
   'written-terms': writtenTerms,
@@ -77,7 +79,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'your-circumstances': yourCircumstances,
   'exceptional-hardship': exceptionalHardship,
   'income-and-expenses': incomeAndExpenses,
-  'what-regular-income-do-you-receive': whatRegularIncomeDoYouReceive,
+  'regular-income': whatRegularIncomeDoYouReceive,
   'have-you-applied-for-universal-credit': haveYouAppliedForUniversalCredit,
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,
