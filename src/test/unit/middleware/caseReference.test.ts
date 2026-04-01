@@ -27,6 +27,7 @@ jest.mock('../../../main/services/ccdCaseService', () => ({
   },
 }));
 
+import { HTTPError } from '../../../main/HttpError';
 import { caseReferenceParamMiddleware } from '../../../main/middleware/caseReference';
 
 interface MockSession {
@@ -88,23 +89,23 @@ describe('caseReferenceParamMiddleware', () => {
       expect(mockRes.status).not.toHaveBeenCalled();
     });
 
-    it('should return 404 when user has no access token', async () => {
+    it('should call next with 401 HTTPError when user has no access token', async () => {
       const validCaseRef = '1234567890123456';
       mockReq.session = {} as MockSession as Request['session'];
 
       await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.render).toHaveBeenCalledWith('error', {
-        error: 'Case not found or access denied',
-      });
-      expect(next).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(401);
+      expect(error.message).toBe('Authentication required');
+      expect(mockRes.status).not.toHaveBeenCalled();
       expect(mockLogger.error).toHaveBeenCalledWith('User not authenticated - no access token', {
         caseReference: validCaseRef,
       });
     });
 
-    it('should return 404 when case is not found', async () => {
+    it('should call next with HTTPError when case is not found', async () => {
       const validCaseRef = '1234567890123456';
       const mockAccessToken = 'mock-access-token';
 
@@ -113,11 +114,10 @@ describe('caseReferenceParamMiddleware', () => {
 
       await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.render).toHaveBeenCalledWith('error', {
-        error: 'Case not found or access denied',
-      });
-      expect(next).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(500);
+      expect(mockRes.status).not.toHaveBeenCalled();
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Case access validation failed',
         expect.objectContaining({
@@ -129,79 +129,79 @@ describe('caseReferenceParamMiddleware', () => {
   });
 
   describe('invalid case reference', () => {
-    it('should return 404 error for case reference that is too short', () => {
+    it('should call next with 404 HTTPError for case reference that is too short', () => {
       const shortCaseRef = '12345';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, shortCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.render).toHaveBeenCalledWith('error', {
-        error: 'Invalid case reference format',
-      });
-      expect(next).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(404);
+      expect(error.message).toBe('Invalid case reference format');
+      expect(mockRes.status).not.toHaveBeenCalled();
       expect(mockLogger.error).toHaveBeenCalledWith('Invalid case reference format', {
         caseReference: shortCaseRef,
       });
     });
 
-    it('should return 404 error for case reference that is too long', () => {
+    it('should call next with 404 HTTPError for case reference that is too long', () => {
       const longCaseRef = '12345678901234567';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, longCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.render).toHaveBeenCalledWith('error', {
-        error: 'Invalid case reference format',
-      });
-      expect(next).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(404);
+      expect(error.message).toBe('Invalid case reference format');
+      expect(mockRes.status).not.toHaveBeenCalled();
     });
 
-    it('should return 404 error for case reference with non-numeric characters', () => {
+    it('should call next with 404 HTTPError for case reference with non-numeric characters', () => {
       const invalidCaseRef = '123456789012345a';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, invalidCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.render).toHaveBeenCalledWith('error', {
-        error: 'Invalid case reference format',
-      });
-      expect(next).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(404);
+      expect(error.message).toBe('Invalid case reference format');
+      expect(mockRes.status).not.toHaveBeenCalled();
     });
 
-    it('should return 404 error for empty case reference', () => {
+    it('should call next with 404 HTTPError for empty case reference', () => {
       const emptyCaseRef = '';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, emptyCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.render).toHaveBeenCalledWith('error', {
-        error: 'Invalid case reference format',
-      });
-      expect(next).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(404);
+      expect(error.message).toBe('Invalid case reference format');
+      expect(mockRes.status).not.toHaveBeenCalled();
     });
 
-    it('should return 404 error for case reference with special characters', () => {
+    it('should call next with 404 HTTPError for case reference with special characters', () => {
       const specialCharCaseRef = '1234-5678-9012-34';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, specialCharCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.render).toHaveBeenCalledWith('error', {
-        error: 'Invalid case reference format',
-      });
-      expect(next).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(404);
+      expect(error.message).toBe('Invalid case reference format');
+      expect(mockRes.status).not.toHaveBeenCalled();
     });
 
-    it('should return 404 error for case reference with spaces', () => {
+    it('should call next with 404 HTTPError for case reference with spaces', () => {
       const spacedCaseRef = '1234 5678 9012 3456';
 
       caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, spacedCaseRef);
 
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.render).toHaveBeenCalledWith('error', {
-        error: 'Invalid case reference format',
-      });
-      expect(next).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(404);
+      expect(error.message).toBe('Invalid case reference format');
+      expect(mockRes.status).not.toHaveBeenCalled();
     });
   });
 

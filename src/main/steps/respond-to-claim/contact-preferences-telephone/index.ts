@@ -37,6 +37,7 @@ export const step: StepDefinition = createFormStep({
               name: 'phoneNumber',
               type: 'text',
               required: true,
+              errorMessage: 'errors.contactByTelephone.phoneNumber',
               labelClasses: 'govuk-!-font-weight-bold',
               translationKey: {
                 label: 'labels.phoneNumberLabel',
