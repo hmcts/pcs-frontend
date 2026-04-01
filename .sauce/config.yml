@@ -26,13 +26,14 @@ npm:
 
 env:
   PLAYWRIGHT_SKIP_ALLURE: 'true'
+  IDAM_PCS_USER_PASSWORD: $IDAM_PCS_USER_PASSWORD
 
 suites:
   - name: 'pcssaucelab @pcssaucelab (Chrome)'
     platformName: Windows 11
     screenResolution: 1920x1080
     testMatch:
-      - '**/*.spec.ts'
+      - '.*sauceSmoke\.spec\.ts$'
     params:
       browserName: chrome
       project: chrome
