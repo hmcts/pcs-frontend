@@ -39,6 +39,10 @@ import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 import { step as writtenTerms } from './written-terms';
+import {step as equalityAndDiversityStart} from './equality-and-diversity-start';
+import {step as equalityAndDiversityEnd} from './equality-and-diversity-end';
+import { step as languageUsed } from './language-used';
+import { step as checkYourAnswers } from './check-your-answers';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -81,4 +85,8 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,
   'what-other-regular-expenses-do-you-have': whatOtherRegularExpensesDoYouHave,
+  'equality-and-diversity-start': equalityAndDiversityStart,
+  'equality-and-diversity-end': equalityAndDiversityEnd,
+  'language-used': languageUsed,
+  'check-your-answers': checkYourAnswers,
 };

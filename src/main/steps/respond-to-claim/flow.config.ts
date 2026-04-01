@@ -27,6 +27,7 @@ export const flowConfig: JourneyFlowConfig = {
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
+    'installment-payments',
     'correspondence-address',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
@@ -56,8 +57,12 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
+    'equality-and-diversity-start',
+    'equality-and-diversity-end',
+    'language-used',
+    'check-your-answers',
     'end-now',
-    'installment-payments',
+
   ],
   steps: {
     'start-now': {
@@ -360,6 +365,10 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'repayments-made',
       defaultNext: 'your-household-and-circumstances',
     },
+    'installment-payments': {
+      previousStep: 'repayments-agreed',
+      defaultNext: 'your-household-and-circumstances',
+    },
     'your-household-and-circumstances': {
       previousStep: 'repayments-agreed',
       defaultNext: 'do-you-have-any-dependant-children',
@@ -410,11 +419,23 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
-      defaultNext: 'end-now',
+      defaultNext: 'equality-and-diversity-start',
     },
-    'installment-payments': {
-      previousStep: 'repayments-agreed',
-      defaultNext: 'your-household-and-circumstances',
+    'equality-and-diversity-start': {
+      previousStep: 'what-other-regular-expenses-do-you-have',
+      defaultNext: 'equality-and-diversity-end',
+    },
+    'equality-and-diversity-end': {
+      previousStep: 'equality-and-diversity-start',
+      defaultNext: 'language-used',
+    },
+    'language-used': {
+      previousStep: 'equality-and-diversity-end',
+      defaultNext: 'check-your-answers',
+    },
+    'check-your-answers': {
+      previousStep: 'language-used',
+      defaultNext: 'end-now',
     },
   },
 };
