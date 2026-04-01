@@ -4,7 +4,6 @@ import * as path from 'path';
 const testCasesPath = path.join(__dirname, '../../../../allure-report/data/test-cases');
 
 const files = fs.readdirSync(testCasesPath).filter(f => f.endsWith('.json'));
-let _removedCount = 0;
 
 for (const file of files) {
   const filePath = path.join(testCasesPath, file);
@@ -26,9 +25,6 @@ for (const file of files) {
         const before = cleaned.attachments.length;
         cleaned.attachments = cleaned.attachments.filter((a: any) => {
           const isSmallVideo = a.type === 'video/webm' && a.size < 50000;
-          if (isSmallVideo) {
-            _removedCount++;
-          }
           return !isSmallVideo;
         });
         if (cleaned.attachments.length !== before) {
