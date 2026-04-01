@@ -1,5 +1,3 @@
-import { PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
-import { buildCcdCaseForPossessionClaimResponse } from 'steps/utils/populateResponseToClaimPayloadmap';
 import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 import { flowConfig } from '../respond-to-claim/flow.config';
 import { createFormStep } from '@modules/steps';
@@ -39,30 +37,7 @@ export const createFreeLegalAdviceBase = (overrides: Partial<FormBuilderConfig>)
     flowConfig,
     journeyFolder: 'respondToClaim',
     customTemplate: `${__dirname}/freeLegalAdvice.njk`,
-    beforeRedirect: async req => {
-      const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
-      if (!hadLegalAdvice) return;
 
-      const ccdValue = mapToCcdEnum(hadLegalAdvice);
-      if (!ccdValue) return;
-
-      const payload: PossessionClaimResponse = {
-        defendantResponses: {
-          freeLegalAdvice: ccdValue,
-        },
-      };
-
-      await buildCcdCaseForPossessionClaimResponse(req, payload);
-    },
-    getInitialFormData: req => {
-      const caseData = req.res?.locals?.validatedCase?.data;
-
-      const existing = caseData?.possessionClaimResponse?.defendantResponses?.freeLegalAdvice;
-
-      const formValue = mapFromCcdEnum(existing);
-
-      return formValue ? { hadLegalAdvice: formValue } : {};
-    },
     translationKeys: {
       pageTitle: 'pageTitle',
       heading: 'heading',
