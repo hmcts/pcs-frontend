@@ -16,4 +16,9 @@ export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home`,
+  dayMissingErrorMessage: `The date you’d be able to move in must include a day`,
+  monthMissingErrorMessage: `The date you’d be able to move in must include a month`,
+  yearMissingErrorMessage: `The date you’d be able to move in must include a year`,
+  realDateErrorMessage: `The date you’d be able to move in must be a real date`,
+  futureDateErrorMessage: `The date you’d be able to move in must be in the future`,
 };
