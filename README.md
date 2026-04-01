@@ -1,4 +1,4 @@
-# pcs-frontend - PR TRIGGER
+# pcs-frontend
 
 ## Getting Started
 
