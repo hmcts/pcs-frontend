@@ -10,7 +10,7 @@ sauce:
     tags:
       - pcs-frontend
       - playwright
-      - saucelab
+      - nightly
 
 defaults:
   timeout: 30m
@@ -49,7 +49,7 @@ env:
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
 suites:
-  - name: 'PCS @saucelab (Chrome)'
+  - name: 'PCS @nightly (Chrome)'
     platformName: Windows 11
     screenResolution: 1920x1080
     # Required by saucectl. Prefer paths with / (often normalized on Sauce); second line matches Windows \\.
@@ -60,7 +60,7 @@ suites:
       browserName: chrome
       project: chrome
       headless: true
-      grep: '@saucelab'
+      grep: '@nightly'
 
 reporters:
   spotlight:
