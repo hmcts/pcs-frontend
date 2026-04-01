@@ -64,7 +64,8 @@ export class OIDCModule {
       return false;
     }
 
-    return ['localhost', '127.0.0.1'].includes(issuer.hostname);
+    // Allow local development; tolerate non https for localhost only.
+    return ['localhost'].includes(issuer.hostname);
   }
 
   private async ensureClientConfig(): Promise<Configuration> {
