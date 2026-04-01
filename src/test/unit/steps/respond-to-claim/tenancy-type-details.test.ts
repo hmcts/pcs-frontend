@@ -2,6 +2,12 @@ jest.mock('../../../../main/modules/steps', () => ({
   createFormStep: jest.fn(config => config),
   getTranslationFunction: jest.fn(() =>
     jest.fn((key: string, options?: Record<string, unknown>) => {
+      if (key === 'tenancyTypeWalesStandard') {
+        return 'The property is let under a standard occupation contract';
+      }
+      if (key === 'tenancyTypeWalesSecure') {
+        return 'The property is let under a secure occupation contract';
+      }
       if (key === 'tenancyTypeWales') {
         return `The property is let under ${options?.welshTenancyTypeAgreementType} occupation contract`;
       }
@@ -430,9 +436,9 @@ describe('respond-to-claim tenancy-type-details step', () => {
       });
 
       it.each([
-        ['STANDARD_CONTRACT', 'a standard', 'The property is let under a standard occupation contract'],
-        ['SECURE_CONTRACT', 'a secure', 'The property is let under a secure occupation contract'],
-      ])('sets tenancyType via tenancyTypeWales interpolation for %s', async (licenceType, _fragment, expectedText) => {
+        ['STANDARD_CONTRACT', 'The property is let under a standard occupation contract'],
+        ['SECURE_CONTRACT', 'The property is let under a secure occupation contract'],
+      ])('sets tenancyType using dedicated Welsh key for %s', async (licenceType, expectedText) => {
         const content = await testedStep.extendGetContent(
           {
             body: {},
