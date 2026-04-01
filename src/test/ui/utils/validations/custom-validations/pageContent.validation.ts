@@ -3,7 +3,9 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
+import { contactUs } from '../../../data/section-data/contactUs.section.data';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
+import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
 const ELEMENT_TYPES = [
@@ -165,11 +167,32 @@ export class PageContentValidation implements IValidation {
   }
 
   private async getPageData(pageName: string): Promise<object | null> {
-    return this.loadPageDataFile(pageName);
+    const pageData = this.loadPageDataFile(pageName);
+    const contactUsData = this.loadSectionDataFile('contactUs');
+    if (contactUsData) {
+      await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
+      return { ...pageData, ...contactUsData };
+    }
+
+    return pageData;
   }
 
   private loadPageDataFile(fileName: string): object | null {
     const filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
+    if (!fs.existsSync(filePath)) {
+      return null;
+    }
+    try {
+      delete require.cache[require.resolve(filePath)];
+      const module = require(filePath);
+      return module.default || module[fileName] || module[Object.keys(module)[0]];
+    } catch {
+      return null;
+    }
+  }
+
+  private loadSectionDataFile(fileName: string): object | null {
+    const filePath = path.join(__dirname, '../../../data/section-data', `${fileName}.section.data.ts`);
     if (!fs.existsSync(filePath)) {
       return null;
     }
