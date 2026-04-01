@@ -62,7 +62,10 @@ export interface PossessionClaimResponse {
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
+    landlordLicensed?: YesNoNotSureValue;
     writtenTerms?: YesNoNotSureValue;
+    disputeClaim?: YesNoValue;
+    disputeClaimDetails?: string;
 
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
