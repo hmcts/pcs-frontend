@@ -1,13 +1,16 @@
 import type { Request } from 'express';
 import { DateTime } from 'luxon';
 
+
 import type { CaseData, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import { Logger } from '@modules/logger';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
+const logger = Logger.getLogger('confirmation-of-notice-date-when-not-provided');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'confirmation-of-notice-date-when-not-provided',
@@ -38,15 +41,26 @@ export const step: StepDefinition = createFormStep({
   ],
   getInitialFormData: req => {
     const caseData: CaseData = req.res?.locals.validatedCase?.data;
-    const noticeReceivedDateRaw: string | undefined =
-      caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
+    const noticeReceivedDateRaw: unknown = caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
 
-    if (!noticeReceivedDateRaw || typeof noticeReceivedDateRaw !== 'string') {
+    if (!noticeReceivedDateRaw) {
+      return {};
+    }
+
+    if (typeof noticeReceivedDateRaw !== 'string') {
+      logger.warn('Unexpected noticeReceivedDate type in case data', {
+        type: typeof noticeReceivedDateRaw,
+        value: noticeReceivedDateRaw,
+      });
       return {};
     }
 
     const dateTime: DateTime = DateTime.fromISO(noticeReceivedDateRaw);
     if (!dateTime.isValid) {
+      logger.warn('Invalid noticeReceivedDate format in case data', {
+        value: noticeReceivedDateRaw,
+        reason: dateTime.invalidReason,
+      });
       return {};
     }
 

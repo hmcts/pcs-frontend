@@ -5,7 +5,7 @@ export enum CaseState {
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'Yes' | 'No';
-export type TenancyTypeCorrectValue = VerticalYesNoValue | 'NOT_SURE';
+export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
