@@ -37,6 +37,7 @@ export const step: StepDefinition = createFormStep({
               name: 'phoneNumber',
               type: 'text',
               required: true,
+              errorMessage: 'errors.contactByTelephone.phoneNumber',
               labelClasses: 'govuk-!-font-weight-bold',
               translationKey: {
                 label: 'labels.phoneNumberLabel',
@@ -74,6 +75,8 @@ export const step: StepDefinition = createFormStep({
   ],
 
   beforeRedirect: async req => {
+    // TODO: Refactor to remove session dependency.
+    // Use req.body directly instead of req.session.formData, following the pattern in rent-arrears-dispute and non-rent-arrears-dispute.
     const telephoneForm = req.session.formData?.['contact-preferences-telephone'];
     if (!telephoneForm) {
       return;
