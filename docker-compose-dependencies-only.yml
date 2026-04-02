@@ -13,6 +13,17 @@ services:
       timeout: 2s
       retries: 10
 
+  service-auth-provider-api:
+    image: 'hmctspublic.azurecr.io/rpe/service-auth-provider:latest'
+    ports:
+      - '${SERVICE_AUTH_PORT}:${SERVICE_AUTH_PORT}'
+    environment:
+      SERVER_PORT: ${SERVICE_AUTH_PORT}
+      AUTH_PROVIDER_SERVICE_SERVER_JWT_KEY: ${AUTH_PROVIDER_SERVICE_SERVER_JWT_KEY}
+      JAVA_TOOL_OPTIONS: -XX:UseSVE=0
+      microserviceKeys_ccd_data: AAAAAAAAAAAAAAAA
+      microserviceKeys_pcs_frontend: AAAAAAAAAAAAAAAA
+
   wiremock:
     image: 'wiremock/wiremock:latest'
     ports:
