@@ -72,6 +72,7 @@ export class ErrorMessageValidation implements IValidation {
 
         // Check for error summary header
         const headerLocator = page.locator(`h2.govuk-error-summary__title:has-text("${header}")`);
+        await headerLocator.waitFor({ state: 'visible', timeout: 5000 });
         const headerCount = await headerLocator.count();
 
         if (headerCount === 0) {
