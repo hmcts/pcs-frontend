@@ -106,4 +106,44 @@ describe('isWalesProperty', () => {
       expect(result).toBe(false);
     });
   });
+
+  describe('when called with caseData directly', () => {
+    it('should return true when legislativeCountry is Wales', () => {
+      const caseData = { legislativeCountry: 'Wales' };
+
+      const result = isWalesProperty(caseData);
+
+      expect(result).toBe(true);
+    });
+
+    it('should return true when legislativeCountry is WALES (case insensitive)', () => {
+      const caseData = { legislativeCountry: 'WALES' };
+
+      const result = isWalesProperty(caseData);
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false when legislativeCountry is England', () => {
+      const caseData = { legislativeCountry: 'England' };
+
+      const result = isWalesProperty(caseData);
+
+      expect(result).toBe(false);
+    });
+
+    it('should return false when legislativeCountry is undefined', () => {
+      const caseData = {};
+
+      const result = isWalesProperty(caseData);
+
+      expect(result).toBe(false);
+    });
+
+    it('should return false when caseData is undefined', () => {
+      const result = isWalesProperty(undefined);
+
+      expect(result).toBe(false);
+    });
+  });
 });

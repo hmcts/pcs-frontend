@@ -11,10 +11,15 @@ import type { Request } from 'express';
  *
  * NOT uppercase "ENGLAND"/"WALES" as might be expected.
  */
-export const isWalesProperty = (req: Request): boolean => {
-  const caseData = req.res?.locals?.validatedCase?.data;
-  const legislativeCountry = caseData?.legislativeCountry;
+export function isWalesProperty(req: Request): boolean;
+export function isWalesProperty(caseData: Record<string, unknown> | undefined): boolean;
+export function isWalesProperty(reqOrCaseData: Request | Record<string, unknown> | undefined): boolean {
+  const caseData =
+    reqOrCaseData && 'res' in reqOrCaseData
+      ? (reqOrCaseData as Request).res?.locals?.validatedCase?.data
+      : reqOrCaseData;
+  const legislativeCountry = (caseData as Record<string, unknown> | undefined)?.legislativeCountry;
 
   // Case-insensitive comparison to handle any case variations
-  return legislativeCountry?.toUpperCase() === 'WALES';
-};
+  return (legislativeCountry as string | undefined)?.toUpperCase() === 'WALES';
+}

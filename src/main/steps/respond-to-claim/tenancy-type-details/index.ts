@@ -165,7 +165,7 @@ export const step: StepDefinition = createFormStep({
       '';
 
     const caseData = req.res?.locals.validatedCase?.data;
-    const walesProperty = isWalesProperty(req);
+    const walesProperty = isWalesProperty(caseData);
     const orgName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string;
     const tenancyTypeOfTenancyLicence = caseData?.tenancy_TypeOfTenancyLicence as string;
     const occupationLicenceTypeWales = caseData?.occupationLicenceTypeWales as string | undefined;
