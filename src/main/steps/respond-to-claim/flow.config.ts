@@ -2,10 +2,12 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
+  getPreviousStepForWhatOtherRegularExpenses,
   getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
+  hasSelectedUniversalCredit,
   isDefendantNameKnown,
   isNoticeDateProvided,
   isNoticeServed,
@@ -419,6 +421,36 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-regular-income-do-you-receive': {
       previousStep: 'income-and-expenditure',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const selected = currentStepData.regularIncome;
+            if (Array.isArray(selected)) {
+              return selected.includes('universalCredit');
+            }
+            return selected === 'universalCredit';
+          },
+          nextStep: 'priority-debts',
+        },
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const selected = currentStepData.regularIncome;
+            if (Array.isArray(selected)) {
+              return !selected.includes('universalCredit');
+            }
+            return selected !== 'universalCredit';
+          },
+          nextStep: 'have-you-applied-for-universal-credit',
+        },
+      ],
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
@@ -426,15 +458,36 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
-      previousStep: 'have-you-applied-for-universal-credit',
-      defaultNext: 'priority-debt-details',
+      previousStep: async (req: Request): Promise<string> => {
+        const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
+        return selectedUniversalCredit ? 'what-regular-income-do-you-receive' : 'have-you-applied-for-universal-credit';
+      },
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.havePriorityDebts === 'yes',
+          nextStep: 'priority-debt-details',
+        },
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.havePriorityDebts === 'no',
+          nextStep: 'what-other-regular-expenses-do-you-have',
+        },
+      ],
+      defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'priority-debt-details': {
       previousStep: 'priority-debts',
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
-      previousStep: 'priority-debt-details',
+      previousStep: getPreviousStepForWhatOtherRegularExpenses,
       defaultNext: 'end-now',
     },
   },
