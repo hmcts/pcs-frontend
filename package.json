@@ -71,7 +71,7 @@
     "i18next-http-middleware": "^3.7.4",
     "ioredis": "^5.4.1",
     "jose": "^6.1.3",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.0",
     "luxon": "^3.6.1",
     "module-alias": "^2.3.4",
     "nunjucks": "^3.2.4",
@@ -177,8 +177,8 @@
     "qs": "^6.14.2",
     "jws": "3.2.3",
     "tar": "~7.5.9",
-    "lodash": "~4.17.23",
-    "lodash-es": "~4.17.23",
+    "lodash": "~4.18.1",
+    "lodash-es": "~4.18.1",
     "path-to-regexp": "^8.4.0"
   },
   "lint-staged": {

@@ -87,7 +87,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
     return new HTTPError('Not authorised to access CCD case service', 403);
   }
 
-  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, 500);
+  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500);
 }
 
 /**
@@ -178,7 +178,13 @@ export const ccdCaseService = {
         data: response.data.case_details?.case_data || {},
       };
     } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'getCaseById');
+      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
+
+      // coerce 400 and 404 to 404 so we can return a 404 error to the client
+      if (httpError.status === 400 || httpError.status === 404) {
+        throw new HTTPError('Case not found', 404);
+      }
+      throw httpError;
     }
   },
 
@@ -286,7 +292,11 @@ export const ccdCaseService = {
       const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
       return response.data;
     } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
+      const httpError = convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
+      if (httpError.status === 400 || httpError.status === 404) {
+        throw new HTTPError('Case not found', 404);
+      }
+      throw httpError;
     }
   },
 
