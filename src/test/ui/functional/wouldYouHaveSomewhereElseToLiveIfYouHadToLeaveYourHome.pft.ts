@@ -16,6 +16,10 @@ export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErro
   });
 
   //This error message will trigger if no day is provided
+  await performAction('clickRadioButton', {
+    question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader,
+    option: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+  });
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, '11');
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, '2022');
   await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
