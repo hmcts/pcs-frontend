@@ -1,3 +1,4 @@
+import { format, parseISO } from 'date-fns';
 import { DateTime } from 'luxon';
 
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
@@ -133,9 +134,7 @@ export const step: StepDefinition = createFormStep({
     const existingStartDate = getTenancyStartDate(caseData);
 
     // Format tenancy date with ordinal
-    const tenancyStartDate = existingStartDate
-      ? DateTime.fromISO(existingStartDate).setZone('Europe/London').setLocale('en-gb').toFormat('do LLLL yyyy')
-      : undefined;
+    const tenancyStartDate = existingStartDate ? format(parseISO(existingStartDate), 'do LLLL yyyy') : undefined;
 
     const t = getTranslationFunction(req, 'tenancy-date-details', ['common']);
     const bulletPoint = t('bulletPoint', { returnObjects: true, tenancyStartDate });
