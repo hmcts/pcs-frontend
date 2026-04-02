@@ -454,7 +454,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', nonRentArrearsDispute.continueButton);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
@@ -476,9 +478,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
-    await performAction('disputingOtherPartsOfTheClaim', {
-      disputeOption: nonRentArrearsDispute.noRadioOption,
-    });
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
