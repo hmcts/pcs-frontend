@@ -1,6 +1,4 @@
-import { dashboard,
-  exceptionalHardship,
-  yourCircumstances } from '../data/page-data';
+import { dashboard, exceptionalHardship, yourCircumstances } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(501);

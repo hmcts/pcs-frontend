@@ -30,8 +30,8 @@ import {
   yourCircumstances,
   yourHouseholdAndCircumstances,
 } from '../data/page-data';
-import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { incomeAndExpenses } from '../data/page-data/incomeAndExpenses.page.data';
+import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -223,10 +223,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.yesRadioOption });
+      yourCircumstancesOption: yourCircumstances.yesRadioOption,
+    });
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.yesRadioOption });
+      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
+    });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
@@ -292,10 +294,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption });
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption });
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
@@ -363,10 +367,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption });
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption });
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
@@ -432,10 +438,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption });
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption });
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
@@ -495,10 +503,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption });
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption });
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
@@ -561,10 +571,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption });
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption });
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
@@ -628,10 +640,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption });
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.yesRadioOption });
+      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
+    });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
@@ -694,10 +708,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.yesRadioOption });
+      yourCircumstancesOption: yourCircumstances.yesRadioOption,
+    });
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption });
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
@@ -763,10 +779,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption });
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption });
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 });

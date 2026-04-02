@@ -67,7 +67,7 @@ export class ActionRegistry {
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],
-    ['exceptionalHardship', new RespondToClaimAction()]
+    ['exceptionalHardship', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

@@ -10,7 +10,8 @@ import {
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
-  disputeClaimInterstitial, exceptionalHardship,
+  disputeClaimInterstitial,
+  exceptionalHardship,
   freeLegalAdvice,
   landlordLicensed,
   landlordRegistered,
@@ -24,7 +25,8 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
-  writtenTerms, yourCircumstances,
+  writtenTerms,
+  yourCircumstances,
 } from '../../../data/page-data';
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
