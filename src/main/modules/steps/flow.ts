@@ -14,12 +14,9 @@ export async function getNextStep(
   currentStepData: Record<string, unknown> = {}
 ): Promise<string | null> {
   if (flowConfig.useShowConditions) {
-    // Rule deprecated: https://eslint.org/docs/latest/rules/no-return-await
-    // eslint-disable-next-line no-return-await
-    return await getNextStepByShowCondition(req, currentStepName, flowConfig);
+    return getNextStepByShowCondition(req, currentStepName, flowConfig);
   } else {
-    // eslint-disable-next-line no-return-await
-    return await getNextStepByRouteConditions(req, currentStepName, flowConfig, formData, currentStepData);
+    return getNextStepByRouteConditions(req, currentStepName, flowConfig, formData, currentStepData);
   }
 }
 
