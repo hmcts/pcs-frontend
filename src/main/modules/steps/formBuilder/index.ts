@@ -55,9 +55,11 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     stepDir,
     showCancelButton,
     getController: () => {
+      // DM how to load from a different directory if professional user logged in?
+
       return createGetController(viewPath, stepName, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
-
+        // can load json from professional folder based on role to override json
         const t: TFunction = getTranslationFunction(req, stepName, ['common'], journeyFolder);
 
         const nunjucksEnv = req.app.locals.nunjucksEnv;
@@ -94,8 +96,6 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           backUrl: await navigation.getBackUrl(req, stepName),
           showCancelButton,
           url: req.originalUrl, // Form action URL - POST to current page
-          // headerModel: headerModel,
-          // footerModel: footerModel
         };
       });
     },

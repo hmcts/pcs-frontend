@@ -87,8 +87,8 @@ export const createGetController = (
 
     if (extendContent) {
       const extended = await extendContent(req);
-      
-      return { ...baseContent, ...extended };
+
+      return { ...baseContent, ...extended };  // can override base content with extended if keys match
     }
 
     return baseContent;

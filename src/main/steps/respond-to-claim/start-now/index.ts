@@ -30,7 +30,14 @@ export const step: StepDefinition = {
       (req: Request) => {
         return {
           backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-          // headerModel,
+          // if professional {
+              // read from professional json folder
+              // explodedJson = professionRespondToClaim/startNow.json (exploded)
+              // overrides citizen json
+            // return ...explodedJson
+          // }
+             claimantVisibilityInfo: "AQIBBBBB" // showing extended overrides content wth same key
+          // conditional back url ,
           // footerModel,
         };
       },
