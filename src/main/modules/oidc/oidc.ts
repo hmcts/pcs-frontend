@@ -160,7 +160,8 @@ export class OIDCModule {
         }
 
         const redirectTo = client.buildAuthorizationUrl(this.clientConfig, parameters);
-        // Persist OIDC session values before redirecting to avoid losing them on the callback round-trip.
+        // Persist OIDC session values before redirecting to avoid a race in which the
+        // callback returns before our session save.
         req.session.save(saveError => {
           if (saveError) {
             this.logger.error('Failed to persist OIDC session state before redirect:', saveError);
