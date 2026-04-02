@@ -1,7 +1,7 @@
 {
   "caption": "Respond to a property possession claim",
   "pageTitle": "Your correspondence address",
-  "legend": "Is your correspondence address ",
+  "legend": "Is your correspondence address {{ formattedAddressStr }}",
   "legendNa": "What’s your correspondence address?",
   "legend.hint": "This is the address provided by Treetops Housing",
   "legend.hintNa": "Your correspondence address is your postal address.",
