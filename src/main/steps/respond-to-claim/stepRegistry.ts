@@ -19,6 +19,7 @@ import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
+import { step as installmentPayments } from './installment-payments';
 import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
@@ -37,6 +38,7 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
+import { step as writtenTerms } from './written-terms';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -51,9 +53,10 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'landlord-registered': landlordRegistered,
   'landlord-licensed': landlordLicensed,
+  'written-terms': writtenTerms,
   'tenancy-type-details': tenancyTypeDetails,
-  'tenancy-date-unknown': tenancyDateUnknown,
   'tenancy-date-details': tenancyDateDetails,
+  'tenancy-date-unknown': tenancyDateUnknown,
   'confirmation-of-notice-given': confirmationOfNoticeGiven,
   'confirmation-of-notice-date-when-provided': confirmationOfNoticeDateProvided,
   'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,
@@ -63,6 +66,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
+  'installment-payments': installmentPayments,
   'your-household-and-circumstances': yourHouseholdAndCircumstances,
   'do-you-have-any-dependant-children': doYouHaveAnyDependantChildren,
   'do-you-have-any-other-dependants': doYouHaveAnyOtherDependants,

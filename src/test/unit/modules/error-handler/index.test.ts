@@ -25,6 +25,8 @@ describe('error-handler', () => {
 
   const createMockTranslation = () => {
     const translations: Record<string, string> = {
+      'errorPages.400.title': 'Bad request',
+      'errorPages.400.paragraph': 'The request you made is not valid. Please check the request and try again.',
       'errorPages.403.title': 'Not Authorised',
       'errorPages.403.paragraph': 'Sorry you do not have access to this account.',
       'errorPages.404.title': 'Page not found',
@@ -33,7 +35,6 @@ describe('error-handler', () => {
       'errorPages.500.paragraph': 'Please try again in a few minutes.',
       serviceName: 'Possession claims',
       phase: 'ALPHA',
-      feedback: 'Feedback text',
       languageToggle: 'Language toggle',
       back: 'Back',
     };
@@ -337,7 +338,6 @@ describe('error-handler', () => {
 
       expect(res.locals.serviceName).toBe('Possession claims');
       expect(res.locals.phase).toBe('ALPHA');
-      expect(res.locals.feedback).toBe('Feedback text');
       expect(res.locals.languageToggle).toBe('Language toggle');
       expect(res.locals.back).toBe('Back');
     });
@@ -445,7 +445,7 @@ describe('error-handler', () => {
       expect(res.render).toHaveBeenCalledWith('error');
     });
 
-    it('should handle 400 status as 403 error message', () => {
+    it('should handle 400 status with its own error message', () => {
       const errorHandler = createErrorHandler('test');
       const err = new HTTPError('Bad request', 400);
       const req = {
@@ -503,7 +503,8 @@ describe('error-handler', () => {
       errorHandler(err, req, res, next);
 
       expect(mockLogger.error).toHaveBeenCalledWith('Request failed', {
-        error: err,
+        errorMessage: 'Test error',
+        stack: 'Error stack trace',
         method: 'GET',
         status: 500,
         url: '/test-url',
