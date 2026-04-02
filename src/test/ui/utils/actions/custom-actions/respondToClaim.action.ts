@@ -334,7 +334,7 @@ export class RespondToClaimAction implements IAction {
       option: moveInDetails.radioOption,
     });
 
-    if (moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
+    if (moveInDetails.radioOption === 'Yes' && moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
       await performActions(
         'Enter Date',
         ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, moveInDetails.day],

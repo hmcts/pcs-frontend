@@ -351,7 +351,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
-      ...getRelativeDate(5),
     });
   });
 
