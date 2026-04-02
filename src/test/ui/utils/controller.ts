@@ -109,7 +109,7 @@ export async function performAction(
       ? ` - ${typeof displayFieldName === 'object' ? readValuesFromInputObjects(displayFieldName) : displayFieldName}`
       : ''
   }${
-    displayValue !== undefined
+    displayValue !== undefined && value !== undefined
       ? ` with value '${typeof displayValue === 'object' ? readValuesFromInputObjects(displayValue) : displayValue}'`
       : ''
   }`;
