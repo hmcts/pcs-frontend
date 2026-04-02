@@ -112,7 +112,10 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const stepData = getFormData(req, STEP_NAME) || {};
 
-    const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(req, stepData);
+    const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
+      req,
+      stepData
+    );
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
@@ -138,7 +141,8 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: (req: Request) => {
     const stepData = getFormData(req, STEP_NAME);
     const possessionClaimResponse = req.res?.locals.validatedCase?.data?.possessionClaimResponse;
-    const correspondenceAddressConfirmed = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
+    const correspondenceAddressConfirmed =
+      possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
 
     const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
@@ -172,7 +176,8 @@ export const step: StepDefinition = createFormStep({
 
     setFormData(req, STEP_NAME, { ...stepData, __isAddressKnown: isAddressKnown });
 
-    const correspondenceAddressConfirmed = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
+    const correspondenceAddressConfirmed =
+      possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
 
     const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
       req,
