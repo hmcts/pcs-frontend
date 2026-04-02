@@ -1,0 +1,23 @@
+export const yourCircumstances = {
+  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
+  mainHeader: 'Your circumstances',
+  yesRadioOption: `Yes`,
+  noRadioOption: `No`,
+  youCanUseThisSectionParagraph:
+    'You can use this section to give details about any events or circumstances that have impacted your case that you think a judge should know about.',
+  forExampleParagraph: 'For example:',
+  someoneInYourHouseholdList: 'someone in your household has an illness or disability',
+  childrenInYourHouseholdList: 'children in your household attend a local school',
+  irregularHoursList: 'you work irregular hours, making it hard to find a new place to live',
+  wouldYouLikeToShareDetailsParagraph: 'Would you like to share any details about your circumstances?',
+  detailsTextInput: `mentionCircumstances here`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  giveDetailsHiddenTextLabel: `Give details about your circumstances`,
+  youCanEnterUpToHiddenHintText: `You can enter up to 500 characters`,
+  tooManyCharacterHiddenHintText: `You have 1 character too many`,
+  backLink: `Back`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectCircumstancesErrorMessage: 'Select if you’d like to share anything about your circumstances',
+  mustBe500CharactersOrFewerErrorMessage: `Must be 500 characters or fewer`,
+};

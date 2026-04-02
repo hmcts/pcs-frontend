@@ -11,6 +11,7 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
+  exceptionalHardship,
   freeLegalAdvice,
   landlordLicensed,
   landlordRegistered,
@@ -25,6 +26,7 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
   writtenTerms,
+  yourCircumstances,
 } from '../../../data/page-data';
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -58,6 +60,8 @@ export class RespondToClaimAction implements IAction {
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
+      ['yourCircumstances', () => this.yourCircumstances(fieldName as actionRecord)],
+      ['exceptionalHardship', () => this.exceptionalHardship(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -378,6 +382,36 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  }
+
+  private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: yourCircumstancesData.question,
+      option: yourCircumstancesData.yourCircumstancesOption,
+    });
+    if (yourCircumstancesData.yourCircumstancesOption === yourCircumstances.yesRadioOption) {
+      await performAction(
+        'inputText',
+        yourCircumstances.giveDetailsHiddenTextLabel,
+        yourCircumstances.detailsTextInput
+      );
+    }
+    await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  }
+
+  private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: exceptionalHardshipData.question,
+      option: exceptionalHardshipData.exceptionalHardshipOption,
+    });
+    if (exceptionalHardshipData.exceptionalHardshipOption === exceptionalHardship.yesRadioOption) {
+      await performAction(
+        'inputText',
+        exceptionalHardship.giveDetailsHiddenTextLabel,
+        exceptionalHardship.detailsTextInput
+      );
+    }
+    await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
