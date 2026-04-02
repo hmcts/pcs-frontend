@@ -9,6 +9,7 @@ import {
   isRentArrearsClaim,
   isTenancyStartDateKnown,
   isWelshProperty,
+  isProfessionalJourney,
 } from '../utils';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
@@ -16,6 +17,7 @@ export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
+  isProfessional: false, // needs to dynamic
   stepOrder: [
     'start-now',
     'free-legal-advice',
@@ -60,6 +62,18 @@ export const flowConfig: JourneyFlowConfig = {
   steps: {
     'start-now': {
       defaultNext: 'free-legal-advice',
+      routes: [
+        {
+          // Route to defendant name confirmation if pro user
+          condition: async (req: Request) => isProfessionalJourney(req),
+          nextStep: 'defendant-name-confirmation',
+        },
+        {
+          // Route to defendant name capture if citizen
+          condition: async (req: Request) => !isProfessionalJourney(req),
+          nextStep: 'free-legal-advice',
+        },
+      ],
     },
     'free-legal-advice': {
       routes: [
