@@ -441,6 +441,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {
+      previousStep: 'priority-debts',
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
