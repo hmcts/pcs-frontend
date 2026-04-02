@@ -3,8 +3,9 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
+export type VerticalYesNoValue = 'YES' | 'NO' | null;
+export type YesNoValue = 'Yes' | 'No';
+export type TenancyTypeCorrectValue = VerticalYesNoValue | 'NOT_SURE';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
@@ -43,7 +44,7 @@ export interface PossessionClaimResponse {
       firstName?: string;
       lastName?: string;
       address?: Address;
-      phoneNumberProvided?: YesNoValue;
+      phoneNumberProvided?: VerticalYesNoValue;
       phoneNumber?: string;
       emailAddress?: string;
     };
@@ -53,8 +54,8 @@ export interface PossessionClaimResponse {
     tenancyType?: string;
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
-    contactByPhone?: YesNoValue;
-    contactByText?: YesNoValue;
+    contactByPhone?: VerticalYesNoValue;
+    contactByText?: VerticalYesNoValue;
     preferenceType?: ContactPreference;
     rentArrearsAmountConfirmation?: string;
     rentArrearsAmount?: string;
@@ -62,6 +63,12 @@ export interface PossessionClaimResponse {
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
+    householdCircumstances?: {
+      shareAdditionalCircumstances?: YesNoValue;
+      additionalCircumstancesDetails?: string;
+      exceptionalHardship?: YesNoValue;
+      exceptionalHardshipDetails?: string;
+    };
     landlordLicensed?: YesNoNotSureValue;
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;

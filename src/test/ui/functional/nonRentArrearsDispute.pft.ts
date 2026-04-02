@@ -36,7 +36,7 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
   await performAction(
     'clickLinkAndVerifyNewTabTitle',
     nonRentArrearsDispute.viewTheClaimLink,
-    nonRentArrearsDispute.mainHeaderGovServiceHiddenNewTab
+    nonRentArrearsDispute.titleGovServiceHiddenNewTab
   );
   await performAction(
     'inputText',
