@@ -42,14 +42,14 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => getTypeOfApplication(req) === 'ADJOURN',
     },
     'do-you-need-help-paying-the-fee': {
-      showCondition: (req: Request) => getTypeOfApplication(req) !== 'ADJOURN' || isHearingInNext14Days(req),
+      showCondition: (req: Request) => doesFeeApply(req),
     },
     'have-you-already-applied-for-help': {
-      showCondition: (req: Request) => isHearingInNext14Days(req) && needHelpPayingTheFee(req),
+      showCondition: (req: Request) => doesFeeApply(req) && needHelpPayingTheFee(req),
     },
     'you-need-to-apply-for-help-with-your-application-fee': {
       showCondition: (req: Request) =>
-        isHearingInNext14Days(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHelpWithFees(req),
+        doesFeeApply(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHelpWithFees(req),
     },
     'are-there-any-reasons-that-this-application-should-not-be-shared': {
       showCondition: (req: Request) => !otherPartiesAgreed(req),
@@ -77,6 +77,10 @@ function needHelpPayingTheFee(req: Request): boolean {
 
 function alreadyAppliedForHelpWithFees(req: Request): boolean {
   return getFormData(req, 'have-you-already-applied-for-help').alreadyAppliedForHelp === 'YES';
+}
+
+function doesFeeApply(req: Request): boolean {
+  return getTypeOfApplication(req) !== 'ADJOURN' || isHearingInNext14Days(req);
 }
 
 function otherPartiesAgreed(req: Request): boolean {
