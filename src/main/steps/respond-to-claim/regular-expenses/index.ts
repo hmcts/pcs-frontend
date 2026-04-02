@@ -1,7 +1,12 @@
 import type { Request } from 'express';
 
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type {
+  FrequencyValue,
+  HouseholdCircumstances,
+  IncomeExpenseDetails,
+  PossessionClaimResponse,
+} from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
@@ -453,7 +458,7 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const draftHc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances as
-      | Record<string, unknown>
+      | HouseholdCircumstances
       | undefined;
 
     if (!draftHc) {
@@ -464,16 +469,15 @@ export const step: StepDefinition = createFormStep({
     const selected: string[] = [];
 
     for (const key of regularExpenseKeys) {
-      if (fromYesNoEnum(draftHc[key] as string | undefined) === 'yes') {
+      const expenseDetails = draftHc[key];
+      if (fromYesNoEnum(expenseDetails?.applies) === 'yes') {
         selected.push(key);
       }
-      const amount = draftHc[`${key}Amount`];
-      if (amount) {
-        formData[`regularExpenses.${key}Amount`] = penceToPounds(amount as string);
+      if (expenseDetails?.amount) {
+        formData[`regularExpenses.${key}Amount`] = penceToPounds(expenseDetails.amount);
       }
-      const frequency = draftHc[`${key}Frequency`];
-      if (frequency) {
-        formData[`regularExpenses.${key}Frequency`] = frequency;
+      if (expenseDetails?.frequency) {
+        formData[`regularExpenses.${key}Frequency`] = expenseDetails.frequency;
       }
     }
 
@@ -492,20 +496,21 @@ export const step: StepDefinition = createFormStep({
 
     for (const key of regularExpenseKeys) {
       const isYes = selected.includes(key);
-      householdCircumstances[key] = toYesNoEnum(isYes ? 'yes' : 'no');
-
-      if (!isYes) {
-        continue;
-      }
-
       const amountRaw = body?.[`regularExpenses.${key}Amount`] as string | undefined;
       const frequency = body?.[`regularExpenses.${key}Frequency`] as string | undefined;
-      if (amountRaw) {
-        householdCircumstances[`${key}Amount`] = poundsToPence(amountRaw);
+
+      const details: IncomeExpenseDetails = {
+        applies: toYesNoEnum(isYes ? 'yes' : 'no'),
+      };
+      if (isYes) {
+        if (amountRaw) {
+          details.amount = poundsToPence(amountRaw);
+        }
+        if (frequency) {
+          details.frequency = frequency as FrequencyValue;
+        }
       }
-      if (frequency) {
-        householdCircumstances[`${key}Frequency`] = frequency;
-      }
+      householdCircumstances[key] = details;
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {

@@ -41,6 +41,12 @@ export interface Address {
   Country?: string;
 }
 
+export interface IncomeExpenseDetails {
+  applies: YesNoValue;
+  amount?: PenceAmount;
+  frequency?: FrequencyValue;
+}
+
 export interface HouseholdCircumstances {
   shareIncomeExpenseDetails?: YesNoValue;
   incomeFromJobs?: YesNoValue;
@@ -58,33 +64,15 @@ export interface HouseholdCircumstances {
   otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
-  householdBills?: YesNoValue;
-  householdBillsAmount?: PenceAmount;
-  householdBillsFrequency?: FrequencyValue;
-  loanPayments?: YesNoValue;
-  loanPaymentsAmount?: PenceAmount;
-  loanPaymentsFrequency?: FrequencyValue;
-  childSpousalMaintenance?: YesNoValue;
-  childSpousalMaintenanceAmount?: PenceAmount;
-  childSpousalMaintenanceFrequency?: FrequencyValue;
-  mobilePhone?: YesNoValue;
-  mobilePhoneAmount?: PenceAmount;
-  mobilePhoneFrequency?: FrequencyValue;
-  groceryShopping?: YesNoValue;
-  groceryShoppingAmount?: PenceAmount;
-  groceryShoppingFrequency?: FrequencyValue;
-  fuelParkingTransport?: YesNoValue;
-  fuelParkingTransportAmount?: PenceAmount;
-  fuelParkingTransportFrequency?: FrequencyValue;
-  schoolCosts?: YesNoValue;
-  schoolCostsAmount?: PenceAmount;
-  schoolCostsFrequency?: FrequencyValue;
-  clothing?: YesNoValue;
-  clothingAmount?: PenceAmount;
-  clothingFrequency?: FrequencyValue;
-  otherExpenses?: YesNoValue;
-  otherExpensesAmount?: PenceAmount;
-  otherExpensesFrequency?: FrequencyValue;
+  householdBills?: IncomeExpenseDetails;
+  loanPayments?: IncomeExpenseDetails;
+  childSpousalMaintenance?: IncomeExpenseDetails;
+  mobilePhone?: IncomeExpenseDetails;
+  groceryShopping?: IncomeExpenseDetails;
+  fuelParkingTransport?: IncomeExpenseDetails;
+  schoolCosts?: IncomeExpenseDetails;
+  clothing?: IncomeExpenseDetails;
+  otherExpenses?: IncomeExpenseDetails;
 }
 
 export interface PossessionClaimResponse {
