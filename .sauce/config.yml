@@ -1,0 +1,87 @@
+# Entry: yarn test:crossbrowserui (alias: yarn test:crossbrowser) → saucectl run.
+apiVersion: v1alpha
+kind: playwright
+
+sauce:
+  region: eu-central-1
+  concurrency: 1
+  retries: 0
+  metadata:
+    tags:
+      - pcs-frontend
+      - crossbrowser
+
+playwright:
+  version: '1.58.1'
+  configFile: playwright.sauce.config.ts
+nodeVersion: 'v20'
+rootDir: ./
+
+npm:
+  registries:
+    - url: https://registry.npmjs.org
+  usePackageLock: false
+
+# $VAR expanded by saucectl from the agent environment (e.g. HTTP_PROXY / HTTPS_PROXY from the shell).
+env:
+  CI: 'true'
+  TEST_URL: '$TEST_URL'
+  NPM_CONFIG_PRODUCTION: 'false'
+  PCS_FRONTEND_IDAM_SECRET: '$PCS_FRONTEND_IDAM_SECRET'
+  IDAM_PCS_USER_EMAIL: '$IDAM_PCS_USER_EMAIL'
+  IDAM_PCS_USER_PASSWORD: '$IDAM_PCS_USER_PASSWORD'
+
+# Full matrix: Chrome/Firefox × Windows/macOS (nightly). Comment out suites locally if you need a quicker run.
+suites:
+  - name: PCS crossbrowser chrome windows
+    platformName: 'Windows 10'
+    screenResolution: '1440x900'
+    preExec:
+      # Sauce caps all preExec at 300s total; full install often needs --no-audit/--ignore-scripts (skip husky prepare).
+      - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
+      - npx ts-node --transpile-only ./scripts/sauce-remove-playwright.ts
+    testMatch: [".*e2eTest/.*\\.spec\\.ts"]
+    passThreshold: 1
+    params:
+      browserName: 'chromium'
+      project: 'chromium'
+      grep: '@crossbrowser'
+
+#  - name: PCS crossbrowser chrome mac
+#    platformName: "macOS 13"
+#    screenResolution: "1440x900"
+#    preExec:
+#      - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
+#      - npx ts-node --transpile-only ./scripts/sauce-remove-playwright.ts
+#    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+#    passThreshold: 1
+#    params:
+#      browserName: "chromium"
+#      project: "chromium"
+#      grep: "@crossbrowser"
+#
+#  - name: PCS crossbrowser firefox windows
+#    platformName: "Windows 10"
+#    screenResolution: "1440x900"
+#    preExec:
+#      - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
+#      - npx ts-node --transpile-only ./scripts/sauce-remove-playwright.ts
+#    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+#    passThreshold: 1
+#    params:
+#      browserName: "firefox"
+#      project: "firefox"
+#      grep: "@crossbrowser"
+#
+#  - name: PCS crossbrowser firefox mac
+#    platformName: "macOS 13"
+#    screenResolution: "1440x900"
+#    preExec:
+#      - npm install --include=dev --no-audit --no-fund --ignore-scripts --loglevel=error
+#      - npx ts-node --transpile-only ./scripts/sauce-remove-playwright.ts
+#    testMatch: [".*e2eTest/pageNotFound\\.spec\\.ts"]
+#    passThreshold: 1
+#    params:
+#      browserName: "firefox"
+#      project: "firefox"
+#      grep: "@crossbrowser"

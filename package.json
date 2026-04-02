@@ -37,6 +37,10 @@
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",
     "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $(git rev-parse --short HEAD) --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:openAllureReport": "yarn allure open allure-report",
+    "test:crossbrowser": "yarn test:crossbrowsersaucecntrl",
+    "test:crossbrowsersaucecntrl": "yarn exec ts-node --transpile-only scripts/crossbrowser/runSauceCrossbrowser.ts",
+    "test:crossbrowsergrid": "bash scripts/crossbrowser/run-sauce-grid.sh",
+    "test:crossbrowserlocal": "yarn playwright install && yarn playwright test --project chrome --grep @crossbrowser; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
     "prepare": "husky"
   },
@@ -144,6 +148,7 @@
     "prettier": "^3.0.0",
     "sass": "^1.65.1",
     "sass-loader": "^16.0.0",
+    "saucectl": "^0.202.0",
     "style-loader": "^4.0.0",
     "stylelint": "^16.0.0",
     "stylelint-config-standard": "^38.0.0",

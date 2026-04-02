@@ -1,0 +1,40 @@
+# Dependencies – preExec runs npm install on the Sauce VM; do not upload local installs
+node_modules/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Build and output
+dist/
+public/
+coverage/
+.nyc_output/
+*.css
+
+# Git and IDE
+.git/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Test reports & local outputs
+allure-report/
+allure-results/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+functional-output/
+smoke-output/
+pact/
+
+# Java / Gradle (not needed for Playwright suite)
+src/test/java/build/
+src/test/java/.gradle/
+
+# Secrets
+.env
+.env.*

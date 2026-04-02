@@ -143,6 +143,48 @@ await performValidationGroup(
 yarn test:functional
 ```
 
+### Cross-browser tests (Sauce Labs) — run locally
+
+Nightly Jenkins uses **`enableCrossBrowserTest`** + Sauce Connect; on your machine you start the tunnel yourself, then run **`yarn test:crossbrowserui`** (or **`yarn test:crossbrowser`**) from the **repository root** (not under `src/test/ui`).
+
+1. **Install dependencies** (once), from repo root:
+   ```bash
+   yarn install
+   ```
+2. **Sauce credentials** — export your Sauce Labs username and access key:
+   ```bash
+   export SAUCE_USERNAME='<your-sauce-username>'
+   export SAUCE_ACCESS_KEY='<your-sauce-access-key>'
+   ```
+3. **Sauce Connect** — start a tunnel and choose a tunnel name (example: `my-local-tunnel`). Use the [Sauce Connect](https://docs.saucelabs.com/secure-connections/sauce-connect-5/) CLI you use in your team (`sc` v5 or legacy `sc`):
+   ```bash
+   # Example — match flags to your Sauce Connect version / docs
+   sc run --tunnel-name my-local-tunnel
+   ```
+   Leave this process running.
+4. **Tunnel env for `saucectl`** — must match the tunnel you started (Jenkins defaults **do not** apply locally unless `BUILD_TAG` / `JENKINS_URL` are set):
+   ```bash
+   export SAUCE_TUNNEL_NAME='my-local-tunnel'
+   export SAUCE_TUNNEL_OWNER="$SAUCE_USERNAME"
+   ```
+5. **App / Idam** — set the same variables you use for functional UI tests, at minimum:
+   - **`TEST_URL`** — environment under test (e.g. AAT manage-case URL).
+   - **`PCS_FRONTEND_IDAM_SECRET`**, **`IDAM_PCS_USER_PASSWORD`** (and **`IDAM_PCS_USER_EMAIL`** if your specs use a fixed user instead of `createUser`).
+   - Other keys your **`global-setup.config.ts`** / specs expect (e.g. **`DATA_STORE_URL_BASE`**, **`CHANGE_ID`**) — same as local **`yarn test:functional`**.
+6. **Run cross-browser** from **repo root**:
+   ```bash
+   yarn test:crossbrowserui
+   ```
+   This runs **`scripts/crossbrowser/runSauceCrossbrowser.ts`** → **`saucectl run`** using **`.sauce/config.yml`** (suites use **`grep` / `testMatch`** as defined in the YAML).
+
+#### Hybrid: APIs on agent, browser on Sauce (`test:crossbrowsergrid`)
+
+**`yarn test:crossbrowsergrid`** — Playwright and API calls run **on your machine or Jenkins**; only **Chrome** runs on Sauce via Selenium Grid ([Sauce](https://docs.saucelabs.com/web-apps/automated-testing/playwright/selenium-grid/), [Playwright](https://playwright.dev/docs/selenium-grid)). Use when **`saucectl`** cannot reach internal APIs. Export **`SAUCE_USERNAME`**, **`SAUCE_ACCESS_KEY`**, and tunnel vars as for saucectl. **Chrome only** (experimental).
+
+**More detail:** **`docs/sauce-jenkins.md`**.
+
+**Troubleshooting:** if `saucectl` cannot reach Sauce or the tunnel never becomes ready, ensure Sauce Connect is running and **`SAUCE_TUNNEL_NAME`** / **`SAUCE_TUNNEL_OWNER`** match step 4. See [Sauce Connect](https://docs.saucelabs.com/secure-connections/sauce-connect-5/) for CLI flags (region, tunnel name).
+
 ## 8. Troubleshooting
 
 | Issue                  | Solution                                    |
@@ -191,9 +233,10 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 - **PR:** Runs functional tests (`@PR` scope) on Chrome. Optional full functional test if `enable_full_functional_tests` label is added.
 - **Master:** Runs functional tests (`@regression` scope) on Chrome. Sends Slack notification to `#hdp-qa-e2e-test-results` on failure.
 
-### Nightly (Jenkinsfile_nightly)
+### Nightly (`@Jenkinsfile_nightly`)
 
 - **Schedule:** Mon–Fri at ~07:00.
+- **Sauce cross-browser:** `enableCrossBrowserTest` runs `yarn test:crossbrowser` (see `docs/sauce-jenkins.md`).
 - **E2E tests:** Runs per-browser stages (Chrome, Firefox, Safari) with separate Allure reports for each.
 - **Accessibility:** Runs `@accessibility` tests on Chrome.
 - **Slack:** Sends notification to `#hdp-qa-e2e-test-results` with links to all 4 reports (Chrome, Firefox, Safari, Accessibility).
