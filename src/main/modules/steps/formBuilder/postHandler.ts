@@ -27,10 +27,12 @@ import {
 import { validateConfigInDevelopment } from './schema';
 import { concatenateJourneyStepName } from '@utils/stepNameFolderCombiner';
 
+type ViewTemplate = string | ((req: Request) => string | Promise<string>);
+
 export function createPostHandler(
   fields: FormFieldConfig[],
   stepName: string,
-  viewPath: string,
+  viewPath: ViewTemplate,
   journeyFolder: string,
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
@@ -111,11 +113,12 @@ export function createPostHandler(
         );
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
+        const resolvedViewPath = typeof viewPath === 'function' ? await viewPath(req) : viewPath;
         const fullContent = { ...formContent, ...extendedContent };
         await renderWithErrors(
           req,
           res,
-          viewPath,
+          resolvedViewPath,
           errors,
           fields,
           fullContent,

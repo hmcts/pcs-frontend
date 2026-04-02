@@ -16,24 +16,34 @@ const logger = Logger.getLogger('controllerFactory');
 
 type PostControllerCallback = (req: Request, res: Response) => Promise<void> | void;
 type TranslationFn = (req: Request) => StepFormData | Promise<StepFormData>;
+type ViewTemplate = string | ((req: Request) => string | Promise<string>);
+
+function resolveViewTemplate(view: ViewTemplate, req: Request): Promise<string> {
+  if (typeof view === 'function') {
+    return Promise.resolve(view(req));
+  }
+  return Promise.resolve(view);
+}
 
 export class GetController {
   constructor(
-    private view: string,
+    private view: ViewTemplate,
     private generateContent: TranslationFn
   ) {}
 
   get = async (req: Request, res: Response): Promise<void> => {
     const content = await this.generateContent(req);
-    res.render(this.view, {
+    const viewPath = await resolveViewTemplate(this.view, req);
+
+    res.render(viewPath, {
       ...content,
-      ...res.locals.extraHeaders
+      ...res.locals.extraHeaders,
     });
   };
 }
 
 export const createGetController = (
-  view: string,
+  view: ViewTemplate,
   stepName: string,
   extendContent?: (req: Request) => StepFormData | Promise<StepFormData>,
   journeyFolder?: string
@@ -88,7 +98,7 @@ export const createGetController = (
     if (extendContent) {
       const extended = await extendContent(req);
 
-      return { ...baseContent, ...extended };  // can override base content with extended if keys match
+      return { ...baseContent, ...extended }; // can override base content with extended if keys match
     }
 
     return baseContent;

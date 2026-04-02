@@ -3,12 +3,12 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { createFreeLegalAdviceBase, mapFromCcdEnum, mapToCcdEnum } from '../../common/freeLegalAdviceBase';
 import { flowConfig } from '../flow.config';
+import { isProfessionalJourney } from '../../utils/isProfessionalJourney';
 
 export const step: StepDefinition = createFreeLegalAdviceBase({
   flowConfig,
-  customTemplate: flowConfig.isProfessional
-    ? `${__dirname}/freeLegalAdvice-professional.njk`
-    : `${__dirname}/freeLegalAdvice.njk`,
+  customTemplate: req =>
+    !isProfessionalJourney(req) ? `${__dirname}/freeLegalAdvice-professional.njk` : `${__dirname}/freeLegalAdvice.njk`,
   beforeRedirect: async req => {
     const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
     if (!hadLegalAdvice) return;

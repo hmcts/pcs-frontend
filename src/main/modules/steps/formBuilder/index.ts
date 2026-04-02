@@ -1,5 +1,6 @@
 import path from 'path';
 
+import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import type { BuiltFormContent, FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
@@ -44,7 +45,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   } = config;
 
   const journeyPath = camelToKebabCase(journeyFolder);
-  const viewPath = customTemplate || 'formBuilder.njk';
+  const viewPath: string | ((req: Request) => string | Promise<string>) = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
 

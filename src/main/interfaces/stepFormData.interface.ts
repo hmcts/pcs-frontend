@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import { Request, RequestHandler } from 'express';
 
 import { GetController, type SupportedLang } from '@modules/steps';
 
@@ -17,7 +17,7 @@ export interface StepFormData {
 export interface StepDefinition {
   url: string;
   name: string;
-  view: string;
+  view: string | ((req: Request) => string | Promise<string>);
   stepDir: string;
   getController: GetController | ((lang?: SupportedLang) => GetController);
   postController?: { post: RequestHandler };

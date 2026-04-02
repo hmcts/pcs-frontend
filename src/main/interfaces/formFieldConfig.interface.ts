@@ -104,11 +104,11 @@ export interface FormBuilderConfig {
   getInitialFormData?: GetInitialFormData;
   stepDir: string;
   translationKeys?: TranslationKeys;
-  customTemplate?: string;
+  customTemplate?: string | ((req: Request) => string | Promise<string>);
   basePath?: string;
   flowConfig?: JourneyFlowConfig;
   showCancelButton?: boolean;
-  professionalHeaders?: ProfessionalHeadersConfig; 
+  professionalHeaders?: ProfessionalHeadersConfig;
 }
 
 export interface ComponentConfig {

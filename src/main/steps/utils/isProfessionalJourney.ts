@@ -1,8 +1,9 @@
 import type { Request } from 'express';
 import * as jose from 'jose';
 
-export const isProfessionalJourney = async (req: Request): Promise<boolean> => {
+export const isProfessionalJourney = (req: Request): boolean => {
   const decoded = jose.decodeJwt(req.session.user!.idToken);
-  const roles = <string[]>decoded.roles;
-  return !(roles[0] === 'citizen');
+  const roles = decoded.roles as string[];
+
+  return !roles.includes('citizen');
 };
