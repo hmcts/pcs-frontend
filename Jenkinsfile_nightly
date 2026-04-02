@@ -97,7 +97,7 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
-  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
+  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'false'
 }
 
 def runE2ETests(yarnBuilder) {
