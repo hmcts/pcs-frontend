@@ -1,6 +1,7 @@
-# Sauce Labs: Playwright @nightly tests on Chrome, Firefox, and WebKit (one suite per browser).
-# Run: yarn test:crossbrowser  (with tunnel + env from vault / CI, same as test:saucelab).
-# Jenkins: call via YarnBuilder / shared library after loadVaultSecrets + env (see Jenkinsfile_CNP patterns).
+# Sauce Labs: Playwright @nightly — Chrome (Win), Firefox (macOS), Safari (macOS), Edge (Win), Chrome (Android).
+# Run: yarn test:crossbrowser  (tunnel + env from vault / CI).
+# Jenkins: YarnBuilder / shared library after loadVaultSecrets + env (see Jenkinsfile_CNP patterns).
+# Platform/browser matrix: https://docs.saucelabs.com/web-apps/automated-testing/playwright/ — confirm Edge/Android if jobs fail to allocate.
 apiVersion: v1alpha
 kind: playwright
 
@@ -51,7 +52,7 @@ env:
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
 suites:
-  - name: 'PCS @nightly (Chrome)'
+  - name: 'PCS @nightly (Chrome — Windows)'
     platformName: Windows 11
     screenResolution: 1920x1080
     testMatch:
@@ -63,8 +64,8 @@ suites:
       headless: true
       grep: '@nightly'
 
-  - name: 'PCS @nightly (Firefox)'
-    platformName: Windows 11
+  - name: 'PCS @nightly (Firefox — macOS)'
+    platformName: macOS 14
     screenResolution: 1920x1080
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
@@ -75,8 +76,8 @@ suites:
       headless: true
       grep: '@nightly'
 
-  - name: 'PCS @nightly (WebKit)'
-    platformName: Windows 11
+  - name: 'PCS @nightly (Safari — macOS)'
+    platformName: macOS 14
     screenResolution: 1920x1080
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
@@ -84,6 +85,31 @@ suites:
     params:
       browserName: webkit
       project: webkit
+      headless: true
+      grep: '@nightly'
+
+  - name: 'PCS @nightly (Edge — Windows)'
+    platformName: Windows 11
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      # Sauce Playwright lists `chromium`; `MicrosoftEdge` project + channel in playwright.config.ts selects Edge.
+      browserName: chromium
+      project: MicrosoftEdge
+      headless: true
+      grep: '@nightly'
+
+  - name: 'PCS @nightly (Chrome — Android)'
+    platformName: Android
+    screenResolution: 1080x1920
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chrome
+      project: MobileChrome
       headless: true
       grep: '@nightly'
 
