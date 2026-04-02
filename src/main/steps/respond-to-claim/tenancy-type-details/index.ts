@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse, TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interface';
+import type { PossessionClaimResponse, YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
@@ -52,13 +52,13 @@ const fieldsConfig: FormFieldConfig[] = [
 
 const STEP_NAME = 'tenancy-type-details';
 
-const TENANCY_TYPE_CONFIRM_TO_CCD: Record<string, TenancyTypeCorrectValue> = {
+const TENANCY_TYPE_CONFIRM_TO_CCD: Record<string, YesNoNotSureValue> = {
   yes: 'YES',
   no: 'NO',
   notSure: 'NOT_SURE',
 };
 
-const CCD_TO_TENANCY_TYPE_CONFIRM: Record<Exclude<TenancyTypeCorrectValue, null>, string> = {
+const CCD_TO_TENANCY_TYPE_CONFIRM: Record<Exclude<YesNoNotSureValue, null>, string> = {
   YES: 'yes',
   NO: 'no',
   NOT_SURE: 'notSure',
@@ -95,7 +95,7 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const existingTenancyTypeCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeCorrect as
-      | TenancyTypeCorrectValue
+      | YesNoNotSureValue
       | undefined;
     const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses?.tenancyType as
       | string
@@ -143,7 +143,7 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: async (req, formContent) => {
     const existingTenancyTypeCorrect = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
-      ?.tenancyTypeCorrect as TenancyTypeCorrectValue;
+      ?.tenancyTypeCorrect as YesNoNotSureValue;
     const existingCorrectedTenancyType = req.res?.locals.validatedCase?.data?.possessionClaimResponse
       ?.defendantResponses?.tenancyType as string;
     const tenancyTypeConfirm =

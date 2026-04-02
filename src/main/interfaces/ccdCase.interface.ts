@@ -3,11 +3,18 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
+export type VerticalYesNoValue = 'YES' | 'NO' | null;
+export type YesNoValue = 'Yes' | 'No';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
+
+export type PaymentAgreement = {
+  anyPaymentsMade?: YesNoValue;
+  paymentDetails?: string;
+  repaymentPlanAgreed?: YesNoNotSureValue;
+  repaymentAgreedDetails?: string;
+};
 
 export interface CcdUserCase {
   id: string;
@@ -36,25 +43,28 @@ export interface Address {
   PostCode: string;
   Country?: string;
 }
-
+export interface CaseData {
+  possessionClaimResponse?: PossessionClaimResponse;
+}
 export interface PossessionClaimResponse {
+  claimantOrganisations?: { value: string }[];
   defendantContactDetails?: {
     party?: {
       firstName?: string;
       lastName?: string;
       address?: Address;
-      phoneNumberProvided?: YesNoValue;
+      phoneNumberProvided?: VerticalYesNoValue;
       phoneNumber?: string;
       emailAddress?: string;
     };
   };
   defendantResponses?: {
-    tenancyTypeCorrect?: TenancyTypeCorrectValue;
+    tenancyTypeCorrect?: YesNoNotSureValue;
     tenancyType?: string;
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
-    contactByPhone?: YesNoValue;
-    contactByText?: YesNoValue;
+    contactByPhone?: VerticalYesNoValue;
+    contactByText?: VerticalYesNoValue;
     preferenceType?: ContactPreference;
     rentArrearsAmountConfirmation?: string;
     rentArrearsAmount?: string;
@@ -66,17 +76,14 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
-
-    paymentAgreement?: {
-      repaymentPlanAgreed?: YesNoNotSureValue;
-      repaymentAgreedDetails?: string;
-    };
+    possessionNoticeReceived?: YesNoNotSureValue;
+    noticeReceivedDate?: string;
+    paymentAgreement?: PaymentAgreement;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;
     lastName?: string;
   };
-  claimantOrganisations?: { value: string }[];
 }
 
 export interface StartCallbackData {
