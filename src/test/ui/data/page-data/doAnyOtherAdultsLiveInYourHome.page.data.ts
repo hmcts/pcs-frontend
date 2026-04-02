@@ -16,4 +16,6 @@ export const doAnyOtherAdultsLiveInYourHome = {
   mustBe500ErrorMessage: `Must be 500 characters or fewer`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `do-any-other-adults-live-in-your-home`,
+  emojiTextInput: `👉 😄`,
+  emojiErrorMessage: `Give details about the other adults living in your home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
 };

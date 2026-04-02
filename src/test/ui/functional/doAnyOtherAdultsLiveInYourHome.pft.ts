@@ -28,6 +28,19 @@ export async function doAnyOtherAdultsLiveInYourHomeErrorValidation(): Promise<v
     header: doAnyOtherAdultsLiveInYourHome.thereIsAProblemErrorMessageHeader,
     message: doAnyOtherAdultsLiveInYourHome.mustBe500ErrorMessage,
   });
+
+  //enter emoji
+  await performAction(
+    'inputText',
+    doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
+    doAnyOtherAdultsLiveInYourHome.emojiTextInput
+  );
+
+  await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: doAnyOtherAdultsLiveInYourHome.thereIsAProblemErrorMessageHeader,
+    message: doAnyOtherAdultsLiveInYourHome.emojiErrorMessage,
+  });
 }
 
 export async function doAnyOtherAdultsLiveInYourHomeNavigationTests(): Promise<void> {
