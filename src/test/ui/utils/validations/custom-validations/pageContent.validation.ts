@@ -179,10 +179,12 @@ export class PageContentValidation implements IValidation {
 
   private async getPageData(pageName: string): Promise<object | null> {
     const pageData = this.loadPageDataFile(pageName);
-    const contactUsData = this.loadSectionDataFile('contactUs');
-    if (contactUsData) {
-      await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
-      return { ...pageData, ...contactUsData };
+    if (pageName !== 'home') {
+      const contactUsData = this.loadSectionDataFile('contactUs');
+      if (contactUsData) {
+        await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
+        return { ...pageData, ...contactUsData };
+      }
     }
 
     return pageData;
