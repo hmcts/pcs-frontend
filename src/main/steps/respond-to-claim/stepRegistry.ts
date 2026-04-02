@@ -2,6 +2,7 @@ import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
+import { step as checkYourAnswers } from './check-your-answers';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
@@ -16,12 +17,15 @@ import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
 import { step as doYouHaveAnyDependantChildren } from './dependant-children';
 import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
+import { step as equalityAndDiversityEnd } from './equality-and-diversity-end';
+import { step as equalityAndDiversityStart } from './equality-and-diversity-start';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
 import { step as installmentPayments } from './installment-payments';
 import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
+import { step as languageUsed } from './language-used';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
 import { step as paymentInterstitial } from './payment-interstitial';
@@ -39,10 +43,6 @@ import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 import { step as writtenTerms } from './written-terms';
-import {step as equalityAndDiversityStart} from './equality-and-diversity-start';
-import {step as equalityAndDiversityEnd} from './equality-and-diversity-end';
-import { step as languageUsed } from './language-used';
-import { step as checkYourAnswers } from './check-your-answers';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
