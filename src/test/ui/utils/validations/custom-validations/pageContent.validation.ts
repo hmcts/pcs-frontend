@@ -169,8 +169,8 @@ export class PageContentValidation implements IValidation {
       // Add the error as a validation failure
       pageResults.push({
         element: 'SectionData',
-        expected: (error instanceof Error ? error.message : String(error)),
-        status: 'fail'
+        expected: error instanceof Error ? error.message : String(error),
+        status: 'fail',
       });
       PageContentValidation.pagesValidated.add(pageName);
       PageContentValidation.validationResults.set(pageUrl, pageResults);
