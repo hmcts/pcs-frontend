@@ -65,6 +65,8 @@ export class ActionRegistry {
     ['tenancyOrContractTypeDetails', new RespondToClaimAction()],
     ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
+    ['selectIfAnyOtherAdultsLiveInYourHouse', new RespondToClaimAction()],
+    ['selectAlternativeAccommodation', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
   ]);
 
