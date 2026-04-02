@@ -1,29 +1,17 @@
 import axios from 'axios';
 import config from 'config';
 
+import { FeeLookupParams, FeeType } from '../interfaces/feeService.interface';
+
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('feeLookupService');
-
-export interface FeeLookupParams {
-  service: string;
-  jurisdiction1: string;
-  jurisdiction2: string;
-  channel: string;
-  event: string;
-  keyword: string;
-}
 
 interface FeeLookupResponse {
   code: string;
   description: string;
   version: number;
   fee_amount: number;
-}
-
-export enum FeeType {
-  genAppStandardFee,
-  genAppMaxFee,
 }
 
 function getBaseUrl(): string {

@@ -1,7 +1,9 @@
 import axios from 'axios';
 import config from 'config';
 
-import { FeeLookupParams, FeeType, getFee } from '@services/feeLookupService';
+import { FeeLookupParams, FeeType } from '../../../main/interfaces/feeService.interface';
+
+import { getFee } from '@services/feeLookupService';
 
 jest.mock('axios');
 jest.mock('config');

@@ -22,7 +22,7 @@
   "onceYouStart": "Once you start your application, you cannot save your progress as a draft.",
   "weWillNotSaveYourAnswers": "This means that if you leave your application before submitting, we will not save your answers so that you can return to them later.",
   "howMuchWillItCost": "How much it will cost",
-  "usualCosts": "It usually costs £{{formattedStandardFee}} to apply. The fee will increase to £{{formattedMaxFee}} if:",
+  "usualCosts": "It usually costs {{standardFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to apply. The fee will increase to {{maxFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} if:",
   "youHaveAlreadyToldTheOtherParty": "you have already told the other party that you are making this application, and",
   "theyDidNotAgreeToIt": "they did not agree to it (this means that they have objected to it)",
   "youWillSeeTheFinalApplicationFee": "You’ll see the final application fee before you pay.",

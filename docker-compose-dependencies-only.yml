@@ -1,6 +1,6 @@
 services:
   cache:
-    image: bitnami/redis
+    image: hmctsprod.azurecr.io/imported/bitnami/redis:8.2.0
     ports:
       - '6379:6379'
     volumes:
@@ -14,7 +14,7 @@ services:
       retries: 10
 
   service-auth-provider-api:
-    image: 'hmctspublic.azurecr.io/rpe/service-auth-provider:latest'
+    image: hmctsprod.azurecr.io/rpe/service-auth-provider:latest
     ports:
       - '${SERVICE_AUTH_PORT}:${SERVICE_AUTH_PORT}'
     environment:
@@ -25,7 +25,7 @@ services:
       microserviceKeys_pcs_frontend: AAAAAAAAAAAAAAAA
 
   wiremock:
-    image: 'wiremock/wiremock:latest'
+    image: 'hmctsprod.azurecr.io/imported/wiremock/wiremock:latest'
     ports:
       - '8180:8080'
     volumes:

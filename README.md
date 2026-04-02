@@ -35,6 +35,14 @@ yarn install
 
 Run the necessary service dependencies, (Redis and Wiremock), using docker compose.
 
+If necessary, login to the hmctsprod ACR:
+
+```bash
+> az acr login -n hmctsprod
+```
+
+Then run docker compose:
+
 ```bash
 > docker compose -f docker-compose-dependencies-only.yml up -d
  ✔ Network pcs-frontend_default       Created                                                                                                                     0.0s

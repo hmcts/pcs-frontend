@@ -1,11 +1,11 @@
 import { Request } from 'express';
 
+import { FeeType } from '../../../interfaces/feeService.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
-import { FeeType, getFee } from '@services/feeLookupService';
-import { formatFee } from '@utils/feeFormatter';
+import { getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'ask-the-court-to-make-an-order',
@@ -56,11 +56,12 @@ export const step: StepDefinition = createFormStep({
     sendTheCompletedFormToTheCourt: 'sendTheCompletedFormToTheCourt',
   },
   extendGetContent: async (_req: Request) => {
-    const standardFee = await getFee(FeeType.genAppStandardFee);
-    const maxFee = await getFee(FeeType.genAppMaxFee);
+    const standardFeePromise = getFee(FeeType.genAppStandardFee);
+    const maxFeePromise = getFee(FeeType.genAppMaxFee);
+    const [standardFee, maxFee] = await Promise.all([standardFeePromise, maxFeePromise]);
     return {
-      formattedStandardFee: formatFee(standardFee),
-      formattedMaxFee: formatFee(maxFee),
+      standardFee,
+      maxFee,
     };
   },
 });
