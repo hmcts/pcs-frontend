@@ -156,6 +156,10 @@ describe('OIDCModule', () => {
       expect(discovery).toHaveBeenCalledWith(expect.any(URL), 'test-client-id', 'test-secret', undefined, undefined);
     });
 
+    it('should not allow insecure discovery for non-http issuers', () => {
+      expect(oidcModule['shouldAllowInsecureDiscovery'](new URL('https://test-issuer'))).toBe(false);
+    });
+
     it('should throw OIDCAuthenticationError when setup fails', async () => {
       (discovery as jest.Mock).mockRejectedValue(new Error('Discovery failed'));
       oidcModule['clientConfig'] = undefined as unknown as (typeof oidcModule)['clientConfig'];
