@@ -6,9 +6,31 @@
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
+  <span class="govuk-caption-l">Respond to a property possession claim</span>
   <h1 class="govuk-heading-l">What regular income do you receive? (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for What Regular Income Do You Receive step.</p>
+  <p class="govuk-body">Select all that apply.</p>
   <form method="post" action="{{ url }}">
+    {% set selectedRegularIncome = (formData and formData.regularIncome) or [] %}
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-visually-hidden">Regular income options</legend>
+        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+          <div class="govuk-checkboxes__item">
+            <input
+              class="govuk-checkboxes__input"
+              id="regularIncome-universalCredit"
+              name="regularIncome"
+              type="checkbox"
+              value="universalCredit"
+              {% if selectedRegularIncome.includes and selectedRegularIncome.includes('universalCredit') %}checked{% endif %}
+            />
+            <label class="govuk-label govuk-checkboxes__label" for="regularIncome-universalCredit">
+              Universal Credit
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
     {{ stepButtons(continue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>

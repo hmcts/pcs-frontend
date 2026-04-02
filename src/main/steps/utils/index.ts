@@ -11,5 +11,11 @@ export { getStepBeforeDisputePages } from './journeyHelpers';
 export { formatDatePartsToISODate } from './dateUtils';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
-export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
+export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
+export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
+export {
+  poundsStringToPence,
+  ccdPenceToPoundsString,
+  additionalRentContributionToPoundsString,
+} from './moneyAmountTransforms';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
