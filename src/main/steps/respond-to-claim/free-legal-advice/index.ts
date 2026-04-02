@@ -9,7 +9,6 @@ export const step: StepDefinition = createFreeLegalAdviceBase({
   customTemplate: flowConfig.isProfessional
     ? `${__dirname}/freeLegalAdvice-professional.njk`
     : `${__dirname}/freeLegalAdvice.njk`,
-// how to make dynamic ??
   beforeRedirect: async req => {
     const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
     if (!hadLegalAdvice) return;

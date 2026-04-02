@@ -17,7 +17,7 @@ export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
-  isProfessional: false, // needs to dynamic
+  isProfessional: (req: Request) => isProfessionalJourney(req),
   stepOrder: [
     'start-now',
     'free-legal-advice',

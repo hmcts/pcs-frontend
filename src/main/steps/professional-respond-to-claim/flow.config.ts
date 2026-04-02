@@ -1,21 +1,14 @@
 import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-import {
-  isDefendantNameKnown,
-} from '../utils';
+import { isDefendantNameKnown } from '../utils';
 
 export const PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE = '/professional/case/:caseReference/respond-to-claim';
 
 export const flowConfig: JourneyFlowConfig = {
-  isProfessional: true,
   basePath: PROFESSIONAL_RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'professionalRespondToClaim',
-  stepOrder: [
-    'start-now',
-    'free-legal-advice',
-    'defendant-name-confirmation',
-  ],
+  stepOrder: ['start-now', 'free-legal-advice', 'defendant-name-confirmation'],
   steps: {
     'start-now': {
       defaultNext: 'free-legal-advice',
