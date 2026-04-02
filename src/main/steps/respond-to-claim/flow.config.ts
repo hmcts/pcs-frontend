@@ -9,7 +9,7 @@ import {
   isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
-  isWelshProperty,
+  isWalesProperty,
 } from '../utils';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
@@ -120,11 +120,11 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial': {
       routes: [
         {
-          condition: async (req: Request) => isWelshProperty(req),
+          condition: async (req: Request) => isWalesProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !(await isWelshProperty(req)),
+          condition: async (req: Request) => !isWalesProperty(req),
           nextStep: 'tenancy-type-details',
         },
       ],
@@ -153,8 +153,8 @@ export const flowConfig: JourneyFlowConfig = {
         },
       ],
       previousStep: async (req: Request) => {
-        const welshProperty = await isWelshProperty(req);
-        if (welshProperty) {
+        const walesProperty = isWalesProperty(req);
+        if (walesProperty) {
           return 'written-terms';
         }
         return 'dispute-claim-interstitial';

@@ -3,10 +3,11 @@ import type { Request } from 'express';
 import type { PossessionClaimResponse, TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { isWalesProperty } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
-// Testing builds
+
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'tenancyTypeConfirm',
@@ -36,6 +37,14 @@ const fieldsConfig: FormFieldConfig[] = [
             translationKey: {
               label: 'correctTypeLabel',
             },
+            validator: (value: unknown): boolean | string => {
+              if (typeof value !== 'string' || !value.trim()) {
+                return true;
+              }
+
+              const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
+              return !invalidCharacters.test(value) || 'errors.correctTypeInvalidCharacters';
+            },
           },
         },
       },
@@ -64,7 +73,6 @@ const CCD_TO_TENANCY_TYPE_CONFIRM: Record<Exclude<TenancyTypeCorrectValue, null>
   NOT_SURE: 'notSure',
 };
 
-// TODO: Welsh translations for tenancy type text will be addressed in the next ticket
 const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   ASSURED_TENANCY: 'an assured',
   SECURE_TENANCY: 'a secure',
@@ -156,19 +164,37 @@ export const step: StepDefinition = createFormStep({
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
       '';
 
-    const orgName = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
-      ?.value as string;
-    const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as string;
-    const otherTenancyTypeDetails = req.res?.locals.validatedCase?.data
-      ?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string;
+    const caseData = req.res?.locals.validatedCase?.data;
+    const walesProperty = isWalesProperty(caseData);
+    const orgName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string;
+    const tenancyTypeOfTenancyLicence = caseData?.tenancy_TypeOfTenancyLicence as string;
+    const occupationLicenceTypeWales = caseData?.occupationLicenceTypeWales as string | undefined;
+    // Wales: flat keys from OccupationLicenceDetailsWales.
+    const otherTenancyTypeDetails = walesProperty
+      ? (caseData?.otherLicenceTypeDetails as string | undefined)
+      : (caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string | undefined);
+    // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
-
     const detailsHeading =
       typeof formContent.detailsHeading === 'string'
         ? `${formContent.detailsHeading}${orgName}${':'}`
         : formContent.detailsHeading;
-    const tenancyType =
-      tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
+
+    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+    let tenancyType: unknown;
+    if (walesProperty) {
+      if (occupationLicenceTypeWales === 'OTHER') {
+        tenancyType = t('tenancyTypeOther', { otherTenancyTypeDetails });
+      } else if (occupationLicenceTypeWales === 'STANDARD_CONTRACT') {
+        tenancyType = t('tenancyTypeWalesStandard');
+      } else if (occupationLicenceTypeWales === 'SECURE_CONTRACT') {
+        tenancyType = t('tenancyTypeWalesSecure');
+      } else {
+        tenancyType = formContent.tenancyType;
+      }
+    } else {
+      tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
+    }
 
     return {
       ...formContent,
