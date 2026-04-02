@@ -112,13 +112,13 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const stepData = getFormData(req, STEP_NAME) || {};
 
-    const { selectedValue, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(req, stepData);
+    const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(req, stepData);
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        correspondenceAddressConfirmation: selectedValue.toUpperCase(),
+        correspondenceAddressConfirmation: addressConfirmedRadioSelection.toUpperCase(),
       },
-      ...(selectedValue === 'no' && {
+      ...(addressConfirmedRadioSelection === 'no' && {
         defendantContactDetails: {
           party: {
             address: {
@@ -138,20 +138,20 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: (req: Request) => {
     const stepData = getFormData(req, STEP_NAME);
     const possessionClaimResponse = req.res?.locals.validatedCase?.data?.possessionClaimResponse;
-    const existingAnswer = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
+    const correspondenceAddressConfirmed = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
 
-    const { selectedValue, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
+    const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
       req,
       stepData,
       partyAddress,
-      existingAnswer
+      correspondenceAddressConfirmed
     );
 
     const result: Record<string, unknown> = {};
-    if (selectedValue) {
-      result['correspondenceAddressConfirm'] = selectedValue;
-      if (selectedValue === 'no') {
+    if (addressConfirmedRadioSelection) {
+      result['correspondenceAddressConfirm'] = addressConfirmedRadioSelection;
+      if (addressConfirmedRadioSelection === 'no') {
         result['correspondenceAddressConfirm.addressLine1'] = addressLine1;
         result['correspondenceAddressConfirm.addressLine2'] = addressLine2;
         result['correspondenceAddressConfirm.townOrCity'] = townOrCity;
@@ -172,19 +172,19 @@ export const step: StepDefinition = createFormStep({
 
     setFormData(req, STEP_NAME, { ...stepData, __isAddressKnown: isAddressKnown });
 
-    const existingAnswer = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
+    const correspondenceAddressConfirmed = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
 
-    const { selectedValue, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
+    const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
       req,
       stepData,
       partyAddress,
-      existingAnswer
+      correspondenceAddressConfirmed
     );
 
     const radioField = formContent.fields.find(f => f.name === 'correspondenceAddressConfirm');
 
     if (radioField) {
-      radioField.value = selectedValue;
+      radioField.value = addressConfirmedRadioSelection;
     }
 
     // TODO: Refactor to avoid mutating module-scoped `fieldsConfig` per request.
@@ -208,7 +208,7 @@ export const step: StepDefinition = createFormStep({
       isAddressKnown,
       formattedAddressStr,
       partyAddress,
-      isManualOpen: selectedValue === 'no',
+      isManualOpen: addressConfirmedRadioSelection === 'no',
       legendNa: t('legendNa'),
       legendhintNa: t('legend.hintNa'),
       caption: t('caption'),
@@ -255,12 +255,12 @@ function getAddressData(
   req: Request,
   stepData: Record<string, unknown>,
   partyAddress?: Address,
-  existingAnswer?: string
+  correspondenceAddressConfirmed?: string
 ) {
-  const selectedValue =
+  const addressConfirmedRadioSelection =
     req.body?.correspondenceAddressConfirm ||
     stepData?.correspondenceAddressConfirm ||
-    (existingAnswer === 'YES' ? 'yes' : existingAnswer === 'NO' ? 'no' : undefined);
+    (correspondenceAddressConfirmed === 'YES' ? 'yes' : correspondenceAddressConfirmed === 'NO' ? 'no' : undefined);
 
   const fieldMap: Record<string, keyof Address> = {
     addressLine1: 'AddressLine1',
@@ -271,7 +271,7 @@ function getAddressData(
   };
 
   const getField = (field: keyof typeof fieldMap) => {
-    if (selectedValue !== 'no') {
+    if (addressConfirmedRadioSelection !== 'no') {
       return '';
     }
 
@@ -286,7 +286,7 @@ function getAddressData(
   };
 
   return {
-    selectedValue,
+    addressConfirmedRadioSelection,
     addressLine1: getField('addressLine1'),
     addressLine2: getField('addressLine2'),
     townOrCity: getField('townOrCity'),
