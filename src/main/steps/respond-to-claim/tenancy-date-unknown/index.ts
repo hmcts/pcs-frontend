@@ -15,6 +15,7 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/tenancyDateUnknown.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    heading: 'heading',
     caption: 'caption',
     question: 'question',
     hint: 'hint',

@@ -2,11 +2,13 @@
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
+{% block pageTitle %}Dependant children &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Do You Have Any Dependant Children? (placeholder)</h1>
+  <h1 class="govuk-heading-l">Do you have any dependant children?</h1>
   <p class="govuk-body">This is a placeholder for Do You Have Any Dependant Children step.</p>
   <form method="post" action="{{ url }}">
     {{ stepButtons(continue, saveForLater) }}

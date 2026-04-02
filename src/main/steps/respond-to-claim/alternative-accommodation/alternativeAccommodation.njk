@@ -2,11 +2,13 @@
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
+{% block pageTitle %}Somewhere else to live &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Would you have somewhere else to live if you had to leave your home? (placeholder)</h1>
+  <h1 class="govuk-heading-l">Would you have somewhere else to live if you had to leave your home?</h1>
   <p class="govuk-body">This is a placeholder for Would You Have Somewhere Else To Live If You Had To Leave Your Home step.</p>
   <form method="post" action="{{ url }}">
     {{ stepButtons(continue, saveForLater) }}

@@ -2,11 +2,13 @@
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
+{% block pageTitle %}Exceptional hardship &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Exceptional hardship (placeholder)</h1>
+  <h1 class="govuk-heading-l">Exceptional hardship</h1>
   <p class="govuk-body">This is a placeholder for Exceptional Hardship step.</p>
   <form method="post" action="{{ url }}">
     {{ stepButtons(continue, saveForLater) }}
