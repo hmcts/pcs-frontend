@@ -19,8 +19,8 @@ jest.mock('../../../../main/modules/steps', () => ({
   ),
 }));
 
-jest.mock('../../../../main/steps/utils/isWelshProperty', () => ({
-  isWelshProperty: jest.fn(),
+jest.mock('../../../../main/steps/utils/isWalesProperty', () => ({
+  isWalesProperty: jest.fn(),
 }));
 
 jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
@@ -28,7 +28,7 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
 }));
 
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
-import { isWelshProperty } from '../../../../main/steps/utils/isWelshProperty';
+import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
 import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 type TenancyTypeDetailsStep = {
@@ -77,7 +77,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (isWelshProperty as jest.Mock).mockResolvedValue(false);
+    (isWalesProperty as jest.Mock).mockReturnValue(false);
   });
 
   describe('getInitialFormData', () => {
@@ -432,7 +432,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
     describe('Welsh property (occupation contract types)', () => {
       beforeEach(() => {
-        (isWelshProperty as jest.Mock).mockResolvedValue(true);
+        (isWalesProperty as jest.Mock).mockReturnValue(true);
       });
 
       it.each([

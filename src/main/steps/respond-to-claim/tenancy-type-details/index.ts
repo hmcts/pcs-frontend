@@ -4,7 +4,7 @@ import type { PossessionClaimResponse, TenancyTypeCorrectValue } from '../../../
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { isWelshProperty } from '../../utils';
+import { isWalesProperty } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -165,14 +165,15 @@ export const step: StepDefinition = createFormStep({
       '';
 
     const caseData = req.res?.locals.validatedCase?.data;
-    const welsh = await isWelshProperty(req);
+    const walesProperty = isWalesProperty(req);
     const orgName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string;
     const tenancyTypeOfTenancyLicence = caseData?.tenancy_TypeOfTenancyLicence as string;
     const occupationLicenceTypeWales = caseData?.occupationLicenceTypeWales as string | undefined;
-    // England: tenancy_* (TenancyLicenceDetails). Wales: flat keys from OccupationLicenceDetailsWales (pcs-api).
-    const otherTenancyTypeDetails = welsh
+    // Wales: flat keys from OccupationLicenceDetailsWales.
+    const otherTenancyTypeDetails = walesProperty
       ? (caseData?.otherLicenceTypeDetails as string | undefined)
       : (caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string | undefined);
+    // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
     const detailsHeading =
       typeof formContent.detailsHeading === 'string'
@@ -181,7 +182,7 @@ export const step: StepDefinition = createFormStep({
 
     const t = getTranslationFunction(req, STEP_NAME, ['common']);
     let tenancyType: unknown;
-    if (welsh) {
+    if (walesProperty) {
       if (occupationLicenceTypeWales === 'OTHER') {
         tenancyType = t('tenancyTypeOther', { otherTenancyTypeDetails });
       } else if (occupationLicenceTypeWales === 'STANDARD_CONTRACT') {

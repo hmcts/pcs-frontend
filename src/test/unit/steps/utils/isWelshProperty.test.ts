@@ -1,10 +1,10 @@
 import { Request } from 'express';
 
-import { isWelshProperty } from '../../../../main/steps/utils/isWelshProperty';
+import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
 
-describe('isWelshProperty', () => {
+describe('isWalesProperty', () => {
   describe('when property is in Wales', () => {
-    it('should return true when legislativeCountry is Wales (title case)', async () => {
+    it('should return true when legislativeCountry is Wales (title case)', () => {
       const mockReq = {
         res: {
           locals: {
@@ -17,12 +17,12 @@ describe('isWelshProperty', () => {
         },
       } as unknown as Request;
 
-      const result = await isWelshProperty(mockReq);
+      const result = isWalesProperty(mockReq);
 
       expect(result).toBe(true);
     });
 
-    it('should return true when legislativeCountry is WALES (uppercase - case insensitive)', async () => {
+    it('should return true when legislativeCountry is WALES (uppercase - case insensitive)', () => {
       const mockReq = {
         res: {
           locals: {
@@ -35,12 +35,12 @@ describe('isWelshProperty', () => {
         },
       } as unknown as Request;
 
-      const result = await isWelshProperty(mockReq);
+      const result = isWalesProperty(mockReq);
 
       expect(result).toBe(true);
     });
 
-    it('should return true when legislativeCountry is wales (lowercase - case insensitive)', async () => {
+    it('should return true when legislativeCountry is wales (lowercase - case insensitive)', () => {
       const mockReq = {
         res: {
           locals: {
@@ -53,14 +53,14 @@ describe('isWelshProperty', () => {
         },
       } as unknown as Request;
 
-      const result = await isWelshProperty(mockReq);
+      const result = isWalesProperty(mockReq);
 
       expect(result).toBe(true);
     });
   });
 
   describe('when property is NOT in Wales', () => {
-    it('should return false when legislativeCountry is England (title case)', async () => {
+    it('should return false when legislativeCountry is England (title case)', () => {
       const mockReq = {
         res: {
           locals: {
@@ -73,12 +73,12 @@ describe('isWelshProperty', () => {
         },
       } as unknown as Request;
 
-      const result = await isWelshProperty(mockReq);
+      const result = isWalesProperty(mockReq);
 
       expect(result).toBe(false);
     });
 
-    it('should return false when legislativeCountry is undefined', async () => {
+    it('should return false when legislativeCountry is undefined', () => {
       const mockReq = {
         res: {
           locals: {
@@ -89,19 +89,19 @@ describe('isWelshProperty', () => {
         },
       } as unknown as Request;
 
-      const result = await isWelshProperty(mockReq);
+      const result = isWalesProperty(mockReq);
 
       expect(result).toBe(false);
     });
 
-    it('should return false when validatedCase is undefined', async () => {
+    it('should return false when validatedCase is undefined', () => {
       const mockReq = {
         res: {
           locals: {},
         },
       } as unknown as Request;
 
-      const result = await isWelshProperty(mockReq);
+      const result = isWalesProperty(mockReq);
 
       expect(result).toBe(false);
     });
