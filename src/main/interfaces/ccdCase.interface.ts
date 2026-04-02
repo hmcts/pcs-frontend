@@ -9,6 +9,8 @@ export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 
+export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
+
 export interface CcdUserCase {
   id: string;
   state: CaseState;
@@ -35,6 +37,10 @@ export interface Address {
   County?: string;
   PostCode: string;
   Country?: string;
+}
+
+export interface CaseData {
+  possessionClaimResponse?: PossessionClaimResponse;
 }
 
 export interface PossessionClaimResponse {
@@ -66,6 +72,7 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
+    languageUsed?: LanguageUsed;
 
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
