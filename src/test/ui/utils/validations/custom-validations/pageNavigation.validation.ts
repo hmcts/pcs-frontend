@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
+import { reportValidationFailure } from '../../common/pft-debug-log';
 import { performAction } from '../../controller';
 import { IValidation, validationRecord } from '../../interfaces';
 
@@ -189,6 +190,25 @@ export class PageNavigationValidation implements IValidation {
           PageNavigationValidation.pagesPassed.add(pageName);
         }
       }
+
+      const expectedNavLog = [
+        expectedElementText && `element: "${expectedElementText}"`,
+        expectedUrlPattern && `url: "${expectedUrlPattern}"`,
+      ]
+        .filter(Boolean)
+        .join('; ');
+      const actualNavLog = [actualElementText && `element: "${actualElementText}"`, `url: "${actualUrl || page.url()}"`]
+        .filter(Boolean)
+        .join('; ');
+
+      await reportValidationFailure(
+        page,
+        'page-navigation',
+        pageName,
+        expectedNavLog || 'page navigation validation',
+        actualNavLog,
+        !overallPassed
+      );
     } catch (error) {
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const actualText = await page
@@ -224,6 +244,15 @@ export class PageNavigationValidation implements IValidation {
         error: error instanceof Error ? error.message.split('\n')[0] : String(error),
         hasPFTFile,
       });
+
+      await reportValidationFailure(
+        page,
+        'page-navigation',
+        pageName,
+        `h1 after navigation: "${expectedValue}"`,
+        `h1: "${(actualText || 'Not found').trim()}"`,
+        true
+      );
     }
   }
 

@@ -23,11 +23,13 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
 } from '../data/page-data';
+import { captureProcessEnvBeforeBeforeEach, logTestBeforeEachContext } from '../utils/common/pft-debug-log';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }, testInfo) => {
+  captureProcessEnvBeforeBeforeEach();
   initializeExecutor(page);
   process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayload.claimantName;
   if (testInfo.title.includes('NoticeServed - No')) {
@@ -138,6 +140,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
+  logTestBeforeEachContext();
 });
 
 test.afterEach(async () => {
@@ -148,7 +151,7 @@ test.afterEach(async () => {
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim @noDefendants @regression @accessibility', async () => {
+  test('Respond to a claim @PR @noDefendants @regression @accessibility', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,

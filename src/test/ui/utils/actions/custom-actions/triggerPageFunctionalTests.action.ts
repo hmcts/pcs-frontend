@@ -7,7 +7,10 @@ import {
   enable_content_validation,
   enable_error_message_validation,
   enable_navigation_tests,
+  enable_pft_debug_log,
 } from '../../../../../../playwright.config';
+import { logUnmappedPftUrl } from '../../common/pft-debug-log';
+import { shortUrl } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
 import {
   ErrorMessageValidation,
@@ -34,7 +37,11 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
     const pageName = await this.getFileNameForPage(page);
+    if (enable_pft_debug_log === 'true') {
+      console.log(`[triggerFunctionalTests] entered url=${shortUrl(page.url())} page=${pageName ?? '(unmapped)'}`);
+    }
     if (!pageName) {
+      logUnmappedPftUrl(page, shortUrl(page.url()));
       return;
     }
 

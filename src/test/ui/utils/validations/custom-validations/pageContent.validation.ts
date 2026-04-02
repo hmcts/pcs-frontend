@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
+import { attachValidationFailureScreenshot, reportValidationFailure } from '../../common/pft-debug-log';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { IValidation } from '../../interfaces';
 
@@ -139,6 +140,17 @@ export class PageContentValidation implements IValidation {
     const pageData = await this.getPageData(pageName);
 
     if (!pageData) {
+      const pageDataPath = path.join(__dirname, '../../../data/page-data', `${pageName}.page.data.ts`);
+      if (fs.existsSync(pageDataPath)) {
+        await reportValidationFailure(
+          page,
+          'page-content',
+          pageName,
+          `Page data file should export default or a named export (data/page-data/${pageName}.page.data.ts)`,
+          'Failed to load or parse the file (syntax error or missing export)',
+          true
+        );
+      }
       return;
     }
 
@@ -162,6 +174,10 @@ export class PageContentValidation implements IValidation {
     }
 
     PageContentValidation.validationResults.set(pageUrl, pageResults);
+
+    if (pageResults.some(r => r.status === 'fail')) {
+      await attachValidationFailureScreenshot(page, 'page-content', pageName);
+    }
   }
 
   private async getPageData(pageName: string): Promise<object | null> {
@@ -284,7 +300,7 @@ export class PageContentValidation implements IValidation {
     }
 
     if (failedPages.size > 0) {
-      console.log('\n❌ VALIDATION FAILED:');
+      console.log('\n❌ FAILED PAGE CONTENT VALIDATION:');
       for (const [pageName, pageFailures] of failedPages) {
         console.log(`   Page: ${pageName}`);
         let pageFailureCount = 0;

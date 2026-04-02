@@ -30,6 +30,7 @@ ui/
 │   ├── registry/              # Component registration
 │   │   ├── action.registry.ts # Action registry
 │   │   └── validation.registry.ts # Validation registry
+│   ├── pft-debug-log.ts       # Optional [PFT] debug logging (ENABLE_PFT_DEBUG_LOG)
 │   └── controller.ts          # Controls the usage of actions and validations
 ├── testREADME.md              # Framework documentation
 └── update-testReadMe.ts       # Documentation auto-update script
@@ -62,6 +63,18 @@ The framework's modular design consists of these key layers:
 ```bash
 Playwright 1.30+ | TypeScript 4.9+
 ```
+
+### PFT debug logging (optional)
+
+When debugging **page navigation**, **error message**, or **page content** flows, enable structured console lines prefixed with `[PFT check: …]`:
+
+- Set **`ENABLE_PFT_DEBUG_LOG=true`** (e.g. in `.env`, or in CI for a single run). Value must be exactly **`true`** or **`false`**.
+- Default is **off** (no extra console output).
+- Implementation: `utils/common/pft-debug-log.ts`. Lines include **test title**, **page label**, **URL**, **expected**, and **actual** (long strings truncated).
+- **Failure screenshots** (`test.info().attach` → HTML / Allure) are **not** controlled by `ENABLE_PFT_DEBUG_LOG`; they attach when a validation reports a failure and requests a screenshot.
+- **`captureProcessEnvBeforeBeforeEach()`** (first line of `test.beforeEach`) and **`logTestBeforeEachContext()`** (end of the same hook): when `ENABLE_PFT_DEBUG_LOG=true`, prints one block with the test title and every **non-empty** `process.env` key whose value **changed** during that `beforeEach` (compared to the snapshot at the start). No allowlist to maintain.
+
+`playwright.config.ts` exports **`enable_pft_debug_log`** alongside other `ENABLE_*` flags.
 
 ## 4. Actions and Validations
 

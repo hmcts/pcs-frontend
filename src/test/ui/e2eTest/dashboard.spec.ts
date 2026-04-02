@@ -3,11 +3,13 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
+import { captureProcessEnvBeforeBeforeEach, logTestBeforeEachContext } from '../utils/common/pft-debug-log';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }) => {
+  captureProcessEnvBeforeBeforeEach();
   initializeExecutor(page);
   process.env.NOTICE_SERVED = 'NO';
   process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
@@ -20,6 +22,7 @@ test.beforeEach(async ({ page }) => {
   await performAction('navigateToUrl', home_url);
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
+  logTestBeforeEachContext();
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
