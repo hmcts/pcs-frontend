@@ -66,10 +66,15 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
-
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
+    };
+    householdCircumstances?: {
+      alternativeAccommodation?: YesNoNotSureValue;
+      alternativeAccommodationTransferDate?: string;
+      otherTenants?: YesNoValue;
+      otherTenantsDetails?: string;
     };
   };
   claimantEnteredDefendantDetails?: {
