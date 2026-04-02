@@ -39,3 +39,8 @@ export async function getStepBeforeDisputePages(req: Request): Promise<string> {
   // Priority 5: No notice flow - user came from tenancy date unknown (fallback)
   return 'tenancy-date-unknown';
 }
+
+// Backwards-compatible alias used in existing tests/callers.
+export async function getPreviousPageForArrears(req: Request): Promise<string> {
+  return getStepBeforeDisputePages(req);
+}

@@ -90,27 +90,9 @@ describe('formBuilder', () => {
   };
 
   const createMockI18n = (t: TFunction) => {
-    const mockCharacterCount = {
-      charactersUnderLimitText: {
-        one: 'You have %{count} character remaining',
-        other: 'You have %{count} characters remaining',
-      },
-      charactersAtLimitText: 'You have reached the limit',
-      charactersOverLimitText: {
-        one: 'You have %{count} character too many',
-        other: 'You have %{count} characters too many',
-      },
-    };
     return {
       getFixedT: jest.fn(() => t),
-      getResourceBundle: jest.fn((lang: string, ns: string) => {
-        if (ns === 'common') {
-          return {
-            characterCount: mockCharacterCount,
-          };
-        }
-        return {};
-      }),
+      getResourceBundle: jest.fn(() => ({})),
     };
   };
 
