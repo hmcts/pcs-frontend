@@ -1,7 +1,7 @@
-import type { PossessionClaimResponse, LanguageUsed, CaseData } from '../../../interfaces/ccdCase.interface';
+import type { CaseData, LanguageUsed, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { flowConfig } from '../flow.config';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 
@@ -35,7 +35,8 @@ export const step: StepDefinition = createFormStep({
   ],
   getInitialFormData: req => {
     const caseData: CaseData = req.res?.locals?.validatedCase?.data;
-    const languageUsedCcd: LanguageUsed | undefined = caseData?.possessionClaimResponse?.defendantResponses?.languageUsed;
+    const languageUsedCcd: LanguageUsed | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.languageUsed;
 
     return languageUsedCcd ? { languageUsed: languageUsedCcd } : {};
   },
@@ -54,5 +55,4 @@ export const step: StepDefinition = createFormStep({
 
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
-
 });
