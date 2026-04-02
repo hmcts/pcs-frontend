@@ -29,7 +29,7 @@ export const step: StepDefinition = createFormStep({
     beforeYouStart: 'beforeYouStart',
     onceYouStart: 'onceYouStart',
     weWillNotSaveYourAnswers: 'weWillNotSaveYourAnswers',
-    howMuchWillItCost: 'howMuchWillItCost',
+    howMuchItWillCost: 'howMuchItWillCost',
     usualCosts: 'usualCosts',
     youHaveAlreadyToldTheOtherParty: 'youHaveAlreadyToldTheOtherParty',
     theyDidNotAgreeToIt: 'theyDidNotAgreeToIt',

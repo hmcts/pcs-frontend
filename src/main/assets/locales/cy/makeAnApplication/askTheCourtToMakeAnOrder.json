@@ -21,7 +21,7 @@
   "beforeYouStart": "cyBefore you start: Make sure that you have all of the evidence you need to apply.",
   "onceYouStart": "cyOnce you start your application, you cannot save your progress as a draft.",
   "weWillNotSaveYourAnswers": "cyThis means that if you leave your application before submitting, we will not save your answers so that you can return to them later.",
-  "howMuchWillItCost": "cyHow much it will cost",
+  "howMuchItWillCost": "cyHow much it will cost",
   "usualCosts": "cyIt usually costs {{standardFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to apply. The fee will increase to {{maxFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} if:",
   "youHaveAlreadyToldTheOtherParty": "cyyou have already told the other party that you are making this application, and",
   "theyDidNotAgreeToIt": "cythey did not agree to it (this means that they have objected to it)",
