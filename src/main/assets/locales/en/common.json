@@ -29,6 +29,10 @@
   },
   "change": "Change",
   "back": "Back",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
   "date": {
     "day": "Day",
     "month": "Month",
