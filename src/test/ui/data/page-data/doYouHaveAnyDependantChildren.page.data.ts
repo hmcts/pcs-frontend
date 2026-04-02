@@ -7,7 +7,6 @@ export const doYouHaveAnyDependantChildren = {
   giveDetailsHiddenTextLabel: `Give details about your dependant children`,
   detailsTextInput: `1 dependant child - Name:Samuel and Age:7`,
   saveAndContinueButton: `Save and continue`,
-  detailsCharLimitInputText: `abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz1234567`,
   youShouldIncludeHiddenHintText: `You should include details about how many dependant children you have and how old they are`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   youHave500CharactersHiddenHintText: `You can enter up to 500 characters`,

@@ -1,6 +1,8 @@
 import { dashboard, doYouHaveAnyDependantChildren, feedback, yourHouseholdAndCircumstances } from '../data/page-data';
+import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
+const charLimitInputText = generateRandomString(501);
 export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<void> {
   await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
@@ -16,11 +18,7 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
   });
 
   await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
-  await performAction(
-    'inputText',
-    doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
-    doYouHaveAnyDependantChildren.detailsCharLimitInputText
-  );
+  await performAction('inputText', doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel, charLimitInputText);
   await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
