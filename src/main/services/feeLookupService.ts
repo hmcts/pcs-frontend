@@ -1,7 +1,8 @@
 import axios from 'axios';
 import config from 'config';
 
-import { FeeLookupParams, FeeType } from '../interfaces/feeService.interface';
+import { FeeType } from '../interfaces/feeService.interface';
+import type { FeeLookupParams } from '../interfaces/feeService.interface';
 
 import { Logger } from '@modules/logger';
 
