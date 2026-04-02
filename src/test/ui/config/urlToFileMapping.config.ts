@@ -24,4 +24,7 @@ export default {
   'landlord-licensed': 'landlordLicensed',
   'written-terms': 'writtenTerms',
   'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
+  'installment-payments': 'installmentPayments',
+  'how-much-afford-to-pay': 'howMuchAffordToPay',
+  'your-household-and-circumstances': 'yourHouseholdAndCircumstances',
 };

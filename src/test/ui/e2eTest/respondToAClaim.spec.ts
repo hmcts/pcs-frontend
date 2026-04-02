@@ -12,13 +12,14 @@ import {
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
+  doYouHaveAnyDependantChildren,
   freeLegalAdvice,
+  howMuchAffordToPay,
   installmentPayments,
   nonRentArrearsDispute,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
-  situationInterstitialScreen,
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
@@ -97,6 +98,14 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
   } else {
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'NO';
+  }
+
+  //Check if No is selected on RepaymentAgreed page(Rent Arrears) - for back link navigation
+  if (testInfo.title.includes('RentArrears - Demoted')) {
+    process.env.REPAYMENT_AGREED = 'NO';
+  }
+  if (testInfo.title.includes('InstallmentPayment - No')) {
+    process.env.INSTALLMENT_PAYMENT = 'NO';
   }
 
   // Tenancy start date logic for noDefendantTest
@@ -205,7 +214,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('readYourHouseHoldAndCircumstances');
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
@@ -262,7 +272,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
+    await performAction('readYourHouseHoldAndCircumstances');
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
@@ -317,9 +328,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('readYourHouseHoldAndCircumstances');
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -375,7 +387,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
+    await performAction('readYourHouseHoldAndCircumstances');
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -467,10 +480,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
+    await performAction('readYourHouseHoldAndCircumstances');
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -520,9 +534,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.noRadioOption,
+    });
+    await performAction('readYourHouseHoldAndCircumstances');
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
@@ -574,7 +593,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.yesRadioOption,
+    });
+    await performAction('selectHowMuchAffordToPay', {
+      affordToPay: howMuchAffordToPay.affordToPayTextInput,
+      question: howMuchAffordToPay.howFrequentlyCouldYouAffordToPayQuestion,
+      radioOption: howMuchAffordToPay.weeklyRadioOption,
+    });
+    await performAction('readYourHouseHoldAndCircumstances');
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
@@ -627,8 +656,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('readYourHouseHoldAndCircumstances');
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
   });
 });

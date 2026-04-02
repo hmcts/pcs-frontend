@@ -12,6 +12,8 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  howMuchAffordToPay,
+  installmentPayments,
   landlordLicensed,
   landlordRegistered,
   nonRentArrearsDispute,
@@ -25,6 +27,7 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
   writtenTerms,
+  yourHouseHoldAndCircumstances,
 } from '../../../data/page-data';
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -58,6 +61,9 @@ export class RespondToClaimAction implements IAction {
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
+      ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
+      ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
+      ['readYourHouseHoldAndCircumstances', () => this.readYourHouseHoldAndCircumstances()],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -239,6 +245,30 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  }
+  private async installmentPayments(installmentData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: installmentData.question,
+      option: installmentData.radioOption,
+    });
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
+  }
+
+  private async selectHowMuchAffordToPay(howMuchToPayData: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
+      howMuchToPayData.affordToPay
+    );
+    await performAction('clickRadioButton', {
+      question: howMuchToPayData.question,
+      option: howMuchToPayData.radioOption,
+    });
+    await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
+  }
+
+  private async readYourHouseHoldAndCircumstances(): Promise<void> {
+    await performAction('clickButton', yourHouseHoldAndCircumstances.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
