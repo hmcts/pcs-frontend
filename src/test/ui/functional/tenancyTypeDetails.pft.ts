@@ -16,7 +16,10 @@ export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
     message: tenancyTypeDetails.selectIfTenancyDetailsErrorMessage,
   });
   //mandatory text field for 'No' radio button selection
-  await performAction('clickRadioButton', tenancyTypeDetails.noRadioOption);
+  await performAction('clickRadioButton', {
+    question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
+    option: tenancyTypeDetails.noRadioOption,
+  });
   await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
@@ -38,6 +41,9 @@ export async function tenancyTypeDetailsNavigationTests(): Promise<void> {
       );
     }
   }
-  await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
+  await performAction('clickRadioButton', {
+    question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
+    option: tenancyTypeDetails.yesRadioOption,
+  });
   await performValidation('pageNavigation', tenancyTypeDetails.saveForLaterButton, dashboard.mainHeader);
 }
