@@ -12,6 +12,7 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   freeLegalAdvice,
+  incomeAndExpenses,
   landlordLicensed,
   landlordRegistered,
   nonRentArrearsDispute,
@@ -24,6 +25,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  whatRegularIncomeDoYouReceive,
   writtenTerms,
 } from '../../../data/page-data';
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
@@ -58,6 +60,11 @@ export class RespondToClaimAction implements IAction {
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
+      ['selectIncomeAndExpenses', () => this.selectIncomeAndExpenses(fieldName as actionRecord)],
+      [
+        'selectWhatRegularIncomeDoYouReceive',
+        () => this.selectWhatRegularIncomeDoYouReceive(fieldName as actionRecord),
+      ],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -239,6 +246,62 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  }
+
+  private async selectIncomeAndExpenses(incomeAndExpenseData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: incomeAndExpenses.doYouWantToProvideDetailsTextLabel,
+      option: incomeAndExpenseData.incomeAndExpensesOption,
+    });
+    await performAction('clickButton', incomeAndExpenses.saveAndContinueButton);
+  }
+
+  private async selectWhatRegularIncomeDoYouReceive(regularIncome?: actionRecord): Promise<void> {
+    if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+      return;
+    }
+
+    for (const income of regularIncome.regularIncomeOptions) {
+      const [option, value, frequency] = income;
+
+      // Select checkbox
+      await performAction('check', {
+        question: whatRegularIncomeDoYouReceive.mainHeader,
+        option,
+      });
+
+      console.log(`checked the check-box ${option}`);
+
+      // Special case: "moneyFromSomewhereElse"
+      if (option === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph) {
+        await performAction(
+          'inputText',
+          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
+          value
+        );
+
+        console.log(`entered additional details for ${option}`);
+        continue;
+      }
+
+      // Normal validation
+      if (!value || !frequency) {
+        throw new Error(`Amount and frequency are required for option: ${option}`);
+      }
+
+      // Enter amount
+      await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
+
+      console.log(`entered the amount for ${option}`);
+
+      // Select frequency
+      await performAction('clickRadioButton', frequency);
+
+      console.log(`clicked frequency radio button for the option ${option}`);
+    }
+
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {

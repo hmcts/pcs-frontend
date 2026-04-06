@@ -1,0 +1,18 @@
+export const incomeAndExpenses = {
+  mainHeader: `Income and expenses`,
+  respondToClaimParagraph: `Respond to a property possession claim`,
+  doYouWantToProvideDetailsTextLabel: `Do you want to provide details of your income and expenses?`,
+  detailsAboutYourIncomeParagraph: `Details about your income and expenses can be used by a judge to reach a decision on your case, and also to decide how much you could afford to repay if you have rent arrears.`,
+  onTheDayOfHearingParagraph: `On the day of the hearing, there may be a duty adviser at the court who can give you advice and represent you for free. They can also use this information to see if there’s any additional benefits or support you might be entitled to.`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  yesRadioOption: `Yes`,
+  noRadioOption: 'No',
+  cancelLink: `Cancel`,
+  cymraegLink: `Cymraeg`,
+  backLink: `Back`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `income-and-expenses`,
+  errorValidationHeader: `There is a problem`,
+  selectIfYouWantToProvideDetailsErrorMessage: `Select if you want to provide details of your income and expenses`,
+};
