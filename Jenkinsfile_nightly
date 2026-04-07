@@ -21,17 +21,37 @@ properties([
     ),
     booleanParam(
       name: 'FIREFOX_TESTS',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Tick the checkbox to run E2E tests in Firefox.'
     ),
     booleanParam(
       name: 'WEBKIT_TESTS',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Tick the checkbox to run E2E tests in Webkit.'
     ),
     booleanParam(
+      name: 'EDGE_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in Microsoft Edge.'
+    ),
+    booleanParam(
+      name: 'MOBILE_CHROME_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in emulated Mobile Chrome (Pixel 5 profile).'
+    ),
+    booleanParam(
+      name: 'MOBILE_SAFARI_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in emulated Mobile Safari (iPhone 12 profile).'
+    ),
+    booleanParam(
+      name: 'IPAD_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in emulated iPad Safari (iPad Pro 11 profile).'
+    ),
+    booleanParam(
       name: 'ACCESSIBILITY_TESTS',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
   ])
@@ -98,6 +118,8 @@ def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'false'
+  env.PLAYWRIGHT_TEST_GREP = '@nightly'
+  env.SAUCE_GREP = '@saucelab'
 }
 
 def runE2ETests(yarnBuilder) {
@@ -109,6 +131,18 @@ def runE2ETests(yarnBuilder) {
   }
   if (params.WEBKIT_TESTS) {
     runE2ETestsForBrowser(yarnBuilder, 'Safari')
+  }
+  if (params.EDGE_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'Edge')
+  }
+  if (params.MOBILE_CHROME_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'MobileChrome')
+  }
+  if (params.MOBILE_SAFARI_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'MobileSafari')
+  }
+  if (params.IPAD_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'Ipad')
   }
 }
 

@@ -1,0 +1,64 @@
+# Single suite: Edge (Chromium) on macOS 13. Run: yarn test:sauce:mac13-edge
+apiVersion: v1alpha
+kind: playwright
+
+sauce:
+  region: eu-central-1
+  concurrency: 1
+  tunnel:
+    name: $SAUCE_TUNNEL_NAME
+  metadata:
+    tags:
+      - pcs-frontend-mac13-edge
+
+defaults:
+  timeout: 30m
+
+playwright:
+  version: 1.58.1
+  configFile: playwright.config.ts
+
+nodeVersion: v22
+
+rootDir: ./
+
+npm:
+  packages:
+    '@hmcts/playwright-common': '1.0.39'
+
+env:
+  PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
+  PLAYWRIGHT_SKIP_ALLURE: 'true'
+  CI: 'true'
+  NODE_CONFIG_ENV: test
+
+  TEST_URL: $TEST_URL
+  MANAGE_CASE_URL: $MANAGE_CASE_URL
+
+  PCS_API_URL: $PCS_API_URL
+  DATA_STORE_URL_BASE: $DATA_STORE_URL_BASE
+  PCS_API_CHANGE_ID: $PCS_API_CHANGE_ID
+
+  PCS_FRONTEND_IDAM_SECRET: $PCS_FRONTEND_IDAM_SECRET
+  IDAM_PCS_USER_EMAIL: $IDAM_PCS_USER_EMAIL
+  IDAM_PCS_USER_PASSWORD: $IDAM_PCS_USER_PASSWORD
+  IDAM_PCS_USER_PASSWORD_B64: $IDAM_PCS_USER_PASSWORD_B64
+
+  SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
+
+suites:
+  - name: 'pcs-frontend-mac13-edge'
+    platformName: macOS 13
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chromium
+      project: MicrosoftEdge
+      headless: true
+      grep: $SAUCE_GREP
+
+reporters:
+  spotlight:
+    enabled: true

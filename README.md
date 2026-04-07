@@ -184,6 +184,12 @@ There are also several custom test scripts available:
 - `test:E2eChrome` - runs the full E2E suite in Chrome
 - `test:E2eFirefox` - runs the full E2E suite in Firefox
 - `test:E2eSafari` - runs the full E2E suite in Safari
+- `test:E2eEdge` - runs the full E2E suite in Microsoft Edge (requires `CI=true` for the Edge project in Playwright config)
+- `test:E2eMobileChrome` - emulated Mobile Chrome (Pixel 5 profile; requires `CI=true`)
+- `test:E2eMobileSafari` - emulated Mobile Safari (iPhone 12 profile; requires `CI=true`)
+- `test:E2eIpad` - emulated iPad Safari (iPad Pro 11 profile; requires `CI=true`)
+
+**`Jenkinsfile_nightly`** sets **`PLAYWRIGHT_TEST_GREP=@nightly`** and **`SAUCE_GREP=@saucelab`** (see `setFunctionalTestEnvVars`). `package.json` scripts use those env vars with **no** inline defaults — export them locally before running `test:E2e*`, `test:local`, `test:fullfunctional`, or `test:sauce*`, e.g. `export PLAYWRIGHT_TEST_GREP=@nightly SAUCE_GREP=@saucelab`.
 
 Running accessibility tests:
 

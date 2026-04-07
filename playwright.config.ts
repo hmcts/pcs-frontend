@@ -20,7 +20,7 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
-/** Sauce installs only `npm.packages` from `.sauce/config.yml` — `allure-playwright` is usually absent; skip if missing or explicitly disabled. */
+/** Sauce installs only `npm.packages` from `.sauce/*.yml` — `allure-playwright` is usually absent; skip if missing or explicitly disabled. */
 function isAllurePlaywrightInstalled(): boolean {
   try {
     require.resolve('allure-playwright');
@@ -32,7 +32,7 @@ function isAllurePlaywrightInstalled(): boolean {
 
 const useAllureReporter = process.env.PLAYWRIGHT_SKIP_ALLURE !== 'true' && isAllurePlaywrightInstalled();
 
-/** Set only in `.sauce/config.yml` — full video, screenshots after each test, and trace (not used on local Jenkins E2E unless you export it). */
+/** Set via `PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS` in `.sauce/*.yml` — full video, screenshots after each test, and trace (not used on local Jenkins E2E unless you export it). */
 const sauceFullJourneyArtifacts = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
 
 const captureSettings = sauceFullJourneyArtifacts
@@ -117,10 +117,9 @@ export default defineConfig({
             name: 'MobileChrome',
             use: {
               ...devices['Pixel 5'],
-              channel: 'MobileChrome',
+              channel: 'chrome',
               ...captureSettings,
               javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
             },
           },
@@ -128,10 +127,19 @@ export default defineConfig({
             name: 'MobileSafari',
             use: {
               ...devices['iPhone 12'],
-              channel: 'MobileSafari',
+              channel: 'webkit',
               ...captureSettings,
               javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
+              headless: !!process.env.CI,
+            },
+          },
+          {
+            name: 'iPad',
+            use: {
+              ...devices['iPad Pro 11'],
+              channel: 'webkit',
+              ...captureSettings,
+              javaScriptEnabled: true,
               headless: !!process.env.CI,
             },
           },
