@@ -218,6 +218,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -350,6 +352,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -673,6 +681,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: howMuchAffordToPay.howFrequentlyCouldYouAffordToPayQuestion,
       radioOption: howMuchAffordToPay.weeklyRadioOption,
     });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -737,6 +747,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performValidation('mainHeader', installmentPayments.mainHeader);
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
