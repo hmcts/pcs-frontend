@@ -2,8 +2,8 @@ import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
-import { Logger } from '@modules/logger';
 
+import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 
 const logger = Logger.getLogger('equalityAndDiversityStart');
