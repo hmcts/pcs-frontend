@@ -28,7 +28,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('Select an Application - Ask to Adjourn journey', async () => {
+  test('Select an Application - Ask to Adjourn journey @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.delayRadioOption,
@@ -38,7 +38,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('Select an Application - Ask to Set aside', async () => {
+  test('Select an Application - Ask to Set aside @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
@@ -48,7 +48,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('Select an Application - Something else', async () => {
+  test('Select an Application - Something else @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
