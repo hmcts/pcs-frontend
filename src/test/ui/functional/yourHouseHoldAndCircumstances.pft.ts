@@ -26,5 +26,5 @@ export async function yourHouseholdAndCircumstancesNavigationTests(): Promise<vo
   if (process.env.INSTALLMENT_PAYMENT === 'NO') {
     await performValidation('pageNavigation', yourHouseHoldAndCircumstances.backLink, installmentPayments.mainHeader);
   }
-  await performValidation('pageNavigation', yourHouseHoldAndCircumstances.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', yourHouseHoldAndCircumstances.cancelLink, dashboard.mainHeader);
 }
