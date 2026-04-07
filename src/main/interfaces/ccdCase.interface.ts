@@ -73,6 +73,7 @@ export interface PossessionClaimResponse {
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
     languageUsed?: LanguageUsed;
+    equalityAndDiversityQuestionsChoice?: 'CONTINUE' | 'SKIP' | null;
 
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;

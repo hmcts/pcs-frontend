@@ -1,5 +1,5 @@
 {% extends "stepsTemplate.njk" %}
-{% from "macros/stepButtons.njk" import stepButtons %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% block mainContent %}
@@ -9,7 +9,19 @@
   <h1 class="govuk-heading-l">Equality and diversity start (placeholder)</h1>
   <p class="govuk-body">This is a placeholder for Equality and diversity start step.</p>
   <form method="post" action="{{ url }}">
-    {{ stepButtons(continue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: 'Continue to the questions',
+        name: 'equalityStartChoice',
+        value: 'continue'
+      }) }}
+      {{ govukButton({
+        text: 'I do not want to answer these questions',
+        classes: 'govuk-button--secondary',
+        name: 'equalityStartChoice',
+        value: 'skip'
+      }) }}
+    </div>
   </form>
 {% endblock %}

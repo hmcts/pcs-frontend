@@ -9,3 +9,4 @@ export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getStepBeforeDisputePages } from './journeyHelpers';
 export { formatDatePartsToISODate } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
+export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
