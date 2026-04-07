@@ -65,10 +65,11 @@ export class ActionRegistry {
     ['tenancyOrContractTypeDetails', new RespondToClaimAction()],
     ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
+    ['readYourHouseholdAndCircumstances', new RespondToClaimAction()],
+    ['doYouHaveAnyDependantChildren', new RespondToClaimAction()],
+    ['doYouHaveAnyOtherDependants', new RespondToClaimAction()],
     ['installmentPayments', new RespondToClaimAction()],
     ['selectHowMuchAffordToPay', new RespondToClaimAction()],
-    ['repaymentsAgreed', new RespondToClaimAction()],
-    ['readYourHouseHoldAndCircumstances', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
   ]);
 

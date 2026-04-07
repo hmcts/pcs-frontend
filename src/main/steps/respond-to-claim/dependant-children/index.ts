@@ -1,4 +1,11 @@
+import type {
+  CaseData,
+  HouseholdCircumstances,
+  PossessionClaimResponse,
+  YesNoValue,
+} from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -8,6 +15,94 @@ export const step: StepDefinition = createFormStep({
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  fields: [],
   customTemplate: `${__dirname}/dependantChildren.njk`,
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    heading: 'heading',
+    caption: 'caption',
+    paragraph: 'dependantChildrenParagraph',
+  },
+  beforeRedirect: async req => {
+    const dependantChildren: string = req.body?.dependantChildren;
+
+    if (!dependantChildren) {
+      return;
+    }
+
+    const enumMapping: Record<string, YesNoValue> = {
+      yes: 'Yes',
+      no: 'No',
+    };
+
+    const dependantChildrenCcd = enumMapping[dependantChildren];
+    if (!dependantChildrenCcd) {
+      return;
+    }
+
+    const dependantChildrenDetails: string | undefined =
+      dependantChildrenCcd === 'Yes' ? req.body?.['dependantChildren.dependantChildrenDetails'] : undefined;
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        householdCircumstances: {
+          dependantChildren: dependantChildrenCcd,
+          dependantChildrenDetails: dependantChildrenDetails ?? '',
+        },
+      },
+    };
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  getInitialFormData: req => {
+    const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
+    const householdCircumstances: HouseholdCircumstances | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const dependantChildrenCcd: YesNoValue | undefined = householdCircumstances?.dependantChildren;
+
+    if (!dependantChildrenCcd) {
+      return {};
+    }
+
+    if (dependantChildrenCcd === 'Yes') {
+      const dependantChildrenDetails: string | undefined = householdCircumstances?.dependantChildrenDetails;
+      return {
+        dependantChildren: 'yes',
+        'dependantChildren.dependantChildrenDetails': dependantChildrenDetails ?? '',
+      };
+    }
+
+    return { dependantChildren: 'no' };
+  },
+  fields: [
+    {
+      name: 'dependantChildren',
+      type: 'radio',
+      required: true,
+      legendClasses: 'govuk-visually-hidden',
+      translationKey: {
+        label: 'heading',
+      },
+      errorMessage: 'errors.dependantChildren',
+      options: [
+        {
+          value: 'yes',
+          translationKey: 'options.yes',
+          subFields: {
+            dependantChildrenDetails: {
+              name: 'dependantChildrenDetails',
+              type: 'character-count',
+              required: true,
+              maxLength: 500,
+              translationKey: {
+                label: 'dependantChildrenDetailsLabel',
+                hint: 'dependantChildrenDetailsHint',
+              },
+              labelClasses: 'govuk-label--s',
+              errorMessage: 'errors.dependantChildrenDetails',
+            },
+          },
+        },
+        { value: 'no', translationKey: 'options.no' },
+      ],
+    },
+  ],
 });
