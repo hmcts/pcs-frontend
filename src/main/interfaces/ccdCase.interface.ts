@@ -6,12 +6,49 @@ export enum CaseState {
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'Yes' | 'No';
 export type TenancyTypeCorrectValue = YesNoNotSureValue;
-export type ContactPreference = 'EMAIL' | 'POST' | null;
-
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
+export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
+
+export interface IncomeExpenseDetails {
+  applies: YesNoValue;
+  amount?: PenceAmount;
+  frequency?: FrequencyValue;
+}
+
+export interface HouseholdCircumstances {
+  dependantChildren?: YesNoValue;
+  dependantChildrenDetails?: string;
+  otherDependants?: YesNoValue;
+  otherDependantDetails?: string;
+  shareIncomeExpenseDetails?: YesNoValue;
+  incomeFromJobs?: YesNoValue;
+  incomeFromJobsAmount?: PenceAmount;
+  incomeFromJobsFrequency?: FrequencyValue;
+  pension?: YesNoValue;
+  pensionAmount?: PenceAmount;
+  pensionFrequency?: FrequencyValue;
+  universalCredit?: YesNoValue;
+  universalCreditAmount?: PenceAmount;
+  universalCreditFrequency?: FrequencyValue;
+  ucApplicationDate?: string;
+  otherBenefits?: YesNoValue;
+  otherBenefitsAmount?: PenceAmount;
+  otherBenefitsFrequency?: FrequencyValue;
+  moneyFromElsewhere?: YesNoValue;
+  moneyFromElsewhereDetails?: string;
+  householdBills?: IncomeExpenseDetails;
+  loanPayments?: IncomeExpenseDetails;
+  childSpousalMaintenance?: IncomeExpenseDetails;
+  mobilePhone?: IncomeExpenseDetails;
+  groceryShopping?: IncomeExpenseDetails;
+  fuelParkingTransport?: IncomeExpenseDetails;
+  schoolCosts?: IncomeExpenseDetails;
+  clothing?: IncomeExpenseDetails;
+  otherExpenses?: IncomeExpenseDetails;
+}
 
 export interface CcdUserCase {
   id: string;
@@ -41,38 +78,8 @@ export interface Address {
   Country?: string;
 }
 
-export interface IncomeExpenseDetails {
-  applies: YesNoValue;
-  amount?: PenceAmount;
-  frequency?: FrequencyValue;
-}
-
-export interface HouseholdCircumstances {
-  shareIncomeExpenseDetails?: YesNoValue;
-  incomeFromJobs?: YesNoValue;
-  incomeFromJobsAmount?: PenceAmount;
-  incomeFromJobsFrequency?: FrequencyValue;
-  pension?: YesNoValue;
-  pensionAmount?: PenceAmount;
-  pensionFrequency?: FrequencyValue;
-  universalCredit?: YesNoValue;
-  universalCreditAmount?: PenceAmount;
-  universalCreditFrequency?: FrequencyValue;
-  ucApplicationDate?: string;
-  otherBenefits?: YesNoValue;
-  otherBenefitsAmount?: PenceAmount;
-  otherBenefitsFrequency?: FrequencyValue;
-  moneyFromElsewhere?: YesNoValue;
-  moneyFromElsewhereDetails?: string;
-  householdBills?: IncomeExpenseDetails;
-  loanPayments?: IncomeExpenseDetails;
-  childSpousalMaintenance?: IncomeExpenseDetails;
-  mobilePhone?: IncomeExpenseDetails;
-  groceryShopping?: IncomeExpenseDetails;
-  fuelParkingTransport?: IncomeExpenseDetails;
-  schoolCosts?: IncomeExpenseDetails;
-  clothing?: IncomeExpenseDetails;
-  otherExpenses?: IncomeExpenseDetails;
+export interface CaseData {
+  possessionClaimResponse?: PossessionClaimResponse;
 }
 
 export interface PossessionClaimResponse {
