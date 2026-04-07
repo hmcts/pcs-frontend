@@ -431,6 +431,39 @@ describe('componentBuilders', () => {
         });
       });
 
+      it('should build radio with option hints', () => {
+        const field: FormFieldConfig = {
+          name: 'choice',
+          type: 'radio',
+          options: [
+            { value: 'yes', text: 'Yes', hint: 'This includes advice from a solicitor.' },
+            { value: 'no', text: 'No' },
+          ],
+        };
+
+        const result = buildComponentConfig(
+          field,
+          'Make a choice',
+          undefined,
+          'yes',
+          [
+            { value: 'yes', text: 'Yes', hint: 'This includes advice from a solicitor.' },
+            { value: 'no', text: 'No' },
+          ],
+          false,
+          undefined,
+          0,
+          false,
+          mockT,
+          mockNunjucksEnv
+        );
+
+        expect(result.component.items).toEqual([
+          { value: 'yes', text: 'Yes', hint: { text: 'This includes advice from a solicitor.' }, checked: true },
+          { value: 'no', text: 'No', checked: false },
+        ]);
+      });
+
       it('should handle radio options without conditionalText or subFields', () => {
         const field: FormFieldConfig = {
           name: 'answer',
@@ -551,6 +584,39 @@ describe('componentBuilders', () => {
         expect(firstItem.conditional).toEqual({
           html: '<p>You have agreed to the terms</p>',
         });
+      });
+
+      it('should build checkbox with option hints', () => {
+        const field: FormFieldConfig = {
+          name: 'agreement',
+          type: 'checkbox',
+          options: [
+            { value: 'agree', text: 'I agree', hint: 'This means you accept the terms.' },
+            { value: 'updates', text: 'Send me updates' },
+          ],
+        };
+
+        const result = buildComponentConfig(
+          field,
+          'Agreement',
+          undefined,
+          ['agree'],
+          [
+            { value: 'agree', text: 'I agree', hint: 'This means you accept the terms.' },
+            { value: 'updates', text: 'Send me updates' },
+          ],
+          false,
+          undefined,
+          0,
+          false,
+          mockT,
+          mockNunjucksEnv
+        );
+
+        expect(result.component.items).toEqual([
+          { value: 'agree', text: 'I agree', hint: { text: 'This means you accept the terms.' }, checked: true },
+          { value: 'updates', text: 'Send me updates', checked: false },
+        ]);
       });
 
       it('should handle checkbox without conditionalText or subFields', () => {

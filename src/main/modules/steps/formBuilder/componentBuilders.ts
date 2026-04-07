@@ -31,7 +31,7 @@ export function buildComponentConfig(
   label: string,
   hint: string | undefined,
   fieldValue: unknown,
-  translatedOptions: { value?: string; text?: string; divider?: string }[] | undefined,
+  translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined,
   hasError: boolean,
   errorText: string | undefined,
   index: number,
@@ -115,6 +115,10 @@ export function buildComponentConfig(
             text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
             checked: radioValue === option.value,
           };
+          const itemHint = translatedOptions?.[optionIndex]?.hint || option.hint;
+          if (itemHint) {
+            item.hint = { text: itemHint };
+          }
 
           // Build conditional HTML from conditionalText and subFields
           const conditionalParts: string[] = [];
@@ -163,6 +167,10 @@ export function buildComponentConfig(
             text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
             checked: option.value ? checkboxArray.includes(option.value) : false,
           };
+          const itemHint = translatedOptions?.[optionIndex]?.hint || option.hint;
+          if (itemHint) {
+            item.hint = { text: itemHint };
+          }
 
           // Build conditional HTML from conditionalText and subFields
           const conditionalParts: string[] = [];

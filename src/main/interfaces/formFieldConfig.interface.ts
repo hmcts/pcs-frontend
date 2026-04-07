@@ -15,6 +15,7 @@ export type ComponentType =
 export interface FormFieldOption {
   value?: string;
   text?: string;
+  hint?: string;
   divider?: string;
   translationKey?: string;
   label?: string | ((translations: Record<string, string>) => string);
