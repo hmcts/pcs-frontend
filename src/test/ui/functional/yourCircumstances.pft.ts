@@ -1,4 +1,4 @@
-import { dashboard, wouldYouHaveSomeoneElse, yourCircumstances } from '../data/page-data';
+import { dashboard, feedback, freeLegalAdvice, wouldYouHaveSomeoneElse, yourCircumstances } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -20,6 +20,10 @@ export async function yourCircumstancesErrorValidation(): Promise<void> {
 }
 
 export async function yourCircumstancesNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', yourCircumstances.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: freeLegalAdvice.pageSlug,
+  });
   await performValidation('pageNavigation', yourCircumstances.backLink, wouldYouHaveSomeoneElse.mainHeader);
   await performAction('clickRadioButton', yourCircumstances.noRadioOption);
   await performValidation('pageNavigation', yourCircumstances.saveForLaterButton, dashboard.mainHeader);

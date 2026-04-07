@@ -19,4 +19,6 @@ export const yourCircumstances = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectCircumstancesErrorMessage: `Select if you'd like to share anything about your circumstances`,
   mustBe500CharactersOrFewerErrorMessage: `Must be 500 characters or fewer`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `free-legal-advice`,
 };

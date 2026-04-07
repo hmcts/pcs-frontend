@@ -1,4 +1,4 @@
-import { dashboard, exceptionalHardship, yourCircumstances } from '../data/page-data';
+import { dashboard, exceptionalHardship, feedback, freeLegalAdvice, yourCircumstances } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -20,6 +20,10 @@ export async function yourExceptionalHardShipErrorValidation(): Promise<void> {
 }
 
 export async function yourExceptionalHardshipNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', exceptionalHardship.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: freeLegalAdvice.pageSlug,
+  });
   await performValidation('pageNavigation', yourCircumstances.backLink, yourCircumstances.mainHeader);
   await performAction('clickRadioButton', yourCircumstances.noRadioOption);
   await performValidation('pageNavigation', exceptionalHardship.saveForLaterButton, dashboard.mainHeader);

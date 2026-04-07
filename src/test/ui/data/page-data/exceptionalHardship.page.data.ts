@@ -22,4 +22,6 @@ export const exceptionalHardship = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectExceptionHardshipErrorMessage: `Select if you'd experience exceptional hardship if you were asked to leave your home`,
   mustBe500CharactersOrFewerErrorMessage: `Must be 500 characters or fewer`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `free-legal-advice`,
 };
