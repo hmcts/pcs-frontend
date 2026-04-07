@@ -116,7 +116,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     pageName: string
   ): string | null {
     if (!fs.existsSync(baseDir)) {
-      throw new Error(`PFT base directory does not exist: ${baseDir}`);
+      throw new Error(`Base directory does not exist: ${baseDir}`);
     }
 
     const directPath = path.join(baseDir, pageName);
