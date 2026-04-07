@@ -425,11 +425,13 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'what-other-regular-expenses-do-you-have',
       routes: [
         {
-          condition: async (_req, _formData, currentStepData: Record<string, unknown>) => currentStepData.equalityStartChoice === 'skip',
+          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
+            currentStepData.equalityStartChoice === 'skip',
           nextStep: 'language-used',
         },
         {
-          condition: async (_req, _formData, currentStepData: Record<string, unknown>) => currentStepData.equalityStartChoice === 'continue',
+          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
+            currentStepData.equalityStartChoice === 'continue',
           nextStep: 'equality-and-diversity-end',
         },
       ],
