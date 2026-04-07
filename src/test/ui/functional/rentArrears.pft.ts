@@ -16,7 +16,10 @@ export async function rentArrearsErrorValidation(): Promise<void> {
     header: rentArrears.thereIsAProblemErrorMessageHeader,
     message: rentArrears.selectIfYouOweErrorMessage,
   });
-  await performAction('clickRadioButton', rentArrears.noRadioOption);
+  await performAction('clickRadioButton', {
+    question: rentArrears.doYouOweThisQuestion,
+    option: rentArrears.noRadioOption,
+  });
   //mandatory input field validation for 'No' radio button selection
   await performAction('clickButton', rentArrears.saveAndContinueButton);
   await performValidation('errorMessage', {
@@ -70,7 +73,9 @@ export async function rentArrearsNavigationTests(): Promise<void> {
   } else if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'YES') {
     await performValidation('pageNavigation', rentArrears.backLink, tenancyDateDetails.mainHeader);
   }
-
-  await performAction('clickRadioButton', rentArrears.yesRadioOption);
+  await performAction('clickRadioButton', {
+    question: rentArrears.doYouOweThisQuestion,
+    option: rentArrears.yesRadioOption,
+  });
   await performValidation('pageNavigation', rentArrears.saveForLaterButton, dashboard.mainHeader);
 }
