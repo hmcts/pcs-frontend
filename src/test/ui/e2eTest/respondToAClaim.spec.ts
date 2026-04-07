@@ -17,6 +17,7 @@ import {
   doYouHaveAnyOtherDependents,
   exceptionalHardship,
   freeLegalAdvice,
+  incomeAndExpenses,
   installmentPayments,
   nonRentArrearsDispute,
   rentArrears,
@@ -28,9 +29,8 @@ import {
   tenancyTypeDetails,
   wouldYouHaveSomeoneElse,
   yourCircumstances,
-  yourHouseholdAndCircumstances,
+  yourHouseholdAndCircumstances
 } from '../data/page-data';
-import { incomeAndExpenses } from '../data/page-data/incomeAndExpenses.page.data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
