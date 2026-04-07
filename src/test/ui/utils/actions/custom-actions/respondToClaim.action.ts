@@ -11,6 +11,8 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
   freeLegalAdvice,
   landlordLicensed,
   landlordRegistered,
@@ -25,6 +27,7 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
   writtenTerms,
+  yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -58,6 +61,9 @@ export class RespondToClaimAction implements IAction {
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
+      ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
+      ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
+      ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -378,6 +384,42 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  }
+
+  private async readYourHouseholdAndCircumstances(): Promise<void> {
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+  }
+
+  private async doYouHaveAnyOtherDependants(otherDependantsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
+      option: otherDependantsData.otherDependantsOption,
+    });
+
+    if (otherDependantsData.otherDependantsOption === doYouHaveAnyOtherDependants.yesRadioOption) {
+      await performAction(
+        'inputText',
+        doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
+        otherDependantsData.otherDependantsInfo
+      );
+    }
+    await performAction('clickButton', doYouHaveAnyOtherDependants.saveAndContinueButton);
+  }
+
+  private async doYouHaveAnyDependantChildren(dependantChildrenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
+      option: dependantChildrenData.dependantChildrenOption,
+    });
+
+    if (dependantChildrenData.dependantChildrenOption === doYouHaveAnyDependantChildren.yesRadioOption) {
+      await performAction(
+        'inputText',
+        doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
+        dependantChildrenData.dependantChildrenInfo
+      );
+    }
+    await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
