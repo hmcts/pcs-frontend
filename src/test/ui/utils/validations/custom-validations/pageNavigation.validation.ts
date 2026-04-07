@@ -61,10 +61,29 @@ export class PageNavigationValidation implements IValidation {
 
       const popup = await Promise.race([popupPromise, new Promise(resolve => setTimeout(() => resolve(null), 1000))]);
 
-      if (popup && (popup as Page).url() !== 'about:blank') {
-        newPage = popup as Page;
-        isNewWindow = true;
-        await newPage.waitForLoadState();
+      let newPopupPage: Page | null = null;
+
+      if (popup) {
+        try {
+          const testPage = popup as Page;
+
+          if (!testPage.isClosed() && testPage.url() !== 'about:blank') {
+            newPopupPage = testPage;
+          }
+        } catch {
+          console.log('Popup closed while checking url or the page is closed');
+          newPopupPage = null;
+        }
+      }
+
+      if (newPopupPage) {
+        try {
+          await newPopupPage.waitForLoadState();
+          newPage = newPopupPage;
+          isNewWindow = true;
+        } catch {
+          console.log('new window closed');
+        }
       }
     }
 
