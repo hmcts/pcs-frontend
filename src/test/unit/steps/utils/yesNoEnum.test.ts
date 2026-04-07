@@ -2,24 +2,34 @@ import { fromYesNoEnum, toYesNoEnum } from '../../../../main/steps/utils/yesNoEn
 
 describe('yesNoEnum utilities', () => {
   describe('toYesNoEnum', () => {
-    it('should convert "yes" to "YES"', () => {
+    it('should convert "yes" to "Yes"', () => {
       const result = toYesNoEnum('yes');
-      expect(result).toBe('YES');
+      expect(result).toBe('Yes');
     });
 
-    it('should convert "no" to "NO"', () => {
+    it('should convert "no" to "No"', () => {
       const result = toYesNoEnum('no');
-      expect(result).toBe('NO');
+      expect(result).toBe('No');
     });
   });
 
   describe('fromYesNoEnum', () => {
-    it('should convert "YES" to "yes"', () => {
+    it('should convert "Yes" to "yes"', () => {
+      const result = fromYesNoEnum('Yes');
+      expect(result).toBe('yes');
+    });
+
+    it('should convert "No" to "no"', () => {
+      const result = fromYesNoEnum('No');
+      expect(result).toBe('no');
+    });
+
+    it('should handle uppercase "YES" case-insensitively', () => {
       const result = fromYesNoEnum('YES');
       expect(result).toBe('yes');
     });
 
-    it('should convert "NO" to "no"', () => {
+    it('should handle uppercase "NO" case-insensitively', () => {
       const result = fromYesNoEnum('NO');
       expect(result).toBe('no');
     });

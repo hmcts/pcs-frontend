@@ -3,11 +3,15 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
+export type VerticalYesNoValue = 'YES' | 'NO' | null;
+export type YesNoValue = 'Yes' | 'No';
+export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
+
+export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
+export type PenceAmount = string;
 
 export interface CcdUserCase {
   id: string;
@@ -37,13 +41,32 @@ export interface Address {
   Country?: string;
 }
 
+export interface HouseholdCircumstances {
+  shareIncomeExpenseDetails?: YesNoValue;
+  incomeFromJobs?: YesNoValue;
+  incomeFromJobsAmount?: PenceAmount;
+  incomeFromJobsFrequency?: FrequencyValue;
+  pension?: YesNoValue;
+  pensionAmount?: PenceAmount;
+  pensionFrequency?: FrequencyValue;
+  universalCredit?: YesNoValue;
+  universalCreditAmount?: PenceAmount;
+  universalCreditFrequency?: FrequencyValue;
+  ucApplicationDate?: string;
+  otherBenefits?: YesNoValue;
+  otherBenefitsAmount?: PenceAmount;
+  otherBenefitsFrequency?: FrequencyValue;
+  moneyFromElsewhere?: YesNoValue;
+  moneyFromElsewhereDetails?: string;
+}
+
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: {
       firstName?: string;
       lastName?: string;
       address?: Address;
-      phoneNumberProvided?: YesNoValue;
+      phoneNumberProvided?: VerticalYesNoValue;
       phoneNumber?: string;
       emailAddress?: string;
     };
@@ -53,8 +76,8 @@ export interface PossessionClaimResponse {
     tenancyType?: string;
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
-    contactByPhone?: YesNoValue;
-    contactByText?: YesNoValue;
+    contactByPhone?: VerticalYesNoValue;
+    contactByText?: VerticalYesNoValue;
     preferenceType?: ContactPreference;
     rentArrearsAmountConfirmation?: string;
     rentArrearsAmount?: string;
@@ -64,6 +87,7 @@ export interface PossessionClaimResponse {
     landlordRegistered?: YesNoNotSureValue;
     landlordLicensed?: YesNoNotSureValue;
     writtenTerms?: YesNoNotSureValue;
+    householdCircumstances?: HouseholdCircumstances;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
 
