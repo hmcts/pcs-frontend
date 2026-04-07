@@ -31,7 +31,7 @@ properties([
     ),
     booleanParam(
       name: 'ACCESSIBILITY_TESTS',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
   ])

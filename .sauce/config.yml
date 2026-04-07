@@ -1,3 +1,7 @@
+# Jenkins nightly Chrome E2E: Linux agent (Ubuntu) + Playwright project `chrome` + Google Chrome, headless when CI=true
+#   (same as: yarn playwright test --project chrome --grep @nightly).
+# Sauce Playwright cloud does not provide a Linux desktop VM — only Windows, macOS, Android (see Sauce docs).
+# We run Chrome on Windows 11 here so the browser/channel matches Jenkins; the host OS is intentionally different.
 apiVersion: v1alpha
 kind: playwright
 
@@ -28,7 +32,6 @@ npm:
     '@hmcts/playwright-common': '1.0.39'
 
 env:
-  # Full video + screenshot after each test + trace — only Sauce sets this (see playwright.config.ts).
   PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
   PLAYWRIGHT_SKIP_ALLURE: 'true'
   CI: 'true'
@@ -49,10 +52,10 @@ env:
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
 suites:
-  - name: 'PCS @saucelab (Chrome)'
+  - name: 'PCS Chrome @nightly (Jenkins parity: browser; OS see header)'
+    # Closest to Jenkins agent: Chrome. Windows 11 = Sauce-supported desktop; not Ubuntu.
     platformName: Windows 11
     screenResolution: 1920x1080
-    # Required by saucectl. Prefer paths with / (often normalized on Sauce); second line matches Windows \\.
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
       - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
@@ -60,7 +63,7 @@ suites:
       browserName: chrome
       project: chrome
       headless: true
-      grep: '@saucelab'
+      grep: '@nightly'
 
 reporters:
   spotlight:
