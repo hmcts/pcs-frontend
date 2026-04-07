@@ -1,4 +1,4 @@
-import { dashboard, exceptionalHardship, feedback, freeLegalAdvice, yourCircumstances } from '../data/page-data';
+import { dashboard, exceptionalHardship, feedback, yourCircumstances } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
