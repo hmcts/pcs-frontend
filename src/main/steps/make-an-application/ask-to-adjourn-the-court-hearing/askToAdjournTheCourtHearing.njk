@@ -11,14 +11,6 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  <div class="govuk-notification-banner" role="region" aria-labelledby="experimental-banner">
-    <div class="govuk-notification-banner__content">
-      <p class="govuk-notification-banner__heading" id="experimental-banner">
-        Placeholder page
-      </p>
-    </div>
-  </div>
-
   <p class="govuk-body">
   {{paragraph1}}
   </p>
@@ -39,4 +31,51 @@
     {{ csrfProtection(csrfToken) }}
 
   </form>
+
+  <h2 class="govuk-heading-m">{{ whatYouWillNeedToApply }}</h2>
+    <p class="govuk-body">
+    {{ youWillNeedToKnow }}
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ ifYouCanPayTheCourtFee }}</li>
+      <li>{{ whyYouAreAskingTheCourt }}</li>
+      <li>{{ whenProposingMovingTo }}</li>
+    </ul>
+    <p class="govuk-body">
+      {{ youMayNeedToProvideEvidence }}
+    </p>
+
+    <div class="govuk-inset-text">
+      <p class="govuk-body">{{ beforeYouStart }}</p>
+      <p class="govuk-body">{{ onceYouStart }}</p>
+      <p class="govuk-body">{{ weWillNotSaveYourAnswers }}</p>
+    </div>
+
+    <h2 class="govuk-heading-m">{{ howLongItTakes }}</h2>
+    <p class="govuk-body">{{ assessedOnUrgencyBasis }}</p>
+
+    <h2 class="govuk-heading-m">{{ howMuchItWillCost }}</h2>
+    <p class="govuk-body">{{ freeIfAtLeast14DaysAway }}</p>
+    <p class="govuk-body">{{ ifHearingSoonerNeedToPay }}</p>
+    <p class="govuk-body">{{ feeIncreasesIf }}</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ youHaveAlreadyToldTheOtherParty }}</li>
+      <li>{{ theyDidNotAgreeToIt }}</li>
+    </ul>
+    <p class="govuk-body">{{ youWillSeeTheFinalApplicationFee }}</p>
+
+    <h2 class="govuk-heading-m">{{ ifYouAreWorriedAboutPayingFees }}</h2>
+    <p class="govuk-body">{{ youMayBeEligibleForHWF | safe }}</p>
+
+    <h2 class="govuk-heading-m">{{ applyByPost }}</h2>
+    <p class="govuk-body">{{ ifPreferToRespondByPost }}</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li><a href="https://www.gov.uk/government/publications/form-n244-application-notice" target="_blank"
+          rel="noopener noreferrer" class="govuk-link">{{ fillInFormForPost }}</a>
+      </li>
+      <li><a href="https://www.gov.uk/find-court-tribunal" target="_blank"
+          rel="noopener noreferrer" class="govuk-link">{{ findYourLocalCourt }}</a></li>
+      <li>{{ sendTheCompletedFormToTheCourt }}</li>
+    </ul>
+
 {% endblock %}

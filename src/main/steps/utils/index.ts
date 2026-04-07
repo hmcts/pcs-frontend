@@ -8,4 +8,4 @@ export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getStepBeforeDisputePages } from './journeyHelpers';
 export { formatDatePartsToISODate } from './dateUtils';
-export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
+export { toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';

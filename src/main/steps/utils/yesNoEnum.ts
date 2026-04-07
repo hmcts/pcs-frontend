@@ -3,17 +3,29 @@
  * Used for CCD API integration where boolean choices are represented as enum strings.
  */
 
-import type { YesNoValue } from '../../interfaces/ccdCase.interface';
+import type { VerticalYesNoValue, YesNoValue } from '../../interfaces/ccdCase.interface';
+
+/**
+ * Converts frontend 'yes'/'no' string to backend CCD YesOrNo enum ('Yes'/'No')
+ * @param value - Frontend radio button value ('yes' or 'no')
+ * @returns CCD enum value ('Yes' or 'No')
+ * @example
+ * toYesNoEnum('yes') // returns 'Yes'
+ * toYesNoEnum('no')  // returns 'No'
+ */
+export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
+  return value.toLowerCase() === 'yes' ? 'Yes' : 'No';
+}
 
 /**
  * Converts frontend 'yes'/'no' string to backend CCD enum 'YES'/'NO'
  * @param value - Frontend radio button value ('yes' or 'no')
  * @returns CCD enum value ('YES' or 'NO')
  * @example
- * toYesNoEnum('yes') // returns 'YES'
- * toYesNoEnum('no')  // returns 'NO'
+ * toVerticalYesNoEnum('yes') // returns 'YES'
+ * toVerticalYesNoEnum('no')  // returns 'NO'
  */
-export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
+export function toVerticalYesNoEnum(value: 'yes' | 'no'): VerticalYesNoValue {
   return value === 'yes' ? 'YES' : 'NO';
 }
 
@@ -22,11 +34,11 @@ export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
  * @param value - CCD enum value ('YES' or 'NO')
  * @returns Frontend radio button value ('yes' or 'no'), or undefined if value is null/invalid
  * @example
- * fromYesNoEnum('YES') // returns 'yes'
- * fromYesNoEnum('NO')  // returns 'no'
- * fromYesNoEnum(null)  // returns undefined
+ * fromVerticalYesNoEnum('YES') // returns 'yes'
+ * fromVerticalYesNoEnum('NO')  // returns 'no'
+ * fromVerticalYesNoEnum(null)  // returns undefined
  */
-export function fromYesNoEnum(value: YesNoValue | string | undefined): 'yes' | 'no' | undefined {
+export function fromVerticalYesNoEnum(value: VerticalYesNoValue | string | undefined): 'yes' | 'no' | undefined {
   if (value === 'YES') {
     return 'yes';
   }
