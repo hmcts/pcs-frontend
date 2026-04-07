@@ -316,6 +316,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performValidation('mainHeader', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.mainHeader);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.continueButton);
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('clickButton', yourCircumstances.continueButton);
+    await performValidation('mainHeader', exceptionalHardship.mainHeader);
+    await performAction('clickButton', exceptionalHardship.continueButton);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
     });
@@ -389,6 +396,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performValidation('mainHeader', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.mainHeader);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.continueButton);
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('clickButton', yourCircumstances.continueButton);
+    await performValidation('mainHeader', exceptionalHardship.mainHeader);
+    await performAction('clickButton', exceptionalHardship.continueButton);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -462,6 +476,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performValidation('mainHeader', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.mainHeader);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.continueButton);
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('clickButton', yourCircumstances.continueButton);
+    await performValidation('mainHeader', exceptionalHardship.mainHeader);
+    await performAction('clickButton', exceptionalHardship.continueButton);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -549,6 +570,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performValidation('mainHeader', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.mainHeader);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.continueButton);
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('clickButton', yourCircumstances.continueButton);
+    await performValidation('mainHeader', exceptionalHardship.mainHeader);
+    await performAction('clickButton', exceptionalHardship.continueButton);
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -614,6 +642,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performValidation('mainHeader', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.mainHeader);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.continueButton);
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('clickButton', yourCircumstances.continueButton);
+    await performValidation('mainHeader', exceptionalHardship.mainHeader);
+    await performAction('clickButton', exceptionalHardship.continueButton);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -708,6 +743,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performValidation('mainHeader', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.mainHeader);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.continueButton);
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('clickButton', yourCircumstances.continueButton);
+    await performValidation('mainHeader', exceptionalHardship.mainHeader);
+    await performAction('clickButton', exceptionalHardship.continueButton);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
@@ -771,6 +813,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performValidation('mainHeader', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.mainHeader);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.continueButton);
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('clickButton', yourCircumstances.continueButton);
+    await performValidation('mainHeader', exceptionalHardship.mainHeader);
+    await performAction('clickButton', exceptionalHardship.continueButton);
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
@@ -836,5 +885,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performValidation('mainHeader', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.mainHeader);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.continueButton);
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('clickButton', yourCircumstances.continueButton);
+    await performValidation('mainHeader', exceptionalHardship.mainHeader);
+    await performAction('clickButton', exceptionalHardship.continueButton);
   });
 });
