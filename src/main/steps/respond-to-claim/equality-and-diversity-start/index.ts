@@ -2,8 +2,11 @@ import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+import { Logger } from '@modules/logger';
 
 import { createFormStep } from '@modules/steps';
+
+const logger = Logger.getLogger('equalityAndDiversityStart');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'equality-and-diversity-start',
@@ -15,6 +18,7 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const choice: 'continue' | 'skip' | undefined = req.body?.equalityStartChoice;
     if (choice !== 'continue' && choice !== 'skip') {
+      logger.warn('Invalid choice for equality and diversity questions', { choice });
       return;
     }
 

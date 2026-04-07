@@ -13,6 +13,8 @@ export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
 
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 
+export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
+
 export interface HouseholdCircumstances {
   dependantChildren?: YesNoValue;
   dependantChildrenDetails?: string;
@@ -82,7 +84,7 @@ export interface PossessionClaimResponse {
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
     languageUsed?: LanguageUsed;
-    equalityAndDiversityQuestionsChoice?: 'CONTINUE' | 'SKIP' | null;
+    equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
 
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
