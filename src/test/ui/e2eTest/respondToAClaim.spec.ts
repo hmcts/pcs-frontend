@@ -25,7 +25,6 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
 } from '../data/page-data';
-import { claimantsName } from '../utils/actions/custom-actions';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -154,6 +153,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim @noDefendants @regression @accessibility', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
+      question: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
@@ -214,10 +214,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
@@ -226,10 +228,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
+      question: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
+      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -280,9 +284,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performAction('doYouHaveAnyOtherDependants', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -292,6 +298,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
+      question: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
@@ -348,9 +355,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performAction('doYouHaveAnyOtherDependants', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
@@ -359,10 +368,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
+      question: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
+      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -412,10 +423,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -425,10 +438,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
+      question: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
+      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -472,10 +487,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -531,16 +548,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantsName),
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -598,14 +616,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantsName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performAction('doYouHaveAnyOtherDependants', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
@@ -618,6 +637,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
+      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -664,10 +684,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -725,16 +747,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantsName),
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performAction('doYouHaveAnyOtherDependants', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
