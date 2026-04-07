@@ -1,7 +1,6 @@
-# Jenkins nightly Chrome E2E: Linux agent (Ubuntu) + Playwright project `chrome` + Google Chrome, headless when CI=true
-#   (same as: yarn playwright test --project chrome --grep @nightly).
-# Sauce Playwright cloud does not provide a Linux desktop VM — only Windows, macOS, Android (see Sauce docs).
-# We run Chrome on Windows 11 here so the browser/channel matches Jenkins; the host OS is intentionally different.
+# Primary Sauce E2E: Safari (Playwright WebKit) on macOS — not the same OS as Jenkins (Linux + Chrome).
+# macOS 13 + 1440x900: saucectl/Sauce allowlist for WebKit on this image (1920x1080 rejected for WebKit here).
+# Local Jenkins parity remains: yarn test:E2eChrome / --project chrome --grep @nightly.
 apiVersion: v1alpha
 kind: playwright
 
@@ -15,6 +14,8 @@ sauce:
       - pcs-frontend
       - playwright
       - nightly
+      - safari
+      - macos
 
 defaults:
   timeout: 30m
@@ -52,16 +53,15 @@ env:
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
 suites:
-  - name: 'PCS Chrome @nightly (Jenkins parity: browser; OS see header)'
-    # Closest to Jenkins agent: Chrome. Windows 11 = Sauce-supported desktop; not Ubuntu.
-    platformName: Windows 11
-    screenResolution: 1920x1080
+  - name: 'PCS Safari (WebKit) @nightly — macOS 13'
+    platformName: macOS 13
+    screenResolution: 1440x900
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
       - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
     params:
-      browserName: chrome
-      project: chrome
+      browserName: webkit
+      project: webkit
       headless: true
       grep: '@nightly'
 
