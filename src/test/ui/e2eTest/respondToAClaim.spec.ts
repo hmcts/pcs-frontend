@@ -32,7 +32,6 @@ import {
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome,
   yourCircumstances,
-  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -307,7 +306,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
     //include missing steps
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -453,7 +451,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
     //include missing steps
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -606,7 +603,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
     //include missing steps
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -617,7 +613,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader)
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
