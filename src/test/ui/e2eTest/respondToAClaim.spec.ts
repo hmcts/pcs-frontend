@@ -23,6 +23,7 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
 } from '../data/page-data';
+import { claimantsName } from '../utils/actions/custom-actions';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -155,6 +156,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
+      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -425,6 +427,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameConfirmation.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
+      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -464,6 +467,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsAgreed.getMainHeader(claimantsName),
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
@@ -477,6 +481,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
+      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -520,6 +525,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsAgreed.getMainHeader(claimantsName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
     await performValidation('mainHeader', situationInterstitialScreen.mainHeader);
@@ -584,6 +590,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
+      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -627,6 +634,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsAgreed.getMainHeader(claimantsName),
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
