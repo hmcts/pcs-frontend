@@ -1,13 +1,23 @@
-# Sauce Labs: Playwright @nightly — Chrome (Win), Firefox (macOS), Safari (macOS), Edge (Win), Chrome (Android).
-# Run: yarn test:crossbrowser  (tunnel + env from vault / CI).
-# Jenkins: YarnBuilder / shared library after loadVaultSecrets + env (see Jenkinsfile_CNP patterns).
-# Platform/browser matrix: https://docs.saucelabs.com/web-apps/automated-testing/playwright/ — confirm Edge/Android if jobs fail to allocate.
+# Cross-browser matrix for Sauce Playwright (eu-central-1).
+#
+# Working set for this region + saucectl schema (v0.202.x):
+#   • Windows 10 / 11 — Chrome, Edge (Chromium)
+#   • macOS 13 — Firefox, Safari (WebKit desktop)
+#
+# Not in this file (document as POC limitations unless Sauce enables them for your account/region):
+#   • Android / iPhone / iPad — Playwright on Sauce in EU often reports "Android is not available" / no iOS
+#     desktop matrix; use Appium / real-device cloud or another region if TCOE approves.
+#   • macOS 14+ with Firefox — schema may reject until saucectl is upgraded; Firefox on macOS 15 has Sauce
+#     known issues; macOS 13 is the safe combo for Firefox + WebKit with older saucectl.
+#
+# Run: yarn test:crossbrowser
+# Ref: https://docs.saucelabs.com/web-apps/automated-testing/playwright/
 apiVersion: v1alpha
 kind: playwright
 
 sauce:
   region: eu-central-1
-  concurrency: 5
+  concurrency: 6
   tunnel:
     name: $SAUCE_TUNNEL_NAME
   metadata:
@@ -15,6 +25,7 @@ sauce:
       - pcs-frontend
       - playwright
       - crossbrowser
+      - sauce-poc
 
 defaults:
   timeout: 30m
@@ -52,7 +63,19 @@ env:
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
 suites:
-  - name: 'PCS @nightly (Chrome — Windows)'
+  - name: 'Chrome — Windows 10'
+    platformName: Windows 10
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chrome
+      project: chrome
+      headless: true
+      grep: '@nightly'
+
+  - name: 'Chrome — Windows 11'
     platformName: Windows 11
     screenResolution: 1920x1080
     testMatch:
@@ -64,8 +87,33 @@ suites:
       headless: true
       grep: '@nightly'
 
-  - name: 'PCS @nightly (Firefox — macOS)'
-    platformName: macOS 14
+  - name: 'Edge (Chromium) — Windows 10'
+    platformName: Windows 10
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chromium
+      project: MicrosoftEdge
+      headless: true
+      grep: '@nightly'
+
+  - name: 'Edge (Chromium) — Windows 11'
+    platformName: Windows 11
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chromium
+      project: MicrosoftEdge
+      headless: true
+      grep: '@nightly'
+
+  # saucectl 0.202 validation + EU allocators: use macOS 13 for Firefox/WebKit (not macOS 14 in schema for these combos).
+  - name: 'Firefox — macOS 13'
+    platformName: macOS 13
     screenResolution: 1920x1080
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
@@ -76,8 +124,8 @@ suites:
       headless: true
       grep: '@nightly'
 
-  - name: 'PCS @nightly (Safari — macOS)'
-    platformName: macOS 14
+  - name: 'Safari (WebKit) — macOS 13'
+    platformName: macOS 13
     screenResolution: 1920x1080
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
@@ -85,31 +133,6 @@ suites:
     params:
       browserName: webkit
       project: webkit
-      headless: true
-      grep: '@nightly'
-
-  - name: 'PCS @nightly (Edge — Windows)'
-    platformName: Windows 11
-    screenResolution: 1920x1080
-    testMatch:
-      - ".*src/test/ui/.*\\.spec\\.ts$"
-      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
-    params:
-      # Sauce Playwright lists `chromium`; `MicrosoftEdge` project + channel in playwright.config.ts selects Edge.
-      browserName: chromium
-      project: MicrosoftEdge
-      headless: true
-      grep: '@nightly'
-
-  - name: 'PCS @nightly (Chrome — Android)'
-    platformName: Android
-    screenResolution: 1080x1920
-    testMatch:
-      - ".*src/test/ui/.*\\.spec\\.ts$"
-      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
-    params:
-      browserName: chrome
-      project: MobileChrome
       headless: true
       grep: '@nightly'
 
