@@ -143,7 +143,7 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('CCD case service error');
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Case not found');
     });
 
     it('should throw HTTPError on unexpected error', async () => {

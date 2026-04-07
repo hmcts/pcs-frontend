@@ -3,14 +3,22 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
+export type VerticalYesNoValue = 'YES' | 'NO' | null;
+export type TenancyTypeCorrectValue = YesNoNotSureValue;
+export type YesNoValue = 'YES' | 'NO' | 'Yes' | 'No' | null;
+export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
-export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE';
 export enum YesNoEnum {
   YES = 'YES',
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
+}
+
+export interface HouseholdCircumstances {
+  dependantChildren?: YesNoValue;
+  dependantChildrenDetails?: string;
+  otherDependants?: YesNoValue;
+  otherDependantDetails?: string;
 }
 
 export interface CcdUserCase {
@@ -73,7 +81,7 @@ export interface CcdDefendantParty {
   address?: CcdCaseAddress | Record<string, never>;
   addressKnown?: string;
   addressSameAsProperty?: string;
-  phoneNumberProvided?: YesNoValue;
+  phoneNumberProvided?: VerticalYesNoValue;
   phoneNumber?: string;
 }
 
@@ -88,14 +96,23 @@ export interface CcdDefendantResponses {
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;
-  contactByPhone?: YesNoValue;
-  contactByEmail?: YesNoValue;
-  contactByPost?: YesNoValue;
-  contactByText?: YesNoValue;
+  contactByPhone?: VerticalYesNoValue;
+  contactByEmail?: VerticalYesNoValue;
+  contactByPost?: VerticalYesNoValue;
+  contactByText?: VerticalYesNoValue;
   preferenceType?: ContactPreference;
+  rentArrearsAmountConfirmation?: string;
+  rentArrearsAmount?: string;
   landlordRegistered?: YesNoNotSureValue;
   landlordLicensed?: YesNoNotSureValue;
   writtenTerms?: YesNoNotSureValue;
+  disputeClaim?: YesNoValue;
+  disputeClaimDetails?: string;
+  paymentAgreement?: {
+    repaymentPlanAgreed?: YesNoNotSureValue;
+    repaymentAgreedDetails?: string;
+  };
+  householdCircumstances?: HouseholdCircumstances;
 }
 
 export interface PossessionClaimResponse {
@@ -106,6 +123,8 @@ export interface PossessionClaimResponse {
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
 }
+
+export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {

@@ -7,6 +7,7 @@
   },
   "scripts": {
     "docker:login:hmctsprod": "az acr login --name hmctsprod",
+    "start:dev:pcs-local": "NODE_ENV=development PCS_API_URL=http://localhost:3206 CCD_URL=http://localhost:3206 S2S_URL=http://localhost:8489 OIDC_ISSUER=http://localhost:5062/o OIDC_CLIENT_ID=pcs-frontend OIDC_REDIRECT_URI=http://localhost:3209/oauth2/callback yarn start:dev",
     "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development USE_SSL=true OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback yarn start:dev",
     "start:dev": "node --trace-deprecation --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/bootstrap.ts",
     "start": "NODE_ENV=production node -r module-alias/register dist/main/bootstrap.js",
@@ -78,7 +79,7 @@
     "i18next-http-middleware": "^3.7.4",
     "ioredis": "^5.4.1",
     "jose": "^6.1.3",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "luxon": "^3.6.1",
     "module-alias": "^2.3.4",
     "nunjucks": "^3.2.4",
@@ -185,8 +186,8 @@
     "qs": "^6.14.2",
     "jws": "3.2.3",
     "tar": "~7.5.9",
-    "lodash": "~4.17.23",
-    "lodash-es": "~4.17.23",
+    "lodash": "~4.18.1",
+    "lodash-es": "~4.18.1",
     "path-to-regexp": "^8.4.0"
   },
   "lint-staged": {

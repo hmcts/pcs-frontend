@@ -7,6 +7,7 @@ import {
   createPostController,
   createPostRedirectController,
 } from '@modules/steps/controller';
+import { StepNavigation } from '@modules/steps/flow';
 
 const mockGetFormData = jest.fn();
 const mockSetFormData = jest.fn();
@@ -29,12 +30,12 @@ jest.mock('@modules/steps/i18n', () => ({
   getStepTranslations: jest.fn(() => ({})),
   loadStepNamespace: jest.fn(),
 }));
-jest.mock('@modules/steps/flow', () => ({
-  stepNavigation: {
-    getBackUrl: jest.fn(() => Promise.resolve(null)),
-    getNextStepUrl: jest.fn(() => Promise.resolve('/next-step')),
-  },
-}));
+
+const stepNavigation: StepNavigation = {
+  getBackUrl: jest.fn(() => Promise.resolve(null)),
+  getNextStepUrl: jest.fn(() => Promise.resolve('/next-step')),
+  getStepUrl: jest.fn(() => '/step-url'),
+};
 describe('createGetController', () => {
   const mockContent = {
     serviceName: 'Test Service',
@@ -97,7 +98,7 @@ describe('createGetController', () => {
 
     mockGetFormData.mockReturnValue({ answer: 'sessionAnswer', choices: ['choice1'] });
 
-    const controller = createGetController(viewPath, stepName, mockExtendContent);
+    const controller = createGetController(viewPath, stepName, stepNavigation, mockExtendContent);
     await controller.get(req, res);
 
     expect(mockExtendContent).toHaveBeenCalledWith(req);
@@ -144,7 +145,7 @@ describe('createGetController', () => {
 
     mockGetFormData.mockReturnValue({ answer: 'sessionAnswer' });
 
-    const controller = createGetController(viewPath, stepName, mockExtendContent);
+    const controller = createGetController(viewPath, stepName, stepNavigation, mockExtendContent);
     await controller.get(req, res);
 
     expect(mockExtendContent).toHaveBeenCalledWith(req);
@@ -190,7 +191,7 @@ describe('createGetController', () => {
 
     mockGetFormData.mockReturnValue({});
 
-    const controller = createGetController(viewPath, stepName, mockExtendContent);
+    const controller = createGetController(viewPath, stepName, stepNavigation, mockExtendContent);
     await controller.get(req, res);
 
     expect(mockExtendContent).toHaveBeenCalledWith(req);
@@ -226,7 +227,7 @@ describe('createGetController', () => {
     const extendContent = jest.fn((_req: Request) => ({ extended: true, ...mockContent }));
     mockGetFormData.mockReturnValue({});
 
-    const controller = createGetController(viewPath, stepName, extendContent);
+    const controller = createGetController(viewPath, stepName, stepNavigation, extendContent);
     await controller.get(req, res);
 
     expect(extendContent).toHaveBeenCalledWith(req);
@@ -283,7 +284,7 @@ describe('createPostController', () => {
     mockValidateForm.mockReturnValue(errors);
     const mockT = jest.fn((key: string) => key);
 
-    const controller = createPostController(stepName, mockGetFields, view);
+    const controller = createPostController(stepName, stepNavigation, mockGetFields, view);
     const req = {
       body: { field1: '' },
       language: 'en',
@@ -313,9 +314,8 @@ describe('createPostController', () => {
   });
 
   it('should save form data and redirect when validation passes', async () => {
-    const { stepNavigation } = require('../../../../main/modules/steps/flow');
     const mockT = jest.fn((key: string) => key);
-    const controller = createPostController(stepName, mockGetFields, view);
+    const controller = createPostController(stepName, stepNavigation, mockGetFields, view);
     const req = {
       body: { field1: 'value1' },
       language: 'en',
@@ -337,7 +337,7 @@ describe('createPostController', () => {
   it('should execute beforeRedirect callback when provided', async () => {
     const mockT = jest.fn((key: string) => key);
     const beforeRedirect = jest.fn();
-    const controller = createPostController(stepName, mockGetFields, view, beforeRedirect);
+    const controller = createPostController(stepName, stepNavigation, mockGetFields, view, beforeRedirect);
     const req = {
       body: { field1: 'value1' },
       language: 'en',
@@ -357,7 +357,7 @@ describe('createPostController', () => {
   it('should not redirect if beforeRedirect sends response', async () => {
     const mockT = jest.fn((key: string) => key);
     const beforeRedirect = jest.fn();
-    const controller = createPostController(stepName, mockGetFields, view, beforeRedirect);
+    const controller = createPostController(stepName, stepNavigation, mockGetFields, view, beforeRedirect);
     const req = {
       body: { field1: 'value1' },
       language: 'en',
@@ -376,11 +376,10 @@ describe('createPostController', () => {
   });
 
   it('should return 500 when next step cannot be determined', async () => {
-    const { stepNavigation } = require('../../../../main/modules/steps/flow');
-    stepNavigation.getNextStepUrl.mockResolvedValue(null);
+    (stepNavigation.getNextStepUrl as jest.Mock).mockResolvedValue(null);
     const mockT = jest.fn((key: string) => key);
 
-    const controller = createPostController(stepName, mockGetFields, view);
+    const controller = createPostController(stepName, stepNavigation, mockGetFields, view);
     const req = {
       body: { field1: 'value1' },
       language: 'en',

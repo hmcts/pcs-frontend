@@ -19,6 +19,7 @@ export const step: StepDefinition = {
     return createGetController(
       'respond-to-claim/dispute-claim-interstitial/disputeClaimInterstitial.njk',
       stepName,
+      stepNavigation,
       async (req: Request) => {
         const t = req.t;
 

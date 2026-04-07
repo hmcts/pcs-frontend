@@ -38,10 +38,6 @@ jest.mock('@modules/i18n', () => ({
 }));
 
 jest.mock('@modules/steps/flow', () => ({
-  stepNavigation: {
-    getBackUrl: jest.fn(async () => null),
-    getNextStepUrl: jest.fn(async () => '/next-step'),
-  },
   createStepNavigation: jest.fn(() => ({
     getBackUrl: jest.fn(async () => '/previous-step'),
     getNextStepUrl: jest.fn(async () => '/next-step'),

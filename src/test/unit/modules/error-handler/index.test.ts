@@ -25,6 +25,8 @@ describe('error-handler', () => {
 
   const createMockTranslation = () => {
     const translations: Record<string, string> = {
+      'errorPages.400.title': 'Bad request',
+      'errorPages.400.paragraph': 'The request you made is not valid. Please check the request and try again.',
       'errorPages.403.title': 'Not Authorised',
       'errorPages.403.paragraph': 'Sorry you do not have access to this account.',
       'errorPages.404.title': 'Page not found',
@@ -443,7 +445,7 @@ describe('error-handler', () => {
       expect(res.render).toHaveBeenCalledWith('error');
     });
 
-    it('should handle 400 status as 403 error message', () => {
+    it('should handle 400 status with its own error message', () => {
       const errorHandler = createErrorHandler('test');
       const err = new HTTPError('Bad request', 400);
       const req = {
