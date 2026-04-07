@@ -110,7 +110,7 @@ export interface FormBuilderConfig {
   // Only runs on GET - POST uses submitted body to preserve user input during validation errors.
   getInitialFormData?: GetInitialFormData;
   stepDir: string;
-  translationKeys?: TranslationKeys;
+  translationKeys?: TranslationKeys | Map<string, TranslationKeys>;
   customTemplate?: string | ((req: Request) => string | Promise<string>);
   basePath?: string;
   flowConfig?: JourneyFlowConfig;

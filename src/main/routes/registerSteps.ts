@@ -43,7 +43,7 @@ function buildGetMiddleware(
 ): RequestHandler[] {
   const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
   const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
-  const professionalHeaderMiddlewares = flowConfig.isProfessional ? [professionalHeaderMiddleware] : [];
+  const professionalHeaderMiddlewares =  [professionalHeaderMiddleware];
 
   return stepMiddleware
     ? [...authMiddlewares, dependencyCheck, ...professionalHeaderMiddlewares, ...stepMiddleware]

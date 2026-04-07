@@ -40,7 +40,6 @@ export const step: StepDefinition = {
           paragraph1: t('paragraph1', { claimantName }),
         };
       },
-      'respondToClaim'
     );
   },
   postController: {

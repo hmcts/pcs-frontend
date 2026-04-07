@@ -41,6 +41,7 @@ interface CustomSessionData extends SessionData {
   rentarrears?: boolean;
   destroy(callback: (err?: Error) => void): void;
   returnTo?: string;
+  isProfessional?: boolean;
 }
 
 declare module 'express-session' {

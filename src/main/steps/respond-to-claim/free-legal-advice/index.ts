@@ -8,7 +8,7 @@ import { isProfessionalJourney } from '../../utils/isProfessionalJourney';
 export const step: StepDefinition = createFreeLegalAdviceBase({
   flowConfig,
   customTemplate: req =>
-    !isProfessionalJourney(req) ? `${__dirname}/freeLegalAdvice-professional.njk` : `${__dirname}/freeLegalAdvice.njk`,
+    isProfessionalJourney(req) ? `${__dirname}/freeLegalAdvice-professional.njk` : `${__dirname}/freeLegalAdvice.njk`,
   beforeRedirect: async req => {
     const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
     if (!hadLegalAdvice) return;

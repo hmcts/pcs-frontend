@@ -32,8 +32,6 @@ export {
   getStepUrl,
   checkStepDependencies,
   createStepNavigation,
-  stepNavigation,
-  professionalStepNavigation,
   stepDependencyCheckMiddleware,
 } from './flow';
 
@@ -50,3 +48,5 @@ export {
 // Re-export language utilities from main i18n module for convenience
 export { getRequestLanguage, getValidatedLanguage } from '../i18n';
 export type { SupportedLang, TranslationContent } from './i18n';
+
+export {retrieveJourneyFolder}  from './journeyFolderRetriever';

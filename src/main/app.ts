@@ -11,6 +11,7 @@ import { caseReferenceParamMiddleware, pageTrackingUrlMiddleware } from './middl
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import { registerAllJourneys } from './routes/registerSteps';
+import { whiteListPaths } from './routes/whiteList';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
@@ -51,10 +52,12 @@ app.param('caseReference', caseReferenceParamMiddleware);
 // This creates a dedicated router for each journey with journey-specific middleware
 registerAllJourneys(app);
 
+whiteListPaths(app);
+
 // Load all other routes (excluding registerSteps.ts which is called manually above)
 glob
   .sync(__dirname + '/routes/**/*.+(ts|js)')
-  .filter(filename => !filename.includes('registerSteps'))
+  .filter(filename => !filename.includes('registerSteps') && !filename.includes('whiteList'))
   .map(filename => require(filename))
   .forEach(route => route.default(app));
 

@@ -11,6 +11,7 @@ import { getStepTranslations, getTranslationFunction, loadStepNamespace } from '
 import { Logger } from '@modules/logger';
 import { StepNavigation } from '@modules/steps/flow';
 import { concatenateJourneyStepName } from '@utils/stepNameFolderCombiner';
+import { retrieveJourneyFolder } from './journeyFolderRetriever';
 
 const logger = Logger.getLogger('controllerFactory');
 
@@ -47,9 +48,11 @@ export const createGetController = (
   stepName: string,
   stepNavigation: StepNavigation,
   extendContent?: (req: Request) => StepFormData | Promise<StepFormData>,
-  journeyFolder?: string
 ): GetController => {
   return new GetController(view, async (req: Request) => {
+
+    const journeyFolder = retrieveJourneyFolder(req);
+
     if (journeyFolder && req.i18n) {
       try {
         await loadStepNamespace(req, stepName, journeyFolder);
@@ -70,7 +73,7 @@ export const createGetController = (
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
 
-    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName) : {};
+    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName, journeyFolder) : {};
     const commonTranslations = req.i18n?.getResourceBundle(lang, 'common') || {};
     const commonContent: Record<string, unknown> = {};
     for (const key of ['change', 'buttons']) {

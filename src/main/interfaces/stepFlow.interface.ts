@@ -31,7 +31,7 @@ export interface StepConfig {
 }
 
 export interface JourneyFlowConfig {
-  basePath?: string;
+  basePath: string;
   journeyName?: string;
   stepOrder: string[];
   steps: Record<string, StepConfig>;

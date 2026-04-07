@@ -2,8 +2,7 @@ import path from 'path';
 
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
-
-import type { BuiltFormContent, FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
+import type { BuiltFormContent, FormBuilderConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
@@ -15,15 +14,12 @@ import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
 import { validateConfigInDevelopment } from './schema';
 import { concatenateJourneyStepName } from '@utils/stepNameFolderCombiner';
+import { retrieveJourneyFolder } from '../journeyFolderRetriever';
 
 export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 
-/**
- * Converts camelCase to kebab-case (e.g., "respondToClaim" -> "respond-to-claim")
- */
-function camelToKebabCase(str: string): string {
-  return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-}
+
+// let defaultTranslationKeys: any;
 
 export function createFormStep(config: FormBuilderConfig): StepDefinition {
   // Validate config in development mode
@@ -48,9 +44,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     throw new Error('flowConfig must be provided');
   }
 
-  const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath: string | ((req: Request) => string | Promise<string>) = customTemplate || 'formBuilder.njk';
-  const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
+  const basePath = flowConfig.basePath;
   const stepNavigation = createStepNavigation(flowConfig);
 
   return {
@@ -61,9 +56,19 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     showCancelButton,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
+
+        const journeyFolder = retrieveJourneyFolder(req);
+
+//         if(translationKeys instanceof Map) {
+//           defaultTranslationKeys = getTranslationKeys(translationKeys, "professional");
+//         } else {
+//           defaultTranslationKeys = translationKeys;
+//         }
+
+
         await loadStepNamespace(req, stepName, journeyFolder);
 
-        const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+        const t: TFunction = getTranslationFunction(req, stepName, ['common'], journeyFolder);
 
         const nunjucksEnv = req.app.locals.nunjucksEnv;
         if (!nunjucksEnv) {
@@ -115,3 +120,12 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     ),
   };
 }
+
+//
+// function getTranslationKeys(translationKeysMap: Map<string, TranslationKeys>, key: string = "default") {
+//   if(translationKeysMap.has("default")) {
+//     return translationKeysMap.get("default");
+//   }
+//   return translationKeysMap.get(key);
+//
+// }
