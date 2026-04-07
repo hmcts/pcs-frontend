@@ -3,7 +3,9 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
+import { contactUs } from '../../../data/section-data/contactUs.section.data';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
+import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
 const ELEMENT_TYPES = [
@@ -136,40 +138,74 @@ export class PageContentValidation implements IValidation {
     await page.waitForLoadState('load');
     const pageUrl = page.url();
     const pageResults: ValidationResult[] = [];
-    const pageData = await this.getPageData(pageName);
+    try {
+      const pageData = await this.getPageData(pageName);
 
-    if (!pageData) {
-      return;
-    }
-
-    PageContentValidation.pagesValidated.add(pageName);
-
-    for (const [key, value] of Object.entries(pageData)) {
-      if (
-        key.includes('Input') ||
-        key.includes('Hidden') ||
-        key.includes('Validation') ||
-        key.includes('pageSlug') ||
-        key.includes('ErrorMessage')
-      ) {
-        continue;
+      if (!pageData) {
+        return;
       }
-      if (typeof value === 'string' && value.trim() !== '') {
-        const elementType = this.getElementType(key);
-        const isVisible = await this.isElementVisible(page, value as string, elementType);
-        pageResults.push({ element: key, expected: value as string, status: isVisible ? 'pass' : 'fail' });
-      }
-    }
 
-    PageContentValidation.validationResults.set(pageUrl, pageResults);
+      PageContentValidation.pagesValidated.add(pageName);
+
+      for (const [key, value] of Object.entries(pageData)) {
+        if (
+          key.includes('Input') ||
+          key.includes('Hidden') ||
+          key.includes('Validation') ||
+          key.includes('pageSlug') ||
+          key.includes('ErrorMessage')
+        ) {
+          continue;
+        }
+        if (typeof value === 'string' && value.trim() !== '') {
+          const elementType = this.getElementType(key);
+          const isVisible = await this.isElementVisible(page, value as string, elementType);
+          pageResults.push({ element: key, expected: value as string, status: isVisible ? 'pass' : 'fail' });
+        }
+      }
+
+      PageContentValidation.validationResults.set(pageUrl, pageResults);
+    } catch (error) {
+      // Add the error as a validation failure
+      pageResults.push({
+        element: 'SectionData',
+        expected: error instanceof Error ? error.message : String(error),
+        status: 'fail',
+      });
+      PageContentValidation.pagesValidated.add(pageName);
+      PageContentValidation.validationResults.set(pageUrl, pageResults);
+    }
   }
 
   private async getPageData(pageName: string): Promise<object | null> {
-    return this.loadPageDataFile(pageName);
+    const pageData = this.loadPageDataFile(pageName);
+    if (pageName !== 'home') {
+      const contactUsData = this.loadSectionDataFile('contactUs');
+      if (contactUsData) {
+        await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
+        return { ...pageData, ...contactUsData };
+      }
+    }
+
+    return pageData;
   }
 
   private loadPageDataFile(fileName: string): object | null {
     const filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
+    if (!fs.existsSync(filePath)) {
+      return null;
+    }
+    try {
+      delete require.cache[require.resolve(filePath)];
+      const module = require(filePath);
+      return module.default || module[fileName] || module[Object.keys(module)[0]];
+    } catch {
+      return null;
+    }
+  }
+
+  private loadSectionDataFile(fileName: string): object | null {
+    const filePath = path.join(__dirname, '../../../data/section-data', `${fileName}.section.data.ts`);
     if (!fs.existsSync(filePath)) {
       return null;
     }
