@@ -68,6 +68,7 @@ export class ActionRegistry {
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
     ['chooseAnApplication', new GenAppsAction()],
+    ['inputErrorValidationGenApp', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {

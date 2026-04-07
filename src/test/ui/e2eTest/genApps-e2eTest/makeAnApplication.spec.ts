@@ -2,18 +2,16 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
-import { checkYourAnswers, chooseAnApplication } from '../../data/genApps-page-data';
 import { dashboard } from '../../data/page-data';
+import { checkYourAnswers, chooseAnApplication } from '../../data/page-data/genApps-page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
-  process.env.NOTICE_SERVED = 'YES';
-  process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('validateAccessCodeAPI');
@@ -34,6 +32,26 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.delayRadioOption,
+    });
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performValidation('mainHeader', dashboard.mainHeader);
+  });
+
+  test('Select an Application - Ask to Set aside', async () => {
+    await performAction('chooseAnApplication', {
+      question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
+      option: chooseAnApplication.setAsideRadioOption,
+    });
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performValidation('mainHeader', dashboard.mainHeader);
+  });
+
+  test('Select an Application - Something else', async () => {
+    await performAction('chooseAnApplication', {
+      question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
+      option: chooseAnApplication.setAsideRadioOption,
     });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);

@@ -6,4 +6,11 @@ export const chooseAnApplication = {
   somethingElseRadioOption: `Something else`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
+  errorValidationField: {
+    errorRadioOption: [
+      { type: `none`, input: ``, errMessage: `You must select an type of application to apply for` }
+    ]
+  },
 };

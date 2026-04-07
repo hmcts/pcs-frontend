@@ -49,11 +49,10 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.add(pageName);
 
-    const pageDataFilePath = path.join(TriggerPageFunctionalTestsAction.PAGE_DATA_DIR, `${pageName}.page.data.ts`);
-    const pageDataFileExists = fs.existsSync(pageDataFilePath);
-
+    const pageDataFilePath = this.resolveFilePath(TriggerPageFunctionalTestsAction.PAGE_DATA_DIR, `${pageName}.page.data.ts`);
+  
     if (enable_content_validation === 'true') {
-      if (pageDataFileExists) {
+      if (pageDataFilePath && fs.existsSync(pageDataFilePath)) {
         PageContentValidation.trackPageWithData(pageName);
         await this.runPageContentValidation(page, pageName);
       } else {
@@ -61,10 +60,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       }
     }
 
-    const pftFilePath = path.join(TriggerPageFunctionalTestsAction.PFT_DIR, `${pageName}.pft.ts`);
-    const pftFileExists = fs.existsSync(pftFilePath);
-
-    if (!pftFileExists) {
+    const pftFilePath = this.resolveFilePath(TriggerPageFunctionalTestsAction.PFT_DIR, `${pageName}.pft.ts`);
+    if (!pftFilePath || !fs.existsSync(pftFilePath)) {
       if (enable_error_message_validation === 'true') {
         ErrorMessageValidation.trackMissingEMVFile(pageName);
       }
@@ -113,6 +110,34 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
   }
 
+
+  private resolveFilePath(
+    baseDir: string,
+    pageName: string
+  ): string | null {
+    if (!fs.existsSync(baseDir)) {
+      throw new Error(`PFT base directory does not exist: ${baseDir}`);
+    }
+
+    const directPath = path.join(baseDir, pageName);
+    if (fs.existsSync(directPath)) {
+      return directPath;
+    }
+
+    const subDirs = fs
+      .readdirSync(baseDir, { withFileTypes: true })
+      .filter(d => d.isDirectory());
+
+    for (const dir of subDirs) {
+      const subDirPath = path.join(baseDir, dir.name, pageName);
+      if (fs.existsSync(subDirPath)) {
+        return subDirPath;
+      }
+    }
+
+    return null;
+  }
+
   private createLockFile(pageName: string): void {
     try {
       if (!fs.existsSync(TriggerPageFunctionalTestsAction.LOCK_DIR)) {
@@ -138,8 +163,10 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async runPageContentValidation(page: Page, pageName: string): Promise<void> {
     try {
-      const validation = new PageContentValidation();
-      await validation.validateCurrentPage(page, pageName);
+      await test.step(`Page content validation for ${pageName}`, async () => {
+        const validation = new PageContentValidation();
+        await validation.validateCurrentPage(page, pageName);
+      });
     } catch (error) {
       PageContentValidation.trackValidationError(pageName, error);
     }
