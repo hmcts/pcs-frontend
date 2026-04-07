@@ -22,7 +22,7 @@ export async function yourCircumstancesErrorValidation(): Promise<void> {
 export async function yourCircumstancesNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', yourCircumstances.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
-    pageSlug: freeLegalAdvice.pageSlug,
+    pageSlug: yourCircumstances.pageSlug,
   });
   await performValidation('pageNavigation', yourCircumstances.backLink, wouldYouHaveSomeoneElse.mainHeader);
   await performAction('clickRadioButton', yourCircumstances.noRadioOption);

@@ -22,7 +22,7 @@ export async function yourExceptionalHardShipErrorValidation(): Promise<void> {
 export async function yourExceptionalHardshipNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', exceptionalHardship.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
-    pageSlug: freeLegalAdvice.pageSlug,
+    pageSlug: exceptionalHardship.pageSlug,
   });
   await performValidation('pageNavigation', yourCircumstances.backLink, yourCircumstances.mainHeader);
   await performAction('clickRadioButton', yourCircumstances.noRadioOption);
