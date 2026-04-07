@@ -1,4 +1,4 @@
-# pcs-frontend - SDM Comment to delete
+# pcs-frontend
 
 ## Getting Started
 
