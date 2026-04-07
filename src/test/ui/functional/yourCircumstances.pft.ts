@@ -1,7 +1,6 @@
 import { dashboard, wouldYouHaveSomeoneElse, yourCircumstances } from '../data/page-data';
+import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
-
-const overMaxLengthString = 'A'.repeat(501);
 
 export async function yourCircumstancesErrorValidation(): Promise<void> {
   await performAction('clickButton', yourCircumstances.saveAndContinueButton);
@@ -11,7 +10,7 @@ export async function yourCircumstancesErrorValidation(): Promise<void> {
   });
   await performAction('clickRadioButton', yourCircumstances.yesRadioOption);
   await performValidation('elementToBeVisible', yourCircumstances.youCanEnterUpToHiddenHintText);
-  await performAction('inputText', yourCircumstances.giveDetailsHiddenTextLabel, overMaxLengthString);
+  await performAction('inputText', yourCircumstances.giveDetailsHiddenTextLabel, generateRandomString(501));
   await performValidation('elementToBeVisible', yourCircumstances.tooManyCharacterHiddenHintText);
   await performAction('clickButton', yourCircumstances.saveAndContinueButton);
   await performValidation('errorMessage', {

@@ -1,9 +1,8 @@
 import { dashboard, exceptionalHardship, yourCircumstances } from '../data/page-data';
+import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
-const overMaxLengthString = 'A'.repeat(501);
-
-export async function yourExceptionalHarshipErrorValidation(): Promise<void> {
+export async function yourExceptionalHardShipErrorValidation(): Promise<void> {
   await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: exceptionalHardship.thereIsAProblemErrorMessageHeader,
@@ -11,7 +10,7 @@ export async function yourExceptionalHarshipErrorValidation(): Promise<void> {
   });
   await performAction('clickRadioButton', yourCircumstances.yesRadioOption);
   await performValidation('elementToBeVisible', exceptionalHardship.youCanEnterUpToHiddenHintText);
-  await performAction('inputText', exceptionalHardship.giveDetailsHiddenTextLabel, overMaxLengthString);
+  await performAction('inputText', exceptionalHardship.giveDetailsHiddenTextLabel, generateRandomString(501));
   await performValidation('elementToBeVisible', exceptionalHardship.tooManyCharacterHiddenHintText);
   await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
   await performValidation('errorMessage', {
