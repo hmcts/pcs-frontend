@@ -5,7 +5,7 @@ import { IAction, actionRecord } from '../../interfaces';
 export class ClickRadioButtonAction implements IAction {
   async execute(page: Page, action: string, params: string | actionRecord): Promise<void> {
     if (typeof params === 'string') {
-      await page.getByRole('radio', { name: params }).check();
+      await page.getByRole('radio', { name: params, exact: true }).first().check();
       return;
     }
     const { question, option, index } = params as actionRecord;
