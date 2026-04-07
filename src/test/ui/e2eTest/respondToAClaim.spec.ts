@@ -25,8 +25,6 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  yourCircumstances,
-  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -222,7 +220,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouHaveAnyOtherDependants', {
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
@@ -482,7 +487,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-     // placeholder page, so need to be replaced with custom action when actual page is implemented
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
