@@ -7,7 +7,7 @@ kind: playwright
 
 sauce:
   region: eu-central-1
-  concurrency: 5
+  concurrency: 1
   tunnel:
     name: $SAUCE_TUNNEL_NAME
   metadata:
