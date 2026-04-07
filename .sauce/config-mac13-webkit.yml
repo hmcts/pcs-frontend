@@ -1,5 +1,5 @@
 # WebKit (Safari-class) on macOS 13 — single suite.
-# Run: yarn test:saucelab or yarn test:sauce:mac13-webkit — set SAUCE_GREP in env (Jenkinsfile_nightly sets @saucelab).
+# Run: yarn test:saucelab (SAUCE_GREP from env / Jenkinsfile_nightly), or yarn test:sauce:mac13-webkit
 # 1440x900: WebKit on this image does not accept 1920x1080 on Sauce for this PoC.
 apiVersion: v1alpha
 kind: playwright

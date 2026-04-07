@@ -1,5 +1,5 @@
 # Single suite: Chrome on Windows 10. Run: yarn test:sauce:win10-chrome
-# Set SAUCE_GREP in env before saucectl — see Jenkinsfile_nightly / package.json test:sauce:*.
+# SAUCE_GREP: see Jenkinsfile_nightly / package.json `test:sauce:*` (`:-@saucelab`).
 apiVersion: v1alpha
 kind: playwright
 
