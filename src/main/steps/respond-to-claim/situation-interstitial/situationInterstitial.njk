@@ -1,15 +1,35 @@
 {% extends "stepsTemplate.njk" %}
-{% from "macros/stepButtons.njk" import stepButtons %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 {% block mainContent %}
-  {% if errorSummary %}
-    {{ govukErrorSummary(errorSummary) }}
+  {% if caption %}
+    <span class="govuk-caption-l">{{ caption }}</span>
   {% endif %}
-  <h1 class="govuk-heading-l">Your Household And Circumstances (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for the Your Household And Circumstances step.</p>
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% endif %}
+  <p class="govuk-body">{{ paragraph1 }}</p>
+  <p class="govuk-body">{{ paragraph2 }}</p>
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
+    <li>{{ bullet1 }}</li>
+    <li>{{ bullet2 }}</li>
+    <li>{{ bullet3 }}</li>
+    <li>{{ bullet4 }}</li>
+    <li>{{ bullet5 }}</li>
+  </ul>
+  <p class="govuk-body">{{ paragraph3 }}</p>
   <form method="post" action="{{ url }}">
-    {{ stepButtons(continue, saveForLater) }}
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: continue,
+        attributes: { name: 'action', value: 'continue' }
+      }) }}
+      <p class="govuk-body">
+        <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+      </p>
+    </div>
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
