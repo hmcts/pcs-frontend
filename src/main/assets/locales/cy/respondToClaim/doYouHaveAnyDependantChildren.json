@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyDependant children",
+  "caption": "cyRespond to a property possession claim",
+  "heading": "cyDo you have any dependant children?",
+  "dependantChildrenParagraph": "cyDependant children are children you look after financially.",
+  "dependantChildrenDetailsLabel": "cyGive details about your dependant children",
+  "dependantChildrenDetailsHint": "cyYou should include details about how many dependant children you have and how old they are",
+  "errors": {
+    "dependantChildren": "cySelect if you have any dependant children",
+    "dependantChildrenDetails": "cyGive details about your dependant children"
+  }
+}
