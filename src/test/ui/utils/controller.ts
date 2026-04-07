@@ -40,8 +40,6 @@ async function detectPageNavigation(): Promise<boolean> {
   const currentUrl = executor.page.url();
   if (!startAxeAudit && executor.page.url().includes('start-now')) {
     startAxeAudit = true;
-  }
-  if (!startFunctionalTests && executor.page.url().includes('free-legal-advice')) {
     startFunctionalTests = true;
   }
   const pageNavigated = currentUrl !== previousUrl;
@@ -54,14 +52,16 @@ async function detectPageNavigation(): Promise<boolean> {
 }
 
 async function validatePageIfNavigated(action: string): Promise<void> {
-  if (action.includes('click') || action.includes('navigate')) {
+  if (action.includes('click') || action.includes('navigateToUrl')) {
     const pageNavigated = await detectPageNavigation();
     const executor = getExecutor();
     if (pageNavigated) {
       if (startAxeAudit && enable_axe_audit === 'true') {
         try {
-          await new AxeUtils(executor.page).audit({
-            exclude: axe_exclusions,
+          await test.step('Running Accessibility Scan', async () => {
+            await new AxeUtils(executor.page).audit({
+              exclude: axe_exclusions,
+            });
           });
         } catch (error) {
           const errorMessage = String((error as Error).message || error).toLowerCase();
@@ -109,7 +109,7 @@ export async function performAction(
       ? ` - ${typeof displayFieldName === 'object' ? readValuesFromInputObjects(displayFieldName) : displayFieldName}`
       : ''
   }${
-    displayValue !== undefined
+    displayValue !== undefined && value !== undefined
       ? ` with value '${typeof displayValue === 'object' ? readValuesFromInputObjects(displayValue) : displayValue}'`
       : ''
   }`;

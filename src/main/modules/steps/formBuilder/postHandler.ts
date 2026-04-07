@@ -10,7 +10,7 @@ import type {
 import type { JourneyFlowConfig } from '../../../interfaces/stepFlow.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { safeRedirect303 } from '../../../utils/safeRedirect';
-import { createStepNavigation, stepNavigation } from '../flow';
+import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
@@ -34,9 +34,9 @@ export function createPostHandler(
   stepName: string,
   viewPath: ViewTemplate,
   journeyFolder: string,
+  flowConfig: JourneyFlowConfig,
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
-  flowConfig?: JourneyFlowConfig,
   showCancelButton?: boolean,
   extendGetContent?: ExtendGetContent
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
@@ -51,8 +51,7 @@ export function createPostHandler(
       translationKeys,
     });
   }
-  // Use provided flowConfig or fall back to default stepNavigation
-  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
+  const stepNavigation = createStepNavigation(flowConfig);
 
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
@@ -124,7 +123,7 @@ export function createPostHandler(
           fullContent,
           stepName,
           journeyFolder,
-          navigation,
+          stepNavigation,
           translationKeys,
           showCancelButton
         );
@@ -159,7 +158,7 @@ export function createPostHandler(
         return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
       }
 
-      const redirectPath = await navigation.getNextStepUrl(req, stepName, bodyWithoutAction);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

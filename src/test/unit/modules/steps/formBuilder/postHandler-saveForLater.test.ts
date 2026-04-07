@@ -1,12 +1,22 @@
 import type { NextFunction, Request, Response } from 'express';
 
 import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
+import { JourneyFlowConfig } from '../../../../../main/interfaces/stepFlow.interface';
 import { createPostHandler } from '../../../../../main/modules/steps/formBuilder/postHandler';
 import * as dashboardModule from '../../../../../main/routes/dashboard';
 
 jest.mock('../../../../../main/routes/dashboard');
 jest.mock('../../../../../main/modules/i18n');
-jest.mock('../../../../../main/modules/steps/flow');
+jest.mock('../../../../../main/modules/steps/flow', () => ({
+  createStepNavigation: jest.fn(() => ({
+    getBackUrl: jest.fn(async () => '/previous-step'),
+  })),
+}));
+
+const flowConfig: JourneyFlowConfig = {
+  stepOrder: [],
+  steps: {},
+};
 
 describe('PostHandler - Save for Later Fix', () => {
   let mockRequest: Partial<Request>;
@@ -81,7 +91,7 @@ describe('PostHandler - Save for Later Fix', () => {
 
   describe('Fix #3: Save for Later Functionality', () => {
     it('should validate form before saving for later', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim');
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim', flowConfig);
 
       // Empty form + save for later
       mockRequest.body = { action: 'saveForLater' };
@@ -100,6 +110,7 @@ describe('PostHandler - Save for Later Fix', () => {
         'free-legal-advice',
         'test.njk',
         'respond-to-claim',
+        flowConfig,
         mockBeforeRedirect
       );
 
@@ -124,7 +135,7 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('should use case ID from res.locals.validatedCase', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim');
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim', flowConfig);
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',
@@ -144,7 +155,7 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('should handle missing case ID gracefully', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim');
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respond-to-claim', flowConfig);
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',
@@ -168,6 +179,7 @@ describe('PostHandler - Save for Later Fix', () => {
         'free-legal-advice',
         'test.njk',
         'respond-to-claim',
+        flowConfig,
         mockBeforeRedirect
       );
 
@@ -188,6 +200,7 @@ describe('PostHandler - Save for Later Fix', () => {
         'free-legal-advice',
         'test.njk',
         'respond-to-claim',
+        flowConfig,
         mockBeforeRedirect
       );
 

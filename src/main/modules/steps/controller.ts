@@ -5,11 +5,11 @@ import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface
 import type { StepFormData } from '../../interfaces/stepFormData.interface';
 import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
-import { stepNavigation } from './flow';
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
 import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
 
 import { Logger } from '@modules/logger';
+import { StepNavigation } from '@modules/steps/flow';
 import { concatenateJourneyStepName } from '@utils/stepNameFolderCombiner';
 
 const logger = Logger.getLogger('controllerFactory');
@@ -45,6 +45,7 @@ export class GetController {
 export const createGetController = (
   view: ViewTemplate,
   stepName: string,
+  stepNavigation: StepNavigation,
   extendContent?: (req: Request) => StepFormData | Promise<StepFormData>,
   journeyFolder?: string
 ): GetController => {
@@ -69,7 +70,7 @@ export const createGetController = (
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
 
-    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName, journeyFolder) : {};
+    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName) : {};
     const commonTranslations = req.i18n?.getResourceBundle(lang, 'common') || {};
     const commonContent: Record<string, unknown> = {};
     for (const key of ['change', 'buttons']) {
@@ -115,6 +116,7 @@ export const createPostRedirectController = (nextUrl: string): { post: (req: Req
 
 export const createPostController = (
   stepName: string,
+  stepNavigation: StepNavigation,
   getFields: (t: TFunction) => FormFieldConfig[],
   view: string,
   beforeRedirect?: PostControllerCallback,

@@ -10,7 +10,17 @@ export interface StepRoute {
   nextStep: string;
 }
 
-export type PreviousStep = string | ((req: Request, formData: Record<string, unknown>) => string | Promise<string>);
+/**
+ * Type for previousStep configuration.
+ * Can be:
+ * - A static string: the step name to navigate back to
+ * - A function with Request only
+ * - A function with Request and formData
+ */
+export type PreviousStep =
+  | string
+  | ((req: Request) => string | Promise<string>)
+  | ((req: Request, formData: Record<string, unknown>) => string | Promise<string>);
 
 export interface StepConfig {
   dependencies?: string[];

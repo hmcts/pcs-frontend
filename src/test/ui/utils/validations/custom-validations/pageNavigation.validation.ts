@@ -4,7 +4,7 @@ import * as path from 'path';
 import { Page, expect } from '@playwright/test';
 
 import { performAction } from '../../controller';
-import { IValidation } from '../../interfaces';
+import { IValidation, validationRecord } from '../../interfaces';
 
 type NavigationTestResult = {
   pageUrl: string;
@@ -16,6 +16,7 @@ type NavigationTestResult = {
   error?: string;
   hasPFTFile: boolean;
   sourcePage?: string;
+  validationType?: 'element' | 'url';
 };
 
 export class PageNavigationValidation implements IValidation {
@@ -29,7 +30,8 @@ export class PageNavigationValidation implements IValidation {
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static currentPageUrl: string = '';
-  private static currentSourcePage: string | null = null; // Track the source page that initiated navigation
+  private static currentSourcePage: string | null = null;
+  private static navigationFailed = false;
 
   static setSourcePage(pageName: string): void {
     PageNavigationValidation.currentSourcePage = pageName;
@@ -39,124 +41,212 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.currentSourcePage = null;
   }
 
-  async validate(page: Page, validation: string, navigateButton: string, fieldName: string): Promise<void> {
+  async validate(page: Page, validation: string, navigateButton: string, fieldName: validationRecord): Promise<void> {
     PageNavigationValidation.currentPageUrl = page.url();
+    let newPage: Page | null = null;
+    let isNewWindow = false;
+
     if (navigateButton) {
-      if (navigateButton.includes('Back')) {
+      const popupPromise = page
+        .context()
+        .waitForEvent('page')
+        .catch(() => null);
+
+      if (navigateButton.includes('Back') || navigateButton.includes('feedback')) {
         await performAction('clickLink', navigateButton);
+        await page.waitForTimeout(200);
       } else {
         await performAction('clickButton', navigateButton);
       }
-    }
-    if (validation !== 'mainHeader' && validation !== 'pageNavigation') {
-      if (PageNavigationValidation.currentPageUrl) {
-        await performAction('navigateToUrl', PageNavigationValidation.currentPageUrl);
+
+      const popup = await Promise.race([popupPromise, new Promise(resolve => setTimeout(() => resolve(null), 1000))]);
+
+      let newPopupPage: Page | null = null;
+
+      if (popup) {
+        try {
+          const testPage = popup as Page;
+
+          if (!testPage.isClosed() && testPage.url() !== 'about:blank') {
+            newPopupPage = testPage;
+          }
+        } catch {
+          console.log('Popup closed while checking url or the page is closed');
+          newPopupPage = null;
+        }
       }
-      return;
+
+      if (newPopupPage) {
+        try {
+          await newPopupPage.waitForLoadState();
+          newPage = newPopupPage;
+          isNewWindow = true;
+        } catch {
+          console.log('new window closed');
+        }
+      }
     }
 
+    const pageToValidate = isNewWindow && newPage ? newPage : page;
+
     try {
-      if (validation === 'mainHeader') {
-        await this.validateMainHeader(page, fieldName);
-      } else if (validation === 'pageNavigation') {
-        await this.validatePageNavigation(page, fieldName);
-      }
+      await this.validatePageNavigation(pageToValidate, fieldName);
     } finally {
-      if (PageNavigationValidation.currentPageUrl) {
+      if (newPage && !newPage.isClosed()) {
+        await newPage.close();
+      }
+      if (
+        PageNavigationValidation.currentPageUrl &&
+        !isNewWindow &&
+        page.url() !== PageNavigationValidation.currentPageUrl
+      ) {
         await performAction('navigateToUrl', PageNavigationValidation.currentPageUrl);
       }
     }
   }
 
-  private async validateMainHeader(page: Page, expectedHeader: string): Promise<void> {
+  private async validatePageNavigation(page: Page, fieldName: validationRecord): Promise<void> {
+    let elementPassed = true;
+    let urlPassed = true;
+    let elementError: string | undefined;
+    let urlError: string | undefined;
+    let actualElementText = '';
+    let expectedElementText = '';
+    let actualUrl = '';
+    let expectedUrlPattern = '';
+
     try {
-      const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
-      await expect(locator).toHaveText(expectedHeader);
+      if (fieldName && typeof fieldName === 'object') {
+        const validationData = fieldName as any;
+
+        if (validationData.element) {
+          expectedElementText = validationData.element;
+          const locator = page.locator(
+            `h1, h1.govuk-heading-xl, h1.govuk-heading-l, span:text-is("${expectedElementText}")`
+          );
+          try {
+            await expect(locator).toHaveText(expectedElementText, { timeout: 5000 });
+            actualElementText = expectedElementText;
+          } catch (error) {
+            elementPassed = false;
+            actualElementText =
+              (await locator
+                .first()
+                .textContent()
+                .catch(() => 'Not found')) || 'Not found';
+            elementError = error instanceof Error ? error.message.split('\n')[0] : String(error);
+          }
+        }
+
+        if (validationData.pageSlug) {
+          try {
+            expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=respond-to-claim/${validationData.pageSlug}`;
+            actualUrl = page.url();
+            if (actualUrl !== expectedUrlPattern) {
+              urlPassed = false;
+              urlError = `URL mismatch. Expected: ${expectedUrlPattern}, Actual: ${actualUrl}`;
+            }
+          } catch (error) {
+            urlPassed = false;
+            actualUrl = page.url();
+            urlError = error instanceof Error ? error.message.split('\n')[0] : String(error);
+          }
+        }
+      } else {
+        expectedElementText = String(fieldName);
+        const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
+        await expect(locator).toHaveText(expectedElementText, { timeout: 5000 });
+        actualElementText = expectedElementText;
+      }
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
+      const overallPassed = elementPassed && urlPassed;
 
-      PageNavigationValidation.navigationResults.push({
-        pageUrl: page.url(),
-        pageName,
-        sourcePage: PageNavigationValidation.currentSourcePage || undefined,
-        testName: 'Main Header Validation',
-        passed: true,
-        expected: expectedHeader,
-        actual: expectedHeader,
-        hasPFTFile,
-      });
+      if (!elementPassed) {
+        PageNavigationValidation.navigationResults.push({
+          pageUrl: page.url(),
+          pageName,
+          sourcePage: PageNavigationValidation.currentSourcePage || undefined,
+          testName: 'Page Navigation Element Validation',
+          passed: false,
+          expected: expectedElementText,
+          actual: actualElementText,
+          error: elementError,
+          hasPFTFile,
+          validationType: 'element',
+        });
+        PageNavigationValidation.navigationFailed = true;
+      }
 
-      if (hasPFTFile) {
-        PageNavigationValidation.pagesPassed.add(pageName);
+      if (!urlPassed && fieldName && typeof fieldName === 'object' && (fieldName as any).pageSlug) {
+        PageNavigationValidation.navigationResults.push({
+          pageUrl: page.url(),
+          pageName,
+          sourcePage: PageNavigationValidation.currentSourcePage || undefined,
+          testName: 'Page Navigation URL Validation',
+          passed: false,
+          expected: expectedUrlPattern,
+          actual: actualUrl,
+          error: urlError || 'Page slug validation failed',
+          hasPFTFile,
+          validationType: 'url',
+        });
+        PageNavigationValidation.navigationFailed = true;
+      }
+
+      if (overallPassed) {
+        PageNavigationValidation.navigationResults.push({
+          pageUrl: page.url(),
+          pageName,
+          sourcePage: PageNavigationValidation.currentSourcePage || undefined,
+          testName: 'Page Navigation Validation',
+          passed: true,
+          expected: expectedElementText || 'URL validation passed',
+          actual: actualElementText || page.url(),
+          hasPFTFile,
+        });
+
+        if (hasPFTFile) {
+          PageNavigationValidation.pagesPassed.add(pageName);
+        }
       }
     } catch (error) {
+      const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const actualText = await page
         .locator('h1')
         .first()
         .textContent()
         .catch(() => 'Not found');
-
-      const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
 
-      PageNavigationValidation.navigationResults.push({
-        pageUrl: page.url(),
-        pageName,
-        sourcePage: PageNavigationValidation.currentSourcePage || undefined,
-        testName: 'Main Header Validation',
-        passed: false,
-        expected: expectedHeader,
-        actual: actualText || 'Not found',
-        error: error instanceof Error ? error.message.split('\n')[0] : String(error),
-        hasPFTFile,
-      });
-    }
-  }
-
-  private async validatePageNavigation(page: Page, expectedHeader: string): Promise<void> {
-    try {
-      const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
-      await expect(locator).toHaveText(expectedHeader);
-
-      const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
-      const actualText = await locator.first().textContent();
-      const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
+      let expectedValue: string;
+      if (typeof fieldName === 'object' && fieldName !== null) {
+        const obj = fieldName as any;
+        const parts: string[] = [];
+        if (obj.element) {
+          parts.push(`element: "${obj.element}"`);
+        }
+        if (obj.pageSlug) {
+          parts.push(`pageSlug: "${obj.pageSlug}"`);
+        }
+        expectedValue = `{ ${parts.join(', ')} }`;
+      } else {
+        expectedValue = String(fieldName);
+      }
 
       PageNavigationValidation.navigationResults.push({
         pageUrl: page.url(),
         pageName,
         sourcePage: PageNavigationValidation.currentSourcePage || undefined,
         testName: 'Page Navigation Validation',
-        passed: true,
-        expected: expectedHeader,
-        actual: actualText || '',
-        hasPFTFile,
-      });
-
-      if (hasPFTFile) {
-        PageNavigationValidation.pagesPassed.add(pageName);
-      }
-    } catch (error) {
-      const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
-      const actualText = await page
-        .locator('h1')
-        .first()
-        .textContent()
-        .catch(() => 'Not found');
-      const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
-
-      PageNavigationValidation.navigationResults.push({
-        pageUrl: page.url(),
-        pageName,
-        sourcePage: PageNavigationValidation.currentSourcePage || undefined,
-        testName: 'Page Navigation Validation',
         passed: false,
-        expected: expectedHeader,
+        expected: expectedValue,
         actual: actualText || 'Not found',
         error: error instanceof Error ? error.message.split('\n')[0] : String(error),
         hasPFTFile,
       });
+      PageNavigationValidation.navigationFailed = true;
     }
   }
 
@@ -177,6 +267,7 @@ export class PageNavigationValidation implements IValidation {
   }
 
   static trackNavigationFailure(pageName: string, error?: unknown): void {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     PageNavigationValidation.navigationResults.push({
       pageUrl: '',
       pageName,
@@ -184,10 +275,11 @@ export class PageNavigationValidation implements IValidation {
       testName: 'Navigation Tests Execution',
       passed: false,
       expected: 'Navigation tests should execute successfully',
-      actual: 'Execution failed',
-      error: error instanceof Error ? error.message.split('\n')[0] : String(error),
+      actual: errorMessage,
+      error: errorMessage,
       hasPFTFile: true,
     });
+    PageNavigationValidation.navigationFailed = true;
   }
 
   private static async hasPFTFile(pageName: string): Promise<boolean> {
@@ -279,60 +371,62 @@ export class PageNavigationValidation implements IValidation {
   static finaliseTest(): void {
     PageNavigationValidation.testCounter++;
 
-    const pagesWithNavigationMethods = new Set<string>();
+    const pagesWithNavigationTests = new Set<string>();
 
     for (const pageName of PageNavigationValidation.pagesWithNavigation) {
-      pagesWithNavigationMethods.add(pageName);
+      pagesWithNavigationTests.add(pageName);
     }
 
-    const totalPages =
-      pagesWithNavigationMethods.size +
-      PageNavigationValidation.missingNavigationMethods.size +
-      PageNavigationValidation.missingNavigationFiles.size;
+    for (const pageName of PageNavigationValidation.missingNavigationMethods) {
+      pagesWithNavigationTests.add(pageName);
+    }
+
+    for (const pageName of PageNavigationValidation.missingNavigationFiles) {
+      pagesWithNavigationTests.add(pageName);
+    }
+
+    const totalPages = pagesWithNavigationTests.size;
 
     if (totalPages === 0) {
-      console.log(`\n📊 NAVIGATION TESTS (Test #${PageNavigationValidation.testCounter}):`);
+      console.log(`\n📊 NAVIGATION TESTS SUMMARY (Test #${PageNavigationValidation.testCounter}):`);
       console.log('   No pages checked for navigation tests');
       return;
     }
 
-    // Track failures by the source page (the page that initiated the navigation)
-    const failureDetails = new Map<string, { expected: string; actual: string }>();
+    const failureDetails = new Map<string, { expected: string; actual: string; validationType?: string }>();
     const failedPages = new Set<string>();
-    const passedPages = new Set<string>();
+    const actuallyPassedPages = new Set<string>();
 
-    // First, identify all failures
     for (const result of PageNavigationValidation.navigationResults) {
       if (!result.passed) {
-        // If this failure has a source page, mark that source page as failed
         if (result.sourcePage) {
           failedPages.add(result.sourcePage);
           if (result.expected && result.actual) {
             failureDetails.set(result.sourcePage, {
               expected: result.expected,
               actual: result.actual,
+              validationType: result.validationType,
             });
           }
-        }
-        // If no source page but the page itself has a PFT file, mark it as failed
-        else if (result.hasPFTFile) {
+        } else if (result.hasPFTFile) {
           failedPages.add(result.pageName);
           if (result.expected && result.actual) {
             failureDetails.set(result.pageName, {
               expected: result.expected,
               actual: result.actual,
+              validationType: result.validationType,
             });
           }
-        }
-        // If it's a page without PFT file and no source page (like Dashboard), we can't attribute it
-        // So we log it but don't fail any specific page
-        else {
-          console.log(`   ⚠️  Unattributed failure on ${result.pageName}: ${result.error}`);
         }
       }
     }
 
-    // A page passes only if it has no failures and has a PFT file
+    for (const pageName of PageNavigationValidation.pagesPassed) {
+      if (!failedPages.has(pageName)) {
+        actuallyPassedPages.add(pageName);
+      }
+    }
+
     for (const result of PageNavigationValidation.navigationResults) {
       if (
         result.passed &&
@@ -340,13 +434,13 @@ export class PageNavigationValidation implements IValidation {
         !failedPages.has(result.pageName) &&
         !failedPages.has(result.sourcePage || '')
       ) {
-        passedPages.add(result.pageName);
+        actuallyPassedPages.add(result.pageName);
       }
     }
 
-    // Add pages that were explicitly marked as passed (and haven't failed)
-    for (const pageName of PageNavigationValidation.pagesPassed) {
-      if (!failedPages.has(pageName)) {
+    const passedPages = new Set<string>();
+    for (const pageName of pagesWithNavigationTests) {
+      if (!failedPages.has(pageName) && actuallyPassedPages.has(pageName)) {
         passedPages.add(pageName);
       }
     }
@@ -379,7 +473,6 @@ export class PageNavigationValidation implements IValidation {
       );
     }
 
-    // Show failure details
     if (failedPages.size > 0) {
       console.log('\n❌ FAILED NAVIGATION TESTS:');
 
@@ -387,26 +480,39 @@ export class PageNavigationValidation implements IValidation {
         const details = failureDetails.get(pageName);
         console.log(`   Page: ${pageName}`);
         if (details) {
-          console.log(`       Expected: ${details.expected}`);
-          console.log(`       Actual: ${details.actual}`);
+          let errorMessage = details.actual;
+          if (errorMessage.includes('expect(locator).toHaveText(expected) failed')) {
+            errorMessage = `"${details.expected}" element not found`;
+          }
+          console.log(`       Error: ${errorMessage}`);
         }
         console.log('');
       }
     }
 
-    if (failedPages.size > 0) {
+    const hasFailures = failedPages.size > 0 || PageNavigationValidation.navigationFailed;
+
+    if (hasFailures) {
       console.log('❌ NAVIGATION TESTS FAILED\n');
     } else if (passedPages.size > 0) {
       console.log('\n✅ ALL NAVIGATION TESTS PASSED\n');
-    } else if (pagesWithNavigationMethods.size > 0) {
+    } else if (pagesWithNavigationTests.size > 0) {
       console.log('\n⚠️  Navigation files found but no tests performed\n');
     }
 
+    const shouldThrow = hasFailures && PageNavigationValidation.shouldThrowError;
+    const errors = Array.from(failureDetails.entries()).map(([page, details]) => {
+      let errorMessage = details.actual;
+      if (errorMessage.includes('expect(locator).toHaveText(expected) failed')) {
+        errorMessage = `"${details.expected}" element not found`;
+      }
+      return `${page}: ${errorMessage}`;
+    });
+
     PageNavigationValidation.clearResults();
 
-    // Throw after clearing so failures don't cascade into subsequent tests
-    if (failedPages.size > 0 && PageNavigationValidation.shouldThrowError) {
-      throw new Error(`Navigation tests failed: ${failedPages.size} page(s) have failures`);
+    if (shouldThrow && errors.length > 0) {
+      throw new Error(`Navigation tests failed:\n\n${errors.join('\n\n')}`);
     }
   }
 
@@ -418,5 +524,6 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.missingNavigationFiles.clear();
     PageNavigationValidation.currentPageUrl = '';
     PageNavigationValidation.currentSourcePage = null;
+    PageNavigationValidation.navigationFailed = false;
   }
 }

@@ -7,7 +7,7 @@ import type { BuiltFormContent, FormBuilderConfig } from '../../../interfaces/fo
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { getDashboardUrl } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
-import { createStepNavigation, stepNavigation } from '../flow';
+import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { buildFormContent } from './formContent';
@@ -44,10 +44,14 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     customTemplate,
   } = config;
 
+  if (!flowConfig) {
+    throw new Error('flowConfig must be provided');
+  }
+
   const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath: string | ((req: Request) => string | Promise<string>) = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
-  const navigation = flowConfig ? createStepNavigation(flowConfig) : stepNavigation;
+  const stepNavigation = createStepNavigation(flowConfig);
 
   return {
     url: path.join(basePath, stepName),
@@ -56,12 +60,10 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     stepDir,
     showCancelButton,
     getController: () => {
-      // DM how to load from a different directory if professional user logged in?
-
-      return createGetController(viewPath, stepName, async req => {
+      return createGetController(viewPath, stepName, stepNavigation, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
-        // can load json from professional folder based on role to override json
-        const t: TFunction = getTranslationFunction(req, stepName, ['common'], journeyFolder);
+
+        const t: TFunction = getTranslationFunction(req, stepName, ['common']);
 
         const nunjucksEnv = req.app.locals.nunjucksEnv;
         if (!nunjucksEnv) {
@@ -94,7 +96,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),
-          backUrl: await navigation.getBackUrl(req, stepName),
+          backUrl: await stepNavigation.getBackUrl(req, stepName),
           showCancelButton,
           url: req.originalUrl, // Form action URL - POST to current page
         };
@@ -105,9 +107,9 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       stepName,
       viewPath,
       journeyFolder,
+      flowConfig,
       beforeRedirect,
       translationKeys,
-      flowConfig,
       showCancelButton,
       extendGetContent
     ),

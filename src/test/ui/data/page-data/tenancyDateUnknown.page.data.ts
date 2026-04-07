@@ -17,4 +17,6 @@ export const tenancyDateUnknown = {
   yearMissingErrorMessage: 'Your tenancy start date must include a year',
   realDateErrorMessage: 'Tenancy start date must be a real date',
   backLink: 'Back',
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `tenancy-date-unknown`,
 };
