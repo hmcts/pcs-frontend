@@ -12,6 +12,10 @@ import {
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
+  doAnyOtherAdultsLiveInYourHome,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
+  exceptionalHardship,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
   incomeAndExpenses,
@@ -27,6 +31,9 @@ import {
   tenancyTypeDetails,
   uploadDocuments,
   whatRegularIncomeDoYouReceive,
+  wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome,
+  yourCircumstances,
+  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -212,8 +219,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
-    //include missing steps
-
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
+    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.continueButton);
+    await performValidation('mainHeader', doYouHaveAnyOtherDependants.mainHeader);
+    await performAction('clickButton', doYouHaveAnyOtherDependants.continueButton);
+    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performValidation('mainHeader', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.mainHeader);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome.continueButton);
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('clickButton', yourCircumstances.continueButton);
+    await performValidation('mainHeader', exceptionalHardship.mainHeader);
+    await performAction('clickButton', exceptionalHardship.continueButton);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
