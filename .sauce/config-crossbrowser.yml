@@ -112,9 +112,10 @@ suites:
       grep: '@nightly'
 
   # saucectl 0.202 validation + EU allocators: use macOS 13 for Firefox/WebKit (not macOS 14 in schema for these combos).
+  # WebKit on macOS: 1920x1080 is not allowed for this OS/browser — Sauce only offers e.g. 1024x768 … 1920x1440 (see job error).
   - name: 'Firefox — macOS 13'
     platformName: macOS 13
-    screenResolution: 1920x1080
+    screenResolution: 1440x900
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
       - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
@@ -126,7 +127,7 @@ suites:
 
   - name: 'Safari (WebKit) — macOS 13'
     platformName: macOS 13
-    screenResolution: 1920x1080
+    screenResolution: 1440x900
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
       - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
