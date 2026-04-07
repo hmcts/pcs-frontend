@@ -55,22 +55,16 @@ export function buildSelectionItems(
         return translatedOptions?.[optionIndex] || { divider: option.divider };
       }
 
-      const item: Record<string, unknown> = {
+      const itemHint = translatedOptions?.[optionIndex]?.hint || option.hint;
+      const conditionalHtml = buildConditionalItemContent(option, nunjucksEnv);
+
+      return {
         value: option.value,
         text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
         checked: isChecked(option),
+        ...(itemHint ? { hint: { text: itemHint } } : {}),
+        ...(conditionalHtml ? { conditional: { html: conditionalHtml } } : {}),
       };
-      const itemHint = translatedOptions?.[optionIndex]?.hint || option.hint;
-      if (itemHint) {
-        item.hint = { text: itemHint };
-      }
-
-      const conditionalHtml = buildConditionalItemContent(option, nunjucksEnv);
-      if (conditionalHtml) {
-        item.conditional = { html: conditionalHtml };
-      }
-
-      return item;
     }) || []
   );
 }
