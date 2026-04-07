@@ -29,7 +29,7 @@ import {
   tenancyTypeDetails,
   wouldYouHaveSomeoneElse,
   yourCircumstances,
-  yourHouseholdAndCircumstances
+  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
