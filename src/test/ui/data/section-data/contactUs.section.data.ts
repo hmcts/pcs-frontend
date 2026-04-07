@@ -3,7 +3,7 @@ export const contactUs = {
   emailSubHeader: 'Email',
   localCourtEmailAddrParagraph:
     'Use the find a court or tribunal service (opens in new tab) to get your local court’s email address.',
-  findACourtLink: 'Find a court or tribunal service (opens in new tab)',
+  findACourtLink: 'find a court or tribunal service (opens in new tab)',
   ifYouDoNotKnowParagraph:
     'If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.',
   telephoneSubHeader: 'Telephone',
