@@ -1,5 +1,6 @@
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { HTTPError } from '../../../HttpError';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -19,7 +20,7 @@ export const step: StepDefinition = createFormStep({
     const choice: 'continue' | 'skip' | undefined = req.body?.equalityStartChoice;
     if (choice !== 'continue' && choice !== 'skip') {
       logger.warn('Invalid choice for equality and diversity questions', { choice });
-      return;
+      throw new HTTPError('Invalid equality and diversity choice', 400);
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
