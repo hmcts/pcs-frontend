@@ -27,12 +27,6 @@
     "start": "Start",
     "submit": "Submit"
   },
-  "options": {
-    "yes": "Yes",
-    "no": "No",
-    "or": "or",
-    "imNotSure": "I'm not sure"
-  },
   "change": "Change",
   "back": "Back",
   "date": {
