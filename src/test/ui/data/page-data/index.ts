@@ -33,3 +33,4 @@ export * from './doYouHaveAnyOtherDependants.page.data';
 export * from './doAnyOtherAdultsLiveInYourHome.page.data';
 export * from './wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.page.data';
 export * from './feedback.page.data';
+export * from './yourCircumstances.page.data';

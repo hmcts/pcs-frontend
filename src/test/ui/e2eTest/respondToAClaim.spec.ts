@@ -25,6 +25,7 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  yourCircumstances,
   yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { getRelativeDate } from '../utils/common/string.utils';
@@ -421,6 +422,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(5),
     });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -485,6 +487,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(5),
     });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -550,6 +553,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
     });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
@@ -616,6 +620,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
