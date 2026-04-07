@@ -29,7 +29,6 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
   writtenTerms,
-  yourHouseHoldAndCircumstances,
   yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
@@ -66,7 +65,6 @@ export class RespondToClaimAction implements IAction {
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
       ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
-      ['readYourHouseHoldAndCircumstances', () => this.readYourHouseHoldAndCircumstances()],
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
@@ -271,10 +269,6 @@ export class RespondToClaimAction implements IAction {
       option: howMuchToPayData.radioOption,
     });
     await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
-  }
-
-  private async readYourHouseHoldAndCircumstances(): Promise<void> {
-    await performAction('clickButton', yourHouseHoldAndCircumstances.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {

@@ -12,7 +12,6 @@ import {
   dateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
-  doYouHaveAnyDependantChildren,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
@@ -107,6 +106,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title.includes('RentArrears - Demoted')) {
     process.env.REPAYMENT_AGREED = 'NO';
   }
+  //Check if No is selected on Installment Payment page(Rent Arrears) - for back link navigation
   if (testInfo.title.includes('InstallmentPayment - No')) {
     process.env.INSTALLMENT_PAYMENT = 'NO';
   }
@@ -218,10 +218,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
-    await performAction('readYourHouseHoldAndCircumstances');
-    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
-    await performValidation('mainHeader', installmentPayments.mainHeader);
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -288,8 +284,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performAction('readYourHouseHoldAndCircumstances');
-    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -356,10 +350,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performAction('readYourHouseHoldAndCircumstances');
-    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
-    await performValidation('mainHeader', installmentPayments.mainHeader);
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -424,8 +414,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performAction('readYourHouseHoldAndCircumstances');
-    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -549,8 +537,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performAction('readYourHouseHoldAndCircumstances');
-    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -619,8 +605,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
       radioOption: installmentPayments.noRadioOption,
     });
-    await performAction('readYourHouseHoldAndCircumstances');
-    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -689,10 +673,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: howMuchAffordToPay.howFrequentlyCouldYouAffordToPayQuestion,
       radioOption: howMuchAffordToPay.weeklyRadioOption,
     });
-    await performAction('readYourHouseHoldAndCircumstances');
-    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
-    await performValidation('mainHeader', installmentPayments.mainHeader);
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -757,10 +737,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performAction('readYourHouseHoldAndCircumstances');
-    await performValidation('mainHeader', doYouHaveAnyDependantChildren.mainHeader);
-    await performValidation('mainHeader', installmentPayments.mainHeader);
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
