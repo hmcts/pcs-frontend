@@ -8,7 +8,6 @@ export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getPreviousPageForArrears } from './journeyHelpers';
 export { getStepBeforeDisputePages } from './journeyHelpers';
-export { formatDatePartsToISODate } from './dateUtils';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
 export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
@@ -19,3 +18,4 @@ export {
   additionalRentContributionToPoundsString,
 } from './moneyAmountTransforms';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
+export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
