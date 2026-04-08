@@ -226,18 +226,15 @@ export class PageNavigationValidation implements IValidation {
       const actualNavLog = [actualElementText && `element: "${actualElementText}"`, `url: "${actualUrl || page.url()}"`]
         .filter(Boolean)
         .join('; ');
+      const navLogSuffix = ` | nav: from "${PageNavigationValidation.currentSourcePage ?? '?'}" | control: "${navigateButton ?? '?'}"`;
 
       await logPftValidationInformation(
         page,
         'page-navigation',
         pageName,
-        expectedNavLog || 'page navigation validation',
+        (expectedNavLog || 'page navigation validation') + navLogSuffix,
         actualNavLog,
-        !overallPassed,
-        {
-          from: PageNavigationValidation.currentSourcePage,
-          via: navigateButton,
-        }
+        !overallPassed
       );
     } catch (error) {
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
@@ -276,17 +273,15 @@ export class PageNavigationValidation implements IValidation {
       });
       PageNavigationValidation.navigationFailed = true;
 
+      const navLogSuffixCatch = ` | nav: from "${PageNavigationValidation.currentSourcePage ?? '?'}" | control: "${navigateButton ?? '?'}"`;
+
       await logPftValidationInformation(
         page,
         'page-navigation',
         pageName,
-        expectedValue,
+        expectedValue + navLogSuffixCatch,
         actualText || 'Not found',
-        true,
-        {
-          from: PageNavigationValidation.currentSourcePage,
-          via: navigateButton,
-        }
+        true
       );
     }
   }

@@ -26,8 +26,7 @@ export async function logPftValidationInformation(
   pageLabel: string,
   expected: string,
   actual: string,
-  failed: boolean,
-  navContext?: { from?: string | null; via?: string }
+  failed: boolean
 ): Promise<void> {
   if (failed) {
     const label = categoryLabel[category];
@@ -53,12 +52,8 @@ export async function logPftValidationInformation(
   const p = truncateForLog(pageLabel, 80);
   const e = truncateForLog(expected, 160);
   const a = truncateForLog(actual, 160);
-  const navSuffix =
-    category === 'page-navigation' && navContext
-      ? ` | nav: from "${navContext.from ? truncateForLog(String(navContext.from), 40) : '?'}" | control: "${navContext.via ? truncateForLog(String(navContext.via), 60) : '?'}"`
-      : '';
 
   console.log(
-    `[PFT] ${categoryLabel[category]} | test: ${t} | page: ${p} | url: ${shortUrl(page.url())}${navSuffix} | expected: ${e} | actual: ${a}`
+    `[PFT] ${categoryLabel[category]} | test: ${t} | page: ${p} | url: ${shortUrl(page.url())} | expected: ${e} | actual: ${a}`
   );
 }
