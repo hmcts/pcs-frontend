@@ -54,6 +54,7 @@
     "test:sauce:mac13-edge": "SAUCE_TUNNEL_NAME=reformtunnel SAUCE_GREP=${SAUCE_GREP:-@crossbrowser} yarn exec saucectl run -c .sauce/config-mac13-edge.yml",
     "test:sauce:mac13-firefox": "SAUCE_TUNNEL_NAME=reformtunnel SAUCE_GREP=${SAUCE_GREP:-@crossbrowser} yarn exec saucectl run -c .sauce/config-mac13-firefox.yml",
     "test:sauce:mac13-webkit": "SAUCE_TUNNEL_NAME=reformtunnel SAUCE_GREP=${SAUCE_GREP:-@crossbrowser} yarn exec saucectl run -c .sauce/config-mac13-webkit.yml",
+    "test:sauce:ac-cross-browser": "SAUCE_TUNNEL_NAME=${SAUCE_TUNNEL_NAME:-reformtunnel} SAUCE_GREP=${SAUCE_GREP:-@crossbrowser} yarn exec saucectl run -c .sauce/config-ac-cross-browser.yml && CI=true yarn playwright install && yarn playwright test --project MobileChrome --grep \"${SAUCE_GREP:-@crossbrowser}\"",
     "test:pact": "jest -c jest.pact.config.ts --runInBand",
     "pact:publish": "ts-node src/test/contract/publish/*.ts",
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",
