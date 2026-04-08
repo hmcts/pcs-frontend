@@ -72,7 +72,7 @@ When debugging **page navigation**, **error message**, or **page content** flows
 - Default is **off** (no extra console output).
 - Implementation: `utils/common/pft-debug-log.ts`. Lines include **test title**, **page label**, **URL**, **expected**, and **actual** (long strings truncated).
 - **Failure screenshots** (`test.info().attach` → HTML / Allure) are **not** controlled by `ENABLE_PFT_DEBUG_LOG`; they attach when a validation reports a failure and requests a screenshot.
-- **`captureProcessEnvBeforeBeforeEach()`** (first line of `test.beforeEach`) and **`logTestBeforeEachContext()`** (end of the same hook): when `ENABLE_PFT_DEBUG_LOG=true`, prints one block with the test title and every **non-empty** `process.env` key whose value **changed** during that `beforeEach` (compared to the snapshot at the start). No allowlist to maintain.
+- **`logTestBeforeEachContext()`** (typically at the end of `test.beforeEach`): when `ENABLE_PFT_DEBUG_LOG=true`, prints the test title and an explicit list of scenario env vars (`PFT_DEBUG_DISPLAY_ENV_KEYS` in `pft-debug-log.ts`). **Add a key to that array** when tests introduce a new `process.env` used for journeys; values matching token/password/secret patterns are redacted.
 
 `playwright.config.ts` exports **`enable_pft_debug_log`** alongside other `ENABLE_*` flags.
 

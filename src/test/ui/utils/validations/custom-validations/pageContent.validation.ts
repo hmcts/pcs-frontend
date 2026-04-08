@@ -3,7 +3,6 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
-import { attachValidationFailureScreenshot, reportValidationFailure } from '../../common/pft-debug-log';
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';

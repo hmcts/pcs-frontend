@@ -10,13 +10,12 @@ import {
   freeLegalAdvice,
   startNow,
 } from '../data/page-data';
-import { captureProcessEnvBeforeBeforeEach, logTestBeforeEachContext } from '../utils/common/pft-debug-log';
+import { logTestBeforeEachContext } from '../utils/common/pft-debug-log';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }, testInfo) => {
-  captureProcessEnvBeforeBeforeEach();
   initializeExecutor(page);
   process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
