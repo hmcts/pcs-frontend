@@ -81,6 +81,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {
+    await performValidation('mainHeader', defendantData.mainHeader);
     await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantData.fName);
     await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantData.lName);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);

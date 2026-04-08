@@ -153,7 +153,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim @noDefendants @regression @accessibility', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
-      question: defendantNameCapture.mainHeader,
+      mainHeader: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
@@ -228,7 +228,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
-      question: defendantNameCapture.mainHeader,
+      mainHeader: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
@@ -298,7 +298,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
-      question: defendantNameCapture.mainHeader,
+      mainHeader: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
@@ -368,7 +368,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
-      question: defendantNameCapture.mainHeader,
+      mainHeader: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
@@ -438,7 +438,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
-      question: defendantNameCapture.mainHeader,
+      mainHeader: defendantNameCapture.mainHeader,
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
