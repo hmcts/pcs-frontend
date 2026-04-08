@@ -1,0 +1,8 @@
+{
+  "heading": "cyWhat is your client's name?",
+  "pageTitle": "cyYour client's name",
+  "errors": {
+    "firstName": "cyEnter your client's first name",
+    "lastName": "cyEnter your client's last name"
+  }
+}

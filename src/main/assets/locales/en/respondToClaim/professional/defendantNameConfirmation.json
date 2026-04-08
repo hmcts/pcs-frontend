@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Your client's name",
+  "nameConfirmationLabel": "Is your client's name {{defendantName}}?",
+  "errors": {
+    "nameConfirmation": "You must say if your client's name is {{defendantName}}",
+    "firstName": "Enter your client's first name",
+    "lastName": "Enter your client's last name"
+  }
+}

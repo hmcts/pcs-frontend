@@ -80,24 +80,37 @@ jest.mock('../../../main/steps', () => ({
   journeyRegistry: {
     respondToClaim: {
       name: 'respondToClaim',
-      flowConfig: {
-        basePath: '/respond-to-claim',
-        stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
-        steps: {
-          'protected-step': { requiresAuth: true },
-          'unprotected-step': { requiresAuth: false },
-          'function-controller-step': { requiresAuth: true },
-          'middleware-step': { requiresAuth: true },
+      default: {
+        flowConfig: {
+          basePath: '/respond-to-claim',
+          stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
+          steps: {
+            'protected-step': { requiresAuth: true },
+            'unprotected-step': { requiresAuth: false },
+            'function-controller-step': { requiresAuth: true },
+            'middleware-step': { requiresAuth: true },
+          },
+        },
+        stepRegistry: {
+          'protected-step': protectedStep,
+          'unprotected-step': unprotectedStep,
+          'function-controller-step': stepWithFunctionController,
+          'middleware-step': stepWithMiddleware,
         },
       },
-      stepRegistry: {
+    },
+  },
+  getFlowConfigForJourney: jest.fn(() => mockFlowConfig),
+  getStepForJourney: jest.fn((_journeyName: string, stepName: string) => {
+    return (
+      {
         'protected-step': protectedStep,
         'unprotected-step': unprotectedStep,
         'function-controller-step': stepWithFunctionController,
         'middleware-step': stepWithMiddleware,
-      },
-    },
-  },
+      }[stepName] || undefined
+    );
+  }),
   getStepsForJourney: jest.fn((journeyName: string) => {
     if (journeyName === 'respondToClaim') {
       return allSteps;
@@ -178,7 +191,7 @@ describe('registerSteps', () => {
     expect(protectedPostCall!).toHaveLength(3);
     expect(protectedPostCall![0]).toBe('/steps/protected');
     expect(protectedPostCall![1]).toBe(oidcMiddleware);
-    expect(protectedPostCall![2]).toBe(mockStepsData.protectedStep.postController.post);
+    expect(typeof protectedPostCall![2]).toBe('function');
   });
 
   it('registers GET and POST without middlewares for unprotected steps', () => {
@@ -195,7 +208,21 @@ describe('registerSteps', () => {
     expect(unprotectedPostCall).toBeDefined();
     expect(unprotectedPostCall!).toHaveLength(2);
     expect(unprotectedPostCall![0]).toBe('/steps/unprotected');
-    expect(unprotectedPostCall![1]).toBe(mockStepsData.unprotectedStep.postController.post);
+    expect(typeof unprotectedPostCall![1]).toBe('function');
+  });
+
+  it('delegates POST handlers to the resolved step definition', () => {
+    registerSteps(app);
+
+    const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
+    const handler = protectedPostCall?.[2];
+    const req = createMockRequest('/steps/protected');
+    const res = createMockResponse();
+    const next = jest.fn();
+
+    handler(req, res, next);
+
+    expect(mockStepsData.protectedStep.postController.post).toHaveBeenCalledWith(req, res, next);
   });
 
   it('handles function-based getController', () => {
@@ -283,15 +310,17 @@ describe('registerSteps', () => {
       journeyRegistry: {
         respondToClaim: {
           name: 'respondToClaim',
-          flowConfig: {
-            basePath: '/respond-to-claim',
-            stepOrder: ['no-controllers'],
-            steps: {
-              'no-controllers': { requiresAuth: true },
+          default: {
+            flowConfig: {
+              basePath: '/respond-to-claim',
+              stepOrder: ['no-controllers'],
+              steps: {
+                'no-controllers': { requiresAuth: true },
+              },
             },
-          },
-          stepRegistry: {
-            'no-controllers': stepWithoutControllers,
+            stepRegistry: {
+              'no-controllers': stepWithoutControllers,
+            },
           },
         },
       },

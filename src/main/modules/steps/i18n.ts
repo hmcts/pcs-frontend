@@ -10,6 +10,7 @@ import {
   getRequestLanguage as getMainRequestLanguage,
   getTranslationFunction as getMainTranslationFunction,
 } from '../i18n';
+import { isProfessionalUser } from '../../steps/utils';
 
 import { Logger } from '@modules/logger';
 
@@ -21,6 +22,30 @@ export type SupportedLang = AllowedLang;
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
+function isObject(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function mergeTranslations(
+  baseTranslations: Record<string, unknown>,
+  overrideTranslations: Record<string, unknown>
+): Record<string, unknown> {
+  const merged = { ...baseTranslations };
+
+  for (const [key, value] of Object.entries(overrideTranslations)) {
+    const existingValue = merged[key];
+
+    if (isObject(existingValue) && isObject(value)) {
+      merged[key] = mergeTranslations(existingValue, value);
+      continue;
+    }
+
+    merged[key] = value;
+  }
+
+  return merged;
+}
+
 export function getStepNamespace(stepName: string): string {
   return stepName
     .split('-')
@@ -30,6 +55,16 @@ export function getStepNamespace(stepName: string): string {
 
 export function getStepTranslationPath(stepName: string, folder: string): string {
   return `${folder}/${getStepNamespace(stepName)}`;
+}
+
+function getStepTranslationPaths(req: Request, stepName: string, folder: string): string[] {
+  const defaultPath = getStepTranslationPath(stepName, folder);
+
+  if (!isProfessionalUser(req)) {
+    return [defaultPath];
+  }
+
+  return [defaultPath, `${folder}/professional/${getStepNamespace(stepName)}`];
 }
 
 export async function loadStepNamespace(req: Request, stepName: string, folder: string): Promise<void> {
@@ -52,22 +87,37 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
     return;
   }
 
-  const translationPath = getStepTranslationPath(stepName, folder);
-  const filePath = path.join(localesDir, lang, `${translationPath}.json`);
-
-  const resolvedPath = path.resolve(filePath);
-  const resolvedLocalesDir = path.resolve(localesDir);
-  if (!resolvedPath.startsWith(resolvedLocalesDir)) {
-    if (isDevelopment) {
-      logger.warn(`Invalid translation path detected: ${translationPath}`);
-    }
-    return;
-  }
-
   try {
-    await fs.access(resolvedPath);
-    const fileContent = await fs.readFile(resolvedPath, 'utf8');
-    const translations = JSON.parse(fileContent);
+    let translations: Record<string, unknown> = {};
+
+    for (const translationPath of getStepTranslationPaths(req, stepName, folder)) {
+      const filePath = path.join(localesDir, lang, `${translationPath}.json`);
+      const resolvedPath = path.resolve(filePath);
+      const resolvedLocalesDir = path.resolve(localesDir);
+
+      if (!resolvedPath.startsWith(resolvedLocalesDir)) {
+        if (isDevelopment) {
+          logger.warn(`Invalid translation path detected: ${translationPath}`);
+        }
+        return;
+      }
+
+      try {
+        await fs.access(resolvedPath);
+        const fileContent = await fs.readFile(resolvedPath, 'utf8');
+        translations = mergeTranslations(translations, JSON.parse(fileContent) as Record<string, unknown>);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (!errorMessage.includes('ENOENT')) {
+          throw error;
+        }
+      }
+    }
+
+    if (Object.keys(translations).length === 0) {
+      return;
+    }
+
     req.i18n.addResourceBundle(lang, stepNamespace, translations, true, true);
 
     await new Promise<void>((resolve, reject) => {
