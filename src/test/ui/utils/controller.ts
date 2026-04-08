@@ -58,8 +58,10 @@ async function validatePageIfNavigated(action: string): Promise<void> {
     if (pageNavigated) {
       if (startAxeAudit && enable_axe_audit === 'true') {
         try {
-          await new AxeUtils(executor.page).audit({
-            exclude: axe_exclusions,
+          await test.step('Running Accessibility Scan', async () => {
+            await new AxeUtils(executor.page).audit({
+              exclude: axe_exclusions,
+            });
           });
         } catch (error) {
           const errorMessage = String((error as Error).message || error).toLowerCase();

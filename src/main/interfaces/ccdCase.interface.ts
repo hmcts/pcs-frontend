@@ -3,11 +3,20 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type YesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = YesNoValue | 'NOT_SURE';
-export type ContactPreference = 'EMAIL' | 'POST' | null;
+export type VerticalYesNoValue = 'YES' | 'NO' | null;
+export type TenancyTypeCorrectValue = YesNoNotSureValue;
+export type YesNoValue = 'Yes' | 'No';
 
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
+
+export type ContactPreference = 'EMAIL' | 'POST' | null;
+
+export interface HouseholdCircumstances {
+  dependantChildren?: YesNoValue;
+  dependantChildrenDetails?: string;
+  otherDependants?: YesNoValue;
+  otherDependantDetails?: string;
+}
 
 export interface CcdUserCase {
   id: string;
@@ -37,13 +46,17 @@ export interface Address {
   Country?: string;
 }
 
+export interface CaseData {
+  possessionClaimResponse?: PossessionClaimResponse;
+}
+
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: {
       firstName?: string;
       lastName?: string;
       address?: Address;
-      phoneNumberProvided?: YesNoValue;
+      phoneNumberProvided?: VerticalYesNoValue;
       phoneNumber?: string;
       emailAddress?: string;
     };
@@ -54,8 +67,8 @@ export interface PossessionClaimResponse {
     tenancyType?: string;
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
-    contactByPhone?: YesNoValue;
-    contactByText?: YesNoValue;
+    contactByPhone?: VerticalYesNoValue;
+    contactByText?: VerticalYesNoValue;
     preferenceType?: ContactPreference;
     rentArrearsAmountConfirmation?: string;
     rentArrearsAmount?: string;
@@ -72,6 +85,7 @@ export interface PossessionClaimResponse {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
     };
+    householdCircumstances?: HouseholdCircumstances;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;
