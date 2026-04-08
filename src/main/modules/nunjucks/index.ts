@@ -12,8 +12,11 @@ export class Nunjucks {
 
   enableFor(app: express.Express): void {
     app.set('view engine', 'njk');
+    const cftNunjucksPath = path.dirname(require.resolve('@hmcts-cft/cft-ui-component-lib/nunjucks/xui-header/macro.njk'));
+    const cftNunjucksRoot = path.resolve(cftNunjucksPath, '..');
+
     app.locals.nunjucksEnv = nunjucks.configure(
-      [path.join(__dirname, '..', '..', 'views'), path.join(__dirname, '..', '..', 'steps')],
+      [path.join(__dirname, '..', '..', 'views'), path.join(__dirname, '..', '..', 'steps'), cftNunjucksRoot],
       {
         autoescape: true,
         watch: this.developmentMode,
