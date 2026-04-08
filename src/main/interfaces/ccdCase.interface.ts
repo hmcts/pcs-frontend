@@ -18,6 +18,10 @@ export interface HouseholdCircumstances {
   dependantChildrenDetails?: string;
   otherDependants?: YesNoValue;
   otherDependantDetails?: string;
+  alternativeAccommodation?: YesNoNotSureValue;
+  alternativeAccommodationTransferDate?: string;
+  otherTenants?: YesNoValue;
+  otherTenantsDetails?: string;
 }
 
 export interface CcdUserCase {
@@ -81,7 +85,6 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
-
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
