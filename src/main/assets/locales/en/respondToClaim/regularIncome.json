@@ -1,0 +1,61 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "What regular income do you receive?",
+  "heading": "What regular income do you receive? (Optional)",
+  "hintText": "Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.",
+  "options": {
+    "incomeFromJobs": "Income from all jobs you do",
+    "pension": "Pension – state and private",
+    "universalCredit": "Universal Credit",
+    "otherBenefits": "Other benefits and credits",
+    "moneyFromElsewhere": "Money from somewhere else (for example, child maintenance payments or someone in your household gives you money)"
+  },
+  "subFields": {
+    "amount": "Total amount received",
+    "frequency": "Received every:",
+    "moneyFromElsewhereDetailsLabel": "Give details",
+    "moneyFromElsewhereDetailsHint": "Give details about the other sources of income and how much you usually receive"
+  },
+  "frequency": {
+    "week": "Week",
+    "month": "Month"
+  },
+  "errors": {
+    "incomeFromJobsAmount": {
+      "required": "Enter the total amount you receive from all jobs you do",
+      "largeAmount": "The total amount you receive from all jobs you do each week or month must be less than £1 billion"
+    },
+    "incomeFromJobsFrequency": {
+      "required": "Select how frequently you receive income from all jobs you do"
+    },
+    "pensionAmount": {
+      "required": "Enter the total amount you receive from a state or private pension",
+      "largeAmount": "The total amount you receive from pension (state and private) each week or month must be less than £1 billion"
+    },
+    "pensionFrequency": {
+      "required": "Select how frequently you receive income from a state or private pension"
+    },
+    "universalCreditAmount": {
+      "required": "Enter the total amount you receive from Universal Credit",
+      "largeAmount": "The total amount you receive from Universal Credit each week or month must be less than £1 billion"
+    },
+    "universalCreditFrequency": {
+      "required": "Select how frequently you receive Universal Credit"
+    },
+    "otherBenefitsAmount": {
+      "required": "Enter the total amount you receive from other benefits and credits",
+      "largeAmount": "The total amount you receive from other benefits and credit each week or month must be less than £1 billion"
+    },
+    "otherBenefitsFrequency": {
+      "required": "Select how frequently you receive income from other benefits and credits"
+    },
+    "moneyFromElsewhereDetails": {
+      "required": "Give details about the other sources of income and how much you usually receive"
+    },
+    "amount": {
+      "negative": "Amount cannot be negative",
+      "tooLarge": "Amount is too large",
+      "invalidFormat": "Enter amount in pounds and pence, for example 148.00 or 148.50"
+    }
+  }
+}

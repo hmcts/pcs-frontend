@@ -5,10 +5,14 @@ import {
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
+  hasSelectedUniversalCredit,
   isDefendantNameKnown,
+  isFinanceDetailsProvided,
+  isFromIncomeAndExpenditure,
   isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
+  isUniversalCreditSelected,
   isWelshProperty,
 } from '../utils';
 
@@ -50,12 +54,13 @@ export const flowConfig: JourneyFlowConfig = {
     'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
     'your-circumstances',
     'exceptional-hardship',
-    'income-and-expenditure',
-    'what-regular-income-do-you-receive',
+    'income-and-expenses',
+    'regular-income',
     'have-you-applied-for-universal-credit',
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
+    'upload-docs',
     'end-now',
     'installment-payments',
   ],
@@ -385,30 +390,66 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'exceptional-hardship': {
       previousStep: 'your-circumstances',
-      defaultNext: 'income-and-expenditure',
+      defaultNext: 'income-and-expenses',
     },
-    'income-and-expenditure': {
+    'income-and-expenses': {
       previousStep: 'exceptional-hardship',
-      defaultNext: 'what-regular-income-do-you-receive',
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            return !(await isFinanceDetailsProvided(req));
+          },
+          nextStep: 'upload-docs',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            return isFinanceDetailsProvided(req);
+          },
+          nextStep: 'regular-income',
+        },
+      ],
+      defaultNext: 'regular-income',
     },
-    'what-regular-income-do-you-receive': {
-      previousStep: 'income-and-expenditure',
+    'regular-income': {
+      previousStep: 'income-and-expenses',
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            return isUniversalCreditSelected(req);
+          },
+          nextStep: 'priority-debts',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            return !(await isUniversalCreditSelected(req));
+          },
+          nextStep: 'have-you-applied-for-universal-credit',
+        },
+      ],
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
-      previousStep: 'what-regular-income-do-you-receive',
+      previousStep: 'regular-income',
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
-      previousStep: 'have-you-applied-for-universal-credit',
+      previousStep: async (req: Request): Promise<string> => {
+        const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
+        return selectedUniversalCredit ? 'regular-income' : 'have-you-applied-for-universal-credit';
+      },
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {
-      previousStep: 'priority-debts',
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
-      previousStep: 'priority-debt-details',
+      defaultNext: 'end-now',
+    },
+    'upload-docs': {
+      previousStep: async (req: Request): Promise<string> => {
+        const fromIncomeExpenditure = await isFromIncomeAndExpenditure(req);
+        return fromIncomeExpenditure ? 'income-and-expenses' : 'what-other-regular-expenses-do-you-have';
+      },
       defaultNext: 'end-now',
     },
     'installment-payments': {

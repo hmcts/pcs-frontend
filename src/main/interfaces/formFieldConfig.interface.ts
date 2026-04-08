@@ -47,6 +47,7 @@ export interface FormFieldConfig {
   prefix?: {
     text: string;
   };
+  suffix?: { text: string };
   attributes?: Record<string, unknown>;
   legendClasses?: string;
   // Pre-built component config for Nunjucks template rendering
