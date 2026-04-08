@@ -1,7 +1,11 @@
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
-import { buildComponentConfig } from '../../../../../main/modules/steps/formBuilder/componentBuilders';
+import type { FormFieldConfig, FormFieldOption } from '../../../../../main/interfaces/formFieldConfig.interface';
+import {
+  buildComponentConfig,
+  buildConditionalItemContent,
+  buildSelectionItems,
+} from '../../../../../main/modules/steps/formBuilder/componentBuilders';
 
 describe('componentBuilders', () => {
   const mockT = ((key: string, defaultValue?: string | Record<string, unknown>) => {
@@ -26,12 +30,75 @@ describe('componentBuilders', () => {
   }) as any;
 
   const mockRenderString = jest.fn((template: string) => `<div>${template}</div>`);
+  const mockRender = jest.fn(() => '<div>Rendered subfields</div>');
   const mockNunjucksEnv = {
+    render: mockRender,
     renderString: mockRenderString,
   } as unknown as Environment;
 
   beforeEach(() => {
+    mockRender.mockClear();
     mockRenderString.mockClear();
+  });
+
+  describe('buildConditionalItemContent', () => {
+    it('should return undefined when there is no conditional content', () => {
+      expect(buildConditionalItemContent({ value: 'yes', text: 'Yes' }, mockNunjucksEnv)).toBeUndefined();
+    });
+
+    it('should combine conditional text and rendered subfields', () => {
+      const option: FormFieldOption = {
+        value: 'yes',
+        conditionalText: '<p>Please provide details below</p>',
+        subFields: {
+          details: {
+            name: 'details',
+            type: 'text',
+            component: {},
+            componentType: 'input',
+          },
+        },
+      };
+
+      const result = buildConditionalItemContent(option, mockNunjucksEnv);
+
+      expect(mockRender).toHaveBeenCalledWith('components/subFields.njk', {
+        subFields: [option.subFields?.details],
+      });
+      expect(result).toBe('<p>Please provide details below</p>\n<div>Rendered subfields</div>');
+    });
+  });
+
+  describe('buildSelectionItems', () => {
+    it('should build selection items with translated text, hints and checked state', () => {
+      const result = buildSelectionItems(
+        [{ value: 'yes', text: 'Yes', hint: 'fallback hint' }, { divider: 'or' }, { value: 'no' }],
+        [
+          { value: 'yes', text: 'Translated yes', hint: 'Translated hint' },
+          { divider: 'or' },
+          { value: 'no', text: 'Translated no' },
+        ],
+        option => option.value === 'yes',
+        mockNunjucksEnv
+      );
+
+      expect(result).toEqual([
+        { value: 'yes', text: 'Yes', hint: { text: 'Translated hint' }, checked: true },
+        { divider: 'or' },
+        { value: 'no', text: 'Translated no', checked: false },
+      ]);
+    });
+
+    it('should fall back to option values when translated options are missing', () => {
+      const result = buildSelectionItems(
+        [{ value: 'maybe', hint: 'Fallback hint' }],
+        undefined,
+        () => false,
+        mockNunjucksEnv
+      );
+
+      expect(result).toEqual([{ value: 'maybe', text: 'maybe', hint: { text: 'Fallback hint' }, checked: false }]);
+    });
   });
 
   describe('buildComponentConfig', () => {
@@ -431,6 +498,39 @@ describe('componentBuilders', () => {
         });
       });
 
+      it('should build radio with option hints', () => {
+        const field: FormFieldConfig = {
+          name: 'choice',
+          type: 'radio',
+          options: [
+            { value: 'yes', text: 'Yes', hint: 'This includes advice from a solicitor.' },
+            { value: 'no', text: 'No' },
+          ],
+        };
+
+        const result = buildComponentConfig(
+          field,
+          'Make a choice',
+          undefined,
+          'yes',
+          [
+            { value: 'yes', text: 'Yes', hint: 'This includes advice from a solicitor.' },
+            { value: 'no', text: 'No' },
+          ],
+          false,
+          undefined,
+          0,
+          false,
+          mockT,
+          mockNunjucksEnv
+        );
+
+        expect(result.component.items).toEqual([
+          { value: 'yes', text: 'Yes', hint: { text: 'This includes advice from a solicitor.' }, checked: true },
+          { value: 'no', text: 'No', checked: false },
+        ]);
+      });
+
       it('should handle radio options without conditionalText or subFields', () => {
         const field: FormFieldConfig = {
           name: 'answer',
@@ -551,6 +651,39 @@ describe('componentBuilders', () => {
         expect(firstItem.conditional).toEqual({
           html: '<p>You have agreed to the terms</p>',
         });
+      });
+
+      it('should build checkbox with option hints', () => {
+        const field: FormFieldConfig = {
+          name: 'agreement',
+          type: 'checkbox',
+          options: [
+            { value: 'agree', text: 'I agree', hint: 'This means you accept the terms.' },
+            { value: 'updates', text: 'Send me updates' },
+          ],
+        };
+
+        const result = buildComponentConfig(
+          field,
+          'Agreement',
+          undefined,
+          ['agree'],
+          [
+            { value: 'agree', text: 'I agree', hint: 'This means you accept the terms.' },
+            { value: 'updates', text: 'Send me updates' },
+          ],
+          false,
+          undefined,
+          0,
+          false,
+          mockT,
+          mockNunjucksEnv
+        );
+
+        expect(result.component.items).toEqual([
+          { value: 'agree', text: 'I agree', hint: { text: 'This means you accept the terms.' }, checked: true },
+          { value: 'updates', text: 'Send me updates', checked: false },
+        ]);
       });
 
       it('should handle checkbox without conditionalText or subFields', () => {
