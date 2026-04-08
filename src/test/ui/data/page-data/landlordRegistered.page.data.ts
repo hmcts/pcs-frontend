@@ -12,7 +12,7 @@ export const landlordRegistered = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  selectIfYouAgreeWithLandlordsClaimRegisteredErrorMessage: `Select incorrect if you agree with the landlord’s claim to be registered`,
+  selectIfYouAgreeWithLandlordsClaimRegisteredErrorMessage: `Select if you agree with the landlord’s claim to be registered`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `landlord-registered`,
 };
