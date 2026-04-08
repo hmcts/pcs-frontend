@@ -27,11 +27,15 @@ export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
  * fromYesNoEnum('No')  // returns 'no'
  * fromYesNoEnum(null)  // returns undefined
  */
-export function fromYesNoEnum(value: YesNoValue | 'YES' | 'NO' | string | undefined | null): 'yes' | 'no' | undefined {
-  if (value === 'Yes' || value === 'YES') {
+export function fromYesNoEnum(value: YesNoValue | string | null | undefined): 'yes' | 'no' | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const lowerValue = value.toLowerCase();
+  if (lowerValue === 'yes') {
     return 'yes';
   }
-  if (value === 'No' || value === 'NO') {
+  if (lowerValue === 'no') {
     return 'no';
   }
   return undefined;

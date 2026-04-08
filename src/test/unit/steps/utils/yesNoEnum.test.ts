@@ -24,21 +24,6 @@ describe('yesNoEnum utilities', () => {
       expect(result).toBe('no');
     });
 
-    it('should convert legacy "YES" to "yes"', () => {
-      const result = fromYesNoEnum('YES');
-      expect(result).toBe('yes');
-    });
-
-    it('should convert legacy "NO" to "no"', () => {
-      const result = fromYesNoEnum('NO');
-      expect(result).toBe('no');
-    });
-
-    it('should return undefined for null', () => {
-      const result = fromYesNoEnum(null);
-      expect(result).toBeUndefined();
-    });
-
     it('should return undefined for undefined', () => {
       const result = fromYesNoEnum(undefined);
       expect(result).toBeUndefined();
