@@ -68,6 +68,7 @@
       "invalidMonth": "cyEnter a valid month",
       "invalidYear": "cyEnter a valid year",
       "futureDate": "cyDate must be in the past",
+      "pastDate": "cyDate must be in the future",
       "invalidValue": "cyEnter a valid value",
       "yearMustBeSameOrAfter": "cyThe year must be the same as or after {{minYear}}",
       "missingOne": "cyDate must include a {{missingField}}",
