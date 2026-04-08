@@ -8,27 +8,27 @@ import { enable_pft_debug_log } from '../../../../../playwright.config';
 
 import { shortUrl, truncateForLog } from './string.utils';
 
-export type ValidationFailureCategory = 'page-content' | 'error-messages' | 'page-navigation';
+export type PftValidationCategory = 'error-messages' | 'page-navigation';
 
-const categoryLabel: Record<ValidationFailureCategory, string> = {
-  'page-content': 'page content',
+const categoryLabel: Record<PftValidationCategory, string> = {
   'error-messages': 'error messages',
   'page-navigation': 'page navigation',
 };
 
 /**
- * When a functional validation fails: attaches a screenshot to the Playwright report.
- * When `enable_pft_debug_log` is true (`ENABLE_PFT_DEBUG_LOG=true` in env), also prints one line to the console.
+ * When `failed` is true, attaches a failure screenshot to the Playwright report.
+ * When `ENABLE_PFT_DEBUG_LOG=true`, prints a `[PFT]` line for every call (pass or fail).
  */
-export async function reportValidationFailure(
+export async function logPftValidationInformation(
   page: Page,
-  category: ValidationFailureCategory,
+  category: PftValidationCategory,
   pageLabel: string,
   expected: string,
   actual: string,
-  attachScreenshot: boolean
+  failed: boolean,
+  navContext?: { from?: string | null; via?: string }
 ): Promise<void> {
-  if (attachScreenshot) {
+  if (failed) {
     const label = categoryLabel[category];
     try {
       const safe = (pageLabel.trim() || 'page').slice(0, 80);
@@ -52,7 +52,12 @@ export async function reportValidationFailure(
   const p = truncateForLog(pageLabel, 80);
   const e = truncateForLog(expected, 160);
   const a = truncateForLog(actual, 160);
+  const navSuffix =
+    category === 'page-navigation' && navContext
+      ? ` | nav: from "${navContext.from ? truncateForLog(String(navContext.from), 40) : '?'}" | control: "${navContext.via ? truncateForLog(String(navContext.via), 60) : '?'}"`
+      : '';
+
   console.log(
-    `[PFT] ${categoryLabel[category]} | test: ${t} | page: ${p} | url: ${shortUrl(page.url())} | expected: ${e} | actual: ${a}`
+    `[PFT] ${categoryLabel[category]} | test: ${t} | page: ${p} | url: ${shortUrl(page.url())}${navSuffix} | expected: ${e} | actual: ${a}`
   );
 }

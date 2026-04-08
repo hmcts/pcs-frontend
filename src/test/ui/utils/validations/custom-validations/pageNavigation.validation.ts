@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
-import { reportValidationFailure } from '../../common/pft-debug-log';
+import { logPftValidationInformation } from '../../common/pft-debug-log';
 import { performAction } from '../../controller';
 import { IValidation, validationRecord } from '../../interfaces';
 
@@ -91,7 +91,7 @@ export class PageNavigationValidation implements IValidation {
     const pageToValidate = isNewWindow && newPage ? newPage : page;
 
     try {
-      await this.validatePageNavigation(pageToValidate, fieldName);
+      await this.validatePageNavigation(pageToValidate, fieldName, navigateButton);
     } finally {
       if (newPage && !newPage.isClosed()) {
         await newPage.close();
@@ -106,7 +106,11 @@ export class PageNavigationValidation implements IValidation {
     }
   }
 
-  private async validatePageNavigation(page: Page, fieldName: validationRecord): Promise<void> {
+  private async validatePageNavigation(
+    page: Page,
+    fieldName: validationRecord,
+    navigateButton?: string
+  ): Promise<void> {
     let elementPassed = true;
     let urlPassed = true;
     let elementError: string | undefined;
@@ -223,13 +227,17 @@ export class PageNavigationValidation implements IValidation {
         .filter(Boolean)
         .join('; ');
 
-      await reportValidationFailure(
+      await logPftValidationInformation(
         page,
         'page-navigation',
         pageName,
         expectedNavLog || 'page navigation validation',
         actualNavLog,
-        !overallPassed
+        !overallPassed,
+        {
+          from: PageNavigationValidation.currentSourcePage,
+          via: navigateButton,
+        }
       );
     } catch (error) {
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
@@ -267,6 +275,19 @@ export class PageNavigationValidation implements IValidation {
         hasPFTFile,
       });
       PageNavigationValidation.navigationFailed = true;
+
+      await logPftValidationInformation(
+        page,
+        'page-navigation',
+        pageName,
+        expectedValue,
+        actualText || 'Not found',
+        true,
+        {
+          from: PageNavigationValidation.currentSourcePage,
+          via: navigateButton,
+        }
+      );
     }
   }
 

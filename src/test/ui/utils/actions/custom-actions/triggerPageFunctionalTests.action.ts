@@ -9,7 +9,7 @@ import {
   enable_navigation_tests,
   enable_pft_debug_log,
 } from '../../../../../../playwright.config';
-import { shortUrl } from '../../common/string.utils';
+import { shortUrl, truncateForLog } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
 import {
   ErrorMessageValidation,
@@ -35,12 +35,13 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
     const pageName = await this.getFileNameForPage(page);
+    const flowTestTitle = truncateForLog(test.info().title, 160);
+
     if (!pageName) {
-      console.warn('[PFT] Unmapped URL (skipped):', shortUrl(page.url()));
+      console.warn(
+        `[PFT flow] test="${flowTestTitle}" | mapping missing in urlToFileMapping.config.ts | url=${shortUrl(page.url())}`
+      );
       return;
-    }
-    if (enable_pft_debug_log === 'true') {
-      console.log('[PFT] Trigger', pageName, shortUrl(page.url()));
     }
 
     // Check lock file before running tests
@@ -51,6 +52,10 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
       return;
+    }
+
+    if (enable_pft_debug_log === 'true') {
+      console.log(`[PFT] Triggering Functional Tests for Page: ${pageName} and URL: ${shortUrl(page.url())}`);
     }
 
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.add(pageName);

@@ -66,23 +66,18 @@ Playwright 1.30+ | TypeScript 4.9+
 
 ### PFT debug logging (optional)
 
-For **functional test validations** (error-message / page-navigation failures, and tracing PFT triggers), extra **`[PFT]`** console lines are **off by default** in code:
+**`[PFT]`** console lines (trigger, EMV, page-navigation) are **on by default** in `playwright.config.ts`:
 
 ```typescript
-export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || 'false';
+export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || 'true';
 ```
 
-**Why keep `process.env.ENABLE_PFT_DEBUG_LOG`?** So you can turn logging **on** (or leave it off) **without changing `playwright.config.ts`** — useful for Jenkins jobs, local shells, or `.env`. Set the variable to the string **`true`** when you want logs:
+Set **`ENABLE_PFT_DEBUG_LOG=false`** in the environment when you want to hide those lines (e.g. noisy CI). If you still see no EMV/navigation logs, ensure PFT is enabled: **`ENABLE_CONTENT_VALIDATION`**, **`ENABLE_ERROR_MESSAGES_VALIDATION`**, **`ENABLE_NAVIGATION_TESTS`**, or **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS=true`**.
 
-- Local: `export ENABLE_PFT_DEBUG_LOG=true` before running Playwright, or add it to `.env` if your setup loads it.
-- Jenkins: add `ENABLE_PFT_DEBUG_LOG=true` to the job or pipeline environment.
+- **`utils/common/pft-debug-log.ts`**: **`logPftValidationInformation`** runs after each EMV / page-navigation check. **`[PFT]`** console lines are printed **whenever** `enable_pft_debug_log === 'true'` — **pass and fail**. **Screenshots** attach to the report **only when** that check **failed**. Page navigation lines may include **`nav: from "…" | control: "…"`**.
+- **`triggerPageFunctionalTests`**: stderr if the URL segment is missing from **`urlToFileMapping.config.ts`**. When `ENABLE_PFT_DEBUG_LOG=true`, one stdout line per **first PFT run for that page in the test run** (`[PFT] Triggering Functional Tests for Page: … and URL: …`), after lock/duplicate skips.
 
-You do **not** need to flip the `|| 'false'` to `|| 'true'` in the repo to get logs; that would turn them on for everyone by default. Prefer the env var.
-
-- **`utils/common/pft-debug-log.ts`**: on a validation failure, attaches a **screenshot** to the Playwright report; when `enable_pft_debug_log === 'true'`, also prints one **`[PFT]`** line (test, page, url, expected, actual).
-- **`triggerPageFunctionalTests`**: always logs **`[PFT] Unmapped URL`** when the URL is not mapped; when debug is enabled, also logs **`[PFT] Trigger`** for a resolved page.
-
-Failure screenshots are attached whenever the validation reports a failure (not gated by `ENABLE_PFT_DEBUG_LOG`).
+Screenshots are **not** gated by `ENABLE_PFT_DEBUG_LOG` (they run on failure whenever `logPftValidationInformation` is called with `failed: true`). The env flag gates **console** output from this helper and from trigger/mapping messages.
 
 ## 4. Actions and Validations
 
