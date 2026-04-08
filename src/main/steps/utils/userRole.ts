@@ -1,6 +1,8 @@
 import type { Request } from 'express';
 
-export const PROFESSIONAL_USER_ROLES = ['caseworker', 'professional', 'solicitor'] as const;
+export const LEGAL_REPRESENTATIVE_USER_ROLES = ['solicitor'] as const;
+
+export type UserType = 'citizen' | 'legalrep';
 
 export function getUserRoles(req: Request): string[] {
   const roles = req.session?.user?.roles;
@@ -15,11 +17,16 @@ export function getUserRoles(req: Request): string[] {
     .filter(Boolean);
 }
 
-export function isProfessionalUser(req: Request): boolean {
-  const roles = getUserRoles(req);
-  return roles.some(role => PROFESSIONAL_USER_ROLES.includes(role as (typeof PROFESSIONAL_USER_ROLES)[number]));
+export function isLegalRepresentativeUser(req: Request): boolean {
+  return getUserRoles(req).some(role =>
+    LEGAL_REPRESENTATIVE_USER_ROLES.includes(role as (typeof LEGAL_REPRESENTATIVE_USER_ROLES)[number])
+  );
 }
 
-export function getUserJourneyVariant(req: Request): 'professional' | 'citizen' {
-  return isProfessionalUser(req) ? 'professional' : 'citizen';
+export function getUserType(req: Request): UserType {
+  if (isLegalRepresentativeUser(req)) {
+    return 'legalrep';
+  }
+
+  return 'citizen';
 }

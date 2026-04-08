@@ -1,12 +1,13 @@
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import { type Request } from 'express';
 
-import { flowConfig as citizenFlowConfig } from './flow.config';
+import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import { isDefendantNameKnown } from '../utils';
 
-export const professionalFlowConfig: JourneyFlowConfig = {
+import { flowConfig as citizenFlowConfig } from './flow.config';
+
+export const legalrepFlowConfig: JourneyFlowConfig = {
   ...citizenFlowConfig,
-  journeyName: 'respondToClaimProfessional',
+  journeyName: 'respondToClaimLegalrep',
   stepOrder: citizenFlowConfig.stepOrder.filter(stepName => stepName !== 'free-legal-advice'),
   steps: {
     ...citizenFlowConfig.steps,

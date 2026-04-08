@@ -4,13 +4,13 @@ import path from 'path';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
+import { getUserType } from '../../steps/utils';
 import {
   type AllowedLang,
   findLocalesDir,
   getRequestLanguage as getMainRequestLanguage,
   getTranslationFunction as getMainTranslationFunction,
 } from '../i18n';
-import { isProfessionalUser } from '../../steps/utils';
 
 import { Logger } from '@modules/logger';
 
@@ -59,12 +59,13 @@ export function getStepTranslationPath(stepName: string, folder: string): string
 
 function getStepTranslationPaths(req: Request, stepName: string, folder: string): string[] {
   const defaultPath = getStepTranslationPath(stepName, folder);
+  const userType = getUserType(req);
 
-  if (!isProfessionalUser(req)) {
+  if (userType === 'citizen') {
     return [defaultPath];
   }
 
-  return [defaultPath, `${folder}/professional/${getStepNamespace(stepName)}`];
+  return [defaultPath, `${folder}/${userType}/${getStepNamespace(stepName)}`];
 }
 
 export async function loadStepNamespace(req: Request, stepName: string, folder: string): Promise<void> {

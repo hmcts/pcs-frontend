@@ -29,10 +29,10 @@ jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
-const mockIsProfessionalUser = jest.fn();
+const mockGetUserType = jest.fn();
 
 jest.mock('../../../../main/steps/utils', () => ({
-  isProfessionalUser: (...args: unknown[]) => mockIsProfessionalUser(...args),
+  getUserType: (...args: unknown[]) => mockGetUserType(...args),
 }));
 
 describe('steps/i18n', () => {
@@ -42,7 +42,7 @@ describe('steps/i18n', () => {
     jest.clearAllMocks();
     mockLogger.warn.mockClear();
     mockLogger.error.mockClear();
-    mockIsProfessionalUser.mockReturnValue(false);
+    mockGetUserType.mockReturnValue('citizen');
   });
 
   afterEach(() => {
@@ -127,13 +127,13 @@ describe('steps/i18n', () => {
       expect(loadNamespaces).toHaveBeenCalledWith('testStep', expect.any(Function));
     });
 
-    it('should merge professional translations over citizen translations', async () => {
+    it('should merge legalrep translations over default translations', async () => {
       const mockLocalesDir = '/test/locales';
       const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
 
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
-      mockIsProfessionalUser.mockReturnValue(true);
+      mockGetUserType.mockReturnValue('legalrep');
 
       const addResourceBundle = jest.fn();
       const getResourceBundle = jest.fn().mockReturnValue(null);

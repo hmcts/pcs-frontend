@@ -4,9 +4,9 @@ import type { JourneyFlowConfig } from '../interfaces/stepFlow.interface';
 import type { StepDefinition } from '../interfaces/stepFormData.interface';
 
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
-import { professionalFlowConfig as respondToClaimProfessionalFlowConfig } from './respond-to-claim/professional.flow.config';
+import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
-import { isProfessionalUser } from './utils';
+import { getUserType } from './utils';
 
 export interface ResolvedJourneyConfig {
   flowConfig: JourneyFlowConfig;
@@ -16,7 +16,7 @@ export interface ResolvedJourneyConfig {
 export interface JourneyConfig {
   name: string;
   default: ResolvedJourneyConfig;
-  professional?: ResolvedJourneyConfig;
+  legalrep?: ResolvedJourneyConfig;
 }
 
 // Journey registry - add new journeys here
@@ -27,39 +27,34 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       flowConfig: respondToClaimFlowConfig,
       stepRegistry: respondToClaimStepRegistry,
     },
-    professional: {
-      flowConfig: respondToClaimProfessionalFlowConfig,
+    legalrep: {
+      flowConfig: respondToClaimLegalrepFlowConfig,
       stepRegistry: respondToClaimStepRegistry,
     },
   },
 };
 
-function getJourneyBaseConfig(journeyName: string): JourneyConfig | undefined {
-  return journeyRegistry[journeyName];
-}
-
 function getJourneyConfigForRequest(journeyName: string, req?: Request): ResolvedJourneyConfig | undefined {
-  const journey = getJourneyBaseConfig(journeyName);
+  const journey = journeyRegistry[journeyName];
   if (!journey) {
     return undefined;
   }
 
-  if (req && isProfessionalUser(req) && journey.professional) {
-    return journey.professional;
+  const userType = req ? getUserType(req) : 'citizen';
+
+  if (userType === 'legalrep' && journey.legalrep) {
+    return journey.legalrep;
   }
 
   return journey.default;
 }
 
 function getRegistrationStepNames(journey: JourneyConfig): string[] {
-  const professionalFlowStepOrder = journey.professional?.flowConfig.stepOrder ?? [];
-  const professionalStepRegistryKeys = Object.keys(journey.professional?.stepRegistry ?? {});
-
   const stepNames = new Set<string>([
     ...journey.default.flowConfig.stepOrder,
     ...Object.keys(journey.default.stepRegistry),
-    ...professionalFlowStepOrder,
-    ...professionalStepRegistryKeys,
+    ...(journey.legalrep?.flowConfig.stepOrder ?? []),
+    ...Object.keys(journey.legalrep?.stepRegistry ?? {}),
   ]);
 
   return Array.from(stepNames);
@@ -79,7 +74,7 @@ export function getStepForJourney(
 
 // Helper function to get steps for a specific journey
 export function getStepsForJourney(journeyName: string, req?: Request): StepDefinition[] {
-  const journey = getJourneyBaseConfig(journeyName);
+  const journey = journeyRegistry[journeyName];
   if (!journey) {
     return [];
   }
@@ -93,7 +88,10 @@ export function getStepsForJourney(journeyName: string, req?: Request): StepDefi
         return activeJourney.stepRegistry[stepName];
       }
 
-      return journey.default.stepRegistry[stepName] ?? journey.professional?.stepRegistry[stepName];
+      return (
+        journey.default.stepRegistry[stepName] ??
+        journey.legalrep?.stepRegistry[stepName]
+      );
     })
     .filter((step: StepDefinition | undefined): step is StepDefinition => step !== undefined);
 }
