@@ -18,7 +18,7 @@ export function getUserRoles(req: Request): string[] {
 }
 
 export function isLegalRepresentativeUser(req: Request): boolean {
-  return getUserRoles(req).some(role =>
+  return !getUserRoles(req).some(role =>
     LEGAL_REPRESENTATIVE_USER_ROLES.includes(role as (typeof LEGAL_REPRESENTATIVE_USER_ROLES)[number])
   );
 }
