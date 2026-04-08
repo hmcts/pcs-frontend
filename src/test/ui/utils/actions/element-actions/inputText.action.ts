@@ -13,6 +13,7 @@ export class InputTextAction implements IAction {
       :has-text("${fieldParams.text}") ~ input:visible:enabled`
             )
             .nth(Number(fieldParams.index));
+    await locator.clear();
     await locator.fill(value);
   }
 
