@@ -19,7 +19,8 @@ import { retrieveJourneyFolder } from '../journeyFolderRetriever';
 export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
 
 
-// let defaultTranslationKeys: any;
+let defaultTranslationKeys: any;
+let journeyFolder: string;
 
 export function createFormStep(config: FormBuilderConfig): StepDefinition {
   // Validate config in development mode
@@ -27,7 +28,6 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
 
   const {
     stepName,
-    journeyFolder,
     fields,
     beforeRedirect,
     beforeGet,
@@ -57,14 +57,13 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
 
-        const journeyFolder = retrieveJourneyFolder(req);
+        journeyFolder = retrieveJourneyFolder(req);
 
-//         if(translationKeys instanceof Map) {
-//           defaultTranslationKeys = getTranslationKeys(translationKeys, "professional");
-//         } else {
-//           defaultTranslationKeys = translationKeys;
-//         }
-
+        if(translationKeys instanceof Map) {
+          defaultTranslationKeys = getTranslationKeys(translationKeys, "professional");
+        } else {
+          defaultTranslationKeys = translationKeys;
+        }
 
         await loadStepNamespace(req, stepName, journeyFolder);
 
@@ -87,7 +86,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           t,
           initialFormData || getFormData(req, concatenateJourneyStepName(stepName, journeyFolder)),
           {},
-          translationKeys,
+          defaultTranslationKeys,
           nunjucksEnv,
           interpolationValues as Record<string, unknown>
         ) as BuiltFormContent;
@@ -114,18 +113,18 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       journeyFolder,
       flowConfig,
       beforeRedirect,
-      translationKeys,
+      defaultTranslationKeys,
       showCancelButton,
       extendGetContent
     ),
   };
 }
 
-//
-// function getTranslationKeys(translationKeysMap: Map<string, TranslationKeys>, key: string = "default") {
-//   if(translationKeysMap.has("default")) {
-//     return translationKeysMap.get("default");
-//   }
-//   return translationKeysMap.get(key);
-//
-// }
+
+function getTranslationKeys(translationKeysMap: Map<string, TranslationKeys>, key: string = "default") {
+  if(translationKeysMap.has("default")) {
+    return translationKeysMap.get("default");
+  }
+  return translationKeysMap.get(key);
+
+}

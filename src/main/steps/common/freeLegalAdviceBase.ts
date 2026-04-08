@@ -36,7 +36,6 @@ export const createFreeLegalAdviceBase = (overrides: Partial<FormBuilderConfig>)
     stepName: 'free-legal-advice',
     stepDir: __dirname,
     flowConfig,
-    journeyFolder: 'respondToClaim',
     translationKeys:
       new Map<string, TranslationKeys>([
                        [ "citizen", {
@@ -68,7 +67,7 @@ export const createFreeLegalAdviceBase = (overrides: Partial<FormBuilderConfig>)
                            paragraph4: 'paragraph4',
                          }
                          ]
-                     ]);,
+                     ]),
     fields: [
       {
         name: 'hadLegalAdvice',

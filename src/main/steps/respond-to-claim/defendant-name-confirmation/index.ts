@@ -9,7 +9,6 @@ import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'defendant-name-confirmation',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   basePath: '/respond-to-claim',
   flowConfig,

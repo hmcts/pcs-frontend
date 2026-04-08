@@ -101,7 +101,7 @@ export type GetInitialFormData = (req: Request) => MaybePromise<Record<string, u
 
 export interface FormBuilderConfig {
   stepName: string;
-  journeyFolder: string;
+  journeyFolder?: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
   beforeGet?: (req: Request) => Promise<void> | void;
