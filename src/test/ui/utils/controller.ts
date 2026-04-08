@@ -105,13 +105,15 @@ export async function performAction(
     displayFieldName = displayValue;
   }
 
-  const stepText = `${action}${displayFieldName !== undefined
-    ? ` - ${typeof displayFieldName === 'object' ? readValuesFromInputObjects(displayFieldName) : displayFieldName}`
-    : ''
-    }${displayValue !== undefined && value !== undefined
+  const stepText = `${action}${
+    displayFieldName !== undefined
+      ? ` - ${typeof displayFieldName === 'object' ? readValuesFromInputObjects(displayFieldName) : displayFieldName}`
+      : ''
+  }${
+    displayValue !== undefined && value !== undefined
       ? ` with value '${typeof displayValue === 'object' ? readValuesFromInputObjects(displayValue) : displayValue}'`
       : ''
-    }`;
+  }`;
 
   await test.step(stepText, async () => {
     await actionInstance.execute(executor.page, action, fieldName, value);
@@ -134,11 +136,13 @@ export async function performValidation(
         : ['', inputFieldName];
 
   const validationInstance = ValidationRegistry.getValidation(validation);
-  await test.step(`Validated ${validation}${fieldName ? ` - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'` : ''
-    }${data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''
-    }`, async () => {
-      await validationInstance.validate(executor.page, validation, fieldName, data);
-    });
+  await test.step(`Validated ${validation}${
+    fieldName ? ` - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'` : ''
+  }${
+    data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''
+  }`, async () => {
+    await validationInstance.validate(executor.page, validation, fieldName, data);
+  });
 }
 
 export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {

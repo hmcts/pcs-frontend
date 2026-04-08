@@ -26,20 +26,20 @@ export class GenAppsAction implements IAction {
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
-
-    const inputs = Array.isArray(validationArr.inputArray)
-      ? validationArr.inputArray
-      : [validationArr.inputArray];
+    const inputs = Array.isArray(validationArr.inputArray) ? validationArr.inputArray : [validationArr.inputArray];
 
     for (const item of inputs) {
       switch (validationArr.validationType) {
         case 'radioOptions':
           await performAction('clickButton', validationArr.button);
-          await performValidation('errorMessage', !validationArr?.header ? validationArr.header = 'There is a problem' : validationArr.header, item.errMessage);
+          await performValidation(
+            'errorMessage',
+            !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header,
+            item.errMessage
+          );
           await performAction('clickRadioButton', { question: validationArr.question, option: validationArr.option });
           break;
       }
     }
-
   }
 }

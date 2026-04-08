@@ -49,8 +49,11 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.add(pageName);
 
-    const pageDataFilePath = this.resolveFilePath(TriggerPageFunctionalTestsAction.PAGE_DATA_DIR, `${pageName}.page.data.ts`);
-  
+    const pageDataFilePath = this.resolveFilePath(
+      TriggerPageFunctionalTestsAction.PAGE_DATA_DIR,
+      `${pageName}.page.data.ts`
+    );
+
     if (enable_content_validation === 'true') {
       if (pageDataFilePath && fs.existsSync(pageDataFilePath)) {
         PageContentValidation.trackPageWithData(pageName);
@@ -110,11 +113,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
   }
 
-
-  private resolveFilePath(
-    baseDir: string,
-    pageName: string
-  ): string | null {
+  private resolveFilePath(baseDir: string, pageName: string): string | null {
     if (!fs.existsSync(baseDir)) {
       throw new Error(`Base directory does not exist: ${baseDir}`);
     }
@@ -124,9 +123,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       return directPath;
     }
 
-    const subDirs = fs
-      .readdirSync(baseDir, { withFileTypes: true })
-      .filter(d => d.isDirectory());
+    const subDirs = fs.readdirSync(baseDir, { withFileTypes: true }).filter(d => d.isDirectory());
 
     for (const dir of subDirs) {
       const subDirPath = path.join(baseDir, dir.name, pageName);
