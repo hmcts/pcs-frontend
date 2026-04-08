@@ -1,145 +1,61 @@
 CANONICAL POC DOCUMENT (pcs-frontend)
-Location: docs/sauce-labs-playwright-poc-confluence.txt
-Maintain this file for Sauce Labs + Playwright evidence, limitations, and recommendations. (Companion Markdown POC files were removed; do not recreate them—update this .txt only.)
+File: docs/sauce-labs-playwright-poc-confluence.txt
+Update this .txt for Sauce + Playwright evidence and recommendations. (Do not recreate removed companion Markdown POC files.)
 
 ---
 
-This is the finalized, comprehensive version of your Proof of Concept (PoC). It incorporates the technical findings from your local runs, the specific configuration fixes for macOS WebKit, and the strategic constraints provided by Satya (TCOE) regarding shared licenses and regional limitations.
+POC: Sauce Labs + Playwright (cross-browser)
 
-POC: Sauce Labs + Playwright Cross-Browser Integration
+1. Executive summary
+Jenkins runs Playwright on Linux (bundled browsers). Sauce runs the same tests on real Windows/macOS VMs via saucectl — behaviour can differ (especially WebKit: Linux vs Safari-class macOS).
+Recommendation: hybrid model — full regression on Jenkins; cross-browser matrix on Sauce (nightly), using yarn test:crossbrowser → .sauce/config-matrix.yml, SAUCE_GREP @crossbrowser (see Jenkinsfile_nightly and package.json).
 
-Acceptance criteria (story) — traceability
-Use this table when signing off the POC; replace placeholders with evidence from your runs (dates, build links, Sauce job IDs).
+2. Why Sauce if we already use Playwright?
+Playwright is only the framework. Linux CI does not run Safari-class WebKit or real Windows Chrome/Edge the same way cloud macOS/Windows do. Sauce fills that gap for a small tagged subset (@crossbrowser), not all tests.
 
-AC (story) | Covered in this doc? | Where / what to attach as evidence
-Sauce Labs on organisational account; tests via saucectl | Yes | §3 Technical implementation; package.json (saucectl); run logs / Sauce UI showing org account jobs.
-Cross-browser validated: Chrome (Windows), Firefox (macOS), Safari (macOS), Edge (Windows), Chrome (Android) | Partial | Desktop matrix: §3 table + config-matrix.yml. Safari-class: macOS 13 WebKit in matrix. Chrome (Android): NOT validated in this POC for eu-central-1 — §3 limitation paragraph + note below; state explicitly if AC is “met with documented exception.”
-Execution performance vs Jenkins baseline | Yes (template) | §4 — replace placeholder metrics with real Jenkins vs Sauce durations for comparable tag scope.
-Browser-specific failures and flaky tests | Yes (examples) | §5 — extend with your failures; tag each as product vs infra vs flake.
-Debugging artefacts: video, logs, screenshots, traces | Yes | §6 Artifacts; confirm in Sauce job what was captured (video may be placeholder).
-Device/browser coverage and limitations documented | Yes | §3 (matrix + Android/EU limitation), §7 (mobile strategy); Playwright vs WebdriverIO differences noted in §6.1.
-Cost, concurrency, usage limits analysed | Yes | §6 and §6.1 (25 org-wide parallel virtual sessions; ≤3 per product guidance).
-High-level CI/CD integration feasibility | Yes | §7; Jenkinsfile_nightly env (PLAYWRIGHT_TEST_GREP, SAUCE_GREP); nightly slot; not every PR.
-Final recommendation | Yes | §8.
-
-Chrome (Android) — explicit AC note: The story asks for Chrome (Android). This POC used eu-central-1; Playwright Android was not available / not run — document the blocker or a future region/account trial. Do not claim Android validation until a successful Sauce job exists.
-
----
-
-1. Executive Summary
-The current Jenkins pipeline executes the pcs-frontend suite on Linux agents using bundled Playwright browser engines.
-Key Finding: The PoC demonstrated significant behavioral divergence between native macOS/Windows environments and our Linux containers. These discrepancies—invisible to our current Jenkins setup—allow us to identify and mitigate platform-specific rendering and performance risks before they reach end users.
-Final Recommendation: Adopt a Hybrid Model.
-* Jenkins (Linux): Execute full regression suites (Fast, Cost-Effective).
-* Sauce Labs (macOS/Windows): Run the matrix via yarn test:crossbrowser (delegates to yarn test:sauce:matrix → .sauce/config-matrix.yml). SAUCE_GREP is @crossbrowser in Jenkinsfile_nightly; package.json uses ${SAUCE_GREP:-@crossbrowser}. Optional single-suite entry points: yarn test:sauce:mac13-webkit (macOS 13 WebKit) and yarn test:sauce:* per platform — see package.json.
-
-2. Strategic Justification: Why Sauce Labs?
-As per TCOE guidance, Sauce Labs is reserved for cross-browser/OS validation, not general functional testing.
-* WebKit Engine Divergence: Playwright on Linux uses a Linux-compiled WebKit engine. Sauce Labs runs WebKit on native macOS VMs (Safari-class stack). Behavior can differ from Linux WebKit in areas such as layout, visibility, and timing.
-* OS-Specific Rendering: macOS and Windows handle CSS properties and stacking contexts differently than Ubuntu Linux.
-* Risk Mitigation: Tests that pass on Linux but fail on macOS/Windows uncover "blind spots" in a standard Linux-only CI pipeline.
-
-2.1 Official reference: Playwright on Sauce (supported versions, OS, browsers)
-
-Primary documentation (bookmark for future updates):
+Sauce docs (bookmark):
 https://docs.saucelabs.com/web-apps/automated-testing/playwright/
-
-Limitations (WebKit, Firefox on macOS 15, Sauce Connect quirks, etc.):
 https://docs.saucelabs.com/web-apps/automated-testing/playwright/limitations/
 
-Per Sauce’s “Supported Testing Platforms” table on that page (verify the row for your exact Playwright patch):
+Align playwright.version in .sauce/*.yml with Sauce’s supported table and yarn.lock.
 
-— Playwright 1.58.2: Node.js 22; supported platforms Windows 10 and 11, macOS 14 and 15; supported browsers Chromium, Chrome, Firefox, WebKit; end of life March 25th, 2027 (see Sauce table).
+Chrome on Android and Sauce Playwright: Sauce’s supported platforms for Playwright in the docs are Windows/macOS only; saucectl does not accept Android as platformName for kind: playwright. For mobile Chrome in Playwright use Jenkins: yarn test:E2eMobileChrome (CI=true). Other Sauce mobile stacks (e.g. Appium) are separate — TCOE.
 
-— Playwright 1.58.1: Same Windows/macOS browser list; end of life February 25th, 2027. Sauce notes that 1.58.1 on ARM (macOS 14 and 15) may require a Premium subscription and armRequired:"true" in YAML—see the same Playwright page for details.
+3. What we run (pcs-frontend)
+* saucectl, region eu-central-1, tunnel (e.g. reformtunnel), scripts in package.json (test:sauce:*).
+* Matrix: .sauce/config-matrix.yml — desktop Chrome/Edge/Firefox/WebKit as configured; macOS WebKit uses 1440x900 (1080p invalid for that stack in our runs).
 
-— Older Playwright lines (e.g. 1.57.x) list macOS 12 and 13 in the Sauce table—useful context if you must pin an older runner.
+4. Evidence (indicative PoC)
+Metric | Jenkins (Linux) | Sauce (PoC) | Notes
+Success | 100% (15/15) | 87% (13/15) | Two native-platform divergences
+Time | ~12 min | ~15 min | Rough comparison; includes Sauce VM setup
 
-System requirements on the same page also list Linux as a supported OS at a high level; the version-specific table focuses on Windows and macOS combinations for cloud runs. Always confirm eu-central-1 availability for your chosen platformName in practice.
+5. Findings (examples)
+* WebKit: selectOption failed on macOS WebKit where Linux WebKit passed — visibility/stricter rendering.
+* Timing: timeout on native platforms where Linux passed — allow longer waits for cross-browser runs.
 
-pcs-frontend: yarn.lock resolves Playwright to 1.58.2 for local/Jenkins; .sauce/*.yml sets playwright.version for Sauce (align with Sauce’s supported list and your lockfile).
+6. TCOE / operations (HMCTS org account — confirm numbers with TCOE)
+* Shared pool (~25 parallel virtual sessions org-wide; use ~3 parallel per product; nightly for heavy matrices).
+* Real-device slots are limited; virtual jobs may queue.
+* Sauce: happy-path / @crossbrowser scope; edge cases on Jenkins where possible.
+* Artifacts: traces/screenshots enabled; Allure skipped on Sauce; video in UI may be placeholder — use traces for debugging.
 
-Note on macOS versions in our YAML: config-matrix.yml uses macOS 13 for Firefox and WebKit because that combination passed saucectl validation and job startup in our EU POC; Sauce’s marketing table for 1.58.x may show macOS 14/15—if you move to those, re-validate YAML and Sauce account features (e.g. ARM / Premium) per the docs above.
+7. Operating model
+Jenkins: fast feedback, bulk of tests. Sauce: nightly cross-browser (@crossbrowser). Mobile Chrome: Jenkins MobileChrome project, not Sauce Playwright+saucectl.
 
-2.2 Can we use Microsoft Edge on Sauce?
+Recommendation — scope on Sauce (not the full suite): Running the entire E2E suite on every Sauce browser/OS is usually not worth it: it burns licences and runtime, repeats coverage already proven on Linux Jenkins, and increases noise from environment-specific flakes. The effective approach is to decide which tests matter for cross-browser risk (critical journeys, UI that differs by engine/layout), tag or select them (e.g. @crossbrowser), and run only that set on Sauce. Keep full breadth and edge cases on Jenkins.
 
-Yes. This PoC already runs Edge on Windows 10 and 11 (Playwright project MicrosoftEdge; Chromium-based Edge). Sauce’s supported-browser column lists “Chromium” alongside Chrome—Edge is a Chromium-based desktop browser; Playwright drives it via the Microsoft Edge channel, not as a separate “Edge” engine name in that table. If a job fails, check Limitations (e.g. Chrome launchOptions overriding Sauce paths) rather than assuming Edge is unsupported.
+8. Conclusion
+Use Sauce for desktop macOS/Windows parity that Linux agents do not represent; keep cost under control with nightly scope, TCOE concurrency, and a deliberately small cross-browser test set (§7) — not a full-suite replay on Sauce. Hybrid model stands.
 
-2.3 Why Sauce Labs if we already use Playwright? (TCOE / stakeholder question)
-Playwright is the test framework everywhere. Jenkins already runs Playwright on Linux with bundled Chromium, Firefox, and WebKit — fast and cheap for volume. That is not the same as:
-* Safari-class WebKit on native macOS (Linux WebKit ≠ Safari stack behaviour).
-* Google Chrome / Microsoft Edge on real Windows desktop OS images.
-* Mobile Chrome on Android in the cloud (when the region/account supports Playwright Android — not demonstrated in this eu-central-1 POC).
+---
 
-Sauce Labs (or similar cloud browsers) is therefore for environmental parity on OS/browser combinations Linux CI cannot honestly represent — not because Playwright is missing features, but because the runtime environment differs. Cost and shared licences mean Sauce should stay on a narrow scope (e.g. nightly, happy-path / @crossbrowser-tagged subset), with full regression on Jenkins — see §6.1 (TCOE).
-
-3. Technical Implementation
-* Framework: Playwright (orchestrated via saucectl).
-* Region: eu-central-1.
-* Primary matrix: yarn test:crossbrowser → yarn test:sauce:matrix → .sauce/config-matrix.yml (tunnel reformtunnel and SAUCE_GREP set in package.json scripts unless overridden by env).
-* Additional entry points: yarn test:sauce:mac13-webkit (.sauce/config-mac13-webkit.yml); yarn test:sauce:win10-chrome (etc.) for one suite at a time — see package.json.
-* Jenkins Linux E2E (yarn test:E2e*): PLAYWRIGHT_TEST_GREP=@nightly in Jenkinsfile_nightly; package.json uses ${PLAYWRIGHT_TEST_GREP:-@nightly} for local runs.
-* Legacy (optional): yarn test:crossbrowserold, yarn test:E2eChromeold — see package.json.
-* Tunneling: Jenkins Shared Library / Sauce Connect; SAUCE_TUNNEL_NAME must match the active tunnel (scripts default reformtunnel where set).
-Validated Target Matrix (.sauce/config-matrix.yml)
-Browser	OS	Resolution	Validation Note
-Chrome	Windows 10	1920x1080	Standard baseline.
-Chrome	Windows 11	1920x1080	Modern Windows baseline.
-Edge (Chromium)	Windows 10	1920x1080	Playwright project: MicrosoftEdge.
-Edge (Chromium)	Windows 11	1920x1080	Modern Edge baseline.
-Firefox	macOS 13	1440x900	Schema-stable choice for saucectl 0.202.
-Safari (WebKit)	macOS 13	1440x900	Resolution Fix: 1080p is invalid for this stack on Sauce; 1440x900 is the validated fallback.
-Limitation: Chrome (Android) / Playwright Mobile is not available in eu-central-1 for this account/region. This is an environmental constraint, not a test defect.
-
-4. Evidence Log and Performance Data
-Data derived from PoC trial runs comparing the Linux baseline to the Sauce Labs Cloud.
-Metric	Jenkins (Baseline)	Sauce Labs (PoC)	Notes
-Success Rate	100% (15/15)	87% (13/15)	Two divergences found on native platforms.
-Execution Time	12 minutes	15 minutes	+25% latency (indicative); includes VM setup.
-Environment	Linux (Ubuntu)	macOS 13 / Win VMs	Not identical OS images.
-5. Key Findings: Environmental Divergence
-The PoC identified discrepancies that passed on Jenkins but failed on Sauce Labs, highlighting the value of native platform testing:
-❌ Discrepancy 1: Safari / WebKit Rendering (Address Selection)
-* Observation: locator.selectOption: element is not visible.
-* Technical Context: The element appeared usable on Linux WebKit but failed on macOS WebKit. Safari-class stacks treat visibility and stacking contexts more strictly.
-* Impact: Surfaces a real-world blind spot for users on Apple devices.
-❌ Discrepancy 2: Execution Latency ("Start now" button)
-* Observation: Timeout (10000ms) exceeded.
-* Technical Context: Native macOS/Windows runs can require more time for DOM resolution than local Linux agents.
-* Impact: Highlights performance/timing sensitivity; underscores the need to tune timeouts for cross-platform suites.
-
-6. Infrastructure and Resource Management (TCOE Alignment)
-To align with the shared HMCTS organizational account:
-* Concurrency: TCOE guidance suggests 3 parallel virtual jobs per product to avoid starving the ~25 shared licenses. Raising this (e.g., to 5) requires TCOE confirmation.
-* Shared Pool Etiquette: Heavy Sauce matrices are scheduled for the Nightly Window to reduce contention with other teams.
-* Stability: CI retries are recommended for transient 503 errors (test-composer) or license queuing delays.
-* Artifacts: Full-journey screenshots and traces are enabled for Sauce; Allure is skipped. Video in the Sauce UI may show a placeholder; rely on Playwright Traces for evidence.
-
-6.1 TCOE guidance (Satya) — pipeline strategy, limits, and best practice
-The following aligns the POC with HMCTS TCOE input from the Sauce + Playwright CI/CD thread (Satya’s replies on pipeline, concurrency, limits, and happy-path scope). If Hemanth or others provided additional written constraints, add a dated bullet under this section so the POC record stays complete. It is guidance, not a legal quote — confirm with TCOE if policy changes.
-
-Pipeline strategy
-* Sauce is intended for the cross-browser phase, typically nightly — not necessarily every pipeline (preview/master/nightly all firing Sauce). Time-consuming; schedule to manage cost.
-* Align Sauce frequency with how often UI changes: use Sauce to catch browser/OS-specific issues when UI changes warrant it — not every trivial change by default.
-
-Parallel execution / concurrency (org limits)
-* Organisational pool (shared across teams): order-of-magnitude — ~25 parallel virtual cross-browser sessions, 1 real device, 500 visual snapshots (TCOE; verify current numbers with TCOE).
-* Per product: prefer not more than ~3 parallel threads for your tests; run at times that do not starve other teams.
-
-Usage limits and behaviour
-* Real-device tests are more constrained than virtual browsers; virtual sessions may wait until a licence is available.
-* Most HMCTS teams use WebdriverIO; Playwright + saucectl can behave differently — validate limits and docs for Playwright specifically (this POC uses saucectl + Playwright).
-
-Best practice (fast feedback vs cost)
-* Prefer happy-path / critical UI scenarios on Sauce for cross-browser runs — not every edge case (edge cases stay on Jenkins/Linux where practical).
-* Balance: fast feedback on PR/dev via Jenkins; Sauce for targeted cross-browser / nightly as agreed with TCOE.
-
-7. Proposed Operating Model
-1. Fast Feedback: Continue running the bulk of tests on Jenkins (Linux) for immediate developer feedback.
-2. Cross-Browser Sanity (Nightly): Trigger Sauce for the matrix / single-suite jobs (SAUCE_GREP @crossbrowser on Sauce). Jenkins Playwright E2E remains @nightly (PLAYWRIGHT_TEST_GREP)—do not conflate the two tags when comparing timings.
-3. Resource Management: Virtual browsers wait in a queue when licenses are saturated.
-4. Mobile Strategy: Playwright Android/iOS in EU is currently out of scope; real-device strategy remains a separate decision.
-
-8. Final Verdict: Hybrid Model
-The PoC showed that native macOS WebKit is not identical to Linux WebKit, and that Windows desktop Chrome/Edge add further parity. While Jenkins remains the engine for speed and volume, Sauce Labs is appropriate for final environmental validation on stacks that Linux agents do not represent.
-A nightly hybrid model preserves environment parity without inflating day-to-day CI cost, adhering to agreed TCOE concurrency and scheduling limits.
+Story AC — quick map (attach build links / Sauce job IDs when signing off)
+* Org Sauce + saucectl: §3, package.json, run logs.
+* Desktop browsers in matrix: §3 + config-matrix.yml. Chrome (Android) on Sauce Playwright: not supported — §2; use Jenkins MobileChrome or other stack with TCOE.
+* vs Jenkins performance: §4.
+* Failures / flakes: §5.
+* Artefacts: §6.
+* Limits / cost: §6.
+* CI: Jenkinsfile_nightly; scoped cross-browser runs (not full suite on Sauce): §7.
+* Final recommendation: §8.
