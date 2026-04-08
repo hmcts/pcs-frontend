@@ -21,8 +21,11 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  yourCircumstances,
 } from '../data/page-data';
 import { test } from '../fixtures/authTest';
+import { getRelativeDate } from '../utils/common/string.utils';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = `${(process.env.TEST_URL?.trim() || 'http://localhost:3209').replace(/\/$/, '')}/`;
@@ -216,7 +219,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouHaveAnyOtherDependants', {
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
@@ -282,7 +293,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
@@ -349,7 +368,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouHaveAnyOtherDependants', {
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test.skip('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -415,7 +441,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -475,7 +509,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -538,7 +580,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
@@ -600,7 +648,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouHaveAnyOtherDependants', {
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
@@ -663,7 +718,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
@@ -728,6 +790,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
-    await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 });
