@@ -52,6 +52,12 @@ export const step: StepDefinition = createFormStep({
 
     return {};
   },
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    caption: 'caption',
+    hint: 'hint',
+    optionUniversalCredit: 'optionUniversalCredit',
+  },
   fields: [],
   customTemplate: `${__dirname}/regularIncome.njk`,
 });

@@ -8,6 +8,12 @@ import { createFormStep } from '@modules/steps';
 
 const MAX_AMOUNT = 1_000_000_000;
 const AMOUNT_REGEX = /^\d+(\.\d{1,2})?$/;
+const FREQUENCY_MAP: Record<string, 'weekly' | 'monthly'> = {
+  WEEK: 'weekly',
+  WEEKLY: 'weekly',
+  MONTH: 'monthly',
+  MONTHLY: 'monthly',
+};
 
 const validateMoney =
   (negativeKey: string, largeKey: string) =>
@@ -90,7 +96,11 @@ export const step: StepDefinition = createFormStep({
 
     const priorityDebtTotal = ccdPenceToPoundsString(householdCircumstances?.debtTotal);
     const priorityDebtContribution = ccdPenceToPoundsString(householdCircumstances?.debtContribution);
-    const priorityDebtContributionFrequency = householdCircumstances?.debtContributionFrequency?.toLowerCase();
+    const priorityDebtContributionFrequencyRaw = householdCircumstances?.debtContributionFrequency;
+    const priorityDebtContributionFrequency =
+      typeof priorityDebtContributionFrequencyRaw === 'string'
+        ? FREQUENCY_MAP[priorityDebtContributionFrequencyRaw.toUpperCase()]
+        : undefined;
 
     return {
       ...(priorityDebtTotal ? { priorityDebtTotal } : {}),
@@ -145,8 +155,8 @@ export const step: StepDefinition = createFormStep({
       translationKey: { label: 'frequencyQuestion' },
       errorMessage: 'errors.priorityDebtContributionFrequency',
       options: [
-        { value: 'week', translationKey: 'frequency.week' },
-        { value: 'month', translationKey: 'frequency.month' },
+        { value: 'weekly', translationKey: 'frequency.week' },
+        { value: 'monthly', translationKey: 'frequency.month' },
       ],
     },
   ],

@@ -69,7 +69,7 @@ describe('respond-to-claim priority-debt-details step', () => {
         action: 'continue',
         priorityDebtTotal: '148.50',
         priorityDebtContribution: '20.00',
-        priorityDebtContributionFrequency: 'week',
+        priorityDebtContributionFrequency: 'weekly',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -87,7 +87,7 @@ describe('respond-to-claim priority-debt-details step', () => {
         householdCircumstances: {
           debtTotal: '14850',
           debtContribution: '2000',
-          debtContributionFrequency: 'WEEK',
+          debtContributionFrequency: 'WEEKLY',
         },
       },
     });

@@ -83,4 +83,23 @@ describe('respond-to-claim priority-debts step', () => {
       },
     });
   });
+
+  it('throws when priority debts selection is missing', async () => {
+    (validateForm as jest.Mock).mockReturnValue({});
+    const req = createReq({ body: { action: 'continue' } });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+    const next = jest.fn();
+
+    if (!step.postController) {
+      throw new Error('expected postController');
+    }
+
+    await step.postController.post(req, res, next);
+
+    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(next.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect((next.mock.calls[0][0] as Error).message).toBe('Missing or invalid priority debts selection submitted');
+  });
 });

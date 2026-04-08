@@ -14,7 +14,7 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const selection = req.body?.havePriorityDebts as string | undefined;
     if (selection !== 'yes' && selection !== 'no') {
-      return;
+      throw new Error('Missing or invalid priority debts selection submitted');
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
@@ -52,15 +52,15 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     paragraph1: 'paragraph1',
     paragraph2: 'paragraph2',
-    bullet1: 'bullet1',
-    bullet2: 'bullet2',
-    bullet3: 'bullet3',
-    bullet4: 'bullet4',
-    bullet5: 'bullet5',
-    bullet6: 'bullet6',
-    bullet7: 'bullet7',
-    bullet8: 'bullet8',
-    bullet9: 'bullet9',
+    councilTaxArrears: 'councilTaxArrears',
+    gasOrElectricityArrears: 'gasOrElectricityArrears',
+    phoneOrInternetArrears: 'phoneOrInternetArrears',
+    tvLicenceArrears: 'tvLicenceArrears',
+    courtFines: 'courtFines',
+    overpaidTaxCredits: 'overpaidTaxCredits',
+    hirePurchaseOrConditionalSalePayments: 'hirePurchaseOrConditionalSalePayments',
+    unpaidIncomeTaxNationalInsuranceOrVat: 'unpaidIncomeTaxNationalInsuranceOrVat',
+    unpaidChildMaintenance: 'unpaidChildMaintenance',
     guidanceLinkText: 'guidanceLinkText',
   },
   fields: [
