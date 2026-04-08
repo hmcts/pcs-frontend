@@ -11,16 +11,24 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  <div class="govuk-notification-banner" role="region" aria-labelledby="experimental-banner">
-    <div class="govuk-notification-banner__content">
-      <p class="govuk-notification-banner__heading" id="experimental-banner">
-        Placeholder page
-      </p>
-    </div>
-  </div>
+  <p class="govuk-body">
+  {{youNeedToApplyBeforeContinuing}}
+  </p>
 
   <p class="govuk-body">
-  {{paragraph1}}
+  {{enterCourtFormNumber}}
+  </p>
+
+  <p class="govuk-body">
+  {{afterYouHaveApplied}}
+  </p>
+
+  <p class="govuk-body">
+  {{ifYouReceiveAnyBenefit}}
+  </p>
+
+  <p class="govuk-body">
+  {{ifYouHaveYourHWFReference | safe}}
   </p>
 
 {% endblock %}
