@@ -20,7 +20,7 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 /** Default off. Set env `ENABLE_PFT_DEBUG_LOG=true` (local/Jenkins) to enable `[PFT]` console lines without editing this file. */
-export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || 'false';
+export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || 'true';
 
 export default defineConfig({
   testDir: './src/test/ui',
