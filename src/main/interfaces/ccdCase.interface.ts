@@ -4,22 +4,28 @@ export enum CaseState {
 }
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoValue = 'Yes' | 'No';
-
+export type ContactPreference = 'EMAIL' | 'POST' | null;
+export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 
 export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
 
-export type ContactPreference = 'EMAIL' | 'POST' | null;
-
 export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
 export interface HouseholdCircumstances {
+  shareAdditionalCircumstances?: YesNoValue;
+  additionalCircumstancesDetails?: string;
+  exceptionalHardship?: YesNoValue;
+  exceptionalHardshipDetails?: string;
   dependantChildren?: YesNoValue;
   dependantChildrenDetails?: string;
   otherDependants?: YesNoValue;
   otherDependantDetails?: string;
+  alternativeAccommodation?: YesNoNotSureValue;
+  alternativeAccommodationTransferDate?: string;
+  otherTenants?: YesNoValue;
+  otherTenantsDetails?: string;
 }
 
 export interface CcdUserCase {
