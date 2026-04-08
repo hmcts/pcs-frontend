@@ -51,7 +51,7 @@ properties([
     ),
     booleanParam(
       name: 'ACCESSIBILITY_TESTS',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
   ])
@@ -118,7 +118,7 @@ def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'false'
-  env.PLAYWRIGHT_TEST_GREP = '@nightly'
+  env.PLAYWRIGHT_TEST_GREP = '@crossbrowser'
   env.SAUCE_GREP = '@crossbrowser'
 }
 

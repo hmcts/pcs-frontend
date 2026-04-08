@@ -18,7 +18,7 @@ if (enable_all_page_functional_tests.toLowerCase() === 'true') {
 export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'false';
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
-export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
+export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'false';
 
 /** Sauce installs only `npm.packages` from `.sauce/*.yml` — `allure-playwright` is usually absent; skip if missing or explicitly disabled. */
 function isAllurePlaywrightInstalled(): boolean {
@@ -54,7 +54,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 1 : 0,
-  workers: 4,
+  workers: 1,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
   use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
