@@ -48,7 +48,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
   test('Select an Application - Something else @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-      option: chooseAnApplication.setAsideRadioOption,
+      option: chooseAnApplication.somethingElseRadioOption,
     });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);
