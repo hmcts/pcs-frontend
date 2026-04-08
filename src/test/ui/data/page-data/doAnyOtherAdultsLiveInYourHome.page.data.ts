@@ -1,3 +1,3 @@
 export const doAnyOtherAdultsLiveInYourHome = {
-  mainHeader: `Do any other adults live in your home?`,
+  mainHeader: `Do any other adults live in your home?(placeholder)`,
 };
