@@ -223,7 +223,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
@@ -312,7 +312,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
@@ -403,7 +403,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
@@ -489,7 +489,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
@@ -573,7 +573,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
@@ -667,7 +667,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
@@ -752,7 +752,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
@@ -835,7 +835,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
@@ -923,7 +923,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
     await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
     await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
     await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
