@@ -24,8 +24,11 @@ jest.mock('../../../main/modules/steps/flow', () => ({
   stepDependencyCheckMiddleware: jest.fn(() => mockStepDependencyCheck),
 }));
 
+const mockLegalRepresentativeHeaderMiddleware = jest.fn((req, res, next) => next());
+
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
+  legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => mockLegalRepresentativeHeaderMiddleware(req, res, next)),
 }));
 
 const mockFlowConfig = {
@@ -130,7 +133,7 @@ const mockStepsData = {
 
 import { Application } from 'express';
 
-import { oidcMiddleware } from '../../../main/middleware';
+import { legalRepresentativeHeaderMiddleware, oidcMiddleware } from '../../../main/middleware';
 import { registerSteps } from '../../../main/routes/registerSteps';
 
 describe('registerSteps', () => {
@@ -180,11 +183,12 @@ describe('registerSteps', () => {
     const protectedGetCall = mockGet.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedGetCall).toBeDefined();
 
-    expect(protectedGetCall!).toHaveLength(4);
+    expect(protectedGetCall!).toHaveLength(5);
     expect(protectedGetCall![0]).toBe('/steps/protected');
     expect(protectedGetCall![1]).toBe(oidcMiddleware);
     expect(protectedGetCall![2]).toBe(mockStepDependencyCheck);
-    expect(typeof protectedGetCall![3]).toBe('function');
+    expect(protectedGetCall![3]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(typeof protectedGetCall![4]).toBe('function');
 
     const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedPostCall).toBeDefined();
@@ -199,10 +203,11 @@ describe('registerSteps', () => {
 
     const unprotectedGetCall = mockGet.mock.calls.find(call => call[0] === '/steps/unprotected');
     expect(unprotectedGetCall).toBeDefined();
-    expect(unprotectedGetCall!).toHaveLength(3);
+    expect(unprotectedGetCall!).toHaveLength(4);
     expect(unprotectedGetCall![0]).toBe('/steps/unprotected');
     expect(unprotectedGetCall![1]).toBe(mockStepDependencyCheck);
-    expect(typeof unprotectedGetCall![2]).toBe('function');
+    expect(unprotectedGetCall![2]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(typeof unprotectedGetCall![3]).toBe('function');
 
     const unprotectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/unprotected');
     expect(unprotectedPostCall).toBeDefined();
@@ -241,12 +246,13 @@ describe('registerSteps', () => {
     const stepWithMiddlewareCall = mockGet.mock.calls.find(call => call[0] === '/steps/with-middleware');
 
     expect(stepWithMiddlewareCall).toBeDefined();
-    expect(stepWithMiddlewareCall!).toHaveLength(5);
+    expect(stepWithMiddlewareCall!).toHaveLength(6);
     expect(stepWithMiddlewareCall![0]).toBe('/steps/with-middleware');
     expect(stepWithMiddlewareCall![1]).toBe(oidcMiddleware);
     expect(stepWithMiddlewareCall![2]).toBe(mockStepDependencyCheck);
     expect(stepWithMiddlewareCall![3]).toBe(mockStepsData.stepWithMiddleware.middleware![0]);
-    expect(typeof stepWithMiddlewareCall![4]).toBe('function');
+    expect(stepWithMiddlewareCall![4]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(typeof stepWithMiddlewareCall![5]).toBe('function');
   });
 
   it('calls getValidatedLanguage for each GET route', () => {
@@ -385,6 +391,7 @@ describe('registerAllJourneys', () => {
     jest.doMock('../../../main/middleware', () => ({
       oidcMiddleware: jest.fn((req, res, next) => next()),
       caseReferenceParamMiddleware: mockCaseReferenceParamMiddleware,
+      legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
     }));
   });
 

@@ -7,11 +7,10 @@ import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
-import { caseReferenceParamMiddleware, pageTrackingUrlMiddleware } from './middleware';
+import { caseReferenceParamMiddleware, legalRepresentativeAccessMiddleware, pageTrackingUrlMiddleware } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import { registerAllJourneys } from './routes/registerSteps';
-import { whiteListPaths } from './routes/whiteList';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
@@ -44,6 +43,7 @@ app.use((req, res, next) => {
 });
 
 app.use(pageTrackingUrlMiddleware);
+app.use(legalRepresentativeAccessMiddleware);
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);
@@ -52,12 +52,10 @@ app.param('caseReference', caseReferenceParamMiddleware);
 // This creates a dedicated router for each journey with journey-specific middleware
 registerAllJourneys(app);
 
-whiteListPaths(app);
-
 // Load all other routes (excluding registerSteps.ts which is called manually above)
 glob
   .sync(__dirname + '/routes/**/*.+(ts|js)')
-  .filter(filename => !filename.includes('registerSteps') && !filename.includes('whiteList'))
+  .filter(filename => !filename.includes('registerSteps'))
   .map(filename => require(filename))
   .forEach(route => route.default(app));
 
