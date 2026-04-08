@@ -11,6 +11,9 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
+  doAnyOtherAdultsLiveInYourHome,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
   freeLegalAdvice,
   landlordLicensed,
   landlordRegistered,
@@ -24,7 +27,9 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
+  yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -58,6 +63,14 @@ export class RespondToClaimAction implements IAction {
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
+      [
+        'selectIfAnyOtherAdultsLiveInYourHouse',
+        () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
+      ],
+      ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
+      ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
+      ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
+      ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -305,6 +318,39 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
   }
 
+  private async selectIfAnyOtherAdultsLiveInYourHouse(adultsInHouseDetails: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: doAnyOtherAdultsLiveInYourHome.mainHeader,
+      option: adultsInHouseDetails.radioOption,
+    });
+
+    if (adultsInHouseDetails.radioOption === 'Yes' && adultsInHouseDetails.details) {
+      await performAction(
+        'inputText',
+        doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
+        adultsInHouseDetails.details
+      );
+    }
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+  }
+
+  private async selectAlternativeAccommodation(moveInDetails: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader,
+      option: moveInDetails.radioOption,
+    });
+
+    if (moveInDetails.radioOption === 'Yes' && moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, moveInDetails.day],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, moveInDetails.month],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, moveInDetails.year]
+      );
+    }
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  }
+
   private async disputingOtherPartsOfTheClaim(doYouWantToDisputeOption: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
@@ -378,6 +424,42 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  }
+
+  private async readYourHouseholdAndCircumstances(): Promise<void> {
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+  }
+
+  private async doYouHaveAnyOtherDependants(otherDependantsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
+      option: otherDependantsData.otherDependantsOption,
+    });
+
+    if (otherDependantsData.otherDependantsOption === doYouHaveAnyOtherDependants.yesRadioOption) {
+      await performAction(
+        'inputText',
+        doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
+        otherDependantsData.otherDependantsInfo
+      );
+    }
+    await performAction('clickButton', doYouHaveAnyOtherDependants.saveAndContinueButton);
+  }
+
+  private async doYouHaveAnyDependantChildren(dependantChildrenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
+      option: dependantChildrenData.dependantChildrenOption,
+    });
+
+    if (dependantChildrenData.dependantChildrenOption === doYouHaveAnyDependantChildren.yesRadioOption) {
+      await performAction(
+        'inputText',
+        doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
+        dependantChildrenData.dependantChildrenInfo
+      );
+    }
+    await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
