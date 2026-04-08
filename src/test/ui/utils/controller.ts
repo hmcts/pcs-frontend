@@ -90,7 +90,7 @@ export async function performAction(
   value?: actionData | actionRecord
 ): Promise<void> {
   const executor = getExecutor();
-  //await validatePageIfNavigated(action);
+  await validatePageIfNavigated(action);
   const actionInstance = ActionRegistry.getAction(action);
 
   let displayFieldName = fieldName;

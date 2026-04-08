@@ -8,11 +8,12 @@ import { enable_pft_debug_log } from '../../../../../playwright.config';
 
 import { shortUrl, truncateForLog } from './string.utils';
 
-export type PftValidationCategory = 'error-messages' | 'page-navigation';
+export type PftValidationCategory = 'error-messages' | 'page-navigation' | 'page-content';
 
 const categoryLabel: Record<PftValidationCategory, string> = {
   'error-messages': 'error messages',
   'page-navigation': 'page navigation',
+  'page-content': 'page content',
 };
 
 /**
