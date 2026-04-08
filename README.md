@@ -189,7 +189,7 @@ There are also several custom test scripts available:
 - `test:E2eMobileSafari` - emulated Mobile Safari (iPhone 12 profile; requires `CI=true`)
 - `test:E2eIpad` - emulated iPad Safari (iPad Pro 11 profile; requires `CI=true`)
 
-**`Jenkinsfile_nightly`** sets **`PLAYWRIGHT_TEST_GREP=@nightly`** and **`SAUCE_GREP=@saucelab`** (see `setFunctionalTestEnvVars`). E2E scripts use **`${PLAYWRIGHT_TEST_GREP:-@nightly}`** so local runs work without exports; Jenkins overrides with the same values. **Sauce:** see **`package.json`** (`yarn test:crossbrowser`, `yarn test:saucelab`, `yarn test:sauce:*`) — each script sets the tunnel name and **`${SAUCE_GREP:-@saucelab}`**.
+**`Jenkinsfile_nightly`** sets **`PLAYWRIGHT_TEST_GREP=@nightly`** and **`SAUCE_GREP=@saucelab`** (see `setFunctionalTestEnvVars`). E2E scripts use **`${PLAYWRIGHT_TEST_GREP:-@nightly}`** so local runs work without exports; Jenkins overrides with the same values. **Sauce:** see **`package.json`** (`yarn test:crossbrowser`, `yarn test:sauce:*`) — each script sets the tunnel name and **`${SAUCE_GREP:-@saucelab}`** (macOS 13 WebKit: **`yarn test:sauce:mac13-webkit`**).
 
 Running accessibility tests:
 
