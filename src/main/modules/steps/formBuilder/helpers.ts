@@ -351,6 +351,7 @@ export function validateForm(
         t,
         field.noFutureDate,
         field.noCurrentDate,
+        field.noPastDate,
         translations
       );
 
