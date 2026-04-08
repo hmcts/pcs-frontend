@@ -22,6 +22,12 @@ export interface HouseholdCircumstances {
   alternativeAccommodationTransferDate?: string;
   otherTenants?: YesNoValue;
   otherTenantsDetails?: string;
+  universalCredit?: YesNoValue;
+  ucApplicationDate?: string;
+  priorityDebts?: YesNoValue;
+  debtTotal?: string;
+  debtContribution?: string;
+  debtContributionFrequency?: string;
 }
 
 export interface CcdUserCase {
@@ -86,14 +92,7 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
-    householdCircumstances?: {
-      universalCredit?: YesNoValue;
-      ucApplicationDate?: string;
-      priorityDebts?: YesNoValue;
-      debtTotal?: string;
-      debtContribution?: string;
-      debtContributionFrequency?: string;
-    };
+    householdCircumstances?: HouseholdCircumstances;
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
@@ -101,7 +100,6 @@ export interface PossessionClaimResponse {
       additionalRentContribution?: unknown;
       additionalContributionFrequency?: string;
     };
-    householdCircumstances?: HouseholdCircumstances;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;

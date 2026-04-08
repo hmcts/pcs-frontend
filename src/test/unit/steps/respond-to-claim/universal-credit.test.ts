@@ -86,7 +86,7 @@ describe('respond-to-claim universal-credit step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: 'YES',
+          universalCredit: 'Yes',
           ucApplicationDate: '2024-02-10',
         },
       },
@@ -114,7 +114,7 @@ describe('respond-to-claim universal-credit step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: 'NO',
+          universalCredit: 'No',
           ucApplicationDate: undefined,
         },
       },

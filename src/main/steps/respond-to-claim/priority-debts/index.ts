@@ -1,5 +1,6 @@
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -12,20 +13,14 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   beforeRedirect: async req => {
     const selection = req.body?.havePriorityDebts as string | undefined;
-    let priorityDebts: 'YES' | 'NO' | undefined;
-    if (selection === 'yes') {
-      priorityDebts = 'YES';
-    } else if (selection === 'no') {
-      priorityDebts = 'NO';
-    }
-    if (!priorityDebts) {
+    if (selection !== 'yes' && selection !== 'no') {
       return;
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances: {
-          priorityDebts,
+          priorityDebts: toYesNoEnum(selection),
         },
       },
     };
@@ -44,10 +39,10 @@ export const step: StepDefinition = createFormStep({
         | undefined
     )?.possessionClaimResponse?.defendantResponses?.householdCircumstances?.priorityDebts;
 
-    if (priorityDebts === 'YES') {
+    if (fromYesNoEnum(priorityDebts) === 'yes') {
       return { havePriorityDebts: 'yes' };
     }
-    if (priorityDebts === 'NO') {
+    if (fromYesNoEnum(priorityDebts) === 'no') {
       return { havePriorityDebts: 'no' };
     }
     return {};

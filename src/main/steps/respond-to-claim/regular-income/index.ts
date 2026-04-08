@@ -2,6 +2,7 @@ import type { Request } from 'express';
 
 import type { PossessionClaimResponse, YesNoValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -12,10 +13,6 @@ function includesUniversalCreditSelection(value: unknown): boolean {
     return value.includes('universalCredit');
   }
   return value === 'universalCredit';
-}
-
-function toYesNoValue(selected: boolean): YesNoValue {
-  return selected ? 'YES' : 'NO';
 }
 
 export const step: StepDefinition = createFormStep({
@@ -29,7 +26,7 @@ export const step: StepDefinition = createFormStep({
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: toYesNoValue(universalCreditSelected),
+          universalCredit: toYesNoEnum(universalCreditSelected ? 'yes' : 'no'),
         },
       },
     };
@@ -49,7 +46,7 @@ export const step: StepDefinition = createFormStep({
         | undefined
     )?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
 
-    if (householdCircumstances?.universalCredit === 'YES') {
+    if (fromYesNoEnum(householdCircumstances?.universalCredit) === 'yes') {
       return { regularIncome: ['universalCredit'] };
     }
 

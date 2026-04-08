@@ -62,7 +62,7 @@ describe('respond-to-claim regular-income step', () => {
     mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
   });
 
-  it('POST maps universal credit selection to YES', async () => {
+  it('POST maps universal credit selection to CCD Yes', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -83,13 +83,13 @@ describe('respond-to-claim regular-income step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: 'YES',
+          universalCredit: 'Yes',
         },
       },
     });
   });
 
-  it('POST maps absent universal credit selection to NO', async () => {
+  it('POST maps absent universal credit selection to CCD No', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -109,7 +109,7 @@ describe('respond-to-claim regular-income step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: 'NO',
+          universalCredit: 'No',
         },
       },
     });

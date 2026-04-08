@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -21,12 +22,7 @@ export const step: StepDefinition = createFormStep({
       year: nestedDate?.year || (req.body?.['ucApplicationDate-year'] as string | undefined),
     };
 
-    let universalCredit: 'YES' | 'NO' | undefined;
-    if (selection === 'yes') {
-      universalCredit = 'YES';
-    } else if (selection === 'no') {
-      universalCredit = 'NO';
-    }
+    const universalCredit = selection === 'yes' || selection === 'no' ? toYesNoEnum(selection) : undefined;
 
     let isoDate: string | undefined;
     if (selection === 'yes' && ucApplicationDate?.day && ucApplicationDate?.month && ucApplicationDate?.year) {
@@ -37,6 +33,8 @@ export const step: StepDefinition = createFormStep({
       });
       if (dateTime.isValid) {
         isoDate = dateTime.toISODate() || undefined;
+      } else {
+        throw new Error('Invalid universal credit application date submitted');
       }
     }
 
@@ -68,10 +66,9 @@ export const step: StepDefinition = createFormStep({
     )?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
 
     const data: Record<string, unknown> = {};
-    if (householdCircumstances?.universalCredit === 'YES') {
-      data.haveAppliedForUniversalCredit = 'yes';
-    } else if (householdCircumstances?.universalCredit === 'NO') {
-      data.haveAppliedForUniversalCredit = 'no';
+    const prepopUniversalCredit = fromYesNoEnum(householdCircumstances?.universalCredit);
+    if (prepopUniversalCredit) {
+      data.haveAppliedForUniversalCredit = prepopUniversalCredit;
     }
 
     if (householdCircumstances?.ucApplicationDate) {
