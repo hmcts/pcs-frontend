@@ -56,6 +56,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     hint: 'hint',
+    fieldsetLegend: 'fieldsetLegend',
     optionUniversalCredit: 'optionUniversalCredit',
   },
   fields: [],
