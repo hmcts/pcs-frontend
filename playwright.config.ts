@@ -19,7 +19,7 @@ export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION |
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
-export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || 'true';
+export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || 'false';
 
 export default defineConfig({
   testDir: './src/test/ui',
