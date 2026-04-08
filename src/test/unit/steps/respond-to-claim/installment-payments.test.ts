@@ -97,7 +97,7 @@ describe('respond-to-claim installment-payments step', () => {
     expect(step.view).toContain('instalmentOffer.njk');
   });
 
-  it('POST saves YES to defendantResponses.paymentAgreement', async () => {
+  it('POST saves Yes to defendantResponses.paymentAgreement', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
 
     const req = createReq({
@@ -117,7 +117,7 @@ describe('respond-to-claim installment-payments step', () => {
 
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
-        paymentAgreement: { repayArrearsInstalments: 'YES' },
+        paymentAgreement: { repayArrearsInstalments: 'Yes' },
       },
     });
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
