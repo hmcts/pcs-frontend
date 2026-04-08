@@ -11,7 +11,7 @@
 #     known issues; macOS 13 is the safe combo for Firefox + WebKit with older saucectl.
 #
 # Run: yarn test:crossbrowser
-# Test tag: SAUCE_GREP from env (Jenkinsfile_nightly sets @saucelab); override per run if needed.
+# Test tag: SAUCE_GREP from env (Jenkinsfile_nightly sets @crossbrowser); override per run if needed.
 # Ref: https://docs.saucelabs.com/web-apps/automated-testing/playwright/
 apiVersion: v1alpha
 kind: playwright

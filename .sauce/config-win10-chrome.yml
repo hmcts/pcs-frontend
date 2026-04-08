@@ -1,5 +1,5 @@
 # Single suite: Chrome on Windows 10. Run: yarn test:sauce:win10-chrome
-# SAUCE_GREP: see Jenkinsfile_nightly / package.json `test:sauce:*` (`:-@saucelab`).
+# SAUCE_GREP: see Jenkinsfile_nightly / package.json `test:sauce:*` (`:-@crossbrowser`).
 apiVersion: v1alpha
 kind: playwright
 
