@@ -147,7 +147,8 @@ export default defineConfig({
             name: 'MicrosoftEdge',
             use: {
               ...devices['Desktop Edge'],
-              channel: 'MicrosoftEdge',
+              // Playwright expects "msedge" — "MicrosoftEdge" is not a valid channel (launch fails on Linux CI).
+              channel: 'msedge',
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
