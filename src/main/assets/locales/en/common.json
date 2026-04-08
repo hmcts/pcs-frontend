@@ -61,6 +61,7 @@
       "required": "Enter a date",
       "notRealDate": "Date must be a real date",
       "futureDate": "Date must be in the past",
+      "pastDate": "Date must be in the future",
       "invalidValue": "Enter a valid value",
       "yearMustBeSameOrAfter": "The year must be the same as or after {{minYear}}",
       "missingOne": "Date must include a {{missingField}}",
