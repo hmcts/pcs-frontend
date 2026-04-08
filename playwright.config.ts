@@ -147,8 +147,10 @@ export default defineConfig({
             name: 'MicrosoftEdge',
             use: {
               ...devices['Desktop Edge'],
-              // Playwright expects "msedge" — "MicrosoftEdge" is not a valid channel (launch fails on Linux CI).
-              channel: 'msedge',
+              // Linux Jenkins: branded Edge via Playwright's msedge channel. Sauce: omit channel — if set, Playwright
+              // looks for msedge.exe on a fixed path and conflicts with Sauce's VM layout (same class of issue as
+              // Chrome launchOptions on Sauce). PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS is set in .sauce/*.yml only.
+              ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,

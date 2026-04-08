@@ -161,7 +161,8 @@ suites:
       grep: $SAUCE_GREP
 
   # saucectl 0.202 validation + EU allocators: use macOS 13 for Firefox/WebKit (not macOS 14 in schema for these combos).
-  # WebKit on macOS: 1920x1080 is not allowed for this OS/browser — Sauce only offers e.g. 1024x768 … 1920x1440 (see job error).
+  # WebKit on macOS: 1440x900 (1080p invalid for this stack on Sauce in our runs).
+  # Suite order: Chrome + Edge before WebKit — mac Chrome/Edge used to be last; if a run stops early, those jobs were missing in Sauce UI.
   - name: 'pcs-frontend-mac13-firefox'
     platformName: macOS 13
     screenResolution: 1440x900
@@ -171,18 +172,6 @@ suites:
     params:
       browserName: firefox
       project: firefox
-      headless: true
-      grep: $SAUCE_GREP
-
-  - name: 'pcs-frontend-mac13-webkit'
-    platformName: macOS 13
-    screenResolution: 1440x900
-    testMatch:
-      - ".*src/test/ui/.*\\.spec\\.ts$"
-      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
-    params:
-      browserName: webkit
-      project: webkit
       headless: true
       grep: $SAUCE_GREP
 
@@ -207,6 +196,18 @@ suites:
     params:
       browserName: chromium
       project: MicrosoftEdge
+      headless: true
+      grep: $SAUCE_GREP
+
+  - name: 'pcs-frontend-mac13-webkit'
+    platformName: macOS 13
+    screenResolution: 1440x900
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: webkit
+      project: webkit
       headless: true
       grep: $SAUCE_GREP
 
