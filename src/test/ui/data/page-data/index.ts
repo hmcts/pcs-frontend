@@ -33,3 +33,6 @@ export * from './doAnyOtherAdultsLiveInYourHome.page.data';
 export * from './wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.page.data';
 export * from './feedback.page.data';
 export * from './yourCircumstances.page.data';
+export * from './otherRegularExpenses.page.data';
+export * from './priorityDebtDetails.page.data';
+
