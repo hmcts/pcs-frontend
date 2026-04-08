@@ -201,6 +201,7 @@ suites:
 
   - name: 'pcs-frontend-mac13-webkit'
     platformName: macOS 13
+    armRequired: true
     screenResolution: 1440x900
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"

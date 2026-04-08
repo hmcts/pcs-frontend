@@ -51,6 +51,9 @@ env:
 suites:
   - name: 'pcs-frontend-mac13-webkit'
     platformName: macOS 13
+    # Avoid "Bad CPU type in executable" when Sauce assigns ARM Mac VMs but the runner picks the wrong WebKit binary.
+    # See https://docs.saucelabs.com/web-apps/automated-testing/playwright/yaml/#armrequired (saucectl 0.196+).
+    armRequired: true
     screenResolution: 1440x900
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
