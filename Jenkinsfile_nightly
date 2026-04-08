@@ -118,8 +118,8 @@ def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'false'
-  env.PLAYWRIGHT_TEST_GREP = '@crossbrowser'
-  env.SAUCE_GREP = '@crossbrowser'
+  env.PLAYWRIGHT_TEST_GREP = '@nightly'
+  env.SAUCE_GREP = '@nightly'
 }
 
 def runE2ETests(yarnBuilder) {
