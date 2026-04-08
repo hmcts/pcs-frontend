@@ -73,6 +73,8 @@ export class ActionRegistry {
     ['installmentPayments', new RespondToClaimAction()],
     ['selectHowMuchAffordToPay', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
+    ['yourCircumstances', new RespondToClaimAction()],
+    ['exceptionalHardship', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
