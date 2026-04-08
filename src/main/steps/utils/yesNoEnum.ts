@@ -14,7 +14,7 @@ import type { YesNoValue } from '../../interfaces/ccdCase.interface';
  * toYesNoEnum('no')  // returns 'NO'
  */
 export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
-  return value === 'yes' ? 'YES' : 'NO';
+  return value === 'yes' ? 'Yes' : 'No';
 }
 
 /**
@@ -26,11 +26,15 @@ export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
  * fromYesNoEnum('NO')  // returns 'no'
  * fromYesNoEnum(null)  // returns undefined
  */
-export function fromYesNoEnum(value: YesNoValue | string | undefined): 'yes' | 'no' | undefined {
-  if (value === 'YES') {
+export function fromYesNoEnum(value: YesNoValue | string | null | undefined): 'yes' | 'no' | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const lowerValue = value.toLowerCase();
+  if (lowerValue === 'yes') {
     return 'yes';
   }
-  if (value === 'NO') {
+  if (lowerValue === 'no') {
     return 'no';
   }
   return undefined;
