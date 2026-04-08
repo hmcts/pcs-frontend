@@ -1,7 +1,7 @@
 export const disputeClaimInterstitial = {
   getMainHeader: (claimantName: string): string => {
     const nameClaimant =
-      claimantName.substring(claimantName.length - 1) === 's' ? `${claimantName}'` : `${claimantName}’ss`;
+      claimantName.substring(claimantName.length - 1) === 's' ? `${claimantName}'` : `${claimantName}’s`;
     return nameClaimant + ' claim';
   },
   getWhenTheyMadeTheirClaimParagraph: (claimantName: string): string => {
