@@ -76,6 +76,7 @@ Set **`ENABLE_PFT_DEBUG_LOG=false`** in the environment when you want to hide th
 
 - **`utils/common/pft-debug-log.ts`**: **`logPftValidationInformation`** runs after each EMV / page-navigation check. **`[PFT]`** console lines are printed **whenever** `enable_pft_debug_log === 'true'` — **pass and fail**. **Screenshots** attach to the report **only when** that check **failed**. Page navigation lines may include **`nav: from "…" | control: "…"`**.
 - **`triggerPageFunctionalTests`**: stderr if the URL segment is missing from **`urlToFileMapping.config.ts`**. When `ENABLE_PFT_DEBUG_LOG=true`, one stdout line per **first PFT run for that page in the test run** (`[PFT] Triggering Functional Tests for Page: … and URL: …`), after lock/duplicate skips.
+- **Page content** (`pageContent.validation.ts`): when `ENABLE_PFT_DEBUG_LOG=true`, one line when content validation runs: **`[PFT] page content | page: … | url: …`**.
 
 Screenshots are **not** gated by `ENABLE_PFT_DEBUG_LOG` (they run on failure whenever `logPftValidationInformation` is called with `failed: true`). The env flag gates **console** output from this helper and from trigger/mapping messages.
 

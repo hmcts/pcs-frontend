@@ -3,8 +3,9 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
+import { enable_pft_debug_log } from '../../../../../../playwright.config';
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
-import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
+import { escapeForRegex, exactTextWithOptionalWhitespaceRegex, shortUrl } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
@@ -137,6 +138,9 @@ export class PageContentValidation implements IValidation {
   async validateCurrentPage(page: Page, pageName: string): Promise<void> {
     await page.waitForLoadState('load');
     const pageUrl = page.url();
+    if (enable_pft_debug_log === 'true') {
+      console.log(`[PFT] page content | page: ${pageName} | url: ${shortUrl(pageUrl)}`);
+    }
     const pageResults: ValidationResult[] = [];
     try {
       const pageData = await this.getPageData(pageName);
