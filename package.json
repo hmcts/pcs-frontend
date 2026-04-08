@@ -39,7 +39,7 @@
     "test:E2eMobileSafari": "yarn playwright install && yarn playwright test --project MobileSafari --grep \"${PLAYWRIGHT_TEST_GREP:-@nightly}\"; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:E2eIpad": "yarn playwright install && yarn playwright test --project iPad --grep \"${PLAYWRIGHT_TEST_GREP:-@nightly}\"; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:local": "yarn playwright install && yarn playwright test --project chrome --grep \"${PLAYWRIGHT_TEST_GREP:-@nightly}\"; EXIT_CODE=$?;",
-    "test:crossbrowser": "yarn test:sauce:mac13-webkit",
+    "test:crossbrowser": "yarn test:sauce:ac-cross-browser",
     "test:crossbrowserold": "SAUCE_TUNNEL_NAME=${SAUCE_TUNNEL_NAME:-reformtunnel} yarn exec saucectl run -c .sauce/config-matrix.yml",
     "test:sauce:matrix": "SAUCE_TUNNEL_NAME=reformtunnel SAUCE_GREP=${SAUCE_GREP:-@crossbrowser} yarn exec saucectl run -c .sauce/config-matrix.yml",
     "test:sauce:win10-chrome": "SAUCE_TUNNEL_NAME=reformtunnel SAUCE_GREP=${SAUCE_GREP:-@crossbrowser} yarn exec saucectl run -c .sauce/config-win10-chrome.yml",
