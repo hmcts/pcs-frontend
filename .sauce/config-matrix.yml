@@ -10,7 +10,7 @@
 #   • macOS 14+ with Firefox — schema may reject until saucectl is upgraded; Firefox on macOS 15 has Sauce
 #     known issues; macOS 13 is the safe combo for Firefox + WebKit with older saucectl.
 #
-# Run: yarn test:crossbrowser
+# Run: yarn test:crossbrowser → test:sauce:matrix → .sauce/config-matrix.yml
 # Test tag: SAUCE_GREP from env (Jenkinsfile_nightly sets @crossbrowser); override per run if needed.
 # Ref: https://docs.saucelabs.com/web-apps/automated-testing/playwright/
 apiVersion: v1alpha
@@ -23,7 +23,7 @@ sauce:
     name: $SAUCE_TUNNEL_NAME
   metadata:
     tags:
-      - pcs-frontend-crossbrowser
+      - pcs-frontend-matrix
 
 defaults:
   timeout: 30m

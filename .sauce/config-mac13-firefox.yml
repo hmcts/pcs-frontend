@@ -1,5 +1,5 @@
 # Single suite: Firefox on macOS 13. Run: yarn test:sauce:mac13-firefox
-# macOS 13: stable for this PoC with saucectl; see config-crossbrowser.yml comments for macOS 14+.
+# macOS 13: stable for this PoC with saucectl; see config-matrix.yml comments for macOS 14+.
 apiVersion: v1alpha
 kind: playwright
 
