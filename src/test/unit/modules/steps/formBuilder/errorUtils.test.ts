@@ -4,10 +4,44 @@ import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldCo
 import {
   type FormError,
   buildErrorSummary,
+  fieldTypeForErrorKey,
+  getErrorMessage,
   renderWithErrors,
 } from '../../../../../main/modules/steps/formBuilder/errorUtils';
 
 describe('errorUtils', () => {
+  describe('fieldTypeForErrorKey', () => {
+    it('returns top-level field type and nested subField type from options', () => {
+      const fields: FormFieldConfig[] = [
+        {
+          name: 'parent',
+          type: 'radio',
+          options: [
+            { value: 'no', subFields: {} },
+            {
+              value: 'yes',
+              subFields: {
+                nestedDate: { name: 'nestedDate', type: 'date', required: false },
+              },
+            },
+          ],
+        },
+      ];
+      expect(fieldTypeForErrorKey(fields, 'parent')).toBe('radio');
+      expect(fieldTypeForErrorKey(fields, 'parent.nestedDate')).toBe('date');
+      expect(fieldTypeForErrorKey(fields, 'a.b.c')).toBeUndefined();
+      expect(fieldTypeForErrorKey(fields, 'parent.unknown')).toBeUndefined();
+      expect(fieldTypeForErrorKey([{ name: 'parent', type: 'radio' }], 'parent.nestedDate')).toBeUndefined();
+    });
+  });
+
+  describe('getErrorMessage', () => {
+    it('returns string errors unchanged and reads message from date field errors', () => {
+      expect(getErrorMessage('Required')).toBe('Required');
+      expect(getErrorMessage({ message: 'Bad date', erroneousParts: ['day'] })).toBe('Bad date');
+    });
+  });
+
   describe('buildErrorSummary', () => {
     const mockT: TFunction = ((key: string) => {
       const translations: Record<string, string> = {
