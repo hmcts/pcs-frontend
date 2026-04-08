@@ -223,7 +223,7 @@ export class RespondToClaimAction implements IAction {
   }
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: repaymentsMade.getmainHeader(claimantsName),
+      question: repaymentsData.question,
       option: repaymentsData.repaymentOption,
     });
     if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
@@ -234,7 +234,7 @@ export class RespondToClaimAction implements IAction {
 
   private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: repaymentsAgreed.getMainHeader(claimantsName),
+      question: repaymentsAgreedData.question,
       option: repaymentsAgreedData.repaymentAgreedOption,
     });
     if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {

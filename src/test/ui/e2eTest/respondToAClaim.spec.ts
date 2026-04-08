@@ -28,10 +28,12 @@ import {
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
+let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayload.claimantName;
+  claimantName = submitCaseApiData.submitCasePayload.claimantName;
+  process.env.CLAIMANT_NAME = claimantName;
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.NOTICE_SERVED = 'NO';
   } else {
@@ -107,6 +109,8 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   if (testInfo.title.includes('@noDefendants')) {
+    claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
+    process.env.CLAIMANT_NAME = claimantName;
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
@@ -202,9 +206,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
@@ -269,9 +275,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
@@ -334,9 +342,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
@@ -397,10 +407,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.yesRadioOption,
       repaymentInfo: repaymentsMade.detailsTextInput,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
@@ -459,9 +471,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
@@ -520,9 +534,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
@@ -584,9 +600,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
@@ -642,9 +660,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
@@ -707,9 +727,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
