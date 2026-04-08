@@ -4,27 +4,27 @@ import {
   howMuchAffordToPay,
   installmentPayments,
   repaymentsAgreed,
-  yourHouseHoldAndCircumstances,
+  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { claimantsName } from '../utils/actions/custom-actions';
 import { performValidation } from '../utils/controller';
 
 export async function yourHouseholdAndCircumstancesNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', yourHouseHoldAndCircumstances.feedbackLink, {
+  await performValidation('pageNavigation', yourHouseholdAndCircumstances.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
-    pageSlug: yourHouseHoldAndCircumstances.pageSlug,
+    pageSlug: yourHouseholdAndCircumstances.pageSlug,
   });
   if (process.env.REPAYMENT_AGREED === 'NO') {
-    await performValidation('pageNavigation', yourHouseHoldAndCircumstances.backLink, howMuchAffordToPay.mainHeader);
+    await performValidation('pageNavigation', yourHouseholdAndCircumstances.backLink, howMuchAffordToPay.mainHeader);
   } else if (process.env.REPAYMENT_AGREED !== 'NO') {
     await performValidation(
       'pageNavigation',
-      yourHouseHoldAndCircumstances.backLink,
+      yourHouseholdAndCircumstances.backLink,
       repaymentsAgreed.getMainHeader(claimantsName)
     );
   }
   if (process.env.INSTALLMENT_PAYMENT === 'NO') {
-    await performValidation('pageNavigation', yourHouseHoldAndCircumstances.backLink, installmentPayments.mainHeader);
+    await performValidation('pageNavigation', yourHouseholdAndCircumstances.backLink, installmentPayments.mainHeader);
   }
-  await performValidation('pageNavigation', yourHouseHoldAndCircumstances.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', yourHouseholdAndCircumstances.cancelLink, dashboard.mainHeader);
 }
