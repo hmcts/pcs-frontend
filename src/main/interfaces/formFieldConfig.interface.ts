@@ -40,6 +40,13 @@ export interface FormFieldConfig {
   };
   options?: FormFieldOption[];
   classes?: string;
+  // Prefix text displayed before the input field (e.g., '£' for currency).
+  // Used to show units or symbols that help users understand the format.
+  // Follows GOV.UK Design System: https://design-system.service.gov.uk/components/text-input/#prefixes-and-suffixes
+  // The prefix is visually displayed but not included in the field's value.
+  prefix?: {
+    text: string;
+  };
   attributes?: Record<string, unknown>;
   legendClasses?: string;
   // Pre-built component config for Nunjucks template rendering
@@ -62,6 +69,7 @@ export interface FormFieldConfig {
   // For date fields: prevent future dates from being entered
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
+  noPastDate?: boolean;
   isPageHeading?: boolean;
 }
 

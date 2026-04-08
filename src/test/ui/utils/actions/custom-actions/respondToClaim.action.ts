@@ -11,20 +11,29 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
+  doAnyOtherAdultsLiveInYourHome,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
+  exceptionalHardship,
   freeLegalAdvice,
   landlordLicensed,
   landlordRegistered,
+  nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   paymentInterstitial,
+  rentArrears,
   repaymentsAgreed,
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
+  yourCircumstances,
+  yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
-import { formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
+import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 export let claimantsName: string;
@@ -52,8 +61,20 @@ export class RespondToClaimAction implements IAction {
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
+      ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
+      ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
+      ['yourCircumstances', () => this.yourCircumstances(fieldName as actionRecord)],
+      ['exceptionalHardship', () => this.exceptionalHardship(fieldName as actionRecord)],
+      [
+        'selectIfAnyOtherAdultsLiveInYourHouse',
+        () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
+      ],
+      ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
+      ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
+      ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
+      ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -301,6 +322,79 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
   }
 
+  private async selectIfAnyOtherAdultsLiveInYourHouse(adultsInHouseDetails: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: doAnyOtherAdultsLiveInYourHome.mainHeader,
+      option: adultsInHouseDetails.radioOption,
+    });
+
+    if (adultsInHouseDetails.radioOption === 'Yes' && adultsInHouseDetails.details) {
+      await performAction(
+        'inputText',
+        doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
+        adultsInHouseDetails.details
+      );
+    }
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+  }
+
+  private async selectAlternativeAccommodation(moveInDetails: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader,
+      option: moveInDetails.radioOption,
+    });
+
+    if (moveInDetails.radioOption === 'Yes' && moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, moveInDetails.day],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, moveInDetails.month],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, moveInDetails.year]
+      );
+    }
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  }
+
+  private async disputingOtherPartsOfTheClaim(doYouWantToDisputeOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
+      option: doYouWantToDisputeOption.disputeOption,
+    });
+
+    if (doYouWantToDisputeOption.disputeOption === 'Yes') {
+      await performAction(
+        'inputText',
+        nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
+        doYouWantToDisputeOption.disputeInfo
+      );
+    }
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  }
+
+  private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
+    await performValidation('text', {
+      elementType: 'subHeader',
+      text: `Amount you owe in rent arrears given by ${submitCaseApiData.submitCasePayload.claimantName}:`,
+    });
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `When making their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
+    });
+    const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `${rentArrearsAmount}`,
+    });
+    await performAction('clickRadioButton', {
+      question: rentArrears.doYouOweThisQuestion,
+      option: rentArrearsInfo.option,
+    });
+    if (rentArrearsInfo.option === 'No') {
+      await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
+    }
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
+  }
+
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
     const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
     const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
@@ -334,6 +428,72 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  }
+
+  private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: yourCircumstancesData.question,
+      option: yourCircumstancesData.yourCircumstancesOption,
+    });
+    if (yourCircumstancesData.yourCircumstancesOption === yourCircumstances.yesRadioOption) {
+      await performAction(
+        'inputText',
+        yourCircumstances.giveDetailsHiddenTextLabel,
+        yourCircumstances.detailsTextInput
+      );
+    }
+    await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  }
+
+  private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: exceptionalHardshipData.question,
+      option: exceptionalHardshipData.exceptionalHardshipOption,
+    });
+    if (exceptionalHardshipData.exceptionalHardshipOption === exceptionalHardship.yesRadioOption) {
+      await performAction(
+        'inputText',
+        exceptionalHardship.giveDetailsHiddenTextLabel,
+        exceptionalHardship.detailsTextInput
+      );
+    }
+    await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
+  }
+
+  private async readYourHouseholdAndCircumstances(): Promise<void> {
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+  }
+
+  private async doYouHaveAnyOtherDependants(otherDependantsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouHaveAnyOtherDependants.mainHeader,
+      option: otherDependantsData.otherDependantsOption,
+    });
+
+    if (otherDependantsData.otherDependantsOption === doYouHaveAnyOtherDependants.yesRadioOption) {
+      await performAction(
+        'inputText',
+        doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
+        otherDependantsData.otherDependantsInfo
+      );
+    }
+    await performAction('clickButton', doYouHaveAnyOtherDependants.saveAndContinueButton);
+  }
+
+  private async doYouHaveAnyDependantChildren(dependantChildrenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouHaveAnyDependantChildren.mainHeader,
+      option: dependantChildrenData.dependantChildrenOption,
+    });
+
+    if (dependantChildrenData.dependantChildrenOption === doYouHaveAnyDependantChildren.yesRadioOption) {
+      await performAction(
+        'inputText',
+        doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
+        dependantChildrenData.dependantChildrenInfo
+      );
+    }
+    await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

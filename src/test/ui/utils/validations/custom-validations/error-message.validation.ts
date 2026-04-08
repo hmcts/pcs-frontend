@@ -23,6 +23,7 @@ export class ErrorMessageValidation implements IValidation {
   private static pagesPassed = new Set<string>();
   private static missingEMVFiles = new Set<string>();
   private static shouldThrowError = true;
+  private static emvFailed = false;
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
 
   async validate(
@@ -72,6 +73,7 @@ export class ErrorMessageValidation implements IValidation {
 
         // Check for error summary header
         const headerLocator = page.locator(`h2.govuk-error-summary__title:has-text("${header}")`);
+        await headerLocator.waitFor({ state: 'visible', timeout: 5000 });
         const headerCount = await headerLocator.count();
 
         if (headerCount === 0) {
@@ -117,6 +119,10 @@ export class ErrorMessageValidation implements IValidation {
       error: passed ? undefined : `Expected "${expected}" but found "${actualText || 'nothing'}"`,
     });
 
+    if (!passed) {
+      ErrorMessageValidation.emvFailed = true;
+    }
+
     if (passed) {
       ErrorMessageValidation.pagesPassed.add(pageName);
     }
@@ -134,8 +140,18 @@ export class ErrorMessageValidation implements IValidation {
     ErrorMessageValidation.missingEMVFiles.add(pageName);
   }
 
-  static trackValidationError(pageName: string, _error?: unknown): void {
-    ErrorMessageValidation.missingEMVFiles.add(pageName);
+  static trackValidationError(pageName: string, error?: unknown): void {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    ErrorMessageValidation.results.push({
+      pageUrl: '',
+      pageName,
+      scenario: 'Error message validation',
+      passed: false,
+      expected: 'Error message validation should execute successfully',
+      actual: errorMessage,
+      error: errorMessage,
+    });
+    ErrorMessageValidation.emvFailed = true;
   }
 
   private static async getPageNameFromUrl(url: string, page?: Page): Promise<string> {
@@ -218,7 +234,7 @@ export class ErrorMessageValidation implements IValidation {
     const totalPages = ErrorMessageValidation.pagesWithEMV.size + ErrorMessageValidation.missingEMVFiles.size;
 
     if (totalPages === 0) {
-      console.log(`\n📊 ERROR MESSAGE VALIDATION (Test #${ErrorMessageValidation.testCounter}):`);
+      console.log(`\n📊 ERROR MESSAGE VALIDATION SUMMARY (Test #${ErrorMessageValidation.testCounter}):`);
       console.log('   No pages checked for error message validation');
       return;
     }
@@ -273,14 +289,23 @@ export class ErrorMessageValidation implements IValidation {
         const details = failureDetails.get(pageName);
         console.log(`   Page: ${pageName}`);
         if (details) {
-          console.log(`       Expected: ${details.expected}`);
-          console.log(`       Actual: ${details.actual}`);
+          let errorMessage = details.actual;
+          if (errorMessage.includes('Header') && errorMessage.includes('not found')) {
+            errorMessage = `"${details.expected.split(':')[0]}" header not found`;
+          } else if (errorMessage.includes('Message') && errorMessage.includes('not found')) {
+            errorMessage = `"${details.expected.split(':')[1]?.trim() || details.expected}" message not found`;
+          } else if (errorMessage === 'No error message found') {
+            errorMessage = `"${details.expected}" error message not found`;
+          }
+          console.log(`       Error: ${errorMessage}`);
         }
         console.log('');
       }
     }
 
-    if (failedPages.size > 0) {
+    const hasFailures = failedPages.size > 0 || ErrorMessageValidation.emvFailed;
+
+    if (hasFailures) {
       console.log('❌ ERROR MESSAGE VALIDATIONS FAILED\n');
     } else if (passedPages.size > 0) {
       console.log('\n✅ ALL ERROR MESSAGE VALIDATIONS PASSED\n');
@@ -288,11 +313,23 @@ export class ErrorMessageValidation implements IValidation {
       console.log('\n⚠️  EMV methods found but no validations performed\n');
     }
 
+    // Collect errors to throw with full error message
+    const errors: string[] = [];
+
+    for (const [pageName, details] of failureDetails) {
+      // Use the actual error message (which contains the full stack trace)
+      const errorMessage = details.actual;
+      // Don't format the error message - keep it as is to show the full error
+      errors.push(`${pageName}: ${errorMessage}`);
+    }
+
+    const shouldThrow =
+      (failedPages.size > 0 || ErrorMessageValidation.emvFailed) && ErrorMessageValidation.shouldThrowError;
+
     ErrorMessageValidation.clearResults();
 
-    // Throw after clearing so failures don't cascade into subsequent tests
-    if (failedPages.size > 0 && ErrorMessageValidation.shouldThrowError) {
-      throw new Error(`Error message validation failed: ${failedPages.size} page(s) have failures`);
+    if (shouldThrow && errors.length > 0) {
+      throw new Error(`Error message validations failed:\n\n${errors.join('\n\n')}`);
     }
   }
 
@@ -301,5 +338,6 @@ export class ErrorMessageValidation implements IValidation {
     ErrorMessageValidation.pagesWithEMV.clear();
     ErrorMessageValidation.pagesPassed.clear();
     ErrorMessageValidation.missingEMVFiles.clear();
+    ErrorMessageValidation.emvFailed = false;
   }
 }
