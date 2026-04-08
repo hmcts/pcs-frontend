@@ -18,7 +18,7 @@ const categoryLabel: Record<ValidationFailureCategory, string> = {
 
 /**
  * When a functional validation fails: attaches a screenshot to the Playwright report.
- * With ENABLE_PFT_DEBUG_LOG=true, also prints one line to the console for local debugging.
+ * When `enable_pft_debug_log` is true (`ENABLE_PFT_DEBUG_LOG=true` in env), also prints one line to the console.
  */
 export async function reportValidationFailure(
   page: Page,

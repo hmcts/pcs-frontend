@@ -66,13 +66,23 @@ Playwright 1.30+ | TypeScript 4.9+
 
 ### PFT debug logging (optional)
 
-For **functional test validations** (error-message / page-navigation failures, and tracing PFT triggers):
+For **functional test validations** (error-message / page-navigation failures, and tracing PFT triggers), extra **`[PFT]`** console lines are **off by default** in code:
 
-- Set **`ENABLE_PFT_DEBUG_LOG=true`** when you want extra console output (e.g. in `.env` for a local run).
-- **`utils/common/pft-debug-log.ts`**: on a validation failure, attaches a **screenshot** to the Playwright report; with debug on, also prints one **`[PFT]`** line (test, page, url, expected, actual).
-- **`triggerPageFunctionalTests`**: logs **`[PFT] Unmapped URL`** if the current URL has no mapping; with debug on, logs **`[PFT] Trigger`** when PFT runs for a resolved page.
+```typescript
+export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || 'false';
+```
 
-Failure screenshots are attached whenever the validation reports a failure (not gated by `ENABLE_PFT_DEBUG_LOG`). `playwright.config.ts` exports **`enable_pft_debug_log`**.
+**Why keep `process.env.ENABLE_PFT_DEBUG_LOG`?** So you can turn logging **on** (or leave it off) **without changing `playwright.config.ts`** — useful for Jenkins jobs, local shells, or `.env`. Set the variable to the string **`true`** when you want logs:
+
+- Local: `export ENABLE_PFT_DEBUG_LOG=true` before running Playwright, or add it to `.env` if your setup loads it.
+- Jenkins: add `ENABLE_PFT_DEBUG_LOG=true` to the job or pipeline environment.
+
+You do **not** need to flip the `|| 'false'` to `|| 'true'` in the repo to get logs; that would turn them on for everyone by default. Prefer the env var.
+
+- **`utils/common/pft-debug-log.ts`**: on a validation failure, attaches a **screenshot** to the Playwright report; when `enable_pft_debug_log === 'true'`, also prints one **`[PFT]`** line (test, page, url, expected, actual).
+- **`triggerPageFunctionalTests`**: always logs **`[PFT] Unmapped URL`** when the URL is not mapped; when debug is enabled, also logs **`[PFT] Trigger`** for a resolved page.
+
+Failure screenshots are attached whenever the validation reports a failure (not gated by `ENABLE_PFT_DEBUG_LOG`).
 
 ## 4. Actions and Validations
 
