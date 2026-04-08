@@ -199,8 +199,9 @@ suites:
       headless: true
       grep: $SAUCE_GREP
 
-  - name: 'pcs-frontend-mac13-webkit'
-    platformName: macOS 13
+  # macOS 14 + armRequired: Sauce rejects macOS 13 + armRequired as unsupported; ARM WebKit needs 14+ per Sauce docs.
+  - name: 'pcs-frontend-mac14-webkit'
+    platformName: macOS 14
     armRequired: true
     screenResolution: 1440x900
     testMatch:

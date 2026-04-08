@@ -1,6 +1,8 @@
-# WebKit (Safari-class) on macOS 13 — single suite.
-# Run: yarn test:sauce:mac13-webkit (SAUCE_GREP from env / Jenkinsfile_nightly)
-# 1440x900: WebKit on this image does not accept 1920x1080 on Sauce for this PoC.
+# WebKit (Safari-class) on macOS — single suite.
+# Sauce: ARM WebKit is supported for macOS 14+ with Playwright >= 1.58.1 (not macOS 13 + armRequired — that combo is rejected as unsupported).
+# Run: yarn test:sauce:mac13-webkit (script name kept; SAUCE_GREP from env / Jenkinsfile_nightly)
+# https://docs.saucelabs.com/web-apps/automated-testing/playwright/yaml/#armrequired
+# 1440x900: validated for this stack (1080p invalid for some macOS WebKit images on Sauce).
 apiVersion: v1alpha
 kind: playwright
 
@@ -11,7 +13,7 @@ sauce:
     name: $SAUCE_TUNNEL_NAME
   metadata:
     tags:
-      - pcs-frontend-mac13-webkit
+      - pcs-frontend-mac14-webkit
 
 defaults:
   timeout: 30m
@@ -49,10 +51,8 @@ env:
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
 suites:
-  - name: 'pcs-frontend-mac13-webkit'
-    platformName: macOS 13
-    # Avoid "Bad CPU type in executable" when Sauce assigns ARM Mac VMs but the runner picks the wrong WebKit binary.
-    # See https://docs.saucelabs.com/web-apps/automated-testing/playwright/yaml/#armrequired (saucectl 0.196+).
+  - name: 'pcs-frontend-mac14-webkit'
+    platformName: macOS 14
     armRequired: true
     screenResolution: 1440x900
     testMatch:
