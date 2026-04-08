@@ -1,4 +1,5 @@
 # Single suite: Chrome on macOS 13. Run: yarn test:sauce:mac13-chrome
+# 1440x900: 1920x1080 is not in Sauce’s allowed list for Mac 13 + Chrome (job start 404 misconfigured).
 apiVersion: v1alpha
 kind: playwright
 
@@ -49,7 +50,7 @@ env:
 suites:
   - name: 'pcs-frontend-mac13-chrome'
     platformName: macOS 13
-    screenResolution: 1920x1080
+    screenResolution: 1440x900
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
       - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"

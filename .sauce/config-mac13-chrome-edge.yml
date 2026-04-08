@@ -1,5 +1,6 @@
 # Two suites only: Chrome + Edge on macOS 13 (matrix rows not in the 10-job POC snapshot build).
 # Run: yarn test:sauce:mac13-chrome-edge
+# Screen: 1440x900 — Sauce does not offer 1920x1080 for Mac 13 + Chrome/Edge (misconfigured resolution 404).
 apiVersion: v1alpha
 kind: playwright
 
@@ -62,7 +63,7 @@ suites:
 
   - name: 'pcs-frontend-mac13-edge'
     platformName: macOS 13
-    screenResolution: 1920x1080
+    screenResolution: 1440x900
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
       - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
