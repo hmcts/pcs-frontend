@@ -13,7 +13,7 @@ export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
 
   if (isLegalRepresentative) {
     const roles = req.session?.user?.roles;
-    const apiUrl: string = config.get('api.url');
+    const apiUrl: string = process.env.PCS_API_URL || config.get('api.url');
   
     headerModel = buildHeaderModel({
       xuiBaseUrl: apiUrl,
