@@ -2,7 +2,7 @@
   "caption": "Respond to a property possession claim",
   "pageTitle": "Registered landlord",
   "introText": "You can check if your landlord is registered by searching the",
-  "publicRegisterLinkText": "Public Register (opens in new tab).",
+  "publicRegisterLinkText": "Public Register (opens in new tab)",
   "question": "Is your landlord registered?",
   "options": {
     "yes": "Yes",
@@ -10,6 +10,7 @@
     "or": "or",
     "imNotSure": "I’m not sure"
   },
+  "fullStop": ".",
   "errors": {
     "landlordRegistered": "Select if you agree with the landlord’s claim to be registered"
   }
