@@ -28,6 +28,12 @@
     "startNow": "cyStart now",
     "submit": "cySubmit"
   },
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "imNotSure": "cyI'm not sure"
+  },
   "change": "cyChange",
   "chooseOption": "cyChoose an option",
   "back": "cyBack",
@@ -63,6 +69,7 @@
       "invalidMonth": "cyEnter a valid month",
       "invalidYear": "cyEnter a valid year",
       "futureDate": "cyDate must be in the past",
+      "pastDate": "cyDate must be in the future",
       "invalidValue": "cyEnter a valid value",
       "yearMustBeSameOrAfter": "cyThe year must be the same as or after {{minYear}}",
       "missingOne": "cyDate must include a {{missingField}}",
