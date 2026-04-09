@@ -202,7 +202,7 @@ export class RespondToClaimAction implements IAction {
     const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
     await performValidation('text', { elementType: 'heading', text: mainHeader });
     await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
-    await performAction('clickButton', disputeClaimInterstitial.saveAndContinueButton);
+    await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
   private async selectLandlordRegistered(registeredData: actionData): Promise<void> {
@@ -230,7 +230,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async readPaymentInterstitial(): Promise<void> {
-    await performAction('clickButton', paymentInterstitial.saveAndContinueButton);
+    await performAction('clickButton', paymentInterstitial.continueButton);
   }
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
@@ -461,7 +461,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async readYourHouseholdAndCircumstances(): Promise<void> {
-    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
   }
 
   private async doYouHaveAnyOtherDependants(otherDependantsData: actionRecord): Promise<void> {
