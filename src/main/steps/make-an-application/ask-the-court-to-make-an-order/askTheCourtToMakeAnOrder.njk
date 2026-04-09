@@ -66,13 +66,12 @@
     {{ youMayNeedToProvideEvidence }}
   </p>
 
-  <div class="govuk-inset-text">
-    <p class="govuk-body">{{ beforeYouStart }}</p>
-    <p class="govuk-body">{{ onceYouStart }}</p>
-    <p class="govuk-body">{{ weWillNotSaveYourAnswers }}</p>
-  </div>
+  <h2 class="govuk-heading-m">{{ beforeYouStart }}</h2>
+  <p class="govuk-body">{{ makeSureThatYouHaveAllOfTheEvidence }}</p>
+  <p class="govuk-body">{{ onceYouStart }}</p>
+  <p class="govuk-body">{{ weWillNotSaveYourAnswers }}</p>
 
-  <h2 class="govuk-heading-m">{{ howMuchWillItCost }}</h2>
+  <h2 class="govuk-heading-m">{{ howMuchItWillCost }}</h2>
   <p class="govuk-body">{{ usualCosts }}</p>
   <ul class="govuk-list govuk-list--bullet">
     <li>{{ youHaveAlreadyToldTheOtherParty }}</li>
@@ -86,8 +85,7 @@
   <h2 class="govuk-heading-m">{{ applyByPost }}</h2>
   <p class="govuk-body">{{ ifPreferToRespondByPost }}</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li><a href="https://www.gov.uk/government/publications/form-n244-application-notice" target="_blank"
-        rel="noopener noreferrer" class="govuk-link">{{ fillInFormForPost }}</a>
+    <li>{{ fillInFormForPost | safe }}</a>
     </li>
     <li><a href="https://www.gov.uk/find-court-tribunal" target="_blank"
         rel="noopener noreferrer" class="govuk-link">{{ findYourLocalCourt }}</a></li>
