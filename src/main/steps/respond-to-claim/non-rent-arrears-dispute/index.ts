@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { fromVerticalYesNoEnum, toVerticalYesNoEnum } from '../../utils';
+import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -26,7 +26,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     const result: Record<string, unknown> = {
-      disputeClaim: toVerticalYesNoEnum(disputeOtherParts),
+      disputeClaim: toYesNoEnum(disputeOtherParts),
     };
 
     // Add dispute details if user selected 'yes' and provided details
@@ -54,7 +54,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Map backend enum to frontend radio value using utility
-    const formValue = fromVerticalYesNoEnum(response.disputeClaim as string);
+    const formValue = fromYesNoEnum(response.disputeClaim as string);
 
     if (!formValue) {
       return {};
