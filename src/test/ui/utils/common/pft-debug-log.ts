@@ -6,9 +6,9 @@ import { test } from '@playwright/test';
 
 import { shortUrl, truncateForLog } from './string.utils';
 
-export type PftValidationKind = 'error-messages' | 'page-content' | 'page-navigation';
+export type PftValidationCategory = 'error-messages' | 'page-content' | 'page-navigation';
 
-const LABEL: Record<PftValidationKind, string> = {
+const LABEL: Record<PftValidationCategory, string> = {
   'error-messages': 'error messages',
   'page-content': 'page content',
   'page-navigation': 'page navigation',
@@ -20,17 +20,17 @@ const LABEL: Record<PftValidationKind, string> = {
  */
 export async function logPftValidation(
   page: Page,
-  kind: PftValidationKind,
+  category: PftValidationCategory,
   pageName: string,
   failed: boolean
 ): Promise<void> {
   if (failed) {
     const safe = (pageName.trim() || 'page').slice(0, 80);
     try {
-      const out = test.info().outputPath('validation-failures', `failure-${kind}-${safe}-${Date.now()}.png`);
+      const out = test.info().outputPath('validation-failures', `failure-${category}-${safe}-${Date.now()}.png`);
       await fs.mkdir(path.dirname(out), { recursive: true });
       await page.screenshot({ path: out, fullPage: true });
-      await test.info().attach(`Validation failure (${LABEL[kind]}): ${safe}`, {
+      await test.info().attach(`Validation failure (${LABEL[category]}): ${safe}`, {
         path: out,
         contentType: 'image/png',
       });
@@ -43,5 +43,5 @@ export async function logPftValidation(
     return;
   }
 
-  console.log(`[PFT] ${LABEL[kind]} | page: ${truncateForLog(pageName, 80)} | url: ${shortUrl(page.url())}`);
+  console.log(`[PFT] ${LABEL[category]} | page: ${truncateForLog(pageName, 80)} | url: ${shortUrl(page.url())}`);
 }
