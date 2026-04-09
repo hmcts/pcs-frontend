@@ -117,15 +117,17 @@ export const step: StepDefinition = createFormStep({
       tenancyStartDate = ' ';
     }
 
-    const shouldClearDate = !tenancyStartDate && !!existingDefendantDate;
+    if (tenancyStartDate) {
+      defendantResponses.tenancyStartDate = tenancyStartDate;
+    }
 
     const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        ...defendantResponses,
-        ...(tenancyStartDate && { tenancyStartDate }),
-      },
-      ...(shouldClearDate && { clearFields: ['defendantResponses.tenancyStartDate'] }),
+      defendantResponses,
     };
+
+    if (!tenancyStartDate && existingDefendantDate) {
+      possessionClaimResponse.clearFields = ['defendantResponses.tenancyStartDate'];
+    }
 
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
