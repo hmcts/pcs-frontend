@@ -27,9 +27,7 @@ import {
   tenancyTypeDetails,
   writtenTerms,
 } from '../data/page-data';
-import {
-  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome
-} from '../data/page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.page.data';
+import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from '../data/page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.page.data';
 import { yourCircumstances } from '../data/page-data/yourCircumstances.page.data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 

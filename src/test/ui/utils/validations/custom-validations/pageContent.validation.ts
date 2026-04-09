@@ -4,8 +4,8 @@ import * as path from 'path';
 import { Page } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
-import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { logPftValidationInformation } from '../../common/pft-debug-log';
+import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
@@ -138,14 +138,7 @@ export class PageContentValidation implements IValidation {
   async validateCurrentPage(page: Page, pageName: string): Promise<void> {
     await page.waitForLoadState('load');
     const pageUrl = page.url();
-    await logPftValidationInformation(
-      page,
-      'page-content',
-      pageName,
-      'page content data checks',
-      'starting',
-      false
-    );
+    await logPftValidationInformation(page, 'page-content', pageName, 'page content data checks', 'starting', false);
     const pageResults: ValidationResult[] = [];
     try {
       const pageData = await this.getPageData(pageName);
