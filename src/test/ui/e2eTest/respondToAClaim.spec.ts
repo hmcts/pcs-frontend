@@ -212,12 +212,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
-      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
@@ -280,11 +278,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
-      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -350,11 +346,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
-      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
@@ -416,12 +410,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
-      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -478,12 +470,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
-      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -543,12 +533,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
-      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -609,11 +597,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
-      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performValidation('mainHeader', doAnyOtherAdultsLiveInYourHome.mainHeader);
@@ -672,12 +658,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
-      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
@@ -740,11 +724,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
-      question: doYouHaveAnyDependantChildren.mainHeader,
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performAction('doYouHaveAnyOtherDependants', {
-      question: doYouHaveAnyOtherDependants.mainHeader,
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
