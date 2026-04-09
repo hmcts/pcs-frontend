@@ -30,7 +30,6 @@ export * from './howMuchAffordToPay.page.data';
 export * from './doYouHaveAnyDependantChildren.page.data';
 export * from './doYouHaveAnyOtherDependants.page.data';
 export * from './doAnyOtherAdultsLiveInYourHome.page.data';
-export * from './wouldYouHaveSomeoneElse.page.data';
 export * from './wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.page.data';
 export * from './feedback.page.data';
 export * from './yourCircumstances.page.data';
