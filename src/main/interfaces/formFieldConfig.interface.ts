@@ -15,11 +15,10 @@ export type ComponentType =
 export interface FormFieldOption {
   value?: string;
   text?: string;
-  hint?: string;
   divider?: string;
   translationKey?: string;
   label?: string | ((translations: Record<string, string>) => string);
-  hint?: string | ((translations: Record<string, string>) => string);
+  hint?: string;
   conditionalText?: string | ((translations: Record<string, string>) => string);
   // SubFields appear conditionally when this option is selected (e.g., text inputs under "No" radio button)
   subFields?: Record<string, FormFieldConfig>;
