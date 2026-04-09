@@ -10,6 +10,7 @@ export const otherRegularExpenses = {
   householdBillsPaidEveryLabel: `Paid every:`,
   householdBillsWeekRadioOption: `Week`,
   householdBillsMonthRadioOption: `Month`,
+  amountReceivedHiddenTextLabel:'Amount paid',
 
   // Loan Payments
   loanPaymentsParagraph: `Loan payments`,
