@@ -138,8 +138,10 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async runPageContentValidation(page: Page, pageName: string): Promise<void> {
     try {
-      const validation = new PageContentValidation();
-      await validation.validateCurrentPage(page, pageName);
+      await test.step(`Page content validation for ${pageName}`, async () => {
+        const validation = new PageContentValidation();
+        await validation.validateCurrentPage(page, pageName);
+      });
     } catch (error) {
       PageContentValidation.trackValidationError(pageName, error);
     }
