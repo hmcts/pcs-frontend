@@ -1,0 +1,143 @@
+# Platform matrix (Feb 2026) — mobile browsers (reference file).
+# Active suites: Android Chrome, iOS Safari. Other platform combinations commented below.
+#
+# IMPORTANT — saucectl kind: playwright (v0.202.x):
+#   Valid suite platformName values are desktop only, e.g. Windows 10/11, macOS 11–15.
+#   There is NO Android / iOS platformName for Playwright on Sauce in this schema.
+#   `yarn test:sauce:mobile-matrix-dry-run` → validation errors on active suites
+#   (evidence for POC / peer review).
+#
+# Real mobile web on Sauce uses a different stack (e.g. Appium + Selenium browserName),
+# not this file. Jenkins Playwright projects (MobileChrome, MobileSafari, etc.) remain
+# the path for emulated mobile in this repo.
+#
+# Ref: https://docs.saucelabs.com/web-apps/automated-testing/playwright/
+# Ref: https://docs.saucelabs.com/web-apps/automated-testing/playwright/limitations/
+#
+# Commented-out combinations (restore if needed): Android Samsung Internet, Android Firefox,
+# iOS Chrome, iOS Edge — not executable as Playwright+saucectl desktop; same constraints apply.
+#
+# Run (expect validation failure): yarn test:sauce:mobile-matrix-dry-run
+apiVersion: v1alpha
+kind: playwright
+
+sauce:
+  region: eu-central-1
+  concurrency: 1
+  tunnel:
+    name: $SAUCE_TUNNEL_NAME
+  metadata:
+    tags:
+      - pcs-frontend-mobile-matrix
+      - poc-not-supported-playwright-saucectl
+
+defaults:
+  timeout: 45m
+
+playwright:
+  version: 1.58.1
+  configFile: playwright.config.ts
+
+nodeVersion: v22
+
+rootDir: ./
+
+npm:
+  packages:
+    '@hmcts/playwright-common': '1.0.39'
+
+env:
+  PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
+  PLAYWRIGHT_SKIP_ALLURE: 'true'
+  CI: 'true'
+  NODE_CONFIG_ENV: test
+
+  TEST_URL: $TEST_URL
+  MANAGE_CASE_URL: $MANAGE_CASE_URL
+
+  PCS_API_URL: $PCS_API_URL
+  DATA_STORE_URL_BASE: $DATA_STORE_URL_BASE
+  PCS_API_CHANGE_ID: $PCS_API_CHANGE_ID
+
+  PCS_FRONTEND_IDAM_SECRET: $PCS_FRONTEND_IDAM_SECRET
+  IDAM_PCS_USER_EMAIL: $IDAM_PCS_USER_EMAIL
+  IDAM_PCS_USER_PASSWORD: $IDAM_PCS_USER_PASSWORD
+  IDAM_PCS_USER_PASSWORD_B64: $IDAM_PCS_USER_PASSWORD_B64
+
+  SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
+
+suites:
+  # --- Android (platform requirement) — NOT supported as platformName for Playwright+saucectl ---
+  - name: pcs-frontend-android-chrome
+    platformName: Android
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chrome
+      project: MobileChrome
+      headless: true
+      grep: $SAUCE_GREP
+
+  # Real Samsung Internet → Appium capability browserName: SamsungBrowser (not this stack).
+  # - name: pcs-frontend-android-samsung-internet
+  #   platformName: Android
+  #   testMatch:
+  #     - ".*src/test/ui/.*\\.spec\\.ts$"
+  #     - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+  #   params:
+  #     browserName: chrome
+  #     project: MobileChrome
+  #     headless: true
+  #     grep: $SAUCE_GREP
+
+  # Real Android Firefox → Appium / GeckoView (params below are placeholders; platformName fails validation first).
+  # - name: pcs-frontend-android-firefox
+  #   platformName: Android
+  #   testMatch:
+  #     - ".*src/test/ui/.*\\.spec\\.ts$"
+  #     - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+  #   params:
+  #     browserName: firefox
+  #     project: firefox
+  #     headless: true
+  #     grep: $SAUCE_GREP
+
+  # --- iOS (commented): Chrome — WebKit on device; Playwright project MobileSafari ≈ iPhone WebKit.
+  # - name: pcs-frontend-ios-chrome
+  #   platformName: iOS
+  #   testMatch:
+  #     - ".*src/test/ui/.*\\.spec\\.ts$"
+  #     - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+  #   params:
+  #     browserName: webkit
+  #     project: MobileSafari
+  #     headless: true
+  #     grep: $SAUCE_GREP
+
+  # --- iOS Safari (active) — same saucectl platformName limitation as Android Chrome above ---
+  - name: pcs-frontend-ios-safari
+    platformName: iOS
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: webkit
+      project: MobileSafari
+      headless: true
+      grep: $SAUCE_GREP
+
+  # - name: pcs-frontend-ios-edge
+  #   platformName: iOS
+  #   testMatch:
+  #     - ".*src/test/ui/.*\\.spec\\.ts$"
+  #     - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+  #   params:
+  #     browserName: webkit
+  #     project: MobileSafari
+  #     headless: true
+  #     grep: $SAUCE_GREP
+
+reporters:
+  spotlight:
+    enabled: true

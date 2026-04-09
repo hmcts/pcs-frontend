@@ -5,10 +5,10 @@
 #   • macOS 13 — Chrome, Edge, Firefox, Safari (WebKit desktop)
 #
 # Not in this file (document as POC limitations unless Sauce enables them for your account/region):
-#   • Android / iPhone / iPad — saucectl + kind: playwright only allows platformName Windows 10/11 and
-#     macOS 11–15 (validated with saucectl run --dry-run). There is no Android Chrome suite for Playwright
-#     on Sauce the same way as desktop. Mobile web on Sauce is typically Appium/Selenium/WebdriverIO; for
-#     Playwright MobileChrome use Jenkins/Linux: yarn test:E2eMobileChrome (CI=true).
+#   • Android / iPhone / iPad — saucectl + kind: playwright only allows desktop platformName values
+#     (validated: yarn test:sauce:mobile-matrix-dry-run → .sauce/config-mobile-platform-matrix.yml).
+#     Mobile web on Sauce is typically Appium/Selenium/WebdriverIO; for Playwright MobileChrome use
+#     Jenkins/Linux: yarn test:E2eMobileChrome (CI=true).
 #   • macOS 14+ with Firefox — schema may reject until saucectl is upgraded; Firefox on macOS 15 has Sauce
 #     known issues; macOS 13 is the safe combo for Firefox + WebKit with older saucectl.
 #
