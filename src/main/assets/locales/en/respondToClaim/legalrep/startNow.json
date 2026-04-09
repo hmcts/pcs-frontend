@@ -1,7 +1,4 @@
 {
-  "listItemName": "your client's name",
-  "listItemDateOfBirth": "your client's date of birth",
-  "listItemCircumstances": "your client's circumstances and any exceptional hardship they would experience if they had to leave their home",
-  "listItemIncomeExpenses": "your client's income and expenses",
-  "financialSituationInfo": "You do not have to answer questions about your client's financial situation, but sharing this information can help a judge understand your client's circumstances."
+  "uploadDocumentsInfo": "The claimant will be able to see any documents you upload and your answers.",
+  "hmctsSupportInfo": "If you or the defendant need support to use HMCTS services, like step-free access to a court for the hearing, you can request this after you’ve submitted your response."
 }

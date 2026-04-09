@@ -1,21 +1,22 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import { isLegalRepresentativeUser } from '../steps/utils'
+import config from 'config';
 
 export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const shouldAddHeaders = isLegalRepresentativeUser(req);
-
+  const isLegalRepresentative = isLegalRepresentativeUser(req);
   let headerModel, footerModel;
 
-  if (shouldAddHeaders) {
+  if (isLegalRepresentative) {
     const roles = req.session?.user?.roles;
-
+    const apiUrl: string = config.get('api.url');
+  
     headerModel = buildHeaderModel({
-      xuiBaseUrl: 'http://pcs-api-aat.service.core-compute-aat.internal', // TODO move to env
+      xuiBaseUrl: apiUrl,
       user: { roles: roles as string[] },
     });
 
@@ -23,13 +24,13 @@ export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
     headerModel.assetsPath = '/assets/ui-component-lib';
 
     footerModel = buildFooterModel();
-  }
 
-  res.locals.extraHeaders = {
-    ...(shouldAddHeaders && { headerModel }),
-    ...(shouldAddHeaders && { footerModel }),
-    isLegalRepresentative: shouldAddHeaders,
-  };
+    res.locals.extraHeaders = {
+      headerModel,
+      footerModel,
+      isLegalRepresentative,
+    };
+  }
 
   next();
 };
