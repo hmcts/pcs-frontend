@@ -35,4 +35,3 @@ export * from './wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.page.dat
 export * from './yourCircumstances.page.data';
 export * from './exceptionalHardship.page.data';
 export * from './incomeAndExpenses.page.data';
-export * from './yourHouseholdAndCircumstances.page.data';
