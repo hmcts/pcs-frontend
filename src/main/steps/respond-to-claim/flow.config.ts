@@ -60,6 +60,7 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
+    'other-considerations',
     'upload-docs',
     'end-now',
     'installment-payments',
@@ -399,7 +400,7 @@ export const flowConfig: JourneyFlowConfig = {
           condition: async (req: Request): Promise<boolean> => {
             return !(await isFinanceDetailsProvided(req));
           },
-          nextStep: 'upload-docs',
+          nextStep: 'other-considerations',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
@@ -440,16 +441,22 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {
+      previousStep: 'priority-debts',
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
-      defaultNext: 'end-now',
+      previousStep: 'priority-debt-details',
+      defaultNext: 'other-considerations',
     },
-    'upload-docs': {
+    'other-considerations': {
       previousStep: async (req: Request): Promise<string> => {
         const fromIncomeExpenditure = await isFromIncomeAndExpenditure(req);
         return fromIncomeExpenditure ? 'income-and-expenses' : 'what-other-regular-expenses-do-you-have';
       },
+      defaultNext: 'upload-docs',
+    },
+    'upload-docs': {
+      previousStep: 'other-considerations',
       defaultNext: 'end-now',
     },
     'installment-payments': {

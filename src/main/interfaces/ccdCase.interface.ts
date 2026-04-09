@@ -12,6 +12,12 @@ export type ContactPreference = 'EMAIL' | 'POST' | null;
 export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
+export interface IncomeExpenseDetails {
+  applies: YesNoValue;
+  amount?: PenceAmount;
+  frequency?: FrequencyValue;
+}
+
 export interface HouseholdCircumstances {
   dependantChildren?: YesNoValue;
   dependantChildrenDetails?: string;
@@ -33,6 +39,15 @@ export interface HouseholdCircumstances {
   otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
+  householdBills?: IncomeExpenseDetails;
+  loanPayments?: IncomeExpenseDetails;
+  childSpousalMaintenance?: IncomeExpenseDetails;
+  mobilePhone?: IncomeExpenseDetails;
+  groceryShopping?: IncomeExpenseDetails;
+  fuelParkingTransport?: IncomeExpenseDetails;
+  schoolCosts?: IncomeExpenseDetails;
+  clothing?: IncomeExpenseDetails;
+  otherExpenses?: IncomeExpenseDetails;
 }
 
 export interface CcdUserCase {
