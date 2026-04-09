@@ -13,7 +13,7 @@ export const disputeClaimInterstitial = {
   theirGroundsForPossessionList: `their grounds for possession (their reasons for making the claim)`,
   ifAnyOfTheInformationParagraph: `If any of the information is wrong, or you disagree with it, you can dispute their claim or parts of it.`,
   theClaimantParagraph: `The claimant will be able to see your answers.`,
-  continueButton: `Continue`,
+  saveAndContinueButton: `Save and continue`,
   cancelLink: `Cancel`,
   cymraegLink: `Cymraeg`,
   backLink: `Back`,

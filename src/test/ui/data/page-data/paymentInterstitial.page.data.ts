@@ -7,7 +7,7 @@ export const paymentInterstitial = {
   ifYouHavePaidList: `If you’ve paid some or all of the money you owe`,
   theClaimantParagraph: `The claimant will be able to see your answers.`,
   ifYouHavePaidSomeParagraph: `If you’ve paid some or all of the money you owe, you should bring proof of this to the hearing.`,
-  continueButton: `Continue`,
+  saveAndContinueButton: `Save and continue`,
   cancelLink: `Cancel`,
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
