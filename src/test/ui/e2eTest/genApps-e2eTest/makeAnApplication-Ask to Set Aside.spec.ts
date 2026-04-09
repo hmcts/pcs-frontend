@@ -27,28 +27,10 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('Select an Application - Ask to Adjourn journey @regression', async () => {
-    await performAction('chooseAnApplication', {
-      question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-      option: chooseAnApplication.delayRadioOption,
-    });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
-  });
-
   test('Select an Application - Ask to Set aside @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
-    });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
-  });
-
-  test('Select an Application - Something else @regression', async () => {
-    await performAction('chooseAnApplication', {
-      question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-      option: chooseAnApplication.somethingElseRadioOption,
     });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);

@@ -9,7 +9,7 @@ export const yourHouseholdAndCircumstances = {
   anyPersonalList: `any personal circumstances that have led to your case that you think a judge should know about`,
   anyExceptionalHardshipList: `any exceptional hardship you’d experience if you were asked to leave your home`,
   theClaimantWillBeParagraph: `The claimant will be able to see your answers.`,
-  continueButton: `Continue`,
+  saveAndContinueButton: `Save and continue`,
   cancelLink: `Cancel`,
   cymraegLink: `Cymraeg`,
   backLink: `Back`,

@@ -220,11 +220,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', installmentPayments.mainHeader);
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependentChildren.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependents.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomeoneElse.saveAndContinueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.yesRadioOption,
@@ -309,11 +309,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
     performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependentChildren.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependents.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomeoneElse.saveAndContinueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
@@ -400,11 +400,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', installmentPayments.mainHeader);
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependentChildren.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependents.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomeoneElse.saveAndContinueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
@@ -486,11 +486,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependentChildren.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependents.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomeoneElse.saveAndContinueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
@@ -570,11 +570,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependentChildren.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependents.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomeoneElse.saveAndContinueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
@@ -664,11 +664,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependentChildren.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependents.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomeoneElse.saveAndContinueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
@@ -749,11 +749,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependentChildren.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependents.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomeoneElse.saveAndContinueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
@@ -832,11 +832,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', installmentPayments.mainHeader);
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependentChildren.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependents.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomeoneElse.saveAndContinueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.yesRadioOption,
@@ -920,11 +920,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', installmentPayments.mainHeader);
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
+    await performAction('clickButton', yourHouseholdAndCircumstances.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependentChildren.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependents.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomeoneElse.saveAndContinueButton);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
