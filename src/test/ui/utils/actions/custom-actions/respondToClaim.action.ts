@@ -277,8 +277,6 @@ export class RespondToClaimAction implements IAction {
         option,
       });
 
-      console.log(`checked the check-box ${option}`);
-
       // Special case: "moneyFromSomewhereElse"
       if (option === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph) {
         await performAction(
