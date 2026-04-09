@@ -31,3 +31,8 @@ export * from './feedback.page.data';
 export * from './doYouHaveAnyDependantChildren.page.data';
 export * from './doYouHaveAnyOtherDependants.page.data';
 export * from './doAnyOtherAdultsLiveInYourHome.page.data';
+export * from './wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.page.data';
+export * from './yourCircumstances.page.data';
+export * from './exceptionalHardship.page.data';
+export * from './incomeAndExpenses.page.data';
+export * from './yourHouseholdAndCircumstances.page.data';
