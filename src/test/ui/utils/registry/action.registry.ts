@@ -71,6 +71,8 @@ export class ActionRegistry {
     ['doYouHaveAnyDependantChildren', new RespondToClaimAction()],
     ['doYouHaveAnyOtherDependants', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
+    ['yourCircumstances', new RespondToClaimAction()],
+    ['exceptionalHardship', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
