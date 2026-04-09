@@ -241,7 +241,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader); //Incorrect header
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', counterClaim.mainHeader); //Incorrect step test failure
   });
 
