@@ -7,7 +7,6 @@ import {
   enable_content_validation,
   enable_error_message_validation,
   enable_navigation_tests,
-  enable_pft_debug_log,
 } from '../../../../../../playwright.config';
 import { shortUrl, truncateForLog } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
@@ -55,10 +54,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
       return;
-    }
-
-    if (enable_pft_debug_log === 'true') {
-      console.log(`[PFT] Triggering Functional Tests for Page: ${pageName} and URL: ${shortUrl(page.url())}`);
     }
 
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.add(pageName);

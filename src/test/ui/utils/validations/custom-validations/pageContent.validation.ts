@@ -4,7 +4,6 @@ import * as path from 'path';
 import { Page } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
-import { logPftValidationInformation } from '../../common/pft-debug-log';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
@@ -138,7 +137,6 @@ export class PageContentValidation implements IValidation {
   async validateCurrentPage(page: Page, pageName: string): Promise<void> {
     await page.waitForLoadState('load');
     const pageUrl = page.url();
-    await logPftValidationInformation(page, 'page-content', pageName, '', '', false);
     const pageResults: ValidationResult[] = [];
     try {
       const pageData = await this.getPageData(pageName);
@@ -322,7 +320,7 @@ export class PageContentValidation implements IValidation {
     }
 
     if (failedPages.size > 0) {
-      console.log('\n❌ FAILED PAGE CONTENT VALIDATION:');
+      console.log('\n❌ VALIDATION FAILED:');
       for (const [pageName, pageFailures] of failedPages) {
         console.log(`   Page: ${pageName}`);
         let pageFailureCount = 0;

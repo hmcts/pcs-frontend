@@ -1,7 +1,5 @@
 # Test Automation Framework Documentation
 
-`enable_pft_debug_log` in `playwright.config.ts` gates optional `[PFT]` console output (e.g. page content / navigation hints). Use `'true'` only while debugging; leave `'false'` for normal runs.
-
 ## 1. Framework Overview
 
 A structured, maintainable test automation solution built on Playwright that:

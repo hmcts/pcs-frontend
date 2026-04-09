@@ -3,8 +3,6 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
-import { enable_pft_debug_log } from '../../../../../../playwright.config';
-import { shortUrl } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation, validationRecord } from '../../interfaces';
 
@@ -164,12 +162,6 @@ export class PageNavigationValidation implements IValidation {
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
       const overallPassed = elementPassed && urlPassed;
-
-      if (enable_pft_debug_log === 'true') {
-        const srcPage = PageNavigationValidation.currentSourcePage ?? '?';
-        const srcUrl = shortUrl(PageNavigationValidation.currentPageUrl || '');
-        console.log(`[PFT] page navigation | page: ${srcPage} | url: ${srcUrl} | to: ${pageName}`);
-      }
 
       if (!elementPassed) {
         PageNavigationValidation.navigationResults.push({

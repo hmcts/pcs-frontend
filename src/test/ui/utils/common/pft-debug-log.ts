@@ -8,11 +8,12 @@ import { enable_pft_debug_log } from '../../../../../playwright.config';
 
 import { shortUrl, truncateForLog } from './string.utils';
 
-export type PftValidationCategory = 'error-messages' | 'page-content';
+export type PftValidationCategory = 'error-messages' | 'page-content' | 'page-navigation';
 
 const LABEL: Record<PftValidationCategory, string> = {
   'error-messages': 'error messages',
   'page-content': 'page content',
+  'page-navigation': 'page navigation',
 };
 
 /** Screenshots on failure; optional `[PFT]` line when `enable_pft_debug_log` is `'true'`. */
@@ -44,7 +45,7 @@ export async function logPftValidationInformation(
   }
 
   const base = `[PFT] ${LABEL[category]} | page: ${truncateForLog(pageLabel, 80)} | url: ${shortUrl(page.url())}`;
-  if (category === 'page-content' && !expected.trim() && !actual.trim()) {
+  if (category === 'page-content' && !failed && !expected.trim() && !actual.trim()) {
     console.log(base);
     return;
   }
