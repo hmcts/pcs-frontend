@@ -1,5 +1,3 @@
-import { enable_pft_debug_log } from '../../../../../playwright.config';
-
 /** Env keys set in `respondToAClaim.spec.ts` `beforeEach` (plus `CASE_NUMBER` from submit). */
 export const RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS = [
   'CASE_NUMBER',
@@ -19,14 +17,11 @@ export const DASHBOARD_BEFORE_EACH_ENV_KEYS = ['CASE_NUMBER', 'GROUNDS', 'NOTICE
 
 export const RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS = ['CASE_NUMBER', 'CLAIMANT_NAME', 'WALES_POSTCODE'] as const;
 
-/**
- * Prints tracked `process.env` values after `beforeEach` setup (for debugging routing / PFT data).
- * Runs when `enable_pft_debug_log` is `'true'` in `playwright.config.ts`.
- */
+/** One line per spec when `ENABLE_PFT_DEBUG_LOG=true`. */
 export function logTestEnvAfterBeforeEach(testTitle: string, keys: readonly string[]): void {
-  if (enable_pft_debug_log !== 'true') {
+  if (process.env.ENABLE_PFT_DEBUG_LOG !== 'true') {
     return;
   }
-  const rows = keys.map(key => `  ${key}=${process.env[key] ?? ''}`);
-  console.log(`[test env] ${testTitle}\n${rows.join('\n')}`);
+  const kv = keys.map(key => `${key}=${process.env[key] ?? ''}`).join(' ');
+  console.log(`[test env] ${testTitle} | ${kv}`);
 }

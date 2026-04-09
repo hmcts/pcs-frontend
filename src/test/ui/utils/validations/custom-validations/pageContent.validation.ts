@@ -4,9 +4,10 @@ import * as path from 'path';
 import { Page } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
+import { logPftValidation } from '../../common/pft-debug-log';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
-import { IValidation } from '../../interfaces';
+import { IValidation, validationData, validationRecord } from '../../interfaces';
 
 const ELEMENT_TYPES = [
   'Button',
@@ -132,7 +133,15 @@ export class PageContentValidation implements IValidation {
     Tab: (page: Page, value: string) => page.getByRole('tab', { name: new RegExp(`^${escapeForRegex(value)}$`) }),
   };
 
-  async validate(_page: Page, _validation: string, _fieldName?: string, _data?: never): Promise<void> {}
+  async validate(
+    page: Page,
+    validation: string,
+    fieldName?: validationData | validationRecord
+  ): Promise<void> {
+    if (validation === 'autoValidatePageContent' && typeof fieldName === 'string') {
+      await this.validateCurrentPage(page, fieldName);
+    }
+  }
 
   async validateCurrentPage(page: Page, pageName: string): Promise<void> {
     await page.waitForLoadState('load');
@@ -146,6 +155,7 @@ export class PageContentValidation implements IValidation {
       }
 
       PageContentValidation.pagesValidated.add(pageName);
+      await logPftValidation(page, 'page-content', pageName, false);
 
       for (const [key, value] of Object.entries(pageData)) {
         if (
