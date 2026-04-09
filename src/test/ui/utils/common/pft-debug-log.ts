@@ -10,16 +10,13 @@ import { shortUrl, truncateForLog } from './string.utils';
 
 export type PftValidationCategory = 'error-messages' | 'page-navigation' | 'page-content';
 
-const categoryLabel: Record<PftValidationCategory, string> = {
+const LABEL: Record<PftValidationCategory, string> = {
   'error-messages': 'error messages',
   'page-navigation': 'page navigation',
   'page-content': 'page content',
 };
 
-/**
- * When `failed` is true, attaches a failure screenshot to the Playwright report.
- * When `ENABLE_PFT_DEBUG_LOG=true`, prints a `[PFT]` line for every call (pass or fail).
- */
+/** Screenshot on failure; optional `[PFT]` line when `ENABLE_PFT_DEBUG_LOG=true`. */
 export async function logPftValidationInformation(
   page: Page,
   category: PftValidationCategory,
@@ -29,13 +26,12 @@ export async function logPftValidationInformation(
   failed: boolean
 ): Promise<void> {
   if (failed) {
-    const label = categoryLabel[category];
+    const safe = (pageLabel.trim() || 'page').slice(0, 80);
     try {
-      const safe = (pageLabel.trim() || 'page').slice(0, 80);
       const out = test.info().outputPath('validation-failures', `failure-${category}-${safe}-${Date.now()}.png`);
       await fs.mkdir(path.dirname(out), { recursive: true });
       await page.screenshot({ path: out, fullPage: true });
-      await test.info().attach(`Validation failure (${label}): ${safe}`, {
+      await test.info().attach(`Validation failure (${LABEL[category]}): ${safe}`, {
         path: out,
         contentType: 'image/png',
       });
@@ -48,12 +44,11 @@ export async function logPftValidationInformation(
     return;
   }
 
-  const t = truncateForLog(test.info().title, 120);
-  const p = truncateForLog(pageLabel, 80);
-  const e = truncateForLog(expected, 160);
-  const a = truncateForLog(actual, 160);
+  const prefix = `[PFT] ${LABEL[category]} | page: ${truncateForLog(pageLabel, 80)} | url: ${shortUrl(page.url())}`;
+  if (category === 'page-content' && !expected.trim() && !actual.trim()) {
+    console.log(prefix);
+    return;
+  }
 
-  console.log(
-    `[PFT] ${categoryLabel[category]} | test: ${t} | page: ${p} | url: ${shortUrl(page.url())} | expected: ${e} | actual: ${a}`
-  );
+  console.log(`${prefix} | expected: ${truncateForLog(expected, 160)} | actual: ${truncateForLog(actual, 160)}`);
 }

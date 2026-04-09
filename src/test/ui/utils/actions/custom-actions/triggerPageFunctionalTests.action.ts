@@ -38,6 +38,9 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     const flowTestTitle = truncateForLog(test.info().title, 160);
 
     if (!pageName) {
+      if (TriggerPageFunctionalTestsAction.isDashboardUrl(page.url())) {
+        return;
+      }
       console.warn(
         `[PFT flow] test="${flowTestTitle}" | mapping missing in urlToFileMapping.config.ts | url=${shortUrl(page.url())}`
       );
@@ -55,6 +58,10 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
 
     if (enable_pft_debug_log === 'true') {
+      // Blank line once per test so first [PFT] line isn’t glued to prior stdout (e.g. case created / API JSON).
+      if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.size === 0) {
+        console.log('');
+      }
       console.log(`[PFT] Triggering Functional Tests for Page: ${pageName} and URL: ${shortUrl(page.url())}`);
     }
 
@@ -189,6 +196,15 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       PageNavigationValidation.trackPagePassed(pageName);
     } else {
       PageNavigationValidation.trackMissingNavigationMethod(pageName);
+    }
+  }
+
+  /** Dashboard is not in url mapping; skip PFT warn. */
+  private static isDashboardUrl(url: string): boolean {
+    try {
+      return new URL(url).pathname.split('/').filter(Boolean)[0] === 'dashboard';
+    } catch {
+      return /\/dashboard(\/|$)/.test(url);
     }
   }
 

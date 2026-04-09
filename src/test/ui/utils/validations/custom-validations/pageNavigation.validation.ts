@@ -226,7 +226,7 @@ export class PageNavigationValidation implements IValidation {
       const actualNavLog = [actualElementText && `element: "${actualElementText}"`, `url: "${actualUrl || page.url()}"`]
         .filter(Boolean)
         .join('; ');
-      const navLogSuffix = ` | nav: from "${PageNavigationValidation.currentSourcePage ?? '?'}" | control: "${navigateButton ?? '?'}"`;
+      const navLogSuffix = ` | nav: from "${PageNavigationValidation.currentSourcePage ?? '?'}" | Action: "${navigateButton ?? '?'}"`;
 
       await logPftValidationInformation(
         page,
@@ -273,7 +273,7 @@ export class PageNavigationValidation implements IValidation {
       });
       PageNavigationValidation.navigationFailed = true;
 
-      const navLogSuffixCatch = ` | nav: from "${PageNavigationValidation.currentSourcePage ?? '?'}" | control: "${navigateButton ?? '?'}"`;
+      const navLogSuffixCatch = ` | nav: from "${PageNavigationValidation.currentSourcePage ?? '?'}" | Action: "${navigateButton ?? '?'}"`;
 
       await logPftValidationInformation(
         page,

@@ -74,7 +74,7 @@ export const enable_pft_debug_log = process.env.ENABLE_PFT_DEBUG_LOG || 'true';
 
 Set **`ENABLE_PFT_DEBUG_LOG=false`** in the environment when you want to hide those lines (e.g. noisy CI). If you still see no EMV/navigation logs, ensure PFT is enabled: **`ENABLE_CONTENT_VALIDATION`**, **`ENABLE_ERROR_MESSAGES_VALIDATION`**, **`ENABLE_NAVIGATION_TESTS`**, or **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS=true`**.
 
-- **`utils/common/pft-debug-log.ts`**: **`logPftValidationInformation`** runs after each EMV / page-navigation check. **`[PFT]`** console lines are printed **whenever** `enable_pft_debug_log === 'true'` — **pass and fail**. **Screenshots** attach to the report **only when** that check **failed**. Page navigation lines may include **`nav: from "…" | control: "…"`**.
+- **`utils/common/pft-debug-log.ts`**: **`logPftValidationInformation`** runs after each EMV / page-navigation check. **`[PFT]`** console lines are printed **whenever** `enable_pft_debug_log === 'true'` — **pass and fail**. **Screenshots** attach to the report **only when** that check **failed**. Page navigation lines may include **`nav: from "…" | Action: "…"`**.
 - **`triggerPageFunctionalTests`**: stderr if the URL segment is missing from **`urlToFileMapping.config.ts`**. When `ENABLE_PFT_DEBUG_LOG=true`, one stdout line per **first PFT run for that page in the test run** (`[PFT] Triggering Functional Tests for Page: … and URL: …`), after lock/duplicate skips.
 - **Page content** (`pageContent.validation.ts`): when `ENABLE_PFT_DEBUG_LOG=true`, one line when content validation runs: **`[PFT] page content | page: … | url: …`**.
 

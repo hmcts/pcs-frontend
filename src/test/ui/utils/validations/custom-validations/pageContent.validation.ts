@@ -138,7 +138,7 @@ export class PageContentValidation implements IValidation {
   async validateCurrentPage(page: Page, pageName: string): Promise<void> {
     await page.waitForLoadState('load');
     const pageUrl = page.url();
-    await logPftValidationInformation(page, 'page-content', pageName, 'page content data checks', 'starting', false);
+    await logPftValidationInformation(page, 'page-content', pageName, '', '', false);
     const pageResults: ValidationResult[] = [];
     try {
       const pageData = await this.getPageData(pageName);
