@@ -17,8 +17,9 @@
   "ifYouCanPayTheCourtFee": "cyif you can pay the court fee, or if you need help with fees (help to pay court fees)",
   "whatYouWantTheCourtToDo": "cywhat you want the court to do",
   "whyYouAreAskingTheCourt": "cywhy you are asking the court to do it, for example any evidence you have to support your application",
-  "youMayNeedToProvideEvidence": "cyYou may need to provide some evidence for the court.",
-  "beforeYouStart": "cyBefore you start: Make sure that you have all of the evidence you need to apply.",
+  "youMayNeedToProvideEvidence": "cyYou may need to provide some evidence to the court.",
+  "beforeYouStart": "cyBefore you start",
+  "makeSureThatYouHaveAllOfTheEvidence": "cyMake sure that you have all of the evidence you need to apply.",
   "onceYouStart": "cyOnce you start your application, you cannot save your progress as a draft.",
   "weWillNotSaveYourAnswers": "cyThis means that if you leave your application before submitting, we will not save your answers so that you can return to them later.",
   "howMuchItWillCost": "cyHow much it will cost",
@@ -30,7 +31,7 @@
   "youMayBeEligibleForHWF": "cyYou may be eligible to apply for <a href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">help with fees (GOV.UK, opens in a new tab)</a>. We will ask you if you want to do this when you apply.",
   "applyByPost": "cyApply by post",
   "ifPreferToRespondByPost": "cyIf you’d prefer to respond by post:",
-  "fillInFormForPost": "cyfill in the N244 form",
+  "fillInFormForPost": "cyfill in the <a href=\"https://www.gov.uk/government/publications/form-n244-application-notice\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">N244 form</a>",
   "findYourLocalCourt": "cyfind your local court",
   "sendTheCompletedFormToTheCourt": "cysend the completed form to the court"
 }
