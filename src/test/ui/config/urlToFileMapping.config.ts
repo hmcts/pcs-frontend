@@ -24,8 +24,6 @@ export default {
   'landlord-licensed': 'landlordLicensed',
   'written-terms': 'writtenTerms',
   'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
-  'your-circumstances': 'yourCircumstances',
-  'exceptional-hardship': 'exceptionalHardship',
   'do-any-other-adults-live-in-your-home': 'doAnyOtherAdultsLiveInYourHome',
   'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home':
     'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
