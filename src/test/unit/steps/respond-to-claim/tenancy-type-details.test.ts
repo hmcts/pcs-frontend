@@ -112,6 +112,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
       expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
         defendantResponses: {
           tenancyTypeCorrect,
+          tenancyType: null,
         },
       });
     });

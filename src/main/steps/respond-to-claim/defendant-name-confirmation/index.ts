@@ -2,6 +2,7 @@ import type { Request } from 'express';
 
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { emptyParty } from '../../utils/ccdObjectTemplates';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -24,37 +25,26 @@ export const step: StepDefinition = createFormStep({
     // Map to CCD enum (same logic as yesNoEnum)
     const defendantNameConfirmation = nameConfirmation === 'yes' ? 'YES' : 'NO';
 
-    const party: Record<string, string> = {};
+    const firstName =
+      nameConfirmation === 'no'
+        ? ((req.body?.['nameConfirmation.firstName'] as string | undefined)?.trim() || null)
+        : null;
+    const lastName =
+      nameConfirmation === 'no'
+        ? ((req.body?.['nameConfirmation.lastName'] as string | undefined)?.trim() || null)
+        : null;
 
-    if (nameConfirmation === 'no') {
-      // User corrects name - read from subFields with dot-notation
-      const firstName = req.body?.['nameConfirmation.firstName'] as string | undefined;
-      const lastName = req.body?.['nameConfirmation.lastName'] as string | undefined;
-
-      if (firstName && firstName.trim()) {
-        party.firstName = firstName;
-      }
-      if (lastName && lastName.trim()) {
-        party.lastName = lastName;
-      }
-    }
-
-    if (nameConfirmation === 'yes') {
-      // User confirms name - clear any previously corrected names by sending empty strings
-      party.firstName = '';
-      party.lastName = '';
-    }
-
-    // Build payload with dual paths
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         defendantNameConfirmation,
       },
-      ...(Object.keys(party).length > 0 && {
-        defendantContactDetails: {
-          party,
+      defendantContactDetails: {
+        party: {
+          ...emptyParty,
+          firstName,
+          lastName,
         },
-      }),
+      },
     };
 
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);

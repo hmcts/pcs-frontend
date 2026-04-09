@@ -43,7 +43,7 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        ...(tenancyStartDateIso && { tenancyStartDate: tenancyStartDateIso }),
+        tenancyStartDate: tenancyStartDateIso ?? null,
       },
     };
 

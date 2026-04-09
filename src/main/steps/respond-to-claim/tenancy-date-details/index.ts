@@ -117,7 +117,7 @@ export const step: StepDefinition = createFormStep({
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         ...defendantResponses,
-        ...(tenancyStartDate && { tenancyStartDate }),
+        tenancyStartDate: tenancyStartDate ?? null,
       },
     };
 

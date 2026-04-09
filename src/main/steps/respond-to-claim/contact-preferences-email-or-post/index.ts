@@ -3,6 +3,7 @@ import { isEmail } from 'validator';
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
+import { emptyParty } from '../../utils/ccdObjectTemplates';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -71,19 +72,16 @@ export const step: StepDefinition = createFormStep({
     }
 
     const emailSelected = emailForm.contactByEmailOrPost === 'email';
-    const postSelected = emailForm.contactByEmailOrPost === 'post';
-
-    const existingEmailAddress =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.emailAddress;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {
         party: {
-          emailAddress: emailSelected ? emailForm['contactByEmailOrPost.email'] : existingEmailAddress ? '' : undefined,
+          ...emptyParty,
+          emailAddress: emailSelected ? emailForm['contactByEmailOrPost.email'] : null,
         },
       },
       defendantResponses: {
-        preferenceType: emailSelected ? 'EMAIL' : postSelected ? 'POST' : undefined,
+        preferenceType: emailSelected ? 'EMAIL' : 'POST',
       },
     };
 

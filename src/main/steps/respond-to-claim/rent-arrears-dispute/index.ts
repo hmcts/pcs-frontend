@@ -43,31 +43,33 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const result: Record<string, unknown> = {};
-
     // Map frontend radio value to backend enum
-    if (rentArrears === FORM_VALUES.YES) {
-      result.rentArrearsAmountConfirmation = BACKEND_CONFIRMATION.YES;
-    } else if (rentArrears === FORM_VALUES.NO) {
-      result.rentArrearsAmountConfirmation = BACKEND_CONFIRMATION.NO;
-      // Convert pounds to pence (backend stores as pence string via MoneyGBP serializer)
-      if (amountRaw) {
-        const normalized = amountRaw.replace(/,/g, ''); // Remove comma separators
-        const amountInPounds = parseFloat(normalized);
-        if (!Number.isNaN(amountInPounds)) {
-          result.rentArrearsAmount = String(Math.round(amountInPounds * 100));
-        }
-      }
-    } else if (rentArrears === FORM_VALUES.NOT_SURE) {
-      result.rentArrearsAmountConfirmation = BACKEND_CONFIRMATION.NOT_SURE;
-    }
+    const confirmationMap: Record<string, string> = {
+      [FORM_VALUES.YES]: BACKEND_CONFIRMATION.YES,
+      [FORM_VALUES.NO]: BACKEND_CONFIRMATION.NO,
+      [FORM_VALUES.NOT_SURE]: BACKEND_CONFIRMATION.NOT_SURE,
+    };
+    const rentArrearsAmountConfirmation = confirmationMap[rentArrears];
 
-    if (Object.keys(result).length === 0) {
+    if (!rentArrearsAmountConfirmation) {
       return;
     }
 
+    // Always explicitly set rentArrearsAmount to avoid stale data persisting.
+    let rentArrearsAmount: string | null = null;
+    if (rentArrears === FORM_VALUES.NO && amountRaw) {
+      const normalized = amountRaw.replace(/,/g, ''); // Remove comma separators
+      const amountInPounds = parseFloat(normalized);
+      if (!Number.isNaN(amountInPounds)) {
+        rentArrearsAmount = String(Math.round(amountInPounds * 100));
+      }
+    }
+
     const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: result,
+      defendantResponses: {
+        rentArrearsAmountConfirmation,
+        rentArrearsAmount,
+      },
     };
 
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);

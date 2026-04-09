@@ -123,14 +123,7 @@ export const step: StepDefinition = createFormStep({
       (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
       (req.body?.correctType as string | undefined)
     )?.trim();
-    const existingCorrectedTenancyType =
-      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.tenancyType;
-    const tenancyType =
-      tenancyTypeConfirm === 'no'
-        ? correctedTenancyTypeText || undefined
-        : existingCorrectedTenancyType
-          ? ''
-          : undefined;
+    const tenancyType = tenancyTypeConfirm === 'no' ? (correctedTenancyTypeText || null) : null;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {

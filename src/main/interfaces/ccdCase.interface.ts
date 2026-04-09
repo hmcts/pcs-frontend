@@ -28,48 +28,48 @@ export interface CcdCase {
 }
 
 export interface Address {
-  AddressLine1: string;
-  AddressLine2?: string;
-  AddressLine3?: string;
-  PostTown: string;
-  County?: string;
-  PostCode: string;
-  Country?: string;
+  AddressLine1: string | null;
+  AddressLine2?: string | null;
+  AddressLine3?: string | null;
+  PostTown: string | null;
+  County?: string | null;
+  PostCode: string | null;
+  Country?: string | null;
 }
 
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: {
-      firstName?: string;
-      lastName?: string;
+      firstName?: string | null;
+      lastName?: string | null;
       address?: Address;
       phoneNumberProvided?: YesNoValue;
-      phoneNumber?: string;
-      emailAddress?: string;
+      phoneNumber?: string | null;
+      emailAddress?: string | null;
     };
   };
   defendantResponses?: {
-    tenancyTypeCorrect?: TenancyTypeCorrectValue;
-    tenancyType?: string;
-    tenancyStartDateCorrect?: string;
-    tenancyStartDate?: string;
-    contactByPhone?: YesNoValue;
-    contactByText?: YesNoValue;
-    preferenceType?: ContactPreference;
-    rentArrearsAmountConfirmation?: string;
-    rentArrearsAmount?: string;
-    freeLegalAdvice?: string;
-    defendantNameConfirmation?: string;
-    dateOfBirth?: string;
-    landlordRegistered?: YesNoNotSureValue;
-    landlordLicensed?: YesNoNotSureValue;
-    writtenTerms?: YesNoNotSureValue;
-    disputeClaim?: YesNoValue;
-    disputeClaimDetails?: string;
+    tenancyTypeCorrect?: TenancyTypeCorrectValue | null;
+    tenancyType?: string | null;
+    tenancyStartDateCorrect?: string | null;
+    tenancyStartDate?: string | null;
+    contactByPhone?: YesNoValue | null;
+    contactByText?: YesNoValue | null;
+    preferenceType?: ContactPreference | null;
+    rentArrearsAmountConfirmation?: string | null;
+    rentArrearsAmount?: string | null;
+    freeLegalAdvice?: string | null;
+    defendantNameConfirmation?: string | null;
+    dateOfBirth?: string | null;
+    landlordRegistered?: YesNoNotSureValue | null;
+    landlordLicensed?: YesNoNotSureValue | null;
+    writtenTerms?: YesNoNotSureValue | null;
+    disputeClaim?: YesNoValue | null;
+    disputeClaimDetails?: string | null;
 
     paymentAgreement?: {
-      repaymentPlanAgreed?: YesNoNotSureValue;
-      repaymentAgreedDetails?: string;
+      repaymentPlanAgreed?: YesNoNotSureValue | null;
+      repaymentAgreedDetails?: string | null;
     };
   };
   claimantEnteredDefendantDetails?: {

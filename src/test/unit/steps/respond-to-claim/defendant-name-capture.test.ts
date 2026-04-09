@@ -164,10 +164,12 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
     expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
       defendantContactDetails: {
-        party: {
+        party: expect.objectContaining({
           firstName: 'Jane',
           lastName: 'Doe',
-        },
+          phoneNumber: null,
+          emailAddress: null,
+        }),
       },
     });
     expect(req.session.formData?.['defendant-name-capture']).toEqual({ firstName: 'Jane', lastName: 'Doe' });

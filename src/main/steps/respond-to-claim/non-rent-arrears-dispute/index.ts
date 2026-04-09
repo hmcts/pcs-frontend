@@ -25,22 +25,14 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const result: Record<string, unknown> = {
-      disputeClaim: toYesNoEnum(disputeOtherParts),
-    };
-
-    // Add dispute details if user selected 'yes' and provided details
-    if (disputeOtherParts === 'yes' && disputeDetailsRaw) {
-      const trimmed = disputeDetailsRaw.trim();
-      if (trimmed) {
-        result.disputeClaimDetails = trimmed;
-      }
-    } else if (disputeOtherParts === 'no') {
-      result.disputeClaimDetails = '';
-    }
+    const disputeClaimDetails =
+      disputeOtherParts === 'yes' ? (disputeDetailsRaw?.trim() || null) : null;
 
     const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: result,
+      defendantResponses: {
+        disputeClaim: toYesNoEnum(disputeOtherParts),
+        disputeClaimDetails,
+      },
     };
 
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);

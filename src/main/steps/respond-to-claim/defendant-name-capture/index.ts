@@ -1,5 +1,6 @@
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { emptyParty } from '../../utils/ccdObjectTemplates';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -31,7 +32,10 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {
-        party,
+        party: {
+          ...emptyParty,
+          ...party,
+        },
       },
     };
 

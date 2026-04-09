@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
+import { emptyPaymentAgreement } from '../../utils/ccdObjectTemplates';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -19,20 +20,16 @@ export const step: StepDefinition = createFormStep({
     if (!repaymentsForm) {
       return;
     }
-    const existingRepaymentDetails =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
-        ?.repaymentAgreedDetails;
 
     const repaymentAgreedDetails =
       repaymentsAgreed === 'yes'
-        ? (repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined)
-        : existingRepaymentDetails
-          ? ''
-          : undefined;
+        ? ((repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined) ?? null)
+        : null;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         paymentAgreement: {
+          ...emptyPaymentAgreement,
           repaymentPlanAgreed: repaymentsAgreed === 'yes' ? 'YES' : repaymentsAgreed === 'no' ? 'NO' : 'NOT_SURE',
           repaymentAgreedDetails,
         },

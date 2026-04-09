@@ -6,6 +6,7 @@ import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { arrayToString } from '../../../utils/arrayToString';
+import { emptyAddress } from '../../utils/ccdObjectTemplates';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -139,10 +140,11 @@ export const step: StepDefinition = createFormStep({
         defendantContactDetails: {
           party: {
             address: {
+              ...emptyAddress,
               AddressLine1: addressLine1,
-              ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
+              AddressLine2: addressLine2 ?? null,
               PostTown: townOrCity,
-              ...(county !== undefined && county !== '' && { County: county }),
+              County: county ?? null,
               PostCode: postcode,
             },
           },
