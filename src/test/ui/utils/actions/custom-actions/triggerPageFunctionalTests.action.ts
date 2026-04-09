@@ -58,9 +58,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
 
     if (enable_pft_debug_log === 'true') {
-      if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.size === 0) {
-        console.log('');
-      }
       console.log(`[PFT] Triggering Functional Tests for Page: ${pageName} and URL: ${shortUrl(page.url())}`);
     }
 

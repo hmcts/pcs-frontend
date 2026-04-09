@@ -8,31 +8,21 @@ import { enable_pft_debug_log } from '../../../../../playwright.config';
 
 import { shortUrl, truncateForLog } from './string.utils';
 
-export type PftValidationCategory = 'error-messages' | 'page-navigation' | 'page-content';
-
-export type PftNavigationLogContext = {
-  sourcePage: string;
-  sourceUrl: string;
-  actionKind: 'clickLink' | 'clickButton';
-  actionName: string;
-  destinationPageName: string;
-};
+export type PftValidationCategory = 'error-messages' | 'page-content';
 
 const LABEL: Record<PftValidationCategory, string> = {
   'error-messages': 'error messages',
-  'page-navigation': 'page navigation',
-  'page-content': 'page content validation',
+  'page-content': 'page content',
 };
 
-/** Screenshot on failure; optional `[PFT]` line when `ENABLE_PFT_DEBUG_LOG=true`. */
+/** Screenshots on failure; optional `[PFT]` line when `enable_pft_debug_log` is `'true'`. */
 export async function logPftValidationInformation(
   page: Page,
   category: PftValidationCategory,
   pageLabel: string,
   expected: string,
   actual: string,
-  failed: boolean,
-  navigationContext?: PftNavigationLogContext
+  failed: boolean
 ): Promise<void> {
   if (failed) {
     const safe = (pageLabel.trim() || 'page').slice(0, 80);
@@ -53,20 +43,10 @@ export async function logPftValidationInformation(
     return;
   }
 
-  const landing = shortUrl(page.url());
-  let prefix: string;
-  if (category === 'error-messages') {
-    prefix = `[PFT] error messages validation | page: ${truncateForLog(pageLabel, 80)} | url: ${landing}`;
-  } else if (category === 'page-navigation' && navigationContext) {
-    const c = navigationContext;
-    prefix = `[PFT] page navigation validation | from page: ${truncateForLog(c.sourcePage, 80)} | url: ${shortUrl(c.sourceUrl || '')} | action: ${c.actionKind} | name: "${truncateForLog(c.actionName, 80)}" | destination page: ${truncateForLog(c.destinationPageName, 80)} | landing url: ${landing}`;
-  } else {
-    prefix = `[PFT] ${LABEL[category]} | page: ${truncateForLog(pageLabel, 80)} | url: ${landing}`;
-  }
+  const base = `[PFT] ${LABEL[category]} | page: ${truncateForLog(pageLabel, 80)} | url: ${shortUrl(page.url())}`;
   if (category === 'page-content' && !expected.trim() && !actual.trim()) {
-    console.log(prefix);
+    console.log(base);
     return;
   }
-
-  console.log(`${prefix} | expected: ${truncateForLog(expected, 160)} | actual: ${truncateForLog(actual, 160)}`);
+  console.log(`${base} | expected: ${truncateForLog(expected, 160)} | actual: ${truncateForLog(actual, 160)}`);
 }
