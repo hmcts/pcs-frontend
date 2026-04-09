@@ -27,6 +27,7 @@ export const step: StepDefinition = createFormStep({
     whyYouAreAskingTheCourt: 'whyYouAreAskingTheCourt',
     youMayNeedToProvideEvidence: 'youMayNeedToProvideEvidence',
     beforeYouStart: 'beforeYouStart',
+    makeSureThatYouHaveAllOfTheEvidence: 'makeSureThatYouHaveAllOfTheEvidence',
     onceYouStart: 'onceYouStart',
     weWillNotSaveYourAnswers: 'weWillNotSaveYourAnswers',
     howMuchItWillCost: 'howMuchItWillCost',
