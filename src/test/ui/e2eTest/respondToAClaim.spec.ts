@@ -20,6 +20,7 @@ import {
   incomeAndExpenses,
   installmentPayments,
   nonRentArrearsDispute,
+  otherRegularExpenses,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
@@ -143,7 +144,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
-  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/what-other-regular-expenses-do-you-have`);
   await performAction('clickButton', startNow.startNowButton);
 });
 
@@ -240,6 +241,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectWhatRegularIncomeDoYouReceive', {
+      regularIncomeOptions: [
+        [
+          otherRegularExpenses.loanPaymentsParagraph,
+          otherRegularExpenses.loanPaymentsTotalAmountInput,
+          otherRegularExpenses.loanPaymentsMonthRadioOption,
+        ],
+      ],
+    });
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {

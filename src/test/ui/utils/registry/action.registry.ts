@@ -72,6 +72,7 @@ export class ActionRegistry {
     ['rentArrears', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
+    ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
