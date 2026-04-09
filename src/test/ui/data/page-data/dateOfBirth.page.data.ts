@@ -26,5 +26,5 @@ export const dateOfBirth = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   feedbackLink: `feedback (opens in new tab)`,
-  pageSlug: `date-of-birth`,
+  pageSlug: `defendant-date-of-birth`,
 };

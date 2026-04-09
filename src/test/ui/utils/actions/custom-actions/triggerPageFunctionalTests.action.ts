@@ -39,12 +39,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       return;
     }
 
-    // Check lock file before running tests
-    const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-    if (fs.existsSync(lockPath)) {
-      return; // Skip if lock file exists (page already passed all tests)
-    }
-
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
       return;
     }
