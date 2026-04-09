@@ -25,10 +25,10 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
+  yourCircumstances,
 } from '../data/page-data';
-import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from '../data/page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.page.data';
-import { yourCircumstances } from '../data/page-data/yourCircumstances.page.data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;

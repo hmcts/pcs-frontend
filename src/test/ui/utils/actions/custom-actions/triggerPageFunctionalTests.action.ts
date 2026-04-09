@@ -58,7 +58,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
 
     if (enable_pft_debug_log === 'true') {
-      // Blank line once per test so first [PFT] line isn’t glued to prior stdout (e.g. case created / API JSON).
       if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.size === 0) {
         console.log('');
       }

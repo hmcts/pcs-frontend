@@ -10,17 +10,18 @@ import { shortUrl, truncateForLog } from './string.utils';
 
 export type PftValidationCategory = 'error-messages' | 'page-navigation' | 'page-content';
 
-/** Set when `category` is `page-navigation` — who we navigated from, how, and landing page name. */
 export type PftNavigationLogContext = {
   sourcePage: string;
-  action: string;
+  sourceUrl: string;
+  actionKind: 'clickLink' | 'clickButton';
+  actionName: string;
   destinationPageName: string;
 };
 
 const LABEL: Record<PftValidationCategory, string> = {
   'error-messages': 'error messages',
   'page-navigation': 'page navigation',
-  'page-content': 'page content',
+  'page-content': 'page content validation',
 };
 
 /** Screenshot on failure; optional `[PFT]` line when `ENABLE_PFT_DEBUG_LOG=true`. */
@@ -52,18 +53,15 @@ export async function logPftValidationInformation(
     return;
   }
 
-  const p = truncateForLog(pageLabel, 80);
-  const u = shortUrl(page.url());
+  const landing = shortUrl(page.url());
   let prefix: string;
   if (category === 'error-messages') {
-    prefix = `[PFT] error messages validation for page: ${p} | url: ${u}`;
+    prefix = `[PFT] error messages validation | page: ${truncateForLog(pageLabel, 80)} | url: ${landing}`;
   } else if (category === 'page-navigation' && navigationContext) {
-    const src = truncateForLog(navigationContext.sourcePage, 80);
-    const act = truncateForLog(navigationContext.action, 80);
-    const dest = truncateForLog(navigationContext.destinationPageName, 80);
-    prefix = `[PFT] page navigation validation | from page: ${src} | action: "${act}" | destination page: ${dest} | url: ${u}`;
+    const c = navigationContext;
+    prefix = `[PFT] page navigation validation | from page: ${truncateForLog(c.sourcePage, 80)} | url: ${shortUrl(c.sourceUrl || '')} | action: ${c.actionKind} | name: "${truncateForLog(c.actionName, 80)}" | destination page: ${truncateForLog(c.destinationPageName, 80)} | landing url: ${landing}`;
   } else {
-    prefix = `[PFT] ${LABEL[category]} | page: ${p} | url: ${u}`;
+    prefix = `[PFT] ${LABEL[category]} | page: ${truncateForLog(pageLabel, 80)} | url: ${landing}`;
   }
   if (category === 'page-content' && !expected.trim() && !actual.trim()) {
     console.log(prefix);
