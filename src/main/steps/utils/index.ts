@@ -11,6 +11,6 @@ export { isFinanceDetailsProvided } from './isFinanceDetailsProvided';
 export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { getStepBeforeDisputePages } from './journeyHelpers';
-export { formatDatePartsToISODate } from './dateUtils';
+export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
 export { penceToPounds, poundsToPence } from './currencyConversion';
