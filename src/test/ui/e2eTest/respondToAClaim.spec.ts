@@ -499,7 +499,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameConfirmation.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
-      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -563,7 +562,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
-      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -628,7 +626,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
-      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
@@ -694,7 +691,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
-      question: dateOfBirth.mainHeader,
       dobDay: dateOfBirth.dayInputText,
       dobMonth: dateOfBirth.monthInputText,
       dobYear: dateOfBirth.yearInputText,
