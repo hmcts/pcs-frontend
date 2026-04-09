@@ -286,8 +286,6 @@ export class RespondToClaimAction implements IAction {
           whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
           value
         );
-
-        console.log(`entered additional details for ${option}`);
         continue;
       }
 

@@ -9,7 +9,7 @@ export async function incomeAndExpensesErrorValidation(): Promise<void> {
   });
 }
 
-export async function tenancyDateDetailsNavigationTests(): Promise<void> {
+export async function incomeAndExpensesNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', incomeAndExpenses.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: incomeAndExpenses.pageSlug,
