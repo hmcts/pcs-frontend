@@ -217,24 +217,31 @@ export class PageNavigationValidation implements IValidation {
         }
       }
 
-      const expectedNavLog = [
-        expectedElementText && `element: "${expectedElementText}"`,
-        expectedUrlPattern && `url: "${expectedUrlPattern}"`,
+      const expectedDestination = [
+        expectedElementText && `expected heading: "${expectedElementText}"`,
+        expectedUrlPattern && `expected URL: ${expectedUrlPattern}`,
       ]
         .filter(Boolean)
-        .join('; ');
-      const actualNavLog = [actualElementText && `element: "${actualElementText}"`, `url: "${actualUrl || page.url()}"`]
+        .join(' | ') || '—';
+      const actualDestination = [
+        actualElementText && `landing heading: "${actualElementText}"`,
+        `landing URL: ${actualUrl || page.url()}`,
+      ]
         .filter(Boolean)
-        .join('; ');
-      const navLogSuffix = ` | nav: from "${PageNavigationValidation.currentSourcePage ?? '?'}" | Action: "${navigateButton ?? '?'}"`;
+        .join(' | ');
 
       await logPftValidationInformation(
         page,
         'page-navigation',
         pageName,
-        (expectedNavLog || 'page navigation validation') + navLogSuffix,
-        actualNavLog,
-        !overallPassed
+        expectedDestination,
+        actualDestination,
+        !overallPassed,
+        {
+          sourcePage: PageNavigationValidation.currentSourcePage ?? '?',
+          action: navigateButton ?? '?',
+          destinationPageName: pageName,
+        }
       );
     } catch (error) {
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
@@ -273,15 +280,18 @@ export class PageNavigationValidation implements IValidation {
       });
       PageNavigationValidation.navigationFailed = true;
 
-      const navLogSuffixCatch = ` | nav: from "${PageNavigationValidation.currentSourcePage ?? '?'}" | Action: "${navigateButton ?? '?'}"`;
-
       await logPftValidationInformation(
         page,
         'page-navigation',
         pageName,
-        expectedValue + navLogSuffixCatch,
-        actualText || 'Not found',
-        true
+        `expected: ${expectedValue}`,
+        `actual heading: ${actualText || 'Not found'} | landing URL: ${page.url()}`,
+        true,
+        {
+          sourcePage: PageNavigationValidation.currentSourcePage ?? '?',
+          action: navigateButton ?? '?',
+          destinationPageName: pageName,
+        }
       );
     }
   }

@@ -10,6 +10,13 @@ import { shortUrl, truncateForLog } from './string.utils';
 
 export type PftValidationCategory = 'error-messages' | 'page-navigation' | 'page-content';
 
+/** Set when `category` is `page-navigation` — who we navigated from, how, and landing page name. */
+export type PftNavigationLogContext = {
+  sourcePage: string;
+  action: string;
+  destinationPageName: string;
+};
+
 const LABEL: Record<PftValidationCategory, string> = {
   'error-messages': 'error messages',
   'page-navigation': 'page navigation',
@@ -23,7 +30,8 @@ export async function logPftValidationInformation(
   pageLabel: string,
   expected: string,
   actual: string,
-  failed: boolean
+  failed: boolean,
+  navigationContext?: PftNavigationLogContext
 ): Promise<void> {
   if (failed) {
     const safe = (pageLabel.trim() || 'page').slice(0, 80);
@@ -44,7 +52,19 @@ export async function logPftValidationInformation(
     return;
   }
 
-  const prefix = `[PFT] ${LABEL[category]} | page: ${truncateForLog(pageLabel, 80)} | url: ${shortUrl(page.url())}`;
+  const p = truncateForLog(pageLabel, 80);
+  const u = shortUrl(page.url());
+  let prefix: string;
+  if (category === 'error-messages') {
+    prefix = `[PFT] error messages validation for page: ${p} | url: ${u}`;
+  } else if (category === 'page-navigation' && navigationContext) {
+    const src = truncateForLog(navigationContext.sourcePage, 80);
+    const act = truncateForLog(navigationContext.action, 80);
+    const dest = truncateForLog(navigationContext.destinationPageName, 80);
+    prefix = `[PFT] page navigation validation | from page: ${src} | action: "${act}" | destination page: ${dest} | url: ${u}`;
+  } else {
+    prefix = `[PFT] ${LABEL[category]} | page: ${p} | url: ${u}`;
+  }
   if (category === 'page-content' && !expected.trim() && !actual.trim()) {
     console.log(prefix);
     return;
