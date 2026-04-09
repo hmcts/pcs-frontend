@@ -489,6 +489,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectWhatRegularIncomeDoYouReceive', {
       regularIncomeOptions: [
         [
+          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
+          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
           whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
           whatRegularIncomeDoYouReceive.pensionTextInput,
           whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
@@ -496,11 +501,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         [
           whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
           whatRegularIncomeDoYouReceive.totalAmountReceivedIncomeFromJobsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
           whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
         ],
         [
@@ -655,6 +655,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectWhatRegularIncomeDoYouReceive', {
       regularIncomeOptions: [
         [
+          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
+          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.universalCreditParagraph,
+          whatRegularIncomeDoYouReceive.universalCreditTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
           whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
           whatRegularIncomeDoYouReceive.pensionTextInput,
           whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
@@ -665,18 +675,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
           whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
         ],
         [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
           whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
           whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
         ],
       ],
     });

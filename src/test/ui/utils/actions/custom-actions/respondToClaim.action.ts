@@ -283,7 +283,7 @@ export class RespondToClaimAction implements IAction {
       if (option === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph) {
         await performAction(
           'inputText',
-          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
+          whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
           value
         );
 
@@ -299,12 +299,8 @@ export class RespondToClaimAction implements IAction {
       // Enter amount
       await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
 
-      console.log(`entered the amount for ${option}`);
-
       // Select frequency
       await performAction('clickRadioButton', frequency);
-
-      console.log(`clicked frequency radio button for the option ${option}`);
     }
 
     await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
