@@ -500,7 +500,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
         [
           whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.totalAmountReceivedIncomeFromJobsTextInput,
+          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
           whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
         ],
         [
@@ -671,7 +671,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
         [
           whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.totalAmountReceivedIncomeFromJobsTextInput,
+          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
           whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
         ],
         [
