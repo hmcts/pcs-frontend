@@ -76,6 +76,7 @@ export interface CaseData {
 }
 
 export interface PossessionClaimResponse {
+  clearFields?: string[];
   defendantContactDetails?: {
     party?: {
       firstName?: string;

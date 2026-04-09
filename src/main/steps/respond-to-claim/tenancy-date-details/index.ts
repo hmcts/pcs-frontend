@@ -95,6 +95,9 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const existingStartDate = getTenancyStartDate(caseData);
+    const existingDefendantDate = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDate as
+      | string
+      | undefined;
     const confirmValue = req.body?.confirmTenancyDate as string | undefined;
 
     const defendantResponses: Record<string, unknown> = {};
@@ -114,11 +117,14 @@ export const step: StepDefinition = createFormStep({
       tenancyStartDate = ' ';
     }
 
+    const shouldClearDate = !tenancyStartDate && !!existingDefendantDate;
+
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         ...defendantResponses,
         ...(tenancyStartDate && { tenancyStartDate }),
       },
+      ...(shouldClearDate && { clearFields: ['defendantResponses.tenancyStartDate'] }),
     };
 
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
