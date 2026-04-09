@@ -36,7 +36,6 @@ export const step: StepDefinition = createFormStep({
     heading: 'heading',
     noticeText: 'noticeText',
     noticeTextByPost: 'noticeTextByPost',
-    noticeTextList: 'noticeTextList',
     readTheGuidance: 'noticeTextList.readTheGuidance',
     fillInTheForm: 'noticeTextList.fillInTheForm',
     findYourLocalCourt: 'noticeTextList.findYourLocalCourt',
