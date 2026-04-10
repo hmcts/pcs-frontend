@@ -10,7 +10,7 @@ describe('isNoticeServed', () => {
           locals: {
             validatedCase: {
               data: {
-                noticeServed: 'Yes',
+                noticeServed: 'YES',
               },
             },
           },
@@ -84,7 +84,7 @@ describe('isNoticeServed', () => {
           locals: {
             validatedCase: {
               data: {
-                noticeServed: 'No',
+                noticeServed: 'NO',
               },
             },
           },
@@ -184,7 +184,7 @@ describe('isNoticeServed', () => {
         session: {
           ccdCase: {
             data: {
-              noticeServed: 'Yes', // Old path - should NOT be used
+              noticeServed: 'YES', // Old path - should NOT be used
             },
           },
         },
@@ -192,7 +192,7 @@ describe('isNoticeServed', () => {
           locals: {
             validatedCase: {
               data: {
-                noticeServed: 'No', // Correct path - should be used
+                noticeServed: 'NO', // Correct path - should be used
               },
             },
           },
@@ -214,7 +214,7 @@ describe('isNoticeServed', () => {
             validatedCase: {
               id: 1771456429013468,
               data: {
-                noticeServed: 'Yes',
+                noticeServed: 'YES',
                 rentArrears_Total: '22222200',
                 legislativeCountry: 'England',
                 notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01',
