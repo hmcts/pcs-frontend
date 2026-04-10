@@ -125,6 +125,12 @@ export function buildComponentConfig({
             checked: radioValue === option.value,
           };
 
+          if (option.hint) {
+            item.hint = {
+              text: option.hint,
+            };
+          }
+
           // Build conditional HTML from conditionalText and subFields
           const conditionalParts: string[] = [];
 
