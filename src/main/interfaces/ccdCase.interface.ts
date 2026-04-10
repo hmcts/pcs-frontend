@@ -6,8 +6,23 @@ export enum CaseState {
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'Yes' | 'No';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
-
+export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
+
+export interface HouseholdCircumstances {
+  shareAdditionalCircumstances?: YesNoValue;
+  additionalCircumstancesDetails?: string;
+  exceptionalHardship?: YesNoValue;
+  exceptionalHardshipDetails?: string;
+  dependantChildren?: YesNoValue;
+  dependantChildrenDetails?: string;
+  otherDependants?: YesNoValue;
+  otherDependantDetails?: string;
+  alternativeAccommodation?: YesNoNotSureValue;
+  alternativeAccommodationTransferDate?: string;
+  otherTenants?: YesNoValue;
+  otherTenantsDetails?: string;
+}
 
 export type PaymentAgreement = {
   anyPaymentsMade?: YesNoValue;
@@ -43,9 +58,11 @@ export interface Address {
   PostCode: string;
   Country?: string;
 }
+
 export interface CaseData {
   possessionClaimResponse?: PossessionClaimResponse;
 }
+
 export interface PossessionClaimResponse {
   claimantOrganisations?: { value: string }[];
   defendantContactDetails?: {
@@ -79,6 +96,7 @@ export interface PossessionClaimResponse {
     possessionNoticeReceived?: YesNoNotSureValue;
     noticeReceivedDate?: string;
     paymentAgreement?: PaymentAgreement;
+    householdCircumstances?: HouseholdCircumstances;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;
@@ -98,4 +116,15 @@ export interface StartCallbackData {
       };
     };
   };
+}
+
+export enum GenAppType {
+  SUSPEND,
+  ADJOURN,
+  SET_ASIDE,
+  SOMETHING_ELSE,
+}
+
+export interface CitizenGenAppRequest {
+  applicationType: GenAppType;
 }
