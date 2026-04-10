@@ -3,10 +3,12 @@
   "caption": "cyMake an application",
   "heading": "cyHave you already applied for help with your application fee?",
   "question": "cyHave you already applied for help with your application fee?",
-  "labels": {
-    "hwfReference": "cyhwfReference (placeholder label)"
+  "revealedHwfQuestion": {
+    "label": "cyEnter your Help with Fees reference number",
+    "hint": "cyYou will have received this number when you applied for Help with Fees. This reference must not have been used for a previous application. For example, HWF-A1B-23C"
   },
   "errors": {
-    "typeOfApplication": "cyYou must select whether you have already applied for help with your application fee"
+    "haveYouAlreadyApplied": "cyConfirm whether you have already applied for help with your application fee",
+    "hwfReference": "cyYou must enter a reference number for Help with Fees"
   }
 }
