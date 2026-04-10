@@ -14,10 +14,6 @@
   "unpaidChildMaintenance": "unpaid child maintenance",
   "guidanceLinkText": "Read guidance from Citizens Advice on what counts as a priority debt (opens in new tab)",
   "question": "Do you have any priority debts?",
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
   "errors": {
     "havePriorityDebts": "Select if you have any priority debts"
   }

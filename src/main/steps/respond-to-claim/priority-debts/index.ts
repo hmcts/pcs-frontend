@@ -72,8 +72,8 @@ export const step: StepDefinition = createFormStep({
       translationKey: { label: 'question' },
       errorMessage: 'errors.havePriorityDebts',
       options: [
-        { value: 'yes', translationKey: 'options.yes' },
-        { value: 'no', translationKey: 'options.no' },
+        { value: 'yes', translationKey: 'common:options.yes' },
+        { value: 'no', translationKey: 'common:options.no' },
       ],
     },
   ],
