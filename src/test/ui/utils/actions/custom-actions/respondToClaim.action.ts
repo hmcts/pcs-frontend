@@ -7,7 +7,7 @@ import {
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
   correspondenceAddress,
-  dateOfBirth,
+  defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
@@ -101,12 +101,12 @@ export class RespondToClaimAction implements IAction {
     if (defendantData?.dobDay && defendantData?.dobMonth && defendantData?.dobYear) {
       await performActions(
         'Defendant Date of Birth Entry',
-        ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
-        ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
-        ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear]
+        ['inputText', defendantDateOfBirth.dayTextLabel, defendantData.dobDay],
+        ['inputText', defendantDateOfBirth.monthTextLabel, defendantData.dobMonth],
+        ['inputText', defendantDateOfBirth.yearTextLabel, defendantData.dobYear]
       );
     }
-    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
+    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
   }
 
   private async confirmDefendantDetails(defendantData: actionRecord) {

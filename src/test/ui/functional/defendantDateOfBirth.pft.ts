@@ -1,11 +1,11 @@
-import { dashboard, dateOfBirth, defendantNameCapture, feedback } from '../data/page-data';
+import { dashboard, defendantDateOfBirth, defendantNameCapture, feedback } from '../data/page-data';
 import { performValidation } from '../utils/controller';
 
 export async function defendantDateOfBirthNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', dateOfBirth.feedbackLink, {
+  await performValidation('pageNavigation', defendantDateOfBirth.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
-    pageSlug: dateOfBirth.pageSlug,
+    pageSlug: defendantDateOfBirth.pageSlug,
   });
-  await performValidation('pageNavigation', dateOfBirth.backLink, defendantNameCapture.mainHeader);
-  await performValidation('pageNavigation', dateOfBirth.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', defendantDateOfBirth.backLink, defendantNameCapture.mainHeader);
+  await performValidation('pageNavigation', defendantDateOfBirth.saveForLaterButton, dashboard.mainHeader);
 }

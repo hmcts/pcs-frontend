@@ -172,7 +172,6 @@ export class VisibilityValidation implements IValidation {
               return value;
             }
           }
-          return headerText.replace(/\s+/g, '');
         }
       }
 
