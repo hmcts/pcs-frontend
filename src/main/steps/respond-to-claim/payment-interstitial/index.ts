@@ -10,6 +10,7 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/paymentInterstitial.njk`,
   translationKeys: {
+    pageTitle: 'pageTitle',
     heading: 'heading',
     caption: 'caption',
     paragraph1: 'paragraph1',

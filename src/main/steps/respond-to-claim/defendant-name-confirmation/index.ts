@@ -113,6 +113,7 @@ export const step: StepDefinition = createFormStep({
       translationKey: {
         label: 'nameConfirmationLabel',
       },
+      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
       options: [
         {
