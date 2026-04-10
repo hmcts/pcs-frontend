@@ -24,8 +24,6 @@ export default {
   'landlord-licensed': 'landlordLicensed',
   'written-terms': 'writtenTerms',
   'contact-preferences-email-or-post': 'contactPreferenceEmailOrPost',
-  'choose-an-application': 'chooseAnApplication',
-  'check-your-answers': 'checkYourAnswers',
   'your-circumstances': 'yourCircumstances',
   'exceptional-hardship': 'exceptionalHardship',
   'do-any-other-adults-live-in-your-home': 'doAnyOtherAdultsLiveInYourHome',
@@ -34,4 +32,7 @@ export default {
   'your-household-and-circumstances': 'yourHouseholdAndCircumstances',
   'do-you-have-any-dependant-children': 'doYouHaveAnyDependantChildren',
   'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
+  //Add Gen APPs mapping below this line
+  'choose-an-application': 'chooseAnApplication',
+  'check-your-answers': 'checkYourAnswers',
 };

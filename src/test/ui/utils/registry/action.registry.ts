@@ -71,10 +71,11 @@ export class ActionRegistry {
     ['doYouHaveAnyDependantChildren', new RespondToClaimAction()],
     ['doYouHaveAnyOtherDependants', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
-    ['chooseAnApplication', new GenAppsAction()],
-    ['inputErrorValidationGenApp', new GenAppsAction()],
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
+    //ADD GEN APPS details below this line
+    ['chooseAnApplication', new GenAppsAction()],
+    ['inputErrorValidationGenApp', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {
