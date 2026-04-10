@@ -1,15 +1,31 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
 {% block mainContent %}
+
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Do any other adults live in your home? (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for Do Any Other Adults Live In Your Home step.</p>
-  <form method="post" action="{{ url }}">
-    {{ stepButtons(continue, saveForLater) }}
+
+  {% if caption %}
+    <span class="govuk-caption-l">{{ caption }}</span>
+  {% endif %}
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
+
 {% endblock %}

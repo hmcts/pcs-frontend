@@ -15,10 +15,18 @@ export enum YesNoEnum {
 }
 
 export interface HouseholdCircumstances {
+  shareAdditionalCircumstances?: YesNoValue;
+  additionalCircumstancesDetails?: string;
+  exceptionalHardship?: YesNoValue;
+  exceptionalHardshipDetails?: string;
   dependantChildren?: YesNoValue;
   dependantChildrenDetails?: string;
   otherDependants?: YesNoValue;
   otherDependantDetails?: string;
+  alternativeAccommodation?: YesNoNotSureValue;
+  alternativeAccommodationTransferDate?: string;
+  otherTenants?: YesNoValue;
+  otherTenantsDetails?: string;
 }
 
 export interface CcdUserCase {
