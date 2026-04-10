@@ -160,6 +160,7 @@ export interface CcdCaseData {
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
+  citizenGenAppRequest?: CitizenGenAppRequest;
 }
 
 /** Case representation used by services: id + case_data. */
