@@ -116,6 +116,12 @@ export function buildComponentConfig(
             checked: radioValue === option.value,
           };
 
+          if (option.hint) {
+            item.hint = {
+              text: option.hint,
+            };
+          }
+
           // Build conditional HTML from conditionalText and subFields
           const conditionalParts: string[] = [];
 
@@ -201,7 +207,7 @@ export function buildComponentConfig(
       };
       component.namePrefix = field.name;
       component.idPrefix = field.name;
-      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
       component.items = [
         {
           name: 'day',

@@ -18,6 +18,7 @@ export interface FormFieldOption {
   divider?: string;
   translationKey?: string;
   label?: string | ((translations: Record<string, string>) => string);
+  hint?: string | ((translations: Record<string, string>) => string);
   conditionalText?: string | ((translations: Record<string, string>) => string);
   // SubFields appear conditionally when this option is selected (e.g., text inputs under "No" radio button)
   subFields?: Record<string, FormFieldConfig>;
@@ -69,6 +70,7 @@ export interface FormFieldConfig {
   // For date fields: prevent future dates from being entered
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
+  noPastDate?: boolean;
   isPageHeading?: boolean;
 }
 

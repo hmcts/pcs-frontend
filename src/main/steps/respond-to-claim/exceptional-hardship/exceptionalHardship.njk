@@ -1,17 +1,43 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% block pageTitle %}Exceptional hardship &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
-
+{% block pageTitle %}
+  {{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Exceptional hardship (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for Exceptional Hardship step.</p>
-  <form method="post" action="{{ url }}">
-    {{ stepButtons(continue, saveForLater) }}
+
+  {% if caption %}
+    <span class="govuk-caption-l">{{ caption }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+
+  <p class="govuk-body">{{ introParagraph1 }}</p>
+  <p class="govuk-body">{{ introParagraph2 }}</p>
+  <p class="govuk-body">{{ introParagraph3 }}</p>
+  <p class="govuk-body">{{ forExample }}</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ bullet1 }}</li>
+    <li>{{ bullet2 }}</li>
+    <li>{{ bullet3 }}</li>
+    <li>{{ bullet4 }}</li>
+  </ul>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
