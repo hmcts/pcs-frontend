@@ -120,4 +120,35 @@ describe('respond-to-claim universal-credit step', () => {
       },
     });
   });
+
+  it('ignores date fields when selection is no', async () => {
+    (validateForm as jest.Mock).mockReturnValue({});
+    const req = createReq({
+      body: {
+        action: 'continue',
+        haveAppliedForUniversalCredit: 'no',
+        'ucApplicationDate-day': '31',
+        'ucApplicationDate-month': '02',
+        'ucApplicationDate-year': '2024',
+      },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+    const next = jest.fn();
+
+    if (!step.postController) {
+      throw new Error('expected postController');
+    }
+
+    await step.postController.post(req, res, next);
+
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
+      defendantResponses: {
+        householdCircumstances: {
+          universalCredit: 'No',
+          ucApplicationDate: undefined,
+        },
+      },
+    });
+  });
 });

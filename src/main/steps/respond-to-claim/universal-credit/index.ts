@@ -15,7 +15,19 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   beforeRedirect: async req => {
     const selection = req.body?.haveAppliedForUniversalCredit as string | undefined;
-    const nestedDate = req.body?.ucApplicationDate as { day?: string; month?: string; year?: string } | undefined;
+    if (selection === 'no') {
+      const possessionClaimResponse: PossessionClaimResponse = {
+        defendantResponses: {
+          householdCircumstances: {
+            universalCredit: toYesNoEnum('no'),
+            ucApplicationDate: undefined,
+          },
+        },
+      };
+      await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      return;
+    }
+
     const ucApplicationDate = {
       day: req.body?.['ucApplicationDate-day'] as string | undefined,
       month: req.body?.['ucApplicationDate-month'] as string | undefined,
