@@ -16,8 +16,18 @@ export const step: StepDefinition = createFormStep({
   showCancelButton: false,
   beforeRedirect: async req => {
     const dateOfBirth = req.body?.dateOfBirth;
+    const existingDob = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.dateOfBirth;
 
-    if (!dateOfBirth || typeof dateOfBirth !== 'object') {
+    const isEmpty =
+      !dateOfBirth || typeof dateOfBirth !== 'object' || (!dateOfBirth.day && !dateOfBirth.month && !dateOfBirth.year);
+
+    if (isEmpty) {
+      if (existingDob) {
+        const possessionClaimResponse: PossessionClaimResponse = {
+          clearFields: ['defendantResponses.dateOfBirth'],
+        };
+        await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      }
       return;
     }
 
@@ -27,7 +37,6 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    // Validate and convert to ISO date (same logic as dateToISO)
     const dateTime = DateTime.fromObject({
       year: Number(year),
       month: Number(month),
