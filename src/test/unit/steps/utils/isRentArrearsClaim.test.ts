@@ -13,7 +13,7 @@ describe('isRentArrearsClaim', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-1',
@@ -114,21 +114,21 @@ describe('isRentArrearsClaim', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'ANTISOCIAL_BEHAVIOUR',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-2',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'SPECIAL_NEEDS_ACCOMMODATION',
                     },
                     id: 'ground-3',
@@ -154,14 +154,14 @@ describe('isRentArrearsClaim', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-2',
@@ -189,7 +189,7 @@ describe('isRentArrearsClaim', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'ANTISOCIAL_BEHAVIOUR',
                     },
                     id: 'ground-1',
@@ -215,21 +215,21 @@ describe('isRentArrearsClaim', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'ANTISOCIAL_BEHAVIOUR',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'SPECIAL_NEEDS_ACCOMMODATION',
                     },
                     id: 'ground-2',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'CRIMINAL_BEHAVIOUR',
                     },
                     id: 'ground-3',
@@ -427,7 +427,7 @@ describe('isRentArrearsClaim', () => {
           locals: {
             validatedCase: {
               data: {
-                claimGroundSummaries: { value: { isRentArrears: 'Yes' } },
+                claimGroundSummaries: { value: { isRentArrears: 'YES' } },
               },
             },
           },
@@ -556,7 +556,7 @@ describe('isRentArrearsClaim', () => {
                   undefined,
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-1',
@@ -585,7 +585,7 @@ describe('isRentArrearsClaim', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: '46c3fe9c-c786-4737-b565-a90ff33aef08',
@@ -611,7 +611,7 @@ describe('isRentArrearsClaim', () => {
               id: 1771777994911210,
               data: {
                 rentArrears_Total: '122200',
-                noticeServed: 'Yes',
+                noticeServed: 'YES',
                 legislativeCountry: 'England',
                 claimGroundSummaries: [
                   {
@@ -619,7 +619,7 @@ describe('isRentArrearsClaim', () => {
                       category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                       label: 'Rent arrears or breach of the tenancy (ground 1)',
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                     },
                     id: '46c3fe9c-c786-4737-b565-a90ff33aef08',
                   },
@@ -649,7 +649,7 @@ describe('isRentArrearsClaim', () => {
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                       label: 'Rent arrears or breach of the tenancy (ground 1)',
                       reason: 'rent arrears reason',
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                     },
                     id: 'ground-1',
                   },
@@ -659,7 +659,7 @@ describe('isRentArrearsClaim', () => {
                       code: 'ANTISOCIAL_BEHAVIOUR_S158',
                       label: 'Antisocial behaviour (ground 14)',
                       reason: 'antisocial behaviour reason',
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                     },
                     id: 'ground-2',
                   },
@@ -669,7 +669,7 @@ describe('isRentArrearsClaim', () => {
                       code: 'SPECIAL_NEEDS_ACCOMMODATION',
                       label: 'Special needs accommodation (ground 15)',
                       reason: 'special needs reason',
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                     },
                     id: 'ground-3',
                   },
@@ -682,7 +682,7 @@ describe('isRentArrearsClaim', () => {
 
       const result = await isRentArrearsClaim(mockReq);
 
-      // Should return true because ground-1 has isRentArrears: 'Yes'
+      // Should return true because ground-1 has isRentArrears: 'YES'
       expect(result).toBe(true);
     });
 
@@ -700,7 +700,7 @@ describe('isRentArrearsClaim', () => {
                       category: 'SECURE_OR_FLEXIBLE_DISCRETIONARY_ALT',
                       code: 'ANTISOCIAL_BEHAVIOUR_S157',
                       label: 'Antisocial behaviour (ground 2)',
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                     },
                     id: 'ground-1',
                   },
@@ -727,14 +727,14 @@ describe('isRentArrearsClaim', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'Yes', // First match - .some() should stop here
+                      isRentArrears: 'YES', // First match - .some() should stop here
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'ANTISOCIAL_BEHAVIOUR',
                     },
                     id: 'ground-2',
@@ -760,21 +760,21 @@ describe('isRentArrearsClaim', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'ANTISOCIAL_BEHAVIOUR',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'SPECIAL_NEEDS_ACCOMMODATION',
                     },
                     id: 'ground-2',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'CRIMINAL_BEHAVIOUR',
                     },
                     id: 'ground-3',

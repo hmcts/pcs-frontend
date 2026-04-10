@@ -161,11 +161,11 @@ describe('pcqRedirectMiddleware', () => {
     expect(mockRedirect).not.toHaveBeenCalled();
   });
 
-  it('should not redirect if userPcqIdSet is already Yes', async () => {
+  it('should not redirect if userPcqIdSet is already YES', async () => {
     mockRes.locals!.validatedCase = {
       id: '123456789',
       data: {
-        userPcqIdSet: 'Yes',
+        userPcqIdSet: 'YES',
       },
     };
 

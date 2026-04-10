@@ -36,7 +36,7 @@ describe('validateForm', () => {
 
     const req = {
       body: {
-        answer: 'Yes',
+        answer: 'YES',
         choices: ['option1'],
       },
       session: {},
