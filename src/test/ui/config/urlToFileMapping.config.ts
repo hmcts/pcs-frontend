@@ -35,4 +35,19 @@ export default {
   //Add Gen APPs mapping below this line
   'choose-an-application': 'chooseAnApplication',
   'check-your-answers': 'checkYourAnswers',
+  'ask-to-adjourn-the-court-hearing': 'askToAdjournTheCourtHearing',
+  'ask-to-set-aside-the-decision-to-evict-you': 'askToSetAsideTheDecisionToEvictYou',
+  'ask-the-court-to-make-an-order': 'askTheCourtToMakeAnOrder',
+  'is-the-court-hearing-in-the-next-14-days': 'isTheCourtHearingInTheNext14Days',
+  'do-you-need-help-paying-the-fee': 'doYouNeedHelpPayingTheFee',
+  'have-you-already-applied-for-help': 'haveYouAlreadyAppliedForHelp',
+  'have-the-other-parties-agreed-to-this-application': 'haveTheOtherPartiesAgreedToThisApplication',
+  'you-need-to-apply-for-help-with-your-application-fee': 'youNeedToApplyForHelpWithYouApplicationFee',
+  'what-order-do-you-want-the-court-to-make-and-why': 'whatOrderDoYouWantTheCourtToMakeAndWhy',
+  'are-there-any-reasons-that-this-application-should-not-be-shared':
+    'areThereAnyReasonsThatThisApplicationShouldNotBeShared',
+  'do-you-want-to-upload-documents-to-support-your-application': 'doYouWantToUploadDocumentsToSupportYourApplication',
+  'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
+  'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
+  'application-submitted': 'applicationSubmitted',
 };
