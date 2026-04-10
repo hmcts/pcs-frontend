@@ -12437,7 +12437,7 @@ __metadata:
     allure-commandline: "npm:^2.34.1"
     allure-js-commons: "npm:^3.3.0"
     allure-playwright: "npm:^3.3.0"
-    axios: "npm:^1.13.5"
+    axios: "npm:^1.15.0"
     body-parser: "npm:^2.0.0"
     config: "npm:^3.3.9"
     connect-redis: "npm:^7.1.1"
