@@ -2,7 +2,6 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import { isLegalRepresentativeUser } from '../steps/utils'
 import config from 'config';
-
 export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
@@ -13,10 +12,10 @@ export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
 
   if (isLegalRepresentative) {
     const roles = req.session?.user?.roles;
-    const apiUrl: string = process.env.PCS_API_URL || config.get('api.url');
+    const xuiBaseUri: string = process.env.XUI_BASE_URI || config.get('xui.uri');
   
     headerModel = buildHeaderModel({
-      xuiBaseUrl: apiUrl,
+      xuiBaseUrl: xuiBaseUri,
       user: { roles: roles as string[] },
     });
 
