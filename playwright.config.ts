@@ -77,7 +77,12 @@ export default defineConfig({
         ],
       ]
     : [['list']],
+  // Projects align with HMCTS "Browsers to test" guidance (~Feb 2026). Playwright runs on the host OS (e.g. Linux CI);
+  // desktop entries approximate Windows/macOS installs. Mobile entries are emulated — not real device browsers.
+  // iOS App Store Chrome/Edge/Safari all use WebKit on device; one WebKit+iPhone project covers Safari; iOS Chrome/Edge
+  // are noted under MobileSafari. Samsung Internet has no Playwright browser — Chromium + Galaxy preset is a proxy only.
   projects: [
+    // Windows + macOS — Google Chrome (latest stable).
     {
       name: 'chrome',
       use: {
@@ -91,6 +96,7 @@ export default defineConfig({
     },
     ...(process.env.CI
       ? [
+          // Windows + macOS — Mozilla Firefox (latest stable).
           {
             name: 'firefox',
             use: {
@@ -102,6 +108,7 @@ export default defineConfig({
               headless: !!process.env.CI,
             },
           },
+          // macOS — Safari: Playwright bundles WebKit (not Apple’s Safari app); closest automated analogue for desktop Safari.
           {
             name: 'webkit',
             use: {
@@ -113,6 +120,19 @@ export default defineConfig({
               headless: !!process.env.CI,
             },
           },
+          // Windows + macOS — Microsoft Edge (latest stable). Sauce: omit channel when PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS is set.
+          {
+            name: 'MicrosoftEdge',
+            use: {
+              ...devices['Desktop Edge'],
+              ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
+              ...captureSettings,
+              javaScriptEnabled: true,
+              viewport: DEFAULT_VIEWPORT,
+              headless: !!process.env.CI,
+            },
+          },
+          // Android — Google Chrome (latest stable); emulated handset (Pixel 5).
           {
             name: 'MobileChrome',
             use: {
@@ -123,6 +143,28 @@ export default defineConfig({
               headless: !!process.env.CI,
             },
           },
+          // Android — Mozilla Firefox (latest stable); emulated Pixel 5.
+          {
+            name: 'MobileFirefox',
+            use: {
+              ...devices['Pixel 5'],
+              channel: 'firefox',
+              ...captureSettings,
+              javaScriptEnabled: true,
+              headless: !!process.env.CI,
+            },
+          },
+          // Android — Samsung Internet (latest stable): no Samsung browser in Playwright; Chromium + Galaxy S24 preset is a best-effort stand-in only.
+          {
+            name: 'AndroidSamsungInternet',
+            use: {
+              ...devices['Galaxy S24'],
+              ...captureSettings,
+              javaScriptEnabled: true,
+              headless: !!process.env.CI,
+            },
+          },
+          // iOS — Safari on supported iOS: WebKit + iPhone emulation. On real devices, App Store Chrome and Edge also use WebKit (same engine class).
           {
             name: 'MobileSafari',
             use: {
@@ -133,6 +175,7 @@ export default defineConfig({
               headless: !!process.env.CI,
             },
           },
+          // iOS — larger viewport / tablet-class WebKit (iPad); complements handset Safari coverage.
           {
             name: 'iPad',
             use: {
@@ -140,20 +183,6 @@ export default defineConfig({
               channel: 'webkit',
               ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'MicrosoftEdge',
-            use: {
-              ...devices['Desktop Edge'],
-              // Linux Jenkins: branded Edge via Playwright's msedge channel. Sauce: omit channel — if set, Playwright
-              // looks for msedge.exe on a fixed path and conflicts with Sauce's VM layout (same class of issue as
-              // Chrome launchOptions on Sauce). PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS is set in .sauce/*.yml only.
-              ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
-              ...captureSettings,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
             },
           },

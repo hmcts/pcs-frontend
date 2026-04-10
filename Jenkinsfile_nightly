@@ -35,19 +35,29 @@ properties([
       description: 'Tick the checkbox to run E2E tests in Microsoft Edge.'
     ),
     booleanParam(
-      name: 'MOBILE_CHROME_TESTS',
+      name: 'ANDROID_MOBILE_CHROME_TESTS',
       defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in emulated Mobile Chrome (Pixel 5 profile).'
+      description: 'Tick the checkbox to run E2E tests in emulated Android Chrome (Pixel 5 profile).'
     ),
     booleanParam(
-      name: 'MOBILE_SAFARI_TESTS',
+      name: 'ANDROID_MOBILE_FIREFOX_TESTS',
       defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in emulated Mobile Safari (iPhone 12 profile).'
+      description: 'Tick the checkbox to run E2E tests in emulated Android Firefox (Pixel 5 profile).'
     ),
     booleanParam(
-      name: 'IPAD_TESTS',
+      name: 'ANDROID_SAMSUNG_INTERNET_TESTS',
       defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in emulated iPad Safari (iPad Pro 11 profile).'
+      description: 'Tick the checkbox to run E2E tests in Chromium + Galaxy S24 preset (proxy for Samsung Internet; not the real browser).'
+    ),
+    booleanParam(
+      name: 'IOS_MOBILE_SAFARI_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in emulated iOS Safari / WebKit (iPhone 12 profile).'
+    ),
+    booleanParam(
+      name: 'IOS_IPAD_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in emulated iPad Safari / WebKit (iPad Pro 11 profile).'
     ),
     booleanParam(
       name: 'ACCESSIBILITY_TESTS',
@@ -135,14 +145,20 @@ def runE2ETests(yarnBuilder) {
   if (params.EDGE_TESTS) {
     runE2ETestsForBrowser(yarnBuilder, 'Edge')
   }
-  if (params.MOBILE_CHROME_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'MobileChrome')
+  if (params.ANDROID_MOBILE_CHROME_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'AndroidMobileChrome')
   }
-  if (params.MOBILE_SAFARI_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'MobileSafari')
+  if (params.ANDROID_MOBILE_FIREFOX_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'AndroidMobileFirefox')
   }
-  if (params.IPAD_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Ipad')
+  if (params.ANDROID_SAMSUNG_INTERNET_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'AndroidSamsungInternet')
+  }
+  if (params.IOS_MOBILE_SAFARI_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'IosMobileSafari')
+  }
+  if (params.IOS_IPAD_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'IosIpad')
   }
 }
 

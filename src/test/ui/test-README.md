@@ -194,7 +194,7 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 ### Nightly (Jenkinsfile_nightly)
 
 - **Schedule:** Mon–Fri at ~07:00.
-- **E2E tests:** Runs per-browser stages (Chrome, Firefox, Safari) with separate Allure reports for each.
-- **Accessibility:** Runs `@accessibility` tests on Chrome.
-- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` with links to all 4 reports (Chrome, Firefox, Safari, Accessibility).
-- **Stage behaviour:** If a browser fails, the stage shows red but the pipeline continues to the next browser. All stages always run.
+- **E2E tests:** Optional stages per Jenkins boolean parameters (desktop: `CHROME_TESTS`, `FIREFOX_TESTS`, `WEBKIT_TESTS`, `EDGE_TESTS`; Android: `ANDROID_MOBILE_CHROME_TESTS`, `ANDROID_MOBILE_FIREFOX_TESTS`, `ANDROID_SAMSUNG_INTERNET_TESTS`; iOS: `IOS_MOBILE_SAFARI_TESTS`, `IOS_IPAD_TESTS`). Each stage runs `yarn test:E2e…` and publishes its own Allure HTML report.
+- **Accessibility:** Optional (`ACCESSIBILITY_TESTS`); runs `@accessibility` on Chrome.
+- **Slack:** Notifications to `#qa-pipeline-status` with links to published HTML reports (one per E2E stage when enabled, plus accessibility when enabled).
+- **Stage behaviour:** If a browser fails, the stage shows red but the pipeline continues to the next browser. All enabled stages run.

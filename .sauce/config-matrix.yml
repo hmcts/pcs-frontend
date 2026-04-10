@@ -8,7 +8,7 @@
 #   • Android / iPhone / iPad — saucectl + kind: playwright only allows desktop platformName values
 #     (validated: yarn test:sauce:mobile-matrix-dry-run → .sauce/config-mobile-platform-matrix.yml).
 #     Mobile web on Sauce is typically Appium/Selenium/WebdriverIO; for Playwright MobileChrome use
-#     Jenkins/Linux: yarn test:E2eMobileChrome (CI=true).
+#     Jenkins/Linux: yarn test:E2eAndroidMobileChrome (CI=true).
 #   • macOS 14+ with Firefox — schema may reject until saucectl is upgraded; Firefox on macOS 15 has Sauce
 #     known issues; macOS 13 is the safe combo for Firefox + WebKit with older saucectl.
 #

@@ -19,7 +19,7 @@ https://docs.saucelabs.com/web-apps/automated-testing/playwright/limitations/
 
 Align playwright.version in .sauce/*.yml with Sauce’s supported table and yarn.lock.
 
-Chrome on Android and Sauce Playwright: Sauce’s supported platforms for Playwright in the docs are Windows/macOS only; saucectl does not accept Android as platformName for kind: playwright. For mobile Chrome in Playwright use Jenkins: yarn test:E2eMobileChrome (CI=true). Other Sauce mobile stacks (e.g. Appium) are separate — TCOE.
+Chrome on Android and Sauce Playwright: Sauce’s supported platforms for Playwright in the docs are Windows/macOS only; saucectl does not accept Android as platformName for kind: playwright. For mobile Chrome in Playwright use Jenkins: yarn test:E2eAndroidMobileChrome (CI=true). Other Sauce mobile stacks (e.g. Appium) are separate — TCOE.
 
 3. What we run (pcs-frontend)
 * saucectl, region eu-central-1, tunnel (e.g. reformtunnel), scripts in package.json (test:sauce:*).
