@@ -28,6 +28,8 @@ import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
 import { step as whatOtherRegularExpensesDoYouHave } from './regular-expenses';
+import { step as otherConsiderations } from './other-considerations';
+import { step as uploadDocs} from './upload-docs';
 import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
@@ -81,4 +83,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,
   'what-other-regular-expenses-do-you-have': whatOtherRegularExpensesDoYouHave,
+  'other-considerations': otherConsiderations,
+  'upload-docs': uploadDocs,
 };

@@ -90,6 +90,8 @@ export interface PossessionClaimResponse {
       repaymentAgreedDetails?: string;
     };
     householdCircumstances?: HouseholdCircumstances;
+    otherConsiderations?: YesNoValue;
+    otherConsiderationsDetails?: string;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;
