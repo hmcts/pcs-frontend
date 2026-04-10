@@ -14,7 +14,6 @@ import {
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
-import { checkYourAnswers, chooseAnApplication } from '../../data/page-data/genApps-page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
