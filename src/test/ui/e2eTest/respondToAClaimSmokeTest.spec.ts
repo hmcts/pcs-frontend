@@ -1,7 +1,8 @@
 import { test } from '@playwright/test';
 import config from 'config';
 
-import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
+import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import { freeLegalAdvice, startNow } from '../data/page-data';
 import { initializeExecutor, performAction } from '../utils/controller';
 
@@ -10,9 +11,9 @@ const home_url = config.get('e2e.testUrl') as string;
 test.describe('Respond to a claim - smoke test @smoke', async () => {
   test('Respond to a claim @smoke', async ({ page }) => {
     initializeExecutor(page);
-    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+    process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
+    await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
     await performAction('fetchPINsAPI');
     await performAction('createUser', 'citizen', ['citizen']);
     await performAction('validateAccessCodeAPI');
