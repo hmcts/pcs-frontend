@@ -202,3 +202,14 @@ export interface StartCallbackData {
   case_details: CcdCaseDetails;
   event_id: string;
 }
+
+export enum GenAppType {
+  SUSPEND,
+  ADJOURN,
+  SET_ASIDE,
+  SOMETHING_ELSE,
+}
+
+export interface CitizenGenAppRequest {
+  applicationType: GenAppType;
+}
