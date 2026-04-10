@@ -161,7 +161,12 @@ export const step: StepDefinition = createFormStep({
     setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as
-      | { component: { label: { text: string }; fieldset: { legend: { text: string } } } }
+      | {
+          component: {
+            label: { text: string };
+            fieldset: { legend: { text: string; isPageHeading?: boolean } };
+          };
+        }
       | undefined;
     if (!radio || !radio.component) {
       return {};

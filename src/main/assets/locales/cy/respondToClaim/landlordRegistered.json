@@ -2,7 +2,7 @@
   "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyRegistered landlord",
   "introText": "cyYou can check if your landlord is registered by searching the",
-  "publicRegisterLinkText": "cyPublic Register (opens in new tab).",
+  "publicRegisterLinkText": "cyPublic Register (opens in new tab)",
   "question": "cyIs your landlord registered?",
   "options": {
     "yes": "cyYes",
