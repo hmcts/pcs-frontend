@@ -321,19 +321,19 @@ export function translateFields(
       throw new Error('Nunjucks environment is required for building component config');
     }
 
-    const { component, componentType } = buildComponentConfig(
-      { ...processedField, options: processedOptionsWithSubFields },
-      resolvedLabel,
-      processedField.hint,
-      fieldValues[fieldNameForValueLookup] ?? fieldValues[processedField.name],
+    const { component, componentType } = buildComponentConfig({
+      field: { ...processedField, options: processedOptionsWithSubFields },
+      label: resolvedLabel,
+      hint: processedField.hint,
+      fieldValue: fieldValues[fieldNameForValueLookup] ?? fieldValues[processedField.name],
       translatedOptions,
-      hasError || false,
+      hasError: hasError || false,
       errorText,
       index,
       hasTitle,
       t,
-      nunjucksEnv
-    );
+      nunjucksEnv,
+    });
 
     return {
       ...processedField,

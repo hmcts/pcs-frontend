@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns';
+import { DateTime } from 'luxon';
 
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
@@ -80,11 +81,11 @@ export const step: StepDefinition = createFormStep({
         const draftData: Record<string, unknown> = { confirmTenancyDate: formValue };
 
         if (existingDateIsCorrect === 'NO' && existingTenancyStartDate) {
-          const parsed = parseISO(existingTenancyStartDate);
+          const parsed = DateTime.fromISO(existingTenancyStartDate).setZone('Europe/London');
           draftData.tenancyStartDate = {
-            day: format(parsed, 'd'),
-            month: format(parsed, 'M'),
-            year: format(parsed, 'yyyy'),
+            day: parsed.toFormat('d'),
+            month: parsed.toFormat('M'),
+            year: parsed.toFormat('yyyy'),
           };
         }
 

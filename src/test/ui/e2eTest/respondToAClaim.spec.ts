@@ -17,6 +17,7 @@ import {
   doYouHaveAnyOtherDependants,
   exceptionalHardship,
   freeLegalAdvice,
+  howMuchAffordToPay,
   incomeAndExpenses,
   installmentPayments,
   nonRentArrearsDispute,
@@ -104,6 +105,15 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
   } else {
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'NO';
+  }
+
+  //Check if No is selected on RepaymentAgreed page(Rent Arrears) - for back link navigation
+  if (testInfo.title.includes('RentArrears - Demoted')) {
+    process.env.REPAYMENT_AGREED = 'NO';
+  }
+  //Check if No is selected on Installment Payment page(Rent Arrears) - for back link navigation
+  if (testInfo.title.includes('InstallmentPayment - No')) {
+    process.env.INSTALLMENT_PAYMENT = 'NO';
   }
 
   // Tenancy start date logic for noDefendantTest
@@ -213,8 +223,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.noRadioOption,
+    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -377,10 +389,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -642,7 +652,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -692,7 +702,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.noRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -768,8 +782,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.yesRadioOption,
+    });
+    await performAction('selectHowMuchAffordToPay', {
+      affordToPay: howMuchAffordToPay.affordToPayTextInput,
+      question: howMuchAffordToPay.howFrequentlyCouldYouAffordToPayQuestion,
+      radioOption: howMuchAffordToPay.weeklyRadioOption,
+    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -847,10 +868,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,

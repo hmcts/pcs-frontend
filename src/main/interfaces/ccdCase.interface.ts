@@ -78,6 +78,7 @@ export interface PossessionClaimResponse {
     rentArrearsAmountConfirmation?: string;
     rentArrearsAmount?: string;
     freeLegalAdvice?: string;
+    receivedFreeLegalAdvice?: string;
     defendantNameConfirmation?: string;
     dateOfBirth?: string;
     landlordRegistered?: YesNoNotSureValue;
@@ -88,6 +89,9 @@ export interface PossessionClaimResponse {
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
+      repayArrearsInstalments?: YesNoValue;
+      additionalRentContribution?: unknown;
+      additionalContributionFrequency?: string;
     };
     householdCircumstances?: HouseholdCircumstances;
   };
