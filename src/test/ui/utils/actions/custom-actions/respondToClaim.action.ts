@@ -256,7 +256,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectIncomeAndExpenses(incomeAndExpenseData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: incomeAndExpenses.doYouWantToProvideDetailsTextLabel,
+      question: incomeAndExpenses.doYouWantToProvideDetailsHeader,
       option: incomeAndExpenseData.incomeAndExpensesOption,
     });
     await performAction('clickButton', incomeAndExpenses.saveAndContinueButton);

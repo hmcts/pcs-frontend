@@ -1,3 +1,5 @@
+import { generateRandomString } from '../../utils/common/string.utils';
+
 export const whatRegularIncomeDoYouReceive = {
   mainHeader: `What regular income do you receive? (Optional)`,
   respondToClaimParagraph: `Respond to a property possession claim`,
@@ -39,6 +41,13 @@ export const whatRegularIncomeDoYouReceive = {
   universalCreditBillionErrorMessage: `The total amount you receive from Universal Credit each week or month must be less than £1 billion`,
   pensionStateAndPrivateBillionErrorMessage: `The total amount you receive from pension (state and private) each week or month must be less than £1 billion`,
   incomeFromAllJobsBillionErrorMessage: `The total amount you receive from all jobs you do each week or month must be less than £1 billion`,
+  enterDetailsAboutMoneyFromSomewhereElseErrorMessage: `Enter details about the money you receive from somewhere else and how much you usually receive`,
+  emojiTextInput: `👉 😄`,
+  emojiErrorMessage: `Give details about the other sources of income and how much you usually receive must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
+  tooManyCharTextInput: generateRandomString(501),
+  limitHiddenHintText: `You have reached the limit`,
+  oneCharTooManyHiddenHintText: `You have 1 character too many`,
+  tooManyCharErrorMessage: `Must be 500 characters or fewer`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   cancelLink: `Cancel`,

@@ -1,4 +1,5 @@
 import { dashboard, feedback, incomeAndExpenses, whatRegularIncomeDoYouReceive } from '../data/page-data';
+import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<void> {
@@ -73,16 +74,13 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
   console.log(`verified > £1 billion value error message for other benefits`);
 
-  await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-        whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+  //uncheck
+
+  await performAction('uncheck', {
+    question: whatRegularIncomeDoYouReceive.mainHeader,
+    option: whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
   });
-  console.log(`entered the correct value`);
+  console.log(`unchecked the option`);
 
   console.log(`****OTHER BENEFITS VALIDATIONS COMPLETED****`);
 
@@ -157,16 +155,12 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
   console.log(`verified > £1 billion value error message`);
 
-  await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.universalCreditParagraph,
-        whatRegularIncomeDoYouReceive.universalCreditTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+  //uncheck
+  await performAction('uncheck', {
+    question: whatRegularIncomeDoYouReceive.mainHeader,
+    option: whatRegularIncomeDoYouReceive.universalCreditParagraph,
   });
-  console.log(`entered the correct value`);
+  console.log(`unchecked the option`);
 
   console.log(`****UNIVERSAL CREDIT VALIDATIONS COMPLETED****`);
 
@@ -241,16 +235,12 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
   console.log(`verified > £1 billion value error message`);
 
-  await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-        whatRegularIncomeDoYouReceive.pensionTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+  //uncheck
+  await performAction('uncheck', {
+    question: whatRegularIncomeDoYouReceive.mainHeader,
+    option: whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
   });
-  console.log(`entered the correct value`);
+  console.log(`unchecked the option`);
 
   console.log(`****PENSION STATE AND PRIVATE VALIDATIONS COMPLETED****`);
 
@@ -325,38 +315,78 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
   console.log(`verified > £1 billion value error message`);
 
-  await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-        whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+  //uncheck
+
+  await performAction('uncheck', {
+    question: whatRegularIncomeDoYouReceive.mainHeader,
+    option: whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
   });
-  console.log(`entered the correct value`);
+  console.log(`unchecked the option`);
 
   console.log(`****INCOME FROM ALL JOBS VALIDATIONS COMPLETED****`);
 
-  // const checkboxes = page.locator('.govuk-checkboxes__input[type="checkbox"]');
-  //
-  // const count = await checkboxes.count();
-  //
-  // for (let i = 0; i < count; i++) {
-  //   const checkbox = checkboxes.nth(i);
-  //   if (await checkbox.isChecked()) {
-  //     await checkbox.uncheck();
-  //   }
-  // }
+  //Select Money from somewhere else
+  console.log(`****MONEY FROM SOMEWHERE ELSE VALIDATION STARTED****`);
+  await performAction('check', {
+    question: whatRegularIncomeDoYouReceive.mainHeader,
+    option: whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
+  });
+  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  console.log(`check box selected - clicked Save and continue`);
 
-    //Select Money from somewhere else
-    //
-    // Mandatory text box is displayed.
-    // 500 Character limit
-    // Error message - Enter details about the money you receive from somewhere else and how much you usually receive
-    // Character count displaying remaining characters
+  await performValidation('errorMessage', {
+    header: whatRegularIncomeDoYouReceive.errorValidationHeader,
+    message: whatRegularIncomeDoYouReceive.enterDetailsAboutMoneyFromSomewhereElseErrorMessage,
+  });
+  console.log(`err msg - mandatory text field`);
+  await performAction(
+    'inputText',
+    whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
+    whatRegularIncomeDoYouReceive.emojiTextInput
+  );
+  console.log(`entered emoji input text`);
 
-    //emoji for text fields
+  await performValidation('errorMessage', {
+    header: whatRegularIncomeDoYouReceive.errorValidationHeader,
+    message: whatRegularIncomeDoYouReceive.emojiErrorMessage,
+  });
+  console.log(`verified emoji error message`);
+  await performAction(
+    'inputText',
+    whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
+    whatRegularIncomeDoYouReceive.tooManyCharTextInput
+  );
+  console.log(`entered text 501 char length`);
+
+  await performValidation('errorMessage', {
+    header: whatRegularIncomeDoYouReceive.errorValidationHeader,
+    message: whatRegularIncomeDoYouReceive.tooManyCharErrorMessage,
+  });
+  console.log(`verified too many char error message`);
+  await performValidation('text', {
+    elementType: 'hintText',
+    text: whatRegularIncomeDoYouReceive.oneCharTooManyHiddenHintText,
+  });
+  console.log(`verified one chr too many hidden hint text for 501 char entered`);
+
+  await performAction(
+    'inputText',
+    whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
+    generateRandomString(500)
+  );
+  console.log(`entered text 500 char length`);
+
+  await performValidation('text', { elementType: 'hintText', text: whatRegularIncomeDoYouReceive.limitHiddenHintText });
+  console.log(`verified hint text for limit hint text`);
+
+  //uncheck
+  await performAction('uncheck', {
+    question: whatRegularIncomeDoYouReceive.mainHeader,
+    option: whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
+  });
+  console.log(`unchecked the option`);
+
+  console.log(`****MONEY FROM SOMEWHERE ELSE VALIDATIONS COMPLETED****`);
 }
 
 export async function whatRegularIncomeDoYouReceiveNavigationTests(): Promise<void> {
