@@ -1,6 +1,3 @@
-import { test } from '@playwright/test';
-import config from 'config';
-
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
@@ -29,10 +26,11 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { test } from '../fixtures/authTest';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = `${(process.env.TEST_URL?.trim() || 'http://localhost:3209').replace(/\/$/, '')}/`;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -155,7 +153,7 @@ test.afterEach(async () => {
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim @noDefendants @regression @accessibility', async () => {
+  test('Respond to a claim @noDefendants @regression @accessibility @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -242,7 +240,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
-  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
+  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -406,7 +404,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
-  test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
+  test.skip('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,

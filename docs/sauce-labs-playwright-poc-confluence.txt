@@ -1,0 +1,61 @@
+CANONICAL POC DOCUMENT (pcs-frontend)
+File: docs/sauce-labs-playwright-poc-confluence.txt
+Update this .txt for Sauce + Playwright evidence and recommendations. (Do not recreate removed companion Markdown POC files.)
+
+---
+
+POC: Sauce Labs + Playwright (cross-browser)
+
+1. Executive summary
+Jenkins runs Playwright on Linux (bundled browsers). Sauce runs the same tests on real Windows/macOS VMs via saucectl — behaviour can differ (especially WebKit: Linux vs Safari-class macOS).
+Recommendation: hybrid model — full regression on Jenkins; cross-browser matrix on Sauce (nightly), using yarn test:crossbrowser → .sauce/config-matrix.yml, SAUCE_GREP @crossbrowser (see Jenkinsfile_nightly and package.json).
+
+2. Why Sauce if we already use Playwright?
+Playwright is only the framework. Linux CI does not run Safari-class WebKit or real Windows Chrome/Edge the same way cloud macOS/Windows do. Sauce fills that gap for a small tagged subset (@crossbrowser), not all tests.
+
+Sauce docs (bookmark):
+https://docs.saucelabs.com/web-apps/automated-testing/playwright/
+https://docs.saucelabs.com/web-apps/automated-testing/playwright/limitations/
+
+Align playwright.version in .sauce/*.yml with Sauce’s supported table and yarn.lock.
+
+Chrome on Android and Sauce Playwright: Sauce’s supported platforms for Playwright in the docs are Windows/macOS only; saucectl does not accept Android as platformName for kind: playwright. For mobile Chrome in Playwright use Jenkins: yarn test:E2eAndroidMobileChrome (CI=true). Other Sauce mobile stacks (e.g. Appium) are separate — TCOE.
+
+3. What we run (pcs-frontend)
+* saucectl, region eu-central-1, tunnel (e.g. reformtunnel), scripts in package.json (test:sauce:*).
+* Matrix: .sauce/config-matrix.yml — desktop Chrome/Edge/Firefox/WebKit as configured; macOS WebKit uses 1440x900 (1080p invalid for that stack in our runs).
+
+4. Evidence (indicative PoC)
+Metric | Jenkins (Linux) | Sauce (PoC) | Notes
+Success | 100% (15/15) | 87% (13/15) | Two native-platform divergences
+Time | ~12 min | ~15 min | Rough comparison; includes Sauce VM setup
+
+5. Findings (examples)
+* WebKit: selectOption failed on macOS WebKit where Linux WebKit passed — visibility/stricter rendering.
+* Timing: timeout on native platforms where Linux passed — allow longer waits for cross-browser runs.
+
+6. TCOE / operations (HMCTS org account — confirm numbers with TCOE)
+* Shared pool (~25 parallel virtual sessions org-wide; use ~3 parallel per product; nightly for heavy matrices).
+* Real-device slots are limited; virtual jobs may queue.
+* Sauce: happy-path / @crossbrowser scope; edge cases on Jenkins where possible.
+* Artifacts: traces/screenshots enabled; Allure skipped on Sauce; video in UI may be placeholder — use traces for debugging.
+
+7. Operating model
+Jenkins: fast feedback, bulk of tests. Sauce: nightly cross-browser (@crossbrowser). Mobile Chrome: Jenkins MobileChrome project, not Sauce Playwright+saucectl.
+
+Recommendation — scope on Sauce (not the full suite): Running the entire E2E suite on every Sauce browser/OS is usually not worth it: it burns licences and runtime, repeats coverage already proven on Linux Jenkins, and increases noise from environment-specific flakes. The effective approach is to decide which tests matter for cross-browser risk (critical journeys, UI that differs by engine/layout), tag or select them (e.g. @crossbrowser), and run only that set on Sauce. Keep full breadth and edge cases on Jenkins.
+
+8. Conclusion
+Use Sauce for desktop macOS/Windows parity that Linux agents do not represent; keep cost under control with nightly scope, TCOE concurrency, and a deliberately small cross-browser test set (§7) — not a full-suite replay on Sauce. Hybrid model stands.
+
+---
+
+Story AC — quick map (attach build links / Sauce job IDs when signing off)
+* Org Sauce + saucectl: §3, package.json, run logs.
+* Desktop browsers in matrix: §3 + config-matrix.yml. Chrome (Android) on Sauce Playwright: not supported — §2; use Jenkins MobileChrome or other stack with TCOE.
+* vs Jenkins performance: §4.
+* Failures / flakes: §5.
+* Artefacts: §6.
+* Limits / cost: §6.
+* CI: Jenkinsfile_nightly; scoped cross-browser runs (not full suite on Sauce): §7.
+* Final recommendation: §8.

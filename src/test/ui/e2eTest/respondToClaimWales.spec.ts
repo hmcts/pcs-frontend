@@ -1,6 +1,3 @@
-import { test } from '@playwright/test';
-import config from 'config';
-
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
@@ -29,9 +26,10 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
+import { test } from '../fixtures/authTest';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = `${(process.env.TEST_URL?.trim() || 'http://localhost:3209').replace(/\/$/, '')}/`;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
@@ -53,7 +51,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales1 @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,

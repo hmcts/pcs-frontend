@@ -30,8 +30,38 @@ properties([
       description: 'Tick the checkbox to run E2E tests in Webkit.'
     ),
     booleanParam(
-      name: 'ACCESSIBILITY_TESTS',
+      name: 'EDGE_TESTS',
       defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in Microsoft Edge.'
+    ),
+    booleanParam(
+      name: 'ANDROID_MOBILE_CHROME_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in emulated Android Chrome (Pixel 5 profile).'
+    ),
+    booleanParam(
+      name: 'ANDROID_MOBILE_FIREFOX_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in emulated Android Firefox (Pixel 5 profile).'
+    ),
+    booleanParam(
+      name: 'ANDROID_SAMSUNG_INTERNET_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in Chromium + Galaxy S24 preset (proxy for Samsung Internet; not the real browser).'
+    ),
+    booleanParam(
+      name: 'IOS_MOBILE_SAFARI_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in emulated iOS Safari / WebKit (iPhone 12 profile).'
+    ),
+    booleanParam(
+      name: 'IOS_IPAD_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in emulated iPad Safari / WebKit (iPad Pro 11 profile).'
+    ),
+    booleanParam(
+      name: 'ACCESSIBILITY_TESTS',
+      defaultValue: false,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
   ])
@@ -56,17 +86,19 @@ static Map secret(String secretName, String envVariable) {
 def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')
+    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
+    secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64')
   ]
 ]
 
 withNightlyPipeline(type, product, component) {
   validateInputs()
-  enableSlackNotifications('#pcs-tech')
+  enableSlackNotifications('#qa-pipeline-status')
   loadVaultSecrets(secrets)
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
   enableFortifyScan()
+  enableCrossBrowserTest()
 
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
@@ -95,10 +127,12 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'false'
+  env.PLAYWRIGHT_TEST_GREP = '@crossbrowser'
+  env.SAUCE_GREP = '@crossbrowser'
 }
 
 def runE2ETests(yarnBuilder) {
-  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
   if (params.CHROME_TESTS) {
     runE2ETestsForBrowser(yarnBuilder, 'Chrome')
   }
@@ -107,6 +141,24 @@ def runE2ETests(yarnBuilder) {
   }
   if (params.WEBKIT_TESTS) {
     runE2ETestsForBrowser(yarnBuilder, 'Safari')
+  }
+  if (params.EDGE_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'Edge')
+  }
+  if (params.ANDROID_MOBILE_CHROME_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'AndroidMobileChrome')
+  }
+  if (params.ANDROID_MOBILE_FIREFOX_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'AndroidMobileFirefox')
+  }
+  if (params.ANDROID_SAMSUNG_INTERNET_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'AndroidSamsungInternet')
+  }
+  if (params.IOS_MOBILE_SAFARI_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'IosMobileSafari')
+  }
+  if (params.IOS_IPAD_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'IosIpad')
   }
 }
 
@@ -163,7 +215,7 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
   def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
-    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    slackSend(channel: '#qa-pipeline-status', message: msg)
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }

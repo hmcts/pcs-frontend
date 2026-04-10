@@ -1,0 +1,218 @@
+# Cross-browser matrix for Sauce Playwright (eu-central-1).
+#
+# Working set for this region + saucectl schema (v0.202.x):
+#   • Windows 10 / 11 — Chrome, Edge, Firefox, WebKit (WebKit on Windows: see Sauce limitations)
+#   • macOS 13 — Chrome, Edge, Firefox, Safari (WebKit desktop)
+#
+# Not in this file (document as POC limitations unless Sauce enables them for your account/region):
+#   • Android / iPhone / iPad — saucectl + kind: playwright only allows desktop platformName values
+#     (validated: yarn test:sauce:mobile-matrix-dry-run → .sauce/config-mobile-platform-matrix.yml).
+#     Mobile web on Sauce is typically Appium/Selenium/WebdriverIO; for Playwright MobileChrome use
+#     Jenkins/Linux: yarn test:E2eAndroidMobileChrome (CI=true).
+#   • macOS 14+ with Firefox — schema may reject until saucectl is upgraded; Firefox on macOS 15 has Sauce
+#     known issues; macOS 13 is the safe combo for Firefox + WebKit with older saucectl.
+#
+# Run: yarn test:crossbrowser → test:sauce:matrix → .sauce/config-matrix.yml
+# Test tag: SAUCE_GREP from env (Jenkinsfile_nightly sets @crossbrowser); override per run if needed.
+# Ref: https://docs.saucelabs.com/web-apps/automated-testing/playwright/
+apiVersion: v1alpha
+kind: playwright
+
+sauce:
+  region: eu-central-1
+  concurrency: 1
+  tunnel:
+    name: $SAUCE_TUNNEL_NAME
+  metadata:
+    tags:
+      - pcs-frontend-matrix
+
+defaults:
+  timeout: 30m
+
+playwright:
+  version: 1.58.1
+  configFile: playwright.config.ts
+
+nodeVersion: v22
+
+rootDir: ./
+
+npm:
+  packages:
+    '@hmcts/playwright-common': '1.0.39'
+
+env:
+  PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
+  PLAYWRIGHT_SKIP_ALLURE: 'true'
+  CI: 'true'
+  NODE_CONFIG_ENV: test
+
+  TEST_URL: $TEST_URL
+  MANAGE_CASE_URL: $MANAGE_CASE_URL
+
+  PCS_API_URL: $PCS_API_URL
+  DATA_STORE_URL_BASE: $DATA_STORE_URL_BASE
+  PCS_API_CHANGE_ID: $PCS_API_CHANGE_ID
+
+  PCS_FRONTEND_IDAM_SECRET: $PCS_FRONTEND_IDAM_SECRET
+  IDAM_PCS_USER_EMAIL: $IDAM_PCS_USER_EMAIL
+  IDAM_PCS_USER_PASSWORD: $IDAM_PCS_USER_PASSWORD
+  IDAM_PCS_USER_PASSWORD_B64: $IDAM_PCS_USER_PASSWORD_B64
+
+  SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
+
+suites:
+  - name: 'pcs-frontend-win10-chrome'
+    platformName: Windows 10
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chrome
+      project: chrome
+      headless: true
+      grep: $SAUCE_GREP
+
+  - name: 'pcs-frontend-win11-chrome'
+    platformName: Windows 11
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chrome
+      project: chrome
+      headless: true
+      grep: $SAUCE_GREP
+
+  - name: 'pcs-frontend-win10-edge'
+    platformName: Windows 10
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chromium
+      project: MicrosoftEdge
+      headless: true
+      grep: $SAUCE_GREP
+
+  - name: 'pcs-frontend-win11-edge'
+    platformName: Windows 11
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chromium
+      project: MicrosoftEdge
+      headless: true
+      grep: $SAUCE_GREP
+
+  - name: 'pcs-frontend-win10-firefox'
+    platformName: Windows 10
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: firefox
+      project: firefox
+      headless: true
+      grep: $SAUCE_GREP
+
+  - name: 'pcs-frontend-win11-firefox'
+    platformName: Windows 11
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: firefox
+      project: firefox
+      headless: true
+      grep: $SAUCE_GREP
+
+  # WebKit on Windows: Sauce docs prefer macOS for WebKit; may see SSL/site issues on Windows.
+  - name: 'pcs-frontend-win10-webkit'
+    platformName: Windows 10
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: webkit
+      project: webkit
+      headless: true
+      grep: $SAUCE_GREP
+
+  - name: 'pcs-frontend-win11-webkit'
+    platformName: Windows 11
+    screenResolution: 1920x1080
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: webkit
+      project: webkit
+      headless: true
+      grep: $SAUCE_GREP
+
+  # saucectl 0.202 validation + EU allocators: use macOS 13 for Firefox/WebKit (not macOS 14 in schema for these combos).
+  # macOS 13 on Sauce: use 1440x900 for Firefox/WebKit/Chrome/Edge — 1080p is not offered for Mac 13 + Chrome/Edge (job misconfigured 404).
+  # Suite order: Chrome + Edge before WebKit — mac Chrome/Edge used to be last; if a run stops early, those jobs were missing in Sauce UI.
+  - name: 'pcs-frontend-mac13-firefox'
+    platformName: macOS 13
+    screenResolution: 1440x900
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: firefox
+      project: firefox
+      headless: true
+      grep: $SAUCE_GREP
+
+  - name: 'pcs-frontend-mac13-chrome'
+    platformName: macOS 13
+    screenResolution: 1440x900
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chrome
+      project: chrome
+      headless: true
+      grep: $SAUCE_GREP
+
+  - name: 'pcs-frontend-mac13-edge'
+    platformName: macOS 13
+    screenResolution: 1440x900
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: chromium
+      project: MicrosoftEdge
+      headless: true
+      grep: $SAUCE_GREP
+
+  # macOS 14 + armRequired: Sauce rejects macOS 13 + armRequired as unsupported; ARM WebKit needs 14+ per Sauce docs.
+  - name: 'pcs-frontend-mac14-webkit'
+    platformName: macOS 14
+    armRequired: true
+    screenResolution: 1440x900
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: webkit
+      project: webkit
+      headless: true
+      grep: $SAUCE_GREP
+
+reporters:
+  spotlight:
+    enabled: true
