@@ -13,6 +13,12 @@ export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousSt
 export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export {
+  shouldRouteToPriorityDebts,
+  shouldRouteToUniversalCreditQuestion,
+  shouldRouteToPriorityDebtDetails,
+  shouldRouteToOtherRegularExpenses,
+} from './respondToClaimRouteConditions';
+export {
   poundsStringToPence,
   ccdPenceToPoundsString,
   additionalRentContributionToPoundsString,

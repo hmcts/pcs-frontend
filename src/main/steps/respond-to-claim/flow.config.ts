@@ -13,6 +13,10 @@ import {
   isNoticeServed,
   isTenancyStartDateKnown,
   isWelshProperty,
+  shouldRouteToOtherRegularExpenses,
+  shouldRouteToPriorityDebtDetails,
+  shouldRouteToPriorityDebts,
+  shouldRouteToUniversalCreditQuestion,
 } from '../utils';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
@@ -422,31 +426,11 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'income-and-expenditure',
       routes: [
         {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            const selected = currentStepData.regularIncome;
-            if (Array.isArray(selected)) {
-              return selected.includes('universalCredit');
-            }
-            return selected === 'universalCredit';
-          },
+          condition: shouldRouteToPriorityDebts,
           nextStep: 'priority-debts',
         },
         {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            const selected = currentStepData.regularIncome;
-            if (Array.isArray(selected)) {
-              return !selected.includes('universalCredit');
-            }
-            return selected !== 'universalCredit';
-          },
+          condition: shouldRouteToUniversalCreditQuestion,
           nextStep: 'have-you-applied-for-universal-credit',
         },
       ],
@@ -463,19 +447,11 @@ export const flowConfig: JourneyFlowConfig = {
       },
       routes: [
         {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => currentStepData.havePriorityDebts === 'yes',
+          condition: shouldRouteToPriorityDebtDetails,
           nextStep: 'priority-debt-details',
         },
         {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => currentStepData.havePriorityDebts === 'no',
+          condition: shouldRouteToOtherRegularExpenses,
           nextStep: 'what-other-regular-expenses-do-you-have',
         },
       ],

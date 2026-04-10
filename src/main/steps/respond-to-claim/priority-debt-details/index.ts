@@ -1,4 +1,8 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type {
+  DebtContributionFrequencyFormValue,
+  DebtContributionFrequencyValue,
+  PossessionClaimResponse,
+} from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdPenceToPoundsString, poundsStringToPence } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
@@ -8,10 +12,8 @@ import { createFormStep } from '@modules/steps';
 
 const MAX_AMOUNT = 1_000_000_000;
 const AMOUNT_REGEX = /^\d+(\.\d{1,2})?$/;
-const FREQUENCY_MAP: Record<string, 'weekly' | 'monthly'> = {
-  WEEK: 'weekly',
+const FREQUENCY_MAP: Record<DebtContributionFrequencyValue, DebtContributionFrequencyFormValue> = {
   WEEKLY: 'weekly',
-  MONTH: 'monthly',
   MONTHLY: 'monthly',
 };
 
@@ -46,7 +48,7 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const total = req.body?.priorityDebtTotal as string | undefined;
     const contribution = req.body?.priorityDebtContribution as string | undefined;
-    const frequency = req.body?.priorityDebtContributionFrequency as string | undefined;
+    const frequency = req.body?.priorityDebtContributionFrequency as DebtContributionFrequencyFormValue | undefined;
 
     const householdCircumstances: Record<string, unknown> = {};
 
@@ -62,8 +64,8 @@ export const step: StepDefinition = createFormStep({
         householdCircumstances.debtContribution = String(pence);
       }
     }
-    if (typeof frequency === 'string' && frequency.trim()) {
-      householdCircumstances.debtContributionFrequency = frequency.toUpperCase();
+    if (frequency === 'weekly' || frequency === 'monthly') {
+      householdCircumstances.debtContributionFrequency = frequency.toUpperCase() as DebtContributionFrequencyValue;
     }
 
     if (Object.keys(householdCircumstances).length === 0) {
@@ -86,7 +88,7 @@ export const step: StepDefinition = createFormStep({
                 householdCircumstances?: {
                   debtTotal?: unknown;
                   debtContribution?: unknown;
-                  debtContributionFrequency?: string;
+                  debtContributionFrequency?: DebtContributionFrequencyValue;
                 };
               };
             };
@@ -97,9 +99,10 @@ export const step: StepDefinition = createFormStep({
     const priorityDebtTotal = ccdPenceToPoundsString(householdCircumstances?.debtTotal);
     const priorityDebtContribution = ccdPenceToPoundsString(householdCircumstances?.debtContribution);
     const priorityDebtContributionFrequencyRaw = householdCircumstances?.debtContributionFrequency;
+    const normalizedFrequency = priorityDebtContributionFrequencyRaw?.toUpperCase();
     const priorityDebtContributionFrequency =
-      typeof priorityDebtContributionFrequencyRaw === 'string'
-        ? FREQUENCY_MAP[priorityDebtContributionFrequencyRaw.toUpperCase()]
+      normalizedFrequency === 'WEEKLY' || normalizedFrequency === 'MONTHLY'
+        ? FREQUENCY_MAP[normalizedFrequency]
         : undefined;
 
     return {

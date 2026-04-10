@@ -8,6 +8,8 @@ export type YesNoValue = 'Yes' | 'No';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
+export type DebtContributionFrequencyValue = 'WEEKLY' | 'MONTHLY';
+export type DebtContributionFrequencyFormValue = 'weekly' | 'monthly';
 
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
@@ -27,7 +29,7 @@ export interface HouseholdCircumstances {
   priorityDebts?: YesNoValue;
   debtTotal?: string;
   debtContribution?: string;
-  debtContributionFrequency?: string;
+  debtContributionFrequency?: DebtContributionFrequencyValue;
 }
 
 export interface CcdUserCase {
