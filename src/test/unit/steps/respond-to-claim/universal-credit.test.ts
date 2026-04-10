@@ -151,4 +151,28 @@ describe('respond-to-claim universal-credit step', () => {
       },
     });
   });
+
+  it('throws when selection is yes and date fields are missing', async () => {
+    (validateForm as jest.Mock).mockReturnValue({});
+    const req = createReq({
+      body: {
+        action: 'continue',
+        haveAppliedForUniversalCredit: 'yes',
+        'ucApplicationDate-day': '10',
+        'ucApplicationDate-year': '2024',
+      },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+    const next = jest.fn();
+
+    if (!step.postController) {
+      throw new Error('expected postController');
+    }
+
+    await step.postController.post(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(expect.any(Error));
+    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+  });
 });

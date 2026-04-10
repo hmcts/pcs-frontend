@@ -28,26 +28,26 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const ucApplicationDate = {
-      day: req.body?.['ucApplicationDate-day'] as string | undefined,
-      month: req.body?.['ucApplicationDate-month'] as string | undefined,
-      year: req.body?.['ucApplicationDate-year'] as string | undefined,
-    };
+    const day = req.body?.['ucApplicationDate-day'] as string | undefined;
+    const month = req.body?.['ucApplicationDate-month'] as string | undefined;
+    const year = req.body?.['ucApplicationDate-year'] as string | undefined;
 
     const universalCredit = selection === 'yes' ? toYesNoEnum(selection) : undefined;
 
     let isoDate: string | undefined;
-    if (selection === 'yes' && ucApplicationDate?.day && ucApplicationDate?.month && ucApplicationDate?.year) {
-      const dateTime = DateTime.fromObject({
-        year: Number(ucApplicationDate.year),
-        month: Number(ucApplicationDate.month),
-        day: Number(ucApplicationDate.day),
+    if (selection === 'yes') {
+      if (!day || !month || !year) {
+        throw new Error('Missing universal credit application date submitted');
+      }
+      const ucApplicationDate = DateTime.fromObject({
+        year: Number(year),
+        month: Number(month),
+        day: Number(day),
       });
-      if (dateTime.isValid) {
-        isoDate = dateTime.toISODate() || undefined;
-      } else {
+      if (!ucApplicationDate.isValid) {
         throw new Error('Invalid universal credit application date submitted');
       }
+      isoDate = ucApplicationDate.toISODate() || undefined;
     }
 
     if (!universalCredit) {
