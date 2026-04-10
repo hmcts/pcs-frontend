@@ -4,14 +4,16 @@ export enum CaseState {
 }
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoValue = 'Yes' | 'No';
-
+export type ContactPreference = 'EMAIL' | 'POST' | null;
+export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 
-export type ContactPreference = 'EMAIL' | 'POST' | null;
-
 export interface HouseholdCircumstances {
+  shareAdditionalCircumstances?: YesNoValue;
+  additionalCircumstancesDetails?: string;
+  exceptionalHardship?: YesNoValue;
+  exceptionalHardshipDetails?: string;
   dependantChildren?: YesNoValue;
   dependantChildrenDetails?: string;
   otherDependants?: YesNoValue;
@@ -108,4 +110,15 @@ export interface StartCallbackData {
       };
     };
   };
+}
+
+export enum GenAppType {
+  SUSPEND,
+  ADJOURN,
+  SET_ASIDE,
+  SOMETHING_ELSE,
+}
+
+export interface CitizenGenAppRequest {
+  applicationType: GenAppType;
 }

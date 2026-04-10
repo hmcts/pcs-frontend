@@ -3,6 +3,8 @@ import type { Request } from 'express';
 import type { JourneyFlowConfig } from '../interfaces/stepFlow.interface';
 import type { StepDefinition } from '../interfaces/stepFormData.interface';
 
+import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
+import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
@@ -31,6 +33,11 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       flowConfig: respondToClaimLegalrepFlowConfig,
       stepRegistry: respondToClaimStepRegistry,
     },
+  },
+  makeAnApplication: {
+    name: 'makeAnApplication',
+    flowConfig: makeAnApplicationFlowConfig,
+    stepRegistry: makeAnApplicationStepRegistry,
   },
 };
 
