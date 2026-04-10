@@ -24,6 +24,13 @@ export interface HouseholdCircumstances {
   otherTenantsDetails?: string;
 }
 
+export type PaymentAgreement = {
+  anyPaymentsMade?: YesNoValue;
+  paymentDetails?: string;
+  repaymentPlanAgreed?: YesNoNotSureValue;
+  repaymentAgreedDetails?: string;
+};
+
 export interface CcdUserCase {
   id: string;
   state: CaseState;
@@ -57,6 +64,7 @@ export interface CaseData {
 }
 
 export interface PossessionClaimResponse {
+  claimantOrganisations?: { value: string }[];
   defendantContactDetails?: {
     party?: {
       firstName?: string;
@@ -68,7 +76,7 @@ export interface PossessionClaimResponse {
     };
   };
   defendantResponses?: {
-    tenancyTypeCorrect?: TenancyTypeCorrectValue;
+    tenancyTypeCorrect?: YesNoNotSureValue;
     tenancyType?: string;
     tenancyStartDateCorrect?: string;
     tenancyStartDate?: string;
@@ -85,17 +93,15 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
-    paymentAgreement?: {
-      repaymentPlanAgreed?: YesNoNotSureValue;
-      repaymentAgreedDetails?: string;
-    };
+    possessionNoticeReceived?: YesNoNotSureValue;
+    noticeReceivedDate?: string;
+    paymentAgreement?: PaymentAgreement;
     householdCircumstances?: HouseholdCircumstances;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;
     lastName?: string;
   };
-  claimantOrganisations?: { value: string }[];
 }
 
 export interface StartCallbackData {

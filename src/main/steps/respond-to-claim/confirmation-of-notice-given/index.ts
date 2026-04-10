@@ -1,4 +1,8 @@
+import type { Request } from 'express';
+
+import type { CaseData, PossessionClaimResponse, YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -17,24 +21,46 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'confirmNoticeGiven',
+      name: 'possessionNoticeReceived',
       type: 'radio',
       required: true,
       translationKey: { label: 'question', hint: 'hintText' },
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
-        { value: 'yes', translationKey: 'options.yes' },
-        { value: 'no', translationKey: 'options.no' },
+        { value: 'YES', translationKey: 'options.yes' },
+        { value: 'NO', translationKey: 'options.no' },
         { divider: 'options.or' },
-        { value: 'imNotSure', translationKey: 'options.imNotSure' },
+        { value: 'NOT_SURE', translationKey: 'options.imNotSure' },
       ],
     },
   ],
+  getInitialFormData: req => {
+    const caseData: CaseData = req.res?.locals.validatedCase?.data;
+    const possessionNoticeReceived: YesNoNotSureValue | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived;
+
+    return possessionNoticeReceived ? { possessionNoticeReceived } : {};
+  },
+  beforeRedirect: async (req: Request) => {
+    const possessionNoticeReceived: YesNoNotSureValue | undefined = req.body?.possessionNoticeReceived;
+
+    if (!possessionNoticeReceived) {
+      return;
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        possessionNoticeReceived,
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
   extendGetContent: req => {
     // Read from CCD (fresh data from START callback via res.locals.validatedCase)
     // Same pattern as free-legal-advice - no session dependency
-    const caseData = req.res?.locals.validatedCase?.data;
-    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
+    const caseData: CaseData = req.res?.locals.validatedCase?.data;
+    const claimantName: string | undefined = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
 
     return {
       claimantName,

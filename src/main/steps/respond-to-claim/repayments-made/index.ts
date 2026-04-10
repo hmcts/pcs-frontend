@@ -1,4 +1,11 @@
+import type {
+  CaseData,
+  PaymentAgreement,
+  PossessionClaimResponse,
+  YesNoValue,
+} from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -23,7 +30,7 @@ export const step: StepDefinition = createFormStep({
       },
       options: [
         {
-          value: 'yes',
+          value: 'Yes',
           translationKey: 'options.yes',
           subFields: {
             repaymentsInfo: {
@@ -39,10 +46,50 @@ export const step: StepDefinition = createFormStep({
             },
           },
         },
-        { value: 'no', translationKey: 'options.no' },
+        { value: 'No', translationKey: 'options.no' },
       ],
     },
   ],
+  beforeRedirect: async req => {
+    const confirmRepaymentsMade: YesNoValue | undefined = req.body?.confirmRepaymentsMade;
+    if (!confirmRepaymentsMade) {
+      return;
+    }
+
+    const paymentDetails: string | undefined =
+      confirmRepaymentsMade === 'Yes' ? req.body?.['confirmRepaymentsMade.repaymentsInfo'] : undefined;
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        paymentAgreement: {
+          anyPaymentsMade: confirmRepaymentsMade,
+          paymentDetails: paymentDetails ?? '',
+        },
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  getInitialFormData: req => {
+    const caseData: CaseData = req.res?.locals.validatedCase?.data;
+    const paymentAgreement: PaymentAgreement | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+    const confirmRepaymentsMade: YesNoValue | undefined = paymentAgreement?.anyPaymentsMade;
+    if (!confirmRepaymentsMade) {
+      return {};
+    }
+
+    if (confirmRepaymentsMade === 'Yes') {
+      const repaymentsInfo: string | undefined = paymentAgreement?.paymentDetails;
+      return {
+        confirmRepaymentsMade: 'Yes',
+        'confirmRepaymentsMade.repaymentsInfo': repaymentsInfo ?? '',
+      };
+    }
+    return {
+      confirmRepaymentsMade: 'No',
+    };
+  },
   extendGetContent: req => ({
     // TODO:Retrieve claimantName/claimIssueDate dynamically from CCD case data and remove hardcoded default value
     claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
