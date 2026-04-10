@@ -9,7 +9,7 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
-  dateOfBirth,
+  defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHome,
@@ -162,9 +162,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnKnown', {
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
@@ -249,9 +249,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnKnown', {
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
@@ -413,9 +413,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnKnown', {
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
@@ -495,9 +495,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnKnown', {
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
@@ -574,9 +574,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameConfirmation.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
@@ -649,9 +649,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
@@ -726,9 +726,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
@@ -804,9 +804,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,

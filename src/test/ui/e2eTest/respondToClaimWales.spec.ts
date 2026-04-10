@@ -9,7 +9,7 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
-  dateOfBirth,
+  defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
@@ -60,9 +60,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnKnown', {
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,

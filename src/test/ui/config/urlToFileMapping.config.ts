@@ -8,7 +8,7 @@ export default {
   'contact-preferences-telephone': 'contactPreferencesTelephone',
   'contact-preferences-text-message': 'contactPreferencesTextMessage',
   'dispute-claim-interstitial': 'disputeClaimInterstitial',
-  'date-of-birth': 'dateOfBirth',
+  'defendant-date-of-birth': 'defendantDateOfBirth',
   'confirmation-of-notice-date-when-not-provided': 'noticeDateWhenNotProvided',
   'confirmation-of-notice-given': 'confirmationOfNoticeGiven',
   'non-rent-arrears-dispute': 'nonRentArrearsDispute',
@@ -32,7 +32,6 @@ export default {
   'your-household-and-circumstances': 'yourHouseholdAndCircumstances',
   'do-you-have-any-dependant-children': 'doYouHaveAnyDependantChildren',
   'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
-  //Add Gen APPs mapping below this line
   'choose-an-application': 'chooseAnApplication',
   'check-your-answers': 'checkYourAnswers',
 };
