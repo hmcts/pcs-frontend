@@ -7,5 +7,13 @@ export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getStepBeforeDisputePages } from './journeyHelpers';
+export {
+  getFirstStepInSection,
+  getSectionCoverage,
+  getSectionForStep,
+  getStepsInSection,
+  isLastStepInSection,
+  isSectionApplicable,
+} from './sections';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
