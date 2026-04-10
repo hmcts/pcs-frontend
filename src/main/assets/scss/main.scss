@@ -28,6 +28,16 @@
   font-weight: 300;
 }
 
+// Priority debt details: "Paid every:" week/month radios (15px gap; GOV.UK default is 10px)
+.priority-debt-details-paid-every-radios .govuk-radios__item {
+  margin-bottom: govuk-spacing(3);
+}
+
+.priority-debt-details-paid-every-radios .govuk-radios__item:last-child,
+.priority-debt-details-paid-every-radios .govuk-radios__item:last-of-type {
+  margin-bottom: 0;
+}
+
 .correspondence-address-form {
   .pcs-address-component {
     .govuk-details__text {

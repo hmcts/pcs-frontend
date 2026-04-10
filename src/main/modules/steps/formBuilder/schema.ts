@@ -65,6 +65,8 @@ export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
     // Label can be string or function
     label: LabelFunctionSchema.optional(),
     labelClasses: z.string().optional(),
+    formGroupClasses: z.string().optional(),
+    hintClasses: z.string().optional(),
     hint: z.string().optional(),
     translationKey: z
       .object({

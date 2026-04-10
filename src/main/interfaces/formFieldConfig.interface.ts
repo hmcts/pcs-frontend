@@ -18,6 +18,7 @@ export interface FormFieldOption {
   divider?: string;
   translationKey?: string;
   label?: string | ((translations: Record<string, string>) => string);
+  hint?: string | ((translations: Record<string, string>) => string);
   conditionalText?: string | ((translations: Record<string, string>) => string);
   // SubFields appear conditionally when this option is selected (e.g., text inputs under "No" radio button)
   subFields?: Record<string, FormFieldConfig>;
@@ -33,6 +34,8 @@ export interface FormFieldConfig {
   errorMessage?: string;
   label?: string | ((translations: Record<string, string>) => string);
   labelClasses?: string;
+  formGroupClasses?: string;
+  hintClasses?: string;
   hint?: string;
   translationKey?: {
     label?: string;

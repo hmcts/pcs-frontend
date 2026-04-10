@@ -2,15 +2,21 @@ import { type Request } from 'express';
 
 import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
+  getPreviousStepForWhatOtherRegularExpenses,
   getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
+  hasSelectedUniversalCredit,
   isDefendantNameKnown,
   isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
   isWelshProperty,
+  shouldRouteToOtherRegularExpenses,
+  shouldRouteToPriorityDebtDetails,
+  shouldRouteToPriorityDebts,
+  shouldRouteToUniversalCreditQuestion,
 } from '../utils';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
@@ -418,6 +424,16 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-regular-income-do-you-receive': {
       previousStep: 'income-and-expenditure',
+      routes: [
+        {
+          condition: shouldRouteToPriorityDebts,
+          nextStep: 'priority-debts',
+        },
+        {
+          condition: shouldRouteToUniversalCreditQuestion,
+          nextStep: 'have-you-applied-for-universal-credit',
+        },
+      ],
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
@@ -425,15 +441,28 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
-      previousStep: 'have-you-applied-for-universal-credit',
-      defaultNext: 'priority-debt-details',
+      previousStep: async (req: Request): Promise<string> => {
+        const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
+        return selectedUniversalCredit ? 'what-regular-income-do-you-receive' : 'have-you-applied-for-universal-credit';
+      },
+      routes: [
+        {
+          condition: shouldRouteToPriorityDebtDetails,
+          nextStep: 'priority-debt-details',
+        },
+        {
+          condition: shouldRouteToOtherRegularExpenses,
+          nextStep: 'what-other-regular-expenses-do-you-have',
+        },
+      ],
+      defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'priority-debt-details': {
       previousStep: 'priority-debts',
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
-      previousStep: 'priority-debt-details',
+      previousStep: getPreviousStepForWhatOtherRegularExpenses,
       defaultNext: 'end-now',
     },
   },

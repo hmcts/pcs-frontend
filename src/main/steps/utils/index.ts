@@ -10,6 +10,18 @@ export { getPreviousPageForArrears } from './journeyHelpers';
 export { getStepBeforeDisputePages } from './journeyHelpers';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
-export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
+export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
+export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
+export {
+  shouldRouteToPriorityDebts,
+  shouldRouteToUniversalCreditQuestion,
+  shouldRouteToPriorityDebtDetails,
+  shouldRouteToOtherRegularExpenses,
+} from './respondToClaimRouteConditions';
+export {
+  poundsStringToPence,
+  ccdPenceToPoundsString,
+  additionalRentContributionToPoundsString,
+} from './moneyAmountTransforms';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';

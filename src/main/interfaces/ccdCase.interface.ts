@@ -8,6 +8,8 @@ export type YesNoValue = 'Yes' | 'No';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
+export type DebtContributionFrequencyValue = 'WEEKLY' | 'MONTHLY';
+export type DebtContributionFrequencyFormValue = 'weekly' | 'monthly';
 
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
@@ -22,6 +24,12 @@ export interface HouseholdCircumstances {
   alternativeAccommodationTransferDate?: string;
   otherTenants?: YesNoValue;
   otherTenantsDetails?: string;
+  universalCredit?: YesNoValue;
+  ucApplicationDate?: string;
+  priorityDebts?: YesNoValue;
+  debtTotal?: string;
+  debtContribution?: string;
+  debtContributionFrequency?: DebtContributionFrequencyValue;
 }
 
 export interface CcdUserCase {
@@ -86,6 +94,7 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
+    householdCircumstances?: HouseholdCircumstances;
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
@@ -93,7 +102,6 @@ export interface PossessionClaimResponse {
       additionalRentContribution?: unknown;
       additionalContributionFrequency?: string;
     };
-    householdCircumstances?: HouseholdCircumstances;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;
@@ -114,4 +122,15 @@ export interface StartCallbackData {
       };
     };
   };
+}
+
+export enum GenAppType {
+  SUSPEND,
+  ADJOURN,
+  SET_ASIDE,
+  SOMETHING_ELSE,
+}
+
+export interface CitizenGenAppRequest {
+  applicationType: GenAppType;
 }
