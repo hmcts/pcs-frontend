@@ -78,7 +78,7 @@ export const step: StepDefinition = createFormStep({
               },
               labelClasses: 'govuk-label',
               errorMessage: 'errors.otherConsiderationsDetails',
-                            validator: (value: unknown) => {
+              validator: (value: unknown) => {
                 const text = (value as string)?.trim();
                 const allowedCharsRegex = /^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u;
 
