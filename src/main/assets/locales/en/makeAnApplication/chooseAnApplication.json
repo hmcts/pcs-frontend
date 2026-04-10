@@ -2,20 +2,31 @@
   "pageTitle": "Choose an application",
   "caption": "Make an application",
   "heading": "Choose an application",
+  "noticeText": "You cannot apply to suspend (stop or delay) the eviction online.",
+  "noticeTextByPost": "You must apply by post: ",
+  "noticeTextList": {
+    "readTheGuidance": "<a href=\"https://www.gov.uk/guidance/suspend-eviction-online\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">read the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)</a>",
+    "fillInTheForm": "<a href=\"https://www.gov.uk/government/publications/form-n244-application-notice\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">fill in the N244a form</a>",
+    "findYourLocalCourt": "<a href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">find your local court</a>",
+    "sendTheFormToTheCourt": "send the completed form to the court, or deliver it by hand"
+  },
   "question": "What do you want to apply for?",
   "hintText": "Some optional hint text here (placeholder)",
   "options": {
     "adjourn": {
-      "label": "Ask to adjourn (delay) the hearing"
+      "label": "Ask to adjourn the hearing (move it to a later time or date)",
+      "hint": "You can apply to change the court hearing until a later time or date"
     },
     "setAside": {
-      "label": "Ask the court to change (set aside) their decision to evict you"
+      "label": "Ask the court to set aside (cancel) a decision the court has made",
+      "hint": "You can ask the court to set aside its order if you have good reason. For example, if you were unable to attend the court hearing because you were ill"
     },
     "somethingElse": {
-      "label": "Something else"
+      "label": "Something else",
+      "hint": "Make an application for something that is not listed above"
     }
   },
   "errors": {
-    "typeOfApplication": "You must select an type of application to apply for"
+    "typeOfApplication": "Choose what you want to apply for"
   }
 }

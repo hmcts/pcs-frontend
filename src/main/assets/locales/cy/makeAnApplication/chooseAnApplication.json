@@ -2,20 +2,31 @@
   "pageTitle": "cyChoose an application",
   "caption": "cyMake an application",
   "heading": "cyChoose an application",
+  "noticeText": "You cannot apply to suspend (stop or delay) the eviction online.",
+  "noticeTextByPost": "cyYou must apply by post: ",
+  "noticeTextList": {
+    "readTheGuidance": "<a href=\"https://www.gov.uk/guidance/suspend-eviction-online\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">cyRead the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)</a>",
+    "fillInTheForm": "<a href=\"https://www.gov.uk/government/publications/form-n244-application-notice\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">cyFill in the N244a form</a>",
+    "findYourLocalCourt": "<a href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">cyFind your local court</a>",
+    "sendTheFormToTheCourt": "cySend the completed form to the court, or deliver it by hand"
+  },
   "question": "cyWhat do you want to apply for?",
   "hintText": "cySome optional hint text here (placeholder)",
   "options": {
     "adjourn": {
-      "label": "cyAsk to adjourn (delay) the hearing"
+      "label": "cyAsk to adjourn the hearing (move it to a later time or date)",
+      "hint": "cyYou can apply to change the court hearing until a later time or date"
     },
     "setAside": {
-      "label": "cyAsk the court to change (set aside) their decision to evict you"
+      "label": "cyAsk the court to set aside (cancel) a decision the court has made",
+      "hint": "cyYou can ask the court to set aside its order if you have good reason. For example, if you were unable to attend the court hearing because you were ill"
     },
     "somethingElse": {
-      "label": "cySomething else"
+      "label": "cySomething else",
+      "hint": "cyMake an application for something that is not listed above"
     }
   },
   "errors": {
-    "typeOfApplication": "cyYou must select an type of application to apply for"
+    "typeOfApplication": "cyChoose what you want to apply for"
   }
 }
