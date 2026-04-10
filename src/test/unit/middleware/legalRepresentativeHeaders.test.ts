@@ -13,18 +13,20 @@ const mockBuildFooterModel = jest.fn();
 
 jest.mock('@hmcts-cft/cft-ui-component-lib', () => ({
   buildHeaderModel: (...args: unknown[]) => mockBuildHeaderModel(...args),
-  buildFooterModel: () => mockBuildFooterModel()
+  buildFooterModel: () => mockBuildFooterModel(),
 }));
 
 describe('legalRepresentativeHeaderMiddleware', () => {
   let res: Partial<Response>;
   let next: NextFunction;
   const invokeMiddleware = (req: Request): void => {
-    (legalRepresentativeHeaderMiddleware as unknown as (request: Request, response: Response, nextFn: NextFunction) => void)(
-      req,
-      res as Response,
-      next
-    );
+    (
+      legalRepresentativeHeaderMiddleware as unknown as (
+        request: Request,
+        response: Response,
+        nextFn: NextFunction
+      ) => void
+    )(req, res as Response, next);
   };
 
   beforeEach(() => {
@@ -49,18 +51,17 @@ describe('legalRepresentativeHeaderMiddleware', () => {
     const headerModel = { name: 'header', assetsPath: '' };
     const footerModel = { name: 'footer' };
     mockIsLegalRepresentativeUser.mockReturnValue(true);
-    mockBuildHeaderModel.mockReturnValue(headerModel);    
+    mockBuildHeaderModel.mockReturnValue(headerModel);
     mockBuildFooterModel.mockReturnValue(footerModel);
     const req = {} as unknown as Request;
 
     invokeMiddleware(req);
 
     expect(next).toHaveBeenCalled();
-    expect(res.locals?.extraHeaders).toEqual({ 
+    expect(res.locals?.extraHeaders).toEqual({
       headerModel,
       footerModel,
-      isLegalRepresentative: true
+      isLegalRepresentative: true,
     });
   });
-
 });

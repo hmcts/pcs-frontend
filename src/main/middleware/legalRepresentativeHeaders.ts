@@ -15,7 +15,7 @@ export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
   if (isLegalRepresentative) {
     const roles = req.session?.user?.roles;
     const xuiBaseUri: string = process.env.XUI_BASE_URI || config.get('xui.uri');
-  
+
     headerModel = buildHeaderModel({
       xuiBaseUrl: xuiBaseUri,
       user: { roles: roles as string[] },

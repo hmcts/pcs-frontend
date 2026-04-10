@@ -28,7 +28,9 @@ const mockLegalRepresentativeHeaderMiddleware = jest.fn((req, res, next) => next
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
-  legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => mockLegalRepresentativeHeaderMiddleware(req, res, next)),
+  legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) =>
+    mockLegalRepresentativeHeaderMiddleware(req, res, next)
+  ),
 }));
 
 const mockFlowConfig = {

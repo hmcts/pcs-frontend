@@ -7,7 +7,11 @@ import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
-import { caseReferenceParamMiddleware, legalRepresentativeAccessMiddleware, pageTrackingUrlMiddleware } from './middleware';
+import {
+  caseReferenceParamMiddleware,
+  legalRepresentativeAccessMiddleware,
+  pageTrackingUrlMiddleware,
+} from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import { registerAllJourneys } from './routes/registerSteps';

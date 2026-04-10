@@ -71,11 +71,7 @@ export function getFlowConfigForJourney(journeyName: string, req?: Request): Jou
   return getJourneyConfigForRequest(journeyName, req)?.flowConfig;
 }
 
-export function getStepForJourney(
-  journeyName: string,
-  stepName: string,
-  req?: Request
-): StepDefinition | undefined {
+export function getStepForJourney(journeyName: string, stepName: string, req?: Request): StepDefinition | undefined {
   return getJourneyConfigForRequest(journeyName, req)?.stepRegistry[stepName];
 }
 
@@ -95,10 +91,7 @@ export function getStepsForJourney(journeyName: string, req?: Request): StepDefi
         return activeJourney.stepRegistry[stepName];
       }
 
-      return (
-        journey.default.stepRegistry[stepName] ??
-        journey.legalrep?.stepRegistry[stepName]
-      );
+      return journey.default.stepRegistry[stepName] ?? journey.legalrep?.stepRegistry[stepName];
     })
     .filter((step: StepDefinition | undefined): step is StepDefinition => step !== undefined);
 }

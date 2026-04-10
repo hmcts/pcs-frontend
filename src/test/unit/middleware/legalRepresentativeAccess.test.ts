@@ -12,11 +12,13 @@ describe('legalRepresentativeAccessMiddleware', () => {
   let res: Partial<Response>;
   let next: NextFunction;
   const invokeMiddleware = (req: Request): void => {
-    (legalRepresentativeAccessMiddleware as unknown as (request: Request, response: Response, nextFn: NextFunction) => void)(
-      req,
-      res as Response,
-      next
-    );
+    (
+      legalRepresentativeAccessMiddleware as unknown as (
+        request: Request,
+        response: Response,
+        nextFn: NextFunction
+      ) => void
+    )(req, res as Response, next);
   };
 
   beforeEach(() => {
