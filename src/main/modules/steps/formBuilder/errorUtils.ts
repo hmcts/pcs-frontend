@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-
 import { getRequestLanguage } from '../../i18n';
 import { getTranslationFunction } from '../i18n';
 

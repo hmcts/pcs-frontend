@@ -5,7 +5,6 @@ import type { PossessionClaimResponse, YesNoValue } from '@interfaces/ccdCase.in
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 
-
 export const step: StepDefinition = createFormStep({
   stepName: 'your-circumstances',
   journeyFolder: 'respondToClaim',

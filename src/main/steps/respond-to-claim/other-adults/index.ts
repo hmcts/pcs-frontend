@@ -5,7 +5,6 @@ import type { PossessionClaimResponse } from '@interfaces/ccdCase.interface';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
-
 export const step: StepDefinition = createFormStep({
   stepName: 'do-any-other-adults-live-in-your-home',
   journeyFolder: 'respondToClaim',
