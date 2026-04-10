@@ -1,15 +1,15 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
+import { normalizeCheckboxValue } from './helpers';
+import { buildSubFieldsHTML } from './subFieldsRenderer';
+
 import type {
   ComponentConfig,
   ComponentType,
   FormFieldConfig,
   FormFieldOption,
-} from '../../../interfaces/formFieldConfig.interface';
-
-import { normalizeCheckboxValue } from './helpers';
-import { buildSubFieldsHTML } from './subFieldsRenderer';
+} from '@interfaces/formFieldConfig.interface';
 
 function createFieldsetLegend(
   label: string,

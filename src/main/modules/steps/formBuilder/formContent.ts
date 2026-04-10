@@ -1,11 +1,11 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import type { BuiltFormContent, FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
-
 import { type FormError, buildErrorSummary, getErrorMessage } from './errorUtils';
 import { buildFieldValues, translateFields } from './fieldTranslation';
 import { getTranslation } from './helpers';
+
+import type { BuiltFormContent, FormFieldConfig, TranslationKeys } from '@interfaces/formFieldConfig.interface';
 
 export function buildFormContent(
   fields: FormFieldConfig[],
