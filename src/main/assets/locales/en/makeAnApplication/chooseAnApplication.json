@@ -1,0 +1,21 @@
+{
+  "pageTitle": "Choose an application",
+  "caption": "Make an application",
+  "heading": "Choose an application",
+  "question": "What do you want to apply for?",
+  "hintText": "Some optional hint text here (placeholder)",
+  "options": {
+    "adjourn": {
+      "label": "Ask to adjourn (delay) the hearing"
+    },
+    "setAside": {
+      "label": "Ask the court to change (set aside) their decision to evict you"
+    },
+    "somethingElse": {
+      "label": "Something else"
+    }
+  },
+  "errors": {
+    "typeOfApplication": "You must select an type of application to apply for"
+  }
+}
