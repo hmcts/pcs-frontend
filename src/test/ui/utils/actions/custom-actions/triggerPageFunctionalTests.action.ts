@@ -8,6 +8,7 @@ import {
   enable_error_message_validation,
   enable_navigation_tests,
 } from '../../../../../../playwright.config';
+import { shortUrl, truncateForLog } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
 import {
   ErrorMessageValidation,
@@ -33,15 +34,23 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
     const pageName = await this.getFileNameForPage(page);
+    const flowTestTitle = truncateForLog(test.info().title, 160);
+
     if (!pageName) {
+      if (TriggerPageFunctionalTestsAction.isDashboardUrl(page.url())) {
+        return;
+      }
+      console.warn(
+        `[PFT flow] test="${flowTestTitle}" | mapping missing in urlToFileMapping.config.ts | url=${shortUrl(page.url())}`
+      );
       return;
     }
 
-    // Check lock file before running tests
-    const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-    if (fs.existsSync(lockPath)) {
-      return; // Skip if lock file exists (page already passed all tests)
-    }
+    // // Check lock file before running tests
+    // const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
+    // if (fs.existsSync(lockPath)) {
+    //   return; // Skip if lock file exists (page already passed all tests)
+    // }
 
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
       return;
@@ -200,6 +209,15 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       PageNavigationValidation.trackPagePassed(pageName);
     } else {
       PageNavigationValidation.trackMissingNavigationMethod(pageName);
+    }
+  }
+
+  /** Dashboard is not in url mapping; skip PFT warn. */
+  private static isDashboardUrl(url: string): boolean {
+    try {
+      return new URL(url).pathname.split('/').filter(Boolean)[0] === 'dashboard';
+    } catch {
+      return /\/dashboard(\/|$)/.test(url);
     }
   }
 

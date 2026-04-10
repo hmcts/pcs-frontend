@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
+import { logPftValidation } from '../../common/pft-debug-log';
 import { performAction } from '../../controller';
 import { IValidation, validationRecord } from '../../interfaces';
 
@@ -161,6 +162,8 @@ export class PageNavigationValidation implements IValidation {
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
+      await logPftValidation(page, 'page-navigation', pageName, false);
+
       const overallPassed = elementPassed && urlPassed;
 
       if (!elementPassed) {

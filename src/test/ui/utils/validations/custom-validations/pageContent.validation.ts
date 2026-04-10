@@ -4,6 +4,7 @@ import * as path from 'path';
 import { Page } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
+import { logPftValidation } from '../../common/pft-debug-log';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
@@ -146,6 +147,7 @@ export class PageContentValidation implements IValidation {
       }
 
       PageContentValidation.pagesValidated.add(pageName);
+      await logPftValidation(page, 'page-content', pageName, false);
 
       for (const [key, value] of Object.entries(pageData)) {
         if (
