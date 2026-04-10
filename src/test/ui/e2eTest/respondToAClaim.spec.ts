@@ -14,9 +14,7 @@ import {
   defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
-  doYouHaveAnyDependentChildren,
   doYouHaveAnyOtherDependants,
-  doYouHaveAnyOtherDependents,
   exceptionalHardship,
   freeLegalAdvice,
   incomeAndExpenses,
@@ -28,10 +26,8 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
-  wouldYouHaveSomeoneElse,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
-  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -219,21 +215,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
-    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.yesRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
-    });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -250,7 +231,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(5),
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.yesRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
@@ -308,21 +297,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-    });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -339,7 +313,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(5),
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
@@ -399,21 +381,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
-    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-    });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -428,7 +395,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -485,21 +460,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-    });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -517,7 +477,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(5),
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -569,29 +537,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-    });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
-    // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
-    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -609,7 +554,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(5),
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -663,21 +616,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-    });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -693,7 +631,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
@@ -748,21 +694,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('repaymentsAgreed', {
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
-    });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -777,7 +708,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
@@ -831,21 +770,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
-    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.yesRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-    });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -862,7 +786,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.yesRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
@@ -919,21 +851,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', installmentPayments.mainHeader);
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
-    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
-    await performAction('clickButton', doYouHaveAnyDependentChildren.continueButton);
-    await performAction('clickButton', doYouHaveAnyOtherDependents.continueButton);
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.continueButton);
-    await performAction('clickButton', wouldYouHaveSomeoneElse.continueButton);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-    });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -949,6 +866,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
   });
 });
