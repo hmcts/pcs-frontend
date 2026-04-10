@@ -1,9 +1,9 @@
 {
-  "pageTitle": "cyYour client's name",
-  "nameConfirmationLabel": "cyIs your client's name {{defendantName}}?",
+  "pageTitle": "cyYour client’s name",
+  "nameConfirmationLabel": "cyIs your client’s name {{defendantName}}?",
   "errors": {
-    "nameConfirmation": "cyYou must say if your client's name is {{defendantName}}",
-    "firstName": "cyEnter your client's first name",
-    "lastName": "cyEnter your client's last name"
+    "nameConfirmation": "cyYou must say if your client’s name is {{defendantName}}",
+    "firstName": "cyEnter your client’s first name",
+    "lastName": "cyEnter your client’s last name"
   }
 }

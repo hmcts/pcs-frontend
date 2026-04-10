@@ -10,6 +10,10 @@ import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respon
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
 import { getUserType } from './utils';
 
+import { Logger } from '@modules/logger';
+
+const logger = Logger.getLogger('steps');
+
 export interface ResolvedJourneyConfig {
   flowConfig: JourneyFlowConfig;
   stepRegistry: Record<string, StepDefinition>;
@@ -46,6 +50,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
 function getJourneyConfigForRequest(journeyName: string, req?: Request): ResolvedJourneyConfig | undefined {
   const journey = journeyRegistry[journeyName];
   if (!journey) {
+    logger.warn(`Failed to load JourneyConfig for journey name [${journeyName}]`);
     return undefined;
   }
 
