@@ -10,6 +10,7 @@ const home_url = config.get('e2e.testUrl') as string;
 test.describe('Respond to a claim - smoke test @smoke', async () => {
   test('Respond to a claim @smoke', async ({ page }) => {
     initializeExecutor(page);
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
     await performAction('fetchPINsAPI');
