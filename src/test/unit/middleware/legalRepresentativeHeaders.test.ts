@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+
 import { legalRepresentativeHeaderMiddleware } from '../../../main/middleware/legalRepresentativeHeaders';
 
 const mockIsLegalRepresentativeUser = jest.fn();
@@ -45,8 +46,8 @@ describe('legalRepresentativeHeaderMiddleware', () => {
   });
 
   it('appends extra headers for legalrep users', () => {
-    const headerModel = { name: "header", assetsPath: "" };
-    const footerModel = { name: "footer" };
+    const headerModel = { name: 'header', assetsPath: '' };
+    const footerModel = { name: 'footer' };
     mockIsLegalRepresentativeUser.mockReturnValue(true);
     mockBuildHeaderModel.mockReturnValue(headerModel);    
     mockBuildFooterModel.mockReturnValue(footerModel);

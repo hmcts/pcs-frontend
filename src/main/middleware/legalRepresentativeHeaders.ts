@@ -1,7 +1,9 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
-import { isLegalRepresentativeUser } from '../steps/utils'
 import config from 'config';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
+
+import { isLegalRepresentativeUser } from '../steps/utils';
+
 export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
