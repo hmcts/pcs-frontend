@@ -13,15 +13,16 @@ export const step: StepDefinition = createFormStep({
       name: 'courtHearingInNext14Days',
       type: 'radio',
       required: true,
-      translationKey: { label: 'question' },
+      errorMessage: 'errors.inNext14Days',
+      translationKey: { label: 'question', hint: 'hintText' },
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
         {
-          value: 'YES',
+          value: 'yes',
           translationKey: 'options.yes',
         },
         {
-          value: 'NO',
+          value: 'no',
           translationKey: 'options.no',
         },
       ],
