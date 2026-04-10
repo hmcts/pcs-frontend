@@ -17,12 +17,12 @@ export const step: StepDefinition = createFormStep({
     const selection = req.body?.haveAppliedForUniversalCredit as string | undefined;
     const nestedDate = req.body?.ucApplicationDate as { day?: string; month?: string; year?: string } | undefined;
     const ucApplicationDate = {
-      day: nestedDate?.day || (req.body?.['ucApplicationDate-day'] as string | undefined),
-      month: nestedDate?.month || (req.body?.['ucApplicationDate-month'] as string | undefined),
-      year: nestedDate?.year || (req.body?.['ucApplicationDate-year'] as string | undefined),
+      day: req.body?.['ucApplicationDate-day'] as string | undefined,
+      month: req.body?.['ucApplicationDate-month'] as string | undefined,
+      year: req.body?.['ucApplicationDate-year'] as string | undefined,
     };
 
-    const universalCredit = selection === 'yes' || selection === 'no' ? toYesNoEnum(selection) : undefined;
+    const universalCredit = selection === 'yes' ? toYesNoEnum(selection) : undefined;
 
     let isoDate: string | undefined;
     if (selection === 'yes' && ucApplicationDate?.day && ucApplicationDate?.month && ucApplicationDate?.year) {
