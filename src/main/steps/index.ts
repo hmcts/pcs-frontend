@@ -36,8 +36,10 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
   },
   makeAnApplication: {
     name: 'makeAnApplication',
-    flowConfig: makeAnApplicationFlowConfig,
-    stepRegistry: makeAnApplicationStepRegistry,
+    default: {
+      flowConfig: makeAnApplicationFlowConfig,
+      stepRegistry: makeAnApplicationStepRegistry,
+    },
   },
 };
 
