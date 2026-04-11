@@ -1,8 +1,7 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -15,49 +14,32 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   beforeRedirect: async req => {
+    const response = getDraftDefendantResponse(req);
     const nameConfirmation = req.body?.nameConfirmation as string | undefined;
 
-    if (!nameConfirmation || (nameConfirmation !== 'yes' && nameConfirmation !== 'no')) {
-      return;
-    }
+    if (nameConfirmation === 'yes' || nameConfirmation === 'no') {
+      response.defendantResponses.defendantNameConfirmation = nameConfirmation === 'yes' ? 'YES' : 'NO';
 
-    // Map to CCD enum (same logic as yesNoEnum)
-    const defendantNameConfirmation = nameConfirmation === 'yes' ? 'YES' : 'NO';
-
-    const party: Record<string, string> = {};
-
-    if (nameConfirmation === 'no') {
-      // User corrects name - read from subFields with dot-notation
-      const firstName = req.body?.['nameConfirmation.firstName'] as string | undefined;
-      const lastName = req.body?.['nameConfirmation.lastName'] as string | undefined;
-
-      if (firstName && firstName.trim()) {
-        party.firstName = firstName;
+      if (nameConfirmation === 'no') {
+        const firstName = req.body?.['nameConfirmation.firstName'] as string | undefined;
+        const lastName = req.body?.['nameConfirmation.lastName'] as string | undefined;
+        if (firstName?.trim()) {
+          response.defendantContactDetails.party.firstName = firstName;
+        }
+        if (lastName?.trim()) {
+          response.defendantContactDetails.party.lastName = lastName;
+        }
+      } else {
+        delete response.defendantContactDetails.party.firstName;
+        delete response.defendantContactDetails.party.lastName;
       }
-      if (lastName && lastName.trim()) {
-        party.lastName = lastName;
-      }
+    } else {
+      delete response.defendantResponses.defendantNameConfirmation;
+      delete response.defendantContactDetails.party.firstName;
+      delete response.defendantContactDetails.party.lastName;
     }
 
-    if (nameConfirmation === 'yes') {
-      // User confirms name - clear any previously corrected names by sending empty strings
-      party.firstName = '';
-      party.lastName = '';
-    }
-
-    // Build payload with dual paths
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        defendantNameConfirmation,
-      },
-      ...(Object.keys(party).length > 0 && {
-        defendantContactDetails: {
-          party,
-        },
-      }),
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   translationKeys: {
     pageTitle: 'pageTitle',

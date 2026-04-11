@@ -1,10 +1,10 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse, TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interface';
+import type { TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
@@ -117,29 +117,29 @@ export const step: StepDefinition = createFormStep({
     return initial;
   },
   beforeRedirect: async req => {
+    const response = getDraftDefendantResponse(req);
     const tenancyTypeConfirm = req.body?.tenancyTypeConfirm as string | undefined;
-    const tenancyTypeCorrect = tenancyTypeConfirm ? TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm] : undefined;
-    const correctedTenancyTypeText = (
-      (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
-      (req.body?.correctType as string | undefined)
-    )?.trim();
-    const existingCorrectedTenancyType =
-      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.tenancyType;
-    const tenancyType =
-      tenancyTypeConfirm === 'no'
-        ? correctedTenancyTypeText || undefined
-        : existingCorrectedTenancyType
-          ? ''
-          : undefined;
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        tenancyTypeCorrect,
-        tenancyType,
-      },
-    };
+    if (tenancyTypeConfirm && TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm]) {
+      response.defendantResponses.tenancyTypeCorrect = TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm];
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+      if (tenancyTypeConfirm === 'no') {
+        const correctedType = (
+          (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
+          (req.body?.correctType as string | undefined)
+        )?.trim();
+        if (correctedType) {
+          response.defendantResponses.tenancyType = correctedType;
+        }
+      } else {
+        delete response.defendantResponses.tenancyType;
+      }
+    } else {
+      delete response.defendantResponses.tenancyTypeCorrect;
+      delete response.defendantResponses.tenancyType;
+    }
+
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async (req, formContent) => {
     const existingTenancyTypeCorrect = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses

@@ -1,8 +1,7 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 const STEP_NAME = 'tenancy-date-unknown';
@@ -41,13 +40,14 @@ export const step: StepDefinition = createFormStep({
     const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
     const tenancyStartDateIso = formatDatePartsToISODate(day, month, year);
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        ...(tenancyStartDateIso && { tenancyStartDate: tenancyStartDateIso }),
-      },
-    };
+    const response = getDraftDefendantResponse(req);
+    if (tenancyStartDateIso) {
+      response.defendantResponses.tenancyStartDate = tenancyStartDateIso;
+    } else {
+      delete response.defendantResponses.tenancyStartDate;
+    }
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async req => {
     const claimantNameFromValidatedCase = req.res?.locals?.validatedCase?.data?.possessionClaimResponse

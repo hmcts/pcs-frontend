@@ -1,6 +1,6 @@
-import type { PossessionClaimResponse, YesNoValue } from '../../../interfaces/ccdCase.interface';
+import type { YesNoValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
@@ -71,29 +71,27 @@ export const step: StepDefinition = createFormStep({
     };
   },
   beforeRedirect: async req => {
+    const response = getDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const exceptionalHardshipValue = req.body?.exceptionalHardship as string | undefined;
+    const ccdMapping: Record<string, YesNoValue> = { yes: 'Yes', no: 'No' };
 
-    if (!exceptionalHardshipValue || (exceptionalHardshipValue !== 'yes' && exceptionalHardshipValue !== 'no')) {
-      return;
+    if (exceptionalHardshipValue && ccdMapping[exceptionalHardshipValue]) {
+      response.defendantResponses.householdCircumstances.exceptionalHardship = ccdMapping[exceptionalHardshipValue];
+
+      if (exceptionalHardshipValue === 'yes') {
+        response.defendantResponses.householdCircumstances.exceptionalHardshipDetails = req.body?.[
+          'exceptionalHardship.exceptionalHardshipDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.householdCircumstances.exceptionalHardshipDetails;
+      }
+    } else {
+      delete response.defendantResponses.householdCircumstances.exceptionalHardship;
+      delete response.defendantResponses.householdCircumstances.exceptionalHardshipDetails;
     }
 
-    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'Yes', no: 'No' };
-    const exceptionalHardship = ccdMapping[exceptionalHardshipValue];
-    const exceptionalHardshipDetails =
-      exceptionalHardshipValue === 'yes'
-        ? (req.body?.['exceptionalHardship.exceptionalHardshipDetails'] as string | undefined)
-        : undefined;
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          exceptionalHardship,
-          exceptionalHardshipDetails,
-        },
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;

@@ -1,7 +1,6 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -73,22 +72,25 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const confirmValue = req.body?.confirmOtherAdults as string | undefined;
-    const householdCircumstances: Record<string, unknown> = {};
-    const details = req.body?.['confirmOtherAdults.otherAdultsDetails'] as string | undefined;
 
-    if (confirmValue === 'yes') {
-      householdCircumstances.otherTenants = 'YES';
-      householdCircumstances.otherTenantsDetails = details;
-    } else if (confirmValue === 'no') {
-      householdCircumstances.otherTenants = 'NO';
+    const response = getDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+
+    if (confirmValue === 'yes' || confirmValue === 'no') {
+      response.defendantResponses.householdCircumstances.otherTenants = confirmValue === 'yes' ? 'Yes' : 'No';
+
+      if (confirmValue === 'yes') {
+        response.defendantResponses.householdCircumstances.otherTenantsDetails = req.body?.[
+          'confirmOtherAdults.otherAdultsDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.householdCircumstances.otherTenantsDetails;
+      }
+    } else {
+      delete response.defendantResponses.householdCircumstances.otherTenants;
+      delete response.defendantResponses.householdCircumstances.otherTenantsDetails;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });

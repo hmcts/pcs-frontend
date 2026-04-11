@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse, YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
+import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -43,18 +43,15 @@ export const step: StepDefinition = createFormStep({
     return { writtenTerms };
   },
   beforeRedirect: async (req: Request) => {
+    const response = getDraftDefendantResponse(req);
     const writtenTerms: YesNoNotSureValue | undefined = req.body?.writtenTerms;
 
-    if (!writtenTerms) {
-      return;
+    if (writtenTerms) {
+      response.defendantResponses.writtenTerms = writtenTerms;
+    } else {
+      delete response.defendantResponses.writtenTerms;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        writtenTerms,
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });

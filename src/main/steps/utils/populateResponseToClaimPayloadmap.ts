@@ -1,18 +1,48 @@
 import { Request } from 'express';
+import { cloneDeep } from 'lodash';
 
 import { CcdCase, PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 
-// Wrap the possession claim response in a ccd case object and submit via ccdCaseService
-export const buildCcdCaseForPossessionClaimResponse = async (
-  req: Request,
-  possessionClaimResponse: PossessionClaimResponse
-): Promise<CcdCase> => {
+// Return type with pre-initialised top-level objects so callers can set/delete fields directly
+export interface DraftDefendantResponse extends PossessionClaimResponse {
+  defendantResponses: NonNullable<PossessionClaimResponse['defendantResponses']>;
+  defendantContactDetails: {
+    party: NonNullable<NonNullable<PossessionClaimResponse['defendantContactDetails']>['party']>;
+  };
+}
+
+// Get a deep clone of defendant-only fields from the existing draft/case data.
+// All nested objects are pre-initialised so callers can set/delete fields directly.
+export const getDraftDefendantResponse = (req: Request): DraftDefendantResponse => {
+  const existing = req.res?.locals?.validatedCase?.data?.possessionClaimResponse;
+
+  const defendantOnly: PossessionClaimResponse = {
+    defendantResponses: existing?.defendantResponses ? cloneDeep(existing.defendantResponses) : {},
+    defendantContactDetails: existing?.defendantContactDetails
+      ? cloneDeep(existing.defendantContactDetails)
+      : { party: {} },
+  };
+
+  // Strip immutable claimant-entered fields that the backend rejects
+  if (defendantOnly.defendantContactDetails?.party) {
+    delete (defendantOnly.defendantContactDetails.party as Record<string, unknown>).nameKnown;
+    delete (defendantOnly.defendantContactDetails.party as Record<string, unknown>).addressKnown;
+    delete (defendantOnly.defendantContactDetails.party as Record<string, unknown>).addressSameAsProperty;
+  } else {
+    defendantOnly.defendantContactDetails = { party: {} };
+  }
+
+  return defendantOnly as DraftDefendantResponse;
+};
+
+// Save the full defendant response to the draft table (full replace)
+export const saveDraftDefendantResponse = async (req: Request, response: PossessionClaimResponse): Promise<CcdCase> => {
   const ccdCase: CcdCase = {
     id: req.res?.locals.validatedCase?.id,
     data: {
-      possessionClaimResponse,
+      possessionClaimResponse: response,
     },
   };
   return ccdCaseService.updateDraftRespondToClaim(req.session?.user?.accessToken, ccdCase.id, ccdCase.data);

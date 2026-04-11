@@ -3,11 +3,15 @@ jest.mock('../../../../main/modules/steps', () => ({
 }));
 
 jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: jest.fn(),
+  getDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+  saveDraftDefendantResponse: jest.fn(),
 }));
 
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 type TenancyTypeDetailsStep = {
   getInitialFormData: (req: {
@@ -102,19 +106,34 @@ describe('respond-to-claim tenancy-type-details step', () => {
       ['yes', 'YES'],
       ['no', 'NO'],
       ['notSure', 'NOT_SURE'],
-      ['maybe', undefined],
-      [undefined, undefined],
     ])('maps tenancyTypeConfirm=%s to tenancyTypeCorrect=%s', async (tenancyTypeConfirm, tenancyTypeCorrect) => {
-      const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
+      const req = { body: { tenancyTypeConfirm } };
 
       await testedStep.beforeRedirect(req);
 
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-        defendantResponses: {
-          tenancyTypeCorrect,
-        },
-      });
+      expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
+        expect.objectContaining({
+          defendantResponses: expect.objectContaining({
+            tenancyTypeCorrect,
+          }),
+        })
+      );
     });
+
+    it.each([['maybe'], [undefined]])(
+      'saves with fields deleted when tenancyTypeConfirm=%s',
+      async tenancyTypeConfirm => {
+        const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
+
+        await testedStep.beforeRedirect(req);
+
+        expect(saveDraftDefendantResponse).toHaveBeenCalledWith(req, {
+          defendantResponses: {},
+          defendantContactDetails: { party: {} },
+        });
+      }
+    );
   });
 
   describe('extendGetContent', () => {

@@ -1,12 +1,11 @@
 import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { arrayToString } from '../../../utils/arrayToString';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 const STEP_NAME = 'postcode-finder';
@@ -113,20 +112,9 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
   },
   beforeRedirect: async req => {
-    let possessionClaimResponse: PossessionClaimResponse;
-    //prepopulate address is correct
+    const response = getDraftDefendantResponse(req);
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
-      // Read fresh CCD data from middleware (available on both GET and POST)
-      const caseData = req.res?.locals.validatedCase?.data;
-      const prepopulateAddress = caseData?.possessionClaimResponse?.defendantContactDetails?.party?.address;
-
-      possessionClaimResponse = {
-        defendantContactDetails: {
-          party: {
-            address: prepopulateAddress,
-          },
-        },
-      };
+      // Address already in the clone from START callback - no change needed
     } else {
       const addressLine1 = req.body?.['correspondenceAddressConfirm.addressLine1'] ?? '';
       const addressLine2 = req.body?.['correspondenceAddressConfirm.addressLine2'];
@@ -134,23 +122,16 @@ export const step: StepDefinition = createFormStep({
       const county = req.body?.['correspondenceAddressConfirm.county'];
       const postcode = req.body?.['correspondenceAddressConfirm.postcode'] ?? '';
 
-      //only the details the defendant provides
-      possessionClaimResponse = {
-        defendantContactDetails: {
-          party: {
-            address: {
-              AddressLine1: addressLine1,
-              ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
-              PostTown: townOrCity,
-              ...(county !== undefined && county !== '' && { County: county }),
-              PostCode: postcode,
-            },
-          },
-        },
+      response.defendantContactDetails.party.address = {
+        AddressLine1: addressLine1,
+        ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
+        PostTown: townOrCity,
+        ...(county !== undefined && county !== '' && { County: county }),
+        PostCode: postcode,
       };
     }
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'correspondence-address', ['common']);
