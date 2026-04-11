@@ -1,16 +1,13 @@
 import { Request } from 'express';
 import { cloneDeep } from 'lodash';
 
-import { CcdCase, HouseholdCircumstances, PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
+import { CcdCase, PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 
-// Return type with pre-initialised nested objects so callers can set/delete fields directly
+// Return type with pre-initialised top-level objects so callers can set/delete fields directly
 export interface DraftDefendantResponse extends PossessionClaimResponse {
-  defendantResponses: NonNullable<PossessionClaimResponse['defendantResponses']> & {
-    householdCircumstances: HouseholdCircumstances;
-    paymentAgreement: NonNullable<NonNullable<PossessionClaimResponse['defendantResponses']>['paymentAgreement']>;
-  };
+  defendantResponses: NonNullable<PossessionClaimResponse['defendantResponses']>;
   defendantContactDetails: {
     party: NonNullable<NonNullable<PossessionClaimResponse['defendantContactDetails']>['party']>;
   };
@@ -36,11 +33,6 @@ export const getDraftDefendantResponse = (req: Request): DraftDefendantResponse 
   } else {
     defendantOnly.defendantContactDetails = { party: {} };
   }
-
-  // Pre-initialise nested objects used by multiple steps
-  defendantOnly.defendantResponses!.householdCircumstances =
-    defendantOnly.defendantResponses!.householdCircumstances ?? {};
-  defendantOnly.defendantResponses!.paymentAgreement = defendantOnly.defendantResponses!.paymentAgreement ?? {};
 
   return defendantOnly as DraftDefendantResponse;
 };

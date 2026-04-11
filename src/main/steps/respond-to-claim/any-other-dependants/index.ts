@@ -19,6 +19,7 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const otherDependants: string = req.body?.otherDependants;
     const enumMapping: Record<string, YesNoValue> = { yes: 'Yes', no: 'No' };
     const otherDependantsCcd = enumMapping[otherDependants];

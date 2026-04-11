@@ -54,7 +54,7 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
 
 jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
   getDraftDefendantResponse: jest.fn(() => ({
-    defendantResponses: { householdCircumstances: {}, paymentAgreement: {} },
+    defendantResponses: {},
     defendantContactDetails: { party: {} },
   })),
   saveDraftDefendantResponse: jest.fn(),
