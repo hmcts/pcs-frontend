@@ -74,8 +74,6 @@ export const step: StepDefinition = createFormStep({
     const confirmValue = req.body?.confirmOtherAdults as string | undefined;
 
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
 
     if (confirmValue === 'yes' || confirmValue === 'no') {
       response.defendantResponses.householdCircumstances.otherTenants = confirmValue === 'yes' ? 'Yes' : 'No';

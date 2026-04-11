@@ -118,8 +118,6 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-
     const tenancyTypeConfirm = req.body?.tenancyTypeConfirm as string | undefined;
 
     if (tenancyTypeConfirm && TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm]) {

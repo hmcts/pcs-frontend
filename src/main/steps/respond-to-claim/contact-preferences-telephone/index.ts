@@ -75,10 +75,6 @@ export const step: StepDefinition = createFormStep({
 
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-    response.defendantContactDetails = response.defendantContactDetails ?? {};
-    response.defendantContactDetails.party = response.defendantContactDetails.party ?? {};
-
     // Reads from session for now - session removal is a separate ticket
     const telephoneForm = req.session.formData?.['contact-preferences-telephone'];
     if (telephoneForm) {

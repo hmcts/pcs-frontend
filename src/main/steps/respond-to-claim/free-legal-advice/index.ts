@@ -12,8 +12,6 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/freeLegalAdvice.njk`,
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-
     const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
     const enumMapping: Record<string, string> = { yes: 'YES', no: 'NO', preferNotToSay: 'PREFER_NOT_TO_SAY' };
 

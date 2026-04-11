@@ -44,8 +44,6 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async (req: Request) => {
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-
     const writtenTerms: YesNoNotSureValue | undefined = req.body?.writtenTerms;
 
     if (writtenTerms) {

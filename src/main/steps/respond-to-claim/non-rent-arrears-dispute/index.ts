@@ -18,8 +18,6 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-
     const disputeOtherParts = req.body?.disputeOtherParts as 'yes' | 'no' | undefined;
 
     if (disputeOtherParts === 'yes' || disputeOtherParts === 'no') {

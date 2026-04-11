@@ -95,8 +95,6 @@ export const step: StepDefinition = createFormStep({
     const confirmValue = req.body?.confirmTenancyDate as string | undefined;
 
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-
     const enumMapping: Record<string, string> = { yes: 'YES', no: 'NO', notSure: 'NOT_SURE' };
 
     if (confirmValue && enumMapping[confirmValue]) {

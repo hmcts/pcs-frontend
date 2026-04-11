@@ -113,9 +113,6 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantContactDetails = response.defendantContactDetails ?? {};
-    response.defendantContactDetails.party = response.defendantContactDetails.party ?? {};
-
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
       // Address already in the clone from START callback - no change needed
     } else {

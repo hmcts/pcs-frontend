@@ -41,8 +41,6 @@ export const step: StepDefinition = createFormStep({
     const tenancyStartDateIso = formatDatePartsToISODate(day, month, year);
 
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-
     if (tenancyStartDateIso) {
       response.defendantResponses.tenancyStartDate = tenancyStartDateIso;
     } else {

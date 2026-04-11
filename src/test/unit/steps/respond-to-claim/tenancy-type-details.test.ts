@@ -3,7 +3,10 @@ jest.mock('../../../../main/modules/steps', () => ({
 }));
 
 jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  getDraftDefendantResponse: jest.fn(() => ({ defendantResponses: {} })),
+  getDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: { householdCircumstances: {}, paymentAgreement: {} },
+    defendantContactDetails: { party: {} },
+  })),
   saveDraftDefendantResponse: jest.fn(),
 }));
 
@@ -125,7 +128,10 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
         await testedStep.beforeRedirect(req);
 
-        expect(saveDraftDefendantResponse).toHaveBeenCalledWith(req, { defendantResponses: {} });
+        expect(saveDraftDefendantResponse).toHaveBeenCalledWith(req, {
+          defendantResponses: { householdCircumstances: {}, paymentAgreement: {} },
+          defendantContactDetails: { party: {} },
+        });
       }
     );
   });

@@ -69,9 +69,6 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
-
     const shareCircumstances = req.body?.shareCircumstances as string | undefined;
     const ccdMapping: Record<string, YesNoValue> = { yes: 'Yes', no: 'No' };
 

@@ -12,9 +12,6 @@ export const step: StepDefinition = createFormStep({
   showCancelButton: false,
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantContactDetails = response.defendantContactDetails ?? {};
-    response.defendantContactDetails.party = response.defendantContactDetails.party ?? {};
-
     const firstName = req.body?.firstName as string | undefined;
     const lastName = req.body?.lastName as string | undefined;
 

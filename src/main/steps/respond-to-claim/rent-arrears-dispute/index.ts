@@ -36,8 +36,6 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-
     const rentArrears = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
     const enumMapping: Record<string, string> = {
       [FORM_VALUES.YES]: BACKEND_CONFIRMATION.YES,

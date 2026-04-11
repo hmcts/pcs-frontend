@@ -15,10 +15,6 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-    response.defendantContactDetails = response.defendantContactDetails ?? {};
-    response.defendantContactDetails.party = response.defendantContactDetails.party ?? {};
-
     const nameConfirmation = req.body?.nameConfirmation as string | undefined;
 
     if (nameConfirmation === 'yes' || nameConfirmation === 'no') {

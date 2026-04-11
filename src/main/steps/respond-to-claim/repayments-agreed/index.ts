@@ -14,9 +14,6 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   beforeRedirect: async req => {
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
-
     const repaymentsAgreed = req.body?.repaymentsAgreed as string | undefined;
     const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', imNotSure: 'NOT_SURE' };
 

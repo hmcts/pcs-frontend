@@ -17,8 +17,6 @@ export const step: StepDefinition = createFormStep({
     const dateOfBirth = req.body?.dateOfBirth;
 
     const response = getDraftDefendantResponse(req);
-    response.defendantResponses = response.defendantResponses ?? {};
-
     let dateSet = false;
     if (dateOfBirth && typeof dateOfBirth === 'object') {
       const { day, month, year } = dateOfBirth;
