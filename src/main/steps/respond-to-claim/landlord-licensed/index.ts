@@ -1,6 +1,6 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -33,25 +33,19 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
+    const response = getDraftDefendantResponse(req);
+    response.defendantResponses = response.defendantResponses ?? {};
+
     const confirmValue = req.body?.confirmLandlordLicensed as string | undefined;
+    const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', imNotSure: 'NOT_SURE' };
 
-    const defendantResponses: Record<string, unknown> = {};
-
-    if (confirmValue === 'yes') {
-      defendantResponses.landlordLicensed = 'YES';
-    } else if (confirmValue === 'no') {
-      defendantResponses.landlordLicensed = 'NO';
-    } else if (confirmValue === 'imNotSure') {
-      defendantResponses.landlordLicensed = 'NOT_SURE';
+    if (confirmValue && enumMapping[confirmValue]) {
+      response.defendantResponses.landlordLicensed = enumMapping[confirmValue];
+    } else {
+      delete response.defendantResponses.landlordLicensed;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        ...defendantResponses,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: async req => {
     const caseData = req.res?.locals?.validatedCase?.data;

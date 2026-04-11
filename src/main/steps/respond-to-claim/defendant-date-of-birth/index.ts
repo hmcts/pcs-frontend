@@ -1,8 +1,7 @@
 import { DateTime } from 'luxon';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -17,34 +16,32 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const dateOfBirth = req.body?.dateOfBirth;
 
-    if (!dateOfBirth || typeof dateOfBirth !== 'object') {
-      return;
+    const response = getDraftDefendantResponse(req);
+    response.defendantResponses = response.defendantResponses ?? {};
+
+    let dateSet = false;
+    if (dateOfBirth && typeof dateOfBirth === 'object') {
+      const { day, month, year } = dateOfBirth;
+
+      if (day && month && year) {
+        const dateTime = DateTime.fromObject({
+          year: Number(year),
+          month: Number(month),
+          day: Number(day),
+        });
+
+        if (dateTime.isValid) {
+          response.defendantResponses.dateOfBirth = dateTime.toISODate();
+          dateSet = true;
+        }
+      }
     }
 
-    const { day, month, year } = dateOfBirth;
-
-    if (!day || !month || !year) {
-      return;
+    if (!dateSet) {
+      delete response.defendantResponses.dateOfBirth;
     }
 
-    // Validate and convert to ISO date (same logic as dateToISO)
-    const dateTime = DateTime.fromObject({
-      year: Number(year),
-      month: Number(month),
-      day: Number(day),
-    });
-
-    if (!dateTime.isValid) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        dateOfBirth: dateTime.toISODate(),
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   translationKeys: {
     pageTitle: 'pageTitle',

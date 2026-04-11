@@ -1,9 +1,8 @@
 import { isEmail } from 'validator';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -65,28 +64,27 @@ export const step: StepDefinition = createFormStep({
   ],
 
   beforeRedirect: async req => {
+    const response = getDraftDefendantResponse(req);
+    response.defendantResponses = response.defendantResponses ?? {};
+    response.defendantContactDetails = response.defendantContactDetails ?? {};
+    response.defendantContactDetails.party = response.defendantContactDetails.party ?? {};
+
+    // Reads from session for now - session removal is a separate ticket
     const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
-    if (!emailForm) {
-      return;
+    if (emailForm) {
+      const emailSelected = emailForm.contactByEmailOrPost === 'email';
+      response.defendantResponses.preferenceType = emailSelected ? 'EMAIL' : 'POST';
+
+      if (emailSelected) {
+        response.defendantContactDetails.party.emailAddress = emailForm['contactByEmailOrPost.email'];
+      } else {
+        delete response.defendantContactDetails.party.emailAddress;
+      }
+    } else {
+      delete response.defendantResponses.preferenceType;
+      delete response.defendantContactDetails.party.emailAddress;
     }
 
-    const emailSelected = emailForm.contactByEmailOrPost === 'email';
-    const postSelected = emailForm.contactByEmailOrPost === 'post';
-
-    const existingEmailAddress =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.emailAddress;
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantContactDetails: {
-        party: {
-          emailAddress: emailSelected ? emailForm['contactByEmailOrPost.email'] : existingEmailAddress ? '' : undefined,
-        },
-      },
-      defendantResponses: {
-        preferenceType: emailSelected ? 'EMAIL' : postSelected ? 'POST' : undefined,
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });

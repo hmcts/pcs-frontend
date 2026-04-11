@@ -1,7 +1,6 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
@@ -40,17 +39,17 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
+    const response = getDraftDefendantResponse(req);
+    response.defendantResponses = response.defendantResponses ?? {};
+
+    // Reads from session for now - session removal is a separate ticket
     const textForm = req.session.formData?.['contact-preferences-text-message'];
-    if (!textForm) {
-      return;
+    if (textForm) {
+      response.defendantResponses.contactByText = textForm.contactByTextMessage === 'yes' ? 'YES' : 'NO';
+    } else {
+      delete response.defendantResponses.contactByText;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        contactByText: textForm.contactByTextMessage === 'yes' ? 'YES' : 'NO',
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });
