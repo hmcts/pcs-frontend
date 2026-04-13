@@ -32,6 +32,7 @@ describe('Csrf', () => {
     mockUse = jest.fn();
     mockApp = {
       use: mockUse,
+      locals: {},
     } as unknown as Express;
 
     csrf = new Csrf();
@@ -76,8 +77,9 @@ describe('Csrf', () => {
     it('should register csrfSynchronisedProtection middleware via app.use', () => {
       csrf.enableFor(mockApp);
 
-      const protectionMiddleware = (csrfSync as jest.Mock).mock.results[0].value.csrfSynchronisedProtection;
-      expect(mockUse).toHaveBeenCalledWith(protectionMiddleware);
+      expect(mockUse).toHaveBeenCalledTimes(2);
+      // First middleware wraps csrfSynchronisedProtection with multipart check
+      expect(mockUse.mock.calls[0][0]).toEqual(expect.any(Function));
     });
 
     it('should register a second middleware that exposes csrfToken to res.locals', () => {

@@ -854,5 +854,238 @@ describe('componentBuilders', () => {
         });
       });
     });
+
+    describe('file field', () => {
+      const mockNunjucksRender = jest.fn((_template: string) => '<div>Upload HTML</div>');
+      const mockNunjucksEnvWithRender = {
+        renderString: mockRenderString,
+        render: mockNunjucksRender,
+      } as unknown as Environment;
+
+      beforeEach(() => {
+        mockNunjucksRender.mockClear();
+      });
+
+      it('should build file upload component with default settings', () => {
+        const field: FormFieldConfig = {
+          name: 'documents',
+          type: 'file',
+        };
+
+        const result = buildComponentConfig(
+          field,
+          'Upload documents',
+          'Upload your supporting documents',
+          [],
+          undefined,
+          false,
+          undefined,
+          0,
+          false,
+          mockT,
+          mockNunjucksEnvWithRender
+        );
+
+        expect(result.componentType).toBe('multiFileUpload');
+        expect(mockNunjucksRender).toHaveBeenCalledWith(
+          'macros/mojMultiFileUploadInner.njk',
+          expect.objectContaining({
+            params: expect.objectContaining({
+              id: 'documents',
+              name: 'documents',
+              label: {
+                text: 'Upload documents',
+                classes: 'govuk-label--m',
+              },
+              hint: { text: 'Upload your supporting documents' },
+              errorMessage: null,
+              fileUploadClasses: 'moj-multi-file-upload__input',
+            }),
+          })
+        );
+      });
+
+      it('should build file upload component with saved files', () => {
+        const field: FormFieldConfig = {
+          name: 'documents',
+          type: 'file',
+        };
+
+        const savedFiles = [
+          {
+            id: 'file1',
+            file_name: 'document.pdf',
+            content_type: 'application/pdf',
+            size: 102400,
+            url: '',
+          },
+          {
+            id: 'file2',
+            file_name: 'image.jpg',
+            content_type: 'image/jpeg',
+            size: 51200,
+            url: '',
+          },
+        ];
+
+        const result = buildComponentConfig(
+          field,
+          'Upload documents',
+          undefined,
+          savedFiles,
+          undefined,
+          false,
+          undefined,
+          0,
+          false,
+          mockT,
+          mockNunjucksEnvWithRender
+        );
+
+        expect(result.componentType).toBe('multiFileUpload');
+        expect(result.component.uploadedFiles).toEqual({
+          heading: { text: 'Files added' },
+          items: [
+            {
+              fileName: 'file1',
+              originalFileName: 'document.pdf',
+              message: { text: 'document.pdf, 100KB' },
+              deleteButton: { text: 'Delete' },
+            },
+            {
+              fileName: 'file2',
+              originalFileName: 'image.jpg',
+              message: { text: 'image.jpg, 50KB' },
+              deleteButton: { text: 'Delete' },
+            },
+          ],
+        });
+      });
+
+      it('should build file upload component with error message', () => {
+        const field: FormFieldConfig = {
+          name: 'documents',
+          type: 'file',
+        };
+
+        buildComponentConfig(
+          field,
+          'Upload documents',
+          undefined,
+          [],
+          undefined,
+          true,
+          'Select a file',
+          0,
+          false,
+          mockT,
+          mockNunjucksEnvWithRender
+        );
+
+        expect(mockNunjucksRender).toHaveBeenCalledWith(
+          'macros/mojMultiFileUploadInner.njk',
+          expect.objectContaining({
+            params: expect.objectContaining({
+              errorMessage: { text: 'Select a file' },
+            }),
+          })
+        );
+      });
+
+      it('should build file upload component with custom label classes', () => {
+        const field: FormFieldConfig = {
+          name: 'documents',
+          type: 'file',
+          labelClasses: 'govuk-label--l',
+        };
+
+        buildComponentConfig(
+          field,
+          'Upload documents',
+          undefined,
+          [],
+          undefined,
+          false,
+          undefined,
+          0,
+          false,
+          mockT,
+          mockNunjucksEnvWithRender
+        );
+
+        expect(mockNunjucksRender).toHaveBeenCalledWith(
+          'macros/mojMultiFileUploadInner.njk',
+          expect.objectContaining({
+            params: expect.objectContaining({
+              label: {
+                text: 'Upload documents',
+                classes: 'govuk-label--l',
+              },
+            }),
+          })
+        );
+      });
+
+      it('should build file upload component with custom accept attribute', () => {
+        const field: FormFieldConfig = {
+          name: 'documents',
+          type: 'file',
+          accept: '.pdf,.docx',
+        };
+
+        buildComponentConfig(
+          field,
+          'Upload documents',
+          undefined,
+          [],
+          undefined,
+          false,
+          undefined,
+          0,
+          false,
+          mockT,
+          mockNunjucksEnvWithRender
+        );
+
+        expect(mockNunjucksRender).toHaveBeenCalledWith(
+          'macros/mojMultiFileUploadInner.njk',
+          expect.objectContaining({
+            params: expect.objectContaining({
+              attributes: expect.objectContaining({
+                accept: '.pdf,.docx',
+              }),
+            }),
+          })
+        );
+      });
+
+      it('should remove standard component properties for file upload', () => {
+        const field: FormFieldConfig = {
+          name: 'documents',
+          type: 'file',
+        };
+
+        const result = buildComponentConfig(
+          field,
+          'Upload documents',
+          undefined,
+          [],
+          undefined,
+          false,
+          undefined,
+          0,
+          false,
+          mockT,
+          mockNunjucksEnvWithRender
+        );
+
+        expect(result.component.id).toBeUndefined();
+        expect(result.component.name).toBeUndefined();
+        expect(result.component.label).toBeUndefined();
+        expect(result.component.hint).toBeUndefined();
+        expect(result.component.errorMessage).toBeUndefined();
+        expect(result.component.attributes).toBeUndefined();
+      });
+    });
   });
 });
