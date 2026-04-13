@@ -5,10 +5,24 @@ export enum CaseState {
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'Yes' | 'No';
-export type TenancyTypeCorrectValue = VerticalYesNoValue | 'NOT_SURE';
 export type ContactPreference = 'EMAIL' | 'POST' | null;
-
+export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
+
+export interface HouseholdCircumstances {
+  shareAdditionalCircumstances?: YesNoValue;
+  additionalCircumstancesDetails?: string;
+  exceptionalHardship?: YesNoValue;
+  exceptionalHardshipDetails?: string;
+  dependantChildren?: YesNoValue;
+  dependantChildrenDetails?: string;
+  otherDependants?: YesNoValue;
+  otherDependantDetails?: string;
+  alternativeAccommodation?: YesNoNotSureValue;
+  alternativeAccommodationTransferDate?: string;
+  otherTenants?: YesNoValue;
+  otherTenantsDetails?: string;
+}
 
 export interface CcdUserCase {
   id: string;
@@ -36,6 +50,10 @@ export interface Address {
   County?: string;
   PostCode: string;
   Country?: string;
+}
+
+export interface CaseData {
+  possessionClaimResponse?: PossessionClaimResponse;
 }
 
 export interface PossessionClaimResponse {
@@ -67,11 +85,11 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: VerticalYesNoValue;
     disputeClaimDetails?: string;
-
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
     };
+    householdCircumstances?: HouseholdCircumstances;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;

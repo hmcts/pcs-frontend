@@ -1,12 +1,12 @@
 /**
- * Utility functions for converting between frontend yes/no values and backend YES/NO enums.
+ * Utility functions for converting between frontend yes/no values and backend Yes/No enums.
  * Used for CCD API integration where boolean choices are represented as enum strings.
  */
 
-import type { VerticalYesNoValue, YesNoValue } from '../../interfaces/ccdCase.interface';
+import type { YesNoValue } from '../../interfaces/ccdCase.interface';
 
 /**
- * Converts frontend 'yes'/'no' string to backend CCD YesOrNo enum ('Yes'/'No')
+ * Converts frontend 'yes'/'no' string to backend CCD enum 'Yes'/'No'
  * @param value - Frontend radio button value ('yes' or 'no')
  * @returns CCD enum value ('Yes' or 'No')
  * @example
@@ -22,31 +22,24 @@ export function toYesNoEnum(value: 'yes' | 'no' | undefined): YesNoValue | undef
 }
 
 /**
- * Converts frontend 'yes'/'no' string to backend CCD enum 'YES'/'NO'
- * @param value - Frontend radio button value ('yes' or 'no')
- * @returns CCD enum value ('YES' or 'NO')
- * @example
- * toVerticalYesNoEnum('yes') // returns 'YES'
- * toVerticalYesNoEnum('no')  // returns 'NO'
- */
-export function toVerticalYesNoEnum(value: 'yes' | 'no'): VerticalYesNoValue {
-  return value === 'yes' ? 'YES' : 'NO';
-}
-
-/**
- * Converts backend CCD enum 'YES'/'NO' to frontend 'yes'/'no' string
- * @param value - CCD enum value ('YES' or 'NO')
+ * Converts backend CCD enum to frontend 'yes'/'no' string.
+ * Accepts title-case ('Yes'/'No') and legacy uppercase ('YES'/'NO') values.
+ * @param value - CCD enum value
  * @returns Frontend radio button value ('yes' or 'no'), or undefined if value is null/invalid
  * @example
- * fromVerticalYesNoEnum('YES') // returns 'yes'
- * fromVerticalYesNoEnum('NO')  // returns 'no'
- * fromVerticalYesNoEnum(null)  // returns undefined
+ * fromYesNoEnum('Yes') // returns 'yes'
+ * fromYesNoEnum('No')  // returns 'no'
+ * fromYesNoEnum(null)  // returns undefined
  */
-export function fromVerticalYesNoEnum(value: VerticalYesNoValue | string | undefined): 'yes' | 'no' | undefined {
-  if (value === 'YES') {
+export function fromYesNoEnum(value: YesNoValue | string | null | undefined): 'yes' | 'no' | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const lowerValue = value.toLowerCase();
+  if (lowerValue === 'yes') {
     return 'yes';
   }
-  if (value === 'NO') {
+  if (lowerValue === 'no') {
     return 'no';
   }
   return undefined;
