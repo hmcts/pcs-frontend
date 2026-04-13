@@ -68,7 +68,6 @@ withPipeline(type, product, component) {
       sh 'rm -rf allure-results allure-report'
     }
     afterAlways('smoketest:preview') {
-      sendAllureReportToSlack('master', 'PCS_20Frontend_20Smoke_20Test_20Report/')
       archiveSmokeTestReports()
     }
     afterAlways('functionalTest:preview') {
@@ -93,13 +92,13 @@ withPipeline(type, product, component) {
     afterAlways('smoketest:aat') {
       archiveSmokeTestReports()
       if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-        sendAllureReportToSlack('master', 'Frontend_20Smoke_20Test_20Report/')
+        sendAllureReportToSlack('master', 'Frontend_20Smoke_20Test_20Report/', 'Smoke test')
       }
     }
     afterAlways('functionalTest:aat') {
       archiveFunctionalTestReports()
       if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-          sendAllureReportToSlack('master', 'Frontend_20Functional_20Test_20Report/')
+          sendAllureReportToSlack('master', 'Frontend_20Functional_20Test_20Report/', 'Functional test')
       }
     }
   }
@@ -128,9 +127,10 @@ def archiveSmokeTestReports() {
   archiveAllureReport('Frontend Smoke Test Report')
 }
 
-def sendAllureReportToSlack(String pipelineType = 'master', String allureReportPathSuffix = 'Frontend_20Functional_20Test_20Report/') {
+def sendAllureReportToSlack(String pipelineType = 'master', String allureReportPathSuffix = 'Frontend_20Functional_20Test_20Report/', String reportStageLabel = '') {
   env.ALLURE_REPORT_PATH_SUFFIX = allureReportPathSuffix
-  def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
+  env.E2E_REPORT_STAGE = reportStageLabel ?: ''
+  def msg = sh(script: "yarn exec ts-node src/test/ui/utils/common/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
     slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
