@@ -43,35 +43,33 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
     });
+    //The below are placeholder page
+    await performValidation('mainHeader', askToSetAsideTheDecisionToEvictYou.mainHeader);
+    await performAction('clickButton', askToSetAsideTheDecisionToEvictYou.startNowButton);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
+    await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
+    await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
+    await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
+    await performAction(
+      'inputText',
+      haveYouAlreadyAppliedForHelp.hwfReferenceHiddenTextLabel,
+      haveYouAlreadyAppliedForHelp.hwfReferenceTextInput
+    );
+    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
+    await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+    await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
+    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
+    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
+    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
+    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
+    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
-  //The below are placeholder page
-  await performValidation('mainHeader', askToSetAsideTheDecisionToEvictYou.mainHeader);
-  await performAction('clickButton', askToSetAsideTheDecisionToEvictYou.startNowButton);
-  await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-  await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
-  await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
-  await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
-  await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
-  await performAction(
-    'inputText',
-    haveYouAlreadyAppliedForHelp.hwfReferenceHiddenTextLabel,
-    haveYouAlreadyAppliedForHelp.hwfReferenceTextInput
-  );
-  await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
-  await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-  await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
-  await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
-  await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
-  await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
-  await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-  await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
-  await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
-  await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
-  await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-  await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
-  await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
-  await performValidation('mainHeader', checkYourAnswers.mainHeader);
-  await performAction('clickButton', checkYourAnswers.submitApplicationButton);
 });
