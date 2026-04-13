@@ -52,7 +52,7 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
+jest.mock('../../../../main/steps/utils/draftDefendantResponse', () => ({
   getDraftDefendantResponse: jest.fn(() => ({
     defendantResponses: {},
     defendantContactDetails: { party: {} },
@@ -62,7 +62,7 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
-import { saveDraftDefendantResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/draftDefendantResponse';
 
 describe('respond-to-claim defendant-name-capture step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;

@@ -5,7 +5,7 @@ import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { arrayToString } from '../../../utils/arrayToString';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 const STEP_NAME = 'postcode-finder';

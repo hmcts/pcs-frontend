@@ -2,7 +2,7 @@ jest.mock('../../../../main/modules/steps', () => ({
   createFormStep: jest.fn(config => config),
 }));
 
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
+jest.mock('../../../../main/steps/utils/draftDefendantResponse', () => ({
   getDraftDefendantResponse: jest.fn(() => ({
     defendantResponses: {},
     defendantContactDetails: { party: {} },
@@ -11,7 +11,7 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
 }));
 
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
-import { saveDraftDefendantResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/draftDefendantResponse';
 
 type TenancyTypeDetailsStep = {
   getInitialFormData: (req: {

@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 // Validation constants

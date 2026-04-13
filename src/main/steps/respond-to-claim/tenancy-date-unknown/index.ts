@@ -1,7 +1,7 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 const STEP_NAME = 'tenancy-date-unknown';

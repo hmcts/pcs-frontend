@@ -4,7 +4,7 @@ import type { TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interf
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
 import { flowConfig } from '../flow.config';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [

@@ -2,7 +2,7 @@ import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { formatDatePartsToISODate, parseISOToDateParts } from '../../utils';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 export const step: StepDefinition = createFormStep({
