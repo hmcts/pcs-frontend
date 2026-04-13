@@ -10,15 +10,12 @@ import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import { arrayToString } from '@utils/arrayToString';
 
-const correspondenceAddressRequired = (_formData: Record<string, unknown>, allData: Record<string, unknown>): boolean =>
-  allData.__isAddressKnown === true;
-
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'correspondenceAddressConfirm',
     type: 'radio',
-    required: correspondenceAddressRequired,
+    required: true,
     translationKey: {
       label: 'legend',
       hint: 'legend.hint',
