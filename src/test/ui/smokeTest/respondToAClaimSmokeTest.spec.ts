@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
 import config from 'config';
 
-import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
-import { freeLegalAdvice, startNow } from '../../data/page-data';
-import { initializeExecutor, performAction } from '../../utils/controller';
+import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { freeLegalAdvice, startNow } from '../data/page-data';
+import { initializeExecutor, performAction } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
