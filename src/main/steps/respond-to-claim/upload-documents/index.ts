@@ -1,7 +1,3 @@
-/**
- * Draft payload for supporting uploads is documented in
- * docs/defendant-supporting-documents-backend-handoff.md (pcs-api handoff).
- */
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
@@ -85,8 +81,10 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     // get saved files from session
     const saved = getSavedUploadFiles(req, STEP_NAME, FIELD_NAME);
+    console.log('[DEBUG] Files from session:', saved);
     // create meta json
     const metaJson = JSON.stringify(saved.map(f => ({ contentType: f.content_type, size: f.size })));
+    console.log('[DEBUG] Meta JSON:', metaJson);
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
@@ -103,6 +101,7 @@ export const step: StepDefinition = createFormStep({
       },
     };
 
+    console.log('[DEBUG] Payload to send:', JSON.stringify(possessionClaimResponse, null, 2));
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
 });
