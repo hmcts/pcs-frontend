@@ -212,7 +212,7 @@ def runAccessibilityTests(yarnBuilder) {
 def sendAllureReportToSlack(String browser, String reportSuffix) {
   env.E2E_BROWSER = browser
   env.ALLURE_REPORT_PATH_SUFFIX = reportSuffix
-  def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()
+  def msg = sh(script: "yarn exec ts-node src/test/ui/utils/common/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
     slackSend(channel: '#qa-pipeline-status', message: msg)
