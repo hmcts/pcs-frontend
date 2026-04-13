@@ -33,6 +33,49 @@ export function handleFileUploadDelete(
   }
 }
 
+function validateFileTypes(
+  files: Express.Multer.File[],
+  fieldName: string,
+  t: TFunction,
+  translations?: Record<string, string>
+): string | null {
+  for (const file of files) {
+    if (!isAllowedUploadFilename(file.originalname)) {
+      return (
+        translations?.[`${fieldName}.invalidFileType`] || t('errors.fileUpload.invalidFileType', FILE_TYPE_ERROR_FALLBACK)
+      );
+    }
+  }
+  return null;
+}
+
+function validateFileSizes(
+  files: Express.Multer.File[],
+  fieldName: string,
+  t: TFunction,
+  translations?: Record<string, string>
+): string | null {
+  for (const file of files) {
+    if (isFileTooLarge(file)) {
+      return translations?.[`${fieldName}.fileTooLarge`] || t('errors.fileUpload.fileTooLarge', FILE_TOO_LARGE_ERROR_FALLBACK);
+    }
+  }
+  return null;
+}
+
+function validateSingleFileConstraint(
+  field: FormFieldConfig,
+  savedCount: number,
+  incomingCount: number,
+  t: TFunction,
+  translations?: Record<string, string>
+): string | null {
+  if (field.fileUploadSingleOnly && (savedCount > 0 || incomingCount > 1)) {
+    return translations?.[`${field.name}.tooMany`] || t('errors.fileUpload.singleFileOnly', 'You can only upload one file');
+  }
+  return null;
+}
+
 /**
  * Validates files submitted via MOJ "Upload file" and appends metadata to session.
  */
@@ -45,11 +88,13 @@ export function validateAndAppendFileUploads(
 ): Record<string, string> {
   const errors: Record<string, string> = {};
   const fileFields = fields.filter(f => f.type === 'file');
+
   if (fileFields.length === 0) {
     return errors;
   }
 
   const withIncoming = fileFields.filter(f => getMulterFilesForField(req, f.name).length > 0);
+
   if (withIncoming.length === 0) {
     errors[fileFields[0].name] =
       translations?.[`${fileFields[0].name}.selectFile`] || t('errors.fileUpload.selectFile', 'Select a file');
@@ -59,30 +104,22 @@ export function validateAndAppendFileUploads(
   for (const field of withIncoming) {
     const incoming = getMulterFilesForField(req, field.name);
 
-    for (const file of incoming) {
-      if (!isAllowedUploadFilename(file.originalname)) {
-        errors[field.name] =
-          translations?.[`${field.name}.invalidFileType`] ||
-          t('errors.fileUpload.invalidFileType', FILE_TYPE_ERROR_FALLBACK);
-        break;
-      }
-      if (isFileTooLarge(file)) {
-        errors[field.name] =
-          translations?.[`${field.name}.fileTooLarge`] ||
-          t('errors.fileUpload.fileTooLarge', FILE_TOO_LARGE_ERROR_FALLBACK);
-        break;
-      }
+    const typeError = validateFileTypes(incoming, field.name, t, translations);
+    if (typeError) {
+      errors[field.name] = typeError;
+      continue;
     }
 
-    if (errors[field.name]) {
+    const sizeError = validateFileSizes(incoming, field.name, t, translations);
+    if (sizeError) {
+      errors[field.name] = sizeError;
       continue;
     }
 
     const saved = getSavedUploadFiles(req, stepName, field.name);
-    if (field.fileUploadSingleOnly && (saved.length > 0 || incoming.length > 1)) {
-      errors[field.name] =
-        translations?.[`${field.name}.tooMany`] ||
-        t('errors.fileUpload.singleFileOnly', 'You can only upload one file');
+    const constraintError = validateSingleFileConstraint(field, saved.length, incoming.length, t, translations);
+    if (constraintError) {
+      errors[field.name] = constraintError;
       continue;
     }
 
