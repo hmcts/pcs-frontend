@@ -1,5 +1,5 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -12,7 +12,7 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/freeLegalAdvice.njk`,
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
     const enumMapping: Record<string, string> = { yes: 'YES', no: 'NO', preferNotToSay: 'PREFER_NOT_TO_SAY' };
 

@@ -1,6 +1,6 @@
 import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -34,7 +34,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     const confirmValue = req.body?.confirmLandlordLicensed as string | undefined;
     const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', imNotSure: 'NOT_SURE' };
 

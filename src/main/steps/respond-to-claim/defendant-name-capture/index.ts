@@ -1,5 +1,5 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -12,7 +12,7 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   showCancelButton: false,
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     const firstName = req.body?.firstName as string | undefined;
     const lastName = req.body?.lastName as string | undefined;
 

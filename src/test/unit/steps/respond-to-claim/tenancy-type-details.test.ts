@@ -2,8 +2,8 @@ jest.mock('../../../../main/modules/steps', () => ({
   createFormStep: jest.fn(config => config),
 }));
 
-jest.mock('../../../../main/steps/utils/getDraftDefendantResponse', () => ({
-  getDraftDefendantResponse: jest.fn(() => ({
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
     defendantResponses: {},
     defendantContactDetails: { party: {} },
   })),

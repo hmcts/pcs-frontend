@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -17,7 +17,7 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const dateOfBirth = req.body?.dateOfBirth;
 
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     let dateSet = false;
     if (dateOfBirth && typeof dateOfBirth === 'object') {
       const { day, month, year } = dateOfBirth;

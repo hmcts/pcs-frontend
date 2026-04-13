@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -15,7 +15,7 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     const nameConfirmation = req.body?.nameConfirmation as string | undefined;
 
     if (nameConfirmation === 'yes' || nameConfirmation === 'no') {

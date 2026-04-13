@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -19,7 +19,7 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
   },
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     const disputeOtherParts = req.body?.disputeOtherParts as 'yes' | 'no' | undefined;
 
     if (disputeOtherParts === 'yes' || disputeOtherParts === 'no') {

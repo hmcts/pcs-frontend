@@ -4,7 +4,7 @@ import type { TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interf
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -119,7 +119,7 @@ export const step: StepDefinition = createFormStep({
     return initial;
   },
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     const tenancyTypeConfirm = req.body?.tenancyTypeConfirm as string | undefined;
 
     if (tenancyTypeConfirm && TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm]) {

@@ -3,7 +3,7 @@ import { format, parseISO } from 'date-fns';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -96,7 +96,7 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const confirmValue = req.body?.confirmTenancyDate as string | undefined;
 
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     const enumMapping: Record<string, string> = { yes: 'YES', no: 'NO', notSure: 'NOT_SURE' };
 
     if (confirmValue && enumMapping[confirmValue]) {

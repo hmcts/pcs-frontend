@@ -1,7 +1,7 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -42,7 +42,7 @@ export const step: StepDefinition = createFormStep({
     const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
     const tenancyStartDateIso = formatDatePartsToISODate(day, month, year);
 
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     if (tenancyStartDateIso) {
       response.defendantResponses.tenancyStartDate = tenancyStartDateIso;
     } else {

@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -37,7 +37,7 @@ export const step: StepDefinition = createFormStep({
     caption: 'captionHeading',
   },
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     const rentArrears = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
     const enumMapping: Record<string, string> = {
       [FORM_VALUES.YES]: BACKEND_CONFIRMATION.YES,

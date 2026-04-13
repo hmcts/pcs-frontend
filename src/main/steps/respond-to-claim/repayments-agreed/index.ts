@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -15,7 +15,7 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
     const repaymentsAgreed = req.body?.repaymentsAgreed as string | undefined;
     const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', imNotSure: 'NOT_SURE' };

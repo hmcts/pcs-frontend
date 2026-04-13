@@ -5,7 +5,7 @@ import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interf
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { arrayToString } from '../../../utils/arrayToString';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -114,7 +114,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
   },
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
       // Address already in the clone from START callback - no change needed
     } else {

@@ -2,7 +2,7 @@ import type { Request } from 'express';
 
 import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -44,7 +44,7 @@ export const step: StepDefinition = createFormStep({
     return { writtenTerms };
   },
   beforeRedirect: async (req: Request) => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     const writtenTerms: YesNoNotSureValue | undefined = req.body?.writtenTerms;
 
     if (writtenTerms) {

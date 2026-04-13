@@ -2,7 +2,7 @@ import { isEmail } from 'validator';
 
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -66,7 +66,7 @@ export const step: StepDefinition = createFormStep({
   ],
 
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     // Reads from session for now - session removal is a separate ticket
     const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
     if (emailForm) {

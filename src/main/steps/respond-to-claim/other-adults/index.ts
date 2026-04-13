@@ -1,6 +1,6 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -75,7 +75,7 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const confirmValue = req.body?.confirmOtherAdults as string | undefined;
 
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
 
     if (confirmValue === 'yes' || confirmValue === 'no') {

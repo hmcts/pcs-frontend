@@ -1,6 +1,6 @@
 import type { CaseData, HouseholdCircumstances, YesNoValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -19,7 +19,7 @@ export const step: StepDefinition = createFormStep({
     paragraph: 'otherDependantsParagraph',
   },
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const otherDependants: string = req.body?.otherDependants;
     const enumMapping: Record<string, YesNoValue> = { yes: 'Yes', no: 'No' };

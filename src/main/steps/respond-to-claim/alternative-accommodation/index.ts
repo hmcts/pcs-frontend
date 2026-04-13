@@ -2,7 +2,7 @@ import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { formatDatePartsToISODate, parseISOToDateParts } from '../../utils';
-import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -68,7 +68,7 @@ export const step: StepDefinition = createFormStep({
     return result;
   },
   beforeRedirect: async req => {
-    const response = getDraftDefendantResponse(req);
+    const response = buildDraftDefendantResponse(req);
     response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const confirmValue = req.body?.confirmAlternativeAccommodation as string | undefined;
     const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', notSure: 'NOT_SURE' };
