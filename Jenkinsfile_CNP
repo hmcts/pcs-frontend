@@ -69,6 +69,7 @@ withPipeline(type, product, component) {
     }
     afterAlways('smoketest:preview') {
       archiveSmokeTestReports()
+      sendAllureReportToSlack('master', 'Frontend_20Smoke_20Test_20Report/', 'Smoke test')
     }
     afterAlways('functionalTest:preview') {
       archiveFunctionalTestReports()
