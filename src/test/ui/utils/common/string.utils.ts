@@ -1,20 +1,16 @@
-/** Truncate long strings in PFT / trigger debug output. */
 export function truncateForLog(text: string, maxLen = 200): string {
-  if (text.length <= maxLen) {
-    return text;
-  }
-  return `${text.slice(0, maxLen)}…`;
+  return text.length <= maxLen ? text : `${text.slice(0, maxLen)}…`;
 }
 
-/** Compact URL for logs (pathname + search, capped). */
 export function shortUrl(url: string, maxLen = 120): string {
+  let s = url;
   try {
     const u = new URL(url);
-    const compact = `${u.pathname}${u.search}`;
-    return compact.length <= maxLen ? compact : `${compact.slice(0, maxLen)}…`;
+    s = u.pathname + u.search;
   } catch {
-    return url.length <= maxLen ? url : `${url.slice(0, maxLen)}…`;
+    /* keep raw url */
   }
+  return s.length <= maxLen ? s : `${s.slice(0, maxLen)}…`;
 }
 
 export function escapeForRegex(text: string): string {
