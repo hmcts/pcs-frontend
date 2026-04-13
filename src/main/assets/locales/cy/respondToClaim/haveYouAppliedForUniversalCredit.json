@@ -1,6 +1,7 @@
 {
-  "pageTitle": "cyHave you applied for Universal Credit?",
+  "pageTitle": "cyUniversal Credit",
   "caption": "cyRespond to a property possession claim",
+  "heading": "cyHave you applied for Universal Credit?",
   "question": "cyHave you applied for Universal Credit?",
   "dateLabel": "cyWhen did you apply?",
   "dateHint": "cyFor example, 27 9 2022",

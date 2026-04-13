@@ -68,7 +68,7 @@ export const step: StepDefinition = createFormStep({
       name: 'havePriorityDebts',
       type: 'radio',
       required: true,
-      legendClasses: 'govuk-fieldset__legend--l',
+      legendClasses: 'govuk-fieldset__legend--m',
       translationKey: { label: 'question' },
       errorMessage: 'errors.havePriorityDebts',
       options: [

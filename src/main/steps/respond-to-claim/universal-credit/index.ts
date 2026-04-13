@@ -97,6 +97,7 @@ export const step: StepDefinition = createFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
+    heading: 'heading',
     caption: 'caption',
   },
   fields: [
@@ -104,7 +105,7 @@ export const step: StepDefinition = createFormStep({
       name: 'haveAppliedForUniversalCredit',
       type: 'radio',
       required: true,
-      legendClasses: 'govuk-fieldset__legend--l',
+      legendClasses: 'govuk-fieldset__legend govuk-visually-hidden',
       translationKey: { label: 'question' },
       errorMessage: 'errors.haveAppliedForUniversalCredit',
       options: [

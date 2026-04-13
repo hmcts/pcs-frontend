@@ -11,6 +11,7 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
   <span class="govuk-caption-l">{{ caption }}</span>
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
 
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
@@ -18,7 +19,7 @@
         {{ govukRadios(field.component) }}
       {% endif %}
     {% endfor %}
-    {{ stepButtons(continue, saveForLater) }}
+    {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
