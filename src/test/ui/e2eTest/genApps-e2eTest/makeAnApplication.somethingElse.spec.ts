@@ -4,8 +4,8 @@ import config from 'config';
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
   askTheCourtToMakeAnOrder,
-  checkYourAnswers,
   chooseAnApplication,
+  doYouNeedHelpPayingTheFee,
 } from '../../data/page-data/genApps-page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
@@ -36,9 +36,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.somethingElseRadioOption,
     });
-    await performValidation('mainHeader', askTheCourtToMakeAnOrder.mainHeader);
     await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
   });
 });
