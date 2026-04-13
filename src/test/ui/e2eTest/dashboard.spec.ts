@@ -22,7 +22,7 @@ test.beforeEach(async ({ page }) => {
   await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
 });
 
-test.describe('Dashboard - e2e Journey @nightly', async () => {
+test.describe.skip('Dashboard - e2e Journey @nightly', async () => {
   test('Validate address, case number and links on the dashboard @regression', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });

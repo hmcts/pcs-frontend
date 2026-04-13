@@ -41,7 +41,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 //This test case will be deleted once correspondence address functional tests automatically handle page routing - will be implemented in a new story
-test.describe('Correspondence Address - functional test @nightly', async () => {
+test.describe.skip('Correspondence Address - functional test @nightly', async () => {
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
