@@ -145,7 +145,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url);
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/what-other-regular-expenses-do-you-have`);
-  await performAction('clickButton', startNow.startNowButton);
+  //await performAction('clickButton', startNow.startNowButton);
 });
 
 test.afterEach(async () => {
@@ -157,7 +157,7 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim @noDefendants @regression @accessibility', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+   await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -241,13 +241,18 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
-    await performAction('selectWhatRegularIncomeDoYouReceive', {
+    await performAction('selectWhatOtherRegularExpensesDoYouHave', {
       regularIncomeOptions: [
+        [
+          otherRegularExpenses.groceryShoppingParagraph,
+          otherRegularExpenses.groceryShoppingTotalAmountInput,
+          otherRegularExpenses.groceryShoppingWeekRadioOption
+        ],
         [
           otherRegularExpenses.loanPaymentsParagraph,
           otherRegularExpenses.loanPaymentsTotalAmountInput,
           otherRegularExpenses.loanPaymentsMonthRadioOption,
-        ],
+        ]
       ],
     });
   });
@@ -332,6 +337,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectWhatRegularIncomeDoYouReceive', {
+      regularIncomeOptions: [
+        [
+          otherRegularExpenses.loanPaymentsParagraph,
+          otherRegularExpenses.loanPaymentsTotalAmountInput,
+          otherRegularExpenses.loanPaymentsMonthRadioOption,
+        ],
+        [
+          otherRegularExpenses.groceryShoppingParagraph,
+          otherRegularExpenses.groceryShoppingTotalAmountInput,
+          otherRegularExpenses.groceryShoppingWeekRadioOption
+        ]
+      ],
+    });
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {

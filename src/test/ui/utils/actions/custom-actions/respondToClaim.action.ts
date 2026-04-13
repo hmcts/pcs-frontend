@@ -514,12 +514,14 @@ export class RespondToClaimAction implements IAction {
         question: otherRegularExpenses.mainHeader,
         option,
       });
-
+      console.log('option'+option);
       if (!value || !frequency) {
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
       await performAction('inputText', otherRegularExpenses.amountReceivedHiddenTextLabel, value);
+      console.log('input'+value);
       await performAction('clickRadioButton', frequency);
+      console.log('frequency'+frequency);
     }
     await performAction('clickButton', otherRegularExpenses.saveAndContinueButton);
   }
