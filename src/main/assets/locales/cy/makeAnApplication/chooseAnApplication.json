@@ -2,7 +2,7 @@
   "pageTitle": "cyChoose an application",
   "caption": "cyMake an application",
   "heading": "cyChoose an application",
-  "noticeText": "You cannot apply to suspend (stop or delay) the eviction online.",
+  "noticeText": "cyYou cannot apply to suspend (stop or delay) the eviction online.",
   "noticeTextByPost": "cyYou must apply by post: ",
   "noticeTextList": {
     "readTheGuidance": "<a href=\"https://www.gov.uk/guidance/suspend-eviction-online\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">cyRead the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)</a>",
