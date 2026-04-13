@@ -350,6 +350,39 @@ describe('updateCase', () => {
     expect(result).toEqual(mockResponse);
   });
 
+  it('should wrap response in possessionClaimResponse and delegate to updateDraftRespondToClaim', async () => {
+    const caseId = '1234567890123456';
+    const mockResponse = { id: caseId, data: {} };
+
+    mockPost.mockResolvedValue({ data: mockResponse });
+
+    const defendantResponse = {
+      defendantResponses: { freeLegalAdvice: 'YES' },
+      defendantContactDetails: { party: { firstName: 'Jane' } },
+    };
+
+    const result = await ccdCaseService.saveDraftDefendantResponse(accessToken, caseId, defendantResponse);
+
+    expect(mockPost).toHaveBeenCalledWith(
+      `${mockUrl}/callbacks/mid-event?page=respondToPossessionDraftSavePage`,
+      {
+        event_id: 'respondPossessionClaim',
+        case_details: {
+          id: caseId,
+          case_type_id: 'PCS',
+          data: { possessionClaimResponse: defendantResponse },
+        },
+      },
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: `Bearer ${accessToken}`,
+        }),
+      })
+    );
+
+    expect(result).toEqual(mockResponse);
+  });
+
   it('should throw HTTPError when draft save fails', async () => {
     const caseId = '1234567890123456';
 
