@@ -68,9 +68,9 @@ describe('respond-to-claim universal-credit step', () => {
       body: {
         action: 'continue',
         haveAppliedForUniversalCredit: 'yes',
-        'ucApplicationDate-day': '10',
-        'ucApplicationDate-month': '02',
-        'ucApplicationDate-year': '2024',
+        'haveAppliedForUniversalCredit.ucApplicationDate-day': '10',
+        'haveAppliedForUniversalCredit.ucApplicationDate-month': '02',
+        'haveAppliedForUniversalCredit.ucApplicationDate-year': '2024',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -127,9 +127,9 @@ describe('respond-to-claim universal-credit step', () => {
       body: {
         action: 'continue',
         haveAppliedForUniversalCredit: 'no',
-        'ucApplicationDate-day': '31',
-        'ucApplicationDate-month': '02',
-        'ucApplicationDate-year': '2024',
+        'haveAppliedForUniversalCredit.ucApplicationDate-day': '31',
+        'haveAppliedForUniversalCredit.ucApplicationDate-month': '02',
+        'haveAppliedForUniversalCredit.ucApplicationDate-year': '2024',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -158,8 +158,8 @@ describe('respond-to-claim universal-credit step', () => {
       body: {
         action: 'continue',
         haveAppliedForUniversalCredit: 'yes',
-        'ucApplicationDate-day': '10',
-        'ucApplicationDate-year': '2024',
+        'haveAppliedForUniversalCredit.ucApplicationDate-day': '10',
+        'haveAppliedForUniversalCredit.ucApplicationDate-year': '2024',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { fromYesNoEnum, toYesNoEnum } from '../../utils';
+import { formatDatePartsToISODate, fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -28,9 +28,13 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const day = req.body?.['ucApplicationDate-day'] as string | undefined;
-    const month = req.body?.['ucApplicationDate-month'] as string | undefined;
-    const year = req.body?.['ucApplicationDate-year'] as string | undefined;
+    const day = ((req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-day'] as string | undefined) ?? '').trim();
+    const month = (
+      (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-month'] as string | undefined) ?? ''
+    ).trim();
+    const year = (
+      (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-year'] as string | undefined) ?? ''
+    ).trim();
 
     const universalCredit = selection === 'yes' ? toYesNoEnum(selection) : undefined;
 
@@ -39,15 +43,11 @@ export const step: StepDefinition = createFormStep({
       if (!day || !month || !year) {
         throw new Error('Missing universal credit application date submitted');
       }
-      const ucApplicationDate = DateTime.fromObject({
-        year: Number(year),
-        month: Number(month),
-        day: Number(day),
-      });
-      if (!ucApplicationDate.isValid) {
+      const parsedIsoDate = formatDatePartsToISODate(day, month, year);
+      if (!parsedIsoDate) {
         throw new Error('Invalid universal credit application date submitted');
       }
-      isoDate = ucApplicationDate.toISODate() || undefined;
+      isoDate = parsedIsoDate;
     }
 
     if (!universalCredit) {
@@ -86,7 +86,7 @@ export const step: StepDefinition = createFormStep({
     if (householdCircumstances?.ucApplicationDate) {
       const parsed = DateTime.fromISO(householdCircumstances.ucApplicationDate);
       if (parsed.isValid) {
-        data.ucApplicationDate = {
+        data['haveAppliedForUniversalCredit.ucApplicationDate'] = {
           day: parsed.toFormat('dd'),
           month: parsed.toFormat('MM'),
           year: parsed.toFormat('yyyy'),
