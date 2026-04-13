@@ -3,8 +3,10 @@ import { format, parseISO } from 'date-fns';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
+import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
+
+import { ccdCaseService } from '@services/ccdCaseService';
 
 function getTenancyStartDate(caseData: Record<string, unknown> | undefined): string | undefined {
   return (caseData?.tenancy_TenancyLicenceDate ?? caseData?.licenceStartDate) as string | undefined;
@@ -124,7 +126,11 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.tenancyStartDate;
     }
 
-    await saveDraftDefendantResponse(req, response);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
   extendGetContent: req => {
     const caseData = req.res?.locals?.validatedCase?.data;

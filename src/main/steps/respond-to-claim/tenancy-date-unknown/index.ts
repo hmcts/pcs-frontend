@@ -1,8 +1,10 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
+import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
+
+import { ccdCaseService } from '@services/ccdCaseService';
 
 const STEP_NAME = 'tenancy-date-unknown';
 
@@ -47,7 +49,11 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.tenancyStartDate;
     }
 
-    await saveDraftDefendantResponse(req, response);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
   extendGetContent: async req => {
     const claimantNameFromValidatedCase = req.res?.locals?.validatedCase?.data?.possessionClaimResponse

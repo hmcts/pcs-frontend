@@ -1,8 +1,9 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
+import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'free-legal-advice',
@@ -21,7 +22,11 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.freeLegalAdvice;
     }
 
-    await saveDraftDefendantResponse(req, response);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
   translationKeys: {
     pageTitle: 'pageTitle',

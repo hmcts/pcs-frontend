@@ -3,8 +3,10 @@ import type { Request } from 'express';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
+import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
+
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'non-rent-arrears-dispute',
@@ -37,7 +39,11 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.disputeClaimDetails;
     }
 
-    await saveDraftDefendantResponse(req, response);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;

@@ -35,7 +35,12 @@ import config from 'config';
 
 import { HTTPError } from '../HttpError';
 import { CaseState } from '../interfaces/ccdCase.interface';
-import type { CcdCase, CcdUserCases, StartCallbackData } from '../interfaces/ccdCase.interface';
+import type {
+  CcdCase,
+  CcdUserCases,
+  PossessionClaimResponse,
+  StartCallbackData,
+} from '../interfaces/ccdCase.interface';
 import { http } from '../modules/http';
 
 import { Logger } from '@modules/logger';
@@ -311,6 +316,14 @@ export const ccdCaseService = {
       }
       throw httpError;
     }
+  },
+
+  async saveDraftDefendantResponse(
+    accessToken: string | undefined,
+    caseId: string,
+    response: PossessionClaimResponse
+  ): Promise<CcdCase> {
+    return this.updateDraftRespondToClaim(accessToken, caseId, { possessionClaimResponse: response });
   },
 
   async updateDraftRespondToClaim(

@@ -1,7 +1,9 @@
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
+import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
+
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-telephone',
@@ -90,6 +92,10 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantContactDetails.party.phoneNumber;
     }
 
-    await saveDraftDefendantResponse(req, response);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
 });

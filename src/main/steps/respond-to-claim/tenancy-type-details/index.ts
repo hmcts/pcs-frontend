@@ -4,8 +4,10 @@ import type { TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interf
 import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
+import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
+
+import { ccdCaseService } from '@services/ccdCaseService';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -139,7 +141,11 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.tenancyType;
     }
 
-    await saveDraftDefendantResponse(req, response);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
   extendGetContent: async (req, formContent) => {
     const existingTenancyTypeCorrect = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses

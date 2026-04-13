@@ -2,16 +2,21 @@ jest.mock('../../../../main/modules/steps', () => ({
   createFormStep: jest.fn(config => config),
 }));
 
-jest.mock('../../../../main/steps/utils/draftDefendantResponse', () => ({
+jest.mock('../../../../main/steps/utils/getDraftDefendantResponse', () => ({
   getDraftDefendantResponse: jest.fn(() => ({
     defendantResponses: {},
     defendantContactDetails: { party: {} },
   })),
-  saveDraftDefendantResponse: jest.fn(),
 }));
 
+jest.mock('../../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    saveDraftDefendantResponse: jest.fn(),
+  },
+}));
+
+import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
-import { saveDraftDefendantResponse } from '../../../../main/steps/utils/draftDefendantResponse';
 
 type TenancyTypeDetailsStep = {
   getInitialFormData: (req: {
@@ -111,8 +116,9 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
       await testedStep.beforeRedirect(req);
 
-      expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
-        req,
+      expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+        undefined, // accessToken
+        undefined, // caseId
         expect.objectContaining({
           defendantResponses: expect.objectContaining({
             tenancyTypeCorrect,
@@ -128,10 +134,14 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
         await testedStep.beforeRedirect(req);
 
-        expect(saveDraftDefendantResponse).toHaveBeenCalledWith(req, {
-          defendantResponses: {},
-          defendantContactDetails: { party: {} },
-        });
+        expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+          undefined, // accessToken
+          undefined, // caseId
+          {
+            defendantResponses: {},
+            defendantContactDetails: { party: {} },
+          }
+        );
       }
     );
   });

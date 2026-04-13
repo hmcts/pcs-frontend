@@ -2,10 +2,11 @@ import type { Request } from 'express';
 
 import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/draftDefendantResponse';
+import { getDraftDefendantResponse } from '../../utils/getDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 const STEP_NAME = 'written-terms';
 
@@ -52,6 +53,10 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.writtenTerms;
     }
 
-    await saveDraftDefendantResponse(req, response);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
 });

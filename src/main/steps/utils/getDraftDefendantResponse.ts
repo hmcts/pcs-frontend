@@ -1,9 +1,7 @@
 import { Request } from 'express';
 import { cloneDeep } from 'lodash';
 
-import { CcdCase, PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
-
-import { ccdCaseService } from '@services/ccdCaseService';
+import { PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
 
 // Return type with pre-initialised top-level objects so callers can set/delete fields directly
 export interface DraftDefendantResponse extends PossessionClaimResponse {
@@ -35,15 +33,4 @@ export const getDraftDefendantResponse = (req: Request): DraftDefendantResponse 
   }
 
   return defendantOnly as DraftDefendantResponse;
-};
-
-// Save the full defendant response to the draft table (full replace)
-export const saveDraftDefendantResponse = async (req: Request, response: PossessionClaimResponse): Promise<CcdCase> => {
-  const ccdCase: CcdCase = {
-    id: req.res?.locals.validatedCase?.id,
-    data: {
-      possessionClaimResponse: response,
-    },
-  };
-  return ccdCaseService.updateDraftRespondToClaim(req.session?.user?.accessToken, ccdCase.id, ccdCase.data);
 };
