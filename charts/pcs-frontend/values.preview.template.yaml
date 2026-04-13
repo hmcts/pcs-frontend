@@ -16,6 +16,7 @@ nodejs:
     PCS_API_URL: '${PCS_API_URL}'
     CCD_URL: '${DATA_STORE_URL_BASE}'
     CASE_TYPE_ID: '${CASE_TYPE_ID}'
+    XUI_BASE_URI: '${XUI_BASE_URI}'
 redis:
   image:
     registry: hmctsprod.azurecr.io
