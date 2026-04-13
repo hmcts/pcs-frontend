@@ -4,6 +4,8 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "xui-header/macro.njk" import hmctsXuiHeader %}
+{% from "footer/macro.njk" import hmctsUiFooter %}
 
 {% set bodyAttributes = {
   "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
@@ -12,43 +14,55 @@
 } %}
 
 {% block head %}
-  {{super()}}
+  {{ super() }}
   {% include "webpack/css.njk" %}
+  {% if isLegalRepresentative %}
+    <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
+   {% endif %}
 {% endblock %}
+
 
 {% block bodyStart %}
 {% endblock %}
 
 {% block header %}
-  {{ govukHeader({
-    containerClasses: "govuk-width-container"
-  }) }}
+  {% if isLegalRepresentative %}
+      {{ hmctsXuiHeader(headerModel) }}
+    {% else %}
+      {{
+        govukHeader({
+          containerClasses: "govuk-width-container"
+        })
+      }}
+    {% endif %}
 {% endblock %}
 
 {% block beforeContent %}
-  {% block serviceNavigation %}
-    {{ govukServiceNavigation({
-      serviceName: t('serviceName', 'Respond to a property possession claim'),
-      serviceUrl: dashboardUrl if dashboardUrl else "/dashboard",
-      navigation: [
-        {
-          text: t('logout', 'Sign out'),
-          href: "/logout"
-        }
-      ],
-      navigationLabel: t('navigationLabel', 'Service navigation'),
-      navigationClasses: "pcs-service-navigation-wrapper"
-    }) }}
-  {% endblock %}
+  {% if not isLegalRepresentative %}
+      {% block serviceNavigation %}
+        {{ govukServiceNavigation({
+          serviceName: t('serviceName', 'Respond to a property possession claim'),
+          serviceUrl: dashboardUrl if dashboardUrl else "/dashboard",
+          navigation: [
+            {
+              text: t('logout', 'Sign out'),
+              href: "/logout"
+            }
+          ],
+          navigationLabel: t('navigationLabel', 'Service navigation'),
+          navigationClasses: "pcs-service-navigation-wrapper"
+        }) }}
+      {% endblock %}
 
-  <div class="govuk-width-container">
-    {{ govukPhaseBanner({
-      tag: {
-        text: (phase or t('phase') or 'ALPHA') | safe
-      },
-      html: ((feedback or t('feedback', { pageTrackingUrl: pageTrackingUrl }) or '')) | safe
-    }) }}
-  </div>
+      <div class="govuk-width-container">
+        {{ govukPhaseBanner({
+          tag: {
+            text: (phase or t('phase') or 'ALPHA') | safe
+          },
+          html: ((feedback or t('feedback', { pageTrackingUrl: pageTrackingUrl }) or '')) | safe
+        }) }}
+      </div>
+    {% endif %}
   {% if backUrl %}
     {{ govukBackLink({
       text: (back or t('back') or "Back"),
@@ -86,6 +100,14 @@
       </div>
     {% endif %}
   </div>
+{% endblock %}
+
+{% block footer %}
+    {% if isLegalRepresentative %}
+      {{ hmctsUiFooter(footerModel) }}
+    {% else %}
+      {{ super() }}
+    {% endif %}
 {% endblock %}
 
 {% block bodyEnd %}
