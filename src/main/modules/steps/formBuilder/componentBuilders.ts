@@ -8,8 +8,19 @@ import type {
   FormFieldOption,
 } from '../../../interfaces/formFieldConfig.interface';
 
+import { DEFAULT_FILE_ACCEPT, type SavedUploadFileMeta } from './fileUpload';
 import { normalizeCheckboxValue } from './helpers';
 import { buildSubFieldsHTML } from './subFieldsRenderer';
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) {
+    return `${bytes}B`;
+  }
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)}KB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+}
 
 function createFieldsetLegend(
   label: string,
@@ -232,6 +243,65 @@ export function buildComponentConfig(
         },
       ];
       componentType = 'dateInput';
+      break;
+    }
+    case 'file': {
+      const inputId = field.id || field.name;
+      const accept = field.accept || DEFAULT_FILE_ACCEPT;
+      const fileAttrs: Record<string, unknown> = {
+        ...(field.attributes || {}),
+        accept,
+      };
+      const uploadHtml = nunjucksEnv.render('macros/mojMultiFileUploadInner.njk', {
+        params: {
+          id: inputId,
+          name: field.name,
+          label: {
+            text: label,
+            classes: field.labelClasses || 'govuk-label--s',
+          },
+          // hint: hint ? { text: hint } : null,
+          errorMessage: hasError && errorText ? { text: errorText } : null,
+          fileUploadClasses: 'moj-multi-file-upload__input',
+          attributes: fileAttrs,
+          javascript: true,
+          chooseFilesButtonText: t('fileUpload.chooseFile', 'Choose file'),
+          dropInstructionText: t('fileUpload.orDropFile', 'or drop file'),
+          noFileChosenText: t('fileUpload.noFileChosen', 'No file chosen'),
+          uploadFileButtonText: t('fileUpload.uploadFile', 'Upload file'),
+        },
+      });
+
+      const saved = (Array.isArray(fieldValue) ? fieldValue : []) as SavedUploadFileMeta[];
+      const items = saved.map((meta: SavedUploadFileMeta) => ({
+        fileName: meta.id,
+        originalFileName: meta.file_name,
+        message: {
+          text: `${meta.file_name}, ${formatFileSize(meta.size)}`,
+        },
+        deleteButton: {
+          text: t('fileUpload.delete', 'Delete'),
+        },
+      }));
+
+      Object.assign(component, {
+        uploadedFiles: {
+          heading: { text: t('fileUpload.filesAdded', 'Files added') },
+          items,
+        },
+        uploadHtml,
+        classes: field.classes,
+        attributes: {},
+      });
+
+      delete component.id;
+      delete component.name;
+      delete component.label;
+      delete component.hint;
+      delete component.errorMessage;
+      delete component.attributes;
+
+      componentType = 'multiFileUpload';
       break;
     }
     default:

@@ -5,6 +5,7 @@ import type { FormFieldConfig, FormFieldOption } from '../../../interfaces/formF
 
 import { buildComponentConfig } from './componentBuilders';
 import { buildConditionalContent, getNestedFieldName } from './conditionalFields';
+import { savedFilesSessionKey } from './fileUpload';
 import { getTranslation, normalizeCheckboxValue } from './helpers';
 
 export function buildFieldValues(
@@ -43,6 +44,10 @@ export function buildFieldValues(
       } else {
         fieldValues[field.name] = { day: '', month: '', year: '' };
       }
+    } else if (field.type === 'file') {
+      const key = savedFilesSessionKey(field.name);
+      const raw = savedData?.[key] ?? savedData?.[field.name];
+      fieldValues[field.name] = Array.isArray(raw) ? raw : [];
     } else {
       // For regular fields, check both the full nested name and the simple name
       fieldValues[field.name] = savedData?.[fullFieldName] ?? savedData?.[field.name] ?? '';

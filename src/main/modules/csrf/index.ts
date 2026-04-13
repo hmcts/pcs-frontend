@@ -14,14 +14,23 @@ export class Csrf {
        * @param {Request} req - The incoming request object.
        * @returns {string|undefined} The CSRF token if present, otherwise undefined.
        */
-      getTokenFromRequest: (req: Request) => req.body._csrf || req.get('x-csrf-token'),
+      getTokenFromRequest: (req: Request) => req.body?._csrf || req.get('x-csrf-token'),
     });
+
+    // Store for route-level use (e.g. after multer parses multipart body)
+    app.locals.csrfProtection = csrfSynchronisedProtection;
 
     /**
      * Middleware to enforce CSRF protection on incoming requests.
-     * This applies the `csrfSynchronisedProtection` middleware globally.
+     * Multipart requests are skipped here because req.body is not yet parsed;
+     * file-upload routes apply CSRF after multer via postMiddleware.
      */
-    app.use(csrfSynchronisedProtection);
+    app.use((req, res, next) => {
+      if (req.is('multipart/form-data')) {
+        return next();
+      }
+      return csrfSynchronisedProtection(req, res, next);
+    });
 
     /**
      * Middleware to expose the CSRF token to views.

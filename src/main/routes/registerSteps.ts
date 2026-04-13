@@ -94,7 +94,8 @@ function registerStepRoutes(
   }
 
   if (step.postController?.post) {
-    router.post(step.url, ...authMiddlewares, step.postController.post);
+    const postExtra = step.postMiddleware?.length ? step.postMiddleware : [];
+    router.post(step.url, ...authMiddlewares, ...postExtra, step.postController.post);
   }
 
   stats.totalSteps++;

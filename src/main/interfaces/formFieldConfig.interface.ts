@@ -2,7 +2,7 @@ import type { Request } from 'express';
 
 import type { JourneyFlowConfig } from './stepFlow.interface';
 
-export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup';
+export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup' | 'file';
 export type ComponentType =
   | 'input'
   | 'textarea'
@@ -10,7 +10,9 @@ export type ComponentType =
   | 'radios'
   | 'checkboxes'
   | 'dateInput'
-  | 'postcodeLookup';
+  | 'postcodeLookup'
+  | 'fileUpload'
+  | 'multiFileUpload';
 
 export interface FormFieldOption {
   value?: string;
@@ -72,6 +74,13 @@ export interface FormFieldConfig {
   noCurrentDate?: boolean;
   noPastDate?: boolean;
   isPageHeading?: boolean;
+  /** Optional `accept` attribute for file inputs (defaults to allowed document types). */
+  accept?: string;
+  /**
+   * When true, only one file may be stored in total for this field (MOJ list still used for layout).
+   * Default false: users can add multiple files one at a time.
+   */
+  fileUploadSingleOnly?: boolean;
 }
 
 export interface TranslationKeys {

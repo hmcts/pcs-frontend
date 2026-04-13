@@ -15,9 +15,11 @@ import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
+import { handleFileUploadDelete, validateAndAppendFileUploads } from './fileUploadPostActions';
 import { buildFormContent } from './formContent';
 import {
   getCustomErrorTranslations,
+  getFormData,
   getTranslationErrors,
   normalizeCheckboxFields,
   processFieldData,
@@ -62,6 +64,54 @@ export function createPostHandler(
         throw new Error('Nunjucks environment not initialized');
       }
 
+      const hasFileFields = fields.some(f => f.type === 'file');
+
+      if (hasFileFields && typeof req.body.delete === 'string' && req.body.delete) {
+        handleFileUploadDelete(req, stepName, fields, req.body.delete);
+        safeRedirect303(res, req.originalUrl, '/', ['/']);
+        return;
+      }
+
+      if (hasFileFields && req.body.fileUploadAction === 'add') {
+        normalizeCheckboxFields(req, fields);
+        const interpolationValuesEarly = extendGetContent ? await extendGetContent(req, { fields: [] } as BuiltFormContent) : {};
+        const fieldErrorsEarly = getTranslationErrors(t, fields, undefined, interpolationValuesEarly);
+        const errorsAdd = validateAndAppendFileUploads(req, stepName, fields, t, fieldErrorsEarly);
+
+        if (Object.keys(errorsAdd).length > 0) {
+          const mergeData = { ...getFormData(req, stepName), ...req.body };
+          const formContent = buildFormContent(
+            fields,
+            t,
+            mergeData,
+            errorsAdd,
+            translationKeys,
+            nunjucksEnv,
+            interpolationValuesEarly,
+            showCancelButton
+          );
+          const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
+          const fullContent = { ...formContent, ...extendedContent, hasFileFields: true };
+          await renderWithErrors(
+            req,
+            res,
+            viewPath,
+            errorsAdd,
+            fields,
+            fullContent,
+            stepName,
+            journeyFolder,
+            stepNavigation,
+            translationKeys,
+            showCancelButton
+          );
+          return;
+        }
+
+        safeRedirect303(res, req.originalUrl, '/', ['/']);
+        return;
+      }
+
       // Get all form data from session for cross-field validation
       const allFormData = req.session.formData
         ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
@@ -89,15 +139,23 @@ export function createPostHandler(
       );
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
       const fieldErrors = getTranslationErrors(t, fields, undefined, interpolationValues);
-      const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
+      const errors = validateForm(
+        req,
+        fieldsWithLabels,
+        { ...fieldErrors, ...stepSpecificErrors },
+        allFormData,
+        t,
+        stepName
+      );
 
       if (Object.keys(errors).length > 0) {
+        const mergeData = { ...getFormData(req, stepName), ...req.body };
         const formContent = buildFormContent(
           fields,
 
           t,
 
-          req.body,
+          mergeData,
 
           errors,
 
@@ -109,7 +167,7 @@ export function createPostHandler(
         );
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
-        const fullContent = { ...formContent, ...extendedContent };
+        const fullContent = { ...formContent, ...extendedContent, hasFileFields };
         await renderWithErrors(
           req,
           res,
@@ -127,9 +185,12 @@ export function createPostHandler(
       }
 
       // Process field data (normalize checkboxes + consolidate date fields) before saving
-      processFieldData(req, fields);
+      processFieldData(req, fields, stepName);
       const { action: _, ...bodyWithoutAction } = req.body;
-      setFormData(req, stepName, bodyWithoutAction);
+      // Merge with existing session data so file-upload metadata (set during the
+      // "add" action) is preserved when the user clicks "Save and Continue".
+      const existingStepData = hasFileFields ? getFormData(req, stepName) : {};
+      setFormData(req, stepName, { ...existingStepData, ...bodyWithoutAction });
 
       if (beforeRedirect) {
         try {

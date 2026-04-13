@@ -15,5 +15,14 @@ export const buildCcdCaseForPossessionClaimResponse = async (
       possessionClaimResponse,
     },
   };
-  return ccdCaseService.updateDraftRespondToClaim(req.session?.user?.accessToken, ccdCase.id, ccdCase.data);
+  const updated = await ccdCaseService.updateDraftRespondToClaim(
+    req.session?.user?.accessToken,
+    ccdCase.id,
+    ccdCase.data
+  );
+  if (req.res?.locals && updated) {
+    // Preserve original case id — mid-event response has no id field
+    req.res.locals.validatedCase = { ...updated, id: updated.id || ccdCase.id };
+  }
+  return updated;
 };

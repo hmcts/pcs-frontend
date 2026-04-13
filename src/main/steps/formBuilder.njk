@@ -6,6 +6,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "moj/components/multi-file-upload/macro.njk" import mojMultiFileUpload %}
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
@@ -34,7 +35,7 @@
     <p class="govuk-body">{{ content | safe }}</p>
   {% endif %}
 
-  <form method="post" action="{{ url }}">
+  <form method="post" action="{{ url }}" {% if hasFileFields %}enctype="multipart/form-data"{% endif %}>
     {# Wrap fields in fieldset with visually-hidden legend for accessibility #}
     {% if heading %}
       {% call govukFieldset({
@@ -59,6 +60,8 @@
               {{ govukCheckboxes(field.component) }}
             {% elif field.componentType == 'dateInput' %}
               {{ govukDateInput(field.component) }}
+            {% elif field.componentType == 'multiFileUpload' %}
+              {{ mojMultiFileUpload(field.component) }}
             {% endif %}
           {% endif %}
         {% endfor %}
@@ -81,6 +84,8 @@
             {{ govukCheckboxes(field.component) }}
           {% elif field.componentType == 'dateInput' %}
             {{ govukDateInput(field.component) }}
+          {% elif field.componentType == 'multiFileUpload' %}
+            {{ mojMultiFileUpload(field.component) }}
           {% endif %}
         {% endif %}
       {% endfor %}

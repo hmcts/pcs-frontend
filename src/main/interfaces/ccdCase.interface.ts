@@ -56,6 +56,19 @@ export interface CaseData {
   possessionClaimResponse?: PossessionClaimResponse;
 }
 
+/** CCD `Document` complex type — property names must match the CCD SDK @JsonProperty annotations. */
+export interface CcdDocumentValue {
+  document_filename?: string;
+  document_url?: string;
+  document_binary_url?: string;
+  category_id?: string;
+}
+
+export interface CcdListValue<T> {
+  id?: string;
+  value?: T;
+}
+
 export interface PossessionClaimResponse {
   defendantContactDetails?: {
     party?: {
@@ -90,6 +103,9 @@ export interface PossessionClaimResponse {
       repaymentAgreedDetails?: string;
     };
     householdCircumstances?: HouseholdCircumstances;
+    supportingDocuments?: CcdListValue<CcdDocumentValue>[];
+    /** Parallel JSON array to supportingDocuments (same order): `[{ "contentType", "size" }, ...]` */
+    supportingDocumentUploadMetaJson?: string;
   };
   claimantEnteredDefendantDetails?: {
     firstName?: string;

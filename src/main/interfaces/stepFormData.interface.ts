@@ -21,6 +21,8 @@ export interface StepDefinition {
   stepDir: string;
   getController: GetController | ((lang?: SupportedLang) => GetController);
   postController?: { post: RequestHandler };
+  /** Run after auth and before POST handler (e.g. multipart parser for file uploads). */
+  postMiddleware?: RequestHandler[];
   middleware?: RequestHandler[];
   showCancelButton?: boolean;
 }

@@ -57,11 +57,14 @@ export function buildFormContent(
     }
   }
 
+  const hasFileFields = fields.some(f => f.type === 'file');
+
   return {
     ...bodyData,
     fieldValues,
     fields: fieldsWithLabels,
     title: pageTitle,
+    hasFileFields,
     ...translatedContent,
     showCancelButton,
     saveAndContinue: t('buttons.saveAndContinue'),

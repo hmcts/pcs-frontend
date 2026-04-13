@@ -69,7 +69,21 @@
       "yearMustBeSameOrAfter": "cyThe year must be the same as or after {{minYear}}",
       "missingOne": "cyDate must include a {{missingField}}",
       "missingTwo": "cyDate must include a {{first}} and {{second}}"
+    },
+    "fileUpload": {
+      "selectFile": "cySelect a file",
+      "singleFileOnly": "cyYou can only upload one file",
+      "invalidFileType": "cyThe selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
+      "fileTooLarge": "cyThe selected file must be smaller than 1024MB"
     }
+  },
+  "fileUpload": {
+    "chooseFile": "cyChoose file",
+    "orDropFile": "cyor drop file",
+    "noFileChosen": "cyNo file chosen",
+    "uploadFile": "cyUpload file",
+    "filesAdded": "cyFiles added",
+    "delete": "cyDelete"
   },
   "months": {
     "1": "cyJanuary",
