@@ -24,5 +24,6 @@ export function logTestEnvAfterBeforeEach(testTitle: string, keys: readonly stri
     return;
   }
   const kv = keys.map(key => `${key}=${process.env[key] ?? ''}`).join(' ');
+  console.log(`\n📊 TEST ENVIRONMENT VARIABLES`);
   console.log(`[test env] ${testTitle} | ${kv}`);
 }
