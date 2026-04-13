@@ -12,11 +12,14 @@ import {
   isWelshProperty,
 } from '../utils';
 
+import { respondToClaimSections } from './sections.config';
+
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
+  sections: respondToClaimSections,
   stepOrder: [
     'start-now',
     'free-legal-advice',
