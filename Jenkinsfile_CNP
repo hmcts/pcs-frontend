@@ -61,6 +61,12 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    before('functionalTest:preview') {
+      sh 'rm -rf allure-results allure-report'
+    }
+    before('fullFunctionalTest:preview') {
+      sh 'rm -rf allure-results allure-report'
+    }
     afterAlways('smoketest:preview') {
       sendAllureReportToSlack('master', 'PCS_20Frontend_20Smoke_20Test_20Report/')
       archiveSmokeTestReports()
@@ -81,6 +87,9 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    before('functionalTest:aat') {
+      sh 'rm -rf allure-results allure-report'
+    }
     afterAlways('smoketest:aat') {
       archiveSmokeTestReports()
       if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
