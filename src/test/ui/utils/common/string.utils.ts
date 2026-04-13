@@ -8,7 +8,7 @@ export function shortUrl(url: string, maxLen = 120): string {
     const u = new URL(url);
     s = u.pathname + u.search;
   } catch {
-    /* keep raw url */
+    console.debug('[shortUrl] could not parse as URL; using raw string for truncation');
   }
   return s.length <= maxLen ? s : `${s.slice(0, maxLen)}…`;
 }

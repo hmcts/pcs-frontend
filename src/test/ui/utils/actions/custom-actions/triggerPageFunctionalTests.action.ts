@@ -41,7 +41,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       }
       const urlSegment = this.getUrlSegment(page.url());
       console.warn(
-        `[PFT] test="${truncateForLog(test.info().title, 160)}" | mapping missing in urlToFileMapping.config.ts | url=${shortUrl(page.url())} | key: ${urlSegment}`
+        `[PFT] WARNING mapping missing in urlToFileMapping.config.ts | test="${truncateForLog(test.info().title, 160)}" | url=${shortUrl(page.url())} | key: ${urlSegment}`
       );
       return;
     }
