@@ -7,8 +7,10 @@ export async function takeValidationFailureScreenshot(
   pageName: string
 ): Promise<void> {
   const body = await page.screenshot({ fullPage: true });
-  await test.info().attach(
-    `Validation failure (${category.replace(/-/g, ' ')}): ${(pageName.trim() || 'page').slice(0, 80)}`,
-    { body, contentType: 'image/png' }
-  );
+  await test
+    .info()
+    .attach(`Validation failure (${category.replace(/-/g, ' ')}): ${(pageName.trim() || 'page').slice(0, 80)}`, {
+      body,
+      contentType: 'image/png',
+    });
 }
