@@ -28,7 +28,9 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const day = ((req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-day'] as string | undefined) ?? '').trim();
+    const day = (
+      (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-day'] as string | undefined) ?? ''
+    ).trim();
     const month = (
       (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-month'] as string | undefined) ?? ''
     ).trim();

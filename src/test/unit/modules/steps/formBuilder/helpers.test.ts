@@ -203,7 +203,6 @@ describe('formBuilder helpers', () => {
 
       expect(req.body.name).toBe('John Doe');
     });
-
   });
 
   describe('getTranslationErrors', () => {
