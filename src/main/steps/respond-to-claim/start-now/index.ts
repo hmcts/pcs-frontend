@@ -3,10 +3,12 @@ import type { Request, Response } from 'express';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '../../../modules/steps';
 import { getDashboardUrl } from '../../../routes/dashboard';
+import { getFlowConfigForJourney } from '../../../steps';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
+const journeyName = 'respondToClaim';
 const stepName = 'start-now';
-const stepNavigation = createStepNavigation(flowConfig);
+const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
 export const step: StepDefinition = {
   url: `${RESPOND_TO_CLAIM_ROUTE}/start-now`,
