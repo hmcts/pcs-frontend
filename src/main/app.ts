@@ -7,7 +7,11 @@ import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
-import { caseReferenceParamMiddleware, pageTrackingUrlMiddleware } from './middleware';
+import {
+  caseReferenceParamMiddleware,
+  legalRepresentativeAccessMiddleware,
+  pageTrackingUrlMiddleware,
+} from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import { registerAllJourneys } from './routes/registerSteps';
@@ -33,12 +37,17 @@ modules.modules.forEach(async moduleName => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve CFT UI component lib assets directly from node_modules
+const cftStylesPath = path.dirname(require.resolve('@hmcts-cft/cft-ui-component-lib/styles/ui-component-lib.css'));
+app.use('/assets/ui-component-lib', express.static(cftStylesPath));
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
   next();
 });
 
 app.use(pageTrackingUrlMiddleware);
+app.use(legalRepresentativeAccessMiddleware);
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);
