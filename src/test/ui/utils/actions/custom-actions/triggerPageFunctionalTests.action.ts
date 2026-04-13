@@ -40,8 +40,9 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       if (TriggerPageFunctionalTestsAction.isDashboardUrl(page.url())) {
         return;
       }
+      const urlSegment = this.getUrlSegment(page.url());
       console.warn(
-        `[PFT flow] test="${flowTestTitle}" | mapping missing in urlToFileMapping.config.ts | url=${shortUrl(page.url())}`
+        `[PFT] test="${flowTestTitle}" | mapping missing in urlToFileMapping.config.ts | url=${shortUrl(page.url())} | key: ${urlSegment}`
       );
       return;
     }

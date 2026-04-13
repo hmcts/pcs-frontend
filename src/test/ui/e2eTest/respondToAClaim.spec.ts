@@ -242,7 +242,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
-    await performAction('clickButton', counterClaim.mainHeader); //Incorrect step test failure
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
