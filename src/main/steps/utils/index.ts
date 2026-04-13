@@ -7,6 +7,7 @@ export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getStepBeforeDisputePages } from './journeyHelpers';
+export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
