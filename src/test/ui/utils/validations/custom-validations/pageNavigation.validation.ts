@@ -154,7 +154,7 @@ export class PageNavigationValidation implements IValidation {
         }
       } else {
         expectedElementText = String(fieldName);
-        const locator = page.locator(`h1, h1.govuk-heading-xl, h1.govuk-heading-l`);
+        const locator = page.locator('h1, h1.govuk-heading-xl, h1.govuk-heading-l');
         await expect(locator).toHaveText(expectedElementText, { timeout: 5000 });
         actualElementText = expectedElementText;
       }
