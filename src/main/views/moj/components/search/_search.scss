@@ -1,0 +1,48 @@
+@use "../../vendor/govuk-frontend" as *;
+
+.moj-search {
+  font-size: 0; // Fallback
+}
+
+.moj-search form {
+  align-items: flex-end;
+  display: flex;
+}
+
+.moj-search .govuk-form-group {
+  display: inline-block;
+  flex: 1;
+  margin-bottom: 0;
+  vertical-align: top;
+}
+
+.moj-search__label,
+.moj-search__hint {
+  text-align: left;
+}
+
+.moj-search__input:focus {
+  position: relative;
+  z-index: 1;
+}
+
+.moj-search__button {
+  display: inline-block;
+  position: relative;
+  top: -2px; // Override default gov properties due to active pixel movement
+  width: auto;
+  margin-bottom: 0;
+  margin-left: govuk-spacing(2);
+  vertical-align: bottom;
+}
+
+.moj-search--inline {
+  // stylelint-disable-next-line declaration-no-important
+  padding: govuk-spacing(2) 0 !important;
+  @include govuk-media-query($from: desktop) {
+    // stylelint-disable-next-line declaration-no-important
+    padding: 0 !important;
+  }
+}
+
+/*# sourceMappingURL=_search.scss.map */

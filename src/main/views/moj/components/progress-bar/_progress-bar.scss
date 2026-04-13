@@ -1,0 +1,105 @@
+@use "../../settings/assets" as *;
+@use "../../vendor/govuk-frontend" as *;
+
+/* ==========================================================================
+   #PROGRESS BAR
+   ========================================================================== */
+
+.moj-progress-bar {
+  margin-bottom: govuk-spacing(7);
+}
+
+.moj-progress-bar__list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  font-size: 0; // Hide white space between elements
+  list-style: none;
+  text-align: justify;
+  vertical-align: top;
+
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 100%;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 13px;
+    left: 0;
+    width: 100%;
+    border-top: 6px solid govuk-colour("green");
+  }
+}
+
+.moj-progress-bar__item {
+  display: inline-block;
+  position: relative;
+  max-width: 20%;
+  text-align: center;
+  vertical-align: top;
+  @include govuk-font(19);
+
+  &:first-child,
+  &:last-child {
+    &::before {
+      content: "";
+      position: absolute;
+      top: 13px;
+      left: 0;
+      width: 50%;
+      border-top: 6px solid govuk-colour("white");
+    }
+  }
+
+  &:first-child {
+    &::before {
+      left: 0;
+    }
+  }
+
+  &:last-child {
+    &::before {
+      right: 0;
+      left: auto;
+    }
+  }
+
+  &[aria-current="step"] {
+    // https://tink.uk/using-the-aria-current-attribute
+    @include govuk-font($size: 19, $weight: "bold");
+  }
+}
+
+.moj-progress-bar__icon {
+  box-sizing: border-box;
+  display: block;
+  position: relative;
+  width: 32px;
+  height: 32px;
+  margin-right: auto;
+  margin-left: auto;
+  border: 6px solid govuk-colour("green");
+  border-radius: 50%;
+  background-color: govuk-colour("white");
+}
+
+.moj-progress-bar__icon--complete {
+  background-color: govuk-colour("green");
+  background-image: url(#{$moj-images-path}icon-progress-tick.svg);
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+
+.moj-progress-bar__label {
+  display: block;
+  position: relative;
+  margin-top: govuk-spacing(3);
+  font-weight: inherit;
+  word-wrap: break-word; // Just in case
+  @include govuk-font(16);
+}
+
+/*# sourceMappingURL=_progress-bar.scss.map */

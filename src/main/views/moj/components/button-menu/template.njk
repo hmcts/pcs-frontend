@@ -1,0 +1,46 @@
+{%- from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/macros/attributes.njk" import govukAttributes %}
+
+{#- Set classes for this component #}
+{%- set classNames = "moj-button-menu" -%}
+{%- set defaultItemClassNames = "moj-button-menu__item govuk-button--secondary" %}
+
+{%- if params.classes %}
+  {% set classNames = classNames + " " + params.classes %}
+{% endif %}
+
+{%- set buttonAttributes = {
+  "data-button-text": {
+    value: params.button.text,
+    optional: true
+    },
+  "data-button-classes": {
+    value: params.button.classes,
+    optional: true
+  },
+  "data-align-menu": {
+    value: params.alignMenu,
+    optional: true
+  }
+}
+%}
+
+<div class="{{- classNames -}}" data-module="moj-button-menu" {{- govukAttributes(params.attributes) -}}  {{- govukAttributes(buttonAttributes) -}}>
+    {%- for item in params.items %}
+      {% set currentItemClassNames = " " + item.classes if item.classes else "" %}
+      {{ govukButton({
+          element: item.element,
+          classes: defaultItemClassNames + currentItemClassNames,
+          text: item.text,
+          html: item.html,
+          name: item.name,
+          type: item.type,
+          value: item.value,
+          href: item.href,
+          disabled: item.disabled,
+          attributes: item.attributes,
+          preventDoubleClick: items.preventDoubleClick
+      }) }}
+    {% endfor -%}
+</div>
+

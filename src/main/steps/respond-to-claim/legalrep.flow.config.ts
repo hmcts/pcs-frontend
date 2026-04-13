@@ -9,7 +9,7 @@ import {
   isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
-  isWelshProperty,
+  isWalesProperty,
 } from '../utils';
 
 import { flowConfig as citizenFlowConfig } from './flow.config';
@@ -116,11 +116,11 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial': {
       routes: [
         {
-          condition: async (req: Request) => isWelshProperty(req),
+          condition: async (req: Request) => isWalesProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !(await isWelshProperty(req)),
+          condition: async (req: Request) => !(await isWalesProperty(req)),
           nextStep: 'tenancy-type-details',
         },
       ],
@@ -149,7 +149,7 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
         },
       ],
       previousStep: async (req: Request) => {
-        const welshProperty = await isWelshProperty(req);
+        const welshProperty = await isWalesProperty(req);
         if (welshProperty) {
           return 'written-terms';
         }

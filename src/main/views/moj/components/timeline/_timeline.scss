@@ -1,0 +1,112 @@
+@use "../../settings/assets" as *;
+@use "../../vendor/govuk-frontend" as *;
+
+/* ==========================================================================
+   #TIMELINE
+   ========================================================================== */
+
+.moj-timeline {
+  position: relative;
+  margin-bottom: govuk-spacing(4);
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: govuk-spacing(2);
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background-color: govuk-functional-colour(brand);
+  }
+}
+
+.moj-timeline--full {
+  margin-bottom: 0;
+
+  &::before {
+    height: calc(100% - 75px);
+  }
+}
+
+.moj-timeline__item {
+  position: relative;
+  padding-bottom: govuk-spacing(6);
+  padding-left: govuk-spacing(4);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: govuk-spacing(2);
+    left: 0;
+    width: 15px;
+    height: 5px;
+    background-color: govuk-functional-colour(brand);
+  }
+}
+
+.moj-timeline__title {
+  display: inline;
+  @include govuk-font($size: 19, $weight: bold);
+}
+
+.moj-timeline__byline {
+  display: inline;
+  margin: 0;
+  color: govuk-functional-colour(secondary-text);
+  @include govuk-font($size: 19);
+}
+
+.moj-timeline__date {
+  margin-top: govuk-spacing(1);
+  margin-bottom: 0;
+  @include govuk-font($size: 16);
+}
+
+.moj-timeline__description {
+  margin-top: govuk-spacing(4);
+  @include govuk-font($size: 19);
+}
+
+/* ==========================================================================
+   #TIMELINE DOCUMENT STYLES – FOR BACKWARDS COMPATIBILITY
+   ========================================================================== */
+
+.moj-timeline__documents {
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.moj-timeline__document-item {
+  margin-bottom: govuk-spacing(1);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.moj-timeline__document-icon {
+  margin-top: 4px;
+  margin-right: 4px;
+  float: left;
+  fill: currentcolor;
+
+  @media screen and (forced-colors: active) {
+    fill: linkText;
+  }
+}
+
+.moj-timeline__document-link {
+  padding-left: govuk-spacing(5);
+  background-image: url(#{$moj-images-path}icon-document.svg);
+  background-repeat: no-repeat;
+  background-position: 0 50%;
+  background-size: 20px 16px;
+
+  &:focus {
+    color: govuk-colour("black"); // Focus colour on yellow should really be black.
+  }
+}
+
+/*# sourceMappingURL=_timeline.scss.map */

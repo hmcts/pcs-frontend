@@ -1,0 +1,29 @@
+@use "../../vendor/govuk-frontend" as *;
+
+.moj-page-header-actions {
+  display: flex;
+  min-height: govuk-spacing(7); // Match button height
+  margin-bottom: govuk-spacing(7);
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: govuk-spacing(2);
+}
+
+.moj-page-header-actions__title {
+  [class^="govuk-heading-"] {
+    margin-bottom: 0;
+  }
+}
+
+.moj-page-header-actions__actions {
+  .moj-button-group {
+    margin-bottom: 0;
+  }
+
+  .govuk-button {
+    margin-bottom: 0;
+  }
+}
+
+/*# sourceMappingURL=_page-header-actions.scss.map */

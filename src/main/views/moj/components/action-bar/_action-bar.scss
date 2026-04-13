@@ -1,0 +1,35 @@
+@use "../../vendor/govuk-frontend" as *;
+
+.moj-action-bar {
+  font-size: 0; // Removes white space
+}
+
+.moj-action-bar__filter {
+  display: inline-block;
+  position: relative;
+
+  @include govuk-media-query($until: desktop) {
+    float: right;
+  }
+
+  @include govuk-media-query($from: desktop) {
+    margin-right: govuk-spacing(2);
+    padding-right: govuk-spacing(2) + 2px; // Takes into account divider width
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 2px;
+      height: 40px;
+      background-color: govuk-colour("black", $variant: "tint-95");
+    }
+  }
+
+  > .govuk-button {
+    vertical-align: baseline;
+  }
+}
+
+/*# sourceMappingURL=_action-bar.scss.map */

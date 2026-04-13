@@ -1,0 +1,20 @@
+@use "../../vendor/govuk-frontend" as *;
+
+.moj-pagination__pagination {
+  margin-bottom: govuk-spacing(2);
+}
+
+.moj-pagination__results {
+  margin-top: 0;
+  margin-bottom: govuk-spacing(6);
+  padding-right: govuk-spacing(1);
+  padding-left: govuk-spacing(1);
+  text-align: center;
+  @include govuk-font(19);
+
+  @include govuk-media-query($from: tablet) {
+    text-align: left;
+  }
+}
+
+/*# sourceMappingURL=_pagination.scss.map */

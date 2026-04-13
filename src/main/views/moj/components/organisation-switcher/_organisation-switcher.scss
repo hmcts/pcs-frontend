@@ -1,0 +1,32 @@
+@use "../../vendor/govuk-frontend" as *;
+
+/* ==========================================================================
+   #ORGANISATION SWITCHER
+   ========================================================================== */
+
+.moj-organisation-nav {
+  margin-top: govuk-spacing(2);
+  margin-bottom: govuk-spacing(3);
+  padding-bottom: govuk-spacing(1);
+  border-bottom: 1px solid $govuk-border-colour;
+  @include govuk-clearfix;
+}
+
+.moj-organisation-nav__title {
+  @include govuk-font($size: 19, $weight: "bold");
+  @include govuk-media-query($from: tablet) {
+    width: 75%;
+    float: left;
+  }
+}
+
+.moj-organisation-nav__link {
+  @include govuk-link-common;
+  @include govuk-link-style-default;
+  @include govuk-link-print-friendly;
+  @include govuk-media-query($from: tablet) {
+    float: right;
+  }
+}
+
+/*# sourceMappingURL=_organisation-switcher.scss.map */

@@ -1,0 +1,68 @@
+@use "../../vendor/govuk-frontend" as *;
+
+/* ==========================================================================
+   #TICKET PANEL
+   ========================================================================== */
+
+.moj-ticket-panel {
+  display: block;
+  margin-right: govuk-spacing(0);
+  flex-wrap: wrap;
+
+  &--inline {
+    @include govuk-media-query($from: desktop) {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+  }
+
+  &--inline > * + * {
+    @include govuk-media-query($from: desktop) {
+      margin-left: govuk-spacing(3);
+    }
+  }
+
+  &__content *:last-child {
+    margin-bottom: govuk-spacing(0);
+  }
+
+  &__content {
+    display: block;
+    position: relative;
+    margin-bottom: govuk-spacing(3);
+    padding: govuk-spacing(4);
+    border-left: 4px solid transparent;
+    background-color: govuk-colour("black", $variant: "tint-95");
+    flex-grow: 1;
+
+    &--grey {
+      border-left-color: govuk-functional-colour(border);
+    }
+
+    &--blue {
+      border-left-color: govuk-colour("blue");
+    }
+
+    &--red {
+      border-left-color: govuk-colour("red");
+    }
+
+    &--yellow {
+      border-left-color: govuk-colour("yellow");
+    }
+
+    &--green {
+      border-left-color: govuk-colour("green");
+    }
+
+    &--purple {
+      border-left-color: govuk-colour("purple");
+    }
+
+    &--orange {
+      border-left-color: govuk-colour("orange");
+    }
+  }
+}
+
+/*# sourceMappingURL=_ticket-panel.scss.map */
