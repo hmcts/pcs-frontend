@@ -12,7 +12,7 @@ describe('yesNoEnum utilities', () => {
       expect(result).toBe('No');
     });
 
-    it('should return undefined to undefined', () => {
+    it('should return undefined for undefined', () => {
       const result = toYesNoEnum(undefined);
       expect(result).toBeUndefined();
     });
@@ -44,5 +44,4 @@ describe('yesNoEnum utilities', () => {
       expect(result).toBeUndefined();
     });
   });
-
 });
