@@ -160,8 +160,11 @@ export const step: StepDefinition = createFormStep({
     const isAddressKnown = formattedAddressStr !== '?';
     setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
 
+    const claimantName = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
+      ?.value as string | undefined;
+
     const radio = formContent.fields.find(f => f.componentType === 'radios') as
-      | { component: { label: { text: string }; fieldset: { legend: { text: string } } } }
+      | { component: { label: { text: string }; fieldset: { legend: { text: string } }; hint: { text: string } } }
       | undefined;
     if (!radio || !radio.component) {
       return {};
@@ -172,6 +175,7 @@ export const step: StepDefinition = createFormStep({
       prepopulateHeading = `${t('legend')}${formattedAddressStr}`;
       radio.component.label.text = prepopulateHeading;
       radio.component.fieldset.legend.text = prepopulateHeading;
+      radio.component.hint.text = t('legend.hint', { claimantName });
     }
 
     // TODO: Refactor to avoid mutating module-scoped `fieldsConfig` per request.

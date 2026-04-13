@@ -44,9 +44,8 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => ({
-    // TODO:Retrieve claimantName/claimIssueDate dynamically from CCD case data and remove hardcoded default value
-    claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
-    claimIssueDate: req.session?.ccdCase?.data?.claimIssueDate || '16th June 2025',
+    claimantName: req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]?.value,
+    claimIssueDate: req.res?.locals?.validatedCase?.data?.claimIssueDate,
   }),
   customTemplate: `${__dirname}/repaymentsMade.njk`,
 });
