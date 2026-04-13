@@ -62,6 +62,7 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
     afterAlways('smoketest:preview') {
+      sendAllureReportToSlack('master', 'PCS_20Frontend_20Smoke_20Test_20Report/')
       archiveSmokeTestReports()
     }
     afterAlways('functionalTest:preview') {
@@ -83,19 +84,19 @@ withPipeline(type, product, component) {
     afterAlways('smoketest:aat') {
       archiveSmokeTestReports()
       if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-        sendAllureReportToSlack('master', 'PCS_20Frontend_20Smoke_20Test_20Report/')
+        sendAllureReportToSlack('master', 'Frontend_20Smoke_20Test_20Report/')
       }
     }
     afterAlways('functionalTest:aat') {
       archiveFunctionalTestReports()
       if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-          sendAllureReportToSlack('master', 'PCS_20Frontend_20Functional_20Test_20Report/')
+          sendAllureReportToSlack('master', 'Frontend_20Functional_20Test_20Report/')
       }
     }
   }
 }
 
-def archiveAllureHtmlReport(String reportName) {
+def archiveAllureReport(String reportName) {
   try {
     publishHTML([
       allowMissing: true,
@@ -111,14 +112,14 @@ def archiveAllureHtmlReport(String reportName) {
 }
 
 def archiveFunctionalTestReports() {
-  archiveAllureHtmlReport('PCS Frontend Functional Test Report')
+  archiveAllureReport('Frontend Functional Test Report')
 }
 
 def archiveSmokeTestReports() {
-  archiveAllureHtmlReport('PCS Frontend Smoke Test Report')
+  archiveAllureReport('Frontend Smoke Test Report')
 }
 
-def sendAllureReportToSlack(String pipelineType = 'master', String allureReportPathSuffix = 'PCS_20Frontend_20Functional_20Test_20Report/') {
+def sendAllureReportToSlack(String pipelineType = 'master', String allureReportPathSuffix = 'Frontend_20Functional_20Test_20Report/') {
   env.ALLURE_REPORT_PATH_SUFFIX = allureReportPathSuffix
   def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
