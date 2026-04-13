@@ -54,6 +54,20 @@ Run:
 yarn start:dev
 ```
 
+To run against a local PCS backend started from the pcs-api repository with:
+
+```bash
+./gradlew bootWithCCD
+```
+
+use the dedicated local script:
+
+```bash
+yarn start:dev:pcs-local
+```
+
+This points the frontend at the local services exposed by `pcs:bootWithCCD`:
+
 #### Production
 
 Bundle:
@@ -68,7 +82,7 @@ Run:
 yarn start
 ```
 
-The applications's home page will be available at http://localhost:3209
+The application's home page will be available at http://localhost:3209
 
 ### Running with Docker
 

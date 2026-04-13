@@ -12,7 +12,7 @@ export const nonRentArrearsDispute = {
   anyOtherList: `any other information they’ve given as part of their claim`,
   doYouWantToDisputeQuestion: `Do you want to dispute any other parts of the claim?`,
   explainPartOfClaimHiddenTextLabel: `Explain which parts of the claim you do not agree with`,
-  explainClaimTextInput: `Example - Do not agree with claim 1,2 and 3`,
+  explainClaimTextInput: `Example - Do not agree with claim 1`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   saveForLaterButton: `Save for later`,
