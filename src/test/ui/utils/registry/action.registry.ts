@@ -7,6 +7,7 @@ import {
   RespondToClaimAction,
   TriggerPageFunctionalTestsAction,
 } from '../actions/custom-actions';
+import { RecordAnswers } from '../actions/custom-actions/recordAnsweredFields.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -75,7 +76,9 @@ export class ActionRegistry {
     ['exceptionalHardship', new RespondToClaimAction()],
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
+    ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
+    ['recordUserEntry', new RecordAnswers()]
   ]);
 
   static getAction(actionName: string): IAction {

@@ -2,10 +2,18 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
-import { checkYourAnswers, chooseAnApplication } from '../../data/page-data/genApps-page-data';
+import {
+  askToAdjournTheCourtHearing,
+  chooseAnApplication,
+  doYouNeedHelpPayingTheFee,
+  haveTheOtherPartiesAgreedToThisApplication,
+  isTheCourtHearingInNext14Days,
+} from '../../data/page-data/genApps-page-data';
+import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
+
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
@@ -32,7 +40,26 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.delayRadioOption,
     });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performValidation('mainHeader', askToAdjournTheCourtHearing.mainHeader);
+    await performAction('clickButton', askToAdjournTheCourtHearing.startNowButton);
+    await performValidation('mainHeader', isTheCourtHearingInNext14Days.mainHeader);
+    await performAction('confirmIfCourtHearingInNext14Days', {
+      question: isTheCourtHearingInNext14Days.isTheCourtHearingInNext14DaysQuestion,
+      option: isTheCourtHearingInNext14Days.yesRadioOption,
+    });
+    await performAction('clickButton', isTheCourtHearingInNext14Days.continueButton);
+    if (FieldsStore.get(isTheCourtHearingInNext14Days.isTheCourtHearingInNext14DaysQuestion)) {
+      await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    } else {
+      await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+    }
+
+
+    for (const [question, answer] of FieldsStore.getAll()) {
+      console.log(question, answer);
+    }
+
+    // await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 });
