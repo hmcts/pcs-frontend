@@ -42,7 +42,8 @@ function validateFileTypes(
   for (const file of files) {
     if (!isAllowedUploadFilename(file.originalname)) {
       return (
-        translations?.[`${fieldName}.invalidFileType`] || t('errors.fileUpload.invalidFileType', FILE_TYPE_ERROR_FALLBACK)
+        translations?.[`${fieldName}.invalidFileType`] ||
+        t('errors.fileUpload.invalidFileType', FILE_TYPE_ERROR_FALLBACK)
       );
     }
   }
@@ -57,7 +58,10 @@ function validateFileSizes(
 ): string | null {
   for (const file of files) {
     if (isFileTooLarge(file)) {
-      return translations?.[`${fieldName}.fileTooLarge`] || t('errors.fileUpload.fileTooLarge', FILE_TOO_LARGE_ERROR_FALLBACK);
+      return (
+        translations?.[`${fieldName}.fileTooLarge`] ||
+        t('errors.fileUpload.fileTooLarge', FILE_TOO_LARGE_ERROR_FALLBACK)
+      );
     }
   }
   return null;
@@ -71,7 +75,9 @@ function validateSingleFileConstraint(
   translations?: Record<string, string>
 ): string | null {
   if (field.fileUploadSingleOnly && (savedCount > 0 || incomingCount > 1)) {
-    return translations?.[`${field.name}.tooMany`] || t('errors.fileUpload.singleFileOnly', 'You can only upload one file');
+    return (
+      translations?.[`${field.name}.tooMany`] || t('errors.fileUpload.singleFileOnly', 'You can only upload one file')
+    );
   }
   return null;
 }
