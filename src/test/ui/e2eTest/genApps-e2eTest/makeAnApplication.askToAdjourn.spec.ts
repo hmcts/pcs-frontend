@@ -44,6 +44,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.delayRadioOption,
     });
+    //The below are placeholder pages
     await performValidation('mainHeader', askToAdjournTheCourtHearing.mainHeader);
     await performAction('clickButton', askToAdjournTheCourtHearing.startNowButton);
     await performValidation('mainHeader', isTheCourtHearingInNext14Days.mainHeader);
