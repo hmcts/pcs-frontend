@@ -145,8 +145,11 @@ yarn test:functional
 
 ### PFT test-env debug logging
 
-Optional. Set [`enable_pft_debug_log`](../../../playwright.config.ts) to `true` in `playwright.config.ts` for extra `[test env]` console lines after `beforeEach` (see [`log-test-env.ts`](utils/common/log-test-env.ts)).
-If you add env vars in a spec `beforeEach`, add them to the matching list there.
+In [`playwright.config.ts`](../../../playwright.config.ts), `enable_pft_debug_log` is **`false` by default**. Set it to **`true`** if you want environment variables to be printed in the console while you debug.
+
+```ts
+export const enable_pft_debug_log = false;
+```
 
 ## 8. Troubleshooting
 

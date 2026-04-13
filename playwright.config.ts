@@ -15,7 +15,7 @@ if (enable_all_page_functional_tests.toLowerCase() === 'true') {
   process.env.ENABLE_NAVIGATION_TESTS = 'true';
 }
 
-export const enable_pft_debug_log = true;
+export const enable_pft_debug_log = false;
 export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'false';
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
