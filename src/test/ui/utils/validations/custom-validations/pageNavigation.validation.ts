@@ -122,7 +122,7 @@ export class PageNavigationValidation implements IValidation {
         if (validationData.element) {
           expectedElementText = validationData.element;
           const locator = page.locator(
-            `h1, h1.govuk-heading-xl, h1.govuk-heading-l, span:text-is("${expectedElementText}")")`
+            `h1, h1.govuk-heading-xl, h1.govuk-heading-l, span:text-is("${expectedElementText}")`
           );
           try {
             await expect(locator).toHaveText(expectedElementText, { timeout: 5000 });
