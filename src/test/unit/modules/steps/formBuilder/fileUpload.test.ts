@@ -144,6 +144,7 @@ describe('fileUpload', () => {
             myStep: {},
           },
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
 
       const files = [{ id: '1', file_name: 'test.pdf', content_type: 'application/pdf', size: 1024, url: '' }];
@@ -156,6 +157,7 @@ describe('fileUpload', () => {
     it('should initialize formData if undefined', () => {
       const req = {
         session: {},
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
 
       const files = [{ id: '1', file_name: 'test.pdf', content_type: 'application/pdf', size: 1024, url: '' }];
