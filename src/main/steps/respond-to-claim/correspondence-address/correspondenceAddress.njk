@@ -19,6 +19,27 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
+<div class="govuk-error-summary"
+     aria-labelledby="error-summary-title"
+     role="alert"
+     tabindex="-1"
+     hidden>
+  <h2 class="govuk-error-summary__title" id="error-summary-title">
+    There is a problem
+  </h2>
+  <div class="govuk-error-summary__body">
+    <ul class="govuk-list govuk-error-summary__list">
+      {% if clientErrors.lookupPostcode %}
+        <li data-error-id="correspondence-lookup-postcode-error">
+          <a href="#correspondence-lookupPostcode">
+            {{ clientErrors.lookupPostcode }}
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+
   <form method="post" action="{{ url }}" novalidate>
     {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
     {% set postcodeFinderHtml %}
