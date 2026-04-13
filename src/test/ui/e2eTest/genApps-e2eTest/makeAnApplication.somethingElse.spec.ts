@@ -2,7 +2,11 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
-import { checkYourAnswers, chooseAnApplication } from '../../data/page-data/genApps-page-data';
+import {
+  askTheCourtToMakeAnOrder,
+  checkYourAnswers,
+  chooseAnApplication,
+} from '../../data/page-data/genApps-page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -32,6 +36,8 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.somethingElseRadioOption,
     });
+    await performValidation('mainHeader', askTheCourtToMakeAnOrder.mainHeader);
+    await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
