@@ -107,6 +107,8 @@ export const step: StepDefinition = createFormStep({
         const existingStartDate = getTenancyStartDate(caseData);
         if (existingStartDate) {
           response.defendantResponses.tenancyStartDate = existingStartDate;
+        } else {
+          delete response.defendantResponses.tenancyStartDate;
         }
       } else if (confirmValue === 'no') {
         const day = (req.body?.['confirmTenancyDate.tenancyStartDate-day'] as string | undefined) ?? '';
