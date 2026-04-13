@@ -71,5 +71,8 @@
       },
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET"
     }
+  },
+  "xui": {
+    "uri": "XUI_BASE_URI"
   }
 }

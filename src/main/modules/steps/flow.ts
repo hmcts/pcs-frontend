@@ -1,10 +1,21 @@
 import { NextFunction, Request, Response } from 'express';
 
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
+import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '../../interfaces/stepFlow.interface';
 
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('stepDependencyCheck');
+
+async function resolveFlowConfig(
+  req: Request,
+  flowConfigOrResolver: JourneyFlowConfig | JourneyFlowConfigResolver
+): Promise<JourneyFlowConfig> {
+  if (typeof flowConfigOrResolver === 'function') {
+    return flowConfigOrResolver(req);
+  }
+
+  return flowConfigOrResolver;
+}
 
 export async function getNextStep(
   req: Request,
@@ -202,13 +213,16 @@ export type StepNavigation = {
   getStepUrl: (stepName: string, caseReference?: string) => string;
 };
 
-export function createStepNavigation(flowConfig: JourneyFlowConfig): StepNavigation {
+export function createStepNavigation(
+  flowConfigOrResolver: JourneyFlowConfig | JourneyFlowConfigResolver
+): StepNavigation {
   return {
     getNextStepUrl: async (
       req: Request,
       currentStepName: string,
       currentStepData: Record<string, unknown> = {}
     ): Promise<string | null> => {
+      const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
       const formData = req.session?.formData || {};
       const caseReference = req.res?.locals.validatedCase?.id;
       const nextStep = await getNextStep(req, currentStepName, flowConfig, formData, currentStepData);
@@ -216,6 +230,7 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): StepNavigat
     },
 
     getBackUrl: async (req: Request, currentStepName: string): Promise<string | null> => {
+      const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
       const formData = req.session?.formData || {};
       const caseReference = req.res?.locals.validatedCase?.id;
       const previousStep = await getPreviousStep(req, currentStepName, flowConfig, formData);
@@ -223,13 +238,17 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): StepNavigat
     },
 
     getStepUrl: (stepName: string, caseReference?: string): string => {
-      return getStepUrl(stepName, flowConfig, caseReference);
+      if (typeof flowConfigOrResolver === 'function') {
+        throw new Error('getStepUrl requires a static JourneyFlowConfig when a resolver is used');
+      }
+
+      return getStepUrl(stepName, flowConfigOrResolver, caseReference);
     },
   };
 }
 
-export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowConfig | JourneyFlowConfigResolver) {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const urlParts = req.path.split('/');
     const stepName = urlParts[urlParts.length - 1];
 
@@ -237,6 +256,7 @@ export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig) {
       return next();
     }
 
+    const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
     const formData = req.session?.formData || {};
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
