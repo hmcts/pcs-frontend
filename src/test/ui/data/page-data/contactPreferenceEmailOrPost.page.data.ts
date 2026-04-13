@@ -19,7 +19,7 @@ export const contactPreferenceEmailOrPost = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  selectHowYouWantToReceiveUpdatesErrorMessage: `Select how you want to XXXX receive updates`,
+  selectHowYouWantToReceiveUpdatesErrorMessage: `Select how you want to receive updates`,
   enterEmailAddressErrorMessage: `Enter your email address`,
   invalidEmailAddressErrorMessage: `Enter an email address in the correct format, like name@example.com`,
   feedbackLink: `feedback (opens in new tab)`,
