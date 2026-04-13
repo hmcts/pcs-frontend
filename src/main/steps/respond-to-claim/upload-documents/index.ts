@@ -95,10 +95,6 @@ export const step: StepDefinition = createFormStep({
       },
     };
 
-    console.log('[upload-documents] Payload being sent to CCD:', JSON.stringify(possessionClaimResponse, null, 2));
-    console.log('[upload-documents] File metadata from session:', saved);
-
-    const result = await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
-    console.log('[upload-documents] Draft save API response:', JSON.stringify(result, null, 2));
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
 });
