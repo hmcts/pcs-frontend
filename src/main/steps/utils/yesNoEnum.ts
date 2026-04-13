@@ -12,8 +12,12 @@ import type { VerticalYesNoValue, YesNoValue } from '../../interfaces/ccdCase.in
  * @example
  * toYesNoEnum('yes') // returns 'Yes'
  * toYesNoEnum('no')  // returns 'No'
+ * toYesNoEnum(undefined)  // returns undefined
  */
-export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
+export function toYesNoEnum(value: 'yes' | 'no' | undefined): YesNoValue | undefined {
+  if (!value) {
+    return undefined;
+  }
   return value.toLowerCase() === 'yes' ? 'Yes' : 'No';
 }
 

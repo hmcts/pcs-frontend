@@ -13,15 +13,29 @@ export const step: StepDefinition = createFormStep({
       name: 'reasonsAppShouldNotBeShared',
       type: 'radio',
       required: true,
-      translationKey: { label: 'question' },
+      translationKey: { label: 'mainQuestion' },
+      errorMessage: 'errors.confirmIfThereIsAReason',
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
         {
-          value: 'YES',
+          value: 'yes',
           translationKey: 'options.yes',
+          subFields: {
+            reasonForNotSharing: {
+              name: 'reasonForNotSharing',
+              type: 'character-count',
+              required: true,
+              maxLength: 6800,
+              labelClasses: 'govuk-!-font-weight-bold',
+              translationKey: {
+                label: 'reasonForNotSharingQuestion',
+              },
+              errorMessage: 'errors.provideAReason',
+            },
+          },
         },
         {
-          value: 'NO',
+          value: 'no',
           translationKey: 'options.no',
         },
       ],
@@ -31,5 +45,13 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    warningHiddenText: 'warningHiddenText',
+    weUsuallySendACopyOfYourApplication: 'weUsuallySendACopyOfYourApplication',
+    inSomeExceptionalCircumstances: 'inSomeExceptionalCircumstances',
+    forExampleIf: 'forExampleIf',
+    itIsUrgent: 'itIsUrgent',
+    couldUndermineTheOrder: 'couldUndermineTheOrder',
+    youBelieveYouAreAtRisk: 'youBelieveYouAreAtRisk',
+    weWillAskYouToProvideTheReason: 'weWillAskYouToProvideTheReason',
   },
 });

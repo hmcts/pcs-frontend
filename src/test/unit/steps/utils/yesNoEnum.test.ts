@@ -1,7 +1,26 @@
-import { fromVerticalYesNoEnum, toVerticalYesNoEnum } from '../../../../main/steps/utils/yesNoEnum';
+import { fromVerticalYesNoEnum, toVerticalYesNoEnum, toYesNoEnum } from '../../../../main/steps/utils/yesNoEnum';
 
-describe('yesNoEnum utilities', () => {
+describe('toYesNoEnum utilities', () => {
   describe('toYesNoEnum', () => {
+    it('should convert "yes" to "YES"', () => {
+      const result = toYesNoEnum('yes');
+      expect(result).toBe('Yes');
+    });
+
+    it('should convert "no" to "NO"', () => {
+      const result = toYesNoEnum('no');
+      expect(result).toBe('No');
+    });
+
+    it('should return undefined to undefined', () => {
+      const result = toYesNoEnum(undefined);
+      expect(result).toBeUndefined();
+    });
+  });
+});
+
+describe('toVerticalYesNoEnum utilities', () => {
+  describe('toVerticalYesNoEnum', () => {
     it('should convert "yes" to "YES"', () => {
       const result = toVerticalYesNoEnum('yes');
       expect(result).toBe('YES');
@@ -13,7 +32,7 @@ describe('yesNoEnum utilities', () => {
     });
   });
 
-  describe('fromYesNoEnum', () => {
+  describe('fromVerticalYesNoEnum', () => {
     it('should convert "YES" to "yes"', () => {
       const result = fromVerticalYesNoEnum('YES');
       expect(result).toBe('yes');

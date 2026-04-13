@@ -30,6 +30,18 @@
     "alreadyAppliedForHwf": {
       "label": "cyHave you already applied for help with your application fee?",
       "changeHint": "cyChange whether you have already applied for help with your application fee"
+    },
+    "otherPartiesAgreed": {
+      "label": "cyHave the other parties agreed to this application?",
+      "changeHint": "cyChange whether the other parties have agreed to this application"
+    },
+    "anyReasonNotToShare": {
+      "label": "cyAre there any reasons that this application should not be shared with the other parties?",
+      "changeHint": "cyChange whether there are any reasons that this application should not be shared with the other parties"
+    },
+    "reasonForNotSharing": {
+      "label": "cyProvide a reason this application should not be shared with the other party",
+      "changeHint": "cyChange the reason this application should not be shared with the other party"
     }
   }
 }
