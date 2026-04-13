@@ -14,7 +14,12 @@ import {
 } from './fileUpload';
 import { getMulterFilesForField } from './helpers';
 
-export function handleFileUploadDelete(req: Request, stepName: string, fields: FormFieldConfig[], deleteId: string): void {
+export function handleFileUploadDelete(
+  req: Request,
+  stepName: string,
+  fields: FormFieldConfig[],
+  deleteId: string
+): void {
   for (const field of fields) {
     if (field.type !== 'file') {
       continue;
@@ -47,8 +52,7 @@ export function validateAndAppendFileUploads(
   const withIncoming = fileFields.filter(f => getMulterFilesForField(req, f.name).length > 0);
   if (withIncoming.length === 0) {
     errors[fileFields[0].name] =
-      translations?.[`${fileFields[0].name}.selectFile`] ||
-      t('errors.fileUpload.selectFile', 'Select a file');
+      translations?.[`${fileFields[0].name}.selectFile`] || t('errors.fileUpload.selectFile', 'Select a file');
     return errors;
   }
 

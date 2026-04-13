@@ -64,14 +64,22 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
     const meta = parseUploadMetaJson(defendantResponses?.supportingDocumentUploadMetaJson);
-    const supportingDocumentSavedFiles = list.map((lv: { id?: string; value?: { document_filename?: string; document_url?: string; document_binary_url?: string } }, i: number) => ({
-      id: lv.id || '',
-      file_name: lv.value?.document_filename || '',
-      content_type: meta[i]?.contentType || '',
-      size: typeof meta[i]?.size === 'number' ? meta[i].size : 0,
-      url: lv.value?.document_url || '',
-      binaryUrl: lv.value?.document_binary_url,
-    }));
+    const supportingDocumentSavedFiles = list.map(
+      (
+        lv: {
+          id?: string;
+          value?: { document_filename?: string; document_url?: string; document_binary_url?: string };
+        },
+        i: number
+      ) => ({
+        id: lv.id || '',
+        file_name: lv.value?.document_filename || '',
+        content_type: meta[i]?.contentType || '',
+        size: typeof meta[i]?.size === 'number' ? meta[i].size : 0,
+        url: lv.value?.document_url || '',
+        binaryUrl: lv.value?.document_binary_url,
+      })
+    );
     return { [savedFilesSessionKey(FIELD_NAME)]: supportingDocumentSavedFiles };
   },
   beforeRedirect: async req => {

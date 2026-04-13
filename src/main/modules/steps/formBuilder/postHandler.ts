@@ -74,7 +74,9 @@ export function createPostHandler(
 
       if (hasFileFields && req.body.fileUploadAction === 'add') {
         normalizeCheckboxFields(req, fields);
-        const interpolationValuesEarly = extendGetContent ? await extendGetContent(req, { fields: [] } as BuiltFormContent) : {};
+        const interpolationValuesEarly = extendGetContent
+          ? await extendGetContent(req, { fields: [] } as BuiltFormContent)
+          : {};
         const fieldErrorsEarly = getTranslationErrors(t, fields, undefined, interpolationValuesEarly);
         const errorsAdd = validateAndAppendFileUploads(req, stepName, fields, t, fieldErrorsEarly);
 

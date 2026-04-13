@@ -1,25 +1,19 @@
 {%- from "govuk/components/file-upload/macro.njk" import govukFileUpload -%}
 {%- from "govuk/components/button/macro.njk" import govukButton -%}
 
-{# Inner upload area for MOJ multi-file-upload: GOV.UK file upload + optional add-files button #}
-<div class="govuk-form-group {% if params.errorMessage %}govuk-form-group--error{% endif %}">
-  {{ govukFileUpload({
-    id: params.id,
-    name: params.name,
-    label: params.label,
-    hint: params.hint,
-    errorMessage: params.errorMessage,
-    classes: params.fileUploadClasses,
-    attributes: params.attributes,
-    javascript: params.javascript,
-    chooseFilesButtonText: params.chooseFilesButtonText,
-    dropInstructionText: params.dropInstructionText,
-    noFileChosenText: params.noFileChosenText
-  }) }}
+{# Inner upload area for MOJ multi-file-upload: GOV.UK file upload + upload button #}
+{{ govukFileUpload({
+  id: params.id,
+  name: params.name,
+  label: params.label,
+  hint: params.hint,
+  errorMessage: params.errorMessage,
+  classes: params.fileUploadClasses,
+  attributes: params.attributes
+}) }}
 
-  {{ govukButton({
-    text: params.uploadFileButtonText,
-    classes: 'govuk-button--secondary moj-multi-file-upload__button',
-    attributes: { name: 'fileUploadAction', value: 'add' }
-  }) }}
-</div>
+{{ govukButton({
+  text: params.uploadFileButtonText,
+  classes: 'govuk-button--secondary moj-multi-file-upload__button',
+  attributes: { name: 'fileUploadAction', value: 'add' }
+}) }}
