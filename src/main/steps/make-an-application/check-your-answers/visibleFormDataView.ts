@@ -15,110 +15,63 @@ export default class VisibleFormDataView {
   constructor(readonly req: Request) {}
 
   getApplicationTypeField(): FieldDetails<GenAppType> | undefined {
-    const stepName = 'choose-an-application';
-    if (!shouldShowStep(this.req, stepName, flowConfig)) {
-      return undefined;
-    }
-
-    return {
-      stepName,
-      fieldValue: getFormData(this.req, stepName).typeOfApplication as GenAppType,
-    };
+    return this.getField('choose-an-application', 'typeOfApplication');
   }
 
   getHearingInNext14DaysField(): FieldDetails<'yes' | 'no'> | undefined {
-    const stepName = 'is-the-court-hearing-in-the-next-14-days';
-    if (!shouldShowStep(this.req, stepName, flowConfig)) {
-      return undefined;
-    }
-
-    return {
-      stepName,
-      fieldValue: getFormData(this.req, stepName).hearingInNext14Days as 'yes' | 'no',
-    };
+    return this.getField('is-the-court-hearing-in-the-next-14-days', 'hearingInNext14Days');
   }
 
   getHelpWithFeesNeededField(): FieldDetails<'yes' | 'no'> | undefined {
-    const stepName = 'do-you-need-help-paying-the-fee';
-    if (!shouldShowStep(this.req, stepName, flowConfig)) {
-      return undefined;
-    }
-
-    return {
-      stepName,
-      fieldValue: getFormData(this.req, stepName).helpWithFeesNeeded as 'yes' | 'no',
-    };
+    return this.getField('do-you-need-help-paying-the-fee', 'helpWithFeesNeeded');
   }
 
   getAlreadyAppliedForHwfField(): FieldDetails<'yes' | 'no'> | undefined {
-    const stepName = 'have-you-already-applied-for-help-with-fees';
-    if (!shouldShowStep(this.req, stepName, flowConfig)) {
-      return undefined;
-    }
-
-    return {
-      stepName,
-      fieldValue: getFormData(this.req, stepName).alreadyAppliedForHwf as 'yes' | 'no',
-    };
+    return this.getField('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf');
   }
 
   getHwfReferenceField(): FieldDetails<string> | undefined {
-    const stepName = 'have-you-already-applied-for-help-with-fees';
-    if (!shouldShowStep(this.req, stepName, flowConfig)) {
-      return undefined;
-    }
+    const alreadyAppliedForHwfField = this.getAlreadyAppliedForHwfField();
 
-    const alreadyAppliedForHwf = getFormData(this.req, stepName).alreadyAppliedForHwf as 'yes' | 'no';
-
-    if (alreadyAppliedForHwf === 'yes') {
-      return {
-        stepName,
-        fieldValue: getFormData(this.req, stepName)['alreadyAppliedForHwf.hwfReference'] as string,
-      };
+    if (alreadyAppliedForHwfField?.fieldValue === 'yes') {
+      return this.getField('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf.hwfReference');
     } else {
       return undefined;
     }
   }
 
   getOtherPartiesAgreedField(): FieldDetails<'yes' | 'no'> | undefined {
-    const stepName = 'have-the-other-parties-agreed-to-this-application';
-    if (!shouldShowStep(this.req, stepName, flowConfig)) {
-      return undefined;
-    }
-
-    return {
-      stepName,
-      fieldValue: getFormData(this.req, stepName).otherPartiesAgreed as 'yes' | 'no',
-    };
+    return this.getField('have-the-other-parties-agreed-to-this-application', 'otherPartiesAgreed');
   }
 
   getAnyReasonsNotToShareField(): FieldDetails<'yes' | 'no'> | undefined {
-    const stepName = 'are-there-any-reasons-that-this-application-should-not-be-shared';
+    return this.getField(
+      'are-there-any-reasons-that-this-application-should-not-be-shared',
+      'reasonsAppShouldNotBeShared'
+    );
+  }
+
+  getReasonForNotSharingField(): FieldDetails<string> | undefined {
+    const anyReasonsNotBeSharedField = this.getAnyReasonsNotToShareField();
+
+    if (anyReasonsNotBeSharedField?.fieldValue === 'yes') {
+      return this.getField(
+        'are-there-any-reasons-that-this-application-should-not-be-shared',
+        'reasonsAppShouldNotBeShared.reasonForNotSharing'
+      );
+    } else {
+      return undefined;
+    }
+  }
+
+  private getField<T>(stepName: string, fieldName: string): FieldDetails<T> | undefined {
     if (!shouldShowStep(this.req, stepName, flowConfig)) {
       return undefined;
     }
 
     return {
       stepName,
-      fieldValue: getFormData(this.req, stepName).reasonsAppShouldNotBeShared as 'yes' | 'no',
+      fieldValue: getFormData(this.req, stepName)[fieldName] as T,
     };
-  }
-
-  getReasonForNotSharingField(): FieldDetails<string> | undefined {
-    const stepName = 'are-there-any-reasons-that-this-application-should-not-be-shared';
-    if (!shouldShowStep(this.req, stepName, flowConfig)) {
-      return undefined;
-    }
-
-    const reasonsAppShouldNotBeShared = getFormData(this.req, stepName).reasonsAppShouldNotBeShared as 'yes' | 'no';
-
-    if (reasonsAppShouldNotBeShared === 'yes') {
-      return {
-        stepName,
-        fieldValue: getFormData(this.req, stepName)['reasonsAppShouldNotBeShared.reasonForNotSharing'] as string,
-      };
-    } else {
-      return undefined;
-    }
   }
 }
