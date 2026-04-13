@@ -143,9 +143,9 @@ await performValidationGroup(
 yarn test:functional
 ```
 
-### `ENABLE_PFT_DEBUG_LOG`
+### PFT test-env debug logging
 
-Optional. Set to `true` for extra `[test env]` console lines after `beforeEach` (see [`log-test-env.ts`](utils/common/log-test-env.ts)).
+Optional. Set [`enable_pft_debug_log`](../../../playwright.config.ts) to `true` in `playwright.config.ts` for extra `[test env]` console lines after `beforeEach` (see [`log-test-env.ts`](utils/common/log-test-env.ts)).
 If you add env vars in a spec `beforeEach`, add them to the matching list there.
 
 ## 8. Troubleshooting
@@ -168,18 +168,10 @@ Smart Mapping: Automatically maps URLs to page data files, including numeric URL
 
 Comprehensive: Validates buttons, headers, links, paragraphs, and other UI elements
 
-Validation Summary -
-After each test, you'll see a detailed report in the respective test stdout:
+Validation outcomes -
+When a PFT validation fails, a full-page screenshot is attached for Allure (see [`pft-validation-screenshot.ts`](utils/common/pft-validation-screenshot.ts)). Use Playwright/Allure for full failure detail.
 
-```
-📊 PAGE CONTENT VALIDATION SUMMARY (Test #1):
-Total pages validated: 3
-Pages passed: 2
-Pages failed: 1
-Missing elements: Submit button, Continue link
-```
-
-## 9. Functional test automation for pcs-frontend
+## 10. Functional test automation for pcs-frontend
 
 ### Categories covered:
 
@@ -189,7 +181,7 @@ Missing elements: Submit button, Continue link
 
 Please follow this confluence page for detailed instructions and guidelines- https://tools.hmcts.net/confluence/x/14FLd
 
-## 10. CI Pipeline Stages
+## 11. CI Pipeline Stages
 
 ### PR & Master (Jenkinsfile_CNP)
 
