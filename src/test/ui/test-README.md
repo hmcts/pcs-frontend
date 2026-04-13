@@ -145,8 +145,8 @@ yarn test:functional
 
 ### `ENABLE_PFT_DEBUG_LOG`
 
-Optional. Set to `true` for extra `[test env]` and `[PFT]` console lines.
-If you add env vars in a spec `beforeEach`, add them to the matching list in [`log-test-env.ts`](utils/common/log-test-env.ts).
+Optional. Set to `true` for extra `[test env]` console lines after `beforeEach` (see [`log-test-env.ts`](utils/common/log-test-env.ts)).
+If you add env vars in a spec `beforeEach`, add them to the matching list there.
 
 ## 8. Troubleshooting
 

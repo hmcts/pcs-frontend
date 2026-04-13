@@ -4,7 +4,7 @@ import * as path from 'path';
 import { Page } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
-import { logPftValidation } from '../../common/pft-debug-log';
+import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
@@ -147,7 +147,6 @@ export class PageContentValidation implements IValidation {
       }
 
       PageContentValidation.pagesValidated.add(pageName);
-      await logPftValidation(page, 'page-content', pageName, false);
 
       for (const [key, value] of Object.entries(pageData)) {
         if (
@@ -167,7 +166,11 @@ export class PageContentValidation implements IValidation {
       }
 
       PageContentValidation.validationResults.set(pageUrl, pageResults);
+      if (pageResults.some(r => r.status === 'fail')) {
+        await takeValidationFailureScreenshot(page, 'page-content', pageName);
+      }
     } catch (error) {
+      await takeValidationFailureScreenshot(page, 'page-content', pageName);
       // Add the error as a validation failure
       pageResults.push({
         element: 'SectionData',

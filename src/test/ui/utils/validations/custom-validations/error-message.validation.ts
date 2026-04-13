@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
-import { logPftValidation } from '../../common/pft-debug-log';
+import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
 import { IValidation, validationData, validationRecord } from '../../interfaces';
 
 type ValidationResult = {
@@ -107,7 +107,9 @@ export class ErrorMessageValidation implements IValidation {
     const pageUrl = page.url();
     const pageName = await ErrorMessageValidation.getPageNameFromUrl(pageUrl, page);
 
-    await logPftValidation(page, 'error-messages', pageName, !passed);
+    if (!passed) {
+      await takeValidationFailureScreenshot(page, 'error-messages', pageName);
+    }
 
     ErrorMessageValidation.results.push({
       pageUrl,
