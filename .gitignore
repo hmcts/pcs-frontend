@@ -26,6 +26,8 @@ dist/
 public/
 src/main/views/govuk
 src/main/views/moj
+src/main/views/ui-component-lib
+src/main/assets
 coverage/
 smoke-output/
 functional-output/
