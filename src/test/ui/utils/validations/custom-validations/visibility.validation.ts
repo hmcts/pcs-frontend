@@ -42,7 +42,7 @@ export class VisibilityValidation implements IValidation {
       locator = pattern(page, elementKey);
     } else {
       locator = page.locator(
-        `label:has-text("${elementKey}"), span:has-text("${elementKey}"), div:has-text("${elementKey}")`
+        `label:text-is("${elementKey}"), span:text-is("${elementKey}"), div:text-is("${elementKey}")`
       );
     }
 
