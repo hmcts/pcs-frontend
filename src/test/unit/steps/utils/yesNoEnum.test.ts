@@ -11,6 +11,11 @@ describe('yesNoEnum utilities', () => {
       const result = toYesNoEnum('no');
       expect(result).toBe('No');
     });
+
+    it('should return undefined for undefined', () => {
+      const result = toYesNoEnum(undefined);
+      expect(result).toBeUndefined();
+    });
   });
 
   describe('fromYesNoEnum', () => {

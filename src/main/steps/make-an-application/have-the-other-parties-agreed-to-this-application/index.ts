@@ -1,6 +1,11 @@
+import { Request } from 'express';
+
+import { FeeType } from '../../../interfaces/feeService.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+
+import { getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'have-the-other-parties-agreed-to-this-application',
@@ -13,15 +18,16 @@ export const step: StepDefinition = createFormStep({
       name: 'otherPartiesAgreed',
       type: 'radio',
       required: true,
-      translationKey: { label: 'question' },
+      translationKey: { label: 'question', hint: 'hint' },
+      errorMessage: 'errors.confirmWhetherOtherPartiesHaveAgreed',
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
         {
-          value: 'YES',
+          value: 'yes',
           translationKey: 'options.yes',
         },
         {
-          value: 'NO',
+          value: 'no',
           translationKey: 'options.no',
         },
       ],
@@ -31,5 +37,24 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    theOtherPartyIsTheOtherSide: 'theOtherPartyIsTheOtherSide',
+    everyOtherPartyWillNeedToAgree: 'everyOtherPartyWillNeedToAgree',
+    ifTheOtherPartiesDoNotAgree: 'ifTheOtherPartiesDoNotAgree',
+    feeWillIncreaseIf: 'feeWillIncreaseIf',
+    youHaveAlreadyToldTheOtherParty: 'youHaveAlreadyToldTheOtherParty',
+    theyDidNotAgreeToIt: 'theyDidNotAgreeToIt',
+    youWillSeeTheFinalApplicationFee: 'youWillSeeTheFinalApplicationFee',
+    whatYouNeedToDo: 'whatYouNeedToDo',
+    youWillNeedToUploadEvidence: 'youWillNeedToUploadEvidence',
+    youHaveToldTheOtherParties: 'youHaveToldTheOtherParties',
+    theyAgreedToIt: 'theyAgreedToIt',
+    forExampleACopyOfALetter: 'forExampleACopyOfALetter',
+    ifYouAreNotAbleToContactOtherParties: 'ifYouAreNotAbleToContactOtherParties',
+  },
+  extendGetContent: async (_req: Request) => {
+    const maxFee = await getFee(FeeType.genAppMaxFee);
+    return {
+      maxFee,
+    };
   },
 });
