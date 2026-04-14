@@ -55,4 +55,85 @@ describe('respond-to-claim regular-income flow routing', () => {
     expect(yesResult).toBe(true);
     expect(noResult).toBe(true);
   });
+
+  it('falls back to CCD when regularIncome is absent and householdCircumstances.universalCredit is yes', async () => {
+    if (!universalCreditRouteCondition || !noUniversalCreditRouteCondition) {
+      throw new Error('expected regular-income route conditions');
+    }
+    const req = {
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: { universalCredit: 'YES' },
+                },
+              },
+            },
+          },
+        },
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const toPriority = await universalCreditRouteCondition(req, {}, {});
+    const toUcQuestion = await noUniversalCreditRouteCondition(req, {}, {});
+
+    expect(toPriority).toBe(true);
+    expect(toUcQuestion).toBe(false);
+  });
+
+  it('falls back to CCD when regularIncome is absent and universal credit is not indicated', async () => {
+    if (!universalCreditRouteCondition || !noUniversalCreditRouteCondition) {
+      throw new Error('expected regular-income route conditions');
+    }
+    const req = {
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: { universalCredit: 'NO' },
+                },
+              },
+            },
+          },
+        },
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const toPriority = await universalCreditRouteCondition(req, {}, {});
+    const toUcQuestion = await noUniversalCreditRouteCondition(req, {}, {});
+
+    expect(toPriority).toBe(false);
+    expect(toUcQuestion).toBe(true);
+  });
+
+  it('prefers form regularIncome over CCD when both are present', async () => {
+    if (!universalCreditRouteCondition) {
+      throw new Error('expected universal credit route condition');
+    }
+    const req = {
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: { universalCredit: 'YES' },
+                },
+              },
+            },
+          },
+        },
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const result = await universalCreditRouteCondition(req, {}, { regularIncome: ['incomeFromJobs'] });
+    expect(result).toBe(false);
+  });
 });

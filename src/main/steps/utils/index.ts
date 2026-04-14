@@ -11,6 +11,8 @@ export { getStepBeforeDisputePages } from './journeyHelpers';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
 export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
+export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';
+export { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export {
   shouldRouteToPriorityDebts,

@@ -1,12 +1,12 @@
 import { type Request } from 'express';
 
 import {
+  getPreviousStepForPriorityDebts,
   getPreviousStepForWhatOtherRegularExpenses,
   getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
-  hasSelectedUniversalCredit,
   isDefendantNameKnown,
   isNoticeDateProvided,
   isNoticeServed,
@@ -507,10 +507,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
-      previousStep: async (req: Request): Promise<string> => {
-        const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
-        return selectedUniversalCredit ? 'what-regular-income-do-you-receive' : 'have-you-applied-for-universal-credit';
-      },
+      previousStep: getPreviousStepForPriorityDebts,
       routes: [
         {
           condition: shouldRouteToPriorityDebtDetails,
