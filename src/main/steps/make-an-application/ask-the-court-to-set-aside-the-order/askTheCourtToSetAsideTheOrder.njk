@@ -1,7 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
@@ -13,33 +12,12 @@
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
   <p class="govuk-body">
-  {{ paragraph1 }}
+  {{paragraph1}}
   </p>
 
   <p class="govuk-body">
-   {{ forExampleYouCanUseThisTo }}
+  {{paragraph2}}
   </p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>{{ addAnExtraParty }}</li>
-    <li>{{ reliefFromSanctions }}</li>
-    <li>{{ serveAClaimOutsideEnglandAndWales }}</li>
-    <li>{{ transferForEnforcement }}</li>
-  </ul>
-  </p>
-
-  <div class="govuk-inset-text">
-    <p class="govuk-body">{{ cannotSuspendOnlineIntro }}</p>
-    <p class="govuk-body">{{ toApplyByPost }}</p>
-
-    <ul class="govuk-list govuk-list--bullet">
-      <li><a href="https://www.gov.uk/repossession/delay-eviction" target="_blank"
-        rel="noopener noreferrer" class="govuk-link">{{ readGuidance }}</a>
-      </li>
-      <li><a href="https://www.gov.uk/government/publications/form-n244-application-notice" target="_blank"
-        rel="noopener noreferrer" class="govuk-link">{{ fillInFormForSuspend }}</a>
-      </li>
-    </ul>
-  </div>
 
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">
@@ -51,6 +29,7 @@
     </div>
 
     {{ csrfProtection(csrfToken) }}
+
   </form>
 
   <h2 class="govuk-heading-m">{{ whatYouWillNeedToApply }}</h2>
@@ -59,7 +38,6 @@
   </p>
   <ul class="govuk-list govuk-list--bullet">
     <li>{{ ifYouCanPayTheCourtFee }}</li>
-    <li>{{ whatYouWantTheCourtToDo }}</li>
     <li>{{ whyYouAreAskingTheCourt }}</li>
   </ul>
   <p class="govuk-body">
@@ -85,8 +63,7 @@
   <h2 class="govuk-heading-m">{{ applyByPost }}</h2>
   <p class="govuk-body">{{ ifPreferToRespondByPost }}</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>{{ fillInFormForPost | safe }}</a>
-    </li>
+    <li>{{ fillInFormForPost | safe }}</a></li>
     <li><a href="https://www.gov.uk/find-court-tribunal" target="_blank"
         rel="noopener noreferrer" class="govuk-link">{{ findYourLocalCourt }}</a></li>
     <li>{{ sendTheCompletedFormToTheCourt }}</li>
