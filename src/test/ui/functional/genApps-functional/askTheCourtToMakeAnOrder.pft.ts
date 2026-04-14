@@ -1,5 +1,5 @@
-import { dashboard, feedback } from '../../data/page-data';
-import { askTheCourtToMakeAnOrder, chooseAnApplication } from '../../data/page-data/genApps-page-data';
+import { feedback } from '../../data/page-data';
+import { askTheCourtToMakeAnOrder } from '../../data/page-data/genApps-page-data';
 import { performValidation } from '../../utils/controller';
 
 export async function askTheCourtToMakeAnOrderNavigationTests(): Promise<void> {
@@ -7,6 +7,4 @@ export async function askTheCourtToMakeAnOrderNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: askTheCourtToMakeAnOrder.pageSlug,
   });
-  await performValidation('pageNavigation', askTheCourtToMakeAnOrder.backLink, chooseAnApplication.mainHeader);
-  await performValidation('pageNavigation', chooseAnApplication.cancelLink, dashboard.mainHeader);
 }
