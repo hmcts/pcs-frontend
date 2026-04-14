@@ -18,6 +18,7 @@ export const step: StepDefinition = createFormStep({
       name: 'confirmRepaymentsMade',
       type: 'radio',
       required: true,
+      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l',
       translationKey: {
         label: 'question',
