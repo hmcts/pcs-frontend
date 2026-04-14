@@ -119,6 +119,9 @@ export interface CcdDefendantResponses {
   paymentAgreement?: {
     repaymentPlanAgreed?: YesNoNotSureValue;
     repaymentAgreedDetails?: string;
+    repayArrearsInstalments?: YesNoValue;
+    additionalRentContribution?: unknown;
+    additionalContributionFrequency?: string;
   };
   householdCircumstances?: HouseholdCircumstances;
 }

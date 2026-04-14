@@ -3,13 +3,17 @@ import type { TFunction } from 'i18next';
 
 import { CitizenGenAppRequest } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation, getTranslationFunction } from '../../../modules/steps';
+import { createGetController, createStepNavigation, getFormData, getTranslationFunction } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { toYesNoEnum } from '../../utils/yesNoEnum';
 import { MAKE_AN_APPLICATION_ROUTE, flowConfig } from '../flow.config';
 
 const STEP_NAME = 'check-your-answers';
 const stepNavigation = createStepNavigation(flowConfig);
+
+function isHearingInNext14Days(req: Request): 'yes' | 'no' | undefined {
+  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').courtHearingInNext14Days as 'yes' | 'no';
+}
 
 export const step: StepDefinition = {
   url: `${MAKE_AN_APPLICATION_ROUTE}/check-your-answers`,
@@ -31,8 +35,7 @@ export const step: StepDefinition = {
         }
 
         const typeOfApplication = formData['choose-an-application']['typeOfApplication'];
-        const courtHearingInNext14Days =
-          formData['is-the-court-hearing-in-the-next-14-days']['courtHearingInNext14Days'];
+        const courtHearingInNext14Days = isHearingInNext14Days(req);
 
         return {
           summaryData: {
@@ -91,9 +94,11 @@ export const step: StepDefinition = {
         throw Error('No existing formData in session');
       }
 
+      const hearingInNext14Days = isHearingInNext14Days(req);
+
       const citizenGenAppRequest: CitizenGenAppRequest = {
         applicationType: formData['choose-an-application']['typeOfApplication'],
-        within14Days: toYesNoEnum(formData['is-the-court-hearing-in-the-next-14-days']['courtHearingInNext14Days']),
+        within14Days: hearingInNext14Days ? toYesNoEnum(hearingInNext14Days) : undefined,
       };
 
       await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
