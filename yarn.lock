@@ -4792,6 +4792,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/git-rev-sync@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "@types/git-rev-sync@npm:2.0.2"
+  checksum: 10/24d8e9573cffad57b6809b0e60917f01d70d1577d5cc027ef1fe557ae2968f827e38836750dd9acbe2339ec9d9d7faa05584b8a162665706085943ade2601a7b
+  languageName: node
+  linkType: hard
+
 "@types/glob@npm:^8.1.0":
   version: 8.1.0
   resolution: "@types/glob@npm:8.1.0"
@@ -7589,6 +7596,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dotenv@npm:^17.3.1":
+  version: 17.3.1
+  resolution: "dotenv@npm:17.3.1"
+  checksum: 10/4dde6571dff22c2323a3e33ac25e1e7d51c4b6d60dc884f59e3efe85c8fd3cc8800d6b3925d05c46b19dca08cba821a0a24e22f75a1b9b768c859b98bb927b04
+  languageName: node
+  linkType: hard
+
 "drange@npm:^1.0.2":
   version: 1.1.1
   resolution: "drange@npm:1.1.1"
@@ -8688,13 +8702,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.15.11":
-  version: 1.15.11
-  resolution: "follow-redirects@npm:1.15.11"
+"follow-redirects@npm:^1.16.0":
+  version: 1.16.0
+  resolution: "follow-redirects@npm:1.16.0"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 10/07372fd74b98c78cf4d417d68d41fdaa0be4dcacafffb9e67b1e3cf090bc4771515e65020651528faab238f10f9b9c0d9707d6c1574a6c0387c5de1042cde9ba
+  checksum: 10/3fbe3d80b3b544c22705d837aa5d4a0d07a740d913534a2620b0a004c610af4148e3b58723536dd099aaa1c9d3a155964bde9665d6e5cb331460809a1fc572fd
   languageName: node
   linkType: hard
 
@@ -12469,6 +12483,7 @@ __metadata:
     "@types/cookie-parser": "npm:^1.4.3"
     "@types/express": "npm:^5.0.1"
     "@types/express-session": "npm:^1.18.1"
+    "@types/git-rev-sync": "npm:^2.0.2"
     "@types/glob": "npm:^8.1.0"
     "@types/jest": "npm:^29.5.14"
     "@types/lodash": "npm:^4.14.197"
@@ -12494,6 +12509,7 @@ __metadata:
     css-loader: "npm:^7.0.0"
     date-fns: "npm:^4.1.0"
     debug: "npm:^4.3.4"
+    dotenv: "npm:^17.3.1"
     eslint: "npm:^9.0.0"
     eslint-config-prettier: "npm:^10.0.0"
     eslint-import-resolver-typescript: "npm:^4.4.4"

@@ -1,13 +1,23 @@
 {
-  "ts-node": {
-    "files": true
-  },
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "baseUrl": "../main",
+    "paths": {
+      "@app/*": ["app/*"],
+      "@interfaces/*": ["interfaces/*"],
+      "@router/*": ["router/*"],
+      "@routes/*": ["routes/*"],
+      "@steps": ["steps/index.ts"],
+      "@modules/*": ["modules/*"],
+      "@services/*": ["services/*"],
+      "@utils/*": ["utils/*"]
+    },
     "target": "es2018",
     "lib": ["es2018", "DOM"],
-    "esModuleInterop": true,
-    "module": "commonjs",
-    "strictNullChecks": true,
     "types": ["jest", "node"]
+  },
+  "include": ["**/*"],
+  "ts-node": {
+    "files": true
   }
 }
