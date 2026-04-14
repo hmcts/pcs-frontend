@@ -1,4 +1,4 @@
 export const installmentPayments = {
-  mainHeader: `Installment Payments(Placeholder)`,
+  mainHeader: `Instalments (placeholder)`,
   saveAndContinueButton: `Save and continue`,
 };

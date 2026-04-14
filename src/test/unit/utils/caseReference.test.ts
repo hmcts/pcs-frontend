@@ -1,4 +1,5 @@
-import { sanitiseCaseReference, toCaseReference16 } from '../../../main/utils/caseReference';
+import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
+import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 
 describe('caseReference utilities', () => {
   describe('sanitiseCaseReference', () => {
@@ -165,27 +166,27 @@ describe('caseReference utilities', () => {
     });
 
     describe('Real-world scenarios', () => {
-      it('should return null for session data that is null', () => {
-        const sessionCaseId = null;
-        const result = toCaseReference16(sessionCaseId);
+      it('should return null for caseId  that is null', () => {
+        const caseId: string | null = null;
+        const result = toCaseReference16(caseId);
         expect(result).toBeNull();
       });
 
-      it('should return null for session data that is undefined', () => {
-        const session: { ccdCase?: { id?: string } } = {};
-        const result = toCaseReference16(session.ccdCase?.id);
+      it('should return null for mock ccdCaseModel data that is undefined', () => {
+        const ccdCaseModel = new CcdCaseModel({ id: '', data: {} });
+        const result = toCaseReference16(ccdCaseModel.id);
         expect(result).toBeNull();
       });
 
-      it('should handle valid session data', () => {
-        const session = { ccdCase: { id: '9876543210987654' } };
-        const result = toCaseReference16(session.ccdCase.id);
+      it('should handle valid mock ccdCaseModel data', () => {
+        const ccdCaseModel = new CcdCaseModel({ id: '9876543210987654', data: {} });
+        const result = toCaseReference16(ccdCaseModel.id);
         expect(result).toBe('9876543210987654');
       });
 
-      it('should return null for malformed session data', () => {
-        const session = { ccdCase: { id: 'invalid-case-id' } };
-        const result = toCaseReference16(session.ccdCase.id);
+      it('should return null for malformed mock ccdCaseModel data', () => {
+        const ccdCaseModel = new CcdCaseModel({ id: 'invalid-case-id', data: {} });
+        const result = toCaseReference16(ccdCaseModel.id);
         expect(result).toBeNull();
       });
     });
