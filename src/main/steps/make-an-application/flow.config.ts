@@ -48,7 +48,8 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => doesFeeApply(req) && needHelpPayingTheFee(req),
     },
     'you-need-to-apply-for-help-with-your-application-fee': {
-      showCondition: (req: Request) => doesFeeApply(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHwf(req),
+      showCondition: (req: Request) =>
+        doesFeeApply(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHelpWithFees(req),
     },
     'are-there-any-reasons-that-this-application-should-not-be-shared': {
       showCondition: (req: Request) => !otherPartiesAgreed(req),
@@ -67,15 +68,15 @@ function getTypeOfApplication(req: Request): string {
 }
 
 function isHearingInNext14Days(req: Request): boolean {
-  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').hearingInNext14Days === 'yes';
+  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').courtHearingInNext14Days === 'yes';
 }
 
 function needHelpPayingTheFee(req: Request): boolean {
   return getFormData(req, 'do-you-need-help-paying-the-fee').helpWithFeesNeeded === 'yes';
 }
 
-function alreadyAppliedForHwf(req: Request): boolean {
-  return getFormData(req, 'have-you-already-applied-for-help-with-fees').alreadyAppliedForHwf === 'yes';
+function alreadyAppliedForHelpWithFees(req: Request): boolean {
+  return getFormData(req, 'have-you-already-applied-for-help-with-fees').alreadyAppliedForHelp === 'yes';
 }
 
 function doesFeeApply(req: Request): boolean {
@@ -83,7 +84,7 @@ function doesFeeApply(req: Request): boolean {
 }
 
 function otherPartiesAgreed(req: Request): boolean {
-  return getFormData(req, 'have-the-other-parties-agreed-to-this-application').otherPartiesAgreed === 'yes';
+  return getFormData(req, 'have-the-other-parties-agreed-to-this-application').otherPartiesAgreed === 'YES';
 }
 
 function documentUploadWanted(req: Request): boolean {

@@ -10,7 +10,7 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/haveYouAlreadyAppliedForHelp.njk`,
   fields: [
     {
-      name: 'alreadyAppliedForHwf',
+      name: 'alreadyAppliedForHelp',
       type: 'radio',
       required: true,
       translationKey: { label: 'question' },
