@@ -26,7 +26,7 @@ export class GetController {
     const content = await this.generateContent(req);
     res.render(this.view, {
       ...content,
-      ...res.locals?.extraHeaders,
+      ...(res.locals?.extraHeaders ?? {}),
     });
   };
 }
