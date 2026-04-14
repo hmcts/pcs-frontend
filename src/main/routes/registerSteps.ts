@@ -3,7 +3,6 @@ import type { RequestHandler } from 'express';
 
 import { caseReferenceParamMiddleware, legalRepresentativeHeaderMiddleware, oidcMiddleware } from '../middleware';
 
-
 import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { Logger } from '@modules/logger';
