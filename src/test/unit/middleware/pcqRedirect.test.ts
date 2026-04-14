@@ -3,10 +3,12 @@ import config from 'config';
 import { NextFunction, Request, Response } from 'express';
 import { Session } from 'express-session';
 
-import type { CcdCase } from '../../../main/interfaces/ccdCase.interface';
 import { pcqRedirectMiddleware } from '../../../main/middleware/pcqRedirect';
-import { ccdCaseService } from '../../../main/services/ccdCaseService';
-import * as createTokenModule from '../../../main/services/pcq/createToken';
+
+import type { CcdCase } from '@interfaces/ccdCase.interface';
+import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
+import { ccdCaseService } from '@services/ccdCaseService';
+import * as createTokenModule from '@services/pcq/createToken';
 
 interface CustomSession extends Session {
   user?: {
@@ -20,19 +22,19 @@ interface CustomSession extends Session {
 
 jest.mock('axios');
 jest.mock('config');
-jest.mock('../../../main/modules/http', () => ({
+jest.mock('@modules/http', () => ({
   createHttp: () => ({
     get: jest.fn(),
     post: jest.fn(),
   }),
 }));
 
-jest.mock('../../../main/services/ccdCaseService', () => ({
+jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
     updateDraftRespondToClaim: jest.fn(),
   },
 }));
-jest.mock('../../../main/services/pcq/createToken');
+jest.mock('@services/pcq/createToken');
 
 describe('pcqRedirectMiddleware', () => {
   let mockReq: Partial<Request>;
@@ -76,10 +78,10 @@ describe('pcqRedirectMiddleware', () => {
     mockRes = {
       redirect: mockRedirect,
       locals: {
-        validatedCase: {
+        validatedCase: new CcdCaseModel({
           id: '123456789',
           data: {},
-        },
+        }),
       },
     };
 
@@ -162,12 +164,12 @@ describe('pcqRedirectMiddleware', () => {
   });
 
   it('should not redirect if userPcqIdSet is already YES', async () => {
-    mockRes.locals!.validatedCase = {
+    mockRes.locals!.validatedCase = new CcdCaseModel({
       id: '123456789',
       data: {
         userPcqIdSet: 'YES',
       },
-    };
+    });
 
     const middleware = pcqRedirectMiddleware();
     await middleware(mockReq as Request, mockRes as Response, mockNext);

@@ -1,5 +1,6 @@
 import { Request } from 'express';
 
+import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
 import { isNoticeServed } from '../../../../main/steps/utils/isNoticeServed';
 
 describe('isNoticeServed', () => {
@@ -8,11 +9,7 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'YES',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'YES' } }),
           },
         },
       } as unknown as Request;
@@ -26,11 +23,7 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'YES',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'YES' } }),
           },
         },
       } as unknown as Request;
@@ -44,11 +37,7 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'yes',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'yes' } }),
           },
         },
       } as unknown as Request;
@@ -62,11 +51,7 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'YeS',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'YeS' } }),
           },
         },
       } as unknown as Request;
@@ -82,11 +67,7 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'NO',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'No' } }),
           },
         },
       } as unknown as Request;
@@ -100,11 +81,7 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                noticeServed: '',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: '' } }),
           },
         },
       } as unknown as Request;
@@ -120,9 +97,7 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {},
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: {} }),
           },
         },
       } as unknown as Request;
@@ -178,7 +153,7 @@ describe('isNoticeServed', () => {
   });
 
   describe('regression tests - ensure CCD data path is correct', () => {
-    it('should use req.res.locals.validatedCase.data path (not req.session.ccdCase)', async () => {
+    it('should use req.res.locals.validatedCase (model) path (not req.session.ccdCase)', async () => {
       // This test ensures we don't regress to using the old session path
       const mockReq = {
         session: {
@@ -190,18 +165,14 @@ describe('isNoticeServed', () => {
         },
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                noticeServed: 'NO', // Correct path - should be used
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'NO' } }), // Correct path - should be used
           },
         },
       } as unknown as Request;
 
       const result = await isNoticeServed(mockReq);
 
-      // Should use res.locals.validatedCase.data.noticeServed ("No")
+      // Should use res.locals.validatedCase (model).noticeServed ("No")
       // NOT session.ccdCase.data.noticeServed ("Yes")
       expect(result).toBe(false);
     });
@@ -211,15 +182,15 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              id: 1771456429013468,
+            validatedCase: new CcdCaseModel({
+              id: '1771456429013468',
               data: {
                 noticeServed: 'YES',
                 rentArrears_Total: '22222200',
                 legislativeCountry: 'England',
                 notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01',
               },
-            },
+            }),
           },
         },
       } as unknown as Request;

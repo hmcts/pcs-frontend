@@ -1,5 +1,6 @@
 import { Request } from 'express';
 
+import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
 import { isNoticeDateProvided } from '../../../../main/steps/utils/isNoticeDateProvided';
 
 describe('isNoticeDateProvided', () => {
@@ -8,11 +9,10 @@ describe('isNoticeDateProvided', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01',
-              },
-            },
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01' },
+            }),
           },
         },
       } as unknown as Request;
@@ -26,11 +26,10 @@ describe('isNoticeDateProvided', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                notice_NoticeHandedOverDateTime: '2023-12-25T23:59:59',
-              },
-            },
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { notice_NoticeHandedOverDateTime: '2023-12-25T23:59:59' },
+            }),
           },
         },
       } as unknown as Request;
@@ -44,11 +43,10 @@ describe('isNoticeDateProvided', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                notice_NoticeHandedOverDateTime: '2022-01-01',
-              },
-            },
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { notice_NoticeHandedOverDateTime: '2022-01-01' },
+            }),
           },
         },
       } as unknown as Request;
@@ -64,9 +62,7 @@ describe('isNoticeDateProvided', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {},
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: {} }),
           },
         },
       } as unknown as Request;
@@ -80,11 +76,10 @@ describe('isNoticeDateProvided', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                notice_NoticeHandedOverDateTime: null,
-              },
-            },
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { notice_NoticeHandedOverDateTime: null as unknown as string },
+            }),
           },
         },
       } as unknown as Request;
@@ -98,11 +93,10 @@ describe('isNoticeDateProvided', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                notice_NoticeHandedOverDateTime: '',
-              },
-            },
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { notice_NoticeHandedOverDateTime: '' },
+            }),
           },
         },
       } as unknown as Request;
@@ -162,23 +156,22 @@ describe('isNoticeDateProvided', () => {
   });
 
   describe('regression tests - ensure CCD data path is correct', () => {
-    it('should use req.res.locals.validatedCase.data path (not req.session.ccdCase)', async () => {
+    it('should use req.res.locals.validatedCase (model) path (not req.session.ccdCase)', async () => {
       // This test ensures we don't regress to using the old session path
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01', // Correct path - should be used
-              },
-            },
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01' },
+            }),
           },
         },
       } as unknown as Request;
 
       const result = await isNoticeDateProvided(mockReq);
 
-      // Should use res.locals.validatedCase.data.notice_NoticeHandedOverDateTime
+      // Should use res.locals.validatedCase (model) notice date getters
       expect(result).toBe(true);
     });
 
@@ -187,8 +180,8 @@ describe('isNoticeDateProvided', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              id: 1771456429013468,
+            validatedCase: new CcdCaseModel({
+              id: '1771456429013468',
               data: {
                 noticeServed: 'YES',
                 rentArrears_Total: '22222200',
@@ -196,7 +189,7 @@ describe('isNoticeDateProvided', () => {
                 notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01',
                 tenancy_TypeOfTenancyLicence: 'SECURE_TENANCY',
               },
-            },
+            }),
           },
         },
       } as unknown as Request;
