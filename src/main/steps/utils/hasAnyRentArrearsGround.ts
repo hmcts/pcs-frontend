@@ -1,10 +1,7 @@
 import type { Request } from 'express';
 
 /**
- * Checks if the claim includes any rent arrears ground from CCD case data.
- *
- * Checks claimGroundSummaries array from CCD case data.
- * Returns true if ANY claim ground has isRentArrears: "Yes" (case-insensitive), false otherwise.
+ * Returns true when ANY selected claim ground is marked as rent arrears.
  */
 export const hasAnyRentArrearsGround = async (req: Request): Promise<boolean> => {
   const caseData = req.res?.locals?.validatedCase?.data;
@@ -14,6 +11,5 @@ export const hasAnyRentArrearsGround = async (req: Request): Promise<boolean> =>
     return false;
   }
 
-  // Check if any claim ground has isRentArrears: "Yes" (case-insensitive)
   return claimGroundSummaries.some(ground => ground?.value?.isRentArrears?.toUpperCase() === 'YES');
 };
