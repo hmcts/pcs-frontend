@@ -14,8 +14,14 @@ export function initPostcodeLookup(): void {
   // Helper utilities that work per-container
   const getParts = (container: HTMLElement) => {
     const prefix = container.dataset.namePrefix || 'address';
+
     const byIdOrName = <T extends HTMLElement>(idOrName: string): T | null => {
-      return container.querySelector<T>(`#${idOrName}`) || container.querySelector<T>(`[name="${idOrName}"]`);
+      return (
+        container.querySelector<T>(`#${idOrName}`) ||
+        container.querySelector<T>(`[name="${idOrName}"]`) ||
+        (document.getElementById(idOrName) as T) ||
+        document.querySelector<T>(`[name="${idOrName}"]`)
+      );
     };
 
     return {
@@ -29,11 +35,12 @@ export function initPostcodeLookup(): void {
       lookupErrorMessage: byIdOrName<HTMLParagraphElement>(`${prefix}-lookup-postcode-error`),
       errorMessage: byIdOrName<HTMLParagraphElement>(`${prefix}-postcode-error`),
       postcodeFormGroup: byIdOrName<HTMLDivElement>(`${prefix}-postcode-form-group`),
-      addressLine1: byIdOrName<HTMLInputElement>('correspondenceAddressConfirm.addressLine1'),
-      addressLine2: byIdOrName<HTMLInputElement>('correspondenceAddressConfirm.addressLine2'),
-      town: byIdOrName<HTMLInputElement>('correspondenceAddressConfirm.townOrCity'),
-      county: byIdOrName<HTMLInputElement>('correspondenceAddressConfirm.county'),
-      postcodeOut: byIdOrName<HTMLInputElement>('correspondenceAddressConfirm.postcode'),
+      addressLine1: byIdOrName<HTMLInputElement>(`${prefix}-addressLine1`),
+      addressLine2: byIdOrName<HTMLInputElement>(`${prefix}-addressLine2`),
+      addressLine3: byIdOrName<HTMLInputElement>(`${prefix}-addressLine3`),
+      town: byIdOrName<HTMLInputElement>(`${prefix}-town`),
+      county: byIdOrName<HTMLInputElement>(`${prefix}-county`),
+      postcodeOut: byIdOrName<HTMLInputElement>(`${prefix}-postcode`),
       enterManuallyDetails: byIdOrName<HTMLDetailsElement>(`${prefix}-enterManuallyDetails`),
       addressesFoundFlag: byIdOrName<HTMLInputElement>(`${prefix}-addressesFoundFlag`),
     };
