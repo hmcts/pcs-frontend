@@ -5,7 +5,7 @@ import {
   validateConfigInDevelopment,
   validateFormBuilderConfig,
   validateFormFieldConfig,
-} from '../../../../../main/modules/steps/formBuilder/schema';
+} from '@modules/steps/formBuilder/schema';
 
 describe('formBuilder schema', () => {
   describe('FormFieldOptionSchema', () => {

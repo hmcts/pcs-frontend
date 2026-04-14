@@ -11,16 +11,16 @@ jest.mock('@modules/logger', () => ({
 
 const mockGetValidatedLanguage = jest.fn((_req: unknown) => 'en');
 
-jest.mock('../../../main/modules/steps/i18n', () => ({
+jest.mock('@modules/steps/i18n', () => ({
   getValidatedLanguage: jest.fn((req: unknown) => mockGetValidatedLanguage(req)),
 }));
 
-jest.mock('../../../main/modules/i18n', () => ({
+jest.mock('@modules/i18n', () => ({
   getValidatedLanguage: jest.fn((req: unknown) => mockGetValidatedLanguage(req)),
 }));
 
 const mockStepDependencyCheck = jest.fn((req, res, next) => next());
-jest.mock('../../../main/modules/steps/flow', () => ({
+jest.mock('@modules/steps/flow', () => ({
   stepDependencyCheckMiddleware: jest.fn(() => mockStepDependencyCheck),
 }));
 
@@ -81,7 +81,7 @@ const stepWithMiddleware = {
 
 const allSteps = [protectedStep, unprotectedStep, stepWithFunctionController, stepWithMiddleware];
 
-jest.mock('../../../main/steps', () => ({
+jest.mock('@steps', () => ({
   journeyRegistry: {
     respondToClaim: {
       name: 'respondToClaim',
