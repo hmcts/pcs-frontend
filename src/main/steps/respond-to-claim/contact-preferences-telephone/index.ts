@@ -1,8 +1,8 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -89,31 +89,53 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  getInitialFormData: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const contactByPhone = validatedCase?.defendantResponsesContactByPhone;
+    const phoneNumber = validatedCase?.defendantContactDetailsPartyPhoneNumber;
+
+    if (contactByPhone === 'YES') {
+      return {
+        contactByTelephone: 'yes',
+        ...(phoneNumber ? { 'contactByTelephone.phoneNumber': phoneNumber } : {}),
+      };
+    }
+
+    if (contactByPhone === 'NO') {
+      return {
+        contactByTelephone: 'no',
+      };
+    }
+
+    return {};
+  },
 
   beforeRedirect: async req => {
-    // TODO: Refactor to remove session dependency.
-    // Use req.body directly instead of req.session.formData, following the pattern in rent-arrears-dispute and non-rent-arrears-dispute.
-    const telephoneForm = req.session.formData?.['contact-preferences-telephone'];
-    if (!telephoneForm) {
+    const telephoneForm = req.body as Record<string, unknown>;
+    const contactByTelephone = telephoneForm.contactByTelephone as string | undefined;
+
+    if (!contactByTelephone) {
       return;
     }
 
-    const existingPhoneNumber =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantContactDetails?.party?.phoneNumber;
+    const existingPhoneNumber = req.res?.locals?.validatedCase?.defendantContactDetailsPartyPhoneNumber as
+      | string
+      | undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantContactDetails: {
         party: {
+          phoneNumberProvided: contactByTelephone === 'yes' ? 'YES' : 'NO',
           phoneNumber:
-            telephoneForm.contactByTelephone === 'yes'
-              ? telephoneForm['contactByTelephone.phoneNumber']
+            contactByTelephone === 'yes'
+              ? (telephoneForm['contactByTelephone.phoneNumber'] as string | undefined)
               : existingPhoneNumber
                 ? ''
                 : undefined,
         },
       },
       defendantResponses: {
-        contactByPhone: telephoneForm.contactByTelephone === 'yes' ? 'YES' : 'NO',
+        contactByPhone: contactByTelephone === 'yes' ? 'YES' : 'NO',
       },
     };
 

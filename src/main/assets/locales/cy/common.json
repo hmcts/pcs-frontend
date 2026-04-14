@@ -25,6 +25,7 @@
     "cancel": "cyCancel",
     "finish": "cyStart a new application",
     "start": "cyStart",
+    "startNow": "cyStart now",
     "submit": "cySubmit"
   },
   "options": {
@@ -40,6 +41,10 @@
     "day": "cyDay",
     "month": "cyMonth",
     "year": "cyYear"
+  },
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
   },
   "errors": {
     "title": "cyThere is a problem",

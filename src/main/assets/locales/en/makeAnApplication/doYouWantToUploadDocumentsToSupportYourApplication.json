@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Do you want to upload documents to support your application?",
+  "caption": "Make an application",
+  "heading": "Do you want to upload documents to support your application?",
+  "question": "Do you want to upload documents to support your application?",
+  "errors": {
+    "typeOfApplication": "You must select whether you want to upload documents to support your application"
+  }
+}
