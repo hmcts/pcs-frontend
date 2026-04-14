@@ -17,6 +17,11 @@ export function getStepsInSection(sectionId: string, sections: SectionsMap): str
   return sections[sectionId]?.steps ?? [];
 }
 
+/**
+ * First slug in the section config `steps` array — config order, not necessarily the first step
+ * a user reaches in the journey for that section. Use for stable task-list entry when that matches
+ * product intent; otherwise resolve entry from flow routing.
+ */
 export function getFirstStepInSection(sectionId: string, sections: SectionsMap): string | null {
   return sections[sectionId]?.steps[0] ?? null;
 }
@@ -32,6 +37,13 @@ export async function isSectionApplicable(sectionId: string, sections: SectionsM
   return section.isApplicable(req);
 }
 
+/**
+ * True when moving from `currentStepSlug` would leave the current section.
+ * - `nextStepSlug` null: treated as end of flow (last step).
+ * - Next step not present in any section: treated as leaving the section if the current step is
+ *   section-mapped (e.g. terminal routes like `end-now` that are omitted from section metadata).
+ * - If the current step is not in any section, returns false (no section boundary to detect).
+ */
 export function isLastStepInSection(
   currentStepSlug: string,
   nextStepSlug: string | null,
@@ -43,6 +55,10 @@ export function isLastStepInSection(
 
   const currentSection = getSectionForStep(currentStepSlug, sections);
   const nextSection = getSectionForStep(nextStepSlug, sections);
+
+  if (currentSection && !nextSection) {
+    return true;
+  }
 
   return Boolean(currentSection && nextSection && currentSection !== nextSection);
 }

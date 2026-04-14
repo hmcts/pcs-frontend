@@ -13,6 +13,21 @@ describe('respond-to-claim sections config', () => {
     expect(coverage.duplicateAssignments).toEqual([]);
   });
 
+  it('lists only steps that exist on the flow config', () => {
+    const flowStepKeys = new Set(Object.keys(flowConfig.steps));
+    const sectionStepsNotInFlow: string[] = [];
+
+    for (const section of Object.values(respondToClaimSections)) {
+      for (const slug of section.steps) {
+        if (!flowStepKeys.has(slug)) {
+          sectionStepsNotInFlow.push(slug);
+        }
+      }
+    }
+
+    expect(sectionStepsNotInFlow).toEqual([]);
+  });
+
   it('keeps placeholder sections available for future steps', () => {
     expect(respondToClaimSections.uploadFiles.steps).toEqual([]);
     expect(respondToClaimSections.checkYourAnswersAndSubmit.steps).toEqual([]);

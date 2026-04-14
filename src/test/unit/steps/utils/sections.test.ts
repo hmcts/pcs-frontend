@@ -92,6 +92,14 @@ describe('sections utils', () => {
     it('returns true when next step is null', () => {
       expect(isLastStepInSection('step-b1', null, testSections)).toBe(true);
     });
+
+    it('returns true when next step is not in any section but current step is', () => {
+      expect(isLastStepInSection('step-a2', 'end-now', testSections)).toBe(true);
+    });
+
+    it('returns false when current step is not in any section', () => {
+      expect(isLastStepInSection('orphan-step', 'step-a1', testSections)).toBe(false);
+    });
   });
 
   describe('getSectionCoverage', () => {
