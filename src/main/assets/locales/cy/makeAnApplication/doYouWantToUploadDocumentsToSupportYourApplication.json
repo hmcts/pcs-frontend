@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyDo you want to upload documents to support your application?",
+  "caption": "cyMake an application",
+  "heading": "cyDo you want to upload documents to support your application?",
+  "question": "cyDo you want to upload documents to support your application?",
+  "errors": {
+    "typeOfApplication": "cyYou must select whether you want to upload documents to support your application"
+  }
+}
