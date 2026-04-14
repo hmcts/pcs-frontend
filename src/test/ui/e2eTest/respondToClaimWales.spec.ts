@@ -49,6 +49,9 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async () => {
+  if (process.env.CASE_NUMBER) {
+    await performAction('deleteCaseRole', '[CREATOR]');
+  }
   finaliseAllValidations();
 });
 

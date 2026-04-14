@@ -22,6 +22,12 @@ test.beforeEach(async ({ page }) => {
   await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
 });
 
+test.afterEach(async () => {
+  if (process.env.CASE_NUMBER) {
+    await performAction('deleteCaseRole', '[CREATOR]');
+  }
+});
+
 test.describe('Dashboard - e2e Journey @nightly', async () => {
   test('Validate address, case number and links on the dashboard @regression', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);

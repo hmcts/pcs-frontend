@@ -160,9 +160,11 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.afterEach(async () => {
+  if (process.env.CASE_NUMBER) {
+    await performAction('deleteCaseRole', '[CREATOR]');
+  }
   finaliseAllValidations();
 });
-
 //@noDefendants(submitCasePayloadNoDefendants) represents all defendant details unknown pages and non-rent arrears
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
