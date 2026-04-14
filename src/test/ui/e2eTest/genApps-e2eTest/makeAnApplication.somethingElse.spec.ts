@@ -6,6 +6,15 @@ import {
   askTheCourtToMakeAnOrder,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
+  checkYourAnswers,
+  chooseAnApplication,
+  doYouNeedHelpPayingTheFee,
+  doYouWantToUploadDocumentToSupportYourApplication,
+  haveTheOtherPartiesAgreedToThisApplication,
+  haveYouAlreadyAppliedForHelp,
+  uploadDocumentsToSupportYourApplication,
+  whatOrderDoYouWantTheCourtToMakeAndWhy,
+  whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
@@ -38,5 +47,33 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     });
     await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    //The below are placeholder pages
+    await performValidation('mainHeader', askTheCourtToMakeAnOrder.mainHeader);
+    await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
+    await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
+    await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
+    await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
+    await performAction(
+      'inputText',
+      haveYouAlreadyAppliedForHelp.hwfReferenceHiddenTextLabel,
+      haveYouAlreadyAppliedForHelp.hwfReferenceTextInput
+    );
+    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
+    await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+    await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
+    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
+    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
+    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
+    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
+    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 });
