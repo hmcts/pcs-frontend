@@ -6,6 +6,7 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+import { getClaimantName } from '../../utils/getClaimantName';
 
 import { Logger } from '@modules/logger';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
@@ -39,7 +40,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   getInitialFormData: req => {
-    const caseData: CaseData = req.res?.locals.validatedCase?.data;
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
     const noticeReceivedDateRaw: unknown = caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
 
     if (!noticeReceivedDateRaw) {
@@ -87,9 +88,8 @@ export const step: StepDefinition = createFormStep({
 
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
-  extendGetContent: req => {
-    //TODO: get claimantName from CCD case - currently hardcoded
-    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
+ extendGetContent: req => {
+    const claimantName = getClaimantName(req);
 
     const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-not-provided', ['common']);
 

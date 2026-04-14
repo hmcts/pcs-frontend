@@ -6,6 +6,7 @@ import type {
 } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -71,7 +72,7 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: req => {
-    const caseData: CaseData = req.res?.locals.validatedCase?.data;
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
     const paymentAgreement: PaymentAgreement | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
     const confirmRepaymentsMade: YesNoValue | undefined = paymentAgreement?.anyPaymentsMade;
@@ -90,10 +91,15 @@ export const step: StepDefinition = createFormStep({
       confirmRepaymentsMade: 'No',
     };
   },
-  extendGetContent: req => ({
-    // TODO:Retrieve claimantName/claimIssueDate dynamically from CCD case data and remove hardcoded default value
-    claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
-    claimIssueDate: req.session?.ccdCase?.data?.claimIssueDate || '16th June 2025',
-  }),
+    extendGetContent: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const claimantName = getClaimantName(req);
+    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
+
+    return {
+      claimantName,
+      claimIssueDate,
+    };
+  },
   customTemplate: `${__dirname}/repaymentsMade.njk`,
 });

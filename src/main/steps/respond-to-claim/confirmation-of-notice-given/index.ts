@@ -4,6 +4,7 @@ import type { CaseData, PossessionClaimResponse, YesNoNotSureValue } from '../..
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+import { getClaimantName } from '../../utils/getClaimantName';
 
 import { createFormStep } from '@modules/steps';
 
@@ -35,7 +36,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   getInitialFormData: req => {
-    const caseData: CaseData = req.res?.locals.validatedCase?.data;
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
     const possessionNoticeReceived: YesNoNotSureValue | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived;
 
@@ -57,10 +58,7 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: req => {
-    // Read from CCD (fresh data from START callback via res.locals.validatedCase)
-    // Same pattern as free-legal-advice - no session dependency
-    const caseData: CaseData = req.res?.locals.validatedCase?.data;
-    const claimantName: string | undefined = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
+    const claimantName = getClaimantName(req);
 
     return {
       claimantName,

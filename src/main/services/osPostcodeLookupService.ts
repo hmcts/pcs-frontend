@@ -1,9 +1,9 @@
 import axios from 'axios';
 import config from 'config';
 
-import type { Address, OSResponse } from '../interfaces/osPostcodeLookup.interface';
-
+import type { Address, OSResponse } from '@interfaces/osPostcodeLookup.interface';
 import { Logger } from '@modules/logger';
+
 const logger = Logger.getLogger('osPostcodeLookupService');
 
 function getBaseUrl(): string {
