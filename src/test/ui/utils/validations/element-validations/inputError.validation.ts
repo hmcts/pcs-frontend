@@ -24,7 +24,7 @@ export class InputErrorValidation implements IValidation {
     const selector =
       ':is(.govuk-form-group:has(label:text-is("' +
       escapedField +
-      '")),.govuk-form-group:has(fieldset:has(legend:text-is("' +
+      '")),.govuk-form-group:has(fieldset:has(h1:text-is("' +
       escapedField +
       '")))) p.govuk-error-message:has-text("' +
       escapedData +

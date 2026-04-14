@@ -33,6 +33,9 @@ export type PaymentAgreement = {
   paymentDetails?: string;
   repaymentPlanAgreed?: YesNoNotSureValue;
   repaymentAgreedDetails?: string;
+  repayArrearsInstalments?: YesNoValue;
+  additionalRentContribution?: unknown;
+  additionalContributionFrequency?: string;
 };
 
 export interface CcdUserCase {
