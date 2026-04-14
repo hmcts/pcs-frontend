@@ -15,17 +15,25 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  equalityAndDiversityEnd,
+  equalityAndDiversityStart,
   exceptionalHardship,
   freeLegalAdvice,
+  haveYouAppliedForUniversalCredit,
   incomeAndExpenses,
   installmentPayments,
+  languageUsed,
   nonRentArrearsDispute,
+  priorityDebtDetails,
+  priorityDebts,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  whatOtherRegularExpensesDoYouHave,
+  whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
@@ -240,6 +248,18 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
@@ -322,6 +342,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.welshRadioOption,
+    });
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
@@ -404,6 +435,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -486,6 +528,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -563,6 +616,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -640,6 +704,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @regression', async () => {
@@ -717,6 +792,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
@@ -795,6 +881,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
@@ -875,5 +972,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 });

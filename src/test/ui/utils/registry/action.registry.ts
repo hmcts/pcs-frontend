@@ -76,6 +76,7 @@ export class ActionRegistry {
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
+    ['languageUsed', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
