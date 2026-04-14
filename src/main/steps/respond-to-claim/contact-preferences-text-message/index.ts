@@ -18,6 +18,20 @@ export const step: StepDefinition = createFormStep({
     content: 'subtitle',
   },
 
+  getInitialFormData: req => {
+    const caseData = req.res?.locals.validatedCase?.data;
+    const possessionClaimResponse = caseData?.possessionClaimResponse;
+    const contactByText = possessionClaimResponse?.defendantResponses?.contactByText;
+
+    if (!contactByText) {
+      return {};
+    }
+
+    return {
+      ...(contactByText ? { contactByTextMessage: contactByText === 'YES' ? 'yes' : 'no' } : {}),
+    };
+  },
+
   fields: [
     {
       name: 'contactByTextMessage',
