@@ -10,7 +10,7 @@ import { flowConfig } from '../flow.config';
 import { createFormStep } from '@modules/steps';
 
 const createAmountValidator =
-  (largeAmountErrorKey: string) =>
+  (negativeErrorKey: string, largeAmountErrorKey: string) =>
   (value: unknown): boolean | string => {
     if (typeof value !== 'string') {
       return true;
@@ -26,9 +26,8 @@ const createAmountValidator =
 
     if (!Number.isNaN(numericValue)) {
       if (numericValue < 0) {
-        return 'errors.amount.negative';
+        return negativeErrorKey;
       }
-      // AC: £1bn or more should error
       if (numericValue >= MAX_INCOME_AMOUNT) {
         return largeAmountErrorKey;
       }
@@ -41,13 +40,36 @@ const createAmountValidator =
     return true;
   };
 
-const validateIncomeFromJobsAmount = createAmountValidator('errors.incomeFromJobsAmount.largeAmount');
-const validatePensionAmount = createAmountValidator('errors.pensionAmount.largeAmount');
-const validateUniversalCreditAmount = createAmountValidator('errors.universalCreditAmount.largeAmount');
-const validateOtherBenefitsAmount = createAmountValidator('errors.otherBenefitsAmount.largeAmount');
+const EMOJI_PATTERN = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
+
+const validateMoneyFromElsewhereDetails = (value: unknown): boolean | string => {
+  if (typeof value === 'string' && value.trim()) {
+    if (EMOJI_PATTERN.test(value)) {
+      return 'errors.moneyFromElsewhereDetails.invalidCharacters';
+    }
+  }
+  return true;
+};
+
+const validateIncomeFromJobsAmount = createAmountValidator(
+  'errors.incomeFromJobsAmount.negative',
+  'errors.incomeFromJobsAmount.largeAmount'
+);
+const validatePensionAmount = createAmountValidator(
+  'errors.pensionAmount.negative',
+  'errors.pensionAmount.largeAmount'
+);
+const validateUniversalCreditAmount = createAmountValidator(
+  'errors.universalCreditAmount.negative',
+  'errors.universalCreditAmount.largeAmount'
+);
+const validateOtherBenefitsAmount = createAmountValidator(
+  'errors.otherBenefitsAmount.negative',
+  'errors.otherBenefitsAmount.largeAmount'
+);
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'regular-income',
+  stepName: 'what-regular-income-do-you-receive',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
@@ -388,6 +410,7 @@ export const step: StepDefinition = createFormStep({
                 label: 'subFields.moneyFromElsewhereDetailsLabel',
                 hint: 'subFields.moneyFromElsewhereDetailsHint',
               },
+              validator: validateMoneyFromElsewhereDetails,
             },
           },
         },

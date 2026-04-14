@@ -55,11 +55,12 @@ export const flowConfig: JourneyFlowConfig = {
     'your-circumstances',
     'exceptional-hardship',
     'income-and-expenses',
-    'regular-income',
+    'what-regular-income-do-you-receive',
     'have-you-applied-for-universal-credit',
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
+    'other-considerations',
     'upload-docs',
     'end-now',
     'installment-payments',
@@ -399,18 +400,18 @@ export const flowConfig: JourneyFlowConfig = {
           condition: async (req: Request): Promise<boolean> => {
             return !(await isFinanceDetailsProvided(req));
           },
-          nextStep: 'upload-docs',
+          nextStep: 'other-considerations',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
             return isFinanceDetailsProvided(req);
           },
-          nextStep: 'regular-income',
+          nextStep: 'what-regular-income-do-you-receive',
         },
       ],
-      defaultNext: 'regular-income',
+      defaultNext: 'what-regular-income-do-you-receive',
     },
-    'regular-income': {
+    'what-regular-income-do-you-receive': {
       previousStep: 'income-and-expenses',
       routes: [
         {
@@ -429,13 +430,13 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
-      previousStep: 'regular-income',
+      previousStep: 'what-regular-income-do-you-receive',
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
       previousStep: async (req: Request): Promise<string> => {
         const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
-        return selectedUniversalCredit ? 'regular-income' : 'have-you-applied-for-universal-credit';
+        return selectedUniversalCredit ? 'what-regular-income-do-you-receive' : 'have-you-applied-for-universal-credit';
       },
       defaultNext: 'priority-debt-details',
     },
@@ -443,13 +444,18 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
-      defaultNext: 'end-now',
+      previousStep: 'priority-debt-details',
+      defaultNext: 'other-considerations',
     },
-    'upload-docs': {
+    'other-considerations': {
       previousStep: async (req: Request): Promise<string> => {
         const fromIncomeExpenditure = await isFromIncomeAndExpenditure(req);
         return fromIncomeExpenditure ? 'income-and-expenses' : 'what-other-regular-expenses-do-you-have';
       },
+      defaultNext: 'upload-docs',
+    },
+    'upload-docs': {
+      previousStep: 'other-considerations',
       defaultNext: 'end-now',
     },
     'installment-payments': {
