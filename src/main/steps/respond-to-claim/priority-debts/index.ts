@@ -1,5 +1,5 @@
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import { fromYesNoEnum, toYesNoEnum } from '../../utils';
+import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -27,17 +27,7 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: req => {
-    const priorityDebts = (
-      req.res?.locals?.validatedCase?.data as
-        | {
-            possessionClaimResponse?: {
-              defendantResponses?: {
-                householdCircumstances?: { priorityDebts?: string };
-              };
-            };
-          }
-        | undefined
-    )?.possessionClaimResponse?.defendantResponses?.householdCircumstances?.priorityDebts;
+    const priorityDebts = getValidatedCaseHouseholdCircumstances(req)?.priorityDebts;
 
     if (fromYesNoEnum(priorityDebts) === 'yes') {
       return { havePriorityDebts: 'yes' };

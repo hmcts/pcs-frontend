@@ -1,7 +1,12 @@
 import { DateTime } from 'luxon';
 
 import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import { formatDatePartsToISODate, fromYesNoEnum, toYesNoEnum } from '../../utils';
+import {
+  formatDatePartsToISODate,
+  fromYesNoEnum,
+  getValidatedCaseHouseholdCircumstances,
+  toYesNoEnum,
+} from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -67,17 +72,9 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: req => {
-    const householdCircumstances = (
-      req.res?.locals?.validatedCase?.data as
-        | {
-            possessionClaimResponse?: {
-              defendantResponses?: {
-                householdCircumstances?: { universalCredit?: string; ucApplicationDate?: string };
-              };
-            };
-          }
-        | undefined
-    )?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
+      | { universalCredit?: string; ucApplicationDate?: string }
+      | undefined;
 
     const data: Record<string, unknown> = {};
     const prepopUniversalCredit = fromYesNoEnum(householdCircumstances?.universalCredit);

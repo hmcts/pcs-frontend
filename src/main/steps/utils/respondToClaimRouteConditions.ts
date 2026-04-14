@@ -1,40 +1,75 @@
 import type { Request } from 'express';
 
-const hasSelectedUniversalCredit = (selected: unknown): boolean => {
+import { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
+import { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
+import { fromYesNoEnum } from './yesNoEnum';
+
+function formRegularIncomeIncludesUniversalCredit(selected: unknown): boolean {
   if (Array.isArray(selected)) {
     return selected.includes('universalCredit');
   }
   return selected === 'universalCredit';
-};
+}
+
+async function isUniversalCreditSelectedForRegularIncomeRouting(
+  req: Request,
+  currentStepData: Record<string, unknown>
+): Promise<boolean> {
+  const fromForm = currentStepData.regularIncome;
+  if (fromForm !== undefined && fromForm !== null) {
+    return formRegularIncomeIncludesUniversalCredit(fromForm);
+  }
+  return hasSelectedUniversalCredit(req);
+}
+
+function priorityDebtsAnswerFromForm(currentStepData: Record<string, unknown>): 'yes' | 'no' | undefined {
+  const v = currentStepData.havePriorityDebts;
+  if (v === 'yes' || v === 'no') {
+    return v;
+  }
+  return undefined;
+}
+
+function priorityDebtsAnswerFromCase(req: Request): 'yes' | 'no' | undefined {
+  return fromYesNoEnum(getValidatedCaseHouseholdCircumstances(req)?.priorityDebts);
+}
 
 export async function shouldRouteToPriorityDebts(
-  _req: Request,
+  req: Request,
   _formData: Record<string, unknown>,
   currentStepData: Record<string, unknown>
 ): Promise<boolean> {
-  return hasSelectedUniversalCredit(currentStepData.regularIncome);
+  return isUniversalCreditSelectedForRegularIncomeRouting(req, currentStepData);
 }
 
 export async function shouldRouteToUniversalCreditQuestion(
-  _req: Request,
+  req: Request,
   _formData: Record<string, unknown>,
   currentStepData: Record<string, unknown>
 ): Promise<boolean> {
-  return !hasSelectedUniversalCredit(currentStepData.regularIncome);
+  return !(await isUniversalCreditSelectedForRegularIncomeRouting(req, currentStepData));
 }
 
 export async function shouldRouteToPriorityDebtDetails(
-  _req: Request,
+  req: Request,
   _formData: Record<string, unknown>,
   currentStepData: Record<string, unknown>
 ): Promise<boolean> {
-  return currentStepData.havePriorityDebts === 'yes';
+  const fromForm = priorityDebtsAnswerFromForm(currentStepData);
+  if (fromForm !== undefined) {
+    return fromForm === 'yes';
+  }
+  return priorityDebtsAnswerFromCase(req) === 'yes';
 }
 
 export async function shouldRouteToOtherRegularExpenses(
-  _req: Request,
+  req: Request,
   _formData: Record<string, unknown>,
   currentStepData: Record<string, unknown>
 ): Promise<boolean> {
-  return currentStepData.havePriorityDebts === 'no';
+  const fromForm = priorityDebtsAnswerFromForm(currentStepData);
+  if (fromForm !== undefined) {
+    return fromForm === 'no';
+  }
+  return priorityDebtsAnswerFromCase(req) === 'no';
 }

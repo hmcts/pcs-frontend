@@ -1,8 +1,5 @@
-import type {
-  FrequencyValue,
-  PossessionClaimResponse,
-} from '../../../interfaces/ccdCase.interface';
-import { ccdPenceToPoundsString, poundsStringToPence } from '../../utils';
+import type { FrequencyValue, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import { ccdPenceToPoundsString, getValidatedCaseHouseholdCircumstances, poundsStringToPence } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -80,21 +77,13 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: req => {
-    const householdCircumstances = (
-      req.res?.locals?.validatedCase?.data as
-        | {
-            possessionClaimResponse?: {
-              defendantResponses?: {
-                householdCircumstances?: {
-                  debtTotal?: unknown;
-                  debtContribution?: unknown;
-                  debtContributionFrequency?: FrequencyValue;
-                };
-              };
-            };
-          }
-        | undefined
-    )?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
+      | {
+          debtTotal?: unknown;
+          debtContribution?: unknown;
+          debtContributionFrequency?: FrequencyValue;
+        }
+      | undefined;
 
     const priorityDebtTotal = ccdPenceToPoundsString(householdCircumstances?.debtTotal);
     const priorityDebtContribution = ccdPenceToPoundsString(householdCircumstances?.debtContribution);

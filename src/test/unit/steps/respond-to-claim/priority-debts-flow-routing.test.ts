@@ -93,4 +93,54 @@ describe('respond-to-claim priority-debts flow routing', () => {
     const result = await previousStep(req, {});
     expect(result).toBe('have-you-applied-for-universal-credit');
   });
+
+  it('routes to priority-debt-details from CCD when havePriorityDebts is absent from step data', async () => {
+    if (!yesRouteCondition) {
+      throw new Error('expected yes route condition');
+    }
+    const req = {
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: { priorityDebts: 'YES' },
+                },
+              },
+            },
+          },
+        },
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const result = await yesRouteCondition(req, {}, {});
+    expect(result).toBe(true);
+  });
+
+  it('routes to other regular expenses from CCD when havePriorityDebts is absent from step data', async () => {
+    if (!noRouteCondition) {
+      throw new Error('expected no route condition');
+    }
+    const req = {
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: { priorityDebts: 'NO' },
+                },
+              },
+            },
+          },
+        },
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const result = await noRouteCondition(req, {}, {});
+    expect(result).toBe(true);
+  });
 });
