@@ -1,10 +1,21 @@
 import { NextFunction, Request, Response } from 'express';
 
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
+import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '../../interfaces/stepFlow.interface';
 
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('stepDependencyCheck');
+
+async function resolveFlowConfig(
+  req: Request,
+  flowConfigOrResolver: JourneyFlowConfig | JourneyFlowConfigResolver
+): Promise<JourneyFlowConfig> {
+  if (typeof flowConfigOrResolver === 'function') {
+    return flowConfigOrResolver(req);
+  }
+
+  return flowConfigOrResolver;
+}
 
 export async function getNextStep(
   req: Request,
@@ -13,6 +24,41 @@ export async function getNextStep(
   formData: Record<string, unknown>,
   currentStepData: Record<string, unknown> = {}
 ): Promise<string | null> {
+  if (flowConfig.useShowConditions) {
+    return getNextStepByShowCondition(req, currentStepName, flowConfig);
+  } else {
+    return getNextStepByRouteConditions(req, currentStepName, flowConfig, formData, currentStepData);
+  }
+}
+
+async function getNextStepByShowCondition(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+  const currentIndex = getStepIndex(flowConfig, currentStepName);
+
+  for (let stepIndex = currentIndex + 1; stepIndex < flowConfig.stepOrder.length; stepIndex++) {
+    const candidateNextStepName = flowConfig.stepOrder[stepIndex];
+    const candidateNextStep = flowConfig.steps[candidateNextStepName];
+
+    if (!candidateNextStep || !candidateNextStep.showCondition) {
+      // No show condition defined
+      return candidateNextStepName;
+    }
+
+    if (candidateNextStep.showCondition(req)) {
+      // Show condition matches
+      return candidateNextStepName;
+    }
+  }
+
+  return null;
+}
+
+async function getNextStepByRouteConditions(
+  req: Request,
+  currentStepName: string,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown>,
+  currentStepData: Record<string, unknown>
+) {
   const stepConfig = flowConfig.steps[currentStepName];
 
   if (stepConfig?.routes) {
@@ -45,6 +91,48 @@ export async function getPreviousStep(
   flowConfig: JourneyFlowConfig,
   formData: Record<string, unknown> = {}
 ): Promise<string | null> {
+  if (flowConfig.useShowConditions) {
+    // Rule deprecated: https://eslint.org/docs/latest/rules/no-return-await
+    // eslint-disable-next-line no-return-await
+    return await getPreviousStepByShowConditions(req, currentStepName, flowConfig);
+  } else {
+    // eslint-disable-next-line no-return-await
+    return await getPreviousStepByRouteConditions(req, currentStepName, flowConfig, formData);
+  }
+}
+
+async function getPreviousStepByShowConditions(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+  const currentStepConfig = flowConfig.steps[currentStepName];
+  if (currentStepConfig?.preventBack) {
+    return null;
+  }
+
+  const currentIndex = getStepIndex(flowConfig, currentStepName);
+
+  for (let stepIndex = currentIndex - 1; stepIndex >= 0; stepIndex--) {
+    const candidatePreviousStepName = flowConfig.stepOrder[stepIndex];
+    const candidatePreviousStep = flowConfig.steps[candidatePreviousStepName];
+
+    if (!candidatePreviousStep || !candidatePreviousStep.showCondition) {
+      // No show condition defined
+      return candidatePreviousStepName;
+    }
+
+    if (candidatePreviousStep.showCondition(req) && !candidatePreviousStep.preventBack) {
+      // Show condition matches
+      return candidatePreviousStepName;
+    }
+  }
+
+  return null;
+}
+
+async function getPreviousStepByRouteConditions(
+  req: Request,
+  currentStepName: string,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown>
+) {
   const stepConfig = flowConfig.steps[currentStepName];
 
   // If step has explicit previousStep configuration, use it
@@ -125,13 +213,16 @@ export type StepNavigation = {
   getStepUrl: (stepName: string, caseReference?: string) => string;
 };
 
-export function createStepNavigation(flowConfig: JourneyFlowConfig): StepNavigation {
+export function createStepNavigation(
+  flowConfigOrResolver: JourneyFlowConfig | JourneyFlowConfigResolver
+): StepNavigation {
   return {
     getNextStepUrl: async (
       req: Request,
       currentStepName: string,
       currentStepData: Record<string, unknown> = {}
     ): Promise<string | null> => {
+      const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
       const formData = req.session?.formData || {};
       const caseReference = req.res?.locals.validatedCase?.id;
       const nextStep = await getNextStep(req, currentStepName, flowConfig, formData, currentStepData);
@@ -139,6 +230,7 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): StepNavigat
     },
 
     getBackUrl: async (req: Request, currentStepName: string): Promise<string | null> => {
+      const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
       const formData = req.session?.formData || {};
       const caseReference = req.res?.locals.validatedCase?.id;
       const previousStep = await getPreviousStep(req, currentStepName, flowConfig, formData);
@@ -146,13 +238,17 @@ export function createStepNavigation(flowConfig: JourneyFlowConfig): StepNavigat
     },
 
     getStepUrl: (stepName: string, caseReference?: string): string => {
-      return getStepUrl(stepName, flowConfig, caseReference);
+      if (typeof flowConfigOrResolver === 'function') {
+        throw new Error('getStepUrl requires a static JourneyFlowConfig when a resolver is used');
+      }
+
+      return getStepUrl(stepName, flowConfigOrResolver, caseReference);
     },
   };
 }
 
-export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowConfig | JourneyFlowConfigResolver) {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const urlParts = req.path.split('/');
     const stepName = urlParts[urlParts.length - 1];
 
@@ -160,6 +256,7 @@ export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig) {
       return next();
     }
 
+    const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
     const formData = req.session?.formData || {};
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
@@ -171,4 +268,12 @@ export function stepDependencyCheckMiddleware(flowConfig: JourneyFlowConfig) {
 
     next();
   };
+}
+
+function getStepIndex(flowConfig: JourneyFlowConfig, stepName: string) {
+  const stepIndex = flowConfig.stepOrder.indexOf(stepName);
+  if (stepIndex === -1) {
+    throw new Error(`Step ${stepName} not found in stepOrder`);
+  }
+  return stepIndex;
 }
