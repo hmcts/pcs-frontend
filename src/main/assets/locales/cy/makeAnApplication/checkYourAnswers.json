@@ -31,6 +31,10 @@
       "label": "cyHave you already applied for help with your application fee?",
       "changeHint": "cyChange whether you have already applied for help with your application fee"
     },
+    "hwfReference": {
+      "label": "cyEnter your Help with Fees reference number",
+      "changeHint": "cyChange your Help with Fees reference number"
+    },
     "otherPartiesAgreed": {
       "label": "cyHave the other parties agreed to this application?",
       "changeHint": "cyChange whether the other parties have agreed to this application"
