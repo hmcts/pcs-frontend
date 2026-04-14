@@ -13,8 +13,7 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
-export type DebtContributionFrequencyValue = 'WEEKLY' | 'MONTHLY';
-export type DebtContributionFrequencyFormValue = 'weekly' | 'monthly';
+export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
@@ -34,7 +33,7 @@ export interface HouseholdCircumstances {
   priorityDebts?: YesNoValue;
   debtTotal?: string;
   debtContribution?: string;
-  debtContributionFrequency?: DebtContributionFrequencyValue;
+  debtContributionFrequency?: FrequencyValue;
 }
 
 export interface CcdUserCase {

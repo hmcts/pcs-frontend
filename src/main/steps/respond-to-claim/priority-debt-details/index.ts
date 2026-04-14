@@ -1,6 +1,5 @@
 import type {
-  DebtContributionFrequencyFormValue,
-  DebtContributionFrequencyValue,
+  FrequencyValue,
   PossessionClaimResponse,
 } from '../../../interfaces/ccdCase.interface';
 import { ccdPenceToPoundsString, poundsStringToPence } from '../../utils';
@@ -12,7 +11,8 @@ import { createFormStep } from '@modules/steps';
 
 const MAX_AMOUNT = 1_000_000_000;
 const AMOUNT_REGEX = /^\d+(\.\d{1,2})?$/;
-const FREQUENCY_MAP: Record<DebtContributionFrequencyValue, DebtContributionFrequencyFormValue> = {
+type FrequencyFormValue = Lowercase<FrequencyValue>;
+const FREQUENCY_MAP: Record<FrequencyValue, FrequencyFormValue> = {
   WEEKLY: 'weekly',
   MONTHLY: 'monthly',
 };
@@ -48,7 +48,7 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const total = req.body?.priorityDebtTotal as string | undefined;
     const contribution = req.body?.priorityDebtContribution as string | undefined;
-    const frequency = req.body?.priorityDebtContributionFrequency as DebtContributionFrequencyFormValue | undefined;
+    const frequency = req.body?.priorityDebtContributionFrequency as FrequencyFormValue | undefined;
 
     const householdCircumstances: Record<string, unknown> = {};
 
@@ -65,7 +65,7 @@ export const step: StepDefinition = createFormStep({
       }
     }
     if (frequency === 'weekly' || frequency === 'monthly') {
-      householdCircumstances.debtContributionFrequency = frequency.toUpperCase() as DebtContributionFrequencyValue;
+      householdCircumstances.debtContributionFrequency = frequency.toUpperCase() as FrequencyValue;
     }
 
     if (Object.keys(householdCircumstances).length === 0) {
@@ -88,7 +88,7 @@ export const step: StepDefinition = createFormStep({
                 householdCircumstances?: {
                   debtTotal?: unknown;
                   debtContribution?: unknown;
-                  debtContributionFrequency?: DebtContributionFrequencyValue;
+                  debtContributionFrequency?: FrequencyValue;
                 };
               };
             };
