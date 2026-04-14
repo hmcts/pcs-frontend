@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 
+import { getFlowConfigForJourney } from '../../../steps';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
@@ -7,8 +8,9 @@ import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '@modules/steps';
 import { getDashboardUrl } from '@routes/dashboard';
 
+const journeyName = 'respondToClaim';
 const stepName = 'dispute-claim-interstitial';
-const stepNavigation = createStepNavigation(flowConfig);
+const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
 export const step: StepDefinition = {
   url: `${RESPOND_TO_CLAIM_ROUTE}/dispute-claim-interstitial`,

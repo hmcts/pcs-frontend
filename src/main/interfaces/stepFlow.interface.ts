@@ -5,6 +5,8 @@ export type StepCondition = (
   currentStepData: Record<string, unknown>
 ) => Promise<boolean>;
 
+export type JourneyFlowConfigResolver = (req: Request) => JourneyFlowConfig | Promise<JourneyFlowConfig>;
+
 export interface StepRoute {
   condition?: StepCondition;
   nextStep: string;
