@@ -2,7 +2,19 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
-import { askToAdjournTheCourtHearing, checkYourAnswers, chooseAnApplication, doYouNeedHelpPayingTheFee, doYouWantToUploadDocumentToSupportYourApplication, haveTheOtherPartiesAgreedToThisApplication, haveYouAlreadyAppliedForHelp, isTheCourtHearingInNext14Days, uploadDocumentsToSupportYourApplication, whatOrderDoYouWantTheCourtToMakeAndWhy, whichLanguageDidYouUseToCompleteThisService } from '../../data/page-data/genApps-page-data';
+import {
+  askToAdjournTheCourtHearing,
+  checkYourAnswers,
+  chooseAnApplication,
+  doYouNeedHelpPayingTheFee,
+  doYouWantToUploadDocumentToSupportYourApplication,
+  haveTheOtherPartiesAgreedToThisApplication,
+  haveYouAlreadyAppliedForHelp,
+  isTheCourtHearingInTheNext14Days,
+  uploadDocumentsToSupportYourApplication,
+  whatOrderDoYouWantTheCourtToMakeAndWhy,
+  whichLanguageDidYouUseToCompleteThisService,
+} from '../../data/page-data/genApps-page-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -34,12 +46,14 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', askToAdjournTheCourtHearing.mainHeader);
     await performAction('clickButton', askToAdjournTheCourtHearing.startNowButton);
-    await performValidation('mainHeader', isTheCourtHearingInNext14Days.mainHeader);
+    await performValidation('mainHeader', isTheCourtHearingInTheNext14Days.mainHeader);
     await performAction('confirmIfCourtHearingInNext14Days', {
-      question: isTheCourtHearingInNext14Days.isTheCourtHearingInNext14DaysQuestion,
-      option: isTheCourtHearingInNext14Days.yesRadioOption,
+      question: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
+      option: isTheCourtHearingInTheNext14Days.yesRadioOption,
     });
+    //The below are placeholder pages
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
     await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
     await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
@@ -72,12 +86,11 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', askToAdjournTheCourtHearing.mainHeader);
     await performAction('clickButton', askToAdjournTheCourtHearing.startNowButton);
-    await performValidation('mainHeader', isTheCourtHearingInNext14Days.mainHeader);
+    await performValidation('mainHeader', isTheCourtHearingInTheNext14Days.mainHeader);
     await performAction('confirmIfCourtHearingInNext14Days', {
-      question: isTheCourtHearingInNext14Days.isTheCourtHearingInNext14DaysQuestion,
-      option: isTheCourtHearingInNext14Days.noRadioOption,
+      question: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
+      option: isTheCourtHearingInTheNext14Days.noRadioOption,
     });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-
   });
 });
