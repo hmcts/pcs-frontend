@@ -95,6 +95,18 @@ module.exports = defineConfig([
             caseInsensitive: false,
             order: 'asc',
           },
+          pathGroups: [
+            { pattern: '@app/**', group: 'internal', position: 'before' },
+            { pattern: '@interfaces/**', group: 'internal', position: 'before' },
+            { pattern: '@modules/**', group: 'internal', position: 'before' },
+            { pattern: '@router/**', group: 'internal', position: 'before' },
+            { pattern: '@routes/**', group: 'internal', position: 'before' },
+            { pattern: '@services/**', group: 'internal', position: 'before' },
+            { pattern: '@steps', group: 'internal', position: 'before' },
+            { pattern: '@steps/**', group: 'internal', position: 'before' },
+            { pattern: '@utils/**', group: 'internal', position: 'before' },
+          ],
+          distinctGroup: false,
 
           'newlines-between': 'always',
         },

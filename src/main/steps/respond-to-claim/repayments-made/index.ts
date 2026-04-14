@@ -1,6 +1,7 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -43,14 +44,18 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  getInitialFormData: () => {
+    // Repayments answers are not currently exposed via validatedCase model getters.
+    return {};
+  },
   extendGetContent: req => {
-    const caseData = req.res?.locals?.validatedCase?.data as
-      | { claimantName?: string; claimIssueDate?: string }
-      | undefined;
+    const validatedCase = req.res?.locals?.validatedCase;
+    const claimantName = getClaimantName(req);
+    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
 
     return {
-      claimantName: caseData?.claimantName || 'Treetops Housing',
-      claimIssueDate: caseData?.claimIssueDate || '16th June 2025',
+      claimantName,
+      claimIssueDate,
     };
   },
   customTemplate: `${__dirname}/repaymentsMade.njk`,

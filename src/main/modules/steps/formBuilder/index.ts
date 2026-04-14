@@ -1,10 +1,8 @@
 import path from 'path';
 
+import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { BuiltFormContent, FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDashboardUrl } from '../../../routes/dashboard';
 import { createGetController } from '../controller';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
@@ -14,7 +12,23 @@ import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
 import { validateConfigInDevelopment } from './schema';
 
-export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
+import type { BuiltFormContent, FormBuilderConfig } from '@interfaces/formFieldConfig.interface';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import { getDashboardUrl } from '@routes/dashboard';
+
+export type { FormBuilderConfig } from '@interfaces/formFieldConfig.interface';
+
+function getPersistedFormData(
+  req: Request,
+  stepName: string,
+  flowConfig?: FormBuilderConfig['flowConfig']
+): Record<string, unknown> {
+  if (flowConfig?.useSessionFormData === false) {
+    return {};
+  }
+
+  return getFormData(req, stepName);
+}
 
 /**
  * Converts camelCase to kebab-case (e.g., "respondToClaim" -> "respond-to-claim")
@@ -78,7 +92,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         const formContent = buildFormContent(
           fields,
           t,
-          initialFormData || getFormData(req, stepName),
+          initialFormData ?? getPersistedFormData(req, stepName, flowConfig),
           {},
           translationKeys,
           nunjucksEnv,

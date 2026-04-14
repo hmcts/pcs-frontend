@@ -25,6 +25,7 @@
     "cancel": "Cancel",
     "finish": "Start a new application",
     "start": "Start",
+    "startNow": "Start now",
     "submit": "Submit"
   },
   "options": {
@@ -39,6 +40,10 @@
     "day": "Day",
     "month": "Month",
     "year": "Year"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   },
   "errors": {
     "title": "There is a problem",

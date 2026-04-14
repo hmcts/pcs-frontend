@@ -18,11 +18,11 @@
     "lib": ["es2020", "dom", "dom.iterable"],
     "baseUrl": "src/main",
     "paths": {
-      "app/*": ["app/*"],
-      "interfaces/*": ["main/interfaces/*"],
-      "router/*": ["router/*"],
-      "routes/*": ["routes/*"],
-      "steps": ["steps/index.ts"],
+      "@app/*": ["app/*"],
+      "@interfaces/*": ["interfaces/*"],
+      "@router/*": ["router/*"],
+      "@routes/*": ["routes/*"],
+      "@steps": ["steps/index.ts"],
       "@modules/*": ["modules/*"],
       "@services/*": ["services/*"],
       "@utils/*": ["utils/*"]
@@ -35,9 +35,18 @@
     "src/types/**/*",
     "src/main/assets/locales/**/*",
     "src/types/global.d.ts",
-    "src/test/unit/middleware/oidc.test.ts"
+    "src/test/unit/**/*"
   ],
-  "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*", "src/test/**/*", "**/*.spec.ts", "**/*.e2e.ts"],
+  "exclude": [
+    "**/codecept.conf.ts",
+    "**/__mocks__/*",
+    "src/test/ui/**/*",
+    "src/test/functional/**/*",
+    "src/test/contract/**/*",
+    "src/test/java/**/*",
+    "**/*.spec.ts",
+    "**/*.e2e.ts"
+  ],
   "ts-node": {
     "files": true
   }
