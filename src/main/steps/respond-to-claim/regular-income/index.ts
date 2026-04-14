@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import type { PossessionClaimResponse, YesNoValue } from '../../../interfaces/ccdCase.interface';
-import { fromYesNoEnum, toYesNoEnum } from '../../utils';
+import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -34,17 +34,9 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: req => {
-    const householdCircumstances = (
-      req.res?.locals?.validatedCase?.data as
-        | {
-            possessionClaimResponse?: {
-              defendantResponses?: {
-                householdCircumstances?: { universalCredit?: YesNoValue };
-              };
-            };
-          }
-        | undefined
-    )?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
+      | { universalCredit?: YesNoValue }
+      | undefined;
 
     if (fromYesNoEnum(householdCircumstances?.universalCredit) === 'yes') {
       return { regularIncome: ['universalCredit'] };
