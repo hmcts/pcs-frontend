@@ -1,6 +1,7 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -44,10 +45,19 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  extendGetContent: req => ({
-    // TODO:Retrieve claimantName/claimIssueDate dynamically from CCD case data and remove hardcoded default value
-    claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
-    claimIssueDate: req.session?.ccdCase?.data?.claimIssueDate || '16th June 2025',
-  }),
+  getInitialFormData: () => {
+    // Repayments answers are not currently exposed via validatedCase model getters.
+    return {};
+  },
+  extendGetContent: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const claimantName = getClaimantName(req);
+    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
+
+    return {
+      claimantName,
+      claimIssueDate,
+    };
+  },
   customTemplate: `${__dirname}/repaymentsMade.njk`,
 });

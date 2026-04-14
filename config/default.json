@@ -72,5 +72,8 @@
     "redirectUri": "http://localhost:3209/oauth2/callback",
     "scope": "openid profile roles",
     "accessTokenEarlyRefreshSeconds": 30
+  },
+  "xui": {
+    "uri": "https://manage-case.aat.platform.hmcts.net"
   }
 }
