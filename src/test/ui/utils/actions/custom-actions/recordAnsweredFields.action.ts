@@ -1,36 +1,43 @@
 import { Page } from 'playwright-core';
 
-import { IAction, actionRecord } from '../../interfaces';
+import { IAction, actionData, actionRecord } from '../../interfaces';
 
-export const fieldsMap = new Map<string, string>();
+const fieldsMap = new Map<string, string>();
 
 export const FieldsStore = {
-  
   set(key: string, value: string): void {
     fieldsMap.set(key, value);
   },
 
-  
+  update(key: string, value: string): boolean {
+    if (!fieldsMap.has(key)) {
+      return false;
+    }
+    fieldsMap.set(key, value);
+    return true;
+  },
+
   get(key: string): string | undefined {
     return fieldsMap.get(key);
   },
 
-  
   getAll(): ReadonlyMap<string, string> {
     return fieldsMap;
   },
 
   clear(): void {
     fieldsMap.clear();
-  }
-};
+  },
 
+  delete(key: string): boolean {
+    return fieldsMap.delete(key);
+  },
+};
 
 export class RecordAnswers implements IAction {
   async execute(page: Page, action: string, fieldName?: actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['recordUserEntry', () => this.recordUserEntry(fieldName as actionRecord)],
-
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -38,13 +45,32 @@ export class RecordAnswers implements IAction {
     }
     await actionToPerform();
   }
+
   private async recordUserEntry(fields: actionRecord) {
-    const setIfKeyExists = (key?: string, value?: string) => {
-      // eslint-disable-next-line curly
-      if (key) FieldsStore.set(key, value ?? '');
+    const recordIfPresent = (keyName: string, valueKey: string) => {
+      const key = fields[keyName];
+      const value = fields[valueKey];
+
+      if (typeof key !== 'string' || value === undefined) {
+        return;
+      }
+
+      FieldsStore.set(key, this.normalizeValueData(value));
     };
-    setIfKeyExists(fields.question as string, fields.option as string);
-    setIfKeyExists(fields.label as string, fields.input as string);
-    setIfKeyExists(fields.confirm as string, fields.peopleOption as string);
+
+    recordIfPresent('question', 'option');
+    recordIfPresent('label', 'input');
   }
+
+  private normalizeValueData = (value: actionData): string => {
+    if (Array.isArray(value)) {
+      return value.map((val: any) => String(val)).join(',');
+    }
+
+    if (typeof value === 'object' && value !== null) {
+      return JSON.stringify(value);
+    }
+
+    return String(value);
+  };
 }

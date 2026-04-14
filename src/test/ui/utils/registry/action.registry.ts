@@ -78,7 +78,7 @@ export class ActionRegistry {
     ['chooseAnApplication', new GenAppsAction()],
     ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
-    ['recordUserEntry', new RecordAnswers()]
+    ['recordUserEntry', new RecordAnswers()],
   ]);
 
   static getAction(actionName: string): IAction {

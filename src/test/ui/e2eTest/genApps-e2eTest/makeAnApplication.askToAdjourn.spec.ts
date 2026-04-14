@@ -9,11 +9,9 @@ import {
   haveTheOtherPartiesAgreedToThisApplication,
   isTheCourtHearingInNext14Days,
 } from '../../data/page-data/genApps-page-data';
-import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
-
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
@@ -35,7 +33,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('Select an Application - Ask to Adjourn journey @regression', async () => {
+  test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.delayRadioOption,
@@ -48,18 +46,22 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: isTheCourtHearingInNext14Days.yesRadioOption,
     });
     await performAction('clickButton', isTheCourtHearingInNext14Days.continueButton);
-    if (FieldsStore.get(isTheCourtHearingInNext14Days.isTheCourtHearingInNext14DaysQuestion)) {
-      await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-    } else {
-      await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-    }
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+  });
 
-
-    for (const [question, answer] of FieldsStore.getAll()) {
-      console.log(question, answer);
-    }
-
-    // await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+  test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression', async () => {
+    await performAction('chooseAnApplication', {
+      question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
+      option: chooseAnApplication.delayRadioOption,
+    });
+    await performValidation('mainHeader', askToAdjournTheCourtHearing.mainHeader);
+    await performAction('clickButton', askToAdjournTheCourtHearing.startNowButton);
+    await performValidation('mainHeader', isTheCourtHearingInNext14Days.mainHeader);
+    await performAction('confirmIfCourtHearingInNext14Days', {
+      question: isTheCourtHearingInNext14Days.isTheCourtHearingInNext14DaysQuestion,
+      option: isTheCourtHearingInNext14Days.noRadioOption,
+    });
+    await performAction('clickButton', isTheCourtHearingInNext14Days.continueButton);
+    await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
   });
 });
