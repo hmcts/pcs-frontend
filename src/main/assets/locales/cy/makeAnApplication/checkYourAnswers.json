@@ -1,0 +1,19 @@
+{
+  "pageTitle": "cyCheck your answers",
+  "caption": "cyMake an application",
+  "heading": "cyCheck your answers (placeholder)",
+  "buttons": {
+    "submitApplication": "cySubmit application"
+  },
+  "answers": {
+    "chooseAnApplication": {
+      "label": "cyType of application",
+      "changeHint": "cyChange type of application",
+      "options": {
+        "ADJOURN": "cyAsk to adjourn (delay) the hearing",
+        "SET_ASIDE": "cyAsk the court to change (set aside) their decision to evict you",
+        "SOMETHING_ELSE": "cySomething else"
+      }
+    }
+  }
+}

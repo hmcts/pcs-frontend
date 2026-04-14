@@ -6,10 +6,14 @@
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Is there anything else you want to tell the court as part of your response? (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder other considerations.</p>
+
+  <h1 class="govuk-heading-l">Other considerations (placeholder)</h1>
+  <p class="govuk-body">This is a placeholder for Other Considerations step.</p>
+
   <form method="post" action="{{ url }}">
     {{ stepButtons(continue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
+
 {% endblock %}
+

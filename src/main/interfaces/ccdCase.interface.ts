@@ -5,9 +5,9 @@ export enum CaseState {
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'Yes' | 'No';
+export type ContactPreference = 'EMAIL' | 'POST' | null;
 export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
-export type ContactPreference = 'EMAIL' | 'POST' | null;
 
 export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
@@ -19,10 +19,18 @@ export interface IncomeExpenseDetails {
 }
 
 export interface HouseholdCircumstances {
+  shareAdditionalCircumstances?: YesNoValue;
+  additionalCircumstancesDetails?: string;
+  exceptionalHardship?: YesNoValue;
+  exceptionalHardshipDetails?: string;
   dependantChildren?: YesNoValue;
   dependantChildrenDetails?: string;
   otherDependants?: YesNoValue;
   otherDependantDetails?: string;
+  alternativeAccommodation?: YesNoNotSureValue;
+  alternativeAccommodationTransferDate?: string;
+  otherTenants?: YesNoValue;
+  otherTenantsDetails?: string;
   shareIncomeExpenseDetails?: YesNoValue;
   incomeFromJobs?: YesNoValue;
   incomeFromJobsAmount?: PenceAmount;
@@ -112,7 +120,6 @@ export interface PossessionClaimResponse {
     householdCircumstances?: HouseholdCircumstances;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
-
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
@@ -137,4 +144,15 @@ export interface StartCallbackData {
       };
     };
   };
+}
+
+export enum GenAppType {
+  SUSPEND,
+  ADJOURN,
+  SET_ASIDE,
+  SOMETHING_ELSE,
+}
+
+export interface CitizenGenAppRequest {
+  applicationType: GenAppType;
 }

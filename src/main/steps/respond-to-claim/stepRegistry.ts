@@ -80,7 +80,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'your-circumstances': yourCircumstances,
   'exceptional-hardship': exceptionalHardship,
   'income-and-expenses': incomeAndExpenses,
-  'regular-income': whatRegularIncomeDoYouReceive,
+  'what-regular-income-do-you-receive': whatRegularIncomeDoYouReceive,
   'have-you-applied-for-universal-credit': haveYouAppliedForUniversalCredit,
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,

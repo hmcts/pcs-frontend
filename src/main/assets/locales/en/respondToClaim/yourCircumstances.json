@@ -1,0 +1,20 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Your circumstances",
+  "introParagraph": "You can use this section to give details about any events or circumstances that have impacted your case that you think a judge should know about.",
+  "forExample": "For example:",
+  "bullet1": "someone in your household has an illness or disability",
+  "bullet2": "children in your household attend a local school",
+  "bullet3": "you work irregular hours, making it hard to find a new place to live",
+  "question": "Would you like to share anything about your circumstances?",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "textAreaLabel": "Give details about your circumstances",
+  "errors": {
+    "shareCircumstances": "Select if you’d like to share anything about your circumstances",
+    "circumstancesDetails": "Give details about your circumstances",
+    "circumstancesDetailsInvalidCharacters": "The details of your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+  }
+}

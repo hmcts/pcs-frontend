@@ -11,6 +11,7 @@ export { isFinanceDetailsProvided } from './isFinanceDetailsProvided';
 export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { getStepBeforeDisputePages } from './journeyHelpers';
-export { formatDatePartsToISODate } from './dateUtils';
+export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
+export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
 export { penceToPounds, poundsToPence } from './currencyConversion';
