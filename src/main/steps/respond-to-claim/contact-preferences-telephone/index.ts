@@ -18,21 +18,6 @@ export const step: StepDefinition = createFormStep({
     heading: 'heading',
     content: 'subtitle',
   },
-  getInitialFormData: req => {
-    const caseData = req.res?.locals.validatedCase?.data;
-    const possessionClaimResponse = caseData?.possessionClaimResponse;
-    const contactByPhone = possessionClaimResponse?.defendantResponses?.contactByPhone;
-    const phoneNumber = possessionClaimResponse?.defendantContactDetails?.party?.phoneNumber;
-
-    if (!contactByPhone && !phoneNumber) {
-      return {};
-    }
-
-    return {
-      ...(contactByPhone ? { contactByTelephone: contactByPhone === 'YES' ? 'yes' : 'no' } : {}),
-      ...(phoneNumber ? { 'contactByTelephone.phoneNumber': phoneNumber } : {}),
-    };
-  },
   fields: [
     {
       name: 'contactByTelephone',
@@ -109,7 +94,6 @@ export const step: StepDefinition = createFormStep({
 
     return {};
   },
-
   beforeRedirect: async req => {
     const telephoneForm = req.body as Record<string, unknown>;
     const contactByTelephone = telephoneForm.contactByTelephone as string | undefined;

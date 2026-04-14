@@ -1,8 +1,8 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -18,21 +18,6 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     content: 'subtitle',
   },
-
-  getInitialFormData: req => {
-    const caseData = req.res?.locals.validatedCase?.data;
-    const possessionClaimResponse = caseData?.possessionClaimResponse;
-    const contactByText = possessionClaimResponse?.defendantResponses?.contactByText;
-
-    if (!contactByText) {
-      return {};
-    }
-
-    return {
-      ...(contactByText ? { contactByTextMessage: contactByText === 'YES' ? 'yes' : 'no' } : {}),
-    };
-  },
-
   fields: [
     {
       name: 'contactByTextMessage',
