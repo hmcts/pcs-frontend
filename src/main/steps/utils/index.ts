@@ -6,6 +6,7 @@ export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
 export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
+export { getPreviousPageForArrears } from './journeyHelpers';
 export { getStepBeforeDisputePages } from './journeyHelpers';
 export {
   getFirstStepInSection,
@@ -15,5 +16,9 @@ export {
   isLastStepInSection,
   isSectionApplicable,
 } from './sections';
+export { normalizeYesNoValue } from './normalizeYesNoValue';
+export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
+export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
+export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';

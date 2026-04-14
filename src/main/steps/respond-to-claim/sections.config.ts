@@ -42,7 +42,13 @@ export const respondToClaimSections = {
   payments: {
     titleKey: 'taskList.payments',
     order: 4,
-    steps: ['payment-interstitial', 'repayments-made', 'repayments-agreed', 'installment-payments'],
+    steps: [
+      'payment-interstitial',
+      'repayments-made',
+      'repayments-agreed',
+      'installment-payments',
+      'how-much-afford-to-pay',
+    ],
     isApplicable: req => hasAnyRentArrearsGround(req),
   },
   situationAndCircumstances: {
