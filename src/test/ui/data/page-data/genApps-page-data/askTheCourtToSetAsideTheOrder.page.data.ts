@@ -29,5 +29,5 @@ export const askTheCourtToSetAsideTheOrder = {
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
   feedbackLink: `Feedback`,
-  pageSlug: `ask-the-court-to-set-aside-the-order`
+  pageSlug: `ask-the-court-to-set-aside-the-order`,
 };
