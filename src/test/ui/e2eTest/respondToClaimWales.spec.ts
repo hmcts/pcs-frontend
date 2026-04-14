@@ -14,17 +14,27 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  equalityAndDiversityEnd,
+  equalityAndDiversityStart,
+  exceptionalHardship,
   freeLegalAdvice,
+  haveYouAppliedForUniversalCredit,
+  incomeAndExpenses,
   installmentPayments,
   landlordLicensed,
   landlordRegistered,
+  languageUsed,
   nonRentArrearsDispute,
+  priorityDebtDetails,
+  priorityDebts,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  whatOtherRegularExpensesDoYouHave,
+  whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
   yourCircumstances,
@@ -135,6 +145,25 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 });
