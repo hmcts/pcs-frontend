@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
+import { shouldShowStep } from '../../';
 import { GenAppType } from '../../../interfaces/ccdCase.interface';
-import { shouldShowStep } from '../../showConditionService';
 import { flowConfig } from '../flow.config';
 
 import { getFormData } from '@modules/steps';
