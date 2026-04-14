@@ -31,6 +31,7 @@ export const flowConfig: JourneyFlowConfig = {
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
+    'installment-payments',
     'correspondence-address',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
@@ -63,7 +64,6 @@ export const flowConfig: JourneyFlowConfig = {
     'other-considerations',
     'upload-docs',
     'end-now',
-    'installment-payments',
   ],
   steps: {
     'start-now': {
@@ -365,6 +365,10 @@ export const flowConfig: JourneyFlowConfig = {
       ],
       previousStep: 'repayments-made',
     },
+    'installment-payments': {
+      previousStep: 'repayments-agreed',
+      defaultNext: 'your-household-and-circumstances',
+    },
     'your-household-and-circumstances': {
       previousStep: 'repayments-agreed',
       defaultNext: 'do-you-have-any-dependant-children',
@@ -458,10 +462,6 @@ export const flowConfig: JourneyFlowConfig = {
     'upload-docs': {
       previousStep: 'other-considerations',
       defaultNext: 'end-now',
-    },
-    'installment-payments': {
-      previousStep: 'repayments-agreed',
-      defaultNext: 'your-household-and-circumstances',
     },
   },
 };
