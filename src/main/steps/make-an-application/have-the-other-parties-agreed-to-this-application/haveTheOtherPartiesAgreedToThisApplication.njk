@@ -14,28 +14,28 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
+  <p class="govuk-body">{{ theOtherPartyIsTheOtherSide }}</p>
+
+  <p class="govuk-body">{{ everyOtherPartyWillNeedToAgree }}</p>
+
+  <h2 class="govuk-heading-m">{{ ifTheOtherPartiesDoNotAgree }}</h2>
+  <p class="govuk-body">{{ feeWillIncreaseIf }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ youHaveAlreadyToldTheOtherParty }}</li>
+    <li>{{ theyDidNotAgreeToIt }}</li>
+  </ul>
+  <p class="govuk-body">{{ youWillSeeTheFinalApplicationFee }}</p>
+
+  <h2 class="govuk-heading-m">{{ whatYouNeedToDo }}</h2>
+  <p class="govuk-body">{{ youWillNeedToUploadEvidence }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ youHaveToldTheOtherParties }}</li>
+    <li>{{ theyAgreedToIt }}</li>
+  </ul>
+  <p class="govuk-body">{{ forExampleACopyOfALetter }}</p>
+  <p class="govuk-body">{{ ifYouAreNotAbleToContactOtherParties }}</p>
+
   <form method="post" action="{{ url }}" novalidate>
-
-    <p class="govuk-body">{{ theOtherPartyIsTheOtherSide }}</p>
-
-    <p class="govuk-body">{{ everyOtherPartyWillNeedToAgree }}</p>
-
-    <h2 class="govuk-heading-m">{{ ifTheOtherPartiesDoNotAgree }}</h2>
-    <p class="govuk-body">{{ feeWillIncreaseIf }}</p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>{{ youHaveAlreadyToldTheOtherParty }}</li>
-      <li>{{ theyDidNotAgreeToIt }}</li>
-    </ul>
-    <p class="govuk-body">{{ youWillSeeTheFinalApplicationFee }}</p>
-
-    <h2 class="govuk-heading-m">{{ whatYouNeedToDo }}</h2>
-    <p class="govuk-body">{{ youWillNeedToUploadEvidence }}</p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>{{ youHaveToldTheOtherParties }}</li>
-      <li>{{ theyAgreedToIt }}</li>
-    </ul>
-    <p class="govuk-body">{{ forExampleACopyOfALetter }}</p>
-    <p class="govuk-body">{{ ifYouAreNotAbleToContactOtherParties }}</p>
 
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
