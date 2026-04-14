@@ -9,14 +9,8 @@ type ContactPreferencesTelephoneStep = {
     res?: {
       locals?: {
         validatedCase?: {
-          data?: {
-            possessionClaimResponse?: {
-              defendantResponses?: { contactByPhone?: string };
-              defendantContactDetails?: {
-                party?: { phoneNumber?: string };
-              };
-            };
-          };
+          defendantResponsesContactByPhone?: string;
+          defendantContactDetailsPartyPhoneNumber?: string;
         };
       };
     };
@@ -30,14 +24,8 @@ describe('respond-to-claim contact-preferences-telephone step', () => {
       res: {
         locals: {
           validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: { contactByPhone },
-                defendantContactDetails: {
-                  party: { phoneNumber },
-                },
-              },
-            },
+            defendantResponsesContactByPhone: contactByPhone,
+            defendantContactDetailsPartyPhoneNumber: phoneNumber,
           },
         },
       },
@@ -51,9 +39,9 @@ describe('respond-to-claim contact-preferences-telephone step', () => {
       expect(result).toMatchObject({ contactByTelephone: formValue });
     });
 
-    it('returns phoneNumber when CCD has phoneNumber', () => {
+    it('returns empty when CCD has phoneNumber but contactByPhone is undefined', () => {
       const result = testedStep.getInitialFormData(makeReq(undefined, '01234567890'));
-      expect(result).toEqual({ 'contactByTelephone.phoneNumber': '01234567890' });
+      expect(result).toEqual({});
     });
 
     it('returns both contactByTelephone and phoneNumber when CCD has both', () => {

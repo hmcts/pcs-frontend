@@ -9,11 +9,7 @@ type ContactPreferencesTextMessageStep = {
     res?: {
       locals?: {
         validatedCase?: {
-          data?: {
-            possessionClaimResponse?: {
-              defendantResponses?: { contactByText?: string };
-            };
-          };
+          defendantResponsesContactByText?: string;
         };
       };
     };
@@ -27,11 +23,7 @@ describe('respond-to-claim contact-preferences-text-message step', () => {
       res: {
         locals: {
           validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: { contactByText },
-              },
-            },
+            defendantResponsesContactByText: contactByText,
           },
         },
       },
