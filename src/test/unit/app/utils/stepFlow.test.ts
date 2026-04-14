@@ -37,7 +37,79 @@ describe('stepFlow', () => {
     },
   };
 
-  describe('getNextStep', () => {
+  describe('getNextStep with show conditions', () => {
+    const mockReq = {} as Request;
+
+    it('should return next page with missing show condition', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: _req => false,
+          },
+          // step3 has no showCondition defined
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'step1', flowConfig, {});
+      expect(result).toBe('step3');
+    });
+
+    it('should return next visible page with show condition', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: _req => false,
+          },
+          step3: {
+            showCondition: _req => true,
+          },
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'step1', flowConfig, {});
+      expect(result).toBe('step3');
+    });
+
+    it('should return null when no further visible pages', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: _req => false,
+          },
+          step3: {
+            showCondition: _req => false,
+          },
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'step1', flowConfig, {});
+      expect(result).toBe(null);
+    });
+
+    it('should throw errorfor unknown step name', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: _req => false,
+          },
+        },
+      };
+
+      await expect(getNextStep(mockReq, 'step99', flowConfig, {})).rejects.toThrow(
+        'Step step99 not found in stepOrder'
+      );
+    });
+  });
+
+  describe('getNextStep without show conditions', () => {
     const mockReq = {} as Request;
 
     it('should return defaultNext when step has defaultNext configured', async () => {
@@ -157,7 +229,125 @@ describe('stepFlow', () => {
     });
   });
 
-  describe('getPreviousStep', () => {
+  describe('getPreviousStep with show conditions', () => {
+    const mockReq = {} as Request;
+
+    it('should return previous page with missing show condition', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: _req => false,
+          },
+          // step3 has no showCondition defined
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe('step1');
+    });
+
+    it('should return previous visible page with show condition', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            showCondition: _req => true,
+          },
+          step2: {
+            showCondition: _req => false,
+          },
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe('step1');
+    });
+
+    it('should return null when no earlier visible pages', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            showCondition: _req => false,
+          },
+          step2: {
+            showCondition: _req => false,
+          },
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe(null);
+    });
+
+    it('should return null when back navigation prevented for current step', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step3: {
+            preventBack: true,
+          },
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe(null);
+    });
+
+    it('should return previous step even when that is prevented from further back navigation', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            preventBack: true,
+          },
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe('step2');
+    });
+
+    it('should ignore preventBack flag for hidden steps', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: _req => false,
+            preventBack: true,
+          },
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step3', flowConfig, {});
+      expect(result).toBe('step1');
+    });
+
+    it('should throw error for unknown step name', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step2: {
+            showCondition: _req => false,
+          },
+        },
+      };
+
+      await expect(getPreviousStep(mockReq, 'step99', flowConfig, {})).rejects.toThrow(
+        'Step step99 not found in stepOrder'
+      );
+    });
+  });
+
+  describe('getPreviousStep without show conditions', () => {
     const mockReq = {} as Request;
 
     it('should return previous step in order', async () => {
