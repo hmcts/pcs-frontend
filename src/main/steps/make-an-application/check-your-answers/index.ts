@@ -156,7 +156,9 @@ export const step: StepDefinition = {
         within14Days: hearingInNext14Days ? toYesNoEnum(hearingInNext14Days) : undefined,
         needHwf: helpWithFeesNeeded ? toYesNoEnum(helpWithFeesNeeded) : undefined,
         appliedForHwf: alreadyAppliedForHwf ? toYesNoEnum(alreadyAppliedForHwf) : undefined,
-        hwfReference: formData['have-you-already-applied-for-help-with-fees']['alreadyAppliedForHelp.hwfReference'],
+        hwfReference: getFormData(req, 'have-you-already-applied-for-help-with-fees')[
+          'alreadyAppliedForHelp.hwfReference'
+        ] as string,
       };
 
       await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
