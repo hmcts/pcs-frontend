@@ -7,10 +7,27 @@ import type { StepFormData } from '../../../interfaces/stepFormData.interface';
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
 import type { FormError } from './errorUtils';
+import {
+  FILE_TOO_LARGE_ERROR_FALLBACK,
+  FILE_TYPE_ERROR_FALLBACK,
+  buildFileMetasFromMulter,
+  getSavedUploadFiles,
+  isAllowedUploadFilename,
+  isFileTooLarge,
+  savedFilesSessionKey,
+} from './fileUpload';
 
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('form-builder-helpers');
+
+export function getMulterFilesForField(req: Request, fieldName: string): Express.Multer.File[] {
+  const all = req.files as Express.Multer.File[] | undefined;
+  if (!all?.length) {
+    return [];
+  }
+  return all.filter(f => f.fieldname === fieldName);
+}
 
 export function getTranslation(
   t: TFunction,
@@ -80,7 +97,7 @@ export function normalizeCheckboxFields(req: Request, fields: FormFieldConfig[])
  * Processes all field data (checkbox normalization + date field consolidation)
  * This should run AFTER validation because date field validation expects individual day/month/year keys
  */
-export function processFieldData(req: Request, fields: FormFieldConfig[]): void {
+export function processFieldData(req: Request, fields: FormFieldConfig[], stepName?: string): void {
   for (const field of fields) {
     if (field.type === 'checkbox') {
       // Normalize checkbox values (in case they weren't normalized before validation)
@@ -94,6 +111,12 @@ export function processFieldData(req: Request, fields: FormFieldConfig[]): void 
       delete req.body[`${field.name}-day`];
       delete req.body[`${field.name}-month`];
       delete req.body[`${field.name}-year`];
+    } else if (field.type === 'file' && stepName) {
+      const key = savedFilesSessionKey(field.name);
+      const fromSession = getSavedUploadFiles(req, stepName, field.name);
+      const incoming = getMulterFilesForField(req, field.name);
+      const newMetas = buildFileMetasFromMulter(incoming);
+      req.body[key] = [...fromSession, ...newMetas];
     }
   }
 }
@@ -265,7 +288,8 @@ export function validateForm(
   fields: FormFieldConfig[],
   translations?: Record<string, string>,
   allFormData?: Record<string, unknown>,
-  t?: TFunction
+  t?: TFunction,
+  stepName?: string
 ): Record<string, FormError> {
   const errors: Record<string, FormError> = {};
   // Build formData from current request body (before processing date fields)
@@ -380,6 +404,74 @@ export function validateForm(
       if (field.validate && !errors[fieldName]) {
         try {
           const customError = field.validate(dateValue, formData, validationAllData);
+          if (customError) {
+            errors[fieldName] = customError.startsWith('errors.')
+              ? translations?.[customError.replace('errors.', '')] || customError
+              : customError;
+          }
+        } catch (err) {
+          logger.error(`Error running validate function for field ${field.name}:`, err);
+        }
+      }
+    } else if (field.type === 'file' && stepName) {
+      const saved = getSavedUploadFiles(req, stepName, field.name);
+      const incoming = getMulterFilesForField(req, field.name);
+
+      for (const f of incoming) {
+        if (!isAllowedUploadFilename(f.originalname)) {
+          errors[fieldName] =
+            translations?.[`${fieldName}.invalidFileType`] ||
+            (t ? t('errors.fileUpload.invalidFileType', FILE_TYPE_ERROR_FALLBACK) : FILE_TYPE_ERROR_FALLBACK);
+          break;
+        }
+        if (isFileTooLarge(f)) {
+          errors[fieldName] =
+            translations?.[`${fieldName}.fileTooLarge`] ||
+            (t ? t('errors.fileUpload.fileTooLarge', FILE_TOO_LARGE_ERROR_FALLBACK) : FILE_TOO_LARGE_ERROR_FALLBACK);
+          break;
+        }
+      }
+
+      if (!errors[fieldName] && field.fileUploadSingleOnly && saved.length + incoming.length > 1) {
+        errors[fieldName] =
+          translations?.[`${fieldName}.tooMany`] ||
+          (t ? t('errors.fileUpload.singleFileOnly', 'You can only upload one file') : 'You can only upload one file');
+      }
+
+      const total = saved.length + incoming.length;
+      const isMissing = total === 0;
+
+      if (isRequired && isMissing) {
+        errors[fieldName] =
+          translations?.[`${fieldName}.required`] ||
+          translations?.[fieldName] ||
+          field.errorMessage ||
+          translations?.defaultRequired ||
+          'This field is required';
+      }
+
+      if (field.validator && total > 0 && !errors[fieldName]) {
+        try {
+          const validatorResult = field.validator(total, formData, validationAllData);
+          if (validatorResult !== true) {
+            const errorMsg =
+              typeof validatorResult === 'string'
+                ? t
+                  ? t(validatorResult)
+                  : translations?.[validatorResult] || validatorResult
+                : 'Invalid value';
+            if (!errors[fieldName]) {
+              errors[fieldName] = errorMsg;
+            }
+          }
+        } catch (err) {
+          logger.error(`Error running validator function for field ${field.name}:`, err);
+        }
+      }
+
+      if (field.validate && !errors[fieldName]) {
+        try {
+          const customError = field.validate(total, formData, validationAllData);
           if (customError) {
             errors[fieldName] = customError.startsWith('errors.')
               ? translations?.[customError.replace('errors.', '')] || customError

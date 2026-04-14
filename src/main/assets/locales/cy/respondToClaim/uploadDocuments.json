@@ -1,0 +1,10 @@
+{
+  "pageTitle": "cyUpload files (optional)",
+  "caption": "cyRespond to a property possession claim",
+  "title": "cyUpload files (optional)",
+  "introText": "cyUpload any files that you think are relevant to your response. The claimant will be able to see the files you upload.",
+  "beforeYouUploadHeading": "cyBefore you upload your files",
+  "namingInstruction": "cyGive your file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "cyUpload a file",
+  "uploadHint": "cyYou can add more than one file by uploading them one at a time."
+}

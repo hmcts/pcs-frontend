@@ -66,7 +66,21 @@
       "yearMustBeSameOrAfter": "The year must be the same as or after {{minYear}}",
       "missingOne": "Date must include a {{missingField}}",
       "missingTwo": "Date must include a {{first}} and {{second}}"
+    },
+    "fileUpload": {
+      "selectFile": "Select a file",
+      "singleFileOnly": "You can only upload one file",
+      "invalidFileType": "The selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
+      "fileTooLarge": "The selected file must be smaller than 1024MB"
     }
+  },
+  "fileUpload": {
+    "chooseFile": "Choose file",
+    "orDropFile": "or drop file",
+    "noFileChosen": "No file chosen",
+    "uploadFile": "Upload file",
+    "filesAdded": "Files added",
+    "delete": "Delete"
   },
   "months": {
     "1": "January",

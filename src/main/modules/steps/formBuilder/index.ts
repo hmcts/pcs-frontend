@@ -9,12 +9,35 @@ import { createGetController } from '../controller';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
+import { multipartFormDataParser } from './fileUpload';
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
 import { validateConfigInDevelopment } from './schema';
 
 export type { FormBuilderConfig } from '../../../interfaces/formFieldConfig.interface';
+
+/**
+ * Runs CSRF validation after multer has parsed the multipart body.
+ * Global CSRF skips multipart requests because req.body is not yet available;
+ * this middleware closes that gap.
+ */
+const csrfAfterMultipart: import('express').RequestHandler = (req, res, next) => {
+  const csrfProtection = req.app.locals.csrfProtection as import('express').RequestHandler | undefined;
+  if (csrfProtection) {
+    csrfProtection(req, res, (err?: unknown) => {
+      if (err) {
+        return next(err);
+      }
+      if (typeof req.csrfToken === 'function') {
+        res.locals.csrfToken = req.csrfToken();
+      }
+      next();
+    });
+    return;
+  }
+  next();
+};
 
 /**
  * Converts camelCase to kebab-case (e.g., "respondToClaim" -> "respond-to-claim")
@@ -50,6 +73,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const stepNavigation = createStepNavigation(flowConfig);
+  const hasFileUploadFields = fields.some(f => f.type === 'file');
 
   return {
     url: path.join(basePath, stepName),
@@ -57,6 +81,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     view: viewPath,
     stepDir,
     showCancelButton,
+    postMiddleware: hasFileUploadFields ? [multipartFormDataParser, csrfAfterMultipart] : undefined,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
@@ -74,11 +99,15 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         // Get interpolation values from extendGetContent if available (for dynamic translation values)
         const emptyFormContent = { fields: [] } as BuiltFormContent;
         const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
-        const initialFormData = getInitialFormData ? await getInitialFormData(req) : undefined;
+        // Prefer session data (from user interactions like file uploads) over initial CCD data.
+        // getInitialFormData is only used on the first visit when no session data exists yet.
+        const sessionData = getFormData(req, stepName);
+        const hasSessionData = Object.keys(sessionData).length > 0;
+        const initialFormData = !hasSessionData && getInitialFormData ? await getInitialFormData(req) : undefined;
         const formContent = buildFormContent(
           fields,
           t,
-          initialFormData || getFormData(req, stepName),
+          initialFormData || sessionData,
           {},
           translationKeys,
           nunjucksEnv,

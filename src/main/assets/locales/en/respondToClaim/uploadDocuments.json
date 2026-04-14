@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Upload files (optional)",
+  "caption": "Respond to a property possession claim",
+  "title": "Upload files (optional)",
+  "introText": "Upload any files that you think are relevant to your response. The claimant will be able to see the files you upload.",
+  "beforeYouUploadHeading": "Before you upload your files",
+  "namingInstruction": "Give your file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "Upload a file",
+  "uploadHint": "You can add more than one file by uploading them one at a time."
+}

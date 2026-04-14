@@ -3,6 +3,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const sourcePath = path.resolve(__dirname, 'src/main/assets/js');
 const govukFrontend = require(path.resolve(__dirname, 'webpack/govukFrontend'));
+const mojFrontend = require(path.resolve(__dirname, 'webpack/mojFrontend'));
 const scss = require(path.resolve(__dirname, 'webpack/scss'));
 const HtmlWebpack = require(path.resolve(__dirname, 'webpack/htmlWebpack'));
 
@@ -15,6 +16,7 @@ const filename = `[name]${fileNameSuffix}.js`;
 module.exports = {
   plugins: [
     ...govukFrontend.plugins,
+    ...mojFrontend.plugins,
     ...scss.plugins,
     ...HtmlWebpack.plugins,
     new CopyWebpackPlugin({

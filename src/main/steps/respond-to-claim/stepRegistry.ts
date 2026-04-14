@@ -24,9 +24,11 @@ import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
+import { step as otherConsiderations } from './other-considerations';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
+import { step as reasonableAdjustments } from './reasonable-adjustments';
 import { step as whatOtherRegularExpensesDoYouHave } from './regular-expenses';
 import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
@@ -38,6 +40,7 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
+import { step as uploadDocuments } from './upload-documents';
 import { step as writtenTerms } from './written-terms';
 
 export const stepRegistry: Record<string, StepDefinition> = {
@@ -76,6 +79,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'your-circumstances': yourCircumstances,
   'exceptional-hardship': exceptionalHardship,
   'income-and-expenditure': incomeAndExpenditure,
+  'other-considerations': otherConsiderations,
+  'upload-documents': uploadDocuments,
+  'reasonable-adjustments': reasonableAdjustments,
   'what-regular-income-do-you-receive': whatRegularIncomeDoYouReceive,
   'have-you-applied-for-universal-credit': haveYouAppliedForUniversalCredit,
   'priority-debts': priorityDebts,

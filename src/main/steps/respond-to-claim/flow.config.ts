@@ -51,6 +51,9 @@ export const flowConfig: JourneyFlowConfig = {
     'your-circumstances',
     'exceptional-hardship',
     'income-and-expenditure',
+    'other-considerations',
+    'upload-documents',
+    'reasonable-adjustments',
     'what-regular-income-do-you-receive',
     'have-you-applied-for-universal-credit',
     'priority-debts',
@@ -389,10 +392,22 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'income-and-expenditure': {
       previousStep: 'exceptional-hardship',
+      defaultNext: 'other-considerations',
+    },
+    'other-considerations': {
+      previousStep: 'income-and-expenditure',
+      defaultNext: 'upload-documents',
+    },
+    'upload-documents': {
+      previousStep: 'other-considerations',
+      defaultNext: 'reasonable-adjustments',
+    },
+    'reasonable-adjustments': {
+      previousStep: 'upload-documents',
       defaultNext: 'what-regular-income-do-you-receive',
     },
     'what-regular-income-do-you-receive': {
-      previousStep: 'income-and-expenditure',
+      previousStep: 'reasonable-adjustments',
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {

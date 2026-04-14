@@ -1,0 +1,19 @@
+{%- from "govuk/components/file-upload/macro.njk" import govukFileUpload -%}
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
+
+{# Inner upload area for MOJ multi-file-upload: GOV.UK file upload + upload button #}
+{{ govukFileUpload({
+  id: params.id,
+  name: params.name,
+  label: params.label,
+  hint: params.hint,
+  errorMessage: params.errorMessage,
+  classes: params.fileUploadClasses,
+  attributes: params.attributes
+}) }}
+
+{{ govukButton({
+  text: params.uploadFileButtonText,
+  classes: 'govuk-button--secondary moj-multi-file-upload__button',
+  attributes: { name: 'fileUploadAction', value: 'add' }
+}) }}
