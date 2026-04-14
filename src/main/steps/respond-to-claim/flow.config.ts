@@ -46,8 +46,8 @@ function getConfirmNoticeGivenAnswer(
     return currentAnswer;
   }
 
-  const ccdAnswer = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses
-    ?.possessionNoticeReceived;
+  const ccdAnswer =
+    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived;
   if (ccdAnswer === 'YES' || ccdAnswer === 'NO' || ccdAnswer === 'NOT_SURE') {
     return ccdAnswer;
   }
