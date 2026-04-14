@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Is the court hearing in the next 14 days?",
+  "caption": "Make an application",
+  "heading": "Is the court hearing in the next 14 days?",
+  "question": "Is the court hearing in the next 14 days?",
+  "hintText": "This will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away.",
+  "errors": {
+    "typeOfApplication": "You must select whether the court hearing is in the next 14 days"
+  }
+}

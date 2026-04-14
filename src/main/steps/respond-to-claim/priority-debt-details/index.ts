@@ -3,11 +3,11 @@ import type {
   DebtContributionFrequencyValue,
   PossessionClaimResponse,
 } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { ccdPenceToPoundsString, poundsStringToPence } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 const MAX_AMOUNT = 1_000_000_000;
