@@ -35,8 +35,7 @@ export const step: StepDefinition = {
         }
 
         const typeOfApplication = formData['choose-an-application']['typeOfApplication'];
-        const courtHearingInNext14Days =
-          formData['is-the-court-hearing-in-the-next-14-days']['courtHearingInNext14Days'];
+        const courtHearingInNext14Days = isHearingInNext14Days(req);
 
         return {
           summaryData: {
