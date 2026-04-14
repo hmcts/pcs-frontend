@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import type { CaseData, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -39,7 +40,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   getInitialFormData: req => {
-    const caseData: CaseData = req.res?.locals.validatedCase?.data;
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
     const noticeReceivedDateRaw: unknown = caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
 
     if (!noticeReceivedDateRaw) {
@@ -88,8 +89,7 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: req => {
-    //TODO: get claimantName from CCD case - currently hardcoded
-    const claimantName = req.session?.ccdCase?.data?.claimantName || 'Treetops Housing';
+    const claimantName = getClaimantName(req);
 
     const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-not-provided', ['common']);
 

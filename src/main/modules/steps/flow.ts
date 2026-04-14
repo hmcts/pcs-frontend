@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '../../interfaces/stepFlow.interface';
-
+import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '@interfaces/stepFlow.interface';
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('stepDependencyCheck');
