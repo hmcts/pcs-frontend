@@ -1,7 +1,7 @@
 {
   "pageTitle": "cyOther considerations",
   "heading": "cyIs there anything else you want to tell the court as part of your response?",
-  "otherConsiderationsDetailsLabel": "Give details about what else you want to tell the court",
+  "otherConsiderationsDetailsLabel": "cyGive details about what else you want to tell the court",
   "errors": {
     "otherConsiderations": "cySelect if there is anything else you want to tell the court",
     "otherConsiderationsDetails": "cyEnter details about what you want to tell the court"

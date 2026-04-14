@@ -4,6 +4,8 @@ import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResp
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import { Logger } from '@modules/logger';
+const logger = Logger.getLogger('OtherConsiderationsStep');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'other-considerations',
@@ -19,6 +21,9 @@ export const step: StepDefinition = createFormStep({
     const otherConsiderations: YesNoValue | undefined = req.body?.otherConsiderations;
 
     if (!otherConsiderations) {
+      logger.warn('Invalid or missing otherConsiderations value', {
+        otherConsiderations,
+      });
       return;
     }
 
