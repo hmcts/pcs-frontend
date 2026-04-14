@@ -1,9 +1,9 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'defendant-name-capture',
@@ -12,30 +12,26 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   showCancelButton: false,
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const firstName = req.body?.firstName as string | undefined;
     const lastName = req.body?.lastName as string | undefined;
 
-    const party: Record<string, string> = {};
-
-    if (firstName && firstName.trim()) {
-      party.firstName = firstName;
+    if (firstName?.trim()) {
+      response.defendantContactDetails.party.firstName = firstName;
+    } else {
+      delete response.defendantContactDetails.party.firstName;
+    }
+    if (lastName?.trim()) {
+      response.defendantContactDetails.party.lastName = lastName;
+    } else {
+      delete response.defendantContactDetails.party.lastName;
     }
 
-    if (lastName && lastName.trim()) {
-      party.lastName = lastName;
-    }
-
-    if (Object.keys(party).length === 0) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantContactDetails: {
-        party,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
   translationKeys: {
     // Browser/tab title

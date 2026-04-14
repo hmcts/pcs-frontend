@@ -1,9 +1,10 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'landlord-licensed',
@@ -33,25 +34,21 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const confirmValue = req.body?.confirmLandlordLicensed as string | undefined;
+    const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', imNotSure: 'NOT_SURE' };
 
-    const defendantResponses: Record<string, unknown> = {};
-
-    if (confirmValue === 'yes') {
-      defendantResponses.landlordLicensed = 'YES';
-    } else if (confirmValue === 'no') {
-      defendantResponses.landlordLicensed = 'NO';
-    } else if (confirmValue === 'imNotSure') {
-      defendantResponses.landlordLicensed = 'NOT_SURE';
+    if (confirmValue && enumMapping[confirmValue]) {
+      response.defendantResponses.landlordLicensed = enumMapping[confirmValue];
+    } else {
+      delete response.defendantResponses.landlordLicensed;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        ...defendantResponses,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
   getInitialFormData: async req => {
     const caseData = req.res?.locals?.validatedCase?.data;

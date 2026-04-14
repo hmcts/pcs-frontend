@@ -1,9 +1,9 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'free-legal-advice',
@@ -12,27 +12,21 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/freeLegalAdvice.njk`,
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
+    const enumMapping: Record<string, string> = { yes: 'YES', no: 'NO', preferNotToSay: 'PREFER_NOT_TO_SAY' };
 
-    if (!hadLegalAdvice) {
-      return;
+    if (hadLegalAdvice && enumMapping[hadLegalAdvice]) {
+      response.defendantResponses.freeLegalAdvice = enumMapping[hadLegalAdvice];
+    } else {
+      delete response.defendantResponses.freeLegalAdvice;
     }
 
-    const enumMapping: Record<string, string> = {
-      yes: 'YES',
-      no: 'NO',
-      preferNotToSay: 'PREFER_NOT_TO_SAY',
-    };
-
-    const ccdValue = enumMapping[hadLegalAdvice];
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        freeLegalAdvice: ccdValue,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
   translationKeys: {
     pageTitle: 'pageTitle',

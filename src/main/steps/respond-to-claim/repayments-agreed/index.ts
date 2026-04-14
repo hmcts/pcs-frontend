@@ -1,10 +1,12 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
+
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',
@@ -13,33 +15,31 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   beforeRedirect: async req => {
-    const repaymentsForm = req.body as Record<string, unknown>;
-    const repaymentsAgreed = repaymentsForm.repaymentsAgreed as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
+    const repaymentsAgreed = req.body?.repaymentsAgreed as string | undefined;
+    const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', imNotSure: 'NOT_SURE' };
 
-    if (!repaymentsForm) {
-      return;
+    if (repaymentsAgreed && enumMapping[repaymentsAgreed]) {
+      response.defendantResponses.paymentAgreement.repaymentPlanAgreed = enumMapping[repaymentsAgreed];
+
+      if (repaymentsAgreed === 'yes') {
+        response.defendantResponses.paymentAgreement.repaymentAgreedDetails = req.body?.[
+          'repaymentsAgreed.repaymentsAgreedDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.paymentAgreement.repaymentAgreedDetails;
+      }
+    } else {
+      delete response.defendantResponses.paymentAgreement.repaymentPlanAgreed;
+      delete response.defendantResponses.paymentAgreement.repaymentAgreedDetails;
     }
-    const existingRepaymentDetails =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
-        ?.repaymentAgreedDetails;
 
-    const repaymentAgreedDetails =
-      repaymentsAgreed === 'yes'
-        ? (repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined)
-        : existingRepaymentDetails
-          ? ''
-          : undefined;
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        paymentAgreement: {
-          repaymentPlanAgreed: repaymentsAgreed === 'yes' ? 'YES' : repaymentsAgreed === 'no' ? 'NO' : 'NOT_SURE',
-          repaymentAgreedDetails,
-        },
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id,
+      response
+    );
   },
   translationKeys: {
     pageTitle: 'pageTitle',

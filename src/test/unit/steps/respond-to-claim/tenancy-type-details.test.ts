@@ -2,12 +2,21 @@ jest.mock('../../../../main/modules/steps', () => ({
   createFormStep: jest.fn(config => config),
 }));
 
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: jest.fn(),
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
 }));
 
+jest.mock('../../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    saveDraftDefendantResponse: jest.fn(),
+  },
+}));
+
+import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 type TenancyTypeDetailsStep = {
   getInitialFormData: (req: {
@@ -102,19 +111,39 @@ describe('respond-to-claim tenancy-type-details step', () => {
       ['yes', 'YES'],
       ['no', 'NO'],
       ['notSure', 'NOT_SURE'],
-      ['maybe', undefined],
-      [undefined, undefined],
     ])('maps tenancyTypeConfirm=%s to tenancyTypeCorrect=%s', async (tenancyTypeConfirm, tenancyTypeCorrect) => {
-      const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
+      const req = { body: { tenancyTypeConfirm } };
 
       await testedStep.beforeRedirect(req);
 
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-        defendantResponses: {
-          tenancyTypeCorrect,
-        },
-      });
+      expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+        undefined, // accessToken
+        undefined, // caseId
+        expect.objectContaining({
+          defendantResponses: expect.objectContaining({
+            tenancyTypeCorrect,
+          }),
+        })
+      );
     });
+
+    it.each([['maybe'], [undefined]])(
+      'saves with fields deleted when tenancyTypeConfirm=%s',
+      async tenancyTypeConfirm => {
+        const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
+
+        await testedStep.beforeRedirect(req);
+
+        expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+          undefined, // accessToken
+          undefined, // caseId
+          {
+            defendantResponses: {},
+            defendantContactDetails: { party: {} },
+          }
+        );
+      }
+    );
   });
 
   describe('extendGetContent', () => {

@@ -52,13 +52,22 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: jest.fn(),
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+}));
+
+jest.mock('../../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    saveDraftDefendantResponse: jest.fn(),
+  },
 }));
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
+import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 describe('respond-to-claim defendant-name-capture step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -150,7 +159,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
   it('POST saves data and redirects when validation passes', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
-    (buildCcdCaseForPossessionClaimResponse as jest.Mock).mockResolvedValue(undefined);
+    (ccdCaseService.saveDraftDefendantResponse as jest.Mock).mockResolvedValue(undefined);
 
     const req = createReq({
       body: { action: 'continue', firstName: 'Jane', lastName: 'Doe' },
@@ -162,14 +171,18 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
     await step.postController!.post(req, res, next);
 
-    expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-      defendantContactDetails: {
-        party: {
-          firstName: 'Jane',
-          lastName: 'Doe',
-        },
-      },
-    });
+    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+      undefined, // accessToken
+      '123', // caseId
+      expect.objectContaining({
+        defendantContactDetails: expect.objectContaining({
+          party: expect.objectContaining({
+            firstName: 'Jane',
+            lastName: 'Doe',
+          }),
+        }),
+      })
+    );
     expect(req.session.formData?.['defendant-name-capture']).toEqual({ firstName: 'Jane', lastName: 'Doe' });
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
