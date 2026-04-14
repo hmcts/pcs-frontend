@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { chooseAnApplication } from '../../../data/page-data/genApps-page-data';
+import { chooseAnApplication, isTheCourtHearingInNext14Days } from '../../../data/page-data/genApps-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -33,7 +33,7 @@ export class GenAppsAction implements IAction {
       question: courtHearing.question,
       option: courtHearing.option,
     });
-    await performAction('clickButton', chooseAnApplication.continueButton);
+    await performAction('clickButton', isTheCourtHearingInNext14Days.continueButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
