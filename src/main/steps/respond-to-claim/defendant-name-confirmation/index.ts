@@ -1,10 +1,10 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -65,11 +65,12 @@ export const step: StepDefinition = createFormStep({
     contactUs: 'contactUs',
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const defendantResponses = caseData?.possessionClaimResponse?.defendantResponses;
-    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
+    const { defendantResponsesDefendantNameConfirmation: existingAnswer, defendantContactDetailsParty: party } = req.res
+      ?.locals?.validatedCase ?? {
+      defendantResponsesDefendantNameConfirmation: undefined,
+      defendantContactDetailsParty: undefined,
+    };
 
-    const existingAnswer = defendantResponses?.defendantNameConfirmation;
     const formValue = existingAnswer === 'YES' ? 'yes' : existingAnswer === 'NO' ? 'no' : undefined;
 
     if (!formValue) {
@@ -91,14 +92,15 @@ export const step: StepDefinition = createFormStep({
     return initial;
   },
   extendGetContent: (req: Request) => {
-    // Provides dynamic values for the template (defendant name and organization name)
-    // These get interpolated into the question text and hint translations
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
-    const defendantName =
-      claimantEntry?.firstName && claimantEntry?.lastName ? `${claimantEntry.firstName} ${claimantEntry.lastName}` : '';
+    const { claimantEnteredDefendantDetailsName, defendantContactDetailsPartyName, claimantName } = req.res?.locals
+      ?.validatedCase ?? {
+      claimantEnteredDefendantDetailsName: '',
+      defendantContactDetailsPartyName: '',
+      claimantName: '',
+    };
 
-    const organisationName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    const defendantName = claimantEnteredDefendantDetailsName || defendantContactDetailsPartyName;
+    const organisationName = claimantName || 'Treetops Housing';
 
     return {
       defendantName,
@@ -113,6 +115,7 @@ export const step: StepDefinition = createFormStep({
       translationKey: {
         label: 'nameConfirmationLabel',
       },
+      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
       options: [
         {

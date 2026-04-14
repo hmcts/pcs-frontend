@@ -3,8 +3,9 @@ import type { Environment } from 'nunjucks';
 
 import * as caseReferenceMiddleware from '../../../main/middleware/caseReference';
 import { Logger } from '../../../main/modules/logger';
-import dashboardRoutes, { getDashboardUrl } from '../../../main/routes/dashboard';
 import { getDashboardNotifications, getDashboardTaskGroups } from '../../../main/services/pcsApi';
+
+import dashboardRoutes, { getDashboardUrl } from '@routes/dashboard';
 
 jest.mock('../../../main/modules/logger', () => {
   const errorFn = jest.fn();
@@ -18,10 +19,12 @@ jest.mock('../../../main/modules/logger', () => {
 
 const mockRouterParam = jest.fn();
 const mockRouterGet = jest.fn();
+const mockRouterUse = jest.fn();
 
 const mockRouter = {
   param: mockRouterParam,
   get: mockRouterGet,
+  use: mockRouterUse,
 };
 
 jest.mock('express', () => {
@@ -113,6 +116,7 @@ describe('Dashboard Routes', () => {
   beforeEach(() => {
     mockRouterGet.mockClear();
     mockRouterParam.mockClear();
+    mockRouterUse.mockClear();
     (getDashboardNotifications as jest.Mock).mockClear();
     (getDashboardTaskGroups as jest.Mock).mockClear();
     logger = (Logger.getLogger as jest.Mock)();
@@ -136,6 +140,7 @@ describe('Dashboard Routes', () => {
     it('should create dashboard router with param middleware', () => {
       dashboardRoutes(app);
 
+      expect(mockRouterUse).toHaveBeenCalledTimes(1);
       expect(mockRouterParam).toHaveBeenCalledWith(
         'caseReference',
         caseReferenceMiddleware.caseReferenceParamMiddleware
@@ -147,7 +152,7 @@ describe('Dashboard Routes', () => {
     it('should render dashboard view with mapped task groups', async () => {
       dashboardRoutes(app);
 
-      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[2] as (
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         req: any,
         res: Response
@@ -215,7 +220,7 @@ describe('Dashboard Routes', () => {
 
       dashboardRoutes(app);
 
-      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[2] as (
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         req: any,
         res: Response

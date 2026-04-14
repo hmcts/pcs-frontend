@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
+import { CcdCaseModel } from '../interfaces/ccdCaseData.model';
 
 import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -33,8 +34,8 @@ export async function caseReferenceParamMiddleware(
 
     const validatedCase = await ccdCaseService.getCaseById(accessToken, sanitisedCaseReference);
 
-    // Store validated case
-    res.locals.validatedCase = validatedCase;
+    // Store validated case as hydrated CcdCaseModel
+    res.locals.validatedCase = new CcdCaseModel(validatedCase);
 
     return next();
   } catch (error) {
