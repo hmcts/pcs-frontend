@@ -32,7 +32,9 @@
 
   <p class="govuk-body">{{ description | safe }}</p>
 
-  <h2 class="govuk-heading-m">{{completingYourResponse}}</h2>
+  {% if not isLegalRepresentative %}
+    <h2 class="govuk-heading-m">{{completingYourResponse}}</h2>
+  {% endif %}
 
   <p class="govuk-body">
   {{saveDraftInfo}}
@@ -42,38 +44,40 @@
   {{uploadDocumentsInfo}}
   </p>
 
-  <p class="govuk-body">
-  {{claimantVisibilityInfo}}
-  </p>
+  {% if not isLegalRepresentative %}
+    <p class="govuk-body">
+    {{claimantVisibilityInfo}}
+    </p>
 
-  <h2 class="govuk-heading-m">{{whatYouWillNeed}}</h2>
+    <h2 class="govuk-heading-m">{{whatYouWillNeed}}</h2>
 
-  <p class="govuk-body">
-  {{provideDetailsInfo}}
-  </p>
+    <p class="govuk-body">
+    {{provideDetailsInfo}}
+    </p>
 
-  <ul class="govuk-list govuk-list--bullet">
-    <li>{{listItemName}}</li>
-    <li>{{listItemDateOfBirth}}</li>
-    <li>{{listItemDependants}}</li>
-    <li>{{listItemCircumstances}}</li>
-  </ul>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{listItemName}}</li>
+      <li>{{listItemDateOfBirth}}</li>
+      <li>{{listItemDependants}}</li>
+      <li>{{listItemCircumstances}}</li>
+    </ul>
 
-  <p class="govuk-body">
-  {{shareDetailsInfo}}
-  </p>
+    <p class="govuk-body">
+    {{shareDetailsInfo}}
+    </p>
 
-  <ul class="govuk-list govuk-list--bullet">
-    <li>{{listItemIncomeExpenses}}</li>
-    <li>{{listItemPriorityDebts}}</li>
-  </ul>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{listItemIncomeExpenses}}</li>
+      <li>{{listItemPriorityDebts}}</li>
+    </ul>
 
-  <p class="govuk-body">
-  {{financialSituationInfo}}
-  </p>
+    <p class="govuk-body">
+    {{financialSituationInfo}}
+    </p>
 
+    <h2 class="govuk-heading-m">{{supportToUseHmctsServices}}</h2>
 
-  <h2 class="govuk-heading-m">{{supportToUseHmctsServices}}</h2>
+  {% endif %}
 
   <p class="govuk-body">
   {{hmctsSupportInfo}}

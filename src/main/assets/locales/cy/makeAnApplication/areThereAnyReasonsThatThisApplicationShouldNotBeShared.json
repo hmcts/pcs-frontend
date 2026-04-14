@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyAre there any reasons that this application should not be shared with the other parties?",
+  "caption": "cyMake an application",
+  "heading": "cyAre there any reasons that this application should not be shared with the other parties?",
+  "question": "cyAre there any reasons that this application should not be shared with the other parties?",
+  "errors": {
+    "typeOfApplication": "cyYou must select whether there are any reasons that this application should not be shared with the other parties"
+  }
+}

@@ -3,43 +3,8 @@ import fs, { promises as fsPromises } from 'fs';
 
 import express, { Express } from 'express';
 import type { TFunction } from 'i18next';
+import i18next from 'i18next';
 
-// ---- Mocks (must be declared before importing the SUT) ----
-const mockUse = jest.fn().mockReturnThis();
-const mockInit = jest.fn();
-const mockI18n = {
-  use: mockUse,
-  init: mockInit,
-  isInitialized: true,
-};
-
-const mockHandle = jest.fn(() => (req: any, _res: any, next: any) => next());
-const mockLogger = { info: jest.fn(), error: jest.fn() };
-
-jest.mock('i18next', () => ({
-  __esModule: true,
-  default: mockI18n,
-}));
-
-jest.mock('i18next-fs-backend', () => ({}), { virtual: true });
-
-jest.mock(
-  'i18next-http-middleware',
-  () => ({
-    __esModule: true,
-    handle: mockHandle,
-    LanguageDetector: {},
-  }),
-  { virtual: true }
-);
-
-jest.mock('@modules/logger', () => ({
-  Logger: {
-    getLogger: jest.fn(() => mockLogger),
-  },
-}));
-
-// Import SUT AFTER mocks
 import {
   I18n,
   createFallbackTFunction,
@@ -48,7 +13,50 @@ import {
   getTranslationFunction,
   populateCommonTranslations,
   setupNunjucksGlobals,
-} from '../../../../main/modules/i18n';
+} from '@modules/i18n';
+import { Logger } from '@modules/logger';
+
+// ---- Mocks (must be declared before importing the SUT) ----
+// Mock factories run when jest.mock is hoisted; create mocks inside factories so they exist.
+
+jest.mock('i18next', () => {
+  const mockUse = jest.fn().mockReturnThis();
+  const mockInit = jest.fn();
+  return {
+    __esModule: true,
+    default: {
+      use: mockUse,
+      init: mockInit,
+      isInitialized: true,
+    },
+  };
+});
+
+jest.mock('i18next-fs-backend', () => ({}), { virtual: true });
+
+jest.mock(
+  'i18next-http-middleware',
+  () => ({
+    __esModule: true,
+    handle: jest.fn(() => (req: any, _res: any, next: any) => next()),
+    LanguageDetector: {},
+  }),
+  { virtual: true }
+);
+
+jest.mock('@modules/logger', () => {
+  const mockLogger = { info: jest.fn(), error: jest.fn() };
+  return {
+    Logger: {
+      getLogger: jest.fn(() => mockLogger),
+    },
+  };
+});
+
+// References to mocks created inside jest.mock factories (for assertions)
+const mockUse = (i18next as unknown as { use: jest.Mock }).use;
+const mockInit = (i18next as unknown as { init: jest.Mock }).init;
+const mockLogger = Logger.getLogger('i18n') as unknown as { info: jest.Mock; error: jest.Mock };
 
 describe('i18n module', () => {
   let app: Express;

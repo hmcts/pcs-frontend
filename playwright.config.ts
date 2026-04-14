@@ -1,6 +1,10 @@
 import * as process from 'node:process';
+import path from 'path';
 
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
 export const VERY_SHORT_TIMEOUT = 1000;

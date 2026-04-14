@@ -1,10 +1,10 @@
 import { DateTime } from 'luxon';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -51,8 +51,9 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals.validatedCase?.data;
-    const dateOfBirth = caseData?.possessionClaimResponse?.defendantResponses?.dateOfBirth;
+    const { defendantResponsesDateOfBirth: dateOfBirth } = req.res?.locals.validatedCase ?? {
+      defendantResponsesDateOfBirth: undefined,
+    };
 
     if (!dateOfBirth || typeof dateOfBirth !== 'string') {
       return {};
@@ -73,6 +74,7 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
+      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l govuk-!-margin-bottom-9',
       name: 'dateOfBirth',
       type: 'date',

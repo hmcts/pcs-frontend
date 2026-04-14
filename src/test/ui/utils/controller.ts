@@ -37,7 +37,8 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-  if (!startAxeAudit && executor.page.url().includes('start-now')) {
+  const testPages = ['start-now', 'choose-an-application'];
+  if (!startAxeAudit && testPages.some(page => currentUrl.includes(page))) {
     startAxeAudit = true;
     startFunctionalTests = true;
   }
