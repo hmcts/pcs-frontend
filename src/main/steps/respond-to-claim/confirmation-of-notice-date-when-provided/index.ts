@@ -4,9 +4,9 @@ import { DateTime } from 'luxon';
 import type { CaseData, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
-import { getClaimantName } from '../../utils/getClaimantName';
 
 import { Logger } from '@modules/logger';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
@@ -93,7 +93,7 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
 
- extendGetContent: req => {
+  extendGetContent: req => {
     const validatedCase = req.res?.locals?.validatedCase;
     const claimantName = getClaimantName(req);
 

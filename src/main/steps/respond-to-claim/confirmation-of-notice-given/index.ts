@@ -2,9 +2,9 @@ import type { Request } from 'express';
 
 import type { CaseData, PossessionClaimResponse, YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
-import { getClaimantName } from '../../utils/getClaimantName';
 
 import { createFormStep } from '@modules/steps';
 

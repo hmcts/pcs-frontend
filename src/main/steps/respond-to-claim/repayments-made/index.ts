@@ -5,8 +5,8 @@ import type {
   YesNoValue,
 } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { getClaimantName } from '../../utils/getClaimantName';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -91,7 +91,7 @@ export const step: StepDefinition = createFormStep({
       confirmRepaymentsMade: 'No',
     };
   },
-    extendGetContent: req => {
+  extendGetContent: req => {
     const validatedCase = req.res?.locals?.validatedCase;
     const claimantName = getClaimantName(req);
     const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
