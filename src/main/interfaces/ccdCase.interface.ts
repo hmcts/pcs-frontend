@@ -83,7 +83,7 @@ export interface PossessionClaimResponse {
     landlordRegistered?: YesNoNotSureValue;
     landlordLicensed?: YesNoNotSureValue;
     writtenTerms?: YesNoNotSureValue;
-    disputeClaim?: YesNoValue;
+    disputeClaim?: VerticalYesNoValue;
     disputeClaimDetails?: string;
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
@@ -121,4 +121,5 @@ export enum GenAppType {
 
 export interface CitizenGenAppRequest {
   applicationType: GenAppType;
+  within14Days?: YesNoValue;
 }
