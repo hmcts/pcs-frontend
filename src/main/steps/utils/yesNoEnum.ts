@@ -12,13 +12,9 @@ import type { YesNoValue } from '../../interfaces/ccdCase.interface';
  * @example
  * toYesNoEnum('yes') // returns 'Yes'
  * toYesNoEnum('no')  // returns 'No'
- * toYesNoEnum(undefined)  // returns undefined
  */
-export function toYesNoEnum(value: 'yes' | 'no' | undefined): YesNoValue | undefined {
-  if (!value) {
-    return undefined;
-  }
-  return value.toLowerCase() === 'yes' ? 'Yes' : 'No';
+export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
+  return value === 'yes' ? 'Yes' : 'No';
 }
 
 /**

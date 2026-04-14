@@ -3,21 +3,7 @@
   "caption": "cyMake an application",
   "heading": "cyHave the other parties agreed to this application?",
   "question": "cyHave the other parties agreed to this application?",
-  "hint": "cyIf you ask the court for more than one thing, this answer will apply to all of them.",
-  "theOtherPartyIsTheOtherSide": "cyThe ‘other party’ is the other side involved in your case. For example your landlord, housing association, or mortgage lender.",
-  "everyOtherPartyWillNeedToAgree": "cyEvery other party will need to agree to let you make this application, if they don’t agree you may need to pay a higher fee.",
-  "ifTheOtherPartiesDoNotAgree": "cyIf the other parties do not agree",
-  "feeWillIncreaseIf": "cyYour application fee will increase to {{maxFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}, if:",
-  "youHaveAlreadyToldTheOtherParty": "cyyou have already told the other party that you are making this application, and",
-  "theyDidNotAgreeToIt": "cythey did not agree to it (this means that they have objected to it)",
-  "youWillSeeTheFinalApplicationFee": "cyYou’ll see the final application fee before you pay.",
-  "whatYouNeedToDo": "cyWhat you need to do",
-  "youWillNeedToUploadEvidence": "cyYou will need to upload evidence for the court, to show that:",
-  "youHaveToldTheOtherParties": "cyyou have told the other parties, and",
-  "theyAgreedToIt": "cythey agreed to it",
-  "forExampleACopyOfALetter": "cyFor example a copy of a letter, email, or a signed consent order. We will ask you to upload this evidence later in this application.",
-  "ifYouAreNotAbleToContactOtherParties": "cyIf you’re not able to contact the other parties, or you’ve attempted to contact them but have not responded, select ‘No’.",
   "errors": {
-    "confirmWhetherOtherPartiesHaveAgreed": "cyConfirm whether the other parties have agreed to this application "
+    "typeOfApplication": "cyYou must select whether the other parties have agreed to this application"
   }
 }
