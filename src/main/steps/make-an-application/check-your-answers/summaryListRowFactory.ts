@@ -156,5 +156,21 @@ export function buildSummaryListRows(req: Request, t: TFunction): SummaryListRow
       )
     );
   }
+
+  const whichLanguageField = visibleFormData.getWhichLanguageField();
+  if (whichLanguageField) {
+    summaryListRows.push(
+      createSummaryListRow(
+        {
+          stepName: whichLanguageField.stepName,
+          fieldLabel: t('answers.whichLanguage.label'),
+          fieldValue: t(`answers.whichLanguage.options.${whichLanguageField.fieldValue}`),
+          changeHint: t('answers.whichLanguage.changeHint'),
+        },
+        t
+      )
+    );
+  }
+
   return summaryListRows;
 }

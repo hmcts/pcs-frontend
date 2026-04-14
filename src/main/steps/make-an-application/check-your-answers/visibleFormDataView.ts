@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { GenAppType } from '../../../interfaces/ccdCase.interface';
+import { GenAppType, LanguageUsed } from '../../../interfaces/ccdCase.interface';
 import { shouldShowStep } from '../../showConditionService';
 import { flowConfig } from '../flow.config';
 
@@ -62,6 +62,10 @@ export default class VisibleFormDataView {
     } else {
       return undefined;
     }
+  }
+
+  getWhichLanguageField(): FieldDetails<LanguageUsed> | undefined {
+    return this.getField('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
   }
 
   private getField<T>(stepName: string, fieldName: string): FieldDetails<T> | undefined {
