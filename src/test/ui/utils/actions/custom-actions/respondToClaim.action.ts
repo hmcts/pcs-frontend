@@ -16,6 +16,8 @@ import {
   doYouHaveAnyOtherDependants,
   exceptionalHardship,
   freeLegalAdvice,
+  howMuchAffordToPay,
+  installmentPayments,
   landlordLicensed,
   landlordRegistered,
   nonRentArrearsDispute,
@@ -72,6 +74,8 @@ export class RespondToClaimAction implements IAction {
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
       ],
       ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
+      ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
+      ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
@@ -256,6 +260,26 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  }
+  private async installmentPayments(installmentData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: installmentData.question,
+      option: installmentData.radioOption,
+    });
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
+  }
+
+  private async selectHowMuchAffordToPay(howMuchToPayData: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
+      howMuchToPayData.affordToPay
+    );
+    await performAction('clickRadioButton', {
+      question: howMuchToPayData.question,
+      option: howMuchToPayData.radioOption,
+    });
+    await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {

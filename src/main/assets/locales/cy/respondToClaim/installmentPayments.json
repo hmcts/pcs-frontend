@@ -1,0 +1,17 @@
+{
+  "pageTitle": "cyMaking an offer to pay your arrears",
+  "caption": "cyRespond to a property possession claim",
+  "heading": "cyMaking an offer to pay your arrears",
+  "paragraph1": "cyFrom your previous answers, you have not come to any arrangement with {{claimantName}} to pay off your rent arrears.",
+  "paragraph2": "cyYou can offer to pay off your arrears in instalments and say how much you’d be able to afford to pay and how frequently.",
+  "paragraph3": "cyAt the hearing, the judge will look at your offer and the details of your income and expenses you choose to share. They will decide if your offer is affordable.",
+  "paragraph4": "cyYou’ll be able to tell the judge if the amount you can afford to pay has changed.",
+  "question": "cyWould you like to offer to pay your arrears in instalments?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
+  "errors": {
+    "confirmInstallmentOffer": "cySelect whether you would like to offer to pay your arrears in instalments"
+  }
+}
