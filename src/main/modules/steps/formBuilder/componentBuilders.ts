@@ -1,15 +1,15 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
+import { normalizeCheckboxValue } from './helpers';
+import { buildSubFieldsHTML } from './subFieldsRenderer';
+
 import type {
   ComponentConfig,
   ComponentType,
   FormFieldConfig,
   FormFieldOption,
-} from '../../../interfaces/formFieldConfig.interface';
-
-import { normalizeCheckboxValue } from './helpers';
-import { buildSubFieldsHTML } from './subFieldsRenderer';
+} from '@interfaces/formFieldConfig.interface';
 
 function createFieldsetLegend(
   label: string,
@@ -207,7 +207,7 @@ export function buildComponentConfig(
       };
       component.namePrefix = field.name;
       component.idPrefix = field.name;
-      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
       component.items = [
         {
           name: 'day',
