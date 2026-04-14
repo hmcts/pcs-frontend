@@ -2,7 +2,7 @@ import config from 'config';
 import * as express from 'express';
 import helmet from 'helmet';
 
-import { Helmet } from '../../../../main/modules/helmet';
+import { Helmet } from '@modules/helmet';
 
 // Mock config
 jest.mock('config', () => ({
