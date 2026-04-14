@@ -26,7 +26,7 @@ dist/
 public/
 src/main/views/govuk
 src/main/views/ui-component-lib
-src/main/assets
+src/main/assets/ui-component-lib
 coverage/
 smoke-output/
 functional-output/
