@@ -29,6 +29,12 @@ jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
+const mockGetUserType = jest.fn();
+
+jest.mock('../../../../main/steps/utils', () => ({
+  getUserType: (...args: unknown[]) => mockGetUserType(...args),
+}));
+
 describe('steps/i18n', () => {
   const originalEnv = process.env.NODE_ENV;
 
@@ -36,6 +42,7 @@ describe('steps/i18n', () => {
     jest.clearAllMocks();
     mockLogger.warn.mockClear();
     mockLogger.error.mockClear();
+    mockGetUserType.mockReturnValue('citizen');
   });
 
   afterEach(() => {
@@ -118,6 +125,47 @@ describe('steps/i18n', () => {
 
       expect(addResourceBundle).toHaveBeenCalledWith('en', 'testStep', mockTranslations, true, true);
       expect(loadNamespaces).toHaveBeenCalledWith('testStep', expect.any(Function));
+    });
+
+    it('should merge legalrep translations over default translations', async () => {
+      const mockLocalesDir = '/test/locales';
+      const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
+
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+      mockGetUserType.mockReturnValue('legalrep');
+
+      const addResourceBundle = jest.fn();
+      const getResourceBundle = jest.fn().mockReturnValue(null);
+      const req = {
+        i18n: {
+          getResourceBundle,
+          addResourceBundle,
+          loadNamespaces,
+        },
+      } as any;
+
+      jest.spyOn(fs, 'access').mockResolvedValue(undefined);
+      jest
+        .spyOn(fs, 'readFile')
+        .mockResolvedValueOnce(JSON.stringify({ title: 'Citizen title', nested: { keep: 'citizen', swap: 'base' } }))
+        .mockResolvedValueOnce(JSON.stringify({ title: 'Professional title', nested: { swap: 'professional' } }));
+
+      await loadStepNamespace(req, 'test-step', 'testFolder');
+
+      expect(addResourceBundle).toHaveBeenCalledWith(
+        'en',
+        'testStep',
+        {
+          title: 'Professional title',
+          nested: {
+            keep: 'citizen',
+            swap: 'professional',
+          },
+        },
+        true,
+        true
+      );
     });
 
     it('should handle path traversal attack', async () => {

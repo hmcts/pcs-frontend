@@ -7,7 +7,7 @@
   },
   "scripts": {
     "docker:login:hmctsprod": "az acr login --name hmctsprod",
-    "start:dev:pcs-local": "NODE_ENV=development PCS_API_URL=http://localhost:3206 CCD_URL=http://localhost:3206 S2S_URL=http://localhost:8489 OIDC_ISSUER=http://localhost:5062/o OIDC_CLIENT_ID=pcs-frontend OIDC_REDIRECT_URI=http://localhost:3209/oauth2/callback yarn start:dev",
+    "start:dev:pcs-local": "NODE_ENV=development PCS_API_URL=http://localhost:3206 CCD_URL=http://localhost:4452 S2S_URL=http://localhost:8489 OIDC_ISSUER=http://localhost:5062/o OIDC_CLIENT_ID=pcs-frontend OIDC_REDIRECT_URI=http://localhost:3209/oauth2/callback XUI_BASE_URI=http://localhost:3000 yarn start:dev",
     "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development USE_SSL=true OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback yarn start:dev",
     "start:dev": "node --trace-deprecation --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/bootstrap.ts",
     "start": "NODE_ENV=production node -r module-alias/register dist/main/bootstrap.js",
@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "@azure/monitor-opentelemetry": "^1.15.1",
+    "@hmcts-cft/cft-ui-component-lib": "^0.1.0-alpha.4",
     "@hmcts/info-provider": "^1.1.0",
     "@hmcts/nodejs-healthcheck": "^1.8.0",
     "@hmcts/properties-volume": "^1.2.0",
