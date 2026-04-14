@@ -4,8 +4,6 @@ import config from 'config';
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
   askTheCourtToMakeAnOrder,
-  chooseAnApplication,
-  doYouNeedHelpPayingTheFee,
   checkYourAnswers,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
@@ -48,9 +46,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
     //The below are placeholder pages
-    await performValidation('mainHeader', askTheCourtToMakeAnOrder.mainHeader);
-    await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
     await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
     await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
