@@ -139,6 +139,11 @@ await performValidationGroup(
 - PCS_API_CHANGE_ID
 - DATA_STORE_URL_BASE
 
+**Playwright grep and file scope (CI or local):**
+
+- **`FUNCTIONAL_TEST_SCOPE`** — Passed to Playwright as `--grep` (matches text in test titles, e.g. `@PR`, `@regression`, `@nightly`). For `yarn test:functional` the default in the script is `@regression` if unset; PR builds set `@PR` unless overridden (see CI section below).
+- **`E2E_POD_KEYWORD`** — Optional. When set, `playwright.config.ts` narrows runs to specs whose **basename** contains this substring: `**/*<keyword>*.spec.ts` under `src/test/ui`. Use the **exact casing** of the filename (e.g. `makeAnApplication` for `makeAnApplication.*.spec.ts`). If unset, all specs under `src/test/ui` are considered (still filtered by `--grep`).
+
 ```bash
 yarn test:functional
 ```
@@ -186,15 +191,38 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 ## 10. CI Pipeline Stages
 
-### PR & Master (Jenkinsfile_CNP)
+### PR & Master (`Jenkinsfile_CNP`)
 
-- **PR:** Runs functional tests (`@PR` scope) on Chrome. Optional full functional test if `enable_full_functional_tests` label is added.
-- **Master:** Runs functional tests (`@regression` scope) on Chrome. Sends Slack notification to `#hdp-qa-e2e-test-results` on failure.
+**Functional UI tests** use `yarn test:functional` (Chrome). Jenkins sets env vars consumed by Playwright as above.
 
-### Nightly (Jenkinsfile_nightly)
+| Branch | Default `--grep` (`FUNCTIONAL_TEST_SCOPE`) | Notes |
+| ------ | ------------------------------------------ | ----- |
+| **PR** | `@PR` | Preview app URL from `CHANGE_ID`. |
+| **Master** | `@regression` | AAT URL. On failure, Allure summary may be sent to Slack `#hdp-qa-e2e-test-results`. |
 
-- **Schedule:** Mon–Fri at ~07:00.
-- **E2E tests:** Runs per-browser stages (Chrome, Firefox, Safari) with separate Allure reports for each.
-- **Accessibility:** Runs `@accessibility` tests on Chrome.
-- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` with links to all 4 reports (Chrome, Firefox, Safari, Accessibility).
-- **Stage behaviour:** If a browser fails, the stage shows red but the pipeline continues to the next browser. All stages always run.
+**Optional GitHub labels on PRs**
+
+| Label pattern | Effect |
+| ------------- | ------ |
+| `e2e-tag:<value>` | Overrides the default PR grep, e.g. `e2e-tag:@regression` → `FUNCTIONAL_TEST_SCOPE=@regression`. |
+| `e2e-pod:<keyword>` | Sets `E2E_POD_KEYWORD` so only `*<keyword>*.spec.ts` files under `src/test/ui` run (substring must match the real filename **exact case**, e.g. `e2e-pod:makeAnApplication`). |
+| `enable_all_page_functional_tests` | Turns on broad page validation flags used by the framework. |
+| `enable_content_validation` | Enables content validation. |
+| `enable_error_messages_validation` | Enables error-message validation. |
+| `enable_navigation_tests` | Enables navigation tests. |
+
+You can combine `e2e-tag:` and `e2e-pod:` (narrow files, then filter by tag in test titles).
+
+**API preview:** A label like `pcs-api-pr:<id>` still rewires PCS/CCD URLs for that API PR (unchanged).
+
+### Nightly (`Jenkinsfile_nightly`)
+
+- **Schedule:** Mon–Fri at ~07:00 (cron `H`).
+- **E2E:** Stages per browser (Chrome, Firefox, Safari / WebKit) via `test:E2eChrome` and siblings; default grep is `@nightly` unless overridden.
+- **Jenkins parameters (relevant to Playwright):**
+  - **`PLAYWRIGHT_GREP_TAG`** — `@nightly`, `@smoke`, `@regression`, or `@PR`; sets `FUNCTIONAL_TEST_SCOPE`.
+  - **`PLAYWRIGHT_POD_KEYWORD`** — Optional; sets `E2E_POD_KEYWORD` (same rules as PR `e2e-pod:`). Empty = all spec files under `src/test/ui` (subject to grep).
+- **Other parameters:** `ENVIRONMENT`, `PR_NUMBER` (for preview), toggles for Chrome / Firefox / WebKit / Accessibility.
+- **Accessibility:** When enabled, runs `@accessibility` tests on Chrome.
+- **Slack:** Notifications to `#hdp-qa-e2e-test-results` (per stage configuration).
+- **Stage behaviour:** A failing browser stage can be marked unstable while later stages still run (see Jenkins job logs).

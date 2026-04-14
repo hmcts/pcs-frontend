@@ -34,6 +34,16 @@ properties([
       defaultValue: true,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@nightly', '@smoke', '@regression', '@PR'],
+      description: 'Playwright --grep tag (default @nightly matches previous nightly behaviour).'
+    ),
+    string(
+      name: 'PLAYWRIGHT_POD_KEYWORD',
+      defaultValue: '',
+      description: 'Optional basename substring for *.spec.ts under src/test/ui (exact case). Leave empty for all specs.'
+    ),
   ])
 ])
 
@@ -95,6 +105,8 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  env.FUNCTIONAL_TEST_SCOPE = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
+  env.E2E_POD_KEYWORD = params.PLAYWRIGHT_POD_KEYWORD?.trim() ?: ''
 }
 
 def runE2ETests(yarnBuilder) {

@@ -24,8 +24,11 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
+const e2ePod = process.env.E2E_POD_KEYWORD?.trim();
+
 export default defineConfig({
   testDir: './src/test/ui',
+  ...(e2ePod ? { testMatch: [`**/*${e2ePod}*.spec.ts`] } : {}),
   /* Run tests in files in parallel */
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
