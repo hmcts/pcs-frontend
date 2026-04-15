@@ -29,14 +29,17 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
+import { claimantsName } from '../utils/actions/custom-actions';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
+let claimantName: string;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   process.env.WALES_POSTCODE = 'YES';
-  process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
+  claimantName = submitCaseApiDataWales.submitCasePayload.claimantName;
+  process.env.CLAIMANT_NAME = claimantsName;
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
   await performAction('fetchPINsAPI');
@@ -108,7 +111,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      question: repaymentsMade.mainHeader,
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {

@@ -31,7 +31,6 @@ import {
   tenancyTypeDetails,
   uploadDocuments,
   whatRegularIncomeDoYouReceive,
-  wouldYouHaveSomewhereElseToLoveIfYouHadToLeaveYourHome,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
@@ -357,7 +356,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-     await performAction('selectIncomeAndExpenses', {
+    await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
     });
     await performValidation('mainHeader', uploadDocuments.mainHeader);
@@ -423,7 +422,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', installmentPayments.mainHeader);
     //include missing steps
     await performAction('clickButton', installmentPayments.saveAndContinueButton);
-    
+
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -535,7 +534,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-     await performAction('selectIncomeAndExpenses', {
+    await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive', {
@@ -718,7 +717,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-     await performAction('selectIncomeAndExpenses', {
+    await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive', {
