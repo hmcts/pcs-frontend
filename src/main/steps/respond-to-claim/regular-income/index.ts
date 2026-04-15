@@ -5,8 +5,8 @@ import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } fr
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 function includesUniversalCreditSelection(value: unknown): boolean {
   if (Array.isArray(value)) {

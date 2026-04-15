@@ -35,10 +35,10 @@ import config from 'config';
 
 import { HTTPError } from '../HttpError';
 
-import { CaseState } from '@interfaces/ccdCase.interface';
-import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@interfaces/ccdCase.interface';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import { CaseState } from '@services/ccdCase.interface';
+import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
 
 const logger = Logger.getLogger('ccdCaseService');
 

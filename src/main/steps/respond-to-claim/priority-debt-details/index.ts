@@ -3,8 +3,8 @@ import { ccdPenceToPoundsString, getValidatedCaseHouseholdCircumstances, poundsS
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const MAX_AMOUNT = 1_000_000_000;
 const AMOUNT_REGEX = /^\d+(\.\d{1,2})?$/;
