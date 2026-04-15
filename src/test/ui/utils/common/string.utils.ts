@@ -37,3 +37,17 @@ export function generateRandomString(length: number): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
+
+const MASK_SUFFIX_LEN = 4;
+
+/** Shows only the last few characters so full IDs are not printed in test logs. */
+export function maskIdentifierForLog(value: string): string {
+  const s = String(value);
+  if (!s) {
+    return '(empty)';
+  }
+  if (s.length <= MASK_SUFFIX_LEN) {
+    return '***';
+  }
+  return `…${s.slice(-MASK_SUFFIX_LEN)}`;
+}

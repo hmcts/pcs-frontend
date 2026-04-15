@@ -10,9 +10,8 @@ import {
   submitCaseEventTokenApiData,
 } from '../../../data/api-data';
 import { user } from '../../../data/user-data';
+import { maskIdentifierForLog } from '../../common/string.utils';
 import { IAction, actionData, actionRecord } from '../../interfaces';
-
-export const caseInfo: { id: string; fid: string; state: string } = { id: '', fid: '', state: '' };
 
 export class CreateCaseAPIAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -89,18 +88,20 @@ export class CreateCaseAPIAction implements IAction {
       const payload = caseUserRoleDeletionApiData.deleteCaseUsersPayload(caseId, userId, caseRole);
       await deleteCaseUsersApi.delete(caseUserRoleDeletionApiData.deleteCaseUsersApiEndPoint, { data: payload });
       console.log(`\n✅ CASE USER CLEANUP:`);
-      console.log(`   Successfully removed case user: ${userId} with role ${caseRole} from case ${caseId}`);
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const errorMessage = `Case ID: ${caseId}, User ID: ${userId}`;
+      console.log(
+        `   Successfully removed case user: ${maskIdentifierForLog(userId)} with role ${caseRole} from case ${maskIdentifierForLog(caseId)}`
+      );
+    } catch (error: unknown) {
+      const status = Axios.isAxiosError(error) ? error.response?.status : undefined;
+      const errorContext = `case ${maskIdentifierForLog(caseId)}, user ${maskIdentifierForLog(userId)}`;
       if (status === 404) {
-        console.warn(`Case user removal failed: case or user not found (404). ${errorMessage}`);
+        console.warn(`Case user removal failed: case or user not found (404). ${errorContext}`);
       } else if (status === 403) {
-        console.warn(`Case user removal failed: insufficient permissions (403). ${errorMessage}`);
+        console.warn(`Case user removal failed: insufficient permissions (403). ${errorContext}`);
       } else if (!status) {
         console.warn('Case user removal failed: no response from server.');
       } else {
-        console.warn(`Case user removal failed with status ${status}. ${errorMessage}`);
+        console.warn(`Case user removal failed with status ${status}. ${errorContext}`);
       }
     }
   }

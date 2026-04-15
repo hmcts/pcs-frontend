@@ -1,7 +1,4 @@
-// eslint-disable-next-line import/order
 import { Page } from '@playwright/test';
-
-
 import axios from 'axios';
 
 import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
