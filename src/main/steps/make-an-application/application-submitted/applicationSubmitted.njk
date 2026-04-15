@@ -1,0 +1,13 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+
+{{ govukPanel({
+  titleText: 'Placeholder Confirmation',
+  html: 'Placeholder reference number'
+}) }}
+
+{% endblock %}

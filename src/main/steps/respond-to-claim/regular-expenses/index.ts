@@ -11,7 +11,6 @@ import type { StepDefinition } from '../../../interfaces/stepFormData.interface'
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
-
 import { createFormStep } from '@modules/steps';
 
 const createAmountValidator =
