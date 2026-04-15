@@ -58,16 +58,12 @@ export default function documentUploadRoutes(app: Application): void {
           const { wrongType, tooLarge } = await uploadErrorMessages(req);
           if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({
-              success: false,
-              error: 'FILE_TOO_LARGE',
-              message: tooLarge,
+              error: { message: tooLarge },
             });
           }
           if (err.message === 'INVALID_FILE_TYPE' || err.message === 'BLOCKED_MEDIA') {
             return res.status(400).json({
-              success: false,
-              error: err.message === 'BLOCKED_MEDIA' ? 'BLOCKED_MEDIA' : 'INVALID_FILE_TYPE',
-              message: wrongType,
+              error: { message: wrongType },
             });
           }
           return next(err);
@@ -80,9 +76,7 @@ export default function documentUploadRoutes(app: Application): void {
         const file = req.file;
         if (!file) {
           return res.status(400).json({
-            success: false,
-            error: 'NO_FILE',
-            message: 'No file was uploaded',
+            error: { message: 'No file was uploaded' },
           });
         }
 
@@ -116,35 +110,42 @@ export default function documentUploadRoutes(app: Application): void {
         if (!uploadedDoc) {
           logger.error('CDAM returned no document in response', { caseId });
           return res.status(502).json({
-            success: false,
-            error: 'UPLOAD_FAILED',
-            message: 'Document service did not return a valid response',
+            error: { message: 'Document service did not return a valid response' },
           });
         }
+
+        const filename = uploadedDoc.document_filename || file.originalname;
 
         const document: CdamDocument = {
           document_url: uploadedDoc.document_url,
           document_binary_url: uploadedDoc.document_binary_url,
-          // Some stubs/environments may return URL fields without document_filename.
-          document_filename: uploadedDoc.document_filename || file.originalname,
+          document_filename: filename,
           content_type: file.mimetype,
           size: file.size,
         };
 
-        logger.info('Document uploaded to CDAM', {
-          caseId,
-          filename: document.document_filename,
-        });
+        logger.info('Document uploaded to CDAM', { caseId, filename });
 
-        return res.json({ success: true, document });
+        // MOJ MultiFileUpload JS expects { success: { messageText, messageHtml }, file: { ... } }.
+        // file.filename becomes the delete button value — we use document_url so it's sent
+        // back on delete, allowing the proxy to forward the correct CDAM URL.
+        return res.json({
+          success: {
+            messageText: `${filename} has been uploaded`,
+            messageHtml: `${filename} has been uploaded`,
+          },
+          file: {
+            filename: document.document_url,
+            originalname: filename,
+          },
+          document,
+        });
       } catch (error) {
         logger.error('Failed to upload document to CDAM', {
           error: error instanceof Error ? error.message : String(error),
         });
         return res.status(502).json({
-          success: false,
-          error: 'UPLOAD_FAILED',
-          message: 'Failed to upload document',
+          error: { message: 'Failed to upload document' },
         });
       }
     }
@@ -156,12 +157,12 @@ export default function documentUploadRoutes(app: Application): void {
     oidcMiddleware,
     async (req: Request, res: Response) => {
       try {
-        const { documentUrl } = req.body as { documentUrl: string };
+        // MOJ component sends { delete: <document_url> } — we put document_url as the
+        // delete button value so it arrives here for the CDAM proxy call.
+        const documentUrl = (req.body as Record<string, string>).delete || '';
         if (!documentUrl) {
           return res.status(400).json({
-            success: false,
-            error: 'MISSING_URL',
-            message: 'Document URL is required',
+            error: { message: 'Document URL is required' },
           });
         }
 
@@ -178,15 +179,13 @@ export default function documentUploadRoutes(app: Application): void {
           documentUrl,
         });
 
-        return res.json({ success: true });
+        return res.json({ success: true, documentUrl });
       } catch (error) {
         logger.error('Failed to delete document from CDAM', {
           error: error instanceof Error ? error.message : String(error),
         });
         return res.status(502).json({
-          success: false,
-          error: 'DELETE_FAILED',
-          message: 'Failed to delete document',
+          error: { message: 'Failed to delete document' },
         });
       }
     }

@@ -7,10 +7,10 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "macros/stepButtons.njk" import stepButtons %}
-{% from "macros/fileUpload.njk" import fileUpload %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
+{% from "macros/fileUploadMoj.njk" import fileUploadMoj %}
 
 {% block pageTitle %}
   {{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
@@ -61,7 +61,7 @@
             {% elif field.componentType == 'dateInput' %}
               {{ govukDateInput(field.component) }}
             {% elif field.componentType == 'fileUpload' %}
-              {{ fileUpload(field.component) }}
+              {{ fileUploadMoj(field.component, "Upload file", "Files added", []) }}
             {% endif %}
           {% endif %}
         {% endfor %}
@@ -85,8 +85,8 @@
           {% elif field.componentType == 'dateInput' %}
             {{ govukDateInput(field.component) }}
           {% elif field.componentType == 'fileUpload' %}
-            {{ fileUpload(field.component) }}
-          {% endif %}
+            {{ fileUploadMoj(field.component, "Upload file", "Files added", []) }}
+            {% endif %}
         {% endif %}
       {% endfor %}
     {% endif %}
