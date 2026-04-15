@@ -1,12 +1,12 @@
 import { format, parseISO } from 'date-fns';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { CcdCaseModel, PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CcdCaseModel, PossessionClaimResponse } from '@services/ccdCaseData.model';
 
 function getTenancyStartDate(validatedCase?: CcdCaseModel): string | undefined {
   return validatedCase?.tenancyStartDate as string | undefined;
