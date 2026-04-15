@@ -98,9 +98,9 @@ export interface CcdDocumentReference {
   document_url: string;
   document_binary_url: string;
   document_filename: string;
-  /** Draft / document table (AC06). */
-  content_type?: string;
-  size?: number;
+  document_hash?: string;
+  /** Backend reads mimeType/size from this JSON string: {"mimeType":"...","size":123} */
+  category_id?: string;
 }
 
 export interface CcdCollectionItem<T> {
@@ -138,7 +138,7 @@ export interface CcdDefendantResponses {
     additionalContributionFrequency?: string;
   };
   householdCircumstances?: HouseholdCircumstances;
-  defendantUploadedDocuments?: CcdCollectionItem<CcdDocumentReference>[];
+  uploadedDocuments?: CcdCollectionItem<CcdDocumentReference>[];
 }
 
 export interface PossessionClaimResponse {

@@ -50,11 +50,11 @@ function toCcdDocumentCollection(docs: CdamDocument[]): CcdCollectionItem<CcdDoc
       document_binary_url: doc.document_binary_url,
       document_filename: doc.document_filename,
     };
-    if (doc.content_type !== undefined && doc.content_type !== null) {
-      value.content_type = doc.content_type;
-    }
-    if (doc.size !== undefined && doc.size !== null) {
-      value.size = doc.size;
+    if (doc.content_type || doc.size) {
+      value.category_id = JSON.stringify({
+        mimeType: doc.content_type || '',
+        size: doc.size || 0,
+      });
     }
     return { value };
   });
@@ -90,8 +90,7 @@ export const step: StepDefinition = createFormStep({
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'upload-document', ['common']);
 
-    const existingDocs =
-      req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.defendantUploadedDocuments;
+    const existingDocs = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.uploadedDocuments;
 
     const uploadedFiles: CdamDocument[] = existingDocs
       ? existingDocs.map((item: CcdCollectionItem<CcdDocumentReference>) => {
@@ -101,11 +100,18 @@ export const step: StepDefinition = createFormStep({
             document_binary_url: v.document_binary_url,
             document_filename: v.document_filename,
           };
-          if (v.content_type !== undefined && v.content_type !== null) {
-            doc.content_type = v.content_type;
-          }
-          if (v.size !== undefined && v.size !== null) {
-            doc.size = v.size;
+          if (v.category_id) {
+            try {
+              const meta = JSON.parse(v.category_id);
+              if (meta.mimeType) {
+                doc.content_type = meta.mimeType;
+              }
+              if (typeof meta.size === 'number') {
+                doc.size = meta.size;
+              }
+            } catch {
+              // category_id is not JSON metadata -- ignore
+            }
           }
           return doc;
         })
@@ -130,7 +136,7 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        defendantUploadedDocuments: toCcdDocumentCollection(documents),
+        uploadedDocuments: toCcdDocumentCollection(documents),
       },
     };
 
