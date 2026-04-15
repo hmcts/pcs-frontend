@@ -1,7 +1,7 @@
 {
   "pageTitle": "Agreements made",
   "caption": "Respond to a property possession claim",
-  "heading": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+  "question": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
   "options": {
     "yes": "Yes",
     "no": "No",
