@@ -105,7 +105,7 @@ export default defineConfig({
             name: 'firefox',
             use: {
               ...devices['Desktop Firefox'],
-              channel: 'firefox',
+              browserName: 'firefox' as const,
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
@@ -117,7 +117,7 @@ export default defineConfig({
             name: 'webkit',
             use: {
               ...devices['Desktop Safari'],
-              channel: 'webkit',
+              browserName: 'webkit' as const,
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
@@ -152,7 +152,7 @@ export default defineConfig({
             name: 'MobileFirefox',
             use: {
               ...devices['Pixel 5'],
-              channel: 'firefox',
+              browserName: 'firefox' as const,
               ...captureSettings,
               javaScriptEnabled: true,
               headless: !!process.env.CI,
@@ -173,7 +173,7 @@ export default defineConfig({
             name: 'MobileSafari',
             use: {
               ...devices['iPhone 12'],
-              channel: 'webkit',
+              browserName: 'webkit' as const,
               ...captureSettings,
               javaScriptEnabled: true,
               headless: !!process.env.CI,
@@ -184,7 +184,7 @@ export default defineConfig({
             name: 'iPad',
             use: {
               ...devices['iPad Pro 11'],
-              channel: 'webkit',
+              browserName: 'webkit' as const,
               ...captureSettings,
               javaScriptEnabled: true,
               headless: !!process.env.CI,
