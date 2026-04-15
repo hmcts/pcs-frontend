@@ -5,7 +5,7 @@ import multer, { memoryStorage } from 'multer';
 
 import { oidcMiddleware } from '../middleware';
 
-import type { CdamDocument } from '@interfaces/documentUpload.interface';
+import type { CdamDocument, CdamRawDocument, CdamUploadResponse } from '@interfaces/documentUpload.interface';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { getTranslationFunction, loadStepNamespace } from '@modules/steps';
@@ -30,20 +30,14 @@ const upload = multer({
   },
 });
 
-// All document calls go through pcs-api, which handles S2S token generation before calling CDAM.
-function getApiUrl(): string {
-  return config.get<string>('api.url');
+// The http singleton automatically attaches ServiceAuthorization (pcs_frontend S2S token)
+// to every request, so CDAM can be called directly from the frontend.
+function getCdamUrl(): string {
+  return config.get<string>('cdam.url');
 }
 
 function getUserToken(req: Request): string {
   return req.session?.user?.accessToken || '';
-}
-
-// Extracts the UUID from a CDAM document URL:
-// e.g. http://cdam.../cases/documents/11111111-1111-1111-1111-111111111111 → 11111111-...
-function extractDocumentId(documentUrl: string): string | undefined {
-  const match = /\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:\/|$)/i.exec(documentUrl);
-  return match?.[1];
 }
 
 async function uploadErrorMessages(req: Request): Promise<{ wrongType: string; tooLarge: string }> {
@@ -89,46 +83,46 @@ export default function documentUploadRoutes(app: Application): void {
         }
 
         const caseId = req.params.caseReference;
-        // Token comes from the authenticated OIDC session.
-        // pcs-api will add the required S2S token before forwarding to CDAM.
+        // http singleton adds ServiceAuthorization (S2S) automatically via its interceptor.
+        // We additionally pass the user's bearer token so CDAM can authorise the user.
         const userToken = getUserToken(req);
-        const apiUrl = getApiUrl();
+        const cdamUrl = getCdamUrl();
 
         const formData = new FormData();
         formData.append('files', file.buffer, {
           filename: file.originalname,
           contentType: file.mimetype,
         });
+        formData.append('classification', 'PUBLIC');
         formData.append('caseTypeId', config.get<string>('ccd.caseTypeId'));
         formData.append('jurisdictionId', 'PCS');
 
-        const response = await http.post<CdamDocument>(
-          // Frontend → pcs-api → CDAM. pcs-api generates the S2S token needed by CDAM.
-          `${apiUrl}/case/document/upload`,
-          formData,
-          {
-            headers: {
-              ...formData.getHeaders(),
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        );
+        const response = await http.post<CdamUploadResponse>(`${cdamUrl}/cases/documents`, formData, {
+          headers: {
+            ...formData.getHeaders(),
+            Authorization: `Bearer ${userToken}`,
+          },
+        });
 
-        const uploadedDoc = response.data;
-        if (!uploadedDoc?.document_url) {
-          logger.error('pcs-api returned no document in response', { caseId });
+        logger.info('CDAM raw response:\n%s', JSON.stringify(response.data, null, 2));
+
+        const uploadedDoc: CdamRawDocument | undefined = response.data?.documents?.[0];
+        if (!uploadedDoc?._links?.self?.href) {
+          logger.error('CDAM returned no document in response', { caseId });
           return res.status(502).json({
             error: { message: 'Document service did not return a valid response' },
           });
         }
 
-        const filename = uploadedDoc.document_filename || file.originalname;
+        // Map from raw CDAM response shape (_links, originalDocumentName, mimeType)
+        // to the normalised CdamDocument shape used by CCD and the MOJ component.
+        const filename = uploadedDoc.originalDocumentName || file.originalname;
 
         const document: CdamDocument = {
-          document_url: uploadedDoc.document_url,
-          document_binary_url: uploadedDoc.document_binary_url,
+          document_url: uploadedDoc._links.self.href,
+          document_binary_url: uploadedDoc._links.binary.href,
           document_filename: filename,
-          content_type: uploadedDoc.content_type ?? file.mimetype,
+          content_type: uploadedDoc.mimeType || file.mimetype,
           size: uploadedDoc.size ?? file.size,
         };
 
@@ -165,8 +159,8 @@ export default function documentUploadRoutes(app: Application): void {
     oidcMiddleware,
     async (req: Request, res: Response) => {
       try {
-        // MOJ component sends { delete: <document_url> } — we stored document_url as
-        // the delete button value so we can extract the UUID and call pcs-api.
+        // MOJ component sends { delete: <document_url> } — we stored the dm-store self-link
+        // as the delete value. We need to extract the UUID and route through CDAM.
         const documentUrl = (req.body as Record<string, string>).delete || '';
         if (!documentUrl) {
           return res.status(400).json({
@@ -174,7 +168,9 @@ export default function documentUploadRoutes(app: Application): void {
           });
         }
 
-        const documentId = extractDocumentId(documentUrl);
+        // The stored URL is a dm-store link: .../documents/{uuid}
+        // CDAM delete endpoint is: DELETE {cdamUrl}/cases/documents/{uuid}
+        const documentId = documentUrl.split('/documents/').pop();
         if (!documentId) {
           return res.status(400).json({
             error: { message: 'Could not extract document ID from URL' },
@@ -182,10 +178,10 @@ export default function documentUploadRoutes(app: Application): void {
         }
 
         const userToken = getUserToken(req);
-        const apiUrl = getApiUrl();
+        const cdamUrl = getCdamUrl();
 
-        // Frontend → pcs-api → CDAM. pcs-api generates the S2S token needed by CDAM.
-        await http.delete(`${apiUrl}/case/document/${documentId}`, {
+        // http singleton adds ServiceAuthorization (S2S) automatically.
+        await http.delete(`${cdamUrl}/cases/documents/${documentId}`, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
