@@ -8,8 +8,9 @@ import type { Request } from 'express';
  * confirmation page or a capture page to the defendant.
  */
 export const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
-  const caseData = req.res?.locals?.validatedCase?.data;
-  const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
+  const { claimantEnteredDefendantDetailsNameKnown } = req.res?.locals?.validatedCase ?? {
+    claimantEnteredDefendantDetailsNameKnown: '',
+  };
 
-  return claimantEntry?.nameKnown === 'YES';
+  return claimantEnteredDefendantDetailsNameKnown === 'YES';
 };

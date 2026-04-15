@@ -1,4 +1,4 @@
-import { currency } from '../../../../../main/modules/nunjucks/filters/currency';
+import { currency } from '@modules/nunjucks/filters/currency';
 
 describe('currency filter', () => {
   it('should format whole numbers with two decimal places', () => {
