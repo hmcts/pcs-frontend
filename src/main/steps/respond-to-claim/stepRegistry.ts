@@ -2,6 +2,7 @@ import type { StepDefinition } from '../../interfaces/stepFormData.interface';
 
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
+import { step as checkYourAnswers } from './check-your-answers';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
@@ -16,12 +17,15 @@ import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
 import { step as doYouHaveAnyDependantChildren } from './dependant-children';
 import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
+import { step as equalityAndDiversityEnd } from './equality-and-diversity-end';
+import { step as equalityAndDiversityStart } from './equality-and-diversity-start';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as incomeAndExpenditure } from './income-and-expenditure';
 import { step as installmentPayments } from './installment-payments';
 import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
+import { step as languageUsed } from './language-used';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
 import { step as paymentInterstitial } from './payment-interstitial';
@@ -81,4 +85,8 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,
   'what-other-regular-expenses-do-you-have': whatOtherRegularExpensesDoYouHave,
+  'equality-and-diversity-start': equalityAndDiversityStart,
+  'equality-and-diversity-end': equalityAndDiversityEnd,
+  'language-used': languageUsed,
+  'check-your-answers': checkYourAnswers,
 };

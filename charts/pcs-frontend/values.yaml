@@ -35,3 +35,4 @@ nodejs:
     PCQ_URL: 'https://pcq.{{ .Values.global.environment }}.platform.hmcts.net'
     OTEL_SERVICE_NAME: 'pcs-frontend'
     OTEL_ENABLED: true
+    XUI_BASE_URI: 'https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net'

@@ -9,6 +9,10 @@ export type ContactPreference = 'EMAIL' | 'POST' | null;
 export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 
+export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
+
+export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
+
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
   additionalCircumstancesDetails?: string;
@@ -85,6 +89,9 @@ export interface PossessionClaimResponse {
     writtenTerms?: YesNoNotSureValue;
     disputeClaim?: YesNoValue;
     disputeClaimDetails?: string;
+    languageUsed?: LanguageUsed;
+    equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
+
     paymentAgreement?: {
       repaymentPlanAgreed?: YesNoNotSureValue;
       repaymentAgreedDetails?: string;
