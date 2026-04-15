@@ -1,9 +1,9 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'free-legal-advice',
@@ -52,8 +52,9 @@ export const step: StepDefinition = createFormStep({
     paragraph4: 'paragraph4',
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const existingAnswer = caseData?.possessionClaimResponse?.defendantResponses?.freeLegalAdvice;
+    const { defendantResponsesFreeLegalAdvice: existingAnswer } = req.res?.locals?.validatedCase ?? {
+      defendantResponsesFreeLegalAdvice: undefined,
+    };
 
     // Map CCD enum to frontend value
     const formValue =

@@ -5,13 +5,13 @@ import {
   getDashboardTaskGroups,
   getRootGreeting,
   validateAccessCode,
-} from '../../../../main/services/pcsApi/pcsApiService';
+} from '@services/pcsApi/pcsApiService';
 
 jest.mock('config', () => ({
   get: jest.fn(),
 }));
 
-jest.mock('../../../../main/modules/http', () => ({
+jest.mock('@modules/http', () => ({
   http: {
     get: jest.fn(),
     post: jest.fn(),

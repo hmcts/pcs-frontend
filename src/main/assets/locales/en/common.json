@@ -101,17 +101,6 @@
     "second": "second",
     "seconds": "seconds"
   },
-  "characterCount": {
-    "charactersUnderLimitText": {
-      "one": "You have %{count} character remaining",
-      "other": "You have %{count} characters remaining"
-    },
-    "charactersAtLimitText": "You have reached the limit",
-    "charactersOverLimitText": {
-      "one": "You have %{count} character too many",
-      "other": "You have %{count} characters too many"
-    }
-  },
   "errorPages": {
     "403": {
       "title": "Not Authorised",

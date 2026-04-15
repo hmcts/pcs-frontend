@@ -1,5 +1,5 @@
-import type { CaseData, PossessionClaimResponse, YesNoValue } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { CaseData, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -28,7 +28,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     const otherConsiderationsDetails: string | undefined =
-      otherConsiderations === 'Yes' ? req.body?.['otherConsiderations.otherConsiderationsDetails'] : undefined;
+      otherConsiderations === 'YES' ? req.body?.['otherConsiderations.otherConsiderationsDetails'] : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
@@ -47,16 +47,16 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
 
-    if (existingAnswer === 'Yes') {
+    if (existingAnswer === 'YES') {
       const otherConsiderationsDetails: string | undefined =
         caseData?.possessionClaimResponse?.defendantResponses?.otherConsiderationsDetails;
       return {
-        otherConsiderations: 'Yes',
+        otherConsiderations: 'YES',
         'otherConsiderations.otherConsiderationsDetails': otherConsiderationsDetails ?? '',
       };
     }
 
-    return { otherConsiderations: 'No' };
+    return { otherConsiderations: 'NO' };
   },
   fields: [
     {
@@ -70,7 +70,7 @@ export const step: StepDefinition = createFormStep({
       errorMessage: 'errors.otherConsiderations',
       options: [
         {
-          value: 'Yes',
+          value: 'YES',
           translationKey: 'options.yes',
           subFields: {
             otherConsiderationsDetails: {
@@ -95,7 +95,7 @@ export const step: StepDefinition = createFormStep({
             },
           },
         },
-        { value: 'No', translationKey: 'options.no' },
+        { value: 'NO', translationKey: 'options.no' },
       ],
     },
   ],

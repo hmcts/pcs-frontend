@@ -1,9 +1,9 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'defendant-name-capture',
@@ -46,9 +46,11 @@ export const step: StepDefinition = createFormStep({
     contactUs: 'contactUs',
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals.validatedCase?.data;
-    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
-    const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
+    const { defendantContactDetailsParty: party, claimantEnteredDefendantDetails: claimantEntry } = req.res?.locals
+      .validatedCase ?? {
+      defendantContactDetailsParty: undefined,
+      claimantEnteredDefendantDetails: undefined,
+    };
 
     const firstName =
       (typeof party?.firstName === 'string' && party.firstName.trim() ? party.firstName : undefined) ||

@@ -1,12 +1,13 @@
 import config from 'config';
 
 import { HTTPError } from '../../../main/HttpError';
-import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '../../../main/interfaces/ccdCase.interface';
-import { http } from '../../../main/modules/http';
-import { ccdCaseService } from '../../../main/services/ccdCaseService';
+
+import { http } from '@modules/http';
+import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('config');
-jest.mock('../../../main/modules/http');
+jest.mock('@modules/http');
 
 const mockPost = http.post as jest.Mock;
 const mockGet = http.get as jest.Mock;
