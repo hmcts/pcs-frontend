@@ -22,6 +22,7 @@ import {
   incomeAndExpenses,
   installmentPayments,
   nonRentArrearsDispute,
+  otherConsiderations,
   priorityDebts,
   rentArrears,
   repaymentsAgreed,
@@ -29,7 +30,6 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
-  uploadDocuments,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
@@ -359,7 +359,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
     });
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
@@ -419,10 +419,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performValidation('mainHeader', installmentPayments.mainHeader);
-    //include missing steps
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
-
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,

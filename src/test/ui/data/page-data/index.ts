@@ -28,7 +28,7 @@ export * from './writtenTerms.page.data';
 export * from './whatRegularIncomeDoYouReceive.page.data';
 export * from './universalCredit.page.data';
 export * from './priorityDebts.page.data';
-export * from './uploadDocuments.page.data';
+export * from './otherConsiderations.page.data';
 export * from './installmentPayments.page.data';
 export * from './howMuchAffordToPay.page.data';
 export * from './doYouHaveAnyDependantChildren.page.data';
