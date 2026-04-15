@@ -1,8 +1,8 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -54,11 +54,7 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: async req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-
-    const landlordLicensed = caseData?.possessionClaimResponse?.defendantResponses?.landlordLicensed as
-      | string
-      | undefined;
+    const landlordLicensed = req.res?.locals?.validatedCase?.defendantResponsesLandlordLicensed as string | undefined;
 
     const mapping: Record<string, string> = {
       YES: 'yes',

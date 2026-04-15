@@ -30,8 +30,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     const enumMapping: Record<string, YesNoValue> = {
-      yes: 'Yes',
-      no: 'No',
+      yes: 'YES',
+      no: 'NO',
     };
 
     const dependantChildrenCcd = enumMapping[dependantChildren];
@@ -40,7 +40,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     const dependantChildrenDetails: string | undefined =
-      dependantChildrenCcd === 'Yes' ? req.body?.['dependantChildren.dependantChildrenDetails'] : undefined;
+      dependantChildrenCcd === 'YES' ? req.body?.['dependantChildren.dependantChildrenDetails'] : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
@@ -62,7 +62,7 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
 
-    if (dependantChildrenCcd === 'Yes') {
+    if (dependantChildrenCcd === 'YES') {
       const dependantChildrenDetails: string | undefined = householdCircumstances?.dependantChildrenDetails;
       return {
         dependantChildren: 'yes',

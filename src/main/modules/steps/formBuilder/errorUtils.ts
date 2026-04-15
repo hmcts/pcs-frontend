@@ -1,12 +1,14 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig, TranslationKeys } from '../../../interfaces/formFieldConfig.interface';
-import { getDashboardUrl } from '../../../routes/dashboard';
 import { getRequestLanguage } from '../../i18n';
 import { getTranslationFunction } from '../i18n';
 
+import { parseNestedFieldName } from './conditionalFields';
 import type { DateFieldError } from './dateValidation';
+
+import type { FormFieldConfig, FormFieldType, TranslationKeys } from '@interfaces/formFieldConfig.interface';
+import { getDashboardUrl } from '@routes/dashboard';
 
 export interface ErrorSummaryData {
   titleText: string;
@@ -14,6 +16,29 @@ export interface ErrorSummaryData {
 }
 
 export type FormError = string | DateFieldError;
+
+/** Config type for an error key: top-level name or parent.child under a radio/checkbox option */
+export function fieldTypeForErrorKey(fields: FormFieldConfig[], key: string): FormFieldType | undefined {
+  const topLevel = fields.find(f => f.name === key);
+  if (topLevel) {
+    return topLevel.type;
+  }
+  const nested = parseNestedFieldName(key);
+  if (!nested) {
+    return undefined;
+  }
+  const parent = fields.find(f => f.name === nested.parentFieldName);
+  if (!parent?.options) {
+    return undefined;
+  }
+  for (const option of parent.options) {
+    const sub = option.subFields?.[nested.subFieldName];
+    if (sub) {
+      return sub.type;
+    }
+  }
+  return undefined;
+}
 
 /**
  * Extracts the error message string from a FormError
@@ -43,8 +68,7 @@ export function buildErrorSummary(
   const errorList: { text: string; href: string }[] = [];
 
   for (const [fieldName, error] of Object.entries(errors)) {
-    const fieldConfig = fields.find(f => f.name === fieldName);
-    const fieldType = fieldConfig?.type;
+    const fieldType = fieldTypeForErrorKey(fields, fieldName);
 
     // Extract error message and date part info
     const errorMessage = typeof error === 'string' ? error : error.message;
@@ -53,12 +77,9 @@ export function buildErrorSummary(
     // Determine the anchor ID for the error link
     let anchorId: string;
     if (fieldType === 'date') {
-      // For date fields, use erroneous parts info if available
-      if (erroneousParts && erroneousParts.length === 1) {
-        // Single specific part error - anchor to that part
+      if (erroneousParts && erroneousParts.length) {
         anchorId = `${fieldName}-${erroneousParts[0]}`;
       } else {
-        // Generic error or multiple parts - anchor to day
         anchorId = `${fieldName}-day`;
       }
     } else if (fieldType === 'radio' || fieldType === 'checkbox') {

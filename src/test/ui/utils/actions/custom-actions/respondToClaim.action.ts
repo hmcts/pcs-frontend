@@ -11,9 +11,13 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
+  doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  exceptionalHardship,
   freeLegalAdvice,
+  howMuchAffordToPay,
+  installmentPayments,
   landlordLicensed,
   landlordRegistered,
   nonRentArrearsDispute,
@@ -26,7 +30,9 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
+  yourCircumstances,
   yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
@@ -61,6 +67,15 @@ export class RespondToClaimAction implements IAction {
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
+      ['yourCircumstances', () => this.yourCircumstances(fieldName as actionRecord)],
+      ['exceptionalHardship', () => this.exceptionalHardship(fieldName as actionRecord)],
+      [
+        'selectIfAnyOtherAdultsLiveInYourHouse',
+        () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
+      ],
+      ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
+      ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
+      ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
@@ -234,7 +249,7 @@ export class RespondToClaimAction implements IAction {
 
   private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: repaymentsAgreed.getMainHeader(claimantsName),
+      question: repaymentsAgreedData.question,
       option: repaymentsAgreedData.repaymentAgreedOption,
     });
     if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {
@@ -245,6 +260,26 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  }
+  private async installmentPayments(installmentData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: installmentData.question,
+      option: installmentData.radioOption,
+    });
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
+  }
+
+  private async selectHowMuchAffordToPay(howMuchToPayData: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
+      howMuchToPayData.affordToPay
+    );
+    await performAction('clickRadioButton', {
+      question: howMuchToPayData.question,
+      option: howMuchToPayData.radioOption,
+    });
+    await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
@@ -309,6 +344,39 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  }
+
+  private async selectIfAnyOtherAdultsLiveInYourHouse(adultsInHouseDetails: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: doAnyOtherAdultsLiveInYourHome.mainHeader,
+      option: adultsInHouseDetails.radioOption,
+    });
+
+    if (adultsInHouseDetails.radioOption === 'Yes' && adultsInHouseDetails.details) {
+      await performAction(
+        'inputText',
+        doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
+        adultsInHouseDetails.details
+      );
+    }
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+  }
+
+  private async selectAlternativeAccommodation(moveInDetails: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader,
+      option: moveInDetails.radioOption,
+    });
+
+    if (moveInDetails.radioOption === 'Yes' && moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, moveInDetails.day],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, moveInDetails.month],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, moveInDetails.year]
+      );
+    }
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
   }
 
   private async disputingOtherPartsOfTheClaim(doYouWantToDisputeOption: actionRecord): Promise<void> {
@@ -384,6 +452,36 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  }
+
+  private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: yourCircumstancesData.question,
+      option: yourCircumstancesData.yourCircumstancesOption,
+    });
+    if (yourCircumstancesData.yourCircumstancesOption === yourCircumstances.yesRadioOption) {
+      await performAction(
+        'inputText',
+        yourCircumstances.giveDetailsHiddenTextLabel,
+        yourCircumstances.detailsTextInput
+      );
+    }
+    await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  }
+
+  private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: exceptionalHardshipData.question,
+      option: exceptionalHardshipData.exceptionalHardshipOption,
+    });
+    if (exceptionalHardshipData.exceptionalHardshipOption === exceptionalHardship.yesRadioOption) {
+      await performAction(
+        'inputText',
+        exceptionalHardship.giveDetailsHiddenTextLabel,
+        exceptionalHardship.detailsTextInput
+      );
+    }
+    await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
   }
 
   private async readYourHouseholdAndCircumstances(): Promise<void> {
