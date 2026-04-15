@@ -32,7 +32,7 @@ export class InputTextAction implements IAction {
       :has-text("${fieldParams}") ~ input:visible:enabled,
       label:has-text("${fieldParams}") ~ textarea,
       label:has-text("${fieldParams}") + div input,
-      :has-text("${fieldParams}") + textarea
+      :has-text("${fieldParams}") ~ textarea:visible:enabled
     `
       )
       .first();
