@@ -10,7 +10,6 @@ import {
   submitCaseEventTokenApiData,
 } from '../../../data/api-data';
 import { user } from '../../../data/user-data';
-import { maskIdentifierForLog } from '../../common/string.utils';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class CreateCaseAPIAction implements IAction {
@@ -88,12 +87,10 @@ export class CreateCaseAPIAction implements IAction {
       const payload = caseUserRoleDeletionApiData.deleteCaseUsersPayload(caseId, userId, caseRole);
       await deleteCaseUsersApi.delete(caseUserRoleDeletionApiData.deleteCaseUsersApiEndPoint, { data: payload });
       console.log(`\n✅ CASE USER CLEANUP:`);
-      console.log(
-        `   Successfully removed case user: ${maskIdentifierForLog(userId)} with role ${caseRole} from case ${maskIdentifierForLog(caseId)}`
-      );
+      console.log(`   Successfully removed case user with role ${caseRole} from case ${caseId}`);
     } catch (error: unknown) {
       const status = Axios.isAxiosError(error) ? error.response?.status : undefined;
-      const errorContext = `case ${maskIdentifierForLog(caseId)}, user ${maskIdentifierForLog(userId)}`;
+      const errorContext = `Case ID: ${caseId}`;
       if (status === 404) {
         console.warn(`Case user removal failed: case or user not found (404). ${errorContext}`);
       } else if (status === 403) {
