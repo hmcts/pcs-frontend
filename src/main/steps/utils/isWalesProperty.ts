@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { CcdCaseData } from '../../interfaces/ccdCase.interface';
+import type { CcdCaseData } from '@services/ccdCase.interface';
 
 /**
  * Checks if property is located in Wales from CCD case data.
