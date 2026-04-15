@@ -62,9 +62,9 @@ export class RecordAnswers implements IAction {
     recordIfPresent('label', 'input');
   }
 
-  private normalizeValueData = (value: actionData): string => {
+  private normalizeValueData(value: actionData): string {
     if (Array.isArray(value)) {
-      return value.map((val: any) => String(val)).join(',');
+      return value.map(val => String(val)).join(',');
     }
 
     if (typeof value === 'object' && value !== null) {
@@ -72,5 +72,5 @@ export class RecordAnswers implements IAction {
     }
 
     return String(value);
-  };
+  }
 }
