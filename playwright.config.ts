@@ -42,21 +42,13 @@ function resolveE2eSpecKeyword(raw: string | undefined): string | undefined {
 }
 
 const e2eSpecKeyword = resolveE2eSpecKeyword(process.env.E2E_SPEC);
-
-function functionalTestGrepFromEnv(): RegExp | undefined {
-  const scope = process.env.FUNCTIONAL_TEST_SCOPE?.trim();
-  if (!scope) {
-    return undefined;
-  }
-  return new RegExp(scope.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-}
-
-const resolvedFunctionalGrep = functionalTestGrepFromEnv();
+const scopeForGrep = process.env.FUNCTIONAL_TEST_SCOPE?.trim();
+const grepFromScope = scopeForGrep ? new RegExp(scopeForGrep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) : undefined;
 
 export default defineConfig({
   testDir: './src/test/ui',
   ...(e2eSpecKeyword ? { testMatch: [`**/*${e2eSpecKeyword}*.spec.ts`] } : {}),
-  ...(resolvedFunctionalGrep ? { grep: resolvedFunctionalGrep } : {}),
+  ...(grepFromScope ? { grep: grepFromScope } : {}),
   /* Run tests in files in parallel */
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -117,32 +109,6 @@ export default defineConfig({
             use: {
               ...devices['Desktop Safari'],
               channel: 'webkit',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'MobileChrome',
-            use: {
-              ...devices['Pixel 5'],
-              channel: 'MobileChrome',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'MobileSafari',
-            use: {
-              ...devices['iPhone 12'],
-              channel: 'MobileSafari',
               screenshot: 'only-on-failure' as const,
               video: 'retain-on-failure' as const,
               trace: 'on-first-retry' as const,

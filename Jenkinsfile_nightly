@@ -1,7 +1,6 @@
 #!groovy
 
 properties([
-  // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
     booleanParam(
@@ -22,22 +21,22 @@ properties([
     booleanParam(
       name: 'MICROSOFT_EDGE_TESTS',
       defaultValue: false,
-      description: 'Microsoft Edge (desktop)'
+      description: 'Microsoft Edge'
     ),
     booleanParam(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
       defaultValue: true,
-      description: 'Enable page functional tests (content, errors, navigation) in Playwright.'
+      description: 'Page functional tests (content, errors, navigation).'
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
       choices: ['@nightly', '(all tests)', '@smoke', '@regression', '@accessibility'],
-      description: 'Test title tag. Default @nightly. (all tests) = no tag filter.'
+      description: 'Title tag. Default @nightly. (all tests) = no tag filter.'
     ),
     string(
       name: 'PLAYWRIGHT_SPEC',
       defaultValue: '',
-      description: 'Substring of a spec path (exact case). Leave blank for all specs. Invalid / no file match → all specs.'
+      description: 'Spec path substring (exact case). Blank = all specs.'
     ),
   ])
 ])
@@ -68,7 +67,7 @@ def secrets = [
 withNightlyPipeline(type, product, component) {
   enableSlackNotifications('#pcs-tech')
   loadVaultSecrets(secrets)
-  handleEnvironmentSetting()
+  env.TEST_URL = 'https://pcs.aat.platform.hmcts.net/'
   setFunctionalTestEnvVars()
   enableFortifyScan()
 
@@ -78,41 +77,37 @@ withNightlyPipeline(type, product, component) {
   }
 }
 
-def handleEnvironmentSetting() {
-  env.TEST_URL = 'https://pcs.aat.platform.hmcts.net/'
-}
-
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
-  def grepChoice = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
-  env.FUNCTIONAL_TEST_SCOPE = (grepChoice == '(all tests)') ? '' : grepChoice
+  def tag = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
+  env.FUNCTIONAL_TEST_SCOPE = (tag == '(all tests)') ? '' : tag
   env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = (params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS != false) ? 'true' : 'false'
 }
 
 def runE2ETests(yarnBuilder) {
-  if (params.CHROME_TESTS) {
-    runE2ETestsForProject(yarnBuilder, 'Chrome', 'Chrome')
-  }
-  if (params.FIREFOX_TESTS) {
-    runE2ETestsForProject(yarnBuilder, 'Firefox', 'Firefox')
-  }
-  if (params.WEBKIT_TESTS) {
-    runE2ETestsForProject(yarnBuilder, 'Safari', 'WebKit')
-  }
-  if (params.MICROSOFT_EDGE_TESTS) {
-    runE2ETestsForProject(yarnBuilder, 'MicrosoftEdge', 'Microsoft Edge')
+  [
+    [flag: 'CHROME_TESTS', playwrightProject: 'chrome', stageLabel: 'Desktop Chrome'],
+    [flag: 'FIREFOX_TESTS', playwrightProject: 'firefox', stageLabel: 'Desktop Firefox'],
+    [flag: 'WEBKIT_TESTS', playwrightProject: 'webkit', stageLabel: 'Desktop WebKit'],
+    [flag: 'MICROSOFT_EDGE_TESTS', playwrightProject: 'MicrosoftEdge', stageLabel: 'Desktop Edge'],
+  ].each { row ->
+    if (params[row.flag]) {
+      runE2eStage(yarnBuilder, row.playwrightProject, row.stageLabel)
+    }
   }
 }
 
-def runE2ETestsForProject(yarnBuilder, String yarnScriptSuffix, String stageLabel) {
-  stage("Full E2E Test - ${stageLabel}") {
+def runE2eStage(yarnBuilder, String playwrightProject, String stageLabel) {
+  stage("${stageLabel}") {
     node {
       checkout scm
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        yarnBuilder.yarn("test:E2e${yarnScriptSuffix}")
+        withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
+          yarnBuilder.yarn('test:E2e')
+        }
       }
       publishHTML([
         allowMissing: true,
@@ -120,13 +115,13 @@ def runE2ETestsForProject(yarnBuilder, String yarnScriptSuffix, String stageLabe
         keepAll: true,
         reportDir: "allure-report",
         reportFiles: 'index.html',
-        reportName: "Full ${stageLabel} E2E Test Report"
+        reportName: "${stageLabel} E2E Report"
       ])
       steps.archiveArtifacts(
         allowEmptyArchive: true,
         artifacts: 'definitions/test/playwright-report/**'
       )
-      sendAllureReportToSlack(yarnScriptSuffix, "Full_20${yarnScriptSuffix}_20E2E_20Test_20Report/")
+      sendAllureReportToSlack(stageLabel, "Full_20${playwrightProject}_20E2E_20Test_20Report/")
     }
   }
 }

@@ -38,9 +38,6 @@ withPipeline(type, product, component) {
   onPR() {
     env.FUNCTIONAL_TEST_SCOPE = '@PR'
     def e2eTag = prLabelSuffix(githubApi, 'e2e-tag:')
-    if (!e2eTag?.trim()) {
-      e2eTag = prLabelSuffix(githubApi, 'e2eTag:')
-    }
     if (e2eTag?.trim()) {
       env.FUNCTIONAL_TEST_SCOPE = e2eTag.trim()
     }

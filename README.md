@@ -181,9 +181,7 @@ By default, the tests will run against http://localhost:3209/, please update the
 There are also several custom test scripts available:
 
 - `yarn test:changed` - runs only changed spec files
-- `test:E2eChrome` - runs the full E2E suite in Chrome
-- `test:E2eFirefox` - runs the full E2E suite in Firefox
-- `test:E2eSafari` - runs the full E2E suite in Safari
+- `PLAYWRIGHT_PROJECT=chrome yarn test:E2e` — full E2E in Chrome (`firefox`, `webkit`, `MicrosoftEdge` also valid)
 
 Running accessibility tests:
 
