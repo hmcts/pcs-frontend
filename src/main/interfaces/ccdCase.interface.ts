@@ -4,8 +4,8 @@ export enum CaseState {
 }
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
+export type YesNoValue = 'YES' | 'NO' | null;
 export type TenancyTypeCorrectValue = YesNoNotSureValue;
-export type YesNoValue = 'YES' | 'NO' | 'Yes' | 'No' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 export enum YesNoEnum {
