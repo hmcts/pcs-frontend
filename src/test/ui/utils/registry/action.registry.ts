@@ -4,10 +4,10 @@ import {
   GenAppsAction,
   LoginAction,
   NavigateToUrlAction,
+  RecordAnswers,
   RespondToClaimAction,
   TriggerPageFunctionalTestsAction,
 } from '../actions/custom-actions';
-import { RecordAnswers } from '../actions/custom-actions/recordAnsweredFields.action';
 import {
   CheckAction,
   ClickButtonAction,
