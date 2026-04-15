@@ -25,6 +25,7 @@ export const step: StepDefinition = createFormStep({
               name: 'hwfReference',
               type: 'text',
               required: true,
+              maxLength: 60,
               labelClasses: 'govuk-!-font-weight-bold',
               translationKey: {
                 label: 'revealedHwfQuestion.label',
