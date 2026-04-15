@@ -1,6 +1,6 @@
 {
   "caption": "cyRespond to a property possession claim",
-  "pageTitle": "cyYour correspondence address",
+  "pageTitle": "cyYour postal address",
   "legend": "cyIs your correspondence address ",
   "legendNa": "cyWhat’s your correspondence address?",
   "legend.hint": "cyThis is the address provided by {{claimantName}}",

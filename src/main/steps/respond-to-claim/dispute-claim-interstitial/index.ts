@@ -1,59 +1,32 @@
-import type { Request, Response } from 'express';
+import { getClaimantName } from '../../utils/getClaimantName';
+import { flowConfig } from '../flow.config';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { getDashboardUrl } from '../../../routes/dashboard';
-import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 
-import { createGetController, createStepNavigation } from '@modules/steps';
-
-const stepName = 'dispute-claim-interstitial';
-const stepNavigation = createStepNavigation(flowConfig);
-
-export const step: StepDefinition = {
-  url: `${RESPOND_TO_CLAIM_ROUTE}/dispute-claim-interstitial`,
-  name: stepName,
-  view: 'respond-to-claim/dispute-claim-interstitial/disputeClaimInterstitial.njk',
+export const step: StepDefinition = createFormStep({
+  stepName: 'dispute-claim-interstitial',
+  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  getController: () => {
-    return createGetController(
-      'respond-to-claim/dispute-claim-interstitial/disputeClaimInterstitial.njk',
-      stepName,
-      stepNavigation,
-      async (req: Request) => {
-        const t = req.t;
-
-        if (!t) {
-          throw new Error('Translation function not available');
-        }
-
-        // Get claimant name from CCD callback data (res.locals.validatedCase)
-        // Use only data from CCD - no hardcoded fallbacks
-        const claimantName = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
-          ?.value as string | undefined;
-
-        return {
-          backUrl: await stepNavigation.getBackUrl(req, stepName),
-          dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-          // these keys override the translations from the step namespace but interpolate the claimantName
-          cancel: t('buttons.cancel', { ns: 'common' }),
-          heading: t('heading', { claimantName }),
-          paragraph1: t('paragraph1', { claimantName }),
-        };
-      },
-      'respondToClaim'
-    );
+  flowConfig,
+  customTemplate: `${__dirname}/disputeClaimInterstitial.njk`,
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    caption: 'caption',
+    paragraph2: 'paragraph2',
+    paragraph3: 'paragraph3',
+    listItem1: 'listItem1',
+    listItem2: 'listItem2',
+    listItem3: 'listItem3',
   },
-  postController: {
-    post: async (req: Request, res: Response) => {
-      // Get next step URL and redirect
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
+  fields: [],
+  extendGetContent: req => {
+    const claimantName = getClaimantName(req);
+    const t = getTranslationFunction(req, 'dispute-claim-interstitial', ['common']);
 
-      if (!redirectPath) {
-        // No next step defined - show not found page
-        return res.status(404).render('not-found');
-      }
-
-      res.redirect(303, redirectPath);
-    },
+    return {
+      heading: t('heading', { claimantName }),
+      paragraph1: t('paragraph1', { claimantName }),
+    };
   },
-};
+});

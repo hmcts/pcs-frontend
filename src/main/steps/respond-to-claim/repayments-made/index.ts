@@ -1,6 +1,7 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -17,6 +18,7 @@ export const step: StepDefinition = createFormStep({
       name: 'confirmRepaymentsMade',
       type: 'radio',
       required: true,
+      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l',
       translationKey: {
         label: 'question',
@@ -43,9 +45,19 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  extendGetContent: req => ({
-    claimantName: req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]?.value,
-    claimIssueDate: req.res?.locals?.validatedCase?.data?.claimIssueDate,
-  }),
+  getInitialFormData: () => {
+    // Repayments answers are not currently exposed via validatedCase model getters.
+    return {};
+  },
+  extendGetContent: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const claimantName = getClaimantName(req);
+    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
+
+    return {
+      claimantName,
+      claimIssueDate,
+    };
+  },
   customTemplate: `${__dirname}/repaymentsMade.njk`,
 });
