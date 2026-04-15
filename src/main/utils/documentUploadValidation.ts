@@ -1,5 +1,5 @@
-import type { CcdCollectionItem, CcdDocumentReference } from '@interfaces/ccdCase.interface';
-import type { CdamDocument } from '@interfaces/documentUpload.interface';
+import type { CcdCollectionItem, CcdDocumentReference } from '@services/ccdCase.interface';
+import type { CdamDocument } from '@services/documentUpload.interface';
 
 export const UPLOAD_MAX_FILE_SIZE_BYTES = 1024 * 1024 * 1024;
 export const UPLOAD_MAX_FILE_SIZE_MB = 1024;

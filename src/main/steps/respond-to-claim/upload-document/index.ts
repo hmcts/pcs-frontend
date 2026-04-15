@@ -1,11 +1,11 @@
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { CcdCollectionItem, CcdDocumentReference } from '@interfaces/ccdCase.interface';
-import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
-import type { CdamDocument } from '@interfaces/documentUpload.interface';
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CcdCollectionItem, CcdDocumentReference } from '@services/ccdCase.interface';
+import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
+import type { CdamDocument } from '@services/documentUpload.interface';
 import {
   ACCEPT_ATTRIBUTE_EXTENSIONS,
   UPLOAD_MAX_FILE_SIZE_MB,

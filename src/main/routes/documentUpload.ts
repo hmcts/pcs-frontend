@@ -5,10 +5,10 @@ import multer, { memoryStorage } from 'multer';
 
 import { oidcMiddleware } from '../middleware';
 
-import type { CdamDocument, CdamRawDocument, CdamUploadResponse } from '@interfaces/documentUpload.interface';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { getTranslationFunction, loadStepNamespace } from '@modules/steps';
+import type { CdamDocument, CdamRawDocument, CdamUploadResponse } from '@services/documentUpload.interface';
 import {
   UPLOAD_MAX_FILE_SIZE_BYTES,
   UPLOAD_MAX_FILE_SIZE_MB,
