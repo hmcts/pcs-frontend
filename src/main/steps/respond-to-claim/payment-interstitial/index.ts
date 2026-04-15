@@ -1,6 +1,6 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -10,6 +10,7 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/paymentInterstitial.njk`,
   translationKeys: {
+    pageTitle: 'pageTitle',
     heading: 'heading',
     caption: 'caption',
     paragraph1: 'paragraph1',

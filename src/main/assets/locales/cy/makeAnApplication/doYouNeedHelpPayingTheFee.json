@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyDo you need help paying the fee for this application?",
+  "caption": "cyMake an application",
+  "heading": "cyDo you need help paying the fee for this application?",
+  "question": "cyDo you need help paying the fee for this application?",
+  "errors": {
+    "typeOfApplication": "cyYou must select whether you need help paying the fee"
+  }
+}
