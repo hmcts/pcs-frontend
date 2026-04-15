@@ -44,7 +44,7 @@ export const whatRegularIncomeDoYouReceive = {
   emojiTextInput: `👉 😄`,
   emojiErrorMessage: `Give details about the other sources of income and how much you usually receive must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   tooManyCharTextInput: generateRandomString(501),
-  limitHiddenHintText: `You have reached the limit`,
+  limitHiddenHintText: `You have 0 characters remaining`,
   oneCharTooManyHiddenHintText: `You have 1 character too many`,
   tooManyCharErrorMessage: `Must be 500 characters or fewer`,
   saveAndContinueButton: `Save and continue`,
