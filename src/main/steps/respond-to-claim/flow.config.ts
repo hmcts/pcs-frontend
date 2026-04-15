@@ -1,6 +1,7 @@
 import { type Request } from 'express';
 
 import {
+  getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
@@ -67,6 +68,8 @@ export const flowConfig: JourneyFlowConfig = {
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
+    'installment-payments',
+    'how-much-afford-to-pay',
     'correspondence-address',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
@@ -112,7 +115,7 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           // Route to defendant name capture if defendant is unknown
-          condition: async (req: Request) => !isDefendantNameKnown(req),
+          condition: async (req: Request) => !(await isDefendantNameKnown(req)),
           nextStep: 'defendant-name-capture',
         },
       ],
@@ -406,11 +409,15 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           condition: async (
-            _req: Request,
+            req: Request,
             _formData: Record<string, unknown>,
             currentStepData: Record<string, unknown>
-          ): Promise<boolean> => currentStepData.repaymentsAgreed === 'no',
-
+          ): Promise<boolean> => {
+            if (currentStepData.repaymentsAgreed !== 'no') {
+              return false;
+            }
+            return hasAnyRentArrearsGround(req);
+          },
           nextStep: 'installment-payments',
         },
         {
@@ -425,8 +432,26 @@ export const flowConfig: JourneyFlowConfig = {
       ],
       previousStep: 'repayments-made',
     },
-    'your-household-and-circumstances': {
+    'installment-payments': {
       previousStep: 'repayments-agreed',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData?.confirmInstallmentOffer === 'yes',
+          nextStep: 'how-much-afford-to-pay',
+        },
+      ],
+      defaultNext: 'your-household-and-circumstances',
+    },
+    'how-much-afford-to-pay': {
+      previousStep: 'installment-payments',
+      defaultNext: 'your-household-and-circumstances',
+    },
+    'your-household-and-circumstances': {
+      previousStep: (req: Request) => getPreviousStepForYourHouseholdAndCircumstances(req),
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {
@@ -476,10 +501,6 @@ export const flowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
-    },
-    'installment-payments': {
-      previousStep: 'repayments-agreed',
-      defaultNext: 'your-household-and-circumstances',
     },
   },
 };

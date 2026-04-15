@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import { JourneyFlowConfig } from '../../../main/interfaces/stepFlow.interface';
-import { shouldShowStep } from '../../../main/steps/showConditionService';
+import { shouldShowStep } from '../../../main/steps/index';
 
 describe('shouldShowStep', () => {
   const req: Request = {} as Request;
