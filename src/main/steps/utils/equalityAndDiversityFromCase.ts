@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse } from '../../interfaces/ccdCase.interface';
+import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 /**
  * Check whether the defendant chose to skip equality and diversity questions
