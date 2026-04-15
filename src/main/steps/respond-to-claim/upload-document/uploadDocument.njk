@@ -1,0 +1,56 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/stepButtons.njk" import stepButtons %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "macros/fileUpload.njk" import fileUpload %}
+
+{% block pageTitle %}
+  {{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-l">{{ caption }}</span>
+  {% endif %}
+
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% endif %}
+
+  <p class="govuk-body">{{ guidanceText }}</p>
+
+  <h2 class="govuk-heading-s">{{ beforeUploadHeading }}</h2>
+  <p class="govuk-body">{{ beforeUploadText }}</p>
+
+  {# Default enctype so urlencoded parser fills req.body (CSRF, action, hidden document fields). Files post via AJAX to the upload proxy. #}
+  <form method="post" action="{{ url }}" novalidate>
+    {{ fileUpload(
+      {
+        id: "documents",
+        name: "documents",
+        label: {
+          text: uploadLabel,
+          classes: "govuk-label--m"
+        },
+        uploadUrl: uploadUrl,
+        deleteUrl: deleteUrl
+      },
+      filesAddedHeading,
+      uploadButton,
+      deleteButton,
+      uploadedFiles,
+      acceptAttribute,
+      maxFileSizeMb,
+      wrongFileTypeError,
+      fileTooLargeError,
+      deleteFailedError
+    ) }}
+
+    {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
+  </form>
+{% endblock %}

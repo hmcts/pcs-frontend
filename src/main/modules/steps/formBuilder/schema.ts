@@ -52,7 +52,7 @@ const ValidateFunctionSchema = z.custom<
 export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
   z.object({
     name: z.string(),
-    type: z.enum(['radio', 'checkbox', 'text', 'date', 'textarea', 'character-count']),
+    type: z.enum(['radio', 'checkbox', 'text', 'date', 'textarea', 'character-count', 'file']),
     required: z.union([z.boolean(), RequiredFunctionSchema]).optional(),
     pattern: z.string().optional(),
     maxLength: z.number().optional(),
@@ -72,11 +72,18 @@ export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
     attributes: z.record(z.string(), z.unknown()).optional(),
     // Pre-processed component configuration for template rendering
     component: z.record(z.string(), z.unknown()).optional(),
-    componentType: z.enum(['input', 'textarea', 'characterCount', 'radios', 'checkboxes', 'dateInput']).optional(),
+    componentType: z
+      .enum(['input', 'textarea', 'characterCount', 'radios', 'checkboxes', 'dateInput', 'fileUpload'])
+      .optional(),
     // Cross-field validation function
     validate: ValidateFunctionSchema.optional(),
     // Field-level validator function
     validator: ValidatorFunctionSchema.optional(),
+    // File upload configuration
+    accept: z.string().optional(),
+    maxFileSize: z.number().optional(),
+    uploadUrl: z.string().optional(),
+    deleteUrl: z.string().optional(),
     // For date fields: if true, disallows future and current dates
     noFutureDate: z.boolean().optional(),
   })
