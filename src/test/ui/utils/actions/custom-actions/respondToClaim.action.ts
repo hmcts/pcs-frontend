@@ -398,23 +398,41 @@ export class RespondToClaimAction implements IAction {
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
     const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
     const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
-
-    if (
-      tenancyType === 'assured tenancy' ||
-      tenancyType === 'introductory tenancy' ||
-      tenancyType === 'secure tenancy' ||
-      tenancyType === 'flexible tenancy' ||
-      tenancyType === 'demoted tenancy'
-    ) {
-      await performValidation('text', {
-        elementType: 'listItem',
-        text: `The property is let under ${article} ${tenancyType} agreement`,
-      });
-    } else if (tenancyType === 'other') {
-      await performValidation('text', {
-        elementType: 'listItem',
-        text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
-      });
+    if (process.env.WALES_POSTCODE === 'YES') {
+      if (tenancyType === 'secure contract') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under a secure occupation contract`,
+        });
+      } else if (tenancyType === 'standard contract') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under a standard occupation contract`,
+        });
+      } else if (tenancyType === 'other') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+        });
+      }
+    } else {
+      if (
+        tenancyType === 'assured tenancy' ||
+        tenancyType === 'introductory tenancy' ||
+        tenancyType === 'secure tenancy' ||
+        tenancyType === 'flexible tenancy' ||
+        tenancyType === 'demoted tenancy'
+      ) {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under ${article} ${tenancyType} agreement`,
+        });
+      } else if (tenancyType === 'other') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+        });
+      }
     }
     await performAction('clickRadioButton', {
       question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,

@@ -90,9 +90,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
       radioOption: writtenTerms.noRadioOption,
     });
-    await performValidation('mainHeader', tenancyTypeDetails.mainHeader);
-    await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
-    await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.noRadioOption,
       day: '01',
