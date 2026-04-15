@@ -5,7 +5,7 @@ import multer, { memoryStorage } from 'multer';
 
 import { oidcMiddleware } from '../middleware';
 
-import type { CdamDocument, CdamUploadResponse } from '@interfaces/documentUpload.interface';
+import type { CdamDocument } from '@interfaces/documentUpload.interface';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { getTranslationFunction, loadStepNamespace } from '@modules/steps';
@@ -30,12 +30,20 @@ const upload = multer({
   },
 });
 
-function getCdamUrl(): string {
-  return config.get<string>('cdam.url');
+// All document calls go through pcs-api, which handles S2S token generation before calling CDAM.
+function getApiUrl(): string {
+  return config.get<string>('api.url');
 }
 
 function getUserToken(req: Request): string {
   return req.session?.user?.accessToken || '';
+}
+
+// Extracts the UUID from a CDAM document URL:
+// e.g. http://cdam.../cases/documents/11111111-1111-1111-1111-111111111111 → 11111111-...
+function extractDocumentId(documentUrl: string): string | undefined {
+  const match = /\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:\/|$)/i.exec(documentUrl);
+  return match?.[1];
 }
 
 async function uploadErrorMessages(req: Request): Promise<{ wrongType: string; tooLarge: string }> {
@@ -81,22 +89,22 @@ export default function documentUploadRoutes(app: Application): void {
         }
 
         const caseId = req.params.caseReference;
-        // Token comes from the authenticated OIDC session; used to authorize CDAM API calls.
+        // Token comes from the authenticated OIDC session.
+        // pcs-api will add the required S2S token before forwarding to CDAM.
         const userToken = getUserToken(req);
-        const cdamUrl = getCdamUrl();
+        const apiUrl = getApiUrl();
 
         const formData = new FormData();
         formData.append('files', file.buffer, {
           filename: file.originalname,
           contentType: file.mimetype,
         });
-        formData.append('classification', 'PUBLIC');
         formData.append('caseTypeId', config.get<string>('ccd.caseTypeId'));
         formData.append('jurisdictionId', 'PCS');
 
-        const response = await http.post<CdamUploadResponse>(
-          // Frontend-to-CDAM proxy call: file leaves browser -> frontend -> CDAM.
-          `${cdamUrl}/cases/documents`,
+        const response = await http.post<CdamDocument>(
+          // Frontend → pcs-api → CDAM. pcs-api generates the S2S token needed by CDAM.
+          `${apiUrl}/case/document/upload`,
           formData,
           {
             headers: {
@@ -106,9 +114,9 @@ export default function documentUploadRoutes(app: Application): void {
           }
         );
 
-        const uploadedDoc = response.data?.documents?.[0];
-        if (!uploadedDoc) {
-          logger.error('CDAM returned no document in response', { caseId });
+        const uploadedDoc = response.data;
+        if (!uploadedDoc?.document_url) {
+          logger.error('pcs-api returned no document in response', { caseId });
           return res.status(502).json({
             error: { message: 'Document service did not return a valid response' },
           });
@@ -120,8 +128,8 @@ export default function documentUploadRoutes(app: Application): void {
           document_url: uploadedDoc.document_url,
           document_binary_url: uploadedDoc.document_binary_url,
           document_filename: filename,
-          content_type: file.mimetype,
-          size: file.size,
+          content_type: uploadedDoc.content_type ?? file.mimetype,
+          size: uploadedDoc.size ?? file.size,
         };
 
         logger.info('Document uploaded to CDAM', { caseId, filename });
@@ -157,8 +165,8 @@ export default function documentUploadRoutes(app: Application): void {
     oidcMiddleware,
     async (req: Request, res: Response) => {
       try {
-        // MOJ component sends { delete: <document_url> } — we put document_url as the
-        // delete button value so it arrives here for the CDAM proxy call.
+        // MOJ component sends { delete: <document_url> } — we stored document_url as
+        // the delete button value so we can extract the UUID and call pcs-api.
         const documentUrl = (req.body as Record<string, string>).delete || '';
         if (!documentUrl) {
           return res.status(400).json({
@@ -166,9 +174,18 @@ export default function documentUploadRoutes(app: Application): void {
           });
         }
 
-        const userToken = getUserToken(req);
+        const documentId = extractDocumentId(documentUrl);
+        if (!documentId) {
+          return res.status(400).json({
+            error: { message: 'Could not extract document ID from URL' },
+          });
+        }
 
-        await http.delete(documentUrl, {
+        const userToken = getUserToken(req);
+        const apiUrl = getApiUrl();
+
+        // Frontend → pcs-api → CDAM. pcs-api generates the S2S token needed by CDAM.
+        await http.delete(`${apiUrl}/case/document/${documentId}`, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -176,7 +193,7 @@ export default function documentUploadRoutes(app: Application): void {
 
         logger.info('Document deleted from CDAM', {
           caseId: req.params.caseReference,
-          documentUrl,
+          documentId,
         });
 
         return res.json({ success: true, documentUrl });

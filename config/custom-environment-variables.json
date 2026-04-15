@@ -71,8 +71,5 @@
   },
   "xui": {
     "uri": "XUI_BASE_URI"
-  },
-  "cdam": {
-    "url": "CDAM_URL"
   }
 }
