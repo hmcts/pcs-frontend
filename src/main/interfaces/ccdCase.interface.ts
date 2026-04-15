@@ -160,6 +160,7 @@ export interface CcdCaseData {
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
+  otherLicenceTypeDetails?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
