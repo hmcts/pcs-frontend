@@ -209,7 +209,9 @@ export const step: StepDefinition = createFormStep({
       radio.component.label.text = prepopulateHeading;
       radio.component.fieldset.legend.text = prepopulateHeading;
       radio.component.fieldset.legend.isPageHeading = true;
-      radio.component.hint.text = t('legend.hint', { claimantName });
+      if (radio.component.hint) {
+        radio.component.hint.text = t('legend.hint', { claimantName });
+      }
     }
 
     // TODO: Refactor to avoid mutating module-scoped `fieldsConfig` per request.

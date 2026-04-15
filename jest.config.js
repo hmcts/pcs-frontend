@@ -19,6 +19,8 @@ module.exports = {
     '^@utils/(.*)$': '<rootDir>/src/main/utils/$1',
     '^jose$': '<rootDir>/src/test/unit/modules/s2s/__mocks__/jose.ts',
     '^uuid$': '<rootDir>/src/test/unit/__mocks__/uuid.ts',
+    '^@hmcts-cft/cft-ui-component-lib$': '<rootDir>/src/test/unit/__mocks__/cft-ui-component-lib.ts',
+    '^@hmcts-cft/cft-ui-component-lib/(.*)$': '<rootDir>/src/test/unit/__mocks__/cft-ui-macro.njk',
   },
   testPathIgnorePatterns: ['/__mocks__/'],
   coverageProvider: 'v8',
