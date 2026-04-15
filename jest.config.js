@@ -11,7 +11,6 @@ module.exports = {
     '^glob$': '<rootDir>/src/test/unit/modules/nunjucks/__mocks__/glob.ts',
     '^@steps$': '<rootDir>/src/main/steps',
     '^@app/(.*)$': '<rootDir>/src/main/app/$1',
-    '^@interfaces/(.*)$': '<rootDir>/src/main/interfaces/$1',
     '^@router/(.*)$': '<rootDir>/src/main/router/$1',
     '^@routes/(.*)$': '<rootDir>/src/main/routes/$1',
     '^@modules/(.*)$': '<rootDir>/src/main/modules/$1',

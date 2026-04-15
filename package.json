@@ -49,7 +49,6 @@
     "@middleware": "dist/main/middleware",
     "@steps": "dist/main/steps",
     "@app": "dist/main/app",
-    "@interfaces": "dist/main/interfaces",
     "@router": "dist/main/router"
   },
   "dependencies": {
