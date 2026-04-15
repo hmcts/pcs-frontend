@@ -8,10 +8,10 @@ import { createFormStep, getTranslationFunction } from '@modules/steps';
 
 function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): YesNoValue | undefined {
   if (value === 'yes') {
-    return 'Yes';
+    return 'YES';
   }
   if (value === 'no') {
-    return 'No';
+    return 'NO';
   }
   return undefined;
 }
