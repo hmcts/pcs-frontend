@@ -23,6 +23,7 @@ import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
+import { step as otherConsiderations } from './other-considerations';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
@@ -65,6 +66,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'upload-document': uploadDocument,
+  'other-considerations': otherConsiderations,
   'counter-claim': counterClaim,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
