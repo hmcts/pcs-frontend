@@ -9,7 +9,7 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'Yes' } }),
+            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'YES' } }),
           },
         },
       } as unknown as Request;
@@ -159,13 +159,13 @@ describe('isNoticeServed', () => {
         session: {
           ccdCase: {
             data: {
-              noticeServed: 'Yes', // Old path - should NOT be used
+              noticeServed: 'YES', // Old path - should NOT be used
             },
           },
         },
         res: {
           locals: {
-            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'No' } }), // Correct path - should be used
+            validatedCase: new CcdCaseModel({ id: '', data: { noticeServed: 'NO' } }), // Correct path - should be used
           },
         },
       } as unknown as Request;
@@ -185,7 +185,7 @@ describe('isNoticeServed', () => {
             validatedCase: new CcdCaseModel({
               id: '1771456429013468',
               data: {
-                noticeServed: 'Yes',
+                noticeServed: 'YES',
                 rentArrears_Total: '22222200',
                 legislativeCountry: 'England',
                 notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01',
