@@ -439,10 +439,6 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'installment-payments': {
       previousStep: 'repayments-agreed',
-      defaultNext: 'your-household-and-circumstances',
-    },
-    'your-household-and-circumstances': {
-      previousStep: 'repayments-agreed',
       routes: [
         {
           condition: async (
