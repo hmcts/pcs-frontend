@@ -5,7 +5,7 @@
   "noticeText": "You cannot apply to suspend (stop or delay) the eviction online.",
   "noticeTextByPost": "You must apply by post: ",
   "noticeTextList": {
-    "readTheGuidance": "<a href=\"https://www.gov.uk/guidance/suspend-eviction-online\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">read the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)</a>",
+    "readTheGuidance": "<a href=\"https://www.gov.uk/repossession/delay-eviction\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">read the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)</a>",
     "fillInTheForm": "<a href=\"https://www.gov.uk/government/publications/form-n244-application-notice\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">fill in the N244a form</a>",
     "findYourLocalCourt": "<a href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">find your local court</a>",
     "sendTheFormToTheCourt": "send the completed form to the court, or deliver it by hand"
