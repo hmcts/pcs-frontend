@@ -229,6 +229,9 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       return new URL(url).pathname.split('/').filter(Boolean)[0] === 'dashboard';
     } catch {
       return /\/dashboard(\/|$)/.test(url);
+    }
+  }
+
   private async runVisibilityValidation(page: Page, pageName: string, pftFilePath: string): Promise<void> {
     delete require.cache[require.resolve(pftFilePath)];
     const pftModule = require(pftFilePath);
