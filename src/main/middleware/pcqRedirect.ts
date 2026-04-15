@@ -34,8 +34,8 @@ export function pcqRedirectMiddleware() {
       return next();
     }
 
-    if (ccdCase?.userPcqIdSet === 'Yes') {
-      logger.debug('User already have PcqId set');
+    if (ccdCase?.userPcqIdSet === 'YES') {
+      logger.debug('User already has PcqId set');
       return next();
     }
 
