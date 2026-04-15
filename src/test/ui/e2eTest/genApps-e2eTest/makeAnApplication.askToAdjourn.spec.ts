@@ -15,12 +15,14 @@ import {
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
+import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
+  FieldsStore.clear();
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
   await performAction('fetchPINsAPI');
