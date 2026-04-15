@@ -52,8 +52,8 @@ export async function uploadDocument(file: Express.Multer.File, userToken: strin
 
 export async function deleteDocument(documentUrl: string, userToken: string): Promise<void> {
   const documentId = documentUrl.split('/documents/').pop();
-  if (!documentId) {
-    throw new Error('Could not extract document ID from URL');
+  if (!documentId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(documentId)) {
+    throw new Error('Invalid document ID');
   }
 
   const cdamUrl = getCdamUrl();

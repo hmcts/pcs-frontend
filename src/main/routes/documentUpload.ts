@@ -75,7 +75,6 @@ export default function documentUploadRoutes(app: Application): void {
         return res.json({
           success: {
             messageText: `${document.document_filename} has been uploaded`,
-            messageHtml: `${document.document_filename} has been uploaded`,
           },
           file: {
             filename: document.document_url,

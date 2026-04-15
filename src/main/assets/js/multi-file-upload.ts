@@ -84,7 +84,7 @@ function installCsrfInterceptor(): void {
     ...rest: unknown[]
   ) {
     const urlStr = String(url);
-    if (urlStr.includes('/upload') || urlStr.includes('/delete')) {
+    if (urlStr.includes('/upload-document/upload') || urlStr.includes('/upload-document/delete')) {
       needsCsrf.add(this);
     }
     return originalOpen.call(this, method, url, ...rest);
@@ -230,6 +230,10 @@ function initContainer(container: HTMLElement): void {
 }
 
 export function initMultiFileUpload(): void {
+  const containers = document.querySelectorAll<HTMLElement>('[data-module="moj-multi-file-upload"]');
+  if (containers.length === 0) {
+    return;
+  }
   installCsrfInterceptor();
-  document.querySelectorAll<HTMLElement>('[data-module="moj-multi-file-upload"]').forEach(initContainer);
+  containers.forEach(initContainer);
 }
