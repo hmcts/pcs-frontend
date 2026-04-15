@@ -1,6 +1,7 @@
 {
   "caption": "cyRespond to a property possession claim",
-  "pageTitle": "cyTenancy, occupation contract or licence start date",
+  "pageTitle": "cyRental agreement start",
+  "heading": "cyTenancy, occupation contract or licence start date",
   "question": "cyIs the tenancy, licence or occupation contract start date correct?",
   "subHeading": "cyDetails given by {{claimantName}}:",
   "bulletPoint": "cyYour tenancy, occupation contract or licence began on {{tenancyStartDate}}",

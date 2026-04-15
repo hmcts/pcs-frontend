@@ -25,6 +25,7 @@
     "cancel": "Cancel",
     "finish": "Start a new application",
     "start": "Start",
+    "startNow": "Start now",
     "submit": "Submit"
   },
   "options": {
@@ -43,6 +44,10 @@
     "day": "Day",
     "month": "Month",
     "year": "Year"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   },
   "errors": {
     "title": "There is a problem",
@@ -99,17 +104,6 @@
     "minutes": "minutes",
     "second": "second",
     "seconds": "seconds"
-  },
-  "characterCount": {
-    "charactersUnderLimitText": {
-      "one": "You have %{count} character remaining",
-      "other": "You have %{count} characters remaining"
-    },
-    "charactersAtLimitText": "You have reached the limit",
-    "charactersOverLimitText": {
-      "one": "You have %{count} character too many",
-      "other": "You have %{count} characters too many"
-    }
   },
   "errorPages": {
     "403": {

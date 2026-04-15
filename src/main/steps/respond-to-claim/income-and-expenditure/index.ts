@@ -1,9 +1,9 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils/yesNoEnum';
 import { flowConfig } from '../flow.config';
 
+import type { PossessionClaimResponse } from '@interfaces/ccdCase.interface';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({

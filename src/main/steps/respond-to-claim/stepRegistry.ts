@@ -1,5 +1,3 @@
-import type { StepDefinition } from '../../interfaces/stepFormData.interface';
-
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
@@ -19,6 +17,7 @@ import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
 import { step as endNow } from './end-now';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
+import { step as howMuchAffordToPay } from './how-much-afford-to-pay';
 import { step as incomeAndExpenses } from './income-and-expenditure';
 import { step as installmentPayments } from './installment-payments';
 import { step as landlordLicensed } from './landlord-licensed';
@@ -42,6 +41,8 @@ import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 import { step as uploadDocs } from './upload-docs';
 import { step as writtenTerms } from './written-terms';
+
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
@@ -71,6 +72,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
   'installment-payments': installmentPayments,
+  'how-much-afford-to-pay': howMuchAffordToPay,
   'your-household-and-circumstances': yourHouseholdAndCircumstances,
   'do-you-have-any-dependant-children': doYouHaveAnyDependantChildren,
   'do-you-have-any-other-dependants': doYouHaveAnyOtherDependants,
