@@ -9,7 +9,7 @@ import type {
   ComponentType,
   FormFieldConfig,
   FormFieldOption,
-} from '@interfaces/formFieldConfig.interface';
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 function createFieldsetLegend(
   label: string,
