@@ -87,18 +87,17 @@ export class CreateCaseAPIAction implements IAction {
       const payload = caseUserRoleDeletionApiData.deleteCaseUsersPayload(caseId, userId, caseRole);
       await deleteCaseUsersApi.delete(caseUserRoleDeletionApiData.deleteCaseUsersApiEndPoint, { data: payload });
       console.log(`\n✅ CASE USER CLEANUP:`);
-      console.log(`   Successfully removed case user with role ${caseRole} from case ${caseId}`);
+      console.log(`   Successfully removed case user with role ${caseRole}`);
     } catch (error: unknown) {
       const status = Axios.isAxiosError(error) ? error.response?.status : undefined;
-      const errorContext = `Case ID: ${caseId}`;
       if (status === 404) {
-        console.warn(`Case user removal failed: case or user not found (404). ${errorContext}`);
+        console.warn('Case user removal failed: case or user not found (404).');
       } else if (status === 403) {
-        console.warn(`Case user removal failed: insufficient permissions (403). ${errorContext}`);
+        console.warn('Case user removal failed: insufficient permissions (403).');
       } else if (!status) {
         console.warn('Case user removal failed: no response from server.');
       } else {
-        console.warn(`Case user removal failed with status ${status}. ${errorContext}`);
+        console.warn(`Case user removal failed with status ${status}.`);
       }
     }
   }
