@@ -78,7 +78,7 @@ describe('respond-to-claim priority-debts step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          priorityDebts: 'Yes',
+          priorityDebts: 'YES',
         },
       },
     });

@@ -56,7 +56,7 @@ describe('respond-to-claim regular-income flow routing', () => {
     expect(noResult).toBe(true);
   });
 
-  it('falls back to CCD when regularIncome is absent and householdCircumstances.universalCredit is yes', async () => {
+  it('treats missing regularIncome as not selected when evaluating regular-income submit route', async () => {
     if (!universalCreditRouteCondition || !noUniversalCreditRouteCondition) {
       throw new Error('expected regular-income route conditions');
     }
@@ -77,11 +77,13 @@ describe('respond-to-claim regular-income flow routing', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
+    req.path = '/case/123/respond-to-claim/what-regular-income-do-you-receive';
+
     const toPriority = await universalCreditRouteCondition(req, {}, {});
     const toUcQuestion = await noUniversalCreditRouteCondition(req, {}, {});
 
-    expect(toPriority).toBe(true);
-    expect(toUcQuestion).toBe(false);
+    expect(toPriority).toBe(false);
+    expect(toUcQuestion).toBe(true);
   });
 
   it('falls back to CCD when regularIncome is absent and universal credit is not indicated', async () => {
@@ -104,6 +106,8 @@ describe('respond-to-claim regular-income flow routing', () => {
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
+
+    req.path = '/some-other-route';
 
     const toPriority = await universalCreditRouteCondition(req, {}, {});
     const toUcQuestion = await noUniversalCreditRouteCondition(req, {}, {});

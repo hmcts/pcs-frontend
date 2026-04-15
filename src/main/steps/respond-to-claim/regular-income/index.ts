@@ -22,11 +22,14 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   beforeRedirect: async (req: Request) => {
     const universalCreditSelected = includesUniversalCreditSelection(req.body?.regularIncome);
+    if (!universalCreditSelected) {
+      return;
+    }
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: toYesNoEnum(universalCreditSelected ? 'yes' : 'no'),
+          universalCredit: toYesNoEnum('yes'),
         },
       },
     };

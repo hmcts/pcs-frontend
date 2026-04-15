@@ -15,10 +15,15 @@ async function isUniversalCreditSelectedForRegularIncomeRouting(
   req: Request,
   currentStepData: Record<string, unknown>
 ): Promise<boolean> {
+  if (req.path?.includes('/what-regular-income-do-you-receive')) {
+    return formRegularIncomeIncludesUniversalCredit(currentStepData.regularIncome);
+  }
+
   const fromForm = currentStepData.regularIncome;
   if (fromForm !== undefined && fromForm !== null) {
     return formRegularIncomeIncludesUniversalCredit(fromForm);
   }
+
   return hasSelectedUniversalCredit(req);
 }
 
