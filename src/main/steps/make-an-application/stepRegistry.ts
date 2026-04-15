@@ -1,5 +1,3 @@
-import type { StepDefinition } from '../../interfaces/stepFormData.interface';
-
 import { step as applicationSubmitted } from './application-submitted';
 import { step as areThereAnyReasonsThatThisApplicationShouldNotBeShared } from './are-there-any-reasons-that-this-application-should-not-be-shared';
 import { step as askToMakeAnOrder } from './ask-the-court-to-make-an-order';
@@ -16,6 +14,8 @@ import { step as uploadDocumentsToSupportYourApplication } from './upload-docume
 import { step as whatOrderDoYouWantTheCourtToMakeAndWhy } from './what-order-do-you-want-the-court-to-make-and-why';
 import { step as whichLanguageDidYouUseToCompleteThisService } from './which-language-did-you-use-to-complete-this-service';
 import { step as youNeedToApplyForHelpWithYourApplicationFee } from './you-need-to-apply-for-help-with-your-application-fee';
+
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'choose-an-application': chooseAnApplication,

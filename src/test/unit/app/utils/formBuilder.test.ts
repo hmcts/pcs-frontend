@@ -1,9 +1,9 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
-import { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 import { type FormBuilderConfig, createFormStep } from '@modules/steps';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 const mockGetFormData = jest.fn();
 const mockSetFormData = jest.fn();
