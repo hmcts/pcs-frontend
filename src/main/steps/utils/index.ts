@@ -8,6 +8,14 @@ export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getPreviousPageForArrears } from './journeyHelpers';
 export { getStepBeforeDisputePages } from './journeyHelpers';
+export {
+  getFirstStepInSection,
+  getSectionCoverage,
+  getSectionForStep,
+  getStepsInSection,
+  isLastStepInSection,
+  isSectionApplicable,
+} from './sections';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
 export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';

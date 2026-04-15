@@ -12,6 +12,8 @@ import {
   isWelshProperty,
 } from '../utils';
 
+import { respondToClaimSections } from './sections.config';
+
 import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
@@ -58,6 +60,7 @@ export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
   useSessionFormData: false,
+  sections: respondToClaimSections,
   stepOrder: [
     'start-now',
     'free-legal-advice',
