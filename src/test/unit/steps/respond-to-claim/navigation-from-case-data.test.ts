@@ -14,15 +14,13 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     const normalizedValidatedCase = includesNestedData ? validatedCase : { ...validatedCase, data: validatedCase };
 
-    return (
-    ({
+    return {
       res: {
         locals: {
           validatedCase: normalizedValidatedCase,
         },
       },
-    }) as unknown as Request
-    );
+    } as unknown as Request;
   };
 
   it('routes contact preferences telephone step from current step answer when provided', async () => {

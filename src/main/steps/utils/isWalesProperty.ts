@@ -15,9 +15,7 @@ import type { CcdCaseData } from '@services/ccdCase.interface';
  */
 export function isWalesProperty(req: Request): boolean;
 export function isWalesProperty(caseData: CcdCaseData | Record<string, unknown> | undefined): boolean;
-export function isWalesProperty(
-  reqOrCaseData: Request | CcdCaseData | Record<string, unknown> | undefined
-): boolean {
+export function isWalesProperty(reqOrCaseData: Request | CcdCaseData | Record<string, unknown> | undefined): boolean {
   const caseData =
     reqOrCaseData && 'res' in reqOrCaseData
       ? (reqOrCaseData as Request).res?.locals?.validatedCase?.data
