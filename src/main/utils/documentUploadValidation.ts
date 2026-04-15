@@ -1,3 +1,6 @@
+import type { CcdCollectionItem, CcdDocumentReference } from '@interfaces/ccdCase.interface';
+import type { CdamDocument } from '@interfaces/documentUpload.interface';
+
 export const UPLOAD_MAX_FILE_SIZE_BYTES = 1024 * 1024 * 1024;
 export const UPLOAD_MAX_FILE_SIZE_MB = 1024;
 
@@ -84,6 +87,60 @@ export function isBlockedExtension(filename: string): boolean {
 }
 
 export type UploadFileValidationResult = 'ok' | 'blocked_media' | 'invalid_type';
+
+// Shared by any step that uses the MOJ multi-file upload component. Import
+export function parseUploadedDocuments(body: Record<string, unknown>): CdamDocument[] {
+  const raw = body['uploadedDocuments[]'];
+  if (!raw) {
+    return [];
+  }
+
+  const items = Array.isArray(raw) ? raw : [raw];
+  const documents: CdamDocument[] = [];
+
+  for (const item of items) {
+    try {
+      const parsed = typeof item === 'string' ? JSON.parse(item) : item;
+      if (parsed?.document_url && parsed?.document_binary_url && parsed?.document_filename) {
+        const doc: CdamDocument = {
+          document_url: parsed.document_url,
+          document_binary_url: parsed.document_binary_url,
+          document_filename: parsed.document_filename,
+        };
+        if (typeof parsed.content_type === 'string' && parsed.content_type) {
+          doc.content_type = parsed.content_type;
+        }
+        const sizeNum = typeof parsed.size === 'number' ? parsed.size : Number(parsed.size);
+        if (!Number.isNaN(sizeNum) && sizeNum >= 0) {
+          doc.size = sizeNum;
+        }
+        documents.push(doc);
+      }
+    } catch {
+      // Skip malformed entries
+    }
+  }
+
+  return documents;
+}
+
+// Maps normalised CdamDocument objects to the CCD collection format expected by defendantUploadedDocuments
+export function toCcdDocumentCollection(docs: CdamDocument[]): CcdCollectionItem<CcdDocumentReference>[] {
+  return docs.map(doc => {
+    const value: CcdDocumentReference = {
+      document_url: doc.document_url,
+      document_binary_url: doc.document_binary_url,
+      document_filename: doc.document_filename,
+    };
+    if (doc.content_type !== undefined && doc.content_type !== null) {
+      value.content_type = doc.content_type;
+    }
+    if (doc.size !== undefined && doc.size !== null) {
+      value.size = doc.size;
+    }
+    return { value };
+  });
+}
 
 export function validateUploadFile(mimetype: string, originalname: string): UploadFileValidationResult {
   const ext = getFileExtensionLower(originalname);
