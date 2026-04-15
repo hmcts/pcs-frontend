@@ -1,5 +1,4 @@
 services:
-
   cache:
     image: hmctsprod.azurecr.io/imported/bitnami/redis:8.2.0
     ports:
