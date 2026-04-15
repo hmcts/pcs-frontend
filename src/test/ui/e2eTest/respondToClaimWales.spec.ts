@@ -42,6 +42,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else if (testInfo.title.includes('Standard')) {
     process.env.OCCUPATION_LICENCE_TYPE = 'STANDARD_CONTRACT';
   }
+  submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
   await performAction('fetchPINsAPI');
